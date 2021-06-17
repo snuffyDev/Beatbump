@@ -1,0 +1,35 @@
+$theme-colors: (
+    "dim": (
+        "base": rgb(9 9 10),
+        "top": rgb(20, 24, 32),
+        "bottom": rgb(20, 24, 32),
+        "side": #0b0c0f,
+        "forms": #181a1a86,
+    ),
+    "dark": (
+        "base": #030303,
+        "top": #111214,
+        "bottom": #111214,
+        "side": #0b0c0c,
+        "forms": #181a1a86,
+    ),
+    "old": (
+        "base": #0e1117,
+        "top": #151b25,
+        "bottom": #151b25,
+        "side": #11151c,
+        "forms": rgb(39 47 58),
+    ),
+    "ytm": (
+        "base": #030303,
+        "top": #030303,
+        "bottom": #121018,
+        "side": #1210183a,
+        "forms": #12101844,
+    ),
+);
+
+@function theme-color($key: "dark", $variant: "base") {
+    $map: map-get($theme-colors, $key);
+    @return map-get($map, $variant);
+}

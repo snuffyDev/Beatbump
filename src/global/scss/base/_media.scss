@@ -1,0 +1,19 @@
+// BASE MEDIA STYLES
+
+figure {
+	margin: 0;
+}
+
+img,
+picture {
+	margin: 0;
+	max-width: 100%;
+}
+
+img::before,
+video::before {
+	display: block;
+	content: '';
+	padding-top: calc(100% * 2 / 3);
+	/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
+}

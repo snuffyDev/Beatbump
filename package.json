@@ -1,0 +1,43 @@
+{
+	"name": "bumpbeat-master",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "svelte-kit dev --host --port 5000",
+		"cache:delete": "rmdir /S /Q build && rmdir /S /Q .svelte-kit",
+		"workers:deploy": "npm run cache:delete && npm run build && wrangler publish",
+		"deploy": "npm run build && wrangler publish",
+		"build": "svelte-kit build",
+		"start": "svelte-kit preview --host",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write ."
+	},
+	"devDependencies": {
+		"@babel/core": "^7.14.0",
+		"@sveltejs/adapter-cloudflare-workers": "next",
+		"@sveltejs/adapter-node": "next",
+		"@sveltejs/kit": "next",
+		"autoprefixer": "^10.2.5",
+		"babel-loader": "^8.2.2",
+		"cssnano": "^4.1.10",
+		"eslint": "^7.22.0",
+		"eslint-config-prettier": "^8.1.0",
+		"eslint-plugin-svelte3": "^3.1.0",
+		"postcss": "^8.2.7",
+		"postcss-load-config": "^3.0.1",
+		"postcss-uncss": "^0.17.0",
+		"prettier": "~2.2.1",
+		"prettier-plugin-svelte": "^2.2.0",
+		"sass": "^1.0.0",
+		"svelte": "^3.38.2",
+		"svelte-check": "^1.5.1",
+		"svelte-loader": "^3.1.1",
+		"svelte-preprocess": "^4.6.9",
+		"tslib": "^2.2.0",
+		"typescript": "^4.2.3",
+		"vite": "^2.1.0"
+	},
+	"type": "module",
+	"engines": {
+		"node": ">= 12.17.0"
+	}
+}

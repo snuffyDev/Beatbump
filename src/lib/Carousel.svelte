@@ -1,0 +1,319 @@
+<script lang="ts">
+	import Loading from './Loading.svelte'
+	import CarouselItem from './components/Carousel/CarouselItem.svelte'
+	export let setTitle
+	export let items = []
+	export let type = ''
+	import lazy from '$lib/lazy'
+	import { fade } from 'svelte/transition'
+	import { key } from '$lib/stores/stores'
+	import { trendingHandler } from '$lib/js/indexUtils'
+	import Icon from '$lib/Icon.svelte'
+	import { goto } from '$app/navigation'
+	import Dropdown from './Dropdown.svelte'
+
+	function splitArray(flatArray, numCols) {
+		const newArray = []
+		for (let c = 0; c < numCols; c++) {
+			newArray.push([])
+		}
+		for (let i = 0; i < flatArray.length; i++) {
+			const mod = i % numCols
+			newArray[mod].push(flatArray[i])
+		}
+		return newArray
+	}
+	let section = []
+	let arr = items
+	let carousel
+	// $: pos = 0
+	// console.log(items)
+	arr = splitArray(arr, 5)
+</script>
+
+<div class="header">
+	<h3>{setTitle}</h3>
+	<!-- <span>{type == 'trending' ? '(not fully implemented)' : '(not implemented)'}</span> -->
+</div>
+<div class="section">
+	<div class="scroll" id="scrollItem" bind:this={carousel}>
+		<!-- <span
+			on:click={() => {
+				console.log(section)
+				if (pos > 0) {
+					pos--
+
+					let child = section[pos].children
+					console.log(child.offsetLeft)
+					// console.log(section)
+					carousel.scrollLeft -= child[0].offsetLeft
+				}
+			}}
+			class="left"
+			><Icon name="chevron-left" size="2em" />
+		</span>
+		<span
+			class="right"
+			on:click={() => {
+				if (pos < section.length - 1) {
+					// console.log(section)
+					++pos
+					let child = section[pos]
+					console.log(child, child.offsetLeft)
+					// console.log(section)
+					carousel.scrollLeft += child.offsetLeft
+				}
+			}}><Icon name="chevron-right" size="2em" /></span
+		> -->
+		<!-- {#each arr as item, index} -->
+		<div class="contents" style="display:contents">
+			{#each items as item, i}
+				{#if type == 'trending'}
+					<!-- {JSON.stringify(item[1], title, thumbnail, subtitle)} -->
+					<CarouselItem {item} index={i} bind:section />
+				{:else if type == 'new'}
+					<!-- content here -->
+					<section
+						class="item"
+						on:click={() => {
+							console.log()
+							let id =
+								item.musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint
+									.browseId
+							let type =
+								item.musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint
+									.browseEndpointContextSupportedConfigs
+									.browseEndpointContextMusicConfig.pageType
+							goto(
+								'/release?type=' +
+									encodeURIComponent(type) +
+									'&id=' +
+									encodeURIComponent(id)
+							)
+						}}>
+						<!-- svelte-ignore a11y-missing-attribute -->
+						<div class="img">
+							<div class="container">
+								<img
+									transition:fade|local
+									width="256"
+									height="256"
+									type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+									data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PGRlZnM+PHBhdGggZD0iTTAgMGg1MTJ2NTEySDBWMHoiIGlkPSJwcmVmaXhfX2EiLz48L2RlZnM+PHVzZSB4bGluazpocmVmPSIjcHJlZml4X19hIiBvcGFjaXR5PSIuMjUiIGZpbGw9IiMyMjIiLz48L3N2Zz4="
+									use:lazy={{
+										src:
+											item.musicTwoRowItemRenderer.thumbnailRenderer
+												.musicThumbnailRenderer.thumbnail.thumbnails[0].url
+									}} />
+							</div>
+						</div>
+						<div class="cont">
+							<h6 class="title">
+								{item.musicTwoRowItemRenderer.title.runs[0].text}
+							</h6>
+							<span class="details">
+								{#each item.musicTwoRowItemRenderer.subtitle.runs as sub}
+									<span>{sub.text}</span>
+								{/each}
+							</span>
+						</div>
+					</section>
+				{/if}
+			{/each}
+		</div>
+		<!-- {/each} -->
+	</div>
+</div>
+
+<style lang="scss">
+	.item {
+		padding-bottom: 2em;
+	}
+	.details {
+		display: flex;
+		align-items: center;
+		margin-top: 3px;
+		display: block;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+	.menu {
+		position: absolute;
+		right: 0;
+		top: 55%;
+		padding-right: 0.8rem;
+	}
+	.title {
+		cursor: pointer;
+
+		text-overflow: ellipsis, 2px;
+		display: inline-block;
+		* {
+			text-overflow: ellipsis, 2px;
+
+			max-width: 10px;
+		}
+	}
+	#scrollItem {
+	}
+	.left,
+	.right {
+		> .feather,
+		.feather-chevron-left,
+		.feather-chevron-right {
+			width: 1.25rem;
+			height: 1.25rem;
+			stroke: black;
+			stroke-width: 5;
+			stroke-linecap: round;
+			stroke-linejoin: round;
+			fill: currentColor;
+		}
+		position: absolute;
+		color: white;
+		z-index: 50;
+		top: 50%;
+		padding: 1rem;
+		border-radius: 50%;
+
+		background: #0a0a0a6b;
+		transform: translateY(-50%);
+		transition: cubic-bezier(0.23, 1, 0.32, 1) 0.12s all;
+
+		&:hover {
+			background: #0a0a0abd;
+
+			transition: cubic-bezier(0.23, 1, 0.32, 1) 0.12s all;
+		}
+	}
+	.left {
+		left: 0;
+	}
+	.right {
+		right: 0;
+	}
+	main {
+		margin: 1.25rem;
+	}
+	.test {
+		background-color: theme-color('dark', 'top');
+	}
+	.section {
+		-webkit-overflow-scrolling: touch;
+		position: relative;
+
+		border-radius: 0.5em;
+		/* width: 100%; */
+		/* max-width: 100%; */
+		-ms-scroll-snap-type: x mandatory;
+		scroll-snap-type: x mandatory;
+		/* overflow: scroll;*/
+	}
+
+	.header {
+		padding: 0.5em;
+		// position: sticky;
+		// /* top: 0; */
+		// width: 100%;
+		// left: 0;
+		/* display: flow-root; */
+		/* right: 0; */
+	}
+	.scroll {
+		margin-bottom: 2.5rem;
+		// padding-bottom: 1.25rem;
+		@include scrim(#1f1a2c2c, 'to top', 0.4125);
+
+		grid-column-gap: 0.5rem;
+		overflow-y: hidden;
+		height: auto;
+		/* overflow-y: clip; */
+		display: grid;
+		// grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+		// grid-auto-rows: 1fr;
+		grid-auto-flow: column;
+		/* flex-direction: row; */
+		overflow-x: scroll;
+		grid-template-columns: repeat(auto, 1fr);
+
+		width: auto;
+		// /* flex: 1 1 auto; */
+		// box-shadow: 0 0 10px 3px rgb(0 0 0 / 13%),
+		// 	inset -2px -2px 20px 0 hsl(0deg 0% 57% / 10%),
+		// 	inset 0 0 11px 3px rgb(46 56 56 / 9%);
+
+		border-radius: inherit;
+		overflow-anchor: none;
+		-ms-scroll-snap-type: x mandatory;
+		scroll-snap-type: x mandatory;
+		-webkit-overflow-scrolling: touch;
+	}
+	.text-inline {
+		display: inline-flex;
+		align-items: center;
+	}
+	section {
+		padding-left: 1.5rem;
+		padding-right: 1.5rem;
+		padding-top: 1.5rem;
+		margin-bottom: 0;
+		display: block;
+		cursor: pointer;
+		content: '';
+
+		::before {
+			display: block;
+		}
+		/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
+	}
+	.item {
+		scroll-snap-align: start;
+		// min-height: 16.75rem;
+		height: auto;
+
+		// width: 16rem;
+	}
+
+	.img {
+		// position: relative;
+		/* width: 100%; */
+		/* height: clamp(10rem,12.5rem,15rem); */
+		/* min-width: 100%; */
+		// box-shadow: 0 0 1rem 0.5rem rgb(0 0 0 / 36%);
+		position: relative;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		max-height: 12.5rem;
+		min-width: 12.5rem;
+		border-radius: 2px;
+		overflow: hidden;
+
+		.container {
+			display: flex;
+			align-items: center;
+			width: 100%;
+			height: 100%;
+			img {
+				// height: inherit;
+				// -o-object-fit: scale-down;
+				// object-fit: scale-down;
+				// // max-height: 12rem;
+				// width: 100%;
+				// max-width: 18rem;
+				width: 100%;
+				height: 100%;
+				-o-object-fit: cover;
+				object-fit: cover;
+			}
+		}
+	}
+	.cont {
+		display: flex;
+		flex-direction: column;
+		margin-top: 0.8571rem;
+		padding-right: 1em;
+	}
+	.scroll-container {
+	}
+</style>

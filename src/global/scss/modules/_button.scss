@@ -1,0 +1,129 @@
+// BASE BUTTON STYLES
+// All rules related to the .button module
+
+%button-base {
+	transition: background, 0.2s;
+	// display: inline-block;
+	padding: 0.5em 1em;
+	color: #fff !important; // !important is added to colors in order to make button utility immutable.  Otherwise, it's common for `a` styles to override button specificity.
+	background-color: $color-primary !important;
+	border: 1px solid $color-primary;
+	border-radius: $base-border-radius;
+	font-size: 1.2em;
+	font-weight: 400;
+	text-transform: none;
+	text-align: center;
+	vertical-align: middle;
+	white-space: nowrap;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
+	// &:focus {
+	//     outline: thin dotted #333;
+	//     outline-offset: -2px;
+	// }
+
+	&:hover,
+	&:active,
+	&.active {
+		color: #fff;
+		// background-color: lighten($base-color, 10%) !important;
+		border-color: $base-color !important;
+		outline: 0;
+		text-decoration: none;
+	}
+}
+
+// Button Types
+////////////////////////////////
+
+// Main Button
+.button {
+	@extend %button-base;
+}
+button {
+	@extend %button-base;
+}
+// Secondary Button
+.button--secondary {
+	@extend %button-base;
+	color: $color-secondary !important;
+	background-color: transparent !important;
+	border-color: $color-secondary !important;
+
+	&:hover,
+	&:focus,
+	&:active,
+	&.active {
+		background-color: lighten($color-secondary, 30) !important;
+		border-color: $color-secondary !important;
+	}
+}
+.button--outlined {
+	@extend %button-base;
+	color: $color-primary !important;
+	background-color: transparent !important;
+	border-color: $color-primary !important;
+
+	&:hover {
+		background-color: transparentize($color-active, 0.95) !important;
+	}
+	&:active,
+	&.active {
+		color: $color-active !important;
+
+		background-color: transparentize($color-primary, 0.8) !important;
+		border-color: $color-primary !important;
+	}
+}
+
+.button--primary {
+	@extend %button-base;
+
+	background-color: $color-primary !important;
+}
+.button--darker {
+	@extend %button-base;
+	border-color: $color-secondary !important;
+	background-color: $color-secondary !important;
+}
+// Button Sizes
+////////////////////////////////
+
+.button--large {
+	@extend %button-base;
+	font-size: 1.25em !important;
+}
+
+.button--small {
+	@extend %button-base;
+	font-size: 0.875em !important;
+}
+
+.button--tiny {
+	@extend %button-base;
+	font-size: 0.757em !important;
+}
+
+.button--block {
+	@extend %button-base;
+	display: block !important;
+	width: 100% !important;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+}
+
+// Special Links
+////////////////////////////////
+
+.button--link:after {
+	position: relative;
+	top: -0.05em;
+	left: 0.25em;
+	content: '›';
+	font-size: 1em;
+	line-height: 0;
+}

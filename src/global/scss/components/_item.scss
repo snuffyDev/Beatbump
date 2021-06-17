@@ -1,0 +1,291 @@
+@import './mixins';
+
+.vid {
+	position: absolute;
+	bottom: 0;
+	z-index: 5;
+}
+.hidden {
+	display: none !important;
+	position: absolute;
+	bottom: 0;
+}
+
+img.backdrop {
+	width: auto;
+	max-width: 100%;
+	display: none !important;
+}
+.thumbnail-text {
+	color: #fcfcfd;
+	font-size: 1.125em;
+	line-height: 1.75;
+
+	text-decoration: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	text-overflow: ellipsis;
+	position: relative;
+	bottom: 0;
+	text-overflow: ellipsis;
+	position: relative;
+	bottom: 0;
+	left: 0;
+	/* margin-top: 0.5em; */
+
+	&:active,
+	&:visited,
+	&:hover {
+		color: rgb(247, 245, 245);
+	}
+}
+.title {
+	display: block;
+	height: auto;
+	// max-height: 100vh;
+
+	z-index: 5;
+
+	position: absolute;
+	bottom: 0;
+	padding-right: 5%;
+	left: 0;
+	right: 0;
+	padding-left: 3%;
+	padding-bottom: 95%;
+	padding-top: 5%;
+	width: auto;
+	max-width: 95%;
+	// mix-blend-mode: overlay;
+	// background: rgba(18, 18, 24, 0.308);
+	// background: linear-gradient(0deg, rgba(18, 18, 24, 0.726) 35%, rgba(136, 136, 136, 0.06066176470588236) 100%);
+	.text {
+		position: absolute;
+		bottom: 0;
+		font-size: 1.1rem;
+		font-weight: 500;
+
+		text-shadow: 2px 2px 2px black;
+		text-transform: capitalize;
+
+		z-index: 5;
+	}
+}
+.container {
+	-webkit-box-flex: 1;
+	display: flex;
+	width: auto;
+	flex: 1 1 auto;
+	isolation: isolate;
+	padding: 0.5em;
+	background: #121315;
+	border-radius: 2.5%;
+	max-width: 15rem;
+	min-width: 15rem;
+	line-height: 1.5;
+
+	min-height: 15rem;
+	.img-container {
+		cursor: pointer;
+
+		overflow: hidden;
+		height: auto;
+		max-width: 15rem;
+		height: auto;
+		max-height: 15rem;
+		border-radius: 2.5%;
+		z-index: 5;
+		position: relative;
+
+		@include scrimGradient(#2929293b, 'to top right');
+
+		&::before {
+			position: absolute;
+			content: '';
+			top: 0;
+			right: 0;
+
+			bottom: 0;
+			left: 0;
+			@include scrimGradient(rgba(19, 19, 19, 0.808), 'to top right');
+			z-index: 5;
+			transition: all cubic-bezier(0.42, 0, 0.58, 1) 0.2s !important;
+			opacity: 1;
+		}
+
+		&:hover::before {
+			transition: all cubic-bezier(0.42, 0, 0.58, 1) 0.15s !important;
+
+			opacity: 0.6;
+			z-index: 5;
+			// 	-180deg,
+			// 	rgba(0, 0, 0, 0.171) 32%,
+			// 	rgba(70, 70, 70, 0.253),
+			// 	rgba(0, 0, 0, 0.596) 75%
+			// );
+
+			.text * {
+				z-index: 5;
+
+				bottom: 0;
+				color: rgb(241, 241, 241) !important;
+				text-shadow: 1px 1px 3px black;
+			}
+		}
+		// position:relative;
+		.thumbnail + img {
+			position: absolute;
+			top: 0;
+			right: 0;
+			left: 0;
+		}
+	}
+	.innercard {
+		height: auto;
+		width: auto;
+		max-width: 15rem;
+		max-height: 15rem;
+		min-width: 100%;
+		min-height: 100%;
+	}
+	img::before,
+	video::before {
+		display: block;
+		content: '';
+		padding-top: calc(100% * 2 / 3);
+		/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
+	}
+	img:not(.backdrop) {
+		z-index: 5;
+		width: auto;
+		isolation: isolate;
+		object-fit: contain;
+		height: auto;
+		border-radius: 0.1em !important;
+		max-height: 15rem;
+		object-fit: cover;
+		height: auto;
+		border-radius: 0.1em !important;
+		max-height: 15rem;
+		height: 100%;
+	}
+}
+
+@media screen and (max-width: 640px) {
+	.title {
+		display: block;
+		height: auto;
+		// max-height: 100vh;
+
+		z-index: 5;
+		height: auto;
+		max-height: 2em;
+		max-width: 100%;
+		min-width: 15ch;
+		min-width: 15ch;
+		position: absolute;
+		padding: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		font-weight: 600;
+		padding-bottom: 100%;
+
+		background: none !important;
+		.thumbnail-text {
+			font-size: 1.1325rem;
+			text-shadow: black 0px 0px 5px;
+			font-weight: 600;
+
+			max-width: 100%;
+
+			width: auto;
+			min-width: auto;
+			background-clip: text;
+
+			background-color: #151b25b2;
+			min-width: 50%;
+			object-fit: contain;
+			word-wrap: break-word;
+			border-radius: 0.2em;
+			/* padding-inline: 10.25em; */
+			padding: 0.3em;
+			> * {
+				font-size: 1.125em;
+			}
+			/* padding: 0.1em; */
+		}
+	}
+	.container {
+		max-height: auto;
+		max-width: 100%;
+		margin-bottom: 2em;
+		.img-container {
+			max-width: 100%;
+			min-width: 100%;
+			// background: rgba(18, 18, 24, 0.308);
+			// background: linear-gradient(0deg, rgba(18, 18, 24, 0.726) 35%, rgba(136, 136, 136, 0.06066176470588236) 100%);
+			@include scrimGradient(#181818, 'to top right');
+		}
+		.innercard {
+			max-width: 100%;
+			min-width: 100%;
+		}
+
+		img:not(.backdrop) {
+			max-width: 100%;
+			min-width: 100%;
+			z-index: 1;
+			object-fit: contain;
+			filter: brightness(1) contrast(1) saturate(1)
+				drop-shadow(0px 0px 0.3em rgba(0, 0, 0, 0.815));
+		}
+		.backdrop {
+			object-fit: cover;
+			filter: blur(5px) brightness(0.9);
+			z-index: -1;
+			width: 100%;
+			height: 100%;
+			min-width: 15ch;
+
+			align-self: center;
+			height: min-content;
+			display: block !important;
+			/* position: relative; */
+		}
+	}
+	.text {
+		position: absolute;
+		bottom: 0;
+		font-size: 1.125rem;
+		font-weight: 500;
+		position: absolute;
+		min-width: 100%;
+		bottom: 0;
+		padding: 2%;
+		padding-bottom: 0;
+		text-shadow: 2px 2px 2px black;
+		text-transform: capitalize;
+		text-shadow: 0px 0px 10px black;
+		text-transform: capitalize;
+		background: rgb(0, 0, 0);
+		background: -moz-radial-gradient(
+			circle,
+			rgba(0, 0, 0, 0.46122198879551823) 52%,
+			rgba(136, 136, 136, 0.06066176470588236) 99%
+		);
+		background: -webkit-radial-gradient(
+			circle,
+			rgba(0, 0, 0, 0.46122198879551823) 52%,
+			rgba(136, 136, 136, 0.06066176470588236) 99%
+		);
+		background: radial-gradient(
+			circle,
+			rgba(0, 0, 0, 0.46122198879551823) 52%,
+			rgba(136, 136, 136, 0.06066176470588236) 99%
+		);
+		z-index: 2;
+	}
+}

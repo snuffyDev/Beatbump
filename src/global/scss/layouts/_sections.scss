@@ -1,0 +1,21 @@
+// SITE SECTIONS
+// The basic section or 'row' that a fixed container may live in
+
+%section {
+	position: relative;
+	padding: $large-spacing 0;
+	z-index: 99;
+}
+
+// basic section
+.l-section {
+	@extend %section;
+	background: $base-background-color;
+}
+
+// basic section with inverted typography colors
+.l-section--secondary {
+	@extend %section;
+	@include inverse-colors;
+	background: $secondary-background-color;
+}

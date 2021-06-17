@@ -1,0 +1,39 @@
+// BASE LIST STYLES
+
+%list--blank {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	font-family: $base-font-family;
+	font-weight: 300;
+}
+
+ol {
+	list-style-type: decimal;
+	margin: 0 0 $small-spacing;
+	padding: 0 0 0 $base-spacing;
+}
+
+ul {
+	list-style-type: disc;
+	margin: 0 0 $small-spacing;
+	padding: 0 0 0 $base-spacing;
+
+	ul {
+		list-style-type: circle;
+		margin-bottom: 0;
+	}
+}
+
+dl {
+	margin-bottom: $base-spacing / 2;
+
+	dt {
+		font-weight: bold;
+		margin-top: $base-spacing / 2;
+	}
+
+	dd {
+		margin: 0;
+	}
+}

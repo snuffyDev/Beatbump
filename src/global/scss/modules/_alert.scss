@@ -1,0 +1,46 @@
+.alert {
+	margin-bottom: 1.125rem;
+}
+.m-alert-danger {
+	position: relative;
+	display: block;
+	max-width: $max-width;
+	padding: $small-spacing $base-spacing;
+	// border: $base-border;
+	border-radius: 0.8rem;
+	margin: 1em 1em 0em 1em;
+	color: white;
+	background-color: transparentize(#5c0805, 0.6);
+}
+
+.m-alert-success {
+	position: relative;
+	display: block;
+	max-width: $max-width;
+	padding: $small-spacing $base-spacing;
+
+	border: $base-border;
+	background-color: transparentize($green, 0.85);
+}
+.m-alert-warning {
+	position: relative;
+	display: block;
+	max-width: $max-width;
+	padding: $small-spacing $base-spacing;
+
+	border: $base-border;
+	background-color: transparentize($color-yellow, 0.85);
+}
+
+.m-alert-info {
+	position: relative;
+	display: block;
+	text-align: center;
+	max-width: $max-width;
+	padding: $small-spacing $base-spacing;
+	border-radius: 0.8rem;
+	// border: $base-border;
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+	background-color: transparentize($color-gray, 0.95);
+}

@@ -1,0 +1,174 @@
+$kroket-config: (
+	'items': (
+		'color': (
+			'primary': #ff00ff,
+			'light': #ffffff,
+			'dark': #252525
+		),
+		'size': (
+			'300': 0.8rem,
+			'400': 1rem,
+			'500': 1.25rem,
+			'600': 1.56rem,
+			'700': 1.95rem,
+			'800': 2.44rem,
+			'900': 3.05rem
+		)
+	),
+	'breakpoints': (
+		'sm': '(min-width: 32em)',
+		'md': '(min-width: 48em)',
+		'lg': '(min-width: 68em)'
+	),
+	'utilities': (
+		'bg': (
+			'items': (
+				'primary': #ff00ff,
+				'light': #ffffff,
+				'dark': #252525
+			),
+			'property': 'background'
+		),
+		'color': (
+			'items': (
+				'primary': #ff00ff,
+				'light': #ffffff,
+				'dark': #252525
+			),
+			'property': 'color'
+		),
+		'font': (
+			'items': (
+				'base': 'Inter, sans-serif',
+				'secondary': 'PT Sans, sans-serif',
+				'serif': 'Georgia, serif'
+			),
+			'property': 'font-family'
+		),
+		'gap-top': (
+			'items': (
+				'300': 0.8rem,
+				'400': 1rem,
+				'500': 1.25rem,
+				'600': 1.56rem,
+				'700': 1.95rem,
+				'800': 2.44rem,
+				'900': 3.05rem
+			),
+			'property': 'margin-top'
+		),
+		'gap-bottom': (
+			'items': (
+				'300': 0.8rem,
+				'400': 1rem,
+				'500': 1.25rem,
+				'600': 1.56rem,
+				'700': 1.95rem,
+				'800': 2.44rem,
+				'900': 3.05rem
+			),
+			'property': 'margin-bottom'
+		),
+		'leading': (
+			'items': (
+				'tight': 1.2,
+				'mid': 1.5,
+				'loose': 1.7
+			),
+			'property': 'line-height'
+		),
+		'measure': (
+			'items': (
+				'long': 75ch,
+				'short': 60ch,
+				'compact': 40ch
+			),
+			'property': 'max-width'
+		),
+		'text': (
+			'items': (
+				'300': 0.8rem,
+				'400': 1rem,
+				'500': 1.25rem,
+				'600': 1.56rem,
+				'700': 1.95rem,
+				'800': 2.44rem,
+				'900': 3.05rem
+			),
+			'property': 'font-size'
+		),
+		'weight': (
+			'items': (
+				'light': 300,
+				'regular': 400,
+				'mid': 600,
+				'bold': 700
+			),
+			'property': 'font-weight'
+		)
+	)
+);
+
+@function get-item($group, $key) {
+	$response: map-get(map-get(map-get($kroket-config, 'items'), $group), $key);
+
+	@if ($response) {
+		@return $response;
+	}
+
+	@warn #{'Item "' + $key + '" not found in "' + $group + '".'};
+
+	@return null;
+}
+
+@function get-color($key) {
+	@return get-item('color', $key);
+}
+
+@function get-size($key) {
+	@return get-item('size', $key);
+}
+
+@function get-utility($group, $key) {
+	$utility: map-get(map-get($kroket-config, 'utilities'), $group);
+	$items: map-get($utility, 'items');
+	$item-value: map-get($items, $key);
+
+	@if ($item-value) {
+		@return $item-value;
+	} @else {
+		@warn #{'Value: ‘' + $key + '’ doesn’t exist in ‘' + $group + '’' };
+	}
+}
+
+@mixin apply-utility($group, $key) {
+	$utility: map-get(map-get($kroket-config, 'utilities'), $group);
+	$property: map-get($utility, 'property');
+	$items: map-get($utility, 'items');
+	$item-value: map-get($items, $key);
+
+	@if ($property and $item-value) {
+		#{ $property }: #{$item-value};
+	} @else {
+		@if ($property) {
+			@warn #{'Value: ‘' + $key + '’ doesn’t exist in ‘' + $group + '’' };
+		}
+
+		@if ($item-value) {
+			@warn #{ 'Utility ‘' + $key + '’ doesn’t exist' };
+		}
+	}
+}
+
+@mixin media-query($key) {
+	$breakpoints: map-get($kroket-config, 'breakpoints');
+	$matched-breakpoint: map-get($breakpoints, $key);
+
+	@if not $matched-breakpoint {
+		@warn #{ 'Breakpoint, ‘' + $key + '’ not found in `$kroket-config`. Make sure it’s set in the ‘breakpoints’ section of your Kroket config file.' };
+	} @else {
+		@media #{ $matched-breakpoint } {
+			@content;
+		}
+	}
+}

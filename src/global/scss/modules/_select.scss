@@ -1,0 +1,56 @@
+select {
+    background: transparent;
+    border: none;
+    display: block;
+    width: 100%;
+
+    height: inherit;
+    color: inherit;
+    padding: 0 2.417rem 0.425rem 0.667rem;
+    max-height: unset;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-indent: 0;
+    text-shadow: none;
+    // font-size: 1.125em;
+    text-align: start;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    * {
+        // background-color: #272f3a;
+        background-color: #111818c9;
+
+        color: rgb(255, 255, 255);
+        &:hover {
+            background-color: transparentize(#000000, 0);
+        }
+    }
+}
+.selectCont::after {
+    content: "▼";
+    position: absolute;
+    top: 27.5%;
+    right: 8%;
+    padding: 1px;
+    font-size: 0.8em;
+    width: auto;
+    color: inherit;
+    /* position: relative; */
+    pointer-events: none;
+}
+.selectCont {
+    border-radius: 4px;
+    // background-color: #272f3a;
+    border: 0.0625rem solid rgba(170, 170, 170, 0.219);
+
+    position: relative;
+    width: auto;
+    max-width: 320px;
+    /* display: flex; */
+    height: 3rem;
+    // width: auto;
+    // max-width: 320px;
+    display: flex; // height: 3rem;
+}

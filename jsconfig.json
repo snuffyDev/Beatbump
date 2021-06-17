@@ -1,0 +1,11 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"$app/*": [".svelte/dev/runtime/app/*", ".svelte/build/runtime/app/*"],
+			"$lib/*": ["src/lib/*"]
+		},
+		"esModuleInterop": true
+	},
+	"include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.svelte"]
+}
