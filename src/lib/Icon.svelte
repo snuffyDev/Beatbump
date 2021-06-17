@@ -111,5 +111,4 @@
 	stroke-linecap="round"
 	stroke-linejoin="round"
 	stroke={color}
-	viewBox="0 0 {box} {box}">{@html displayIcon.svg}</svg
->
+	viewBox="0 0 {box} {box}">{@html displayIcon.svg}</svg>

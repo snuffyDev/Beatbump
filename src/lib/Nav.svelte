@@ -36,8 +36,7 @@
 		height="0.5rem"
 		alt="logo"
 		title="Beatbump Home"
-		on:click={() => goto('/')}
-	/>
+		on:click={() => goto('/')} />
 </div>
 {#if width < 640}
 	<section on:click={() => goto('/')}>
@@ -52,16 +51,14 @@
 				}}
 				class="nav-search"
 				transition:fade={{ duration: 120, easing: circIn }}
-				class:hidden
-			>
+				class:hidden>
 				<!-- <label for="search"><em>search</em></label> -->
 				<Search type="inline" />
 				<div
 					on:click={() => {
 						hidden = !hidden
 					}}
-					class="x-button"
-				>
+					class="x-button">
 					<Icon name="x" size="1.5em" />
 				</div>
 			</div>
@@ -70,8 +67,7 @@
 			class="nav-item"
 			on:click={() => {
 				hidden = !hidden
-			}}
-		>
+			}}>
 			<svelte:component this={Icon} name="search" size="1.75em" />
 		</div>
 		{#if !settingsHidden}
@@ -82,8 +78,7 @@
 				}}
 				class="nav-settings"
 				style={`background-color: var(--${curTheme}-top)}`}
-				transition:fade={{ duration: 120, easing: circIn }}
-			>
+				transition:fade={{ duration: 120, easing: circIn }}>
 				<!-- <label for="search"><em>search</em></label> -->
 				<span class="setting">
 					<span class="s-text">Theme:</span>
@@ -101,8 +96,7 @@
 			class="nav-item"
 			on:click={() => {
 				settingsHidden = !settingsHidden
-			}}
-		>
+			}}>
 			<svelte:component this={Icon} name="settings" size="1.75em" />
 		</div>
 	</section>

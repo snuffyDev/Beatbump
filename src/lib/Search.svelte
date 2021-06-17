@@ -42,8 +42,7 @@
 				autocorrect="off"
 				type="search"
 				placeholder="Search"
-				bind:value={songTitle}
-			/>
+				bind:value={songTitle} />
 		</div>
 	</div>
 

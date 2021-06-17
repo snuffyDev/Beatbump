@@ -56,8 +56,7 @@
 	}}
 	on:mouseleave={() => {
 		isHovering = false
-	}}
->
+	}}>
 	<span class="number"
 		>{#if isHovering}
 			<svelte:component this={Icon} class="icon" name="play" size="1.5em" />
@@ -76,8 +75,7 @@
 			{/if}
 		</span>
 		<span class="artist"
-			>{item.artistNames ? item.artistNames : item.artistInfo.artists}</span
-		>
+			>{item.artistNames ? item.artistNames : item.artistInfo.artists}</span>
 	</span>
 </li>
 

@@ -63,8 +63,7 @@
 		on:click_outside={() => {
 			show = !show
 		}}
-		transition:fly={{ y: 0, duration: 225, easing: cubicIn }}
-	>
+		transition:fly={{ y: 0, duration: 225, easing: cubicIn }}>
 		<div class="list">
 			{#if list.length > 1}
 				<ul class="list-m" id="list" bind:this={songList}>
@@ -78,8 +77,7 @@
 							on:click={async () => {
 								// console.log(`${autoId}`)
 								handleClick(index)
-							}}
-						>
+							}}>
 							<div class="pl-thumbnail" style="min-width:5rem; max-width:5rem;">
 								<img src={item.thumbnail} alt="" />
 							</div>

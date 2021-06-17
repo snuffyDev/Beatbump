@@ -102,8 +102,7 @@
 									/=(w(\d+))-(h(\d+))/g,
 									'=w256-h256'
 								)}
-								alt="album"
-							/>
+								alt="album" />
 						</div>
 						<div class="info">
 							<div class="info-title">
@@ -116,8 +115,7 @@
 										<small
 											>{info.trackCount > 1
 												? `${info.trackCount} tracks`
-												: `${info.trackCount} track`}</small
-										>
+												: `${info.trackCount} track`}</small>
 									</p>
 								</span>
 							</div>
@@ -168,8 +166,7 @@
 									currentTitle.set(radio[0].title)
 								}}
 								><Icon name="play" size="1.5em" />
-								Album Radio</button
-							>
+								Album Radio</button>
 							<!-- <button class="radioMix" on:click={async () => {}}
 								><Icon name="play" size="1.5em" />
 								Album Radio</button

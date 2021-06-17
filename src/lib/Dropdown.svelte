@@ -15,8 +15,7 @@
 	class="menuButtons"
 	on:click={() => {
 		show = !show
-	}}
->
+	}}>
 	<svelte:component this={Icon} size="1.5em" name="dots" />
 	{#if show}
 		<div
@@ -25,8 +24,7 @@
 			use:clickOutside
 			on:click_outside={() => {
 				show = !show
-			}}
-		>
+			}}>
 			<slot name="content" />
 			<!-- <div class="dd-item">
 				<slot name="item" itemprop="item" />
