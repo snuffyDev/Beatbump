@@ -140,9 +140,7 @@
 			vertical-align: top;
 		}
 	}
-	form {
-		display: contents;
-	}
+
 	.items {
 		display: flex;
 		flex-direction: row;

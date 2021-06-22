@@ -39,22 +39,7 @@
 		box-shadow: -0.2rem 0.1rem 1rem 0.1rem rgba(0, 0, 0, 0.486);
 		justify-items: center;
 	}
-	hr {
-		color: white;
-		width: 100%;
-	}
-	.nav-item {
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		margin-bottom: 0.53125rem;
-	}
-	.header-text {
-		text-align: center;
-		padding-top: 0.5rem;
-		padding-bottom: 0.5rem;
-		font-size: 1.125rem;
-	}
+
 	.head {
 		width: 100%;
 		padding-top: 0.8em;

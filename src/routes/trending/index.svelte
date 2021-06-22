@@ -254,49 +254,11 @@
 		flex-wrap: nowrap;
 		text-overflow: clip;
 		font-size: 100%;
-		border-radius: 0.8rem;
+		border-radius: 0.8rem 0.4286rem 0.4286rem 0.8rem;
 		width: 100%;
 		align-items: center;
 		white-space: nowrap;
 		height: 3rem;
 		padding: 0 0 0 1rem;
-	}
-	.left,
-	.right {
-		> .feather,
-		.feather-chevron-left,
-		.feather-chevron-right {
-			width: 1.25rem;
-			height: 1.25rem;
-			stroke: black;
-			stroke-width: 5;
-			stroke-linecap: round;
-			stroke-linejoin: round;
-			fill: currentColor;
-		}
-		position: absolute;
-		color: white;
-		z-index: 50;
-		top: 50%;
-		padding: 1rem;
-		border-radius: 50%;
-
-		background: #0a0a0a6b;
-		transform: translateY(-50%);
-		transition: cubic-bezier(0.23, 1, 0.32, 1) 0.12s all;
-
-		&:hover {
-			background: #0a0a0abd;
-
-			transition: cubic-bezier(0.23, 1, 0.32, 1) 0.12s all;
-		}
-	}
-	.left {
-		left: 0;
-	}
-	.right {
-		right: 0;
-	}
-	main {
 	}
 </style>

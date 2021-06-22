@@ -236,12 +236,6 @@
 		flex-direction: column;
 		padding-inline: 0.8em;
 	}
-	h2 {
-		font-size: 1.2rem;
-		top: 0;
-		display: inline;
-		position: relative;
-	}
 
 	h1 {
 		text-transform: capitalize;
@@ -253,8 +247,7 @@
 		max-width: 14rem;
 	}
 
-	img::before,
-	video::before {
+	img::before {
 		display: block;
 		content: '';
 		padding-top: calc(100% * 2 / 3);

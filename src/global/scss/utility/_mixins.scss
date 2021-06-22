@@ -2,76 +2,71 @@
 
 // font smoothing for anti-aliasing on macOS
 @mixin font-smoothing($value: on) {
-	@if $value == on {
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
-	} @else {
-		-webkit-font-smoothing: subpixel-antialiased;
-		-moz-osx-font-smoothing: auto;
-	}
+    @if $value == on {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    } @else {
+        -webkit-font-smoothing: subpixel-antialiased;
+        -moz-osx-font-smoothing: auto;
+    }
 }
-@mixin scrim(
-	$startColor: $color-black,
-	$direction: 'to bottom',
-	$startAlpha: 1
-) {
-	$scrimCoordinates: (
-		0: 1,
-		19: 0.738,
-		34: 0.541,
-		47: 0.382,
-		56.5: 0.278,
-		65: 0.194,
-		73: 0.126,
-		80.2: 0.075,
-		86.1: 0.042,
-		91: 0.021,
-		95.2: 0.008,
-		98.2: 0.002,
-		100: 0
-	);
+@mixin scrim($startColor: $color-black, $direction: "to bottom", $startAlpha: 1) {
+    $scrimCoordinates: (
+        0: 1,
+        19: 0.738,
+        34: 0.541,
+        47: 0.382,
+        56.5: 0.278,
+        65: 0.194,
+        73: 0.126,
+        80.2: 0.075,
+        86.1: 0.042,
+        91: 0.021,
+        95.2: 0.008,
+        98.2: 0.002,
+        100: 0,
+    );
 
-	$hue: hue($startColor);
-	$saturation: saturation($startColor);
-	$lightness: lightness($startColor);
-	$stops: ();
+    $hue: hue($startColor);
+    $saturation: saturation($startColor);
+    $lightness: lightness($startColor);
+    $stops: ();
 
-	@each $colorStop, $alphaValue in $scrimCoordinates {
-		$stop: hsla($hue, $saturation, $lightness, $alphaValue * $startAlpha)
-			percentage($colorStop/100);
-		$stops: append($stops, $stop, comma);
-	}
+    @each $colorStop, $alphaValue in $scrimCoordinates {
+        $stop: hsla($hue, $saturation, $lightness, $alphaValue * $startAlpha) percentage($colorStop/100);
+        $stops: append($stops, $stop, comma);
+    }
 
-	background: linear-gradient(unquote($direction), $stops);
+    background: linear-gradient(unquote($direction), $stops);
 }
 
 // inverse color scheme for basic typography
 @mixin inverse-colors {
-	color: $secondary-font-color;
+    color: $secondary-font-color;
 
-	a {
-		color: $base-color;
+    a {
+        color: $base-color;
 
-		&:active,
-		&:focus,
-		&:hover {
-			color: lighten($base-color, 20%);
-			outline: none;
-		}
-	}
+        &:active,
+        &:focus,
+        &:hover {
+            color: lighten($base-color, 20%);
+            outline: none;
+        }
+    }
 
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		color: $secondary-font-color;
-	}
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        color: $secondary-font-color;
+    }
 }
 
 @mixin mobilefirst($res) {
-	@media screen and (min-width: $res) {
-		@content;
-	}
+    @media screen and (min-width: $res) {
+        @content;
+    }
 }

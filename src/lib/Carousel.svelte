@@ -137,66 +137,12 @@
 		text-overflow: ellipsis;
 		overflow: hidden;
 	}
-	.menu {
-		position: absolute;
-		right: 0;
-		top: 55%;
-		padding-right: 0.8rem;
-	}
+
 	.title {
 		cursor: pointer;
 
 		text-overflow: ellipsis, 2px;
 		display: inline-block;
-		* {
-			text-overflow: ellipsis, 2px;
-
-			max-width: 10px;
-		}
-	}
-	#scrollItem {
-	}
-	.left,
-	.right {
-		> .feather,
-		.feather-chevron-left,
-		.feather-chevron-right {
-			width: 1.25rem;
-			height: 1.25rem;
-			stroke: black;
-			stroke-width: 5;
-			stroke-linecap: round;
-			stroke-linejoin: round;
-			fill: currentColor;
-		}
-		position: absolute;
-		color: white;
-		z-index: 50;
-		top: 50%;
-		padding: 1rem;
-		border-radius: 50%;
-
-		background: #0a0a0a6b;
-		transform: translateY(-50%);
-		transition: cubic-bezier(0.23, 1, 0.32, 1) 0.12s all;
-
-		&:hover {
-			background: #0a0a0abd;
-
-			transition: cubic-bezier(0.23, 1, 0.32, 1) 0.12s all;
-		}
-	}
-	.left {
-		left: 0;
-	}
-	.right {
-		right: 0;
-	}
-	main {
-		margin: 1.25rem;
-	}
-	.test {
-		background-color: theme-color('dark', 'top');
 	}
 	.section {
 		-webkit-overflow-scrolling: touch;
@@ -248,10 +194,7 @@
 		scroll-snap-type: x mandatory;
 		-webkit-overflow-scrolling: touch;
 	}
-	.text-inline {
-		display: inline-flex;
-		align-items: center;
-	}
+
 	section {
 		padding-left: 1.5rem;
 		padding-right: 1.5rem;

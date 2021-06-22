@@ -329,13 +329,6 @@
 		bottom: 0;
 		width: 100%;
 	}
-	.icon {
-		align-self: baseline;
-	}
-	.hidden {
-		display: none;
-		transition: cubic-bezier(0.23, 1, 0.32, 1) all 0.2s;
-	}
 
 	progress {
 		display: block;

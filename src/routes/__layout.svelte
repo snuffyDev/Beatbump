@@ -74,15 +74,5 @@
 	:global(body) {
 		scroll-behavior: smooth;
 		text-rendering: optimizeLegibility;
-		img::before,
-		video::before {
-			display: block;
-			content: '';
-			padding-top: calc(100% * 2 / 3);
-			/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
-		}
-	}
-	.layout {
-		display: grid;
 	}
 </style>

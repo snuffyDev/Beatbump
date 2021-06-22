@@ -81,10 +81,7 @@
 		box-shadow: -0.2rem 0.1rem 1rem 0.1rem rgba(0, 0, 0, 0.486);
 		justify-items: center;
 	}
-	hr {
-		color: white;
-		width: 100%;
-	}
+
 	.nav-item {
 		width: 100%;
 		display: flex;
