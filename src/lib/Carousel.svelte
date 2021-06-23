@@ -26,7 +26,7 @@
 	let section = []
 	let arr = items
 	let carousel
-	// $: pos = 0
+	let pos = 0
 	// console.log(items)
 	arr = splitArray(arr, 5)
 </script>
@@ -57,14 +57,14 @@
 			on:click={() => {
 				if (pos < section.length - 1) {
 					// console.log(section)
-					++pos
+					pos++
 					let child = section[pos]
 					console.log(child, child.offsetLeft)
 					// console.log(section)
 					carousel.scrollLeft += child.offsetLeft
 				}
-			}}><Icon name="chevron-right" size="2em" /></span
-		> -->
+			}}><Icon name="chevron-right" size="2em" /></span> -->
+
 		<!-- {#each arr as item, index} -->
 		<div class="contents" style="display:contents">
 			{#each items as item, i}
@@ -126,6 +126,22 @@
 </div>
 
 <style lang="scss">
+	.left,
+	.right {
+		background: black;
+		top: 50%;
+		z-index: 100;
+	}
+	.left {
+		left: 0;
+		position: absolute;
+	}
+
+	.right {
+		position: absolute;
+		right: 0;
+	}
+
 	.item {
 		padding-bottom: 2em;
 	}

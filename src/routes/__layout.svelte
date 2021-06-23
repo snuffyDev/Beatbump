@@ -14,14 +14,13 @@
 		if (!localStorage.getItem('theme')) theme.init('dim')
 	})
 
-	// await tick()
 	let current = $currentTrack
 
 	let width
 	$: curTheme = $theme
 </script>
 
-<svelte:window bind:outerWidth={width} />
+<svelte:window bind:innerWidth={width} />
 <body style={`background-color: var(--${curTheme}-base)`}>
 	{#if browser}
 		<nav class="nav" style={`background-color: var(--${curTheme}-top)`}>
@@ -70,7 +69,6 @@
 		border-bottom: 0.25px rgba(170, 170, 170, 0.116) solid;
 		// background-color: rgb(20 24 32 / 59%);
 	}
-
 	:global(body) {
 		scroll-behavior: smooth;
 		text-rendering: optimizeLegibility;

@@ -1,9 +1,7 @@
 <script>
-	import keyboard from './js/keyboard.js'
 	import { goto } from '$app/navigation'
 	import Dropdown from './Dropdown.svelte'
 	import { iOS } from './stores/stores.js'
-	import { onMount } from 'svelte'
 	import { tweened } from 'svelte/motion'
 	import { getSrc } from '$lib/utils'
 	import Playlist from './Playlist.svelte'
@@ -19,7 +17,6 @@
 	} from '$lib/stores/stores'
 	import { cubicOut } from 'svelte/easing'
 	import * as utils from '$lib/utils'
-	import { clickOutside } from './js/clickOutside.js'
 
 	export let title
 	export let playerStatus = 'paused'
@@ -36,7 +33,7 @@
 
 	$: mixList = $currentMix.list
 	$: list = $currentMix
-	$: autoId = $key
+	let autoId = $key
 
 	$: time = player.currentTime
 	$: currentTitle.set(title)
@@ -55,7 +52,7 @@
 	$: hasList = mixList.length > 1
 
 	// log any and all updates to the list for testing
-	$: console.log(mixList)
+	// $: console.log(mixList)
 
 	const playing = (e) => player.play()
 	const paused = (e) => player.pause()
@@ -192,33 +189,33 @@
 				: seek(event, songBar.getBoundingClientRect()) * duration
 	}
 
-	let _key
-	let keyCode
+	// let _key
+	// let keyCode
 
-	function getKey(event) {
-		_key = event.key
-		keyCode = event.keyCode
-		if (player.src !== undefined || player.src !== '') {
-			switch (keyCode) {
-				case 32:
-					if (!isPlaying) {
-						startPlay()
-					} else {
-						pause()
-					}
-					break
-				case 39:
-					player.currentTime += 5
-					break
-				case 37:
-					player.currentTime -= 5
-					break
+	// function getKey(event) {
+	// 	_key = event.key
+	// 	keyCode = event.keyCode
+	// 	if (player.src !== undefined || player.src !== '') {
+	// 		switch (keyCode) {
+	// 			case 32:
+	// 				if (!isPlaying) {
+	// 					startPlay()
+	// 				} else {
+	// 					pause()
+	// 				}
+	// 				break
+	// 			case 39:
+	// 				player.currentTime += 5
+	// 				break
+	// 			case 37:
+	// 				player.currentTime -= 5
+	// 				break
 
-				default:
-					break
-			}
-		}
-	}
+	// 			default:
+	// 				break
+	// 		}
+	// 	}
+	// }
 </script>
 
 <!-- on:keydown={(e) => getKey(e)} -->
@@ -232,7 +229,7 @@
 	}}
 	bind:show={listShow}
 	bind:mixList
-	bind:autoId />
+	bind:autoId={$key} />
 
 <div class="f-container">
 	<div

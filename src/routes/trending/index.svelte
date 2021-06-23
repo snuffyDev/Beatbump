@@ -22,9 +22,8 @@
 	let carouselItems = []
 
 	const handler = getTracks()
-	const objectMap = (obj, fn) =>
-		Object.fromEntries(Object.entries(obj).map(([k, v], i) => [k, fn(v, k, i)]))
-	function getTracks(n) {
+
+	function getTracks() {
 		utils.moodsAndGenres('FEmusic_moods_and_genres').then((data) => {
 			let moodsArr = data[0][0]
 			let genresArr = data[1][0]
@@ -163,7 +162,7 @@
 <svelte:head>
 	<title>{$currentTitle == '' ? 'Home' : $currentTitle} - Beatbump</title>
 </svelte:head>
-<!-- <Icon name="loading" /> -->
+
 {#if !content}
 	<Loading />
 	{#await handler then _}
@@ -172,6 +171,7 @@
 {:else}
 	{''}
 {/if}
+
 {#if content}
 	<main>
 		<Carousel

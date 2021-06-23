@@ -38,8 +38,8 @@
 				if (!loading) {
 					trendingHandler(item).then(() => {
 						loading = !loading
+						key.set(0)
 					})
-					key.set(0)
 					loading = !loading
 				}
 			}}>

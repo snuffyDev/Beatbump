@@ -26,11 +26,6 @@
 	let explicit
 	let type
 	onMount(async () => {
-		let songTitle,
-			filter,
-			endpoint,
-			pt = ''
-		endpoint = 'browse'
 		loading = true
 		const data = await getData('', '', 'browse', browseId, pageType, '', '')
 		if (data) {
