@@ -54,8 +54,8 @@
 	// log any and all updates to the list for testing
 	// $: console.log(mixList)
 
-	const playing = (e) => player.play()
-	const paused = (e) => player.pause()
+	const playing = () => player.play()
+	const paused = () => player.pause()
 	function pause() {
 		paused()
 	}

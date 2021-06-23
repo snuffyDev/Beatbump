@@ -79,7 +79,7 @@
 								handleClick(index)
 							}}>
 							<div class="pl-thumbnail" style="min-width:5rem; max-width:5rem;">
-								<img src={item.thumbnail} alt="" />
+								<img src={item.thumbnail} alt="thumbnail" />
 							</div>
 							<div class="p-text">
 								<span class="p-artist">

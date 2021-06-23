@@ -10,13 +10,13 @@
 	import { page } from '$app/stores'
 	import * as utils from '$lib/utils'
 	import { invalidate } from '$app/navigation'
-	let ctoken = ''
-	let itct = ''
+	$: ctoken = ''
+	$: itct = ''
 	let error = undefined
 	let correctedQuery = undefined
-	$: q = $page.query.get('q')
+	let q = $page.query.get('q')
 	$: filter = $page.query.get('filter')
-	$: songTitle = q
+	let songTitle = q
 	$: {
 		q
 		window.scrollTo(0, 0)
@@ -104,7 +104,7 @@
 	<button
 		class="button--block button--outlined"
 		on:click={async () => {
-			return await searchCont(error, ctoken).then(async (data) => {
+			return await searchCont(error).then(async (data) => {
 				// songIndex = [...songIndex, ...data.contents]
 			})
 		}}>Load More</button>

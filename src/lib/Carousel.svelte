@@ -95,6 +95,7 @@
 						<div class="img">
 							<div class="container">
 								<img
+									alt="thumbnail"
 									transition:fade|local
 									width="256"
 									height="256"

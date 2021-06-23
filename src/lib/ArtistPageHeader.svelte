@@ -18,14 +18,17 @@
 <div class="artist-header">
 	<div class="artist-thumbnail">
 		<picture class="header-thumbnail">
-			<img class="header-thumbnail" src={thumbnail[0].url} alt="" />
+			<img
+				class="header-thumbnail"
+				src={thumbnail[0].url}
+				alt="Artist Thumbnail" />
 		</picture>
 	</div>
 	<div class="artist-content">
 		<div class="content-wrapper">
 			<div class="name">{headerContent.name}</div>
 			{#if width > 500}
-				<div class="description">{description[0]}</div>
+				<div class="description">{description[0]}.</div>
 			{/if}
 		</div>
 	</div>

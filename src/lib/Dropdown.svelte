@@ -7,8 +7,6 @@
 	import { clickOutside } from './js/clickOutside'
 	export let type = ''
 	export let show = false
-	// export let items
-	let menuToggle
 </script>
 
 <div

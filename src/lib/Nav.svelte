@@ -39,7 +39,7 @@
 		on:click={() => goto('/')} />
 </div>
 {#if width < 640}
-	<section on:click={() => goto('/')}>
+	<section class="homeIcon" on:click={() => goto('/')}>
 		<Icon name="home" size="1.75em" />
 	</section>
 	<section class="items">
@@ -103,6 +103,11 @@
 {/if}
 
 <style lang="scss">
+	.homeIcon {
+		width: 2rem;
+		max-width: 2rem;
+		display: inline;
+	}
 	.s-text {
 		margin-right: 0.8rem;
 		/* align-self: start; */

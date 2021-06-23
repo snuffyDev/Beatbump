@@ -15,8 +15,8 @@
 	let headerContent = {}
 	let items = []
 	let thumbnail = []
+	let carouselItems = []
 	let promise = parser()
-
 	async function parser() {
 		return await getData('', '', 'browse', id, 'MUSIC_PAGE_TYPE_ARTIST')
 			.then(
@@ -40,6 +40,8 @@
 				}
 			)
 			.then((d) => {
+				console.log(d)
+				carouselItems = [...d.carouselItems]
 				headerContent = d[0]
 				headerContent.thumbnails.forEach((h) => {
 					thumbnail.push(h)
@@ -88,11 +90,39 @@
 					{/each}
 				</section>
 			</section>
+			{#each carouselItems as carousel}
+				<section>
+					{#if carousel.header[0].title}
+						<h4>{carousel.header[0].title}</h4>
+					{:else}
+						<h4>{carousel.header}</h4>
+					{/if}
+					<section class="grid">
+						{#each carousel.contents as item, index}
+							<!-- <ListItem {item} {index} /> -->
+							<div class="grid-item">
+								<img src={item.thumbnails[0].url} alt="Thumbnail" />
+								<p class="item-title">{item.title}</p>
+							</div>
+						{/each}
+					</section>
+				</section>
+			{/each}
 		</div>
 	</main>
 {/await}
 
 <style lang="scss">
+	.grid-item {
+	}
+	.item-title {
+		font-size: 1.25rem;
+	}
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		grid-gap: 2rem;
+	}
 	.songs {
 		margin-bottom: 1rem;
 	}
