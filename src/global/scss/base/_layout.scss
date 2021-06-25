@@ -1,102 +1,83 @@
 // BASE LAYOUT STYLES
 
 html {
-	box-sizing: border-box;
-	scroll-behavior: smooth;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
 }
 
 *,
 *::before,
 *::after {
-	box-sizing: inherit;
+    box-sizing: inherit;
 }
 
 html,
 body {
-	height: 100%;
-	line-height: 1.5;
+    height: 100%;
+    line-height: 1.5;
 }
 
 body {
-	margin: 0;
-	line-height: 1.5;
+    margin: 0;
+    line-height: 1.5;
 }
 
-// @media screen and (prefers-color-scheme: dark) {
-// 	$secondary-font-color: #fff;
-// 	html,
-// 	body {
-// 		background-color: #161616;
-// 	}
-
-// 	h1,
-// 	h2,
-// 	h3,
-// 	h4,
-// 	h5,
-// 	h6 {
-// 		color: $secondary-font-color;
-// 		font-family: $secondary-font-family;
-// 		line-height: 1.2;
-// 		margin: 0 0 $small-spacing;
-// 	}
-// }
-
 :root {
-	font-family: 'Commissioner', sans-serif;
-	word-wrap: break-word;
-	// background-color: #0e1117;
-	background-color: theme-color('dim', 'base');
-	color: rgb(255, 255, 255);
-	scroll-behavior: smooth;
-	-webkit-text-size-adjust: 100%;
-	/* ===== Scrollbar CSS ===== */
-	/* Firefox */
-	* {
-		scrollbar-gutter: 10px;
-		scrollbar-width: thin;
-		scrollbar-color: #c7c7c7 #5e5e5e2f;
-	}
+    font-family: "Commissioner", sans-serif;
+    word-wrap: break-word;
+    // background-color: #0e1117;
+    background-color: theme-color("dim", "base");
+    color: rgb(255, 255, 255);
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
 
-	/* Chrome, Edge, and Safari */
-	*::-webkit-scrollbar {
-		width: 0.916667rem;
-		height: 0.916667rem;
-	}
+    /* ===== Scrollbar CSS ===== */
+    /* Firefox */
+    * {
+        scrollbar-gutter: 10px;
+        scrollbar-width: thin;
+        scrollbar-color: #c7c7c7 #5e5e5e2f;
+    }
 
-	*::-webkit-scrollbar-track {
-		background: #5e5e5e2f;
-		border-radius: 0.625rem;
-		height: 0.916667rem;
-		width: 100%;
-		background-clip: content-box;
-		border-radius: 10px;
-		border: transparent solid 0.0983333rem;
-	}
+    /* Chrome, Edge, and Safari */
+    *::-webkit-scrollbar {
+        width: 0.916667rem;
+        height: 0.916667rem;
+    }
 
-	*::-webkit-scrollbar-thumb {
-		background-color: #e0e0e0a8;
-		border-radius: 0.5625rem;
-		width: 0.5625rem;
-		scrollbar-width: 0.625rem;
-		border: 0.25rem solid #b8b8b800;
-		background-clip: content-box;
-	}
+    *::-webkit-scrollbar-track {
+        background: #5e5e5e2f;
+        border-radius: 0.625rem;
+        height: 0.916667rem;
+        width: 100%;
+        background-clip: content-box;
+        border-radius: 10px;
+        border: transparent solid 0.0983333rem;
+    }
 
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	-webkit-tap-highlight-color: transparent;
-	font-size: 12px;
-	@media screen and (min-width: 620px) and (max-width: 1440px) {
-		font-size: 14px;
-	}
-	@media screen and (min-width: 1441px) {
-		font-size: 16px;
-	}
+    *::-webkit-scrollbar-thumb {
+        background-color: #e0e0e0a8;
+        border-radius: 0.5625rem;
+        width: 0.5625rem;
+        scrollbar-width: 0.625rem;
+        border: 0.25rem solid #b8b8b800;
+        background-clip: content-box;
+    }
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    font-size: 12px;
+    @media screen and (min-width: 620px) and (max-width: 1440px) {
+        font-size: 14px;
+    }
+    @media screen and (min-width: 1441px) {
+        font-size: 16px;
+    }
 }
 
 // body {
@@ -104,33 +85,33 @@ body {
 //     overflow: hidden;
 // }
 body {
-	grid-template-rows: 4rem auto 4rem;
-	height: 100%;
-	margin: 0;
-	/* overflow: clip; */
-	position: fixed;
-	display: grid;
-	grid-template-areas:
-		'n n n n'
-		'm m m m'
-		'f f f f';
-	overflow: hidden;
-	width: 100%;
-	grid-template-columns: 16.1255rem 1fr;
+    grid-template-rows: 4rem auto 4rem;
+    height: 100%;
+    margin: 0;
+    /* overflow: clip; */
+    position: fixed;
+    display: grid;
+    grid-template-areas:
+        "n n n n"
+        "m m m m"
+        "f f f f";
+    overflow: hidden;
+    width: 100%;
+    grid-template-columns: 16.1255rem 1fr;
 
-	max-width: 100%;
+    max-width: 100%;
 }
 @media (min-width: 640px) {
-	body {
-		grid-template-areas:
-			'n n n n'
-			's m m m'
-			'f f f f';
-	}
+    body {
+        grid-template-areas:
+            "n n n n"
+            "s m m m"
+            "f f f f";
+    }
 }
 main {
-	// padding: 0em;
-	margin: 0 auto;
-	padding: 1rem;
-	height: auto;
+    // padding: 0em;
+    margin: 0 auto;
+    padding: 1rem;
+    height: auto;
 }

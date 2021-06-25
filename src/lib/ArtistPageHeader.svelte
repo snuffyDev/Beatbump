@@ -20,7 +20,7 @@
 		<picture class="header-thumbnail">
 			<img
 				class="header-thumbnail"
-				src={thumbnail[0].url}
+				src={thumbnail[1].url}
 				alt="Artist Thumbnail" />
 		</picture>
 	</div>

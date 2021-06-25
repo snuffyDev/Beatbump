@@ -1,4 +1,5 @@
 <script>
+	import Carousel from '$lib/Carousel.svelte'
 	import ArtistPageHeader from '../../lib/ArtistPageHeader.svelte'
 
 	import Loading from '$lib/Loading.svelte'
@@ -91,6 +92,12 @@
 				</section>
 			</section>
 			{#each carouselItems as carousel}
+				<!-- <Carousel
+					setTitle={carousel.header[0].title
+						? carousel.header[0].title
+						: carousel.header}
+					items={carousel.contents}
+					type="trending" /> -->
 				<section>
 					{#if carousel.header[0].title}
 						<h4>{carousel.header[0].title}</h4>
@@ -101,7 +108,11 @@
 						{#each carousel.contents as item, index}
 							<!-- <ListItem {item} {index} /> -->
 							<div class="grid-item">
-								<img src={item.thumbnails[0].url} alt="Thumbnail" />
+								<img
+									loading="lazy"
+									class="thumbnail"
+									src={item.thumbnails[0].url}
+									alt="Thumbnail" />
 								<p class="item-title">{item.title}</p>
 							</div>
 						{/each}
@@ -114,14 +125,17 @@
 
 <style lang="scss">
 	.grid-item {
+		.thumbnail {
+			max-width: 9rem;
+		}
 	}
 	.item-title {
-		font-size: 1.25rem;
+		font-size: 1rem;
 	}
 	.grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-		grid-gap: 2rem;
+		grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+		grid-gap: 1rem;
 	}
 	.songs {
 		margin-bottom: 1rem;

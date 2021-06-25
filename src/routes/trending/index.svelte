@@ -230,19 +230,21 @@
 		// padding: 0.8rem;
 	}
 	.box-cont {
-		display: flex;
-		width: 100%;
-		flex-direction: column;
-		flex-wrap: wrap;
+		// display: flex;
+		// width: 100%;
+		// flex-direction: column;
+		// flex-wrap: wrap;
 		justify-content: space-around;
 
 		padding: 0.8rem;
 	}
 	box {
 		display: grid;
+		// grid-gap: 1rem;
 
-		grid-template-columns: 1fr 1fr;
-		grid-gap: 0.3rem;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+
+		grid-gap: 0.8rem;
 	}
 	.box {
 		margin-bottom: 0.8rem;
@@ -254,7 +256,8 @@
 		flex-wrap: nowrap;
 		text-overflow: clip;
 		font-size: 100%;
-		border-radius: 0.8rem 0.4286rem 0.4286rem 0.8rem;
+		min-width: 180px;
+		border-radius: 0.8rem;
 		width: 100%;
 		align-items: center;
 		white-space: nowrap;
