@@ -82,11 +82,11 @@
 								<img src={item.thumbnail} alt="thumbnail" />
 							</div>
 							<div class="p-text">
-								<span class="p-artist">
-									<b>{item.artist}</b>
-								</span>
 								<span class="p-title">
 									<span>{item.title}</span>
+								</span>
+								<span class="p-artist">
+									<span>{item.artist}</span>
 								</span>
 							</div>
 							<span class="p-length">
@@ -223,7 +223,8 @@
 		border-radius: 0.2em;
 	}
 	.p-artist {
-		font-size: 1.12rem;
+		font-size: 1.0125rem;
+		font-weight: 600;
 	}
 	.p-text {
 		/*margin-left: .5em; */
@@ -255,7 +256,7 @@
 	}
 	.p-title {
 		padding: 0em;
-		font-size: 1.1725rem;
+		font-size: 1.0125rem;
 	}
 	@media screen and (min-width: 641px) and (max-width: 800px) {
 		.listContainer {

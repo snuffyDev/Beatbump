@@ -1,9 +1,9 @@
 <script>
 	import { searchTracks } from './utils'
 	let options = [
-		{ label: 'songs', params: 'EgWKAQIIAWoKEAMQBBAKEAUQCQ%3D%3D' },
-		{ label: 'videos', params: 'EgWKAQIQAWoKEAMQBBAKEAUQCQ%3D%3D' },
-		{ label: 'playlists', params: 'EgWKAQIoAWoKEAMQBBAKEAUQCQ%3D%3D' }
+		{ label: 'Songs', params: 'EgWKAQIIAWoKEAMQBBAKEAUQCQ%3D%3D' },
+		{ label: 'Videos', params: 'EgWKAQIQAWoKEAMQBBAKEAUQCQ%3D%3D' },
+		{ label: 'Playlists', params: 'EgWKAQIoAWoKEAMQBBAKEAUQCQ%3D%3D' }
 	]
 	export let type
 	import { goto, invalidate } from '$app/navigation'

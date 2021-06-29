@@ -27,8 +27,8 @@
 	<div class="artist-content">
 		<div class="content-wrapper">
 			<div class="name">{headerContent.name}</div>
-			{#if width > 500}
-				<div class="description">{description[0]}.</div>
+			{#if width > 500 && !!description}
+				<div class="description">{description[0]}</div>
 			{/if}
 		</div>
 	</div>

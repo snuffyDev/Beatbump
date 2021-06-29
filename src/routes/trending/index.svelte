@@ -1,12 +1,7 @@
-<script context="module">
-	let browseId = 'FEmusic_explore'
-</script>
-
 <script lang="ts">
 	import { currentTitle } from '$lib/stores/stores'
 	import Loading from '$lib/Loading.svelte'
 	import * as utils from '$lib/utils'
-	import { onMount, setContext } from 'svelte'
 
 	import Carousel from '$lib/Carousel.svelte'
 
@@ -20,6 +15,8 @@
 	let data
 	let genres, moods
 	let carouselItems = []
+
+	let browseId = 'FEmusic_explore'
 
 	const handler = getTracks()
 
@@ -61,7 +58,6 @@
 					let ctx = musicCarouselShelfRenderer
 					let { header, contents } = ctx
 					header = utils.transform(header)
-					let head = []
 
 					header = [
 						...header.map(({ musicCarouselShelfBasicHeaderRenderer }) => {

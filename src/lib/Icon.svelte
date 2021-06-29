@@ -6,6 +6,11 @@
 	let box = 24
 	let icons = [
 		{
+			name: 'volume',
+			svg: `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />`
+		},
+		{
 			name: 'music',
 			svg: `  <path d="M9 18V5l12-2v13" />
   <circle cx="6" cy="18" r="3" />
@@ -70,8 +75,7 @@
 		},
 		{
 			name: 'search',
-			svg: `
-  <circle cx="11" cy="11" r="8" />
+			svg: `<circle cx="11" cy="11" r="8" />
   <line x1="21" y1="21" x2="16.65" y2="16.65" />`
 		},
 		{
