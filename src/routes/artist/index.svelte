@@ -1,4 +1,5 @@
 <script>
+	import { goto } from '$app/navigation'
 	import Carousel from '$lib/Carousel.svelte'
 	import ArtistPageHeader from '../../lib/ArtistPageHeader.svelte'
 
@@ -113,7 +114,21 @@
 					<section class="grid">
 						{#each carousel.contents as item, index}
 							<!-- <ListItem {item} {index} /> -->
-							<div class="grid-item">
+							<div
+								class="grid-item"
+								on:click={() => {
+									if (
+										carousel?.header[0]?.title?.includes('Singles') ||
+										carousel?.header[0]?.title?.includes('Albums')
+									) {
+										goto(`/release?id=${item.browseEndpoint.browseId}`)
+									} else if (
+										carousel?.header?.includes('Singles') ||
+										carousel?.header?.includes('Albums')
+									) {
+										goto(`/release?id=${item.browseEndpoint.browseId}`)
+									}
+								}}>
 								<img
 									loading="lazy"
 									class="thumbnail"
@@ -131,6 +146,7 @@
 
 <style lang="scss">
 	.grid-item {
+		cursor: pointer;
 		.thumbnail {
 			max-width: 9rem;
 		}
