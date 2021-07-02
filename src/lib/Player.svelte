@@ -1,4 +1,5 @@
 <script>
+	import { clickOutside } from '$lib/js/clickOutside'
 	import { goto } from '$app/navigation'
 	import Dropdown from './Dropdown.svelte'
 	import { iOS } from './stores/stores.js'
@@ -9,7 +10,6 @@
 	import Icon from '$lib/Icon.svelte'
 	import {
 		playbackStatus,
-		index,
 		updateTrack,
 		key,
 		currentMix,
@@ -17,7 +17,6 @@
 	} from '$lib/stores/stores'
 	import { cubicOut } from 'svelte/easing'
 	import * as utils from '$lib/utils'
-	import { clickOutside } from './js/clickOutside'
 
 	export let title
 	export let playerStatus = 'paused'
@@ -66,7 +65,7 @@
 	function startPlay() {
 		playing()
 	}
-	$: console.log(volume)
+	// $: console.log(volume)
 	$: player.volume = volume
 
 	player.addEventListener('loadedmetadata', () => {
@@ -222,11 +221,15 @@
 	// 		}
 	// 	}
 	// }
+	let width
 </script>
 
 <!-- on:keydown={(e) => getKey(e)} -->
 
-<svelte:window on:mouseup={() => (seeking = false)} on:mousemove={trackMouse} />
+<svelte:window
+	bind:outerWidth={width}
+	on:mouseup={() => (seeking = false)}
+	on:mousemove={trackMouse} />
 <Playlist
 	on:updated={(event) => {
 		player.src = event.detail.src
@@ -300,21 +303,35 @@
 		</div>
 
 		<div class="player-right">
-			<div class="volume">
-				<div class="volume-icon" on:click={() => (volumeHover = !volumeHover)}>
-					<svelte:component this={Icon} name="volume" size="2em" />
-				</div>
-				{#if volumeHover}
-					<div class="volume-container">
-						<input
-							type="range"
-							bind:value={volume}
-							min="0"
-							max="1"
-							step="0.1" />
+			{#if width > 500}
+				<div class="volume">
+					<div
+						class="volume-icon"
+						use:clickOutside
+						on:click_outside={() => {
+							volumeHover = false
+						}}
+						on:click={() => {
+							volumeHover = !volumeHover
+						}}>
+						<svelte:component this={Icon} name="volume" size="2em" />
 					</div>
-				{/if}
-			</div>
+					{#if volumeHover}
+						<div class="volume-wrapper">
+							<div class="volume-container">
+								<div class="volume-slider">
+									<input
+										type="range"
+										bind:value={volume}
+										min="0"
+										max="1"
+										step="0.1" />
+								</div>
+							</div>
+						</div>
+					{/if}
+				</div>
+			{/if}
 			<div class="menu-container">
 				<Dropdown type="player" bind:show={menuShow}>
 					<div slot="content">
@@ -336,14 +353,28 @@
 </div>
 
 <style lang="scss">
-	.volume-container {
-		transform: rotate(-90deg);
+	.volume-wrapper {
+		background: inherit;
+		background: var(--dark-bottom);
+		/* width: 100%; */
+		display: block;
 		position: absolute;
-		top: 0;
-		bottom: 10rem;
-		background-color: inherit;
-		width: 0;
-		height: 0;
+		top: -5rem;
+		/* height: 100%; */
+		/* width: 0; */
+		transform: rotate(-90deg);
+	}
+	.volume-icon {
+		cursor: pointer;
+	}
+	.volume-container {
+		// transform: rotate(-90deg);
+		// position: absolute;
+		// top: 0;
+		// bottom: 10rem;
+		// background-color: inherit;
+		// width: 0;
+		// height: 0;
 		// width: 44pt;
 
 		input[type='range'] {
@@ -354,8 +385,8 @@
 	}
 	.menu-container {
 		position: absolute;
-		right: 0;
-		margin-right: 3rem;
+		right: 5%;
+		bottom: 28%;
 	}
 	.player-right {
 		display: flex;

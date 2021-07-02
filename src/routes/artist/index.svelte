@@ -47,7 +47,11 @@
 				headerContent.thumbnails.forEach((h) => {
 					thumbnail.push(h)
 				})
-				items = [...d.songs]
+				if (d.songs) {
+					items = [...d.songs]
+				} else {
+					items = undefined
+				}
 
 				description = headerContent.description.split('.')
 				// console.log(headerContent, d, description, items)
@@ -83,14 +87,16 @@
 				><Icon size="1.5rem" name="radio" /><span class="btn-text">
 					Play Radio</span
 				></button>
-			<section>
-				<h4>Songs</h4>
-				<section class="songs">
-					{#each items as item, index}
-						<ListItem {item} {index} />
-					{/each}
+			{#if items !== undefined}
+				<section>
+					<h4>Songs</h4>
+					<section class="songs">
+						{#each items as item, index}
+							<ListItem {item} {index} />
+						{/each}
+					</section>
 				</section>
-			</section>
+			{/if}
 			{#each carouselItems as carousel}
 				<!-- <Carousel
 					setTitle={carousel.header[0].title
