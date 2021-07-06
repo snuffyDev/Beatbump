@@ -98,7 +98,7 @@
 			left: 0;
 			// @include scrim(#09090a, 'to top');
 			background: linear-gradient(360deg, #09090a 8.98%, rgba(0, 0, 0, 0) 100%);
-			z-index: 5;
+			z-index: 1;
 			transition: all cubic-bezier(0.42, 0, 0.58, 1) 0.2s !important;
 			opacity: 1;
 		}
@@ -116,19 +116,34 @@
 				padding: 0 2rem 2rem 2rem;
 			}
 			.name {
-				font-size: 5rem;
+				font-size: 5em;
 				font-weight: 700;
 				display: inline-block;
-				white-space: pre-line;
+				white-space: pre;
 				padding: 0 2rem 0 2rem;
 
 				@media screen and (max-width: 500px) {
 					inline-size: 100%;
 					overflow-wrap: break-word;
-					font-size: 2rem;
-					padding: 0 2rem 0 1.5rem;
+					font-size: 1.5rem;
+					white-space: pre-line;
+					padding: 1rem 0.8rem;
+				}
+				@media screen and (max-width: 700px) {
+					inline-size: 100%;
+					overflow-wrap: break-word;
+					font-size: 0em;
+					// padding: 0 2rem 0 1.5rem;
+				}
+				@media screen and (max-width: 850px) {
+					inline-size: 100%;
+					overflow-wrap: break-word;
+					font-size: 3.5em;
 				}
 			}
+		}
+		@media screen and (max-width: 500px) {
+			padding: 0.8rem;
 		}
 	}
 	.gradient {

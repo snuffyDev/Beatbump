@@ -74,7 +74,7 @@
 			<div
 				use:clickOutside
 				on:click_outside={() => {
-					settingsHidden = !settingsHidden
+					settingsHidden = false
 				}}
 				class="nav-settings"
 				style={`background-color: var(--${curTheme}-top)}`}
@@ -134,6 +134,7 @@
 		border-top: 0.125px rgba(170, 170, 170, 0.26) inset;
 		background-color: inherit;
 		padding: 0.5em;
+		z-index: 10;
 		/* flex-wrap: nowrap; */
 		/* white-space: nowrap; */
 		flex-direction: row;

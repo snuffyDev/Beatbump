@@ -51,7 +51,7 @@
 		// })
 		currentTitle.set(mix.results[0].title)
 	}}
-	on:mouseenter={() => {
+	on:mouseover={() => {
 		isHovering = true
 	}}
 	on:mouseleave={() => {
@@ -59,7 +59,9 @@
 	}}>
 	<span class="number"
 		>{#if isHovering}
-			<svelte:component this={Icon} class="icon" name="play" size="1.5em" />
+			<span>
+				<svelte:component this={Icon} class="icon" name="play" size="1.5em" />
+			</span>
 			<!-- content here -->
 		{:else}
 			<span>{index + 1}<!-- else content here --></span>
@@ -139,6 +141,7 @@
 	.itemInfo {
 		display: flex;
 		flex-direction: column;
+		flex: 1 0;
 	}
 	ul {
 		padding: 0;
@@ -155,9 +158,19 @@
 		height: 2rem;
 		margin-right: 0.75rem;
 		margin-left: 0.75rem;
-		opacity: 1;
-		transition: opacity 0.25s ease-in-out;
+		opacity: 0;
+		transition: opacity 1.25s ease-in-out;
 		-moz-transition: opacity 0.25s ease-in-out;
 		-webkit-transition: opacity 0.25s ease-in-out;
+
+		&:hover {
+			opacity: 1;
+			transition: opacity 1.25s ease-in-out;
+			-moz-transition: opacity 0.25s ease-in-out;
+			-webkit-transition: opacity 0.25s ease-in-out;
+		}
+	}
+	.number {
+		opacity: 1 !important;
 	}
 </style>

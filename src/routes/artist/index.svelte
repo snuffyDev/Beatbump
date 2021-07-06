@@ -90,7 +90,7 @@
 				></button>
 			{#if items !== undefined}
 				<section>
-					<h4>Songs</h4>
+					<h4 class="grid-title">Songs</h4>
 					<section class="songs">
 						{#each items as item, index}
 							<ListItem {item} {index} />
@@ -107,9 +107,9 @@
 					type="trending" /> -->
 				<section>
 					{#if carousel.header[0].title}
-						<h4>{carousel.header[0].title}</h4>
+						<h4 class="grid-title">{carousel.header[0].title}</h4>
 					{:else}
-						<h4>{carousel.header}</h4>
+						<h4 class="grid-title">{carousel.header}</h4>
 					{/if}
 					<section class="grid">
 						{#each carousel.contents as item, index}
@@ -145,10 +145,19 @@
 {/await}
 
 <style lang="scss">
+	.grid-title {
+		font-weight: 600;
+		font-size: 1.75rem;
+		padding: 0 2rem 0 1rem;
+	}
 	.grid-item {
 		cursor: pointer;
+		display: flex;
+		flex-direction: column;
+		flex-wrap: nowrap;
+		place-items: center;
 		.thumbnail {
-			max-width: 9rem;
+			max-width: 12rem;
 		}
 	}
 	.item-title {
@@ -156,8 +165,11 @@
 	}
 	.grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-		grid-gap: 1rem;
+		grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+		grid-gap: 1rem 1.5rem;
+		@media screen and (max-width: 575px) {
+			grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+		}
 	}
 	.songs {
 		margin-bottom: 1rem;
@@ -181,6 +193,7 @@
 		padding: 0.3rem;
 	}
 	.radio-button {
+		margin-left: 0.5rem;
 		background: transparent !important;
 		border: white 0.1rem solid !important;
 		color: white !important;
