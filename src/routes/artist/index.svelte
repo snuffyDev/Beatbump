@@ -129,12 +129,18 @@
 										goto(`/release?id=${item.browseEndpoint.browseId}`)
 									}
 								}}>
-								<img
-									loading="lazy"
-									class="thumbnail"
-									src={item.thumbnails[0].url}
-									alt="Thumbnail" />
-								<p class="item-title">{item.title}</p>
+								<div class="row">
+									<div class="thumbnail-wrapper">
+										<img
+											loading="lazy"
+											class="thumbnail"
+											src={item.thumbnails[0].url}
+											alt="Thumbnail" />
+									</div>
+									<div class="content-wrapper">
+										<span class="item-title">{item.title}</span>
+									</div>
+								</div>
 							</div>
 						{/each}
 					</section>
@@ -145,30 +151,98 @@
 {/await}
 
 <style lang="scss">
+	.row {
+		display: grid;
+		/* flex-direction: row; */
+		/* flex: 1 0 auto; */
+		place-items: center;
+		grid-template-rows: repeat(auto-fill, minmax(50px, 1fr));
+	}
+	.content-wrapper {
+		display: flex;
+		max-width: inherit;
+		margin: 0.5rem 0 0.5em 0;
+	}
 	.grid-title {
 		font-weight: 600;
 		font-size: 1.75rem;
-		padding: 0 2rem 0 1rem;
+		padding: 0 0em 0 0.75rem;
+		margin: 1.5rem 0;
 	}
 	.grid-item {
-		cursor: pointer;
-		display: flex;
-		flex-direction: column;
-		flex-wrap: nowrap;
-		place-items: center;
-		.thumbnail {
+		/* display: flex; */
+		/* flex-direction: column; */
+		/* flex-wrap: nowrap; */
+		transition: all 50ms cubic-bezier(0.16, 0.73, 0.85, 0.49);
+		position: relative;
+		padding: 1em;
+		margin: 0;
+		&:before {
+			content: '';
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			border-radius: 0.8rem;
+			background: rgb(255 255 255 / 1%);
+		}
+		&:before:hover {
+			background: rgba(170, 170, 170, 0.041);
+		}
+		.thumbnail-wrapper {
+			cursor: pointer;
+			width: 100%;
+			height: auto;
 			max-width: 12rem;
+			max-height: 12rem;
+			aspect-ratio: 1/1;
+			position: relative;
+			/* bottom: 0; */
+			/* right: 0; */
+			/* left: 0; */
+			/* top: 0; */
+			background: none;
+			justify-self: center;
+		}
+		&:hover {
+			background: rgba(170, 170, 170, 0.041);
+			.thumbnail-wrapper {
+				box-shadow: 0em 0em 1em 0.1em #bbbbbb0a;
+
+				// outline: #1f1c3173 solid 0.0125rem;
+			}
+		}
+		.thumbnail {
+			width: 100%;
+			height: 100%;
+			-o-object-fit: scale-down;
+			object-fit: scale-down;
+			max-height: 100%;
+			max-width: 100%;
+			aspect-ratio: inherit;
+			position: absolute;
+			bottom: 0;
+			top: 0;
+			right: 0;
+			left: 0;
 		}
 	}
 	.item-title {
 		font-size: 1rem;
+		cursor: pointer;
+		margin: 0;
+		padding: 0;
 	}
 	.grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
-		grid-gap: 1rem 1.5rem;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(12.85rem, 1fr));
+		grid-gap: 1.7rem 1.2rem;
+		// grid-gap: 1rem 1.5rem;
 		@media screen and (max-width: 575px) {
-			grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+			grid-template-columns: repeat(auto-fit, minmax(12.85rem, 1fr));
 		}
 	}
 	.songs {
