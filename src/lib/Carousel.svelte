@@ -185,8 +185,35 @@
 	.scroll {
 		margin-bottom: 2.5rem;
 		// padding-bottom: 1.25rem;
-		@include scrim(#1f1a2c2c, 'to top', 0.4125);
-
+		// @include scrim(#1f1a2c2c, 'to top', 0.4125);
+		// background: linear-gradient(
+		// 	180deg,
+		// 	#120f1854 1%,
+		// 	#312b4230 9%,
+		// 	#1b17255e 17%,
+		// 	#2c253c57 25%,
+		// 	#332c4975 32%,
+		// 	#352d4b29 45%,
+		// 	#2a234057 56%,
+		// 	#332c4659 70%,
+		// 	#30284766 80%,
+		// 	#2e25435e 90%,
+		// 	#2f27435c 100%
+		// );
+		background: linear-gradient(
+			180deg,
+			rgb(18 15 24 / 8%) 1%,
+			rgb(20 17 29 / 14%) 10%,
+			rgb(31 26 43 / 18%) 18%,
+			rgb(22 18 30 / 31%) 27%,
+			rgb(33 29 47 / 23%) 37%,
+			rgb(30 26 42 / 28%) 50%,
+			rgb(42 35 64 / 22%) 62%,
+			rgb(33 29 46 / 38%) 70%,
+			rgb(41 33 57 / 34%) 78%,
+			rgb(27 22 39 / 50%) 82%,
+			rgb(49 40 66 / 37%) 100%
+		);
 		grid-column-gap: 0.5rem;
 		overflow-y: hidden;
 		height: auto;

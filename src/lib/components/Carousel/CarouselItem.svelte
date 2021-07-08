@@ -64,9 +64,10 @@
 					<h6 class="title">
 						{item.title}
 					</h6>
-					{#each item.subtitle as sub}
-						<span>{sub.text}</span>
-					{/each}
+					{#if item.subtitle}
+						{#each item.subtitle as sub}
+							<span>{sub.text}</span>
+						{/each}{/if}
 				</div>
 			</div>
 		</div>
@@ -77,11 +78,17 @@
 						<div
 							class="dd-item"
 							on:click={() => {
-								goto(
-									`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
-								)
+								if (item?.subtitle[0]?.navigationEndpoint) {
+									goto(
+										`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
+									)
+								}
 							}}
-							href={`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`}>
+							href={`/artist?id=${
+								item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
+									? item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
+									: ''
+							}`}>
 							<Icon name="artist" size="1.5em" />
 							<div class="dd-text">View Artist</div>
 						</div>

@@ -1,54 +1,55 @@
-import { parseContents } from '$lib/endpoints/nextUtils'
+import { parseContents } from "$lib/endpoints/nextUtils";
 
 // import NextParser from "/nextUtils";
 
 export async function get({ query }) {
-	const i = query.get('index')
-	const params = query.get('params')
-	const video_id = query.get('videoId')
-	const playlist_id = query.get('playlistId')
-	const ctoken = query.get('ctoken')
-
+	const i = query.get("index") ? query.get("index") : "";
+	const params = query.get("params") ? query.get("params") : "";
+	const video_id = query.get("videoId") ? query.get("video_id") : "";
+	const playlist_id = query.get("playlistId") ? query.get("playlistId") : "";
+	const ctoken = query.get("ctoken") ? query.get("ctoken") : "";
+	let cont = `continuation: ${ctoken}`;
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/next?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
-			method: 'POST',
+			method: "POST",
 			body: JSON.stringify({
 				context: {
 					client: {
-						clientName: 'WEB_REMIX',
-						clientVersion: '0.1'
+						clientName: "WEB_REMIX",
+						clientVersion: "0.1",
 					},
 
 					user: {
-						enableSafetyMode: false
-					}
+						enableSafetyMode: false,
+					},
 				},
-				continuation: `${ctoken}`,
+
+				continuation: `${ctoken ? ctoken : ""}`,
 				isAudioOnly: true,
 				enablePersistentPlaylistPanel: true,
-				index: `${i}`,
-				params: `${params}`,
-				tunerSettingValue: 'AUTOMIX_SETTING_NORMAL',
+				index: `${i ? i : ""}`,
+				params: `${params ? params : ""}`,
+				tunerSettingValue: "AUTOMIX_SETTING_NORMAL",
 				videoId: `${video_id}`,
 				playlistId: `${playlist_id}`,
 				watchEndpointMusicConfig: {
 					hasPersistentPlaylistPanel: true,
-					musicVideoType: 'MUSIC_VIDEO_TYPE_ATV'
-				}
+					musicVideoType: "MUSIC_VIDEO_TYPE_ATV",
+				},
 			}),
 			headers: {
-				'Content-Type': 'application/json; charset=utf-8',
-				Origin: 'https://music.youtube.com'
-			}
+				"Content-Type": "application/json; charset=utf-8",
+				Origin: "https://music.youtube.com",
+			},
 			// referrer: `https://music.youtube.com/watch?v=${videoId}&list=${playlistId}`,
 		}
-	)
+	);
 	if (!response.ok) {
 		// NOT res.status >= 200 && res.status < 300
-		return { statusCode: response.status, body: response.statusText }
+		return { statusCode: response.status, body: response.statusText };
 	}
-	const data = await response.json()
+	const data = await response.json();
 	if (!params) {
 		let {
 			contents: {
@@ -67,23 +68,23 @@ export async function get({ query }) {
 															{
 																nextRadioContinuationData: {
 																	clickTrackingParams,
-																	continuation
-																}
-															}
-														]
-													}
-												}
-											}
-										}
-									}
-								}
-							]
-						}
-					}
-				}
+																	continuation,
+																},
+															},
+														],
+													},
+												},
+											},
+										},
+									},
+								},
+							],
+						},
+					},
+				},
 			},
-			currentVideoEndpoint: { watchEndpoint }
-		} = data
+			currentVideoEndpoint: { watchEndpoint },
+		} = data;
 		async function parser(
 			contents,
 			continuation,
@@ -97,11 +98,11 @@ export async function get({ query }) {
 				contents,
 				continuation,
 				clickTrackingParams,
-				watchEndpoint ? watchEndpoint : ''
-			)
+				watchEndpoint ? watchEndpoint : ""
+			);
 
 			// console.log(parsed + "parsed 1 ");
-			return parsed
+			return parsed;
 		}
 		// parser(contents);
 		// await console.log(parse);
@@ -109,10 +110,10 @@ export async function get({ query }) {
 			statusCode: 200,
 			body: JSON.stringify(
 				await parser(contents, continuation, clickTrackingParams, watchEndpoint)
-			)
-		}
+			),
+		};
 	}
-	let watchEndpoint
+	let watchEndpoint;
 	let {
 		// currentVideoEndpoint: { watchEndpoint },
 		continuationContents: {
@@ -120,14 +121,14 @@ export async function get({ query }) {
 				contents,
 				continuations: [
 					{
-						nextRadioContinuationData: { clickTrackingParams, continuation }
-					}
+						nextRadioContinuationData: { clickTrackingParams, continuation },
+					},
 				],
 				playlistId,
 				...rest
-			} = watchEndpoint
-		}
-	} = data
+			} = watchEndpoint,
+		},
+	} = data;
 	async function parser(contents, continuation, clickTrackingParams, rest) {
 		// let d = await contents;
 		// const parse = new NextParser(watchEndpoint, contents, watchEndpoint);
@@ -137,16 +138,16 @@ export async function get({ query }) {
 			continuation,
 			clickTrackingParams,
 			rest
-		)
+		);
 		// console.log(parsed + "parsed 2 ");
-		return parsed
+		return parsed;
 	}
 	return {
 		statusCode: 200,
 		body: JSON.stringify(
 			await parser(contents, continuation, clickTrackingParams, rest)
-		)
-	}
+		),
+	};
 }
 
 // output to netlify function log

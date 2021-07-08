@@ -62,8 +62,8 @@ function parseSongs(items) {
 		let browse;
 		let browseId;
 		if (
-			d.menu.menuRenderer.items[5].menuNavigationItemRenderer.navigationEndpoint
-				.browseEndpoint
+			d.menu?.menuRenderer?.items[5]?.menuNavigationItemRenderer
+				?.navigationEndpoint?.browseEndpoint
 		) {
 			let menu = pb(d.menu.menuRenderer, "items", true);
 			let items = pb(
@@ -82,8 +82,8 @@ function parseSongs(items) {
 			// console.log(browse);
 		} else {
 			browseId =
-				d.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0]
-					.navigationEndpoint.browseEndpoint.browseId;
+				d.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text
+					?.runs[0]?.navigationEndpoint?.browseEndpoint?.browseId;
 		}
 		let mixInfo =
 			d.menu.menuRenderer.items[0].menuNavigationItemRenderer
@@ -131,9 +131,34 @@ function parseCarouselItem(items, header) {
 		if (ctx.subtitleBadges) {
 			explicit = true;
 		}
+		let playlistId = "";
 		let title = ctx.title.runs[0].text;
+		let videoId = "";
+		if (
+			ctx?.menu?.menuRenderer?.items[2]?.menuServiceItemRenderer
+				?.serviceEndpoint?.queueAddEndpoint?.queueTarget?.playlistId
+		) {
+			videoId =
+				ctx?.thumbnailOverlay?.musicItemThumbnailOverlayRenderer?.content
+					?.musicPlayButtonRenderer?.playNavigationEndpoint?.watchEndpoint
+					?.videoId;
+			playlistId =
+				ctx?.menu?.menuRenderer?.items[2]?.menuServiceItemRenderer
+					?.serviceEndpoint?.queueAddEndpoint?.queueTarget?.playlistId;
+		}
 		let browseEndpoint = ctx.title?.runs[0]?.navigationEndpoint?.browseEndpoint;
-		return { browseEndpoint, title, thumbnails, explicit };
+		if (playlistId !== undefined || playlistId !== null) {
+			return {
+				playlistId,
+				videoId,
+				browseEndpoint,
+				title,
+				thumbnails,
+				explicit,
+			};
+		} else {
+			return { browseEndpoint, title, thumbnails, explicit };
+		}
 	});
 	let head = [
 		...header.map((i) => {
