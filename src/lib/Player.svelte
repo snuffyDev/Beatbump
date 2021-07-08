@@ -109,7 +109,6 @@
 		if (autoId == mixList.length - 1) {
 			const data = await utils.getNext(
 				autoId,
-
 				mixList[autoId].itct,
 				mixList[autoId].videoId,
 				mixList[autoId].autoMixList,
