@@ -50,6 +50,7 @@ export async function get({ query }) {
 		return { statusCode: response.status, body: response.statusText };
 	}
 	const data = await response.json();
+	console.log(data);
 	if (!params) {
 		let {
 			contents: {

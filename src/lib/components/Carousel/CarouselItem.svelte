@@ -2,13 +2,19 @@
 	import lazy from '$lib/lazy'
 	import { trendingHandler } from '$lib/js/indexUtils'
 	import Loading from '$lib/Loading.svelte'
-	import { continuation, currentMix, key } from '$lib/stores/stores'
+	import {
+		continuation,
+		currentMix,
+		currentTitle,
+		currentTrack,
+		key
+	} from '$lib/stores/stores'
 	import { fade } from 'svelte/transition'
 	import Dropdown from './../../Dropdown.svelte'
 	import { goto } from '$app/navigation'
 	import Icon from '$lib/Icon.svelte'
 
-	import { addToQueue } from '$lib/utils'
+	import { addToQueue, getSrc } from '$lib/utils'
 	import { clickOutside } from '$lib/js/clickOutside'
 	export let section
 	export let index
@@ -47,6 +53,29 @@
 						`/api/artistNext.json?playlistId=${item.playlistId}&videoId=${item.videoId}`
 					).then((data) => data.json())
 					const res = await data
+					await getSrc(res[0].videoId)
+					currentMix.set({
+						videoId: `${res.videoId}`,
+						playlistId: `${res.playlistId}`,
+						continuation: '',
+						list: [
+							...res.map((d, i) => ({
+								continuation: '',
+								itct: d.itct,
+								autoMixList: d.autoMixList,
+								artistId: d.artistInfo.browseId,
+								id: d.index,
+								videoId: d.videoId,
+								title: d.title,
+								artist: d.artistInfo.artist,
+								thumbnail: d.thumbnail,
+								length: d.length
+							}))
+						]
+					})
+					currentTrack.set({ ...res[0] })
+					currentTitle.set(res[0].title)
+					key.set(0)
 					console.log(data)
 				}
 			}}>
@@ -56,14 +85,27 @@
 				{/if}
 				<!-- svelte-ignore a11y-missing-attribute -->
 				<div class="container">
-					<img
-						alt="thumbnail"
-						transition:fade|local
-						type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-						data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
-						use:lazy={{
-							src: item.thumbnails[0].url
-						}} />
+					{#if type == 'artist'}
+						<img
+							alt="thumbnail"
+							transition:fade|local
+							loading="lazy"
+							type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+							data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
+							width="250"
+							height="250"
+							src={item.thumbnails[0].url} />
+					{:else}
+						<img
+							alt="thumbnail"
+							transition:fade|local
+							loading="lazy"
+							type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+							data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
+							use:lazy={{
+								src: item.thumbnails[0].url
+							}} />
+					{/if}
 				</div>
 			</div>
 			<div class="cont">
@@ -146,6 +188,7 @@
 	}
 	.title {
 		cursor: pointer;
+		letter-spacing: 0.05em;
 	}
 
 	section {
@@ -179,7 +222,10 @@
 		position: relative;
 		display: block;
 		width: auto;
+		width: 100%;
+		height: 100%;
 		min-width: 12.5rem;
+		max-width: 12.5rem;
 		.container {
 			display: flex;
 			align-items: center;

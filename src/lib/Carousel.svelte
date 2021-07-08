@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Loading from './Loading.svelte'
 	import CarouselItem from './components/Carousel/CarouselItem.svelte'
-	export let setTitle
+	export let setTitle = ''
 	export let items = []
 	export let type = ''
 	import lazy from '$lib/lazy'
@@ -29,11 +29,15 @@
 	let pos = 0
 	// console.log(items)
 	arr = splitArray(arr, 5)
+	// let notComplete = setTitle.includes('Fans Might')
+	// console.log()
+	// let notComplete = setTitle.includes('Fans') ? true : false
 </script>
 
 <div class="header">
-	<h3>{setTitle}</h3>
-	<!-- <span>{type == 'trending' ? '(not fully implemented)' : '(not implemented)'}</span> -->
+	<h3>
+		{setTitle}
+	</h3>
 </div>
 <div class="section">
 	<div class="scroll" id="scrollItem" bind:this={carousel}>

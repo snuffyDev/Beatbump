@@ -73,8 +73,8 @@ export async function get({ query }) {
 			return { statusCode: response.status, body: response.statusText };
 		}
 		const data = await response.json();
-		function parsedData() {
-			console.log(data);
+		function trimResponse() {
+			// console.log(data);
 			let {
 				contents: {
 					singleColumnMusicWatchNextResultsRenderer: {
@@ -85,7 +85,9 @@ export async function get({ query }) {
 										tabRenderer: {
 											content: {
 												musicQueueRenderer: {
-													content: { playlistPanelRenderer },
+													content: {
+														playlistPanelRenderer: { ...rest },
+													},
 												},
 											},
 										},
@@ -96,30 +98,75 @@ export async function get({ query }) {
 					},
 				},
 			} = data;
-			const convertArrayToObject = (array, key) => {
-				const initialValue = {};
-				return array.reduce((obj, item) => {
-					return {
-						...obj,
-						[item[key]]: item,
-					};
-				}, initialValue);
-			};
-			playlistPanelRenderer = [playlistPanelRenderer];
-			const response = playlistPanelRenderer.map((ctx) => {
-				let items = ctx.contents;
-				console.log(items);
-				let contents = Object.fromEntries(items);
-				return { ...items };
+			let temp = [];
+			let res;
+			rest.contents.forEach(({ playlistPanelVideoRenderer }) => {
+				if (playlistPanelVideoRenderer) {
+					temp.push(playlistPanelVideoRenderer);
+				} else {
+					return;
+				}
 			});
-			console.log(response);
+			//console.log(temp);
+			const response = temp.map((item) => {
+				let title = item.title.runs[0].text;
+				let {
+					videoId,
+					playlistId,
+					index,
+					params,
+				} = item.navigationEndpoint.watchEndpoint;
+				let length = item.lengthText.runs[0].text;
+				let mixList =
+					item.menu.menuRenderer.items[0].menuNavigationItemRenderer
+						.navigationEndpoint.watchEndpoint.playlistId;
+				let browseId =
+					item?.longBylineText?.runs[0]?.navigationEndpoint?.browseEndpoint
+						?.browseId;
+				let thumbnail = item.thumbnail.thumbnails[0].url;
+				let artistInfo = {
+					pageType: "MUSIC_PAGE_TYPE_ARTIST",
+					artist: item.shortBylineText.runs[0].text,
+					browseId:
+						item.longBylineText.runs[0].navigationEndpoint.browseEndpoint
+							.browseId,
+				};
+				// let Obj = Object.fromEntries(results);
+				return {
+					index: index,
+					itct: params,
+					title,
+					artistInfo,
+					autoMixList: mixList,
+					thumbnail,
+					length,
+					videoId,
+					playlistId,
+				};
+			});
+
+			//console.log(temp);
 			return response;
 		}
-		const d = parsedData();
+		const trim: [] = trimResponse();
+		// if (trim !== undefined) parseResponse();
 
+		// function parseResponse() {
+		// 	// return trim.playlistSetVideoId;
+		// 	let result = trim.forEach((item) => {
+		// 		let {
+		// 			navigationEndpoint: { watchEndpoint },
+		// 		} = item;
+		// 		let { videoId, playlistId } = watchEndpoint;
+		// 		return { videoId, playlistId };
+		// 	});
+		// 	console.log(trim[0]);
+		// 	return result;
+		// }
+		// let finalRes = parseResponse();
 		return {
 			statusCode: 200,
-			body: JSON.stringify(d),
+			body: JSON.stringify(trim),
 		};
 	} catch (error) {
 		// output to netlify function log

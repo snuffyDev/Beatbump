@@ -14,7 +14,7 @@
 	class="item"
 	on:click={async () => {
 		let mix = await utils
-			.getNext(0, '', item.videoId, '', '')
+			.getNext(0, '', item.videoId, item.autoMixId, '')
 			.then((data) => data)
 		// console.log(mix)
 		const play = await utils

@@ -25,25 +25,24 @@
 
 <style lang="scss">
 	.sidebar {
-		padding: 0 0.3125rem;
-		/* position: fixed; */
 		overflow-x: hidden;
 		overflow-y: hidden;
 		top: 0;
-		bottom: 6rem;
-		padding-bottom: 6rem;
+		/* bottom: 6rem; */
+		padding: 0 0.3125rem 6rem;
 		width: 16rem;
+		max-width: 16rem;
 		height: 100%;
 		min-height: 100%;
 		border-right: 0.0625rem outset hsla(0, 0%, 66.7%, 0.123);
-		/* padding-top: 4.3125rem; */
 		box-sizing: border-box;
 		display: none;
+		contain: layout;
 		grid-area: s;
 		grid-template-rows: 1fr 1fr 1fr;
 		grid-gap: 1rem;
 		padding-inline: auto;
-		box-shadow: -0.2rem 0.1rem 1rem 0.1rem rgba(0, 0, 0, 0.486);
+		box-shadow: -0.2rem 0.1rem 1rem 0.1rem rgb(0 0 0 / 49%);
 		justify-items: center;
 	}
 
@@ -52,17 +51,17 @@
 		padding-top: 0.8em;
 	}
 	.bottom {
-		em {
-			margin-bottom: 0.5em;
-		}
 		position: absolute;
-		bottom: 5rem;
-		display: inline-flex;
+		bottom: 1rem;
+		display: flex;
 		flex-direction: column;
-		// top: 8em;
-		margin-left: 2.5rem;
+		/* margin-left: 2.5rem; */
 		line-height: 2;
 		text-align: center;
+		flex-wrap: nowrap;
+		left: 0;
+		right: 0;
+		/* z-index: 200;*/
 	}
 	@media (min-width: 640px) {
 		.sidebar {

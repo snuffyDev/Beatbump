@@ -25,9 +25,11 @@
 	let loading = false
 	let explicit
 	let type
+	let playlistId = ''
 	onMount(async () => {
 		loading = true
 		const data = await getData('', '', 'browse', browseId, pageType, '', '')
+		console.log(data)
 		if (data) {
 			let {
 				frameworkUpdates: {
@@ -35,7 +37,7 @@
 				}
 			} = await data
 			let arr = mutations
-			// console.log(mutations)
+			console.log(mutations)
 			let temp = []
 			info = []
 			arr.forEach((d) => {
@@ -46,7 +48,7 @@
 					info.push(d.payload.musicAlbumRelease)
 				}
 			})
-
+			if (info) playlistId = info[0].radioAutomixPlaylistId
 			items = [
 				...temp.map((item) => {
 					let explicit = false
@@ -58,6 +60,7 @@
 						explicit = true
 					}
 					return {
+						autoMixId: playlistId ? playlistId : '',
 						thumbnail: item.thumbnailDetails.thumbnails[0].url,
 						videoId: item.videoId,
 						title: item.title,
@@ -67,8 +70,8 @@
 					}
 				})
 			]
-			// console.log(info)
-			// console.log(items)
+			console.log(info)
+			console.log(items)
 			loading = false
 		}
 	})
