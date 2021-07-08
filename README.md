@@ -36,7 +36,9 @@ Run the following command:
 npm install
 ```
 
-Make sure the SvelteKit packages are marked 'next' in the package.json
+Make sure the SvelteKit packages are marked 'next' in the ```package.json``` before starting up the development server. If everything is installed, and the SvelteKit related packages are marked ```"next"``` then the setup is finished. The dev server will be served on port 5000.
+
+> NOTE: the dev command has the flag ```--host``` enabled. Remove this if you want to avoid the dev server being accessible on other devices.   
 
 ### Deploying
 
@@ -44,6 +46,6 @@ The default deployment is configured for Cloudflare Workers. For information on 
 
 For other adapters, visit the official [adapters section](https://kit.svelte.dev/docs#adapters) of the SvelteKit documentation.
 
-**NOTE:** It's highly encouraged to use serverless deployment or the Node adapter for easier deployment.
+> **Note:** This app uses SvelteKit endpoints, which will not work with @sveltejs/adapter-static, it's **_not recommended_** to use it, even if you refactor it to use Serverless Functions.
 
-To use the static adapter, you would need to modify the endpoint routes to fit your platform's serverless functions format. It is **_not recommended_** to use the static adapter.
+
