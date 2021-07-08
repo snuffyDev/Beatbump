@@ -101,9 +101,9 @@
 				</section>
 			{/if}
 			{#each carouselItems as carousel}
-				<!-- <Carousel
+				<Carousel
 					items={carousel.contents}
-					type="trending"
+					type="artist"
 					setTitle={carousel.header[0].title
 						? carousel.header[0].title
 						: carousel.header}>
@@ -115,7 +115,7 @@
 							{/each}
 						</div>
 					</div>
-				</Carousel> -->
+				</Carousel>
 				{#if carousel.header[0].title}
 					<h4 class="grid-title">{carousel.header[0].title}</h4>
 				{:else}

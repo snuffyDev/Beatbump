@@ -13,6 +13,7 @@
 	export let section
 	export let index
 	export let item
+	export let type = ''
 	let hovering
 	let isLoading = false
 	let loading = isLoading ? true : false
@@ -34,13 +35,19 @@
 		bind:this={section[index]}>
 		<div
 			class="clickable"
-			on:click={() => {
-				if (!loading) {
+			on:click={async () => {
+				if (type == 'trending' && !loading) {
 					trendingHandler(item).then(() => {
 						loading = !loading
 						key.set(0)
 					})
 					loading = !loading
+				} else if (type == 'artist' && !loading) {
+					const data = await fetch(
+						`/api/artistNext.json?playlistId=${item.playlistId}&videoId=${item.videoId}`
+					).then((data) => data.json())
+					const res = await data
+					console.log(data)
 				}
 			}}>
 			<div class="img">
