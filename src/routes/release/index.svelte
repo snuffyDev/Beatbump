@@ -60,7 +60,7 @@
 						explicit = true
 					}
 					return {
-						autoMixId: playlistId ? playlistId : '',
+						playlistId: playlistId ? playlistId : '',
 						thumbnail: item.thumbnailDetails.thumbnails[0].url,
 						videoId: item.videoId,
 						title: item.title,

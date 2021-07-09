@@ -140,7 +140,7 @@
 	}
 	.artist-content {
 		position: relative;
-		z-index: 5;
+		z-index: 1;
 		.content-wrapper {
 			position: absolute;
 			bottom: 0;

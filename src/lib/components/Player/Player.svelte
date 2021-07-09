@@ -235,7 +235,7 @@
 		autoId = event.detail.id
 		console.log(autoId)
 	}}
-	bind:show={listShow}
+	bind:show={showing}
 	bind:mixList
 	bind:autoId={$key} />
 
@@ -332,7 +332,7 @@
 				</div>
 			{/if}
 			<div class="menu-container">
-				<Dropdown type="player" bind:show={menuShow}>
+				<Dropdown type="player">
 					<div slot="content">
 						{#if hasList}
 							<div

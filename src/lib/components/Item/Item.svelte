@@ -146,7 +146,7 @@
 			</div>
 		</div>
 		<div class="menu">
-			<Dropdown bind:show={toggle}>
+			<Dropdown>
 				<div slot="content">
 					<div
 						class="dd-item"

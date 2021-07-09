@@ -1,28 +1,34 @@
 <script lang="ts">
+	import { createEventDispatcher } from 'svelte'
 	import { slide } from 'svelte/transition'
 	import { goto } from '$app/navigation'
 
 	import Icon from '$lib/components/Icon/Icon.svelte'
 
 	import { clickOutside } from '$lib/js/clickOutside'
+	import { quartInOut, quintIn } from 'svelte/easing'
 	export let type = ''
-	export let show = false
+	export let show
+	let showing = false
+	$: menuToggle = showing ? true : false
+	const dispatch = createEventDispatcher()
 </script>
 
 <div
 	class="menuButtons"
 	on:click={() => {
-		show = !show
+		showing = !showing
+		console.log(showing)
+	}}
+	use:clickOutside
+	on:click_outside={() => {
+		showing = false
 	}}>
 	<svelte:component this={Icon} size="1.5em" name="dots" />
-	{#if show}
+	{#if menuToggle}
 		<div
-			transition:slide={{ duration: 125 }}
-			class={type == 'player' ? 'dd-player' : 'dd-menu'}
-			use:clickOutside
-			on:click_outside={() => {
-				show = !show
-			}}>
+			transition:slide={{ duration: 125, easing: quartInOut }}
+			class={type == 'player' ? 'dd-player' : 'dd-menu'}>
 			<slot name="content" />
 			<!-- <div class="dd-item">
 				<slot name="item" itemprop="item" />

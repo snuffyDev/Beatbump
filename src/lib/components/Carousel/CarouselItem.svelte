@@ -132,7 +132,7 @@
 		</div>
 		{#if width < 525}
 			<div class="menu">
-				<Dropdown bind:show={menuToggle}>
+				<Dropdown>
 					<div slot="content">
 						<div
 							class="dd-item"
@@ -182,7 +182,7 @@
 			</div>
 		{:else if hovering}
 			<div class="menu">
-				<Dropdown bind:show={menuToggle}>
+				<Dropdown>
 					<div slot="content">
 						<div
 							class="dd-item"
