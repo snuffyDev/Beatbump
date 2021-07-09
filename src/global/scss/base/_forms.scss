@@ -18,7 +18,7 @@ fieldset {
 
 legend {
 	font-weight: 600;
-	margin-bottom: $small-spacing / 2;
+	margin-bottom: $small-spacing * 0.5;
 	padding: 0;
 }
 
@@ -27,7 +27,7 @@ label {
 	font-weight: 500;
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	font-variant-caps: all-small-caps;
-	margin-bottom: $small-spacing / 2;
+	margin-bottom: $small-spacing * 0.5;
 }
 
 // // all text inputs
@@ -112,7 +112,7 @@ textarea {
 [type='radio'] {
 	display: inline;
 	font-family: initial;
-	margin-right: $small-spacing / 2;
+	margin-right: $small-spacing * 0.5;
 }
 
 [type='file'] {

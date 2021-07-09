@@ -1,17 +1,12 @@
 <script>
 	import lazy from '$lib/lazy'
 	import { trendingHandler } from '$lib/js/indexUtils'
-	import Loading from '$lib/components/Loading/Loading.svelte'
-	import {
-		currentMix,
-		currentTitle,
-		currentTrack,
-		key
-	} from '$lib/stores/stores'
+	import Loading from '$components/Loading/Loading.svelte'
+	import { currentMix, currentTitle, currentTrack, key } from '$stores/stores'
 	import { fade } from 'svelte/transition'
-	import Dropdown from '$lib/components/Dropdown/Dropdown.svelte'
+	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 	import { goto } from '$app/navigation'
-	import Icon from '$lib/components/Icon/Icon.svelte'
+	import Icon from '$components/Icon/Icon.svelte'
 
 	import { addToQueue, getSrc } from '$lib/utils'
 	import { clickOutside } from '$lib/js/clickOutside'

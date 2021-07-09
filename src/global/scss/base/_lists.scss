@@ -26,11 +26,11 @@ ul {
 }
 
 dl {
-	margin-bottom: $base-spacing / 2;
+	margin-bottom: $base-spacing * 0.5;
 
 	dt {
 		font-weight: bold;
-		margin-top: $base-spacing / 2;
+		margin-top: $base-spacing * 0.5;
 	}
 
 	dd {

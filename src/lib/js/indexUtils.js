@@ -1,4 +1,4 @@
-import { currentMix, currentTitle, currentTrack, key } from '$lib/stores/stores'
+import { currentMix, currentTitle, currentTrack, key } from '$stores/stores'
 import * as utils from '$lib/utils'
 
 export async function trendingHandler(item) {

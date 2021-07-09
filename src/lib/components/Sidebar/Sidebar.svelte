@@ -1,7 +1,7 @@
 <script>
 	import { fade, slide, fly } from 'svelte/transition'
-	import Icon from '$lib/components/Icon/Icon.svelte'
-	import Search from '$lib/components/Search/Search.svelte'
+	import Icon from '$components/Icon/Icon.svelte'
+	import Search from '$components/Search/Search.svelte'
 </script>
 
 <div class="sidebar" transition:fly>

@@ -1,7 +1,7 @@
 <script>
 	import { fade } from 'svelte/transition'
-	import Icon from '$lib/components/Icon/Icon.svelte'
-	import { currentMix, currentTitle, key } from '$lib/stores/stores'
+	import Icon from '$components/Icon/Icon.svelte'
+	import { currentMix, currentTitle, key } from '$stores/stores'
 	import * as utils from '$lib/utils'
 	export let item
 	export let index

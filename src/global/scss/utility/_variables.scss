@@ -9,7 +9,7 @@ $secondary-font-family: "Commissioner", sans-serif;
 // Sizes
 $max-width: 85.375rem;
 $base-spacing: 2rem;
-$small-spacing: $base-spacing / 2;
+$small-spacing: $base-spacing * 0.5;
 $large-spacing: $base-spacing * 2;
 $small-break: 480px;
 // Borders

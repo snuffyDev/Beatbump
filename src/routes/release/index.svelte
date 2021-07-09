@@ -4,19 +4,14 @@
 </script>
 
 <script>
-	import Loading from '$lib/components/Loading/Loading.svelte'
+	import Loading from '$components/Loading/Loading.svelte'
 	import { page } from '$app/stores'
 	import { getData } from '$lib/utils'
 	import { onMount } from 'svelte'
 	import * as utils from '$lib/utils'
-	import Icon from '$lib/components/Icon/Icon.svelte'
-	import ListItem from '$lib/components/ListItem/ListItem.svelte'
-	import {
-		currentMix,
-		currentTitle,
-		currentTrack,
-		key
-	} from '$lib/stores/stores'
+	import Icon from '$components/Icon/Icon.svelte'
+	import ListItem from '$components/ListItem/ListItem.svelte'
+	import { currentMix, currentTitle, currentTrack, key } from '$stores/stores'
 	let browseId = $page.query.get('id')
 	// console.log(browseId)
 	let pageType = $page.query.get('type')

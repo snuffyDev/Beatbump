@@ -128,22 +128,6 @@
 </div>
 
 <style lang="scss">
-	.left,
-	.right {
-		background: black;
-		top: 50%;
-		z-index: 100;
-	}
-	.left {
-		left: 0;
-		position: absolute;
-	}
-
-	.right {
-		position: absolute;
-		right: 0;
-	}
-
 	.item {
 		padding-bottom: 2em;
 	}

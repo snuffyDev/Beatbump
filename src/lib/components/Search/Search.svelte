@@ -8,7 +8,7 @@
 	export let type
 	import { goto, invalidate } from '$app/navigation'
 	import { page } from '$app/stores'
-	import { searchManager } from '$lib/stores/stores'
+	import { searchManager } from '$stores/stores'
 	let endpoint = 'search'
 	let filterType
 	let songTitle = ''

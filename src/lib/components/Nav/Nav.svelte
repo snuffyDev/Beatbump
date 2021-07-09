@@ -1,11 +1,11 @@
 <script>
-	import Search from '$lib/components/Search/Search.svelte'
+	import Search from '$components/Search/Search.svelte'
 	import { fade } from 'svelte/transition'
-	import Icon from '$lib/components/Icon/Icon.svelte'
+	import Icon from '$components/Icon/Icon.svelte'
 	import { circIn } from 'svelte/easing'
 	import { goto } from '$app/navigation'
 	import { clickOutside } from '$lib/js/clickOutside'
-	import { theme } from '$lib/stores/stores'
+	import { theme } from '$stores/stores'
 	import { onMount } from 'svelte'
 
 	export let width

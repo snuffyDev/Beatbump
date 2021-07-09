@@ -1,24 +1,18 @@
 <script>
 	import { clickOutside } from '$lib/js/clickOutside'
 	import { goto } from '$app/navigation'
-	import Dropdown from '$lib/components/Dropdown/Dropdown.svelte'
-	import { iOS } from '$lib/stores/stores.js'
+	import Dropdown from '$components/Dropdown/Dropdown.svelte'
+	import { iOS } from '$stores/stores.js'
 	import { tweened } from 'svelte/motion'
 	import { getSrc } from '$lib/utils'
-	import Playlist from '$lib/components/Playlist/Playlist.svelte'
+	import Playlist from '$components/Playlist/Playlist.svelte'
 	import '../../../global/scss/components/_player.scss'
-	import Icon from '$lib/components/Icon/Icon.svelte'
-	import {
-		updateTrack,
-		key,
-		currentMix,
-		currentTitle
-	} from '$lib/stores/stores'
+	import Icon from '$components/Icon/Icon.svelte'
+	import { updateTrack, key, currentMix, currentTitle } from '$stores/stores'
 	import { cubicOut } from 'svelte/easing'
 	import * as utils from '$lib/utils'
 
 	export let title
-	export let playerStatus = 'paused'
 	export let nowPlaying
 
 	const player = new Audio()

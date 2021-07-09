@@ -4,7 +4,7 @@ import node from '@sveltejs/adapter-node'
 
 import autoprefixer from 'autoprefixer'
 import cssnano from 'cssnano'
-import fs from 'fs'
+import path from 'path'
 import sveltePreprocess from 'svelte-preprocess'
 
 const check = process.env.NODE_ENV
@@ -35,6 +35,14 @@ export default {
             routes: 'src/routes',
             serviceWorker: 'src/service-worker',
             template: 'src/app.html',
+        },
+        vite: {
+            resolve: {
+                alias: {
+                    $stores: path.resolve('./src/lib/stores'),
+                    $components: path.resolve('./src/lib/components')
+                }
+            }
         }
     }
 }

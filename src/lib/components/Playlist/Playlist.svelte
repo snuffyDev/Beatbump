@@ -7,7 +7,7 @@
 		onMount
 	} from 'svelte'
 	import { cubicIn } from 'svelte/easing'
-	import { currentTitle } from '$lib/stores/stores'
+	import { currentTitle } from '$stores/stores'
 	import { getSrc } from '$lib/utils'
 	import { clickOutside } from '$lib/js/clickOutside'
 

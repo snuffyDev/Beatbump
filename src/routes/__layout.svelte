@@ -3,12 +3,12 @@
 	import { browser } from '$app/env'
 	import { fade } from 'svelte/transition'
 	import { onMount } from 'svelte'
-	import { currentTrack, theme } from '$lib/stores/stores'
+	import { currentTrack, theme } from '$stores/stores'
 	import * as utils from '$lib/utils'
-	import { iOS } from '$lib/stores/stores'
-	import Nav from '$lib/components/Nav/Nav.svelte'
-	import Sidebar from '$lib/components/Sidebar/Sidebar.svelte'
-	import Player from '$lib/components/Player/Player.svelte'
+	import { iOS } from '$stores/stores'
+	import Nav from '$components/Nav/Nav.svelte'
+	import Sidebar from '$components/Sidebar/Sidebar.svelte'
+	import Player from '$components/Player/Player.svelte'
 	onMount(() => {
 		iOS.init()
 		const getTheme = () => {

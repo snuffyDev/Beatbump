@@ -3,7 +3,7 @@
 	import { slide } from 'svelte/transition'
 	import { goto } from '$app/navigation'
 
-	import Icon from '$lib/components/Icon/Icon.svelte'
+	import Icon from '$components/Icon/Icon.svelte'
 
 	import { clickOutside } from '$lib/js/clickOutside'
 	import { quartInOut, quintIn } from 'svelte/easing'

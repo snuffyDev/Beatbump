@@ -1,19 +1,14 @@
 <script>
-	import Dropdown from '$lib/components/Dropdown/Dropdown.svelte'
+	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 
 	export let data
 	import { fade } from 'svelte/transition'
-	import Loading from '$lib/components/Loading/Loading.svelte'
+	import Loading from '$components/Loading/Loading.svelte'
 	import { afterUpdate, beforeUpdate, onMount, tick } from 'svelte'
 
-	import {
-		currentMix,
-		currentTitle,
-		key,
-		currentTrack
-	} from '$lib/stores/stores'
+	import { currentMix, currentTitle, key, currentTrack } from '$stores/stores'
 	import * as utils from '$lib/utils'
-	import Icon from '$lib/components/Icon/Icon.svelte'
+	import Icon from '$components/Icon/Icon.svelte'
 	import { goto } from '$app/navigation'
 	// import { addToQueue } from '$lib/utils'
 
@@ -200,45 +195,26 @@
 	p {
 		margin: 0.2em 0;
 	}
-	.listItem {
-		width: 100%;
-		display: flex;
-		padding: 0rem 1rem;
-		align-items: center;
-		cursor: pointer;
-		margin: 0;
-		.list-icon {
-			display: inline;
-		}
-		.list-item-text {
-			display: inline;
-			margin-left: 0.5rem;
-		}
-		&:hover {
-			background: #313338;
-			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.1s;
-		}
-	}
-	.menu {
-		// position: absolute;
-		// right: 3.5rem;
+	// .listItem {
+	// 	width: 100%;
+	// 	display: flex;
+	// 	padding: 0rem 1rem;
+	// 	align-items: center;
+	// 	cursor: pointer;
+	// 	margin: 0;
+	// 	.list-icon {
+	// 		display: inline;
+	// 	}
+	// 	.list-item-text {
+	// 		display: inline;
+	// 		margin-left: 0.5rem;
+	// 	}
+	// 	&:hover {
+	// 		background: #313338;
+	// 		transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.1s;
+	// 	}
+	// }
 
-		// background: #18191b;
-		// outline: 0.0714rem solid hsla(0, 0%, 90.6%, 0.329);
-		// padding: 0.5rem 0;
-		position: relative;
-		display: block;
-	}
-	.menuButtons {
-		z-index: 1;
-		margin-right: 0;
-		stroke: 2px #000;
-		height: 25%;
-		/* position: relative; */
-		margin-left: auto;
-		/* place-items: flex-end; */
-		cursor: pointer;
-	}
 	.container {
 		display: flex;
 		flex: 1 1 auto;
@@ -277,7 +253,6 @@
 		padding: 0 0.2rem;
 		margin-left: 0.2rem;
 	}
-	.artist,
 	.text-title {
 		&:hover {
 			text-decoration: underline solid white 0.0714rem;
