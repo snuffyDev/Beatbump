@@ -1,12 +1,8 @@
 <script>
-	import Loading from '$lib/Loading.svelte'
 	import { getData } from '$lib/utils'
 	import { page } from '$app/stores'
 
 	import { onMount } from 'svelte'
-	import { parseArtistPage } from '$lib/js/artistUtils'
-	import Icon from '$lib/Icon.svelte'
-	import ListItem from '$lib/ListItem.svelte'
 	export let headerContent
 	export let items = []
 	export let thumbnail = []
@@ -112,10 +108,25 @@
 			top: 0;
 			right: 0;
 
+			// background: linear-gradient(
+			// 	0turn,
+			// 	#09090a 0%,
+			// 	#0b0b0b 1.2%,
+			// 	#0a0a0bed 14.98%,
+			// 	#1313149e 23%,
+			// 	#14141440 38%,
+			// 	#ababaf17
+			// );
 			background: linear-gradient(
-				0.01turn,
-				#09090a 8.98%,
-				rgb(216 208 227 / 7%) 60%
+				0turn,
+				#09090a,
+				#0b0b0b 1.2%,
+				rgba(10, 10, 11, 0.9294117647058824) 14.98%,
+				rgb(12 12 13 / 85%) 24%,
+				rgb(19 19 20 / 65%) 36%,
+				rgb(19 19 20 / 51%) 50%,
+				rgb(20 20 20 / 16%) 70%,
+				rgb(171 171 175 / 0%) 100%
 			);
 			// background: linear-gradient(1turn, #09090a 8.98%, #d29e9e05 67%);
 			bottom: 0;
@@ -140,31 +151,60 @@
 				padding: 0 2rem 2rem 2rem;
 			}
 			.name {
-				font-size: 5em;
 				font-weight: 700;
+				font-size: 2.5rem;
 				display: inline-block;
-				white-space: pre;
-				padding: 0 2rem 0 2rem;
+				// white-space: pre;
 				text-shadow: rgba(0, 0, 0, 0.171) 0.2rem -0.12rem 0.5rem;
 
-				@media screen and (max-width: 500px) {
+				padding: 0.8em 0 0.8rem 0.5rem;
+				// @media screen and (max-width: 550px) {
+				// 	// padding: 0 2rem 0 2rem;
+				// 	color: red;
+				// }
+				// @media screen and (max-width: 600px) {
+				// 	inline-size: 100%;
+				// 	overflow-wrap: break-word;
+				// 	font-size: 3.5rem;
+				// 	// white-space: pre-line;
+				// 	// padding: 1rem 0.8rem;
+				// 	// padding: 0 2rem 0 2rem;
+
+				// 	padding: 0em 0 0 0.2em;
+				// }
+
+				@media (min-width: 320px) and (max-width: 499px) {
+					padding: 0.8em 0 0.8rem 0.5rem;
+				}
+				@media (min-width: 500px) and (max-width: 640px) {
+					padding: 0.8em 0 0.8rem 1.8rem;
+				}
+				@media screen and (min-width: 642px) and (max-width: 839px) {
+					font-size: 2rem;
+					// color: pink;
+					padding: 0.8em 0 0.8rem 2rem;
+				}
+				@media screen and (min-width: 840px) and (max-width: 960px) {
+					font-size: 3.5rem;
+					// color: orange;
 					inline-size: 100%;
 					overflow-wrap: break-word;
-					font-size: 1.5rem;
-					white-space: pre-line;
-					padding: 1rem 0.8rem;
+
+					// font-size: 2.75em;
+					padding: 0 2rem 0.8rem 2rem;
 				}
-				@media screen and (max-width: 700px) {
-					inline-size: 100%;
-					overflow-wrap: break-word;
-					font-size: 0em;
-					// padding: 0 2rem 0 1.5rem;
+				@media screen and (min-width: 961px) {
+					padding: 0 2rem 0.8rem 2rem;
+					font-size: 4.5rem;
 				}
-				@media screen and (max-width: 850px) {
-					inline-size: 100%;
-					overflow-wrap: break-word;
-					font-size: 3.5em;
-				}
+
+				// @media screen and (min-width: 641px) {
+				// 	inline-size: 100%;
+				// 	overflow-wrap: break-word;
+				// 	padding: 2rem 0 0 2rem;
+
+				// 	font-size: 3.5em; // padding: 0 2rem 0 1.5rem;
+				// }
 			}
 		}
 		@media screen and (max-width: 500px) {

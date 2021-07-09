@@ -5,13 +5,23 @@
 	import { onMount } from 'svelte'
 	import { currentTrack, theme } from '$lib/stores/stores'
 	import * as utils from '$lib/utils'
-	import { iOS } from '../lib/stores/stores'
-	import Nav from './../lib/Nav.svelte'
-	import Sidebar from '../lib/Sidebar.svelte'
-	import Player from '../lib/Player.svelte'
+	import { iOS } from '$lib/stores/stores'
+	import Nav from '$lib/components/Nav/Nav.svelte'
+	import Sidebar from '$lib/components/Sidebar/Sidebar.svelte'
+	import Player from '$lib/components/Player/Player.svelte'
 	onMount(() => {
 		iOS.init()
-		if (!localStorage.getItem('theme')) theme.init('dim')
+		const getTheme = () => {
+			let ls = localStorage.getItem('theme')
+			if (ls) {
+				theme.init(ls)
+			} else {
+				theme.init('dark')
+			}
+			console.log(localStorage.getItem('theme'))
+		}
+		getTheme()
+		// if (!localStorage.getItem('theme')) theme.init('dark')
 	})
 
 	let current = $currentTrack
@@ -58,6 +68,7 @@
 		grid-area: f/f/f/f;
 		height: 4rem;
 		display: block;
+		z-index: 1;
 	}
 	:global(.sidebar) {
 		background-color: theme-color('ytm', 'side');

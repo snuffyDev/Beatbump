@@ -1,11 +1,11 @@
 <script>
-	import Search from './Search.svelte'
+	import Search from '$lib/components/Search/Search.svelte'
 	import { fade } from 'svelte/transition'
-	import Icon from '$lib/Icon.svelte'
+	import Icon from '$lib/components/Icon/Icon.svelte'
 	import { circIn } from 'svelte/easing'
 	import { goto } from '$app/navigation'
-	import { clickOutside } from './js/clickOutside'
-	import { theme } from './stores/stores'
+	import { clickOutside } from '$lib/js/clickOutside'
+	import { theme } from '$lib/stores/stores'
 	import { onMount } from 'svelte'
 
 	export let width
@@ -26,7 +26,7 @@
 	let themeSet = $theme
 
 	let themes = [{ name: 'dark' }, { name: 'dim' }, { name: 'ytm' }]
-	$: theme.init($theme)
+	// $: theme.set($theme)
 </script>
 
 <div class="logo">
@@ -38,6 +38,47 @@
 		title="Beatbump Home"
 		on:click={() => goto('/')} />
 </div>
+{#if width > 640}
+	<div
+		style="background:inherit;"
+		class:shown={width > 640}
+		class:desktop={width < 640}>
+		<div
+			class="nav-item-desktop"
+			on:click={() => {
+				settingsHidden = !settingsHidden
+			}}>
+			<svelte:component this={Icon} name="settings" size="1.75em" />
+		</div>
+		{#if !settingsHidden}
+			<div
+				use:clickOutside
+				on:click_outside={() => {
+					settingsHidden = !settingsHidden
+				}}
+				class="nav-settings"
+				style={`background-color: var(--${curTheme}-top)}`}
+				transition:fade={{ duration: 120, easing: circIn }}>
+				<!-- <label for="search"><em>search</em></label> -->
+				<span class="setting">
+					<span class="s-text">Theme:</span>
+					<div class="selectCont">
+						<select
+							class="select"
+							bind:value={setTheme}
+							on:blur={() => {
+								theme.set(setTheme)
+							}}>
+							{#each themes as theme}
+								<option value={theme.name}>{theme.name}</option>
+							{/each}
+						</select>
+					</div>
+				</span>
+			</div>
+		{/if}
+	</div>
+{/if}
 {#if width < 640}
 	<section class="homeIcon" on:click={() => goto('/')}>
 		<Icon name="home" size="1.75em" />
@@ -74,7 +115,7 @@
 			<div
 				use:clickOutside
 				on:click_outside={() => {
-					settingsHidden = false
+					settingsHidden = !settingsHidden
 				}}
 				class="nav-settings"
 				style={`background-color: var(--${curTheme}-top)}`}
@@ -83,7 +124,12 @@
 				<span class="setting">
 					<span class="s-text">Theme:</span>
 					<div class="selectCont">
-						<select class="select" bind:value={$theme}>
+						<select
+							class="select"
+							bind:value={setTheme}
+							on:blur={() => {
+								theme.set(setTheme)
+							}}>
 							{#each themes as theme}
 								<option value={theme.name}>{theme.name}</option>
 							{/each}
@@ -103,14 +149,18 @@
 {/if}
 
 <style lang="scss">
+	.desktop.nav-item {
+		// position: absolute;
+		// right: 0;
+		// z-index: 5;
+	}
 	.homeIcon {
 		width: 2rem;
 		max-width: 2rem;
 		display: inline;
 	}
 	.s-text {
-		margin-right: 0.8rem;
-		/* align-self: start; */
+		padding: 0 0.8rem 0.2rem 0.8rem; /* align-self: start; */
 		font-size: 1.1rem;
 	}
 	.x-button {
@@ -119,27 +169,38 @@
 	.hidden {
 		display: none;
 	}
+	.shown {
+		visibility: visible;
+		display: block;
+	}
+	.desktop {
+		visibility: hidden;
+		display: none;
+	}
 	.nav-search > :nth-child(2) {
 		right: 0;
 		position: fixed;
 	}
 	.nav-item {
 		margin-bottom: 0;
+		&-desktop {
+			place-items: end;
+		}
 	}
 	.nav-settings {
 		position: absolute;
 		right: 0;
 		bottom: -4em;
 		display: flex;
-		border-top: 0.125px rgba(170, 170, 170, 0.26) inset;
+		border-top: 0.125px inset hsla(0, 0%, 66.7%, 0.26);
 		background-color: inherit;
-		padding: 0.5em;
+		padding: 0.5em 0em 0.5em 0;
 		z-index: 10;
-		/* flex-wrap: nowrap; */
-		/* white-space: nowrap; */
 		flex-direction: row;
+		width: 100%;
+		max-width: 11.4rem;
+		max-height: 4rem;
 		.setting {
-			margin-right: 5rem;
 			display: flex;
 			flex-wrap: nowrap;
 			align-items: center;

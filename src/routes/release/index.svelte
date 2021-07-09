@@ -4,13 +4,13 @@
 </script>
 
 <script>
-	import Loading from '$lib/Loading.svelte'
+	import Loading from '$lib/components/Loading/Loading.svelte'
 	import { page } from '$app/stores'
 	import { getData } from '$lib/utils'
 	import { onMount } from 'svelte'
 	import * as utils from '$lib/utils'
-	import Icon from '$lib/Icon.svelte'
-	import ListItem from '$lib/ListItem.svelte'
+	import Icon from '$lib/components/Icon/Icon.svelte'
+	import ListItem from '$lib/components/ListItem/ListItem.svelte'
 	import {
 		currentMix,
 		currentTitle,

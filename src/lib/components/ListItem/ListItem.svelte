@@ -1,8 +1,8 @@
 <script>
 	import { fade } from 'svelte/transition'
-	import Icon from '$lib/Icon.svelte'
-	import { currentMix, currentTitle, key } from './stores/stores'
-	import * as utils from './utils'
+	import Icon from '$lib/components/Icon/Icon.svelte'
+	import { currentMix, currentTitle, key } from '$lib/stores/stores'
+	import * as utils from '$lib/utils'
 	export let item
 	export let index
 
@@ -51,10 +51,10 @@
 		// })
 		currentTitle.set(mix.results[0].title)
 	}}
-	on:mouseover={() => {
+	on:mouseenter={() => {
 		isHovering = true
 	}}
-	on:mouseleave={() => {
+	on:mouseout={() => {
 		isHovering = false
 	}}>
 	<span class="number"

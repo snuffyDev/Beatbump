@@ -1,7 +1,6 @@
 export async function get({ query }) {
 	const videoId = query.get("videoId") || "";
 	const playlistId = query.get("playlistId") || "";
-
 	try {
 		const response = await fetch(
 			`https://music.youtube.com/youtubei/v1/next?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
@@ -72,9 +71,10 @@ export async function get({ query }) {
 			// NOT res.status >= 200 && res.status < 300
 			return { statusCode: response.status, body: response.statusText };
 		}
+		// Start of Data Parsing
 		const data = await response.json();
-		function trimResponse() {
-			// console.log(data);
+		const trimResponse = () => {
+			// Use destructuring to get the contents of the playlistPanelRenderer
 			let {
 				contents: {
 					singleColumnMusicWatchNextResultsRenderer: {
@@ -98,8 +98,10 @@ export async function get({ query }) {
 					},
 				},
 			} = data;
+
 			let temp = [];
-			let res;
+			/* We require playlistPanelVideoRenderer as our only responses
+               only one other response is automixPreviewVideoRenderer which is not going to be used*/
 			rest.contents.forEach(({ playlistPanelVideoRenderer }) => {
 				if (playlistPanelVideoRenderer) {
 					temp.push(playlistPanelVideoRenderer);
@@ -107,7 +109,10 @@ export async function get({ query }) {
 					return;
 				}
 			});
-			//console.log(temp);
+			/*
+                Map out each item in the list for the information that's going to be used
+                by the automix and other components.
+            */
 			const response = temp.map((item) => {
 				let title = item.title.runs[0].text;
 				let {
@@ -147,32 +152,17 @@ export async function get({ query }) {
 
 			//console.log(temp);
 			return response;
-		}
+		};
 		const trim: [] = trimResponse();
-		// if (trim !== undefined) parseResponse();
 
-		// function parseResponse() {
-		// 	// return trim.playlistSetVideoId;
-		// 	let result = trim.forEach((item) => {
-		// 		let {
-		// 			navigationEndpoint: { watchEndpoint },
-		// 		} = item;
-		// 		let { videoId, playlistId } = watchEndpoint;
-		// 		return { videoId, playlistId };
-		// 	});
-		// 	console.log(trim[0]);
-		// 	return result;
-		// }
-		// let finalRes = parseResponse();
 		return {
-			statusCode: 200,
+			status: 200,
 			body: JSON.stringify(trim),
 		};
 	} catch (error) {
-		// output to netlify function log
 		console.log(error);
 		return {
-			statusCode: 500,
+			status: 500,
 			// Could be a custom message or object i.e. JSON.stringify(err)
 			body: JSON.stringify({ msg: error.message }),
 		};

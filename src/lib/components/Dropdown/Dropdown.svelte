@@ -2,9 +2,9 @@
 	import { slide } from 'svelte/transition'
 	import { goto } from '$app/navigation'
 
-	import Icon from './Icon.svelte'
+	import Icon from '$lib/components/Icon/Icon.svelte'
 
-	import { clickOutside } from './js/clickOutside'
+	import { clickOutside } from '$lib/js/clickOutside'
 	export let type = ''
 	export let show = false
 </script>
@@ -35,8 +35,9 @@
 	.menuButtons {
 		z-index: 1;
 		margin-right: 0.2rem;
-		stroke: 2px #000;
-		height: 25%;
+		stroke: 2px rgba(0, 0, 0, 0.692);
+		height: 2%;
+		margin: 0pt;
 		/* position: relative; */
 		margin-left: auto;
 		/* place-items: flex-end; */

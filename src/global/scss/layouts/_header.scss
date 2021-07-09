@@ -13,7 +13,8 @@ nav.nav {
     // border-bottom: 0.0625rem groove rgb(10, 10, 10);
     padding: 1rem;
     grid-area: n / n / n / n;
-    @media screen and (max-width: 40rem) {
+    @media screen and (min-width: 640px) {
+        grid-template-columns: 1rem auto;
     }
     .nav-item {
         margin-right: 0.5rem;

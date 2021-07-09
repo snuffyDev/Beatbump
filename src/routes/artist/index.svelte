@@ -1,15 +1,15 @@
 <script>
 	import { goto } from '$app/navigation'
-	import Carousel from '$lib/Carousel.svelte'
-	import ArtistPageHeader from '../../lib/ArtistPageHeader.svelte'
+	import Carousel from '$lib/components/Carousel/Carousel.svelte'
+	import ArtistPageHeader from '../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte'
 
-	import Loading from '$lib/Loading.svelte'
+	import Loading from '$lib/components/Loading/Loading.svelte'
 	import { getData } from '$lib/utils'
 	import { page } from '$app/stores'
 
 	import { parseArtistPage } from '$lib/js/artistUtils'
-	import Icon from '$lib/Icon.svelte'
-	import ListItem from '$lib/ListItem.svelte'
+	import Icon from '$lib/components/Icon/Icon.svelte'
+	import ListItem from '$lib/components/ListItem/ListItem.svelte'
 	import CarouselItem from '$lib/components/Carousel/CarouselItem.svelte'
 
 	let id = $page.query.get('id')

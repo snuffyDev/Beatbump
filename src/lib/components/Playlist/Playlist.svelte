@@ -9,7 +9,7 @@
 	import { cubicIn } from 'svelte/easing'
 	import { currentTitle } from '$lib/stores/stores'
 	import { getSrc } from '$lib/utils'
-	import { clickOutside } from './js/clickOutside'
+	import { clickOutside } from '$lib/js/clickOutside'
 
 	export let autoId
 	export let mixList = []

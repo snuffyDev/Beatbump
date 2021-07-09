@@ -1,13 +1,13 @@
 <script>
 	import { clickOutside } from '$lib/js/clickOutside'
 	import { goto } from '$app/navigation'
-	import Dropdown from './Dropdown.svelte'
-	import { iOS } from './stores/stores.js'
+	import Dropdown from '$lib/components/Dropdown/Dropdown.svelte'
+	import { iOS } from '$lib/stores/stores.js'
 	import { tweened } from 'svelte/motion'
 	import { getSrc } from '$lib/utils'
-	import Playlist from './Playlist.svelte'
-	import './../global/scss/components/_player.scss'
-	import Icon from '$lib/Icon.svelte'
+	import Playlist from '$lib/components/Playlist/Playlist.svelte'
+	import '../../../global/scss/components/_player.scss'
+	import Icon from '$lib/components/Icon/Icon.svelte'
 	import {
 		playbackStatus,
 		updateTrack,
@@ -340,7 +340,7 @@
 								on:click={() => {
 									goto(`/artist?id=${mixList[autoId].artistId}`)
 								}}>
-								<Icon name="artist" size="1.5em" />
+								<Icon name="artist" size="2em" />
 								<span class="dd-text">View Artist</span>
 							</div>
 						{/if}
@@ -383,12 +383,21 @@
 		}
 	}
 	.menu-container {
-		position: absolute;
-		right: 5%;
-		bottom: 28%;
+		position: relative;
+
+		@media (min-width: 37.1429rem) {
+			right: 5%;
+			/* bottom: 50%; */
+			padding: 0;
+			/* top: 50%; */
+			/* overflow: hidden; */
+			position: absolute;
+		}
 	}
 	.player-right {
 		display: flex;
+		flex-wrap: nowrap;
+		align-items: center;
 	}
 	.player-left {
 		width: auto;

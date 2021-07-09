@@ -1,11 +1,11 @@
 <script>
-	import Dropdown from './Dropdown.svelte'
+	import Dropdown from '$lib/components/Dropdown/Dropdown.svelte'
 
 	export let data
 	import { fade } from 'svelte/transition'
-	import Loading from './Loading.svelte'
+	import Loading from '$lib/components/Loading/Loading.svelte'
 	import { afterUpdate, beforeUpdate, onMount, tick } from 'svelte'
-	// import './../global/scss/components/_item.scss'
+
 	import {
 		currentArtist,
 		currentMix,
@@ -14,11 +14,9 @@
 		currentTrack
 	} from '$lib/stores/stores'
 	import * as utils from '$lib/utils'
-	import { clickOutside } from './js/clickOutside'
-	import lazy from './lazy'
-	import Icon from './Icon.svelte'
+	import Icon from '$lib/components/Icon/Icon.svelte'
 	import { goto } from '$app/navigation'
-	import { addToQueue } from '$lib/utils'
+	// import { addToQueue } from '$lib/utils'
 
 	let ctoken = ''
 	let videoId = ''

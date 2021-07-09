@@ -1,7 +1,7 @@
 <script>
 	import lazy from '$lib/lazy'
 	import { trendingHandler } from '$lib/js/indexUtils'
-	import Loading from '$lib/Loading.svelte'
+	import Loading from '$lib/components/Loading/Loading.svelte'
 	import {
 		continuation,
 		currentMix,
@@ -10,9 +10,9 @@
 		key
 	} from '$lib/stores/stores'
 	import { fade } from 'svelte/transition'
-	import Dropdown from './../../Dropdown.svelte'
+	import Dropdown from '$lib/components/Dropdown/Dropdown.svelte'
 	import { goto } from '$app/navigation'
-	import Icon from '$lib/Icon.svelte'
+	import Icon from '$lib/components/Icon/Icon.svelte'
 
 	import { addToQueue, getSrc } from '$lib/utils'
 	import { clickOutside } from '$lib/js/clickOutside'
@@ -20,13 +20,21 @@
 	export let index
 	export let item
 	export let type = ''
-	let hovering
+	let hovering = false
 	let isLoading = false
 	let loading = isLoading ? true : false
 	let showing = false
 	let menuToggle = showing ? true : false
+	let width
+	// $: if (width < 525) {
+	// 	hovering = false
+	// }
+	// if (width < 550) {
+	// 	hovering = true
+	// }
 </script>
 
+<svelte:window bind:outerWidth={width} />
 <div class="item">
 	<section
 		class="item"
@@ -35,7 +43,9 @@
 		}}
 		on:mouseleave={() => {
 			hovering = false
-			menuToggle = false
+			if (width > 550) {
+				menuToggle = false
+			}
 		}}
 		transition:fade|local
 		bind:this={section[index]}>
@@ -120,7 +130,57 @@
 				</div>
 			</div>
 		</div>
-		{#if hovering}
+		{#if width < 525}
+			<div class="menu">
+				<Dropdown bind:show={menuToggle}>
+					<div slot="content">
+						<div
+							class="dd-item"
+							on:click={() => {
+								if (item?.subtitle[0]?.navigationEndpoint) {
+									goto(
+										`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
+									)
+								}
+							}}
+							href={`/artist?id=${
+								item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
+									? item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
+									: ''
+							}`}>
+							<Icon name="artist" size="1.5em" />
+							<div class="dd-text">View Artist</div>
+						</div>
+						<div
+							class="dd-item"
+							on:click={async () => {
+								if (index !== $key) {
+									let mixList = $currentMix.list
+									let length = await addToQueue(item.videoId)
+									let next = {
+										continuation: mixList[0].continuation,
+										autoMixList: item.playlistId,
+										artistId:
+											item.subtitle[0].navigationEndpoint.browseEndpoint
+												.browseId,
+										id: $key + 1,
+										videoId: item.videoId,
+										title: item.title,
+										artist: item.subtitle[0].text,
+										thumbnail: item.thumbnails[0].url,
+										length: length
+									}
+									mixList.splice($key + 1, 0, next)
+									console.log(mixList)
+								}
+							}}>
+							<Icon name="queue" size="1.5rem" />
+							<div class="dd-text">Add to Queue</div>
+						</div>
+					</div>
+				</Dropdown>
+			</div>
+		{:else if hovering}
 			<div class="menu">
 				<Dropdown bind:show={menuToggle}>
 					<div slot="content">
@@ -181,14 +241,14 @@
 	}
 	.menu {
 		position: absolute;
-		right: 0;
+		right: 2%;
 		top: 50%;
 		padding-top: 0.125rem;
 		padding-right: 0.625rem;
 	}
 	.title {
 		cursor: pointer;
-		letter-spacing: 0.05em;
+		letter-spacing: 0.02em;
 	}
 
 	section {
@@ -217,37 +277,52 @@
 		/* height: clamp(10rem,12.5rem,15rem); */
 		/* min-width: 100%; */
 		// box-shadow: 0 0 1rem 0.5rem rgb(0 0 0 / 36%);
-		position: relative;
+		// position: relative;
 		display: block;
-		position: relative;
-		display: block;
-		width: auto;
+		// width: auto;
 		width: 100%;
-		height: 100%;
+		height: auto;
 		min-width: 12.5rem;
 		max-width: 12.5rem;
+		aspect-ratio: 16/9;
 		.container {
-			display: flex;
-			align-items: center;
+			// display: flex;
+			// align-items: center;
+			// width: 100%;
+			// height: 100%;
+			// background: rgba(13, 13, 15, 0.3411764705882353);
+			// max-width: inherit;
+			// max-height: inherit;
+			// aspect-ratio: inherit;
+			// position: relative;
+			cursor: pointer;
 			width: 100%;
-			height: 100%;
-			background: #0d0d0f57;
+			height: auto;
+			max-width: inherit;
+			max-height: inherit;
+			aspect-ratio: inherit;
+			position: relative;
+
+			justify-self: center;
 			img {
-				// height: inherit;
-				// -o-object-fit: scale-down;
-				// object-fit: scale-down;
-				// // max-height: 12rem;
-				// width: 100%;
-				// max-width: 18rem;
-				width: 100%;
-				height: 100%;
-				object-fit: cover;
+				width: auto;
+				height: auto;
+				-o-object-fit: scale-down;
+				object-fit: scale-down;
+				max-height: inherit;
+				max-width: inherit;
+				aspect-ratio: inherit;
+				// position: absolute;
+				// bottom: 0;
+				// top: 0;
+				// right: 0;
+				// left: 0;
 			}
 		}
 	}
 	.cont {
 		margin-top: 1em;
-		padding-right: 1em;
+		margin-right: 1em;
 	}
 	.scroll-container {
 	}

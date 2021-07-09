@@ -1,16 +1,11 @@
 <script lang="ts">
-	import Loading from './Loading.svelte'
-	import CarouselItem from './components/Carousel/CarouselItem.svelte'
+	import CarouselItem from './CarouselItem.svelte'
 	export let setTitle = ''
 	export let items = []
 	export let type = ''
 	import lazy from '$lib/lazy'
 	import { fade } from 'svelte/transition'
-	import { key } from '$lib/stores/stores'
-	import { trendingHandler } from '$lib/js/indexUtils'
-	import Icon from '$lib/Icon.svelte'
 	import { goto } from '$app/navigation'
-	import Dropdown from './Dropdown.svelte'
 
 	function splitArray(flatArray, numCols) {
 		const newArray = []

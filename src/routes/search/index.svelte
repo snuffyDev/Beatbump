@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Loading from '$lib/Loading.svelte'
+	import Loading from '$lib/components/Loading/Loading.svelte'
 	import { searchManager } from '$lib/stores/stores'
 
-	import Item from '$lib/Item.svelte'
+	import Item from '$lib/components/Item/Item.svelte'
 	import { currentTitle, updateTrack, key } from '$lib/stores/stores'
 	let loading = true
 

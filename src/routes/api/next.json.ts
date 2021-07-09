@@ -3,12 +3,12 @@ import { parseContents } from "$lib/endpoints/nextUtils";
 // import NextParser from "/nextUtils";
 
 export async function get({ query }) {
-	const i = query.get("index") ? query.get("index") : "";
-	const params = query.get("params") ? query.get("params") : "";
-	const video_id = query.get("videoId") ? query.get("video_id") : "";
-	const playlist_id = query.get("playlistId") ? query.get("playlistId") : "";
-	const ctoken = query.get("ctoken") ? query.get("ctoken") : "";
-	let cont = `continuation: ${ctoken}`;
+	const i = query.get("index");
+	const params = query.get("params");
+	const video_id = query.get("videoId");
+	const playlist_id = query.get("playlistId");
+	const ctoken = query.get("ctoken");
+
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/next?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
@@ -24,12 +24,11 @@ export async function get({ query }) {
 						enableSafetyMode: false,
 					},
 				},
-
-				continuation: `${ctoken ? ctoken : ""}`,
+				continuation: `${ctoken}`,
 				isAudioOnly: true,
 				enablePersistentPlaylistPanel: true,
-				index: `${i ? i : ""}`,
-				params: `${params ? params : ""}`,
+				index: `${i}`,
+				params: `${params}`,
 				tunerSettingValue: "AUTOMIX_SETTING_NORMAL",
 				videoId: `${video_id}`,
 				playlistId: `${playlist_id}`,
@@ -50,7 +49,6 @@ export async function get({ query }) {
 		return { statusCode: response.status, body: response.statusText };
 	}
 	const data = await response.json();
-	console.log(data);
 	if (!params) {
 		let {
 			contents: {

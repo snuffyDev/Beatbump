@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { currentTitle } from '$lib/stores/stores'
-	import Loading from '$lib/Loading.svelte'
+	import Loading from '$lib/components/Loading/Loading.svelte'
 	import * as utils from '$lib/utils'
 
-	import Carousel from '$lib/Carousel.svelte'
+	import Carousel from '$lib/components/Carousel/Carousel.svelte'
 
 	$: content = listNew.length > 0
 

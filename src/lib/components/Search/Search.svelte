@@ -1,5 +1,5 @@
 <script>
-	import { searchTracks } from './utils'
+	import { searchTracks } from '../../utils'
 	let options = [
 		{ label: 'Songs', params: 'EgWKAQIIAWoKEAMQBBAKEAUQCQ%3D%3D' },
 		{ label: 'Videos', params: 'EgWKAQIQAWoKEAMQBBAKEAUQCQ%3D%3D' },

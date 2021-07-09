@@ -7,7 +7,7 @@
 		"workers:deploy": "npm run cache:delete && npm run build && wrangler publish",
 		"deploy": "npm run build && wrangler publish",
 		"build": "svelte-kit build",
-		"start": "svelte-kit preview --host",
+		"preview": "svelte-kit preview --host",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write ."
 	},
