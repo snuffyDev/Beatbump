@@ -23,7 +23,7 @@ export async function trendingHandler(item) {
                 itct: d.itct,
                 autoMixList: d.autoMixList,
                 artistId: d.artistInfo.browseId,
-                id: d.index,
+                index: d.index,
                 videoId: d.videoId,
                 title: d.title,
                 artist: d.artistInfo.artist,

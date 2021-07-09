@@ -9,7 +9,6 @@
 	import '../../../global/scss/components/_player.scss'
 	import Icon from '$lib/components/Icon/Icon.svelte'
 	import {
-		playbackStatus,
 		updateTrack,
 		key,
 		currentMix,
@@ -26,7 +25,6 @@
 	$: player.autoplay = true
 
 	$: player.src = $updateTrack
-	$: playbackStatus.set({ playerStatus })
 	$: nowPlaying = nowPlaying
 	$: isWebkit = $iOS
 	$: title = mixList[autoId].title
@@ -125,7 +123,7 @@
 					autoMixList: d.autoMixList,
 					artistId: d.artistInfo.browseId,
 					itct: d.itct,
-					id: d.index,
+					index: d.index,
 					videoId: d.videoId,
 					title: d.title,
 					artist: d.artistInfo.artist,

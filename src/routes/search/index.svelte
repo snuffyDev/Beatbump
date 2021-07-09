@@ -10,33 +10,33 @@
 	import { page } from '$app/stores'
 	import * as utils from '$lib/utils'
 	import { invalidate } from '$app/navigation'
-	$: ctoken = ''
-	$: itct = ''
+
+	let ctoken = ''
+	let itct = ''
 	let error = undefined
 	let correctedQuery = undefined
-	let q = $page.query.get('q')
-	$: filter = $page.query.get('filter')
-	let songTitle = q
-	$: {
-		q
-		window.scrollTo(0, 0)
-	}
+	$: q = $page.query.get('q')
+	let filter = $page.query.get('filter')
+	$: songTitle = q
+	$: console.log(q)
 	onMount(async () => {
 		loading = true
-
-		let q = $page.query.get('q')
-
+		testSearch()
+	})
+	async function testSearch() {
+		loading = true
 		console.log(ctoken + ` beginning ctoken`)
 		songTitle = q
 		let res = await utils.searchTracks(songTitle, filter, endpoint, '', ctoken)
 		console.log(res)
-		if (res.error) {
+		if (res?.error) {
 			error = res.error
 			loading = false
 			return []
 		}
-		const data = res.contents
-		if (res.didYouMean) {
+
+		const data = res?.contents
+		if (res?.didYouMean) {
 			correctedQuery = res.term
 		}
 		ctoken = res.continuation.continuation
@@ -45,20 +45,18 @@
 
 		loading = false
 		return { data, ctoken, itct, correctedQuery }
-	})
+	}
 	$: hasList = $searchManager.length > 0
 	async function searchCont(error) {
-		return await utils
-			.searchTracks(q, itct, 'search', '', ctoken, '')
-			.then((data) => {
-				if (data.error) {
-					error = res.error
-					loading = false
-				}
-				// console.log(data)
-				ctoken = data.continuation.continuation
-				itct = data.continuation.clickTrackingParams
-			})
+		return await utils.searchTracks(q, itct, '', ctoken, '').then((data) => {
+			if (data.error) {
+				error = res.error
+				loading = false
+			}
+			// console.log(data)
+			ctoken = data.continuation.continuation
+			itct = data.continuation.clickTrackingParams
+		})
 
 		console.log(ctoken, songIndex)
 	}
@@ -76,7 +74,7 @@
 
 {#if loading}
 	<Loading />
-{:else if error !== undefined}
+{:else if error}
 	<section class="searchHeader">
 		<p>
 			{error} for <em>'{songTitle}'</em>
@@ -85,7 +83,9 @@
 {:else}
 	<section class="searchHeader">
 		<p>All Results for...</p>
-		<em>'{songTitle}'</em>
+		{#key songTitle}
+			<em>'{songTitle}'</em>
+		{/key}
 		{#if correctedQuery}
 			<p>
 				Did you mean: <em
@@ -101,13 +101,15 @@
 			<Item {data} />
 		{/each}
 	</main>
-	<button
-		class="button--block button--outlined"
-		on:click={async () => {
-			return await searchCont(error).then(async (data) => {
-				// songIndex = [...songIndex, ...data.contents]
-			})
-		}}>Load More</button>
+	{#key ctoken}
+		<button
+			class="button--block button--outlined"
+			on:click={async () => {
+				return await searchCont(error).then(async (data) => {
+					// songIndex = [...songIndex, ...data.contents]
+				})
+			}}>Load More</button>
+	{/key}
 {/if}
 
 <style scoped lang="scss">

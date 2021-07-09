@@ -1,3 +1,4 @@
+import type { Song } from "$lib/types";
 import { pb } from "$lib/utils";
 
 export const parseArtistPage = (header, items) => {
@@ -102,7 +103,7 @@ function parseSongs(items) {
 			artists: [artist],
 		};
 		// console.log(artists, artists)
-		let result = {
+		let result: Song = {
 			artistInfo: artistInfo,
 			title: title,
 			videoId: videoId,

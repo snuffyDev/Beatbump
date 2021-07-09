@@ -5,10 +5,7 @@ export const playbackStatus = writable({})
 
 export const updateTrack = updateSource()
 export const ctxKey = {}
-export const currentSource = writable(undefined)
 export const currentTitle = writable(undefined)
-export const currentArtist = writable('')
-export const index = writable([{}])
 export const continuation = writable('')
 export const searchManager = _searchIndex()
 export const currentTrack = writable({
@@ -28,8 +25,6 @@ export const currentMix = writable({
         { id: '', videoId: '', thumbnail: '', artist: '', title: '', length: '' }
     ]
 })
-export const list = writable([{}])
-export const autoMix = writable({})
 export const key = writable(0)
 export const iOS = _verifyUserAgent()
 export function updateSource() {

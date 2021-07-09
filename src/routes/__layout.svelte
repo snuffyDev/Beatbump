@@ -18,10 +18,8 @@
 			} else {
 				theme.init('dark')
 			}
-			console.log(localStorage.getItem('theme'))
 		}
 		getTheme()
-		// if (!localStorage.getItem('theme')) theme.init('dark')
 	})
 
 	let current = $currentTrack

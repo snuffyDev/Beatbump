@@ -31,6 +31,7 @@
 </div>
 
 <style lang="scss">
+	@import '../../../global/vars.css';
 	.artist-body {
 		padding: 0 1rem;
 	}
@@ -117,16 +118,21 @@
 			// 	#14141440 38%,
 			// 	#ababaf17
 			// );
+			// background: linear-gradient(
+			// 	0turn,
+			// 	#09090a,
+			// 	#0b0b0b 1.2%,
+			// 	rgba(10, 10, 11, 0.9294117647058824) 14.98%,
+			// 	rgb(12 12 13 / 85%) 24%,
+			// 	rgb(19 19 20 / 65%) 36%,
+			// 	rgb(19 19 20 / 51%) 50%,
+			// 	rgb(20 20 20 / 16%) 70%,
+			// 	rgb(171 171 175 / 0%) 100%
+			// );
 			background: linear-gradient(
-				0turn,
-				#09090a,
-				#0b0b0b 1.2%,
-				rgba(10, 10, 11, 0.9294117647058824) 14.98%,
-				rgb(12 12 13 / 85%) 24%,
-				rgb(19 19 20 / 65%) 36%,
-				rgb(19 19 20 / 51%) 50%,
-				rgb(20 20 20 / 16%) 70%,
-				rgb(171 171 175 / 0%) 100%
+				360deg,
+				var(--dark-base) 8.98%,
+				rgba(0, 0, 0, 0) 100%
 			);
 			// background: linear-gradient(1turn, #09090a 8.98%, #d29e9e05 67%);
 			bottom: 0;

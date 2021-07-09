@@ -7,7 +7,6 @@
 	import { afterUpdate, beforeUpdate, onMount, tick } from 'svelte'
 
 	import {
-		currentArtist,
 		currentMix,
 		currentTitle,
 		key,

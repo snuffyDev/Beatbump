@@ -135,23 +135,13 @@
 			margin-left: 0.5rem;
 		}
 	}
-	.info {
-		padding-left: 0.75rem;
-	}
 	.itemInfo {
 		display: flex;
 		flex-direction: column;
 		flex: 1 0;
 	}
-	ul {
-		padding: 0;
-		margin: 0;
-	}
-	p {
-		margin: 0;
-	}
-	.number,
-	.icon-play {
+
+	.number {
 		width: 2rem;
 		font-size: 1.125rem;
 		font-weight: 600;

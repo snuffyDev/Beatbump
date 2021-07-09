@@ -8,7 +8,7 @@
 	import { clickOutside } from '$lib/js/clickOutside'
 	import { quartInOut, quintIn } from 'svelte/easing'
 	export let type = ''
-	export let show
+
 	let showing = false
 	$: menuToggle = showing ? true : false
 	const dispatch = createEventDispatcher()

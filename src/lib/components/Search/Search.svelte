@@ -8,26 +8,31 @@
 	export let type
 	import { goto, invalidate } from '$app/navigation'
 	import { page } from '$app/stores'
+	import { searchManager } from '$lib/stores/stores'
 	let endpoint = 'search'
 	let filterType
 	let songTitle = ''
 	let filter = filterType ? filterType : options[0].params
 	async function handleSubmit(s, f) {
 		if (!$page.path.includes('/search')) {
+			invalidate($page.path)
 			let url =
 				'/search?q=' + encodeURIComponent(songTitle) + `&filter=${filter}`
 
-			let q = $page.query.append('q', songTitle)
-			invalidate(url)
+			// invalidate('/search')
+			goto(url, { replaceState: true })
+			searchManager.reset()
 			goto(url)
 		} else {
+			invalidate($page.path)
 			let url =
 				'/search?q=' + encodeURIComponent(songTitle) + `&filter=${filter}`
 
-			$page.query.append('q', songTitle)
-			const res = searchTracks(s, f, endpoint, '', '', '')
-			invalidate(url)
-			goto(url, { replaceState: true })
+			// $page.query.('q', songTitle)
+			searchManager.reset()
+
+			const res = searchTracks(s, f, '', '', '')
+			goto(url)
 		}
 	}
 </script>

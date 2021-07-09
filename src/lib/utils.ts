@@ -1,6 +1,6 @@
 import { sort } from "./endpoints/playerUtils";
-import { searchManager, updateTrack } from "./stores/stores";
 import { parseSearchResult } from "./parsers";
+import { searchManager, updateTrack } from "./stores/stores";
 
 // General data endpoint
 export const getData = (
@@ -33,7 +33,6 @@ export const getData = (
 export const searchTracks = async (
 	songTitle,
 	filter,
-	endpoint,
 	browseId?,
 	ctoken?,
 	i?
@@ -41,55 +40,38 @@ export const searchTracks = async (
 	let resHandler;
 	let contents;
 	if (ctoken) {
-		resHandler = await getData(
-			songTitle,
-			filter,
-			endpoint,
-			browseId,
-			"",
-			ctoken,
-			i
-		);
+		return await fetch(
+			`/api/search.json?q=${songTitle ? songTitle : ""}${
+				filter ? `&params=${filter}` : ""
+			}${ctoken ? `&ctoken=${ctoken}` : ""}${i ? `&index=${i}` : ""}`
+		)
+			.then((data) => data.json())
+			.then((res) => {
+				console.log(res.contents);
+				searchManager.update((u) => [...u, ...res.contents]);
+				return res;
+			});
+		let res = resHandler.json();
+
 		contents = "continuationContents";
+		return { ...res };
 	} else {
-		resHandler = await getData(
-			songTitle,
-			filter,
-			endpoint,
-			browseId
-		).catch((err) => console.log(err));
-		contents = "contents";
+		return await fetch(
+			`/api/search.json?q=${songTitle ? songTitle : ""}${
+				filter ? `&params=${filter}` : ""
+			}`
+		)
+			.then((data) => data.json())
+			.then((res) => {
+				console.log(res.contents);
+				searchManager.reset();
+				searchManager.set([...res.contents]);
+				return res;
+			})
+			.catch((err) => console.log(err));
 	}
-	let data = await resHandler;
 
 	// console.log(data);
-	if (data.hasOwnProperty("continuationContents")) {
-		contents = data.continuationContents;
-		let results = await parseSearchResult(contents, true);
-
-		searchManager.update((u) => [...u, ...results.contents]);
-
-		// console.log(`contents: `, results);
-		return results;
-	} else {
-		let {
-			contents: {
-				sectionListRenderer: {
-					contents: [...rest],
-				},
-			},
-		} = data;
-
-		let results = await parseSearchResult(rest, false);
-		if (results.error) {
-			console.log(results.error);
-			return { error: results.error };
-		}
-		searchManager.reset();
-		searchManager.set([...results.contents]);
-
-		return results;
-	}
 };
 
 // Get Trending page

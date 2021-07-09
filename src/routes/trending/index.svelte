@@ -13,7 +13,8 @@
 	$: titleNew = ' '
 	$: titleTrending = ''
 	let data
-	let genres, moods
+	let moods
+	let genres
 	let carouselItems = []
 
 	let browseId = 'FEmusic_explore'

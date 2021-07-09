@@ -3,7 +3,6 @@
 	import { trendingHandler } from '$lib/js/indexUtils'
 	import Loading from '$lib/components/Loading/Loading.svelte'
 	import {
-		continuation,
 		currentMix,
 		currentTitle,
 		currentTrack,
