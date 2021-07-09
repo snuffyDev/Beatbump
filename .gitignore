@@ -8,5 +8,4 @@ node_modules
 /functions
 /dist
 /workers-site
-package-lock.json
 wrangler.toml

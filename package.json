@@ -8,8 +8,8 @@
 		"deploy": "npm run build && wrangler publish",
 		"build": "svelte-kit build",
 		"preview": "svelte-kit preview --host",
-		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"lint": "prettier --check . && eslint ."
 	},
 	"devDependencies": {
 		"@babel/core": "^7.14.0",
