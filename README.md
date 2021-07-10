@@ -17,7 +17,7 @@ Alternative frontend for YouTube Music created using Svelte/SvelteKit.
   - Note: all content is audio-only.
 - View Artist pages for your favorite content
 
-# Development
+## Development
 
 This project is in it's infancy, so for stability reasons, this repository is currently not accepting pull requests for now. You can download the repo and modify the code to fit your needs best.
 
