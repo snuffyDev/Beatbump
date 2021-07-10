@@ -179,6 +179,14 @@
 </div>
 
 <style lang="scss">
+	.menu {
+		// position: absolute;
+		// right: 0.8rem;
+		// top: 50%;
+		position: relative;
+		padding-top: 0.125rem;
+		padding-right: 0.625rem;
+	}
 	.hidden {
 		display: none;
 	}

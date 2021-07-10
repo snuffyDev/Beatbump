@@ -19,23 +19,23 @@
 	on:click={() => {
 		showing = !showing
 		console.log(showing)
-	}}
-	use:clickOutside
-	on:click_outside={() => {
-		showing = false
 	}}>
 	<svelte:component this={Icon} size="1.5em" name="dots" />
-	{#if menuToggle}
-		<div
-			transition:slide={{ duration: 125, easing: quartInOut }}
-			class={type == 'player' ? 'dd-player' : 'dd-menu'}>
-			<slot name="content" />
-			<!-- <div class="dd-item">
+</div>
+{#if menuToggle}
+	<div
+		use:clickOutside
+		on:click_outside={() => {
+			showing = false
+		}}
+		transition:slide={{ duration: 125, easing: quartInOut }}
+		class={type == 'player' ? 'dd-player' : 'dd-menu'}>
+		<slot name="content" />
+		<!-- <div class="dd-item">
 				<slot name="item" itemprop="item" />
 			</div> -->
-		</div>
-	{/if}
-</div>
+	</div>
+{/if}
 
 <style lang="scss">
 	.menuButtons {
