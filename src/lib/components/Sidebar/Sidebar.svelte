@@ -17,13 +17,23 @@
 		<slot name="bottom"
 			><em>Get the code on Github</em>
 
-			<a href="https://github.com/snuffyDev/Beatbump" rel="external"
-				><Icon name="github" size="1.5rem" /></a>
+			<section class="flex">
+				<a href="https://github.com/snuffyDev/Beatbump" rel="external"
+					><Icon name="github" size="1.5rem" /></a>
+			</section>
 		</slot>
 	</section>
 </div>
 
 <style lang="scss">
+	.flex {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		a {
+			width: 1.5em;
+		}
+	}
 	.sidebar {
 		overflow-x: hidden;
 		overflow-y: hidden;
@@ -53,7 +63,7 @@
 	.bottom {
 		position: absolute;
 		bottom: 1rem;
-		display: flex;
+		// display: flex;
 		flex-direction: column;
 		/* margin-left: 2.5rem; */
 		line-height: 2;

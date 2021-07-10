@@ -227,7 +227,7 @@
 		autoId = event.detail.id
 		console.log(autoId)
 	}}
-	bind:show={showing}
+	bind:show={listShow}
 	bind:mixList
 	bind:autoId={$key} />
 
