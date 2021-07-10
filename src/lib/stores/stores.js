@@ -6,7 +6,7 @@ export const playbackStatus = writable({})
 export const updateTrack = updateSource()
 export const ctxKey = {}
 export const currentTitle = writable(undefined)
-export const continuation = writable('')
+export const searchCtoken = writable({ continuation: '', itct: '' })
 export const searchManager = _searchIndex()
 export const currentTrack = writable({
     continuation: '',

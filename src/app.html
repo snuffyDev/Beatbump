@@ -4,11 +4,25 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="/favicon.ico" />
 		<link rel="shortcut icon" href="/favicon.ico" />
-		<!-- <meta
-			name="viewport"
-			content="width=device-width, initial-scale=0.86,
-			maximum-scale=5.0, minimum-scale=0.86"
-		/> -->
+
+		<link
+			href="https://fonts.googleapis.com/css?family=Commissioner:100,200,300,regular,500,600,700,800,900"
+			rel="stylesheet"
+		/>
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script
+			async
+			src="https://www.googletagmanager.com/gtag/js?id=G-758W5TJNMT"
+		></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag() {
+				dataLayer.push(arguments);
+			}
+			gtag("js", new Date());
+
+			gtag("config", "G-758W5TJNMT");
+		</script>
 		<meta
 			name="viewport"
 			content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0"
@@ -28,10 +42,6 @@
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 		<link rel="manifest" href="/manifest.json" />
 
-		<link
-			href="https://fonts.googleapis.com/css?family=Commissioner:100,200,300,regular,500,600,700,800,900"
-			rel="stylesheet"
-		/>
 		%svelte.head%
 	</head>
 	%svelte.body%

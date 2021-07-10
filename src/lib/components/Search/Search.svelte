@@ -8,7 +8,7 @@
 	export let type
 	import { goto, invalidate } from '$app/navigation'
 	import { page } from '$app/stores'
-	import { searchManager } from '$stores/stores'
+	import { searchCtoken, searchManager } from '$stores/stores'
 	let endpoint = 'search'
 	let filterType
 	let songTitle = ''
@@ -16,22 +16,18 @@
 	async function handleSubmit(s, f) {
 		if (!$page.path.includes('/search')) {
 			invalidate($page.path)
-			let url =
-				'/search?q=' + encodeURIComponent(songTitle) + `&filter=${filter}`
+			let url = '/search/beta?q=' + encodeURIComponent(s) + `&filter=${f}`
+			searchManager.reset()
 
 			// invalidate('/search')
 			goto(url, { replaceState: true })
-			searchManager.reset()
-			goto(url)
+			// goto(url)
 		} else {
-			invalidate($page.path)
-			let url =
-				'/search?q=' + encodeURIComponent(songTitle) + `&filter=${filter}`
-
-			// $page.query.('q', songTitle)
-			searchManager.reset()
-
-			const res = searchTracks(s, f, '', '', '')
+			// invalidate($page.path + '?q=' + encodeURIComponent(s) + '&filter=' + f)
+			// console.log($page.path + '?q=' + encodeURIComponent(s) + '&filter=' + f)
+			let url = './beta?q=' + encodeURIComponent(s) + `&filter=${f}`
+			// searchManager.reset({})
+			const a = searchTracks(s, f, '', '', '')
 			goto(url)
 		}
 	}
