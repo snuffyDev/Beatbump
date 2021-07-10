@@ -4,8 +4,10 @@ Alternative frontend for YouTube Music created using Svelte/SvelteKit.
 
 **Live Site**: https://beatbump.ml/
 
-![Artist Page](/.repo/images/Artist.png)
+> Documentation coming soon! For both Beatbump's API and important portions of YouTube Music's API.
 
+
+![Artist Page](/.repo/images/Artist.png)
 ## Features
 
 - Autoplay/Automix
@@ -13,36 +15,38 @@ Alternative frontend for YouTube Music created using Svelte/SvelteKit.
 - Music playback in background on mobile
 - Search for songs, playlists, and videos
   - Note: all content is audio-only.
-- Artist pages
-
-### In The Works
-
-- Playlist page
-- Fully implement the YTM Explore page
-- Finish the Artist page
+- View Artist pages for your favorite content
 
 ## Development
 
-This repository is currently not accepting pull requests for now. You can download the repo and modify the code to fit your needs best.
+This project is in it's infancy, so for stability reasons, this repository is currently not accepting pull requests for now. You can download the repo and modify the code to fit your needs best.
 
-### Local Development
+Once there's documentation for how it works, along with a solid base of features, this repo will accept them.
 
-Clone or download the repository, then navigate into the repo's folder.
-NPM is recommended for the package manager, but you can try others.
+### Getting Started
+First, clone or initialize the repository on your machine. To quickly get setup, use [degit](https://github.com/Rich-Harris/degit): 
 
-Run the following command:
+```bash
+npx degit snuffyDev/Beatbump Beatbump
+cd Beatbump
 
 ```
+Install the dependencies using npm or pnpm:
+
+```bash
 npm install
 ```
+Make sure the SvelteKit packages are marked 'next' in the ```package.json``` before starting up the development server. If everything is installed, and the SvelteKit related packages are marked ```"next"``` then the setup is finished! Run ```npm run dev``` to get started!
 
-Make sure the SvelteKit packages are marked 'next' in the ```package.json``` before starting up the development server. If everything is installed, and the SvelteKit related packages are marked ```"next"``` then the setup is finished. The dev server will be served on port 5000.
-
-> NOTE: the dev command has the flag ```--host``` enabled. Remove this if you want to avoid the dev server being accessible on other devices.   
+> NOTE: The dev server served on port 5000, with the flag ```--host``` enabled. Remove this if you want to avoid the dev server being accessible on other devices.   
 
 ### Deploying
 
 The default deployment is configured for Cloudflare Workers. For information on how to setup and configure Cloudflare Workers, visit the [official repo](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare-workers) for the adapter.
+
+For deploying to Cloudflare Workers, there's two commands in ```package.json``` for this.
+- To delete the ```.svelte-kit``` and any prior ```build``` folders, run ```deploy:clean```.
+- To deploy if you don't have those folders (so you can't delete them), or you don't want to delete them, run ```deploy```.
 
 For other adapters, visit the official [adapters section](https://kit.svelte.dev/docs#adapters) of the SvelteKit documentation.
 
