@@ -6,8 +6,8 @@ export const playbackStatus = writable({})
 export const updateTrack = updateSource()
 export const ctxKey = {}
 export const currentTitle = writable(undefined)
-export const searchCtoken = writable({ continuation: '', itct: '' })
 export const searchManager = _searchIndex()
+export const searchCtoken = _ctoken()
 export const currentTrack = writable({
     continuation: '',
     id: '',
@@ -41,6 +41,19 @@ export function updateSource() {
     }
 }
 
+export function _ctoken() {
+    const { subscribe, set, update } = writable({ continuation: '', itct: '' })
+
+    return {
+        set,
+        subscribe,
+        update, get: (token) => get(token),
+        reset: () => {
+            set({ continuation: '', itct: '' })
+        }
+    }
+}
+
 function _searchIndex() {
     const { subscribe, set, update } = writable([])
     return {
@@ -53,7 +66,7 @@ function _searchIndex() {
         }
     }
 }
-
+export const search = writable([])
 function _verifyUserAgent() {
     const { subscribe, set, update } = writable(undefined)
     let CheckiOS

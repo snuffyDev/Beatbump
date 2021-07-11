@@ -1,6 +1,6 @@
 {
-	"name": "bumpbeat-master",
-	"version": "0.0.1",
+	"name": "beatbump",
+	"version": "0.0.8",
 	"scripts": {
 		"dev": "svelte-kit dev --host --port 5000",
 		"cache:delete": "rmdir /S /Q build && rmdir /S /Q .svelte-kit",
