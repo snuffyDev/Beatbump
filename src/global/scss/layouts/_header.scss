@@ -1,59 +1,59 @@
 nav.nav {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    right: 0px;
-    // background-color: rgb(20 24 32 / 59%);
-    height: 4rem;
-    z-index: 5;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: nowrap;
-    position: relative;
-    align-content: center;
-    // border-bottom: 0.0625rem groove rgb(10, 10, 10);
-    padding: 1rem;
-    grid-area: n / n / n / n;
-    @media screen and (min-width: 640px) {
-        grid-template-columns: 1rem auto;
-    }
-    .nav-item {
-        margin-right: 0.5rem;
-    }
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	right: 0px;
+	// background-color: rgb(20 24 32 / 59%);
+	height: 4rem;
+	z-index: 5;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: nowrap;
+	position: relative;
+	align-content: center;
+	// border-bottom: 0.0625rem groove rgb(10, 10, 10);
+	padding: 1rem;
+	grid-area: n / n / n / n;
+	@media screen and (min-width: 640px) {
+		grid-template-columns: 1rem auto;
+	}
+	.nav-item {
+		margin-right: 0.5rem;
+	}
 
-    .logo {
-        position: relative;
-        object-fit: cover;
-        img {
-            margin: 0;
-            padding: 0;
-            width: auto;
-            height: auto;
-            max-width: 2.5em;
-            max-height: 2.5em;
-        }
-        cursor: pointer;
-    }
+	.logo {
+		position: relative;
+		object-fit: cover;
+		img {
+			margin: 0;
+			padding: 0;
+			width: auto;
+			height: auto;
+			max-width: 2.5em;
+			max-height: 2.5em;
+		}
+		cursor: pointer;
+	}
 }
 .hidden {
-    display: none;
+	display: none;
 }
 .nav-search {
-    display: inline-flex;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    z-index: 15;
-    box-sizing: border-box;
-    align-content: center;
-    justify-content: center;
-    flex-wrap: nowrap;
-    flex-direction: row;
-    height: 100%;
-    align-items: center;
-    background: fixed;
-    background-color: inherit;
-    &::before {
-    }
+	display: inline-flex;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	z-index: 15;
+	box-sizing: border-box;
+	align-content: center;
+	justify-content: center;
+	flex-wrap: nowrap;
+	flex-direction: row;
+	height: 100%;
+	align-items: center;
+	background: fixed;
+	background-color: inherit;
+	&::before {
+	}
 }

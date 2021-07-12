@@ -1,55 +1,55 @@
 .dd-item {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
 
-    padding: 0.5rem;
-    align-items: center;
-    cursor: pointer;
-    margin: 0;
-    .list-icon {
-        display: inline;
-    }
-    .dd-text {
-        display: inline-block;
-        margin-left: 0.75em;
-        font-size: 1em;
-        white-space: nowrap;
-    }
-    border-bottom: #313338 solid 0.0714rem;
+	padding: 0.5rem;
+	align-items: center;
+	cursor: pointer;
+	margin: 0;
+	.list-icon {
+		display: inline;
+	}
+	.dd-text {
+		display: inline-block;
+		margin-left: 0.75em;
+		font-size: 1em;
+		white-space: nowrap;
+	}
+	border-bottom: #313338 solid 0.0714rem;
 
-    &:hover {
-        background: #313338;
-        transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.1s;
-    }
+	&:hover {
+		background: #313338;
+		transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.1s;
+	}
 }
 .dd-menu {
-    position: absolute;
-    right: 0.8em;
-    background: #18191b;
-    outline: 0.0714rem solid rgba(231, 231, 231, 0.329);
-    display: flex;
-    top: 2rem;
-    z-index: 1;
-    isolation: isolate;
-    /* position: absolute; */
-    /* flex: none; */
-    flex-direction: row;
+	position: absolute;
+	right: 0.8em;
+	background: #18191b;
+	outline: 0.0714rem solid rgba(231, 231, 231, 0.329);
+	display: flex;
+	top: 2rem;
+	z-index: 1;
+	isolation: isolate;
+	/* position: absolute; */
+	/* flex: none; */
+	flex-direction: row;
 }
 .dd-player {
-    /* margin-top: 0; */
-    position: fixed;
+	/* margin-top: 0; */
+	position: fixed;
 
-    margin-top: -1.75em;
-    /* position: absolute; */
-    right: 0;
-    background: #18191b;
-    outline: 0.0714rem solid rgba(231, 231, 231, 0.329);
-    /* display: flex; */
-    /* top: 0; */
-    isolation: isolate;
+	margin-top: -1.75em;
+	/* position: absolute; */
+	right: 0;
+	background: #18191b;
+	outline: 0.0714rem solid rgba(231, 231, 231, 0.329);
+	/* display: flex; */
+	/* top: 0; */
+	isolation: isolate;
 
-    transform: translateY(-3.25rem);
-    flex-direction: column;
-    flex-wrap: nowrap;
+	transform: translateY(-3.25rem);
+	flex-direction: column;
+	flex-wrap: nowrap;
 }
