@@ -1,12 +1,91 @@
 import { pb } from "$lib/utils";
-export async function getTrending() {
-	let carouselItems: any[];
-	let listNew;
-	let titleNew;
+
+export async function get({ query }) {
+	const endpoint = query.get("q") || "";
+	const browseId = "FEmusic_explore";
+	let carouselItems = [];
+
 	try {
 		const response = await fetch(
-			"/api/main.json?q=&endpoint=browse&browseId=FEmusic_explore"
-		).then((data) => data.json());
+			`https://music.youtube.com/youtubei/v1/${endpoint}?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
+			{
+				method: "POST",
+				body: JSON.stringify({
+					context: {
+						client: {
+							clientName: "WEB_REMIX",
+							clientVersion: "0.1",
+							deviceMake: "google",
+							platform: "DESKTOP",
+							deviceModel: "bot",
+							experimentIds: [],
+							experimentsToken: "",
+							osName: "Googlebot",
+							osVersion: "2.1",
+							locationInfo: {
+								locationPermissionAuthorizationStatus:
+									"LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED",
+							},
+							musicAppInfo: {
+								musicActivityMasterSwitch:
+									"MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
+								musicLocationMasterSwitch:
+									"MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE",
+								pwaInstallabilityStatus: "PWA_INSTALLABILITY_STATUS_UNKNOWN",
+							},
+							utcOffsetMinutes: -new Date().getTimezoneOffset(),
+						},
+						capabilities: {},
+						request: {
+							internalExperimentFlags: [
+								{
+									key: "force_music_enable_outertube_tastebuilder_browse",
+									value: "true",
+								},
+								{
+									key: "force_music_enable_outertube_playlist_detail_browse",
+									value: "true",
+								},
+								{
+									key: "force_music_enable_outertube_search_suggestions",
+									value: "true",
+								},
+							],
+							sessionIndex: {},
+						},
+						user: {
+							enableSafetyMode: false,
+						},
+						activePlayers: {},
+					},
+					browseEndpointContextMusicConfig: {
+						browseEndpointContextMusicConfig: {
+							pageType: "",
+						},
+					},
+					browseId: `${browseId}`,
+
+					isAudioOnly: true,
+					query: "",
+
+					params: "",
+					videoId: "",
+					playlistId: "",
+				}),
+				headers: {
+					"Content-Type": "application/json; charset=utf-8",
+					Origin: "https://music.youtube.com",
+					"User-Agent":
+						"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+				},
+			}
+		);
+
+		if (!response.ok) {
+			// NOT res.status >= 200 && res.status < 300
+			return { status: response.status, body: response.statusText };
+		}
+		// const data = await response.json();
 		let {
 			contents: {
 				singleColumnBrowseResultsRenderer: {
@@ -21,12 +100,14 @@ export async function getTrending() {
 					],
 				},
 			},
-		} = await response;
+		} = await response.json();
+
 		contents.forEach((content) => {
 			if (content.hasOwnProperty("musicCarouselShelfRenderer")) {
 				carouselItems.push(content);
 			}
 		});
+
 		carouselItems = carouselItems.map(({ musicCarouselShelfRenderer }) => {
 			let ctx = musicCarouselShelfRenderer;
 			let { header, contents } = ctx;
@@ -66,10 +147,10 @@ export async function getTrending() {
 							thumbnails:
 								r.musicTwoRowItemRenderer.thumbnailRenderer
 									.musicThumbnailRenderer.thumbnail.thumbnails,
-							...r.musicTwoRowItemRenderer.navigationEndpoint.watchEndpoint,
+							endpoint:
+								r.musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint,
 							subtitle: [...r.musicTwoRowItemRenderer.subtitle.runs],
 						};
-						// console.log(result)
 
 						break;
 					case "musicResponsiveListItemRenderer":
@@ -109,18 +190,18 @@ export async function getTrending() {
 			};
 		});
 		let newList = contents[1].musicCarouselShelfRenderer;
-
-		titleNew =
-			newList.header.musicCarouselShelfBasicHeaderRenderer.title.runs[0].text;
-		listNew = newList.contents;
-		console.log(newList, carouselItems);
-		if (newList.length !== 0) {
+		if (carouselItems.length > 0) {
 			return {
 				status: 200,
+				maxage: 3600,
 				body: JSON.stringify({ carouselItems }),
 			};
 		}
 	} catch (error) {
-		return { status: 400, body: JSON.stringify(error) };
+		return {
+			status: 500,
+			// Could be a custom message or object i.e. JSON.stringify(err)
+			body: JSON.stringify({ msg: error.message }),
+		};
 	}
 }

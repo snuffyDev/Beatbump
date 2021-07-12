@@ -90,13 +90,11 @@
 						class="item"
 						on:click={() => {
 							console.log()
-							let id =
-								item.musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint
-									.browseId
+							let id = item.endpoint.browseId
 							let type =
-								item.musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint
-									.browseEndpointContextSupportedConfigs
+								item.endpoint.browseEndpointContextSupportedConfigs
 									.browseEndpointContextMusicConfig.pageType
+
 							goto(
 								'/release?type=' +
 									encodeURIComponent(type) +
@@ -116,18 +114,16 @@
 									type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 									data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PGRlZnM+PHBhdGggZD0iTTAgMGg1MTJ2NTEySDBWMHoiIGlkPSJwcmVmaXhfX2EiLz48L2RlZnM+PHVzZSB4bGluazpocmVmPSIjcHJlZml4X19hIiBvcGFjaXR5PSIuMjUiIGZpbGw9IiMyMjIiLz48L3N2Zz4="
 									use:lazy={{
-										src:
-											item.musicTwoRowItemRenderer.thumbnailRenderer
-												.musicThumbnailRenderer.thumbnail.thumbnails[0].url
+										src: item.thumbnails[0].url
 									}} />
 							</div>
 						</div>
 						<div class="cont">
 							<h6 class="title">
-								{item.musicTwoRowItemRenderer.title.runs[0].text}
+								{item.title}
 							</h6>
 							<span class="details">
-								{#each item.musicTwoRowItemRenderer.subtitle.runs as sub}
+								{#each item.subtitle as sub}
 									<span>{sub.text}</span>
 								{/each}
 							</span>

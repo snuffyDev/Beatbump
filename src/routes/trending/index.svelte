@@ -1,175 +1,66 @@
+<script context="module">
+	// import { getTrending } from './index.json'
+	export async function load({ page, fetch }) {
+		const slug = page.params.slug
+		const data = await fetch('/trending.json?q=browse')
+		const { carouselItems } = await data.json()
+
+		if (!data.ok) {
+			return {
+				status: 400,
+				error: data.statusText
+			}
+		}
+		return {
+			props: {
+				carouselItems
+			},
+			maxage: 3600,
+			status: 200
+		}
+	}
+</script>
+
 <script lang="ts">
+	export let carouselItems
 	import { currentTitle } from '$stores/stores'
 	import Loading from '$components/Loading/Loading.svelte'
 	import * as utils from '$lib/utils'
 
 	import Carousel from '$components/Carousel/Carousel.svelte'
 
-	let carouselItems = []
-	$: content = carouselItems.length > 0
-
-	$: listNew = []
-	$: listTrending = []
-
-	$: titleNew = ' '
-	$: titleTrending = ''
-	let data
-	let moods
-	let genres
+	let moods = []
+	let genres = []
 
 	let browseId = 'FEmusic_explore'
 
 	const handler = getTracks()
 
 	function getTracks() {
-		utils.moodsAndGenres('FEmusic_moods_and_genres').then((data) => {
-			let moodsArr = data[0][0]
-			let genresArr = data[1][0]
-
-			genres = [...genresArr.items.slice(0, 10)]
-			utils.shuffle(genres)
-			moods = [...moodsArr.items.slice(0, 10)]
-			return { genres, moods }
-		})
-		// @ts-ignore
-		data = utils
-			.getData('', '', 'browse', browseId, '', '', '')
+		utils
+			.moodsAndGenres('FEmusic_moods_and_genres')
 			.then((data) => {
-				let {
-					contents: {
-						singleColumnBrowseResultsRenderer: {
-							tabs: [
-								{
-									tabRenderer: {
-										content: {
-											sectionListRenderer: { contents }
-										}
-									}
-								}
-							]
-						}
-					}
-				} = data
-				contents.forEach((content) => {
-					if (content.hasOwnProperty('musicCarouselShelfRenderer')) {
-						carouselItems.push(content)
-					}
-				})
-				carouselItems = carouselItems.map(({ musicCarouselShelfRenderer }) => {
-					let ctx = musicCarouselShelfRenderer
-					let { header, contents } = ctx
-					header = utils.transform(header)
+				let moodsArr = data[0][0]
+				let genresArr = data[1][0]
 
-					header = [
-						...header.map(({ musicCarouselShelfBasicHeaderRenderer }) => {
-							let h = musicCarouselShelfBasicHeaderRenderer
-							return {
-								title: utils.pb(h, 'title:runs:text', true),
-								browseId: utils.pb(
-									h,
-									'moreContentButton:buttonRenderer:navigationEndpoint:browseEndpoint:browseId',
-									true
-								)
-							}
-						})
-					]
-					let results = []
-
-					contents.map((r) => {
-						let type = Object.getOwnPropertyNames(r).toString()
-						interface result {
-							title: string
-							artist: string
-							endpoint?: string
-							videoId: string
-							playlistId: string
-							params?: string
-							thumbnails: []
-							subtitle?: {}[]
-						}
-						let result: result
-						switch (type) {
-							case 'musicTwoRowItemRenderer':
-								result = {
-									title: r.musicTwoRowItemRenderer.title.runs[0].text,
-									thumbnails:
-										r.musicTwoRowItemRenderer.thumbnailRenderer
-											.musicThumbnailRenderer.thumbnail.thumbnails,
-									...r.musicTwoRowItemRenderer.navigationEndpoint.watchEndpoint,
-									subtitle: [...r.musicTwoRowItemRenderer.subtitle.runs]
-								}
-								// console.log(result)
-
-								break
-							case 'musicResponsiveListItemRenderer':
-								result = {
-									subtitle: [
-										...r.musicResponsiveListItemRenderer.flexColumns[1]
-											.musicResponsiveListItemFlexColumnRenderer.text.runs
-									],
-									title:
-										r.musicResponsiveListItemRenderer.flexColumns[0]
-											.musicResponsiveListItemFlexColumnRenderer.text.runs[0]
-											.text,
-									videoId:
-										r.musicResponsiveListItemRenderer.flexColumns[0]
-											.musicResponsiveListItemFlexColumnRenderer.text.runs[0]
-											.navigationEndpoint.watchEndpoint.videoId,
-									playlistId:
-										r.musicResponsiveListItemRenderer.menu.menuRenderer.items[0]
-											.menuNavigationItemRenderer.navigationEndpoint
-											.watchEndpoint.playlistId,
-									thumbnails:
-										r.musicResponsiveListItemRenderer.thumbnail
-											.musicThumbnailRenderer.thumbnail.thumbnails
-								}
-								// console.log(result, 'musicResponse')
-								break
-							case 'musicNavigationButtonRenderer':
-								// console.log('nav')
-								break
-							default:
-								break
-						}
-						results.push(result)
-					})
-					return {
-						header,
-						results
-					}
-				})
-				// console.log(carouselItems)
-				let newList = contents[1].musicCarouselShelfRenderer
-				let trendList = contents[3].musicCarouselShelfRenderer
-				let carousel = [newList, trendList]
-
-				titleNew =
-					newList.header.musicCarouselShelfBasicHeaderRenderer.title.runs[0]
-						.text
-				titleTrending = carouselItems[0].header.title
-				listTrending = trendList.contents
-				listNew = newList.contents
-				return { listNew, listTrending, titleNew, titleTrending }
+				genres = [...genresArr.items.slice(0, 10)]
+				utils.shuffle(genres)
+				moods = [...moodsArr.items.slice(0, 10)]
+				return { genres, moods }
 			})
-
-		return { data, genres }
+			.finally((msg) => {
+				console.log(genres, moods)
+			})
+		// @ts-ignore
 	}
 </script>
 
 <svelte:head>
 	<title>{$currentTitle == '' ? 'Home' : $currentTitle} - Beatbump</title>
 </svelte:head>
-
-{#if !content}
+{#await handler}
 	<Loading />
-	{#await handler then _}
-		{''}
-	{/await}
-{:else}
-	{''}
-{/if}
-
-{#if content}
+{:then _}
 	<main>
 		<Carousel
 			setTitle={carouselItems[2].header[0].title}
@@ -180,7 +71,10 @@
 			setTitle={carouselItems[3].header[0].title}
 			items={carouselItems[3].results}
 			type="trending" />
-		<Carousel setTitle={titleNew} items={listNew} type="new" />
+		<Carousel
+			setTitle={carouselItems[0].header[0].title}
+			items={carouselItems[0].results}
+			type="new" />
 		<div class="breakout">
 			<div class="box-cont">
 				<section-header>Moods</section-header>
@@ -213,7 +107,7 @@
 			</div>
 		</div>
 	</main>
-{/if}
+{/await}
 
 <style lang="scss">
 	section-header {
