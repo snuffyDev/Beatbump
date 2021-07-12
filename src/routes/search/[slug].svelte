@@ -15,7 +15,9 @@
 		} = await response.json()
 		if (response.ok) {
 			return {
-				props: { filter, contents, continuation, correctedQuery, error }
+				props: { filter, contents, continuation, correctedQuery, error },
+				maxage: 3600,
+				status: 200
 			}
 		}
 	}

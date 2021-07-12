@@ -69,9 +69,21 @@
 			{#each items as item, i}
 				{#if type == 'trending'}
 					<!-- {JSON.stringify(item[1], title, thumbnail, subtitle)} -->
-					<CarouselItem type="trending" {item} index={i} bind:section />
+					<CarouselItem
+						type="trending"
+						imgWidth={16}
+						imgHeight={9}
+						{item}
+						index={i}
+						bind:section />
 				{:else if type == 'artist'}
-					<CarouselItem type="artist" {item} index={i} bind:section />
+					<CarouselItem
+						type="artist"
+						imgHeight={256}
+						imgWidth={256}
+						{item}
+						index={i}
+						bind:section />
 				{:else if type == 'new'}
 					<!-- content here -->
 					<section
