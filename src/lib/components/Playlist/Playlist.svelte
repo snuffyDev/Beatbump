@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { fly, fade } from 'svelte/transition'
+	import { fly, fade, slide } from 'svelte/transition'
 	import {
 		afterUpdate,
 		beforeUpdate,
 		createEventDispatcher,
 		onMount
 	} from 'svelte'
-	import { cubicIn } from 'svelte/easing'
+	import { cubicIn, cubicInOut } from 'svelte/easing'
 	import { currentTitle } from '$stores/stores'
 	import { getSrc } from '$lib/utils'
 	import { clickOutside } from '$lib/js/clickOutside'
@@ -54,16 +54,23 @@
 			id: `${autoId}`
 		})
 	}
+	function showList(i) {
+		dispatch('hide', {
+			showing: false
+		})
+	}
 </script>
 
 {#if show}
+	<!-- content here -->
 	<div
 		class="listContainer"
 		use:clickOutside
 		on:click_outside={() => {
-			show = !show
+			show = false
+			showList(show)
 		}}
-		transition:fly={{ y: 0, duration: 225, easing: cubicIn }}>
+		transition:fly={{ y: 0, duration: 125, easing: cubicInOut }}>
 		<div class="list">
 			{#if list.length > 1}
 				<ul class="list-m" id="list" bind:this={songList}>
@@ -79,7 +86,11 @@
 								handleClick(index)
 							}}>
 							<div class="pl-thumbnail" style="min-width:5rem; max-width:5rem;">
-								<img src={item.thumbnail} alt="thumbnail" />
+								<img
+									referrerpolicy="origin-when-cross-origin"
+									src={item.thumbnail}
+									loading="lazy"
+									alt="thumbnail" />
 							</div>
 							<div class="p-text">
 								<span class="p-title">
@@ -115,11 +126,10 @@
 	.listContainer {
 		isolation: auto;
 		box-shadow: 0.2em 0 3em 0em #00000040;
-		position: absolute;
+		position: fixed;
 		margin: 0;
 		left: 0;
-
-		bottom: 4em;
+		// bottom: -10em;
 		display: flex;
 		flex: 1 1 auto;
 		visibility: visible;
@@ -130,11 +140,16 @@
 		// transition: all cubic-bezier(0.23, 1, 0.32, 1) 1300ms;
 		min-height: 55%;
 		width: 40%;
-		z-index: 50;
+		z-index: -1;
 
 		/* overflow-y: scroll !important; */
 		overflow-y: hidden;
-
+		opacity: 1;
+		transition: all 125ms ease-in;
+		bottom: 4em;
+		&.slide {
+			opacity: 1;
+		}
 		.list {
 			// background: #11151c;
 			background: theme-color('dim', 'side');

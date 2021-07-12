@@ -69,7 +69,7 @@ export async function get({ query }) {
 
 		if (!response.ok) {
 			// NOT res.status >= 200 && res.status < 300
-			return { statusCode: response.status, body: response.statusText };
+			return { status: response.status, body: response.statusText };
 		}
 		// Start of Data Parsing
 		const data = await response.json();

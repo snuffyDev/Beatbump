@@ -122,6 +122,7 @@
 					<!-- svelte-ignore a11y-missing-attribute -->
 					<img
 						id="img"
+						referrerpolicy="origin-when-cross-origin"
 						data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PGRlZnM+PHBhdGggZD0iTTAgMGg1MTJ2NTEySDBWMHoiIGlkPSJwcmVmaXhfX2EiLz48L2RlZnM+PHVzZSB4bGluazpocmVmPSIjcHJlZml4X19hIiBvcGFjaXR5PSIuMjUiIGZpbGw9IiMyMjIiLz48L3N2Zz4="
 						loading="lazy"
 						src={thumbnail}

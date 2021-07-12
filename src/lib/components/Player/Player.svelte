@@ -133,7 +133,7 @@
 				list: mixList
 			})
 
-			autoId++
+			// autoId++
 			player.src = await utils.getSrc(mixList[autoId].videoId)
 			key.set(autoId)
 			return mixList
@@ -227,6 +227,10 @@
 		autoId = event.detail.id
 		console.log(autoId)
 	}}
+	on:hide={(event) => {
+		showing = event.detail.showing
+		// console.log(showing)
+	}}
 	bind:show={listShow}
 	bind:mixList
 	bind:autoId={$key} />
@@ -242,6 +246,9 @@
 		<div class="player-left">
 			<div
 				on:click={() => {
+					if (showing) {
+						showing = false
+					}
 					showing = !showing
 				}}
 				class="listButton">
@@ -253,7 +260,7 @@
 				<div
 					class="player-btn"
 					on:click={async () => {
-						if (autoId < 0) {
+						if (!autoId || autoId < 0) {
 							console.log('cant do that!')
 						} else {
 							autoId--
@@ -344,6 +351,12 @@
 </div>
 
 <style lang="scss">
+	.f-container {
+		background-color: inherit;
+	}
+	.player {
+		background-color: inherit;
+	}
 	.volume-wrapper {
 		background: inherit;
 		background: var(--dark-bottom);

@@ -8,19 +8,23 @@
 	export let type
 	import { goto, invalidate } from '$app/navigation'
 	import { page } from '$app/stores'
+	import { search } from '$lib/stores/stores'
+	import { tick } from 'svelte'
 	let endpoint = 'search'
 	let filterType
 	let songTitle = ''
 	let filter = filterType ? filterType : options[0].params
 	async function handleSubmit(s, f) {
-		if (!$page.path.includes('/search')) {
-			let url = '/search/' + `${s}?filter=${f}`
+		// invalidate($page.path)
 
-			goto(url)
-		} else {
-			let url = `/search/${s}?filter=${f}`
-			goto(url, { replaceState: true, noscroll: false })
-		}
+		let url = `/search/${s}?filter=${f}`
+		// search.set([])
+		await tick()
+		window.scrollTo({
+			behavior: 'smooth',
+			top: 0
+		})
+		goto(url, { replaceState: true })
 	}
 </script>
 

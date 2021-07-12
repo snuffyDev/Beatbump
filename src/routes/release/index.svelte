@@ -12,6 +12,7 @@
 	import Icon from '$components/Icon/Icon.svelte'
 	import ListItem from '$components/ListItem/ListItem.svelte'
 	import { currentMix, currentTitle, currentTrack, key } from '$stores/stores'
+	import lazy from '$lib/lazy'
 	let browseId = $page.query.get('id')
 	// console.log(browseId)
 	let pageType = $page.query.get('type')
@@ -88,13 +89,18 @@
 					<div class="info-wrapper">
 						<div class="img">
 							<img
+								referrerpolicy="origin-when-cross-origin"
 								width="18.2857rem"
 								height="18.2857rem"
 								loading="lazy"
-								src={info.thumbnailDetails.thumbnails[1].url.replace(
-									/=(w(\d+))-(h(\d+))/g,
-									'=w256-h256'
-								)}
+								type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+								data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0icHJlZml4X19wcmVmaXhfX2ZlYXRoZXIgcHJlZml4X19wcmVmaXhfX2ZlYXRoZXItbGlzdCI+PHBhdGggb3BhY2l0eT0iLjciIHN0cm9rZT0iI2NjYyIgZmlsbD0iIzMzMyIgZD0iTTAgMGgyNHYyNEgweiIvPjwvc3ZnPg=="
+								use:lazy={{
+									src: info.thumbnailDetails.thumbnails[1].url.replace(
+										/=(w(\d+))-(h(\d+))/g,
+										'=w256-h256'
+									)
+								}}
 								alt="album" />
 						</div>
 						<div class="info">
@@ -194,7 +200,7 @@
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
-		flex: 1 1 auto;
+		flex: none;
 		/* margin-left: auto; */
 	}
 	button {
@@ -210,22 +216,22 @@
 		font-size: 1.1rem;
 		padding: 0.3em;
 	}
-	.radioMix {
-		background: transparent !important;
-		border: white 0.1rem solid !important;
-		color: white !important;
-		svg > * {
-			fill: white;
-		}
+	// .radioMix {
+	// 	background: transparent !important;
+	// 	border: white 0.1rem solid !important;
+	// 	color: white !important;
+	// 	svg > * {
+	// 		fill: white;
+	// 	}
 
-		&:active,
-		&:hover {
-			border: rgb(158, 158, 158) 0.1rem solid !important;
-			background: rgba(255, 255, 255, 0.027) !important;
-			box-shadow: 0 0 0.1em 0 inset black;
-			color: rgb(236, 236, 236) !important;
-		}
-	}
+	// 	&:active,
+	// 	&:hover {
+	// 		border: rgb(158, 158, 158) 0.1rem solid !important;
+	// 		background: rgba(255, 255, 255, 0.027) !important;
+	// 		box-shadow: 0 0 0.1em 0 inset black;
+	// 		color: rgb(236, 236, 236) !important;
+	// 	}
+	// }
 	li,
 	.box {
 		align-content: center;
@@ -251,17 +257,22 @@
 	.img {
 		position: relative;
 		aspect-ratio: 1/1;
-		width: auto;
-		height: auto;
+		width: 100%;
+		height: 100%;
 		object-fit: contain;
+		max-width: 18.2857rem;
+		max-height: 18.2857rem;
 		img {
 			box-shadow: 0 0 1.5rem 0.125rem rgb(0 0 0 / 37%);
 			/* max-width: inherit; */
 			/* max-height: inherit; */
+			max-width: 18.2857rem;
+			max-height: 18.2857rem;
 			-o-object-fit: scale-down;
 			object-fit: scale-down;
-			height: auto;
-			width: auto;
+			aspect-ratio: inherit;
+			height: 100%;
+			width: 100%;
 		}
 	}
 

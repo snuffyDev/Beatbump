@@ -15,6 +15,7 @@
 	<div class="artist-thumbnail">
 		<picture class="header-thumbnail">
 			<img
+				referrerpolicy="origin-when-cross-origin"
 				class="header-thumbnail"
 				src={thumbnail[1].url}
 				alt="Artist Thumbnail" />

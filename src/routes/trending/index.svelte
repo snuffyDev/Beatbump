@@ -5,7 +5,8 @@
 
 	import Carousel from '$components/Carousel/Carousel.svelte'
 
-	$: content = listNew.length > 0
+	let carouselItems = []
+	$: content = carouselItems.length > 0
 
 	$: listNew = []
 	$: listTrending = []
@@ -15,7 +16,6 @@
 	let data
 	let moods
 	let genres
-	let carouselItems = []
 
 	let browseId = 'FEmusic_explore'
 

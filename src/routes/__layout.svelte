@@ -1,7 +1,7 @@
 <script>
 	import '../global/stylesheet.scss'
 	import { browser } from '$app/env'
-	import { fade } from 'svelte/transition'
+	import { fade, scale } from 'svelte/transition'
 	import { onMount } from 'svelte'
 	import { currentTrack, theme } from '$stores/stores'
 	import * as utils from '$lib/utils'

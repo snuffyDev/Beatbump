@@ -97,6 +97,7 @@
 							<div class="container">
 								<img
 									alt="thumbnail"
+									referrerpolicy="origin-when-cross-origin"
 									transition:fade|local
 									width="256"
 									height="256"

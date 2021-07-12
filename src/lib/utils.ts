@@ -74,118 +74,6 @@ export const searchTracks = async (
 	// console.log(data);
 };
 
-// Get Trending page
-export const getTrending = () => {
-	let browseId = "FEmusic_explore";
-
-	return getData("", "", "browse", browseId, "", "", "").then((data) => {
-		let carouselItems = [];
-		let resHeader = [];
-		let results = [];
-
-		let {
-			contents: {
-				singleColumnBrowseResultsRenderer: {
-					tabs: [
-						{
-							tabRenderer: {
-								content: {
-									sectionListRenderer: { contents },
-								},
-							},
-						},
-					],
-				},
-			},
-		} = data;
-		contents.forEach((content) => {
-			if (content.hasOwnProperty("musicCarouselShelfRenderer")) {
-				carouselItems.push(content);
-			}
-		});
-		carouselItems.map(({ musicCarouselShelfRenderer }) => {
-			let ctx = musicCarouselShelfRenderer;
-			let { header, contents } = ctx;
-			header = transform(header);
-
-			let head = [];
-
-			resHeader = header.map(({ musicCarouselShelfBasicHeaderRenderer }) => {
-				let h = musicCarouselShelfBasicHeaderRenderer;
-				let title = pb(h, "title:runs:text", true);
-				let browseId = pb(
-					h,
-					"moreContentButton:buttonRenderer:navigationEndpoint:browseEndpoint:browseId",
-					true
-				);
-				return {
-					title,
-					browseId,
-				};
-			});
-
-			contents.map((r) => {
-				let type = Object.getOwnPropertyNames(r).toString();
-				if (type == "musicNavigationButtonRenderer") {
-					return;
-				}
-				interface result {
-					title: string;
-					artist: string;
-					endpoint?: string;
-					videoId: string;
-					playlistId: string;
-					params?: string;
-					thumbnails: [];
-					subtitle?: {}[];
-				}
-				let result: result;
-				switch (type) {
-					case "musicTwoRowItemRenderer":
-						result = {
-							title: r.musicTwoRowItemRenderer.title.runs[0].text,
-							thumbnails:
-								r.musicTwoRowItemRenderer.thumbnailRenderer
-									.musicThumbnailRenderer.thumbnail.thumbnails,
-							...r.musicTwoRowItemRenderer.navigationEndpoint.watchEndpoint,
-							subtitle: [...r.musicTwoRowItemRenderer.subtitle.runs],
-						};
-						// console.log(result)
-
-						break;
-					case "musicResponsiveListItemRenderer":
-						result = {
-							subtitle: [
-								...r.musicResponsiveListItemRenderer.flexColumns[1]
-									.musicResponsiveListItemFlexColumnRenderer.text.runs,
-							],
-							title:
-								r.musicResponsiveListItemRenderer.flexColumns[0]
-									.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text,
-							...r.musicResponsiveListItemRenderer.flexColumns[0]
-								.musicResponsiveListItemFlexColumnRenderer.text.runs[0]
-								.navigationEndpoint.watchEndpoint,
-							thumbnails:
-								r.musicResponsiveListItemRenderer.thumbnail
-									.musicThumbnailRenderer.thumbnail.thumbnails,
-						};
-						// console.log(result, 'musicResponse')
-						break;
-					case "musicNavigationButtonRenderer":
-						// console.log('nav')
-						break;
-					default:
-						break;
-				}
-				results.push(result);
-			});
-		});
-		return {
-			header: resHeader,
-			results: carouselItems,
-		};
-	});
-};
 // TODO: Get playlist
 export const getPlaylist = async (browseId) => {
 	const res = await fetch(`/api/playlist.json?browseId=${browseId}`, {
@@ -322,8 +210,8 @@ export const getSrc = async (videoId?: string, playlistId?: string) => {
 
 	const res = await fetch(url).then((r) => r.json());
 	const formats = await sort(res);
-
-	const parsedURL = await formats[0].downloadURL();
+	console.log(formats);
+	const parsedURL = formats[0].url;
 	updateTrack.set(parsedURL);
 
 	return parsedURL;

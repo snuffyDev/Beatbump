@@ -1,24 +1,36 @@
 <script context="module">
 	// import { search } from '$stores/stores'
 	export async function load({ page, fetch }) {
+		const { slug } = page.params
+		const filter = page.query.get('filter')
 		const url =
-			'/api/search.json?q=' +
-			encodeURIComponent(page.params.slug) +
+			`/api/search.json?q=${page.params.slug}` +
 			`&params=${page.query.get('filter')}`
 		const response = await fetch(url)
-		const results = await response.json()
+		let {
+			contents,
+			continuation,
+			correctedQuery,
+			error
+		} = await response.json()
 		if (response.ok) {
 			return {
-				props: { results }
+				props: { slug, filter, contents, continuation, correctedQuery, error }
 			}
 		}
 	}
 </script>
 
 <script lang="ts">
-	export let results
-
-	let { contents, error, correctedQuery } = results
+	export let continuation
+	export let contents
+	export let correctedQuery
+	export let error
+	export let slug
+	export let filter
+	// $: console.log(slug, filter, `TEST`)
+	// $: contents = contents
+	// $: console.log(continuation)
 	import {
 		currentTitle,
 		search,
@@ -30,35 +42,37 @@
 	import { invalidate } from '$app/navigation'
 	import Item from '$components/Item/Item.svelte'
 	import { onMount } from 'svelte'
-	onMount(() => {
-		search.set([...contents])
-	})
+	$: search.set([...contents])
+	// $: console.log(contents[1].title)
 	$: songTitle = $page.params.slug
-	let {
-		continuation: ctoken,
-		clickTrackingParams: itct
-	} = results?.continuation
+	// let { continuation: ctoken, clickTrackingParams: itct } = continuation
+	let ctoken = continuation?.continuation
+	let itct = continuation?.clickTrackingParams
 	async function paginate() {
 		return await fetch(
 			`/api/search.json?q=` +
-				`&params=${itct}${ctoken ? `&ctoken=${ctoken}` : ''}`
+				`&params=${continuation.clickTrackingParams}${
+					continuation.continuation
+						? `&ctoken=${continuation.continuation}`
+						: ''
+				}`
 		)
 			.then((data) => data.json())
 			.then((data) => {
 				const res = data
 
 				search.update((u) => [...u, ...res.contents])
-				searchCtoken.set({
-					continuation: res.continuation.continuation,
-					itct: res.continuation.clickTrackingParams
-				})
+				// searchCtoken.set({
+				// 	continuation: res.continuation.continuation,
+				// 	itct: res.continuation.clickTrackingParams
+				// })
 
 				if (data?.error) {
 					error = data?.error
 				}
 				// console.log(data)
-				ctoken = $searchCtoken.continuation
-				itct = $searchCtoken.itct
+				ctoken = res.continuation.continuation
+				itct = res.continuation.clickTrackingParams
 				return { params: itct, continuation: ctoken }
 			})
 	}
@@ -72,9 +86,7 @@
 			: 'Search - '}Beatbump</title>
 </svelte:head>
 <!-- {JSON.stringify(results)} -->
-{#await results}
-	<Loading />
-{:then _}
+{#key results}
 	{#if error}
 		<section class="searchHeader">
 			<p>
@@ -108,7 +120,7 @@
 				paginate()
 			}}>Load More</button>
 	{/if}
-{/await}
+{/key}
 
 <style scoped lang="scss">
 	@import '../../global/scss/components/mixins';
