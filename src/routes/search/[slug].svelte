@@ -43,7 +43,7 @@
 	import { onMount } from 'svelte'
 	$: search.set([...contents])
 	// $: console.log(contents[1].title)
-	$: songTitle = $page.params.slug
+	let songTitle = $page.params.slug
 	// let { continuation: ctoken, clickTrackingParams: itct } = continuation
 	let ctoken = continuation?.continuation
 	let itct = continuation?.clickTrackingParams
@@ -85,7 +85,7 @@
 			: 'Search - '}Beatbump</title>
 </svelte:head>
 <!-- {JSON.stringify(results)} -->
-{#key results}
+{#key contents}
 	{#if error}
 		<section class="searchHeader">
 			<p>

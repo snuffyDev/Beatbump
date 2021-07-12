@@ -10,12 +10,16 @@
 	import * as utils from '$lib/utils'
 	import Icon from '$components/Icon/Icon.svelte'
 	import { goto } from '$app/navigation'
+	// import { addToQueue } from '$lib/utils'
 
 	let ctoken = ''
 	let videoId = ''
 	let playlistId = ''
 	$: title = songTitle = '...'
 
+	let src
+	let songTitle
+	let video
 	let thumbnail
 
 	let explicit

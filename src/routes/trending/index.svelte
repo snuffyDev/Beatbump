@@ -138,7 +138,7 @@
 						results
 					}
 				})
-				console.log(carouselItems)
+				// console.log(carouselItems)
 				let newList = contents[1].musicCarouselShelfRenderer
 				let trendList = contents[3].musicCarouselShelfRenderer
 				let carousel = [newList, trendList]

@@ -1,5 +1,6 @@
 <script>
 	import '../global/stylesheet.scss'
+    import '../app.css'
 	import { browser } from '$app/env'
 	import { fade, scale } from 'svelte/transition'
 	import { onMount } from 'svelte'

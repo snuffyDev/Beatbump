@@ -256,8 +256,6 @@
 		// box-shadow: 0 0 1rem 0.5rem rgb(0 0 0 / 36%);
 		position: relative;
 		top: 0;
-		width: 100%;
-		height: 100%;
 		max-height: 12.5rem;
 		min-width: 12.5rem;
 		border-radius: 2px;
@@ -279,6 +277,9 @@
 				height: 100%;
 				-o-object-fit: cover;
 				object-fit: cover;
+
+				max-width: inherit;
+				max-height: inherit;
 			}
 		}
 	}

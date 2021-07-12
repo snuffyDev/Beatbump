@@ -17,7 +17,7 @@
 	async function handleSubmit(s, f) {
 		// invalidate($page.path)
 
-		let url = `/search/${s}?filter=${f}`
+		let url = `/search/`+encodeURIComponent(s)+`?filter=`encodeURIComponent(f)
 		// search.set([])
 		await tick()
 		window.scrollTo({

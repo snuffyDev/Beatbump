@@ -161,9 +161,12 @@
 				font-weight: 700;
 				font-size: 2.5rem;
 				display: inline-block;
+				font-family: 'Commissioner', sans-serif;
+
 				// white-space: pre;
 				text-shadow: rgba(0, 0, 0, 0.171) 0.2rem -0.12rem 0.5rem;
 
+				letter-spacing: -0.02em;
 				padding: 0.8em 0 0.8rem 0.5rem;
 				// @media screen and (max-width: 550px) {
 				// 	// padding: 0 2rem 0 2rem;

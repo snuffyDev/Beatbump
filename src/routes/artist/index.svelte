@@ -108,10 +108,16 @@
 						? carousel.header[0].title
 						: carousel.header}>
 					>
+
 					<div class="section">
 						<div class="scroll">
 							{#each carousel.contents as item, i}
-								<CarouselItem {item} index={i} bind:section />
+								<CarouselItem
+									{item}
+									imgWidth="1"
+									imgHeight="1"
+									index={i}
+									bind:section />
 							{/each}
 						</div>
 					</div>

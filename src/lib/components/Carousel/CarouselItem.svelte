@@ -14,6 +14,8 @@
 	export let index
 	export let item
 	export let type = ''
+	export let imgWidth
+	export let imgHeight
 	let hovering = false
 	let isLoading = false
 	let loading = isLoading ? true : false
@@ -91,14 +93,13 @@
 				<div class="container">
 					{#if type == 'artist'}
 						<img
+							style="aspect-ratio:{imgWidth}/{imgHeight}"
 							alt="thumbnail"
 							transition:fade|local
 							referrerpolicy="origin-when-cross-origin"
 							loading="lazy"
 							type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 							data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
-							width="250"
-							height="250"
 							src={item.thumbnails[0].url} />
 					{:else}
 						<img
@@ -244,7 +245,7 @@
 	}
 	.title {
 		cursor: pointer;
-		letter-spacing: 0.02em;
+		// letter-spacing: 0.02em;
 	}
 
 	section {
@@ -268,19 +269,15 @@
 	}
 
 	.img {
-		// position: relative;
-		/* width: 100%; */
-		/* height: clamp(10rem,12.5rem,15rem); */
-		/* min-width: 100%; */
-		// box-shadow: 0 0 1rem 0.5rem rgb(0 0 0 / 36%);
-		// position: relative;
-		display: block;
-		// width: auto;
-		width: 100%;
+		/* display: block; */
+		// min-width: 12.125rem;
+		max-width: 12rem;
+		// aspect-ratio: 1/1;
 		height: auto;
-		min-width: 12.5rem;
-		max-width: 12.5rem;
-		aspect-ratio: 16/9;
+		width: 100%;
+		// display: flex;
+		// flex: none;
+		// max-height: 10rem;
 		.container {
 			// display: flex;
 			// align-items: center;
@@ -291,22 +288,22 @@
 			// max-height: inherit;
 			// aspect-ratio: inherit;
 			// position: relative;
+
 			cursor: pointer;
 			width: 100%;
-			height: auto;
 			max-width: inherit;
 			max-height: inherit;
 			aspect-ratio: inherit;
+			// height: 100%;
 			position: relative;
 
 			justify-self: center;
 			img {
-				width: auto;
+				width: 100%;
 				height: auto;
+				max-height: 9rem;
 				-o-object-fit: scale-down;
 				object-fit: scale-down;
-				max-height: inherit;
-				max-width: inherit;
 				aspect-ratio: inherit;
 				// position: absolute;
 				// bottom: 0;

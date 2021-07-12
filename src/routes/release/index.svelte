@@ -204,7 +204,8 @@
 		/* margin-left: auto; */
 	}
 	button {
-		font-family: 'Lato' sans-serif;
+		font-family: 'Commissioner', sans-serif;
+
 		flex-wrap: nowrap;
 		display: flex;
 		place-items: center;
