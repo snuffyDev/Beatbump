@@ -85,21 +85,18 @@
 <style lang="scss">
 	.explicit {
 		text-shadow: none;
-		width: 18px;
-		height: 18px;
+		width: 1rem;
+		height: 1rem;
+		font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+			Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
 		font-size: 0.7143rem;
 		flex: none;
-		color: rgb(0, 0, 0);
-		font-weight: 600;
+		color: #000;
+		font-weight: 700;
 		filter: contrast(100%);
-		background: rgba(255, 255, 255, 0.966);
-		// background-clip: border-box;
-		// background-blend-mode: multiply;
-		// mix-blend-mode: darken;
-		// filter:
-		// backdrop-filter: opacity(100%) invert(100%);
-		padding: 0 0.2rem;
-		margin-left: 0.2rem;
+		background: hsla(0, 0%, 100%, 0.966);
+		padding: 0 0.4em;
+		margin-left: 0.3em;
 	}
 	.itemInfo {
 		.title {

@@ -196,6 +196,8 @@
 		background-color: inherit;
 		padding: 0.5em 0em 0.5em 0;
 		z-index: 10;
+
+		border-radius: 0.5em;
 		flex-direction: row;
 		width: 100%;
 		max-width: 11.4rem;

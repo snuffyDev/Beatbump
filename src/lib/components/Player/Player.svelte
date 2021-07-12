@@ -108,7 +108,7 @@
 			)
 			const res = await data
 
-			mixList.pop()
+			// mixList.pop()
 
 			mixList = [
 				...mixList,
@@ -124,8 +124,10 @@
 					thumbnail: d.thumbnail,
 					length: d.length
 				}))
-			]
-
+			].filter(
+				((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set())
+			)
+			console.log(mixList)
 			currentMix.set({
 				videoId: `${mixList[autoId].videoId}`,
 				playlistId: `${list.playlistId}`,
@@ -135,7 +137,7 @@
 
 			// autoId++
 			player.src = await utils.getSrc(mixList[autoId].videoId)
-			key.set(autoId)
+			key.set(autoId++)
 			once = false
 			return mixList
 		} else {
@@ -298,7 +300,6 @@
 						if (!gettingNext) {
 							if (autoId == mixList.length - 1) {
 								gettingNext = true
-								autoId++
 								await getNext()
 								gettingNext = false
 							} else {
@@ -386,6 +387,7 @@
 	.volume-icon {
 		cursor: pointer;
 	}
+
 	.volume-container {
 		// transform: rotate(-90deg);
 		// position: absolute;

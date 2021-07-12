@@ -2,10 +2,10 @@
 // for inverted color schemes, see `inverse-colors` global mixin.
 
 body {
-	color: $base-font-color;
-	font-family: $base-font-family;
-	font-size: 1rem;
-	line-height: 1.5;
+    color: $base-font-color;
+    font-family: $base-font-family;
+    font-size: 1rem;
+    line-height: 1.5;
 }
 
 h1,
@@ -14,147 +14,147 @@ h3,
 h4,
 h5,
 h6 {
-	color: $base-font-color;
-	font-family: $base-font-family;
-	line-height: 1.5;
-	font-weight: 500;
-	margin: 0 0 $small-spacing;
+    color: $base-font-color;
+    font-family: $base-font-family;
+    line-height: 1.5;
+    font-weight: 500;
+    margin: 0 0 $small-spacing;
 }
 
 h1 {
-	font-size: 2.25em;
-	font-weight: 700;
+    font-size: 2.25em;
+    font-weight: 700;
 }
 
 h2 {
-	font-size: 2em;
+    font-size: 2em;
 }
 
 h3 {
-	font-size: 1.75em;
+    font-size: 1.75em;
 }
 
 h4 {
-	font-size: 1.5em;
+    font-size: 1.5em;
 }
 
 h5 {
-	font-size: 1.25em;
+    font-size: 1.25em;
 }
 
 h6 {
-	font-size: 1em;
+    font-size: 1em;
 }
 
 p {
-	// margin: 0 0 $small-spacing;
+    // margin: 0 0 $small-spacing;
 }
 
 a,
 .link {
-	$link-color: rgb(245, 245, 245);
-	color: rgb(245, 245, 245);
-	// -webkit-text-decoration: $link-color 0.01em underline solid;
-	// text-decoration: $link-color 0.1em underline solid;
-	text-decoration: none;
-	transition: color 0.2s;
-	display: inline;
-	&.link {
-		font-weight: 600;
-	}
-	&:visited {
-		color: darken($link-color, 3%);
-	}
-	&:active,
-	&:focus,
-	&:hover {
-		color: darken($link-color, 10%);
-		outline: none;
-		text-decoration: none;
-	}
-	&:hover {
-		cursor: pointer;
-	}
+    $link-color: rgb(245, 245, 245);
+    color: rgb(245, 245, 245);
+    // -webkit-text-decoration: $link-color 0.01em underline solid;
+    // text-decoration: $link-color 0.1em underline solid;
+    text-decoration: none;
+    transition: color 0.2s;
+    display: inline;
+    &.link {
+        font-weight: 500;
+    }
+    &:visited {
+        color: darken($link-color, 3%);
+    }
+    &:active,
+    &:focus,
+    &:hover {
+        color: darken($link-color, 10%);
+        outline: none;
+        text-decoration: none;
+    }
+    &:hover {
+        cursor: pointer;
+    }
 }
 
 pre {
-	white-space: pre-wrap;
+    white-space: pre-wrap;
 }
 // code {
 // 	line-height: 1;
 // }
 pre {
-	margin-bottom: 0rem;
-	border: $base-border;
-	background: #1d1f21;
-	color: #c5c8c6;
-	font-family: Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-	word-wrap: normal;
-	overflow-wrap: normal;
+    margin-bottom: 0rem;
+    border: $base-border;
+    background: #1d1f21;
+    color: #c5c8c6;
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    word-wrap: normal;
+    overflow-wrap: normal;
 }
 pre code {
-	word-wrap: normal;
-	overflow-wrap: normal;
+    word-wrap: normal;
+    overflow-wrap: normal;
 }
 pre {
-	margin-bottom: 3rem;
-	padding: 0.75rem;
-	background: #1d1f21;
-	color: #c5c8c6;
+    margin-bottom: 3rem;
+    padding: 0.75rem;
+    background: #1d1f21;
+    color: #c5c8c6;
 }
 pre code {
-	word-wrap: normal;
+    word-wrap: normal;
 }
 strong,
 em,
 small,
 code,
 hr {
-	line-height: 1;
+    line-height: 1;
 }
 code,
 kbd,
 pre,
 samp {
-	font-family: Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-	font-size: 1em;
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 1em;
 }
 pre {
-	padding: 0.75rem;
-	background: #1d1f21;
-	color: #c5c8c6;
-	font-size: 1rem;
-	line-height: 1.5;
-	word-wrap: break-word;
+    padding: 0.75rem;
+    background: #1d1f21;
+    color: #c5c8c6;
+    font-size: 1rem;
+    line-height: 1.5;
+    word-wrap: break-word;
 }
 pre::first-line {
-	font-size: 1;
+    font-size: 1;
 }
 .hljs-string {
-	color: #b5bd68;
+    color: #b5bd68;
 }
 .hljs-keyword {
-	color: #81a2be;
+    color: #81a2be;
 }
 .example + pre {
-	margin-bottom: 3rem;
+    margin-bottom: 3rem;
 }
 
 hr {
-	margin: $base-spacing 0;
-	border-bottom: $base-border;
-	border-left: none;
-	border-right: none;
-	border-top: none;
-	color: #c5c8c6;
+    margin: $base-spacing 0;
+    border-bottom: $base-border;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    color: #c5c8c6;
 }
 
 blockquote {
-	border-left: 0.25rem solid $primary-color;
-	font-family: Georgia, Times, 'Times New Roman', serif;
-	font-size: 1.25em;
-	font-style: italic;
-	font-weight: 400;
-	margin: 0 0 $base-spacing*0.5;
-	padding-left: 25px;
+    border-left: 0.25rem solid $primary-color;
+    font-family: Georgia, Times, "Times New Roman", serif;
+    font-size: 1.25em;
+    font-style: italic;
+    font-weight: 400;
+    margin: 0 0 $base-spacing * 0.5;
+    padding-left: 25px;
 }

@@ -10,20 +10,13 @@
 	import * as utils from '$lib/utils'
 	import Icon from '$components/Icon/Icon.svelte'
 	import { goto } from '$app/navigation'
-	// import { addToQueue } from '$lib/utils'
 
 	let ctoken = ''
 	let videoId = ''
 	let playlistId = ''
 	$: title = songTitle = '...'
 
-	let src
-	let songTitle
-	let video
 	let thumbnail
-	let endpoint = 'next'
-
-	let radio = []
 
 	let explicit
 	let clicked
@@ -224,7 +217,7 @@
 	// 	}
 	// }
 
-	.container {
+	.container:not(.menu) {
 		display: flex;
 		flex: 1 1 auto;
 		// margin-top: 0.125rem;
@@ -238,7 +231,7 @@
 		flex-direction: column;
 		flex-wrap: nowrap;
 
-		&:active {
+		&:active:not(.menu) {
 			background: lighten(#212225, 3%);
 			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
 		}
@@ -246,21 +239,18 @@
 
 	.explicit {
 		text-shadow: none;
-		width: 18px;
-		height: 18px;
+		width: 1rem;
+		height: 1rem;
+		font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+			Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
 		font-size: 0.7143rem;
 		flex: none;
-		color: rgb(0, 0, 0);
-		font-weight: 600;
+		color: #000;
+		font-weight: 700;
 		filter: contrast(100%);
-		background: rgba(255, 255, 255, 0.966);
-		// background-clip: border-box;
-		// background-blend-mode: multiply;
-		// mix-blend-mode: darken;
-		// filter:
-		// backdrop-filter: opacity(100%) invert(100%);
-		padding: 0 0.2rem;
-		margin-left: 0.2rem;
+		background: hsla(0, 0%, 100%, 0.966);
+		padding: 0 0.4em;
+		margin-left: 0.3em;
 	}
 	.text-title {
 		&:hover {
@@ -272,8 +262,7 @@
 		width: auto;
 		height: auto;
 	}
-	img::before,
-	video::before {
+	img::before {
 		display: block;
 		content: '';
 		padding-top: calc(100% * 2 / 3);
@@ -328,7 +317,7 @@
 	}
 	@media (min-width: 640px) {
 		.container:hover:not(.menu) {
-			pointer-events: fill;
+			pointer-events: all;
 			background: lighten(#212225, 3%);
 			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
 		}

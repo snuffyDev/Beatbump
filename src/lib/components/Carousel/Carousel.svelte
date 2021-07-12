@@ -170,6 +170,7 @@
 	}
 	.scroll {
 		margin-bottom: 2.5rem;
+
 		// padding-bottom: 1.25rem;
 		// @include scrim(#1f1a2c2c, 'to top', 0.4125);
 		// background: linear-gradient(

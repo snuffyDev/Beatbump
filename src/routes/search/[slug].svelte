@@ -15,7 +15,7 @@
 		} = await response.json()
 		if (response.ok) {
 			return {
-				props: { slug, filter, contents, continuation, correctedQuery, error }
+				props: { filter, contents, continuation, correctedQuery, error }
 			}
 		}
 	}
@@ -26,7 +26,6 @@
 	export let contents
 	export let correctedQuery
 	export let error
-	export let slug
 	export let filter
 	// $: console.log(slug, filter, `TEST`)
 	// $: contents = contents
@@ -145,17 +144,5 @@
 			// padding-top: 0.5rem;
 			font-size: 0.95em;
 		}
-	}
-
-	.top {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
-		gap: 2rem;
-
-		padding: 2rem 2rem 0.5rem 2rem;
-
-		align-items: center;
-		justify-content: space-evenly;
-		max-width: 100%;
 	}
 </style>

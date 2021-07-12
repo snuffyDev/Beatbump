@@ -41,7 +41,7 @@
 		display: flex;
 		place-items: center;
 		color: #09090a !important;
-		font-weight: 550;
+		font-weight: 500;
 		border: #09090a;
 		background: white !important;
 		margin-bottom: 0.8rem;

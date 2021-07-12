@@ -33,12 +33,17 @@
 	<div class="nav-item">
 		<div class="input">
 			<div class="searchBtn" on:click={handleSubmit(songTitle, filter)} />
-			<input
-				autofocus
-				autocorrect="off"
-				type="search"
-				placeholder="Search"
-				bind:value={songTitle} />
+			{#if type == 'inline'}<input
+					autofocus
+					autocorrect="off"
+					type="search"
+					placeholder="Search"
+					bind:value={songTitle} />
+			{:else}<input
+					autocorrect="off"
+					type="search"
+					placeholder="Search"
+					bind:value={songTitle} />{/if}
 		</div>
 	</div>
 

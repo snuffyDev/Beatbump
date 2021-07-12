@@ -16,7 +16,7 @@
 
 <div
 	class="menuButtons"
-	on:click={() => {
+	on:click|stopPropagation={() => {
 		showing = !showing
 		console.log(showing)
 	}}>
