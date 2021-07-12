@@ -41,7 +41,7 @@
 	let songBar
 
 	let menuShow = false
-	let showing = false
+	let showing
 	$: toggle = menuShow ? true : false
 	$: listShow = showing ? true : false
 	$: hasList = mixList.length > 1
@@ -88,6 +88,7 @@
 
 	player.addEventListener('ended', () => {
 		// console.log('ended')
+
 		key.set(autoId)
 
 		getNext()
@@ -96,7 +97,6 @@
 	player.addEventListener('seeked', () => {
 		startPlay()
 	})
-
 	const getNext = async () => {
 		if (autoId == mixList.length - 1) {
 			const data = await utils.getNext(
@@ -136,16 +136,19 @@
 			// autoId++
 			player.src = await utils.getSrc(mixList[autoId].videoId)
 			key.set(autoId)
+			once = false
 			return mixList
+		} else {
+			autoId++
+
+			// console.log(autoId)
+			key.set(autoId)
+
+			player.src = await utils.getSrc(mixList[autoId].videoId)
+
+			currentTitle.set(mixList[autoId].title)
+			once = false
 		}
-		autoId++
-
-		// console.log(autoId)
-		key.set(autoId)
-
-		player.src = await utils.getSrc(mixList[autoId].videoId)
-
-		currentTitle.set(mixList[autoId].title)
 		once = false
 	}
 	/* TODO: implement this eventually.
@@ -246,10 +249,13 @@
 		<div class="player-left">
 			<div
 				on:click={() => {
-					if (showing) {
-						showing = false
+					if (!showing) {
+						showing = true
 					}
-					showing = !showing
+					// } else {
+					// 	showing = false
+					// }
+					// showing = !showing
 				}}
 				class="listButton">
 				<svelte:component this={Icon} name="radio" size="2em" />
@@ -288,12 +294,21 @@
 				<div
 					class="player-btn"
 					on:click={async () => {
-						if (autoId == mixList.length - 1) {
-							await getNext()
+						let gettingNext = false
+						if (!gettingNext) {
+							if (autoId == mixList.length - 1) {
+								gettingNext = true
+								autoId++
+								await getNext()
+								gettingNext = false
+							} else {
+								gettingNext = true
+								autoId++
+								key.set(autoId)
+								await getSrc(mixList[autoId].videoId)
+								gettingNext = false
+							}
 						}
-						autoId++
-						key.set(autoId)
-						await getSrc(mixList[autoId].videoId)
 					}}>
 					<svelte:component this={Icon} name="skip-forward" size="2em" />
 				</div>
@@ -302,13 +317,14 @@
 
 		<div class="player-right">
 			{#if width > 500}
-				<div class="volume">
+				<div
+					class="volume"
+					use:clickOutside
+					on:click_outside={() => {
+						volumeHover = false
+					}}>
 					<div
 						class="volume-icon"
-						use:clickOutside
-						on:click_outside={() => {
-							volumeHover = false
-						}}
 						on:click={() => {
 							volumeHover = !volumeHover
 						}}>
@@ -319,6 +335,7 @@
 							<div class="volume-container">
 								<div class="volume-slider">
 									<input
+										class="volume"
 										type="range"
 										bind:value={volume}
 										min="0"
@@ -360,13 +377,11 @@
 	.volume-wrapper {
 		background: inherit;
 		background: var(--dark-bottom);
-		/* width: 100%; */
 		display: block;
 		position: absolute;
 		top: -5rem;
-		/* height: 100%; */
-		/* width: 0; */
 		transform: rotate(-90deg);
+		padding: 0 0.2rem;
 	}
 	.volume-icon {
 		cursor: pointer;
@@ -380,13 +395,43 @@
 		// width: 0;
 		// height: 0;
 		// width: 44pt;
-
-		input[type='range'] {
-			// -webkit-appearance: none;
-			// width: 100%;
-			// background: transparent;
-		}
 	}
+	// input[type='range']::-webkit-slider-thumb {
+	// 	-webkit-appearance: none;
+	// 	// border: 4px solid #000000;
+	// 	height: 1.5rem;
+	// 	width: 1.5rem;
+	// 	border-radius: 100%;
+	// 	background: rgb(240, 214, 214);
+	// 	cursor: pointer;
+	// 	// margin-top: -11px;
+	// }
+	// input[type='range']::-webkit-slider-runnable-track {
+	// 	width: 100%;
+	// 	height: 100%;
+	// 	cursor: pointer;
+	// 	background: red;
+	// 	border-radius: 1.3px;
+	// }
+
+	// input[type='range']:focus::-webkit-slider-runnable-track {
+	// 	background: rgb(211, 44, 44);
+	// }
+
+	// input[type='range']:focus {
+	// 	outline: none;
+	// }
+
+	// input[type='range']::-ms-track {
+	// 	width: 40%;
+	// 	cursor: pointer;
+
+	// 	/* Hides the slider so custom styles can be added */
+	// 	background: transparent;
+	// 	border-color: transparent;
+	// 	color: transparent;
+	// }
+
 	.menu-container {
 		position: relative;
 

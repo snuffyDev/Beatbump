@@ -67,7 +67,7 @@
 		class="listContainer"
 		use:clickOutside
 		on:click_outside={() => {
-			show = false
+			show = !show
 			showList(show)
 		}}
 		transition:fly={{ y: 0, duration: 125, easing: cubicInOut }}>
