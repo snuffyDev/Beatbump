@@ -61,7 +61,26 @@
 	{/if}
 </body>
 
-<style lang="scss">
+<style lang="scss" global>
+	:root {
+		--ytm-bottom: #121018;
+		--ytm-base: #09090a;
+		--ytm-top: #09090a;
+		--ytm-forms: #12101844;
+		--ytm-side: #1210183a;
+
+		--dark-bottom: #111214;
+		--dark-base: #09090a;
+		--dark-top: #111214;
+		--dark-forms: #181a1a86;
+		--dark-side: #0b0c0c;
+
+		--dim-bottom: rgb(20, 24, 32);
+		--dim-base: rgb(9 9 10);
+		--dim-top: rgb(20, 24, 32);
+		--dim-forms: #181a1a86;
+		--dim-side: #0b0c0f;
+	}
 	.footer-container {
 		/* position: fixed; */
 		grid-area: f/f/f/f;
@@ -72,7 +91,10 @@
 	:global(.sidebar) {
 		background-color: theme-color('ytm', 'side');
 	}
-	:global(.input, .selectCont) {
+	:global(.input) {
+		background-color: theme-color('ytm', 'forms');
+	}
+	:global(.selectCont) {
 		background-color: theme-color('ytm', 'forms');
 	}
 	:global(nav) {

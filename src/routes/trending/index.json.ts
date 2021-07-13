@@ -132,7 +132,7 @@ export async function get({ query }) {
 				interface result {
 					title: string;
 					artist?: string;
-					endpoint?: string;
+					endpoint?: {}[];
 					videoId: string;
 					playlistId: string;
 					params?: string;
@@ -147,8 +147,16 @@ export async function get({ query }) {
 							thumbnails:
 								r.musicTwoRowItemRenderer.thumbnailRenderer
 									.musicThumbnailRenderer.thumbnail.thumbnails,
-							endpoint:
-								r.musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint,
+							videoId:
+								r.musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint
+									?.videoId,
+							playlistId:
+								r.musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint
+									?.playlistId,
+							params:
+								r.musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint
+									?.params,
+
 							subtitle: [...r.musicTwoRowItemRenderer.subtitle.runs],
 						};
 

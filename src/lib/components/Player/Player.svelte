@@ -22,7 +22,6 @@
 	$: nowPlaying = nowPlaying
 	$: isWebkit = $iOS
 	$: title = mixList[autoId].title
-
 	$: mixList = $currentMix.list
 	$: list = $currentMix
 	let autoId = $key
@@ -125,7 +124,9 @@
 					length: d.length
 				}))
 			].filter(
-				((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set())
+				((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(
+					new Set()
+				)
 			)
 			console.log(mixList)
 			currentMix.set({
@@ -183,7 +184,8 @@
 	function seekAudio(event) {
 		if (!songBar) return
 
-		player.currentTime = seek(event, songBar.getBoundingClientRect()) * duration
+		player.currentTime =
+			seek(event, songBar.getBoundingClientRect()) * duration
 		player.currentTime =
 			isWebkit == true
 				? (seek(event, songBar.getBoundingClientRect()) * duration) / 2
@@ -233,7 +235,7 @@
 		console.log(autoId)
 	}}
 	on:hide={(event) => {
-		showing = event.detail.showing
+		showing = !event.detail.showing
 		// console.log(showing)
 	}}
 	bind:show={listShow}
@@ -251,9 +253,7 @@
 		<div class="player-left">
 			<div
 				on:click={() => {
-					if (!showing) {
-						showing = true
-					}
+					showing = !showing
 					// } else {
 					// 	showing = false
 					// }
@@ -311,7 +311,10 @@
 							}
 						}
 					}}>
-					<svelte:component this={Icon} name="skip-forward" size="2em" />
+					<svelte:component
+						this={Icon}
+						name="skip-forward"
+						size="2em" />
 				</div>
 			</div>
 		</div>
@@ -329,7 +332,10 @@
 						on:click={() => {
 							volumeHover = !volumeHover
 						}}>
-						<svelte:component this={Icon} name="volume" size="2em" />
+						<svelte:component
+							this={Icon}
+							name="volume"
+							size="2em" />
 					</div>
 					{#if volumeHover}
 						<div class="volume-wrapper">
@@ -355,7 +361,9 @@
 							<div
 								class="dd-item"
 								on:click={() => {
-									goto(`/artist?id=${mixList[autoId].artistId}`)
+									goto(
+										`/artist?id=${mixList[autoId].artistId}`
+									)
 								}}>
 								<Icon name="artist" size="2em" />
 								<span class="dd-text">View Artist</span>

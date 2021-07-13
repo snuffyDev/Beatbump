@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 
 	export let data
@@ -161,7 +161,7 @@
 								videoId: data.videoId,
 								title: data.title,
 								artist: data.artistInfo.artists[0],
-								thumbnail: data.thumbnails[0].url,
+								thumbnail: data.thumbnail,
 								length: data.length
 							}
 							mixList.splice($key + 1, 0, next)

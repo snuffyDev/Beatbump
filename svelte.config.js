@@ -20,11 +20,13 @@ export default {
 			prependData: `@import 'src/global/scss/utility/themes.scss'; @import 'src/global/scss/utility/_mixins.scss';`
 		},
 		defaults: {
-			style: 'postcss'
+			style: 'postcss', script: 'typescript'
 		},
 		postcss: {
 			plugins: [cssnano({ preset: 'default' }), autoprefixer({})]
-		}
+
+		},
+		typescript: { tsconfigFile: './tsconfig.json' }
 	}),
 	kit: {
 		adapter: dev ? node() : worker(),
@@ -34,7 +36,9 @@ export default {
 			lib: 'src/lib',
 			routes: 'src/routes',
 			serviceWorker: 'src/service-worker',
-			template: 'src/app.html'
+			template: 'src/app.html',
+			hooks: 'src/hooks',
+
 		},
 		vite: {
 			resolve: {

@@ -1,4 +1,5 @@
-export async function get({ query }) {
+export async function get({ query, headers }) {
+	// if (headers.origin !== "https://beatbump.ml/") { return { status: 400, body: JSON.stringify('CORS error!') } }
 	const q = query.get('q') || ''
 	const params = query.get('params') || ''
 	const endpoint = query.get('endpoint') || ''
@@ -14,12 +15,10 @@ export async function get({ query }) {
 
 	try {
 		const response = await fetch(
-			`https://music.youtube.com/youtubei/v1/${endpoint}?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${
-				ctoken !== '' ? '' : `&sp=EgWKAQIIAWoKEAoQAxAEEAUQCQ%3D%3D`
-			}${
-				ctoken !== ''
-					? `&ctoken=${ctoken}&continuation=${ctoken}&itct=${params}&type='next'`
-					: ''
+			`https://music.youtube.com/youtubei/v1/${endpoint}?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${ctoken !== '' ? '' : `&sp=EgWKAQIIAWoKEAoQAxAEEAUQCQ%3D%3D`
+			}${ctoken !== ''
+				? `&ctoken=${ctoken}&continuation=${ctoken}&itct=${params}&type='next'`
+				: ''
 			}`,
 			{
 				method: 'POST',

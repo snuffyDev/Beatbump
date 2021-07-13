@@ -11,6 +11,8 @@
 	import Icon from '$components/Icon/Icon.svelte'
 	import ListItem from '$components/ListItem/ListItem.svelte'
 	import CarouselItem from '$components/Carousel/CarouselItem.svelte'
+	import { browser } from '$app/env'
+	import { onMount, tick } from 'svelte'
 
 	let id = $page.query.get('id')
 	let description = ''
@@ -39,7 +41,10 @@
 						}
 					}
 				}) => {
-					return parseArtistPage(musicImmersiveHeaderRenderer, contents)
+					return parseArtistPage(
+						musicImmersiveHeaderRenderer,
+						contents
+					)
 				}
 			)
 			.then((d) => {
@@ -60,11 +65,11 @@
 				return { headerContent, items }
 			})
 	}
+	let section = []
 	if (width < 501) {
 		description = headerContent.description.split('.')
 		// console.log(description)
 	}
-	let section = []
 </script>
 
 <svelte:head>
@@ -261,5 +266,6 @@
 	main {
 		margin: 0;
 		padding: 0;
+		// overflow-y: scroll;
 	}
 </style>

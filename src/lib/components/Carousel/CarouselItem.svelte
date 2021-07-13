@@ -141,8 +141,10 @@
 								}
 							}}
 							href={`/artist?id=${
-								item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
-									? item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
+								item.subtitle[0].navigationEndpoint
+									.browseEndpoint.browseId
+									? item.subtitle[0].navigationEndpoint
+											.browseEndpoint.browseId
 									: ''
 							}`}>
 							<Icon name="artist" size="1.5em" />
@@ -158,8 +160,8 @@
 										continuation: mixList[0].continuation,
 										autoMixList: item.playlistId,
 										artistId:
-											item.subtitle[0].navigationEndpoint.browseEndpoint
-												.browseId,
+											item.subtitle[0].navigationEndpoint
+												.browseEndpoint.browseId,
 										id: $key + 1,
 										videoId: item.videoId,
 										title: item.title,
@@ -191,8 +193,10 @@
 								}
 							}}
 							href={`/artist?id=${
-								item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
-									? item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
+								item.subtitle[0].navigationEndpoint
+									.browseEndpoint.browseId
+									? item.subtitle[0].navigationEndpoint
+											.browseEndpoint.browseId
 									: ''
 							}`}>
 							<Icon name="artist" size="1.5em" />
@@ -208,8 +212,8 @@
 										continuation: mixList[0].continuation,
 										autoMixList: item.playlistId,
 										artistId:
-											item.subtitle[0].navigationEndpoint.browseEndpoint
-												.browseId,
+											item.subtitle[0].navigationEndpoint
+												.browseEndpoint.browseId,
 										id: $key + 1,
 										videoId: item.videoId,
 										title: item.title,
@@ -271,7 +275,7 @@
 	.img {
 		/* display: block; */
 		// min-width: 12.125rem;
-		max-width: 12rem;
+		// max-width: 12rem;
 		// aspect-ratio: 1/1;
 		height: auto;
 		width: 100%;
@@ -301,7 +305,7 @@
 			img {
 				width: 100%;
 				height: auto;
-				max-height: 9rem;
+				max-height: 100%;
 				-o-object-fit: scale-down;
 				object-fit: scale-down;
 				aspect-ratio: inherit;

@@ -25,3 +25,17 @@ export interface result {
 	thumbnails: []
 	subtitle?: {}[]
 }
+
+export interface mixList {
+	continuation: string
+	autoMixList?: string
+	artistId?: string
+	itct?: string
+	index?: number
+	videoId: string
+	title: string
+	id?: number
+	artist: string
+	thumbnail?: string
+	length: string
+}

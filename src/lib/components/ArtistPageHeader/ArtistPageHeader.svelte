@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { getData } from '$lib/utils'
 	import { page } from '$app/stores'
 
@@ -8,11 +8,13 @@
 	export let thumbnail = []
 	export let description
 	export let width
-	onMount(() => {})
 </script>
 
 <div class="artist-header">
 	<div class="artist-thumbnail">
+		<div
+			class="gradient"
+			style={`background-image: linear-gradient(1turn, var(--ytm-base), transparent);`} />
 		<picture class="header-thumbnail">
 			<img
 				referrerpolicy="origin-when-cross-origin"
@@ -69,11 +71,10 @@
 	}
 	.artist-header {
 		display: block;
-		// @include scrim(#221e2b42, 'to top', 0.65);
-		// @include scrim(#000000ef, 'to top', 1);
 		margin-bottom: 0.5rem;
-		width: 100%;
-		height: 100%;
+		padding-bottom: 1rem;
+		// width: 100%;
+		// height: 100%;
 	}
 	.artist-thumbnail {
 		display: block;
@@ -87,7 +88,7 @@
 			// width: 100%;
 			// height: 100%;
 			// background: linear-gradient(360deg, #000 8.98%, rgba(0, 0, 0, 0) 100%);
-			box-shadow: 0rem 0rem 0.5rem 0.1rem rgba(19, 19, 20, 0.384);
+			// box-shadow: 0rem 0rem 0.5rem 0.1rem rgba(19, 19, 20, 0.384);
 			top: 0;
 			bottom: 0;
 			left: 0;
@@ -95,6 +96,14 @@
 			/* margin-bottom: 5rem; */
 			right: 0;
 		}
+	}
+
+	.gradient {
+		z-index: 0;
+		width: 100%;
+		height: inherit;
+		position: absolute;
+		top: 0;
 	}
 	.header-thumbnail {
 		// position: absolute;
@@ -104,46 +113,42 @@
 		max-height: 25%;
 		overflow: hidden;
 
-		&::before {
-			position: absolute;
-			content: '';
-			top: 0;
-			right: 0;
+		// &::before {
+		// 	position: absolute;
+		// 	content: '';
+		// 	top: 0;
+		// 	right: 0;
 
-			// background: linear-gradient(
-			// 	0turn,
-			// 	#09090a 0%,
-			// 	#0b0b0b 1.2%,
-			// 	#0a0a0bed 14.98%,
-			// 	#1313149e 23%,
-			// 	#14141440 38%,
-			// 	#ababaf17
-			// );
-			// background: linear-gradient(
-			// 	0turn,
-			// 	#09090a,
-			// 	#0b0b0b 1.2%,
-			// 	rgba(10, 10, 11, 0.9294117647058824) 14.98%,
-			// 	rgb(12 12 13 / 85%) 24%,
-			// 	rgb(19 19 20 / 65%) 36%,
-			// 	rgb(19 19 20 / 51%) 50%,
-			// 	rgb(20 20 20 / 16%) 70%,
-			// 	rgb(171 171 175 / 0%) 100%
-			// );
-			background: linear-gradient(
-				360deg,
-				var(--dark-base) 8.98%,
-				rgba(0, 0, 0, 0) 100%
-			);
-			// background: linear-gradient(1turn, #09090a 8.98%, #d29e9e05 67%);
-			bottom: 0;
-			left: 0;
-			// @include scrim(#09090a, 'to top');
-			// background: linear-gradient(360deg, #09090a 8.98%, rgba(0, 0, 0, 0) 100%);
-			z-index: 1;
-			transition: all cubic-bezier(0.42, 0, 0.58, 1) 0.2s !important;
-			opacity: 1;
-		}
+		// 	// background: linear-gradient(
+		// 	// 	0turn,
+		// 	// 	#09090a 0%,
+		// 	// 	#0b0b0b 1.2%,
+		// 	// 	#0a0a0bed 14.98%,
+		// 	// 	#1313149e 23%,
+		// 	// 	#14141440 38%,
+		// 	// 	#ababaf17
+		// 	// );
+		// 	// background: linear-gradient(
+		// 	// 	0turn,
+		// 	// 	#09090a,
+		// 	// 	#0b0b0b 1.2%,
+		// 	// 	rgba(10, 10, 11, 0.9294117647058824) 14.98%,
+		// 	// 	rgb(12 12 13 / 85%) 24%,
+		// 	// 	rgb(19 19 20 / 65%) 36%,
+		// 	// 	rgb(19 19 20 / 51%) 50%,
+		// 	// 	rgb(20 20 20 / 16%) 70%,
+		// 	// 	rgb(171 171 175 / 0%) 100%
+		// 	// );
+		// 	background: linear-gradient(1turn, var(--ytm-base) 0, transparent);
+		// 	// background: linear-gradient(1turn, #09090a 8.98%, #d29e9e05 67%);
+		// 	bottom: 0;
+		// 	left: 0;
+		// 	// @include scrim(#09090a, 'to top');
+		// 	// background: linear-gradient(360deg, #09090a 8.98%, rgba(0, 0, 0, 0) 100%);
+		// 	z-index: 1;
+		// 	transition: all cubic-bezier(0.42, 0, 0.58, 1) 0.2s !important;
+		// 	opacity: 1;
+		// }
 	}
 	.artist-content {
 		position: relative;
@@ -220,9 +225,6 @@
 		@media screen and (max-width: 500px) {
 			padding: 0.8rem;
 		}
-	}
-	.gradient {
-		@include scrim(#000000ef, 'to top', 1);
 	}
 	main {
 		margin: 0;

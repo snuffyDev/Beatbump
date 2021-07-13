@@ -31,9 +31,14 @@
 
 	let moods = []
 	let genres = []
-
+	$: console.log(carouselItems)
 	let browseId = 'FEmusic_explore'
-
+	const d = async () => {
+		const r = await fetch('/trending.json?q=browse')
+		const da = await r.json()
+		return da
+	}
+	d().then(console.log)
 	const handler = getTracks()
 
 	function getTracks() {
@@ -88,7 +93,8 @@
 						</div>
 					{/each}
 				</box>
-				<span class="link" on:click={() => alert('Coming Soon!')}>See All</span>
+				<span class="link" on:click={() => alert('Coming Soon!')}
+					>See All</span>
 
 				<hr />
 				<section-header>Genres</section-header>
@@ -103,7 +109,8 @@
 						</div>
 					{/each}
 				</box>
-				<span class="link" on:click={() => alert('Coming Soon!')}>See All</span>
+				<span class="link" on:click={() => alert('Coming Soon!')}
+					>See All</span>
 			</div>
 		</div>
 	</main>
