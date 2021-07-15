@@ -1,16 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { sort } from './endpoints/playerUtils'
 import { parseSearchResult } from './parsers'
 import { searchManager, updateTrack } from './stores/stores'
 
 // General data endpoint
 export const getData = (
-	songTitle,
-	filter?,
-	endpoint?,
-	browseId?,
-	pt?,
-	ctoken?,
-	index?
+	songTitle: string,
+	filter?: string,
+	endpoint?: string,
+	browseId?: any,
+	pt?: undefined,
+	ctoken?: undefined,
+	index?: undefined
 ) => {
 	return fetch(
 		`/api/main.json?q=${songTitle}
@@ -31,14 +32,14 @@ export const getData = (
 }
 // Parse search results
 export const searchTracks = async (
-	songTitle,
-	filter,
-	browseId?,
-	ctoken?,
-	i?
+	songTitle: any,
+	filter: any,
+	browseId?: any,
+	ctoken?: any,
+	i?: any
 ) => {
-	let resHandler
-	let contents
+	let resHandler: { json: () => any }
+	let contents: string
 	if (ctoken) {
 		return await fetch(
 			`/api/search.json?q=${songTitle ? songTitle : ''}${
@@ -51,10 +52,6 @@ export const searchTracks = async (
 				searchManager.update((u) => [...u, ...res.contents])
 				return res
 			})
-		let res = resHandler.json()
-
-		contents = 'continuationContents'
-		return { ...res }
 	} else {
 		return await fetch(
 			`/api/search.json?q=${songTitle ? songTitle : ''}${
@@ -75,7 +72,7 @@ export const searchTracks = async (
 }
 
 // TODO: Get playlist
-export const getPlaylist = async (browseId) => {
+export const getPlaylist = async (browseId: any) => {
 	const res = await fetch(`/api/playlist.json?browseId=${browseId}`, {
 		headers: { accept: 'application/json' }
 	})
@@ -101,7 +98,7 @@ export const getPlaylist = async (browseId) => {
 	console.log(header, musicPlaylistShelfRenderer)
 }
 // Moods and Genres for trending page
-export const moodsAndGenres = (browseId) => {
+export const moodsAndGenres = (browseId: any) => {
 	return getData('', '', 'browse', browseId).then(
 		({
 			contents: {
@@ -120,30 +117,34 @@ export const moodsAndGenres = (browseId) => {
 		}) => {
 			let results = []
 
-			contents.forEach((e) => {
-				let section
+			contents.forEach((e: any[]) => {
+				let section: any[]
 				e = [e]
 				section = [
 					...e.map(({ gridRenderer }) => {
 						let items = []
 						let header =
 							gridRenderer.header.gridHeaderRenderer.title.runs[0].text
-						items = gridRenderer.items.map((i) => {
-							const { musicNavigationButtonRenderer } = i
-							let text = musicNavigationButtonRenderer.buttonText.runs[0].text
-							let color: number =
-								musicNavigationButtonRenderer.solid.leftStripeColor
-							let colorCode = argbToRGB(color)
-							function argbToRGB(color) {
-								return ('00000000' + (color & 0xffffff).toString(16)).slice(-6)
-							}
+						items = gridRenderer.items.map(
+							(i: { musicNavigationButtonRenderer: any }) => {
+								const { musicNavigationButtonRenderer } = i
+								let text = musicNavigationButtonRenderer.buttonText.runs[0].text
+								let color: number =
+									musicNavigationButtonRenderer.solid.leftStripeColor
+								let colorCode = argbToRGB(color)
+								function argbToRGB(color: number) {
+									return ('00000000' + (color & 0xffffff).toString(16)).slice(
+										-6
+									)
+								}
 
-							return {
-								text: text,
-								colorCode: `#${colorCode}`,
-								clickCommand: musicNavigationButtonRenderer.clickCommand
+								return {
+									text: text,
+									colorCode: `#${colorCode}`,
+									clickCommand: musicNavigationButtonRenderer.clickCommand
+								}
 							}
-						})
+						)
 						return {
 							header: header,
 							items: [...items]
@@ -157,17 +158,17 @@ export const moodsAndGenres = (browseId) => {
 	)
 }
 // Transform object to array
-export function transform(arr) {
+export function transform(arr: any[]) {
 	if (!Array.isArray(arr)) {
 		return (arr = [arr])
 	}
 }
 // Shuffle array possitions
-export function shuffle(array) {
+export function shuffle(array: any[]) {
 	array.sort(() => Math.random() - 0.5)
 }
 // TODO: use this -- formats seconds to MM:SS
-function format(seconds) {
+function format(seconds: string | number) {
 	if (isNaN(seconds)) return '...'
 
 	const minutes = Math.floor(seconds / 60)
@@ -177,7 +178,7 @@ function format(seconds) {
 	return `${minutes}:${seconds}`
 }
 // adds song to queue
-export const addToQueue = async (videoId) => {
+export const addToQueue = async (videoId: any) => {
 	let url = `/api/player.json${videoId ? `?videoId=${videoId}` : ''}`
 	const data = await fetch(url, { headers: { accept: 'application/json' } })
 		.then((json) => json.json())
@@ -186,7 +187,13 @@ export const addToQueue = async (videoId) => {
 	return length
 }
 // get the next songs in autoplayback
-export const getNext = async (index, params, videoId, playlistId, ctoken) => {
+export const getNext = async (
+	index: string | number | boolean,
+	params: string,
+	videoId: any,
+	playlistId: string | number | boolean,
+	ctoken: string
+) => {
 	return await fetch(
 		'/api/next.json?playlistId=' +
 			encodeURIComponent(playlistId) +
@@ -204,21 +211,20 @@ export const getNext = async (index, params, videoId, playlistId, ctoken) => {
 }
 // Get source URLs
 export const getSrc = async (videoId?: string, playlistId?: string) => {
-	let url = `/api/player.json${videoId ? `?videoId=${videoId}` : ''}${
+	const url = `/api/player.json${videoId ? `?videoId=${videoId}` : ''}${
 		playlistId ? `?list=${playlistId}` : ''
 	}`
 
-	const res = await fetch(url).then((r) => r.json())
-	const formats = await sort(res)
-	console.log(formats)
+	const res = await fetch(url).then((data) => data.json())
+	const formats = sort(res)
 	const parsedURL = formats[0].url
 	updateTrack.set(parsedURL)
 
 	return parsedURL
 }
 // parse array object input for child
-export const pb = (input, query, justOne = false) => {
-	const iterate = (x, y) => {
+export const pb = (input: any, query: string, justOne = false) => {
+	const iterate = (x: string | any[], y: string | number) => {
 		var r = []
 
 		x.hasOwnProperty(y) && r.push(x[y])

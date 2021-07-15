@@ -30,80 +30,6 @@ label {
 	margin-bottom: $small-spacing * 0.5;
 }
 
-// // all text inputs
-// [type="color"],
-// [type="date"],
-// [type="datetime"],
-// [type="datetime-local"],
-// [type="email"],
-// [type="month"],
-// [type="number"],
-// [type="password"],
-// [type="search"],
-// [type="tel"],
-// [type="text"],
-// [type="time"],
-// [type="url"],
-// [type="week"],
-// input:not([type]),
-// textarea {
-//     display: block;
-//     font-family: $base-font-family;
-//     font-size: 16px;
-//     -webkit-appearance: none;
-//     -moz-appearance: none;
-//     appearance: none;
-//     background-color: $_form-background-color;
-//     border: $base-border;
-//     border-radius: $base-border-radius;
-//     box-shadow: $_form-box-shadow;
-//     box-sizing: border-box;
-//     margin-bottom: $small-spacing;
-//     padding: $base-spacing / 3;
-//     transition: border-color 0.3s;
-
-//     width: auto;
-//     appearance: none;
-//     &:hover {
-//         border-color: darken($base-border-color, 20%);
-//     }
-
-//     &:focus {
-//         border-color: $primary-color;
-//         box-shadow: $_form-box-shadow-focus;
-//         outline: none;
-//     }
-
-//     &:disabled {
-//         background-color: darken($_form-background-color, 5%);
-//         cursor: not-allowed;
-
-//         &:hover {
-//             border: $base-border;
-//         }
-//     }
-
-//     &::-webkit-input-placeholder {
-//         color: lighten($base-font-color, 40%);
-//     }
-
-//     &::-moz-placeholder {
-//         color: lighten($base-font-color, 40%);
-//     }
-
-//     &:-ms-input-placeholder {
-//         color: lighten($base-font-color, 40%);
-//     }
-
-//     &::-ms-input-placeholder {
-//         color: lighten($base-font-color, 40%);
-//     }
-
-//     &::placeholder {
-//         color: lighten($base-font-color, 40%);
-//     }
-// }
-
 textarea {
 	resize: vertical;
 }
@@ -174,7 +100,7 @@ input[type='search']::-webkit-search-results-decoration {
 		transition: all cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s;
 	}
 }
-input {
+input :not([type='range']) {
 	border: 0.0625rem solid rgba(170, 170, 170, 0.219);
 	font-family: inherit;
 	width: auto;

@@ -19,17 +19,16 @@ body {
 
 body {
 	margin: 0;
-	line-height: 1.5;
 }
 
 :root {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
-		"Helvetica Neue", sans-serif;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+		Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 	word-wrap: break-word;
 	// background-color: #0e1117;
-	background-color: theme-color("dim", "base");
+	background-color: theme-color('dim', 'base');
 	color: rgb(255, 255, 255);
-	scroll-behavior: smooth;
+
 	-webkit-text-size-adjust: 100%;
 
 	/* ===== Scrollbar CSS ===== */
@@ -87,32 +86,31 @@ body {
 // }
 body {
 	grid-template-rows: 4rem auto 4rem;
-	height: 100%;
-	margin: 0;
-	/* overflow: clip; */
 	position: fixed;
+	height: 100%;
+	width: 100%;
+	margin: 0;
+
+	line-height: 1.5;
 	display: grid;
 	grid-template-areas:
-		"n n n n"
-		"m m m m"
-		"f f f f";
-	overflow: hidden;
-	width: 100%;
+		'n n n n'
+		'm m m m'
+		'f f f f';
 	grid-template-columns: 16.1255rem 1fr;
 
+	overflow: hidden;
 	max-width: 100%;
 }
 @media (min-width: 640px) {
 	body {
 		grid-template-areas:
-			"n n n n"
-			"s m m m"
-			"f f f f";
+			'n n n n'
+			's m m m'
+			'f f f f';
 	}
 }
 main {
-	// padding: 0em;
 	margin: 0 auto;
 	padding: 1rem;
-	height: 100%;
 }

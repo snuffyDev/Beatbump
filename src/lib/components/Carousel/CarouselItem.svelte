@@ -109,9 +109,7 @@
 							loading="lazy"
 							type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 							data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
-							use:lazy={{
-								src: item.thumbnails[0].url
-							}} />
+							src={item.thumbnails[0].url} />
 					{/if}
 				</div>
 			</div>
@@ -141,10 +139,8 @@
 								}
 							}}
 							href={`/artist?id=${
-								item.subtitle[0].navigationEndpoint
-									.browseEndpoint.browseId
-									? item.subtitle[0].navigationEndpoint
-											.browseEndpoint.browseId
+								item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
+									? item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
 									: ''
 							}`}>
 							<Icon name="artist" size="1.5em" />
@@ -160,8 +156,8 @@
 										continuation: mixList[0].continuation,
 										autoMixList: item.playlistId,
 										artistId:
-											item.subtitle[0].navigationEndpoint
-												.browseEndpoint.browseId,
+											item.subtitle[0].navigationEndpoint.browseEndpoint
+												.browseId,
 										id: $key + 1,
 										videoId: item.videoId,
 										title: item.title,
@@ -193,10 +189,8 @@
 								}
 							}}
 							href={`/artist?id=${
-								item.subtitle[0].navigationEndpoint
-									.browseEndpoint.browseId
-									? item.subtitle[0].navigationEndpoint
-											.browseEndpoint.browseId
+								item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
+									? item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
 									: ''
 							}`}>
 							<Icon name="artist" size="1.5em" />
@@ -212,8 +206,8 @@
 										continuation: mixList[0].continuation,
 										autoMixList: item.playlistId,
 										artistId:
-											item.subtitle[0].navigationEndpoint
-												.browseEndpoint.browseId,
+											item.subtitle[0].navigationEndpoint.browseEndpoint
+												.browseId,
 										id: $key + 1,
 										videoId: item.videoId,
 										title: item.title,
@@ -276,7 +270,7 @@
 		/* display: block; */
 		// min-width: 12.125rem;
 		// max-width: 12rem;
-		// aspect-ratio: 1/1;
+		// aspect-ratio: 16/9;
 		height: auto;
 		width: 100%;
 		// display: flex;
@@ -303,8 +297,9 @@
 
 			justify-self: center;
 			img {
-				width: 100%;
+				width: auto;
 				height: auto;
+				min-width: 100%;
 				max-height: 100%;
 				-o-object-fit: scale-down;
 				object-fit: scale-down;

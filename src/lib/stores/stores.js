@@ -7,6 +7,7 @@ export const updateTrack = updateSource()
 export const ctxKey = {}
 export const currentTitle = writable('')
 export const searchManager = _searchIndex()
+
 export const searchCtoken = _ctoken()
 export const currentTrack = writable({
 	continuation: '',

@@ -93,8 +93,7 @@
 						</div>
 					{/each}
 				</box>
-				<span class="link" on:click={() => alert('Coming Soon!')}
-					>See All</span>
+				<span class="link" on:click={() => alert('Coming Soon!')}>See All</span>
 
 				<hr />
 				<section-header>Genres</section-header>
@@ -109,8 +108,7 @@
 						</div>
 					{/each}
 				</box>
-				<span class="link" on:click={() => alert('Coming Soon!')}
-					>See All</span>
+				<span class="link" on:click={() => alert('Coming Soon!')}>See All</span>
 			</div>
 		</div>
 	</main>

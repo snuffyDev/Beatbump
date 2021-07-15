@@ -19,30 +19,21 @@
 
 	let songList
 	let items = []
-	let active
+	let active = document.getElementById(autoId)
 
 	const dispatch = createEventDispatcher()
 
 	onMount(() => {
-		active = document.getElementById(autoId)
 		if (active) active.scrollIntoView(true)
+		console.log('active Mounted' + active)
 	})
+
+	$: if (active) active.scrollIntoView(true)
 	afterUpdate(() => {
-		active = document.getElementById(autoId)
-
+		let active = document.getElementById(autoId)
 		if (active) active.scrollIntoView(true)
+		console.log('active ' + active)
 	})
-	beforeUpdate(() => {
-		active = document.getElementById(autoId)
-
-		if (active) active.scrollIntoView(true)
-	})
-
-	$: if (list.length > 1) {
-		active = document.getElementById(autoId)
-		if (active) active.scrollIntoView(true)
-	}
-
 	async function handleClick(i) {
 		autoId = i
 		const src = await getSrc(mixList[i].videoId).catch((err) =>

@@ -41,10 +41,7 @@
 						}
 					}
 				}) => {
-					return parseArtistPage(
-						musicImmersiveHeaderRenderer,
-						contents
-					)
+					return parseArtistPage(musicImmersiveHeaderRenderer, contents)
 				}
 			)
 			.then((d) => {

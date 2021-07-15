@@ -32,21 +32,13 @@
 	// $: console.log(slug, filter, `TEST`)
 	// $: contents = contents
 	// $: console.log(continuation)
-	import {
-		currentTitle,
-		search,
-		searchCtoken,
-		searchManager
-	} from '$stores/stores'
+	import { currentTitle, search } from '$stores/stores'
 	import { page } from '$app/stores'
-	import Loading from '$components/Loading/Loading.svelte'
 	import { invalidate } from '$app/navigation'
 	import Item from '$components/Item/Item.svelte'
-	import { onMount } from 'svelte'
+
 	$: search.set([...contents])
-	// $: console.log(contents[1].title)
 	let songTitle = $page.params.slug
-	// let { continuation: ctoken, clickTrackingParams: itct } = continuation
 	let ctoken = continuation?.continuation
 	let itct = continuation?.clickTrackingParams
 	async function paginate() {
@@ -63,21 +55,15 @@
 				const res = data
 
 				search.update((u) => [...u, ...res.contents])
-				// searchCtoken.set({
-				// 	continuation: res.continuation.continuation,
-				// 	itct: res.continuation.clickTrackingParams
-				// })
 
 				if (data?.error) {
 					error = data?.error
 				}
-				// console.log(data)
 				ctoken = res.continuation.continuation
 				itct = res.continuation.clickTrackingParams
 				return { params: itct, continuation: ctoken }
 			})
 	}
-	// export let contents
 </script>
 
 <svelte:head>

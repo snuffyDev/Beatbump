@@ -1,29 +1,9 @@
-class VideoFormat {
-	constructor(hasCipher, value, mimeType, video_id, bitrate, hasAudio) {
-		this.hasCipher = hasCipher
-		this.value = value
-		this.mimeType = mimeType
-		this.video_id = video_id
-		this.bitrate = bitrate
-		this.hasAudio = hasAudio
-	}
-
-	getURL() {
-		if (this.hasCipher) {
-			const signature = ''
-			return this.value.url + '&sig=' + signature
-		} else {
-			return this.value
-		}
-	}
-}
-
 const parseProxyRedir = (url) => {
 	let new_url = url.replace('https://', '')
 	new_url = new_url.split('/')
 	new_url = new_url[2] !== undefined ? new_url[2] : new_url[1]
 	url = 'https://redirector.googlevideo.com/' + new_url
-	return { url: url }
+	return url
 }
 
 export const sort = (data) => {
@@ -35,39 +15,22 @@ export const sort = (data) => {
 		)
 		let arr = []
 
-		const r = formatParent.forEach((i) => {
-			let { url } = parseProxyRedir(i.url)
-			i.url = url
+		formatParent.forEach((i) => {
 			if (i.mimeType.includes('audio')) {
 				if (
 					i.audioChannels === 2 &&
 					i.audioQuality.includes('AUDIO_QUALITY_MEDIUM')
 				) {
+					i.url = parseProxyRedir(i.url)
 					return arr.push(i)
 				}
 			}
-
-			return { url: url }
 		})
 		if (arr.length !== 0) {
 			return arr.map((format) => {
-				const hasCipher = Boolean(format.signatureCipher)
 				return {
-					url: format.url,
-					mimeType: format.mimeType,
-					videoId: format.videoId,
-					bitrate: format.bitrate,
-					audioQuality: format.audioQuality ? format.audioQuality : false
+					url: format.url
 				}
-				// return new VideoFormat(
-				//     hasCipher,
-				//     format.url,
-
-				//     format.mimeType,
-				//     format.videoId,
-				//     format.bitrate,
-				//     format.audioQuality !== undefined
-				// )
 			})
 		}
 

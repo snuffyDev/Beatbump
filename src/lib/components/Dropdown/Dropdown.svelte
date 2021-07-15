@@ -41,7 +41,7 @@
 	.menuButtons {
 		z-index: 1;
 		margin-right: 0.2rem;
-		stroke: 2px rgba(0, 0, 0, 0.692);
+		stroke: rgba(0, 0, 0, 0.692);
 		height: 2%;
 		margin: 0pt;
 		/* position: relative; */

@@ -5,7 +5,6 @@
 	import { fade, scale } from 'svelte/transition'
 	import { onMount } from 'svelte'
 	import { currentTrack, theme } from '$stores/stores'
-	import * as utils from '$lib/utils'
 	import { iOS } from '$stores/stores'
 	import Nav from '$components/Nav/Nav.svelte'
 	import Sidebar from '$components/Sidebar/Sidebar.svelte'
@@ -26,6 +25,7 @@
 	let current = $currentTrack
 
 	let width
+
 	$: curTheme = $theme
 </script>
 
@@ -33,23 +33,12 @@
 <body style={`background-color: var(--${curTheme}-base)`}>
 	{#if browser}
 		<nav class="nav" style={`background-color: var(--${curTheme}-top)`}>
-			<Nav
-				on:submitted={(event) => {
-					let filter = event.detail.filter
-					let songTitle = event.detail.query
-					utils.searchTracks(songTitle, filter)
-				}}
-				{width} />
+			<Nav {width} />
 		</nav>
 		{#if width > 640}
-			<Sidebar
-				on:submitted={(event) => {
-					let filter = event.detail.filter
-					let songTitle = event.detail.query
-					utils.searchTracks(songTitle, filter)
-				}} />
+			<Sidebar />
 		{/if}
-		<div class="wrapper" transition:fade>
+		<div class="wrapper" id="wrapper" transition:fade>
 			<slot />
 		</div>
 

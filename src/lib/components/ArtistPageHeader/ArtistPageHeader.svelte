@@ -8,13 +8,56 @@
 	export let thumbnail = []
 	export let description
 	export let width
+	let container
+	let y = 0
+	onMount(() => {
+		let start
+
+		let gradient = document.getElementById('gradient')
+
+		function handler(event) {
+			if (start === undefined) start = event.timestamp
+			const scroll = gradient.getBoundingClientRect()
+
+			const elapsed = event.timestamp - start
+
+			window.requestAnimationFrame(function (e) {
+				y = Math.min(Math.max(-scroll.top / window.innerWidth, 0), 5) * 200
+
+				// Math.min(-0.2 * scroll.top);
+				// console.log(y);
+				if (elapsed < 2000) {
+					// Stop the animation after 2 seconds
+					window.requestAnimationFrame(handler)
+				}
+
+				window.cancelAnimationFrame(y)
+				// -scroll.top * 2;
+				// (-scroll.top Math.max(0, y / 40)0) * 2;
+			})
+
+			// console.log(y);
+		}
+		// window.requestAnimationFrame(handler);
+		// window.addEventListener("scroll", handler);
+		let wrapper = document.getElementById('wrapper')
+
+		wrapper.addEventListener('scroll', handler, { passive: true })
+		return () => window.removeEventListener('scroll', handler)
+	})
 </script>
 
+<!-- <svelte:window bind:scrollY={y} /> -->
 <div class="artist-header">
 	<div class="artist-thumbnail">
 		<div
-			class="gradient"
-			style={`background-image: linear-gradient(1turn, var(--ytm-base), transparent);`} />
+			bind:this={container}
+			style={`background-image: linear-gradient(0turn, var(--ytm-base) ${Math.min(
+				y,
+				75
+			)}%, transparent); transition: cubic-bezier(0.6, -0.28, 0.74, 0.05) background-image 125ms`}
+			id="gradient"
+			class="gradient" />
 		<picture class="header-thumbnail">
 			<img
 				referrerpolicy="origin-when-cross-origin"
@@ -72,7 +115,7 @@
 	.artist-header {
 		display: block;
 		margin-bottom: 0.5rem;
-		padding-bottom: 1rem;
+
 		// width: 100%;
 		// height: 100%;
 	}
@@ -103,6 +146,8 @@
 		width: 100%;
 		height: inherit;
 		position: absolute;
+		// transition: background-image 13s ease-in;
+
 		top: 0;
 	}
 	.header-thumbnail {

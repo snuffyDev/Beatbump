@@ -15,10 +15,12 @@ export async function get({ query, headers }) {
 
 	try {
 		const response = await fetch(
-			`https://music.youtube.com/youtubei/v1/${endpoint}?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${ctoken !== '' ? '' : `&sp=EgWKAQIIAWoKEAoQAxAEEAUQCQ%3D%3D`
-			}${ctoken !== ''
-				? `&ctoken=${ctoken}&continuation=${ctoken}&itct=${params}&type='next'`
-				: ''
+			`https://music.youtube.com/youtubei/v1/${endpoint}?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${
+				ctoken !== '' ? '' : `&sp=EgWKAQIIAWoKEAoQAxAEEAUQCQ%3D%3D`
+			}${
+				ctoken !== ''
+					? `&ctoken=${ctoken}&continuation=${ctoken}&itct=${params}&type='next'`
+					: ''
 			}`,
 			{
 				method: 'POST',

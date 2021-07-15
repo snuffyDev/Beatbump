@@ -67,8 +67,11 @@
 	player.addEventListener('timeupdate', async () => {
 		time = player.currentTime
 		duration = player.duration
-		$progress = isWebkit == true ? time * 2 : time
 		remainingTime = duration - time
+		$progress = isWebkit == true ? time * 2 : time
+		// This checks if the user is on an iOS device
+		// due to the length of a song being doubled on iOS,
+		// we have to cut the time in half. Doesn't effect other devices.
 		if (isWebkit && remainingTime < duration / 2 && once == false) {
 			once = true
 			getNext()
@@ -124,20 +127,18 @@
 					length: d.length
 				}))
 			].filter(
-				((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(
-					new Set()
-				)
+				((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set())
 			)
-			console.log(mixList)
+			// console.log(mixList);
 			currentMix.set({
 				videoId: `${mixList[autoId].videoId}`,
 				playlistId: `${list.playlistId}`,
 				continuation: res.continuation,
 				list: mixList
 			})
-			a
+
 			// autoId++
-			player.src = await utils.getSrc(mixList[autoId].videoId)
+			player.src = utils.getSrc(mixList[autoId].videoId).then((url) => url)
 			key.set(autoId++)
 			once = false
 			return mixList
@@ -147,7 +148,7 @@
 			// console.log(autoId)
 			key.set(autoId)
 
-			player.src = await utils.getSrc(mixList[autoId].videoId)
+			player.src = utils.getSrc(mixList[autoId].videoId).then((url) => url)
 
 			currentTitle.set(mixList[autoId].title)
 			once = false
@@ -184,55 +185,26 @@
 	function seekAudio(event) {
 		if (!songBar) return
 
-		player.currentTime =
-			seek(event, songBar.getBoundingClientRect()) * duration
+		player.currentTime = seek(event, songBar.getBoundingClientRect()) * duration
 		player.currentTime =
 			isWebkit == true
 				? (seek(event, songBar.getBoundingClientRect()) * duration) / 2
 				: seek(event, songBar.getBoundingClientRect()) * duration
 	}
 
-	// let _key
-	// let keyCode
-
-	// function getKey(event) {
-	// 	_key = event.key
-	// 	keyCode = event.keyCode
-	// 	if (player.src !== undefined || player.src !== '') {
-	// 		switch (keyCode) {
-	// 			case 32:
-	// 				if (!isPlaying) {
-	// 					startPlay()
-	// 				} else {
-	// 					pause()
-	// 				}
-	// 				break
-	// 			case 39:
-	// 				player.currentTime += 5
-	// 				break
-	// 			case 37:
-	// 				player.currentTime -= 5
-	// 				break
-
-	// 			default:
-	// 				break
-	// 		}
-	// 	}
-	// }
 	let width
 </script>
-
-<!-- on:keydown={(e) => getKey(e)} -->
 
 <svelte:window
 	bind:outerWidth={width}
 	on:mouseup={() => (seeking = false)}
 	on:mousemove={trackMouse} />
+
 <Playlist
 	on:updated={(event) => {
 		player.src = event.detail.src
 		autoId = event.detail.id
-		console.log(autoId)
+		// console.log(autoId);
 	}}
 	on:hide={(event) => {
 		showing = !event.detail.showing
@@ -254,10 +226,6 @@
 			<div
 				on:click={() => {
 					showing = !showing
-					// } else {
-					// 	showing = false
-					// }
-					// showing = !showing
 				}}
 				class="listButton">
 				<svelte:component this={Icon} name="radio" size="2em" />
@@ -311,10 +279,7 @@
 							}
 						}
 					}}>
-					<svelte:component
-						this={Icon}
-						name="skip-forward"
-						size="2em" />
+					<svelte:component this={Icon} name="skip-forward" size="2em" />
 				</div>
 			</div>
 		</div>
@@ -332,10 +297,7 @@
 						on:click={() => {
 							volumeHover = !volumeHover
 						}}>
-						<svelte:component
-							this={Icon}
-							name="volume"
-							size="2em" />
+						<svelte:component this={Icon} name="volume" size="2em" />
 					</div>
 					{#if volumeHover}
 						<div class="volume-wrapper">
@@ -361,9 +323,7 @@
 							<div
 								class="dd-item"
 								on:click={() => {
-									goto(
-										`/artist?id=${mixList[autoId].artistId}`
-									)
+									goto(`/artist?id=${mixList[autoId].artistId}`)
 								}}>
 								<Icon name="artist" size="2em" />
 								<span class="dd-text">View Artist</span>
@@ -387,60 +347,14 @@
 		background: inherit;
 		background: var(--dark-bottom);
 		display: block;
-		position: absolute;
-		top: -5rem;
+		position: fixed;
+		bottom: 8.9rem;
 		transform: rotate(-90deg);
-		padding: 0 0.2rem;
+		padding: 0 0rem;
 	}
 	.volume-icon {
 		cursor: pointer;
 	}
-
-	.volume-container {
-		// transform: rotate(-90deg);
-		// position: absolute;
-		// top: 0;
-		// bottom: 10rem;
-		// background-color: inherit;
-		// width: 0;
-		// height: 0;
-		// width: 44pt;
-	}
-	// input[type='range']::-webkit-slider-thumb {
-	// 	-webkit-appearance: none;
-	// 	// border: 4px solid #000000;
-	// 	height: 1.5rem;
-	// 	width: 1.5rem;
-	// 	border-radius: 100%;
-	// 	background: rgb(240, 214, 214);
-	// 	cursor: pointer;
-	// 	// margin-top: -11px;
-	// }
-	// input[type='range']::-webkit-slider-runnable-track {
-	// 	width: 100%;
-	// 	height: 100%;
-	// 	cursor: pointer;
-	// 	background: red;
-	// 	border-radius: 1.3px;
-	// }
-
-	// input[type='range']:focus::-webkit-slider-runnable-track {
-	// 	background: rgb(211, 44, 44);
-	// }
-
-	// input[type='range']:focus {
-	// 	outline: none;
-	// }
-
-	// input[type='range']::-ms-track {
-	// 	width: 40%;
-	// 	cursor: pointer;
-
-	// 	/* Hides the slider so custom styles can be added */
-	// 	background: transparent;
-	// 	border-color: transparent;
-	// 	color: transparent;
-	// }
 
 	.menu-container {
 		position: relative;
