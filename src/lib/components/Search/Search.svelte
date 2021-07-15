@@ -1,31 +1,40 @@
 <script>
-	import { searchTracks } from '../../utils'
 	let options = [
-		{ label: 'Songs', params: 'EgWKAQIIAWoKEAMQBBAKEAUQCQ%3D%3D' },
-		{ label: 'Videos', params: 'EgWKAQIQAWoKEAMQBBAKEAUQCQ%3D%3D' },
-		{ label: 'Playlists', params: 'EgWKAQIoAWoKEAMQBBAKEAUQCQ%3D%3D' }
-	]
-	export let type
-	import { goto, invalidate } from '$app/navigation'
-	import { page } from '$app/stores'
-	import { search } from '$lib/stores/stores'
-	import { tick } from 'svelte'
-	let endpoint = 'search'
-	let filterType
-	let songTitle = ''
-	let filter = filterType ? filterType : options[0].params
+		{ label: "Songs", params: "EgWKAQIIAWoKEAMQBBAKEAUQCQ%3D%3D" },
+		{ label: "Videos", params: "EgWKAQIQAWoKEAMQBBAKEAUQCQ%3D%3D" },
+		{ label: "All Playlists", params: "EgWKAQIoAWoKEAMQBBAKEAUQCQ%3D%3D" },
+		{
+			label: "Featured Playlists",
+			params: "EgeKAQQoADgBagwQDhAKEAkQAxAEEAU%3D",
+		},
+		{
+			label: "Community Playlists",
+			params: "EgeKAQQoAEABagwQDhAKEAkQAxAEEAU%3D",
+		},
+	];
+	export let type;
+	import { goto, invalidate } from "$app/navigation";
+	import { page } from "$app/stores";
+	import { search } from "$lib/stores/stores";
+	import { tick } from "svelte";
+	let endpoint = "search";
+	let filterType;
+	let songTitle = "";
+	let filter = filterType ? filterType : options[0].params;
 	async function handleSubmit(s, f) {
 		// invalidate($page.path)
-
+		// let URL_BASE = new URL();
 		let url =
-			`/search/` + encodeURIComponent(s) + `?filter=` + encodeURIComponent(f)
-		// search.set([])
-		await tick()
-		window.scrollTo({
-			behavior: 'smooth',
-			top: 0
-		})
-		goto(url, { replaceState: true })
+			`/search/` + encodeURIComponent(encodeURIComponent(s)) + `?filter=` + f;
+
+		await tick();
+		search.set([]);
+		scrollTo({
+			behavior: "smooth",
+			top: 0,
+		});
+
+		goto(url, { replaceState: true, state: {} });
 	}
 </script>
 
@@ -34,7 +43,7 @@
 	<div class="nav-item">
 		<div class="input">
 			<div class="searchBtn" on:click={handleSubmit(songTitle, filter)} />
-			{#if type == 'inline'}<input
+			{#if type == "inline"}<input
 					autofocus
 					autocorrect="off"
 					type="search"

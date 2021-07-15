@@ -1,32 +1,44 @@
+<script context="module">
+	export const load = async ({ page }) => {
+		return {
+			props: {
+				page: page.path,
+			},
+		};
+	};
+</script>
+
 <script>
-	import '../global/stylesheet.scss'
-	import '../app.css'
-	import { browser } from '$app/env'
-	import { fade, scale } from 'svelte/transition'
-	import { onMount } from 'svelte'
-	import { currentTrack, theme } from '$stores/stores'
-	import { iOS } from '$stores/stores'
-	import Nav from '$components/Nav/Nav.svelte'
-	import Sidebar from '$components/Sidebar/Sidebar.svelte'
-	import Player from '$components/Player/Player.svelte'
+	import "../global/stylesheet.scss";
+	import "../app.css";
+	import { browser } from "$app/env";
+	import { fade, scale } from "svelte/transition";
+	import { onMount } from "svelte";
+	import { currentTrack, theme } from "$stores/stores";
+	import { iOS } from "$stores/stores";
+	import Nav from "$components/Nav/Nav.svelte";
+	import Sidebar from "$components/Sidebar/Sidebar.svelte";
+	import Player from "$components/Player/Player.svelte";
+	import Wrapper from "$components/Wrapper/Wrapper.svelte";
+	export let page;
+	$: page = page;
 	onMount(() => {
-		iOS.init()
+		iOS.init();
 		const getTheme = () => {
-			let ls = localStorage.getItem('theme')
+			let ls = localStorage.getItem("theme");
 			if (ls) {
-				theme.init(ls)
+				theme.init(ls);
 			} else {
-				theme.init('dark')
+				theme.init("dark");
 			}
-		}
-		getTheme()
-	})
+		};
+		getTheme();
+	});
 
-	let current = $currentTrack
-
-	let width
-
-	$: curTheme = $theme
+	let current = $currentTrack;
+	let width;
+	let route = "";
+	$: curTheme = $theme;
 </script>
 
 <svelte:window bind:innerWidth={width} />
@@ -38,10 +50,11 @@
 		{#if width > 640}
 			<Sidebar />
 		{/if}
-		<div class="wrapper" id="wrapper" transition:fade>
-			<slot />
+		<div class="wrapper" id="wrapper">
+			<Wrapper {page}>
+				<slot />
+			</Wrapper>
 		</div>
-
 		<footer
 			class="footer-container"
 			style={`background-color: var(--${curTheme}-bottom)`}>
@@ -78,13 +91,13 @@
 		z-index: 1;
 	}
 	:global(.sidebar) {
-		background-color: theme-color('ytm', 'side');
+		background-color: theme-color("ytm", "side");
 	}
 	:global(.input) {
-		background-color: theme-color('ytm', 'forms');
+		background-color: theme-color("ytm", "forms");
 	}
 	:global(.selectCont) {
-		background-color: theme-color('ytm', 'forms');
+		background-color: theme-color("ytm", "forms");
 	}
 	:global(nav) {
 		border-bottom: 0.25px rgba(170, 170, 170, 0.116) solid;

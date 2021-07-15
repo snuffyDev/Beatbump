@@ -1,20 +1,20 @@
 <script lang="ts">
 	// import { getPlaylist } from '$lib/utils'
-	import { searchTracks } from '$lib/utils'
+	import { searchTracks } from "$lib/utils";
 	// getPlaylist('VLRDCLAK5uy_n4g8XbXdlPTtik7Fwl4RU3Gij-63HBsmo')
-	const getData = async () => {
-		const response = await searchTracks(
-			'weeee',
-			'EgWKAQIIAWoKEAMQBBAKEAUQCQ',
-			'',
-			'',
-			''
-		)
-		const data = await response
-		console.log(data)
-		return data
-	}
-	const promise = getData()
+	// const getData = async () => {
+	// 	const response = await searchTracks(
+	// 		'weeee',
+	// 		'EgWKAQIIAWoKEAMQBBAKEAUQCQ',
+	// 		'',
+	// 		'',
+	// 		''
+	// 	)
+	// 	const data = await response
+	// 	console.log(data)
+	// 	return data
+	// }
+	// const promise = getData()
 </script>
 
 {#await promise}

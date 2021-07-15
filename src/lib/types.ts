@@ -1,41 +1,61 @@
 export interface Song {
-	index: number
-	itct: string
-	title: string
-	artistInfo: ArtistInfo
-	videoId: string
-	autoMixList: string
-	thumbnail: string
-	length: string
+	index?: number;
+	itct?: string;
+	title?: string;
+	artistInfo: ArtistInfo;
+	videoId: string;
+	playlistId?: string;
+	params?: string;
+	autoMixList?: string;
+	thumbnails: [{ url: string }];
+	length?: string;
+	explicit?: string;
+	hash?: string;
 }
 
 export interface ArtistInfo {
-	pageType: string
-	artist: string
-	browseId: string
+	pageType?: string;
+	artists?: [];
+	browseId?: string;
 }
 
-export interface result {
-	title: string
-	artist?: string
-	endpoint?: string
-	videoId: string
-	playlistId: string
-	params?: string
-	thumbnails: []
-	subtitle?: {}[]
+export interface Subtitle {
+	text: string;
+	browseId: string;
+	pageType: string;
+}
+
+export interface SearchResult {
+	title: string;
+	artist?: string;
+	endpoint?: string;
+	videoId: string;
+	playlistId: string;
+	params?: string;
+	thumbnails: [{ url: string }];
+	subtitle?: [Subtitle];
+}
+export interface CarouselItem {
+	title: string;
+	artist?: string;
+	endpoint?: string;
+	videoId: string;
+	playlistId: string;
+	params?: string;
+	thumbnails: [{ url: string }];
+	subtitle?: [Subtitle];
 }
 
 export interface mixList {
-	continuation: string
-	autoMixList?: string
-	artistId?: string
-	itct?: string
-	index?: number
-	videoId: string
-	title: string
-	id?: number
-	artist: string
-	thumbnail?: string
-	length: string
+	continuation: string;
+	autoMixList?: string;
+	artistId?: string;
+	itct?: string;
+	index?: number;
+	videoId: string;
+	title: string;
+	id?: number;
+	artist: string;
+	thumbnail?: string;
+	length: string;
 }

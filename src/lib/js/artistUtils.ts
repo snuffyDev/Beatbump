@@ -1,34 +1,34 @@
-import type { Song } from '$lib/types'
-import { pb } from '$lib/utils'
+import type { Song, ArtistInfo } from "$lib/types";
+import { pb } from "$lib/utils";
 
 export const parseArtistPage = (header, items) => {
-	console.log(items)
-	header = [header]
-	let parsedHeader = header.map((h) => {
-		let name = h.title.runs[0].text
-		let description
-		let thumbnail = h.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails
-		let mixInfo =
-			h.startRadioButton.buttonRenderer.navigationEndpoint.watchPlaylistEndpoint
+	console.log(items);
+	header = [header];
+	const parsedHeader = header.map((h) => {
+		const name = h.title.runs[0].text;
+		let description;
+		const thumbnail = h.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
+		const mixInfo =
+			h.startRadioButton.buttonRenderer.navigationEndpoint
+				.watchPlaylistEndpoint;
 		if (h.description) {
-			description = h.description.runs[0].text
+			description = h.description.runs[0].text;
 		} else {
-			description = ''
+			description = "";
 		}
 		return {
 			name: name,
 			thumbnails: thumbnail,
 			mixInfo: mixInfo,
-			description: description
-		}
-	})
-	let temp = []
-	let songs
-	let carouselItems = []
+			description: description,
+		};
+	});
+	let songs;
+	let carouselItems = [];
 	items.map((i) => {
 		if (i.musicShelfRenderer) {
-			songs = parseSongs(i.musicShelfRenderer.contents)
-			console.log(songs)
+			songs = parseSongs(i.musicShelfRenderer.contents);
+			console.log(songs);
 		}
 		if (i.musicCarouselShelfRenderer) {
 			carouselItems = [
@@ -37,67 +37,71 @@ export const parseArtistPage = (header, items) => {
 					i.musicCarouselShelfRenderer.contents,
 					i.musicCarouselShelfRenderer.header
 						.musicCarouselShelfBasicHeaderRenderer?.title.runs[0]
-				)
-			]
+				),
+			];
 		}
-	})
-	console.log(`items`, carouselItems)
-	return { ...parsedHeader, songs, carouselItems }
-}
+	});
+	console.log(`items`, carouselItems);
+	return { ...parsedHeader, songs, carouselItems };
+};
 
 function parseSongs(items) {
-	let results = []
-	items.map(({ musicResponsiveListItemRenderer }) => {
-		let d = musicResponsiveListItemRenderer
-		let explicit
-		if (d.hasOwnProperty('badges')) explicit = true
-		const flexColumns = pb(d, 'musicResponsiveListItemFlexColumnRenderer', true)
+	const results = [];
+	let explicit;
+	items.map(({ musicResponsiveListItemRenderer: d }) => {
+		if (Object.prototype.hasOwnProperty.call(d, "badges")) explicit = true;
+		const flexColumns = pb(
+			d,
+			"musicResponsiveListItemFlexColumnRenderer",
+			true
+		);
 
-		let thumbnails = d.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails
-		let title = pb(flexColumns[0], 'runs:text', true)
-		let browse
-		let browseId
+		const thumbnails = d.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
+		const title = pb(flexColumns[0], "runs:text", true);
+		// const browse
+		let browseId;
 		if (
 			d.menu?.menuRenderer?.items[5]?.menuNavigationItemRenderer
 				?.navigationEndpoint?.browseEndpoint
 		) {
-			let menu = pb(d.menu.menuRenderer, 'items', true)
-			let items = pb(
+			const menu = pb(d.menu.menuRenderer, "items", true);
+			const items = pb(
 				menu,
-				'menuNavigationItemRenderer:navigationEndpoint:browseEndpoint'
-			)
+				"menuNavigationItemRenderer:navigationEndpoint:browseEndpoint"
+			);
 			items.forEach((i) => {
 				if (
 					i.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType.includes(
-						'ARTIST'
+						"ARTIST"
 					)
 				) {
-					browseId = i.browseId
+					browseId = i.browseId;
 				}
-			})
+			});
 			// console.log(browse);
 		} else {
 			browseId =
 				d.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text
-					?.runs[0]?.navigationEndpoint?.browseEndpoint?.browseId
+					?.runs[0]?.navigationEndpoint?.browseEndpoint?.browseId;
 		}
-		let mixInfo =
-			d.menu.menuRenderer.items[0].menuNavigationItemRenderer.navigationEndpoint
-		let { videoId, playlistId, params } = mixInfo.watchEndpoint
-		let metaInfo: any[] = pb(flexColumns[1], 'runs:text')
+		const mixInfo =
+			d.menu.menuRenderer.items[0].menuNavigationItemRenderer
+				.navigationEndpoint;
+		const { videoId, playlistId, params } = mixInfo.watchEndpoint;
+		let metaInfo: any[] = pb(flexColumns[1], "runs:text");
 
-		let artist
-		let length = metaInfo[metaInfo.length - 1]
+		let artist;
+		const length = metaInfo[metaInfo.length - 1];
 		if (metaInfo.length > 1) {
-			metaInfo = [...metaInfo]
-			artist = metaInfo.join('')
+			metaInfo = [...metaInfo];
+			artist = metaInfo.join("");
 		}
-		let artistInfo = {
+		const artistInfo: ArtistInfo = {
 			browseId: browseId,
-			artists: [artist]
-		}
+			artists: [artist],
+		};
 		// console.log(artists, artists)
-		let result: Song = {
+		const result: Song = {
 			artistInfo: artistInfo,
 			title: title,
 			videoId: videoId,
@@ -108,27 +112,27 @@ function parseSongs(items) {
 			explicit: explicit,
 			hash:
 				Math.random().toString(36).substring(2, 15) +
-				Math.random().toString(36).substring(2, 15)
-		}
-		results.push(result)
-	})
-	return results
+				Math.random().toString(36).substring(2, 15),
+		};
+		results.push(result);
+	});
+	return results;
 }
 
 function parseCarouselItem(items, header) {
-	console.log(items, header)
-	header = [header]
-	let contents = items.map(({ musicTwoRowItemRenderer }) => {
-		let ctx = musicTwoRowItemRenderer
-		let explicit
-		let thumbnails =
-			ctx.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails
+	console.log(items, header);
+	header = [header];
+	const contents = items.map(({ musicTwoRowItemRenderer }) => {
+		const ctx = musicTwoRowItemRenderer;
+		let explicit;
+		const thumbnails =
+			ctx.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails;
 		if (ctx.subtitleBadges) {
-			explicit = true
+			explicit = true;
 		}
-		let playlistId = ''
-		let title = ctx.title.runs[0].text
-		let videoId = ''
+		let playlistId = "";
+		const title = ctx.title.runs[0].text;
+		let videoId = "";
 		if (
 			ctx?.menu?.menuRenderer?.items[2]?.menuServiceItemRenderer
 				?.serviceEndpoint?.queueAddEndpoint?.queueTarget?.playlistId
@@ -136,12 +140,13 @@ function parseCarouselItem(items, header) {
 			videoId =
 				ctx?.thumbnailOverlay?.musicItemThumbnailOverlayRenderer?.content
 					?.musicPlayButtonRenderer?.playNavigationEndpoint?.watchEndpoint
-					?.videoId
+					?.videoId;
 			playlistId =
 				ctx?.menu?.menuRenderer?.items[2]?.menuServiceItemRenderer
-					?.serviceEndpoint?.queueAddEndpoint?.queueTarget?.playlistId
+					?.serviceEndpoint?.queueAddEndpoint?.queueTarget?.playlistId;
 		}
-		let browseEndpoint = ctx.title?.runs[0]?.navigationEndpoint?.browseEndpoint
+		const browseEndpoint =
+			ctx.title?.runs[0]?.navigationEndpoint?.browseEndpoint;
 		if (playlistId !== undefined || playlistId !== null) {
 			return {
 				playlistId,
@@ -149,27 +154,27 @@ function parseCarouselItem(items, header) {
 				browseEndpoint,
 				title,
 				thumbnails,
-				explicit
-			}
+				explicit,
+			};
 		} else {
-			return { browseEndpoint, title, thumbnails, explicit }
+			return { browseEndpoint, title, thumbnails, explicit };
 		}
-	})
-	let head = [
+	});
+	const head = [
 		...header.map((i) => {
-			let title = i.text
-			let endpoint = i.navigationEndpoint?.browseEndpoint
+			const title = i.text;
+			const endpoint = i.navigationEndpoint?.browseEndpoint;
 			if (endpoint) {
 				return {
 					title,
 
 					browseId: endpoint.browseId,
-					params: endpoint.params
-				}
+					params: endpoint.params,
+				};
 			} else {
-				return title
+				return title;
 			}
-		})
-	]
-	return { header: head, contents }
+		}),
+	];
+	return { header: head, contents };
 }

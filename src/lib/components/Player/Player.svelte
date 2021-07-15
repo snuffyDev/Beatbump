@@ -1,104 +1,105 @@
 <script>
-	import { clickOutside } from '$lib/js/clickOutside'
-	import { goto } from '$app/navigation'
-	import Dropdown from '$components/Dropdown/Dropdown.svelte'
-	import { iOS } from '$stores/stores.js'
-	import { tweened } from 'svelte/motion'
-	import { getSrc } from '$lib/utils'
-	import Playlist from '$components/Playlist/Playlist.svelte'
-	import '../../../global/scss/components/_player.scss'
-	import Icon from '$components/Icon/Icon.svelte'
-	import { updateTrack, key, currentMix, currentTitle } from '$stores/stores'
-	import { cubicOut } from 'svelte/easing'
-	import * as utils from '$lib/utils'
+	import { clickOutside } from "$lib/js/clickOutside";
+	import { goto } from "$app/navigation";
+	import Dropdown from "$components/Dropdown/Dropdown.svelte";
+	import { iOS } from "$stores/stores.js";
+	import { tweened } from "svelte/motion";
+	import { getSrc } from "$lib/utils";
+	import Playlist from "$components/Playlist/Playlist.svelte";
+	import "../../../global/scss/components/_player.scss";
+	import Icon from "$components/Icon/Icon.svelte";
+	import { updateTrack, key, currentMix, currentTitle } from "$stores/stores";
+	import { cubicOut } from "svelte/easing";
+	import * as utils from "$lib/utils";
 
-	export let title
-	export let nowPlaying
+	export let title;
+	export let nowPlaying;
 
-	const player = new Audio()
-	$: player.autoplay = true
+	const player = new Audio();
+	$: player.autoplay = true;
 
-	$: player.src = $updateTrack
-	$: nowPlaying = nowPlaying
-	$: isWebkit = $iOS
-	$: title = mixList[autoId].title
-	$: mixList = $currentMix.list
-	$: list = $currentMix
-	let autoId = $key
+	$: player.src = $updateTrack;
+	$: nowPlaying = nowPlaying;
+	$: isWebkit = $iOS;
+	$: title = mixList[autoId].title;
+	$: mixList = $currentMix.list;
+	$: list = $currentMix;
+	let autoId = $key;
 
-	$: time = player.currentTime
-	$: currentTitle.set(title)
-	$: duration = 1000
-	let remainingTime = 55
+	$: time = player.currentTime;
+	$: currentTitle.set(title);
+	$: duration = 1000;
+	let remainingTime = 55;
 
-	$: volume = 0.5
-	let volumeHover = false
+	$: volume = 0.5;
+	let volumeHover = false;
 
-	$: isPlaying = false
-	let seeking = false
-	let once = false
-	let songBar
+	$: isPlaying = false;
+	let seeking = false;
+	let once = false;
+	let songBar;
 
-	let menuShow = false
-	let showing
-	$: toggle = menuShow ? true : false
-	$: listShow = showing ? true : false
-	$: hasList = mixList.length > 1
+	let menuShow = false;
+	let showing;
+	$: toggle = menuShow ? true : false;
+	$: listShow = showing ? true : false;
+	$: hasList = mixList.length > 1;
 
 	// log any and all updates to the list for testing
 	// $: console.log(mixList)
 
-	const playing = () => player.play()
-	const paused = () => player.pause()
+	const playing = () => player.play();
+	const paused = () => player.pause();
 	function pause() {
-		paused()
+		paused();
 	}
 	function startPlay() {
-		playing()
+		console.log(mixList);
+		playing();
 	}
 	// $: console.log(volume)
-	$: player.volume = volume
+	$: player.volume = volume;
 
-	player.addEventListener('loadedmetadata', () => {
-		isPlaying = true
-		startPlay()
-	})
+	player.addEventListener("loadedmetadata", () => {
+		isPlaying = true;
+		startPlay();
+	});
 
-	player.addEventListener('timeupdate', async () => {
-		time = player.currentTime
-		duration = player.duration
-		remainingTime = duration - time
-		$progress = isWebkit == true ? time * 2 : time
+	player.addEventListener("timeupdate", async () => {
+		time = player.currentTime;
+		duration = player.duration;
+		remainingTime = duration - time;
+		$progress = isWebkit == true ? time * 2 : time;
 		// This checks if the user is on an iOS device
 		// due to the length of a song being doubled on iOS,
 		// we have to cut the time in half. Doesn't effect other devices.
 		if (isWebkit && remainingTime < duration / 2 && once == false) {
-			once = true
-			getNext()
+			once = true;
+			getNext();
 		}
-	})
+	});
 
-	player.addEventListener('pause', () => {
-		isPlaying = false
-		pause()
-	})
+	player.addEventListener("pause", () => {
+		isPlaying = false;
+		pause();
+	});
 
-	player.addEventListener('play', () => {
-		isPlaying = true
-		startPlay()
-	})
+	player.addEventListener("play", () => {
+		isPlaying = true;
+		startPlay();
+	});
 
-	player.addEventListener('ended', () => {
+	player.addEventListener("ended", () => {
 		// console.log('ended')
 
-		key.set(autoId)
+		key.set(autoId);
 
-		getNext()
-	})
+		getNext();
+	});
 
-	player.addEventListener('seeked', () => {
-		startPlay()
-	})
+	player.addEventListener("seeked", () => {
+		startPlay();
+	});
 	const getNext = async () => {
 		if (autoId == mixList.length - 1) {
 			const data = await utils.getNext(
@@ -107,10 +108,10 @@
 				mixList[autoId].videoId,
 				mixList[autoId].autoMixList,
 				list.continuation
-			)
-			const res = await data
+			);
+			const res = await data;
 
-			// mixList.pop()
+			mixList.pop();
 
 			mixList = [
 				...mixList,
@@ -124,75 +125,74 @@
 					title: d.title,
 					artist: d.artistInfo.artist,
 					thumbnail: d.thumbnail,
-					length: d.length
-				}))
-			].filter(
-				((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set())
-			)
+					length: d.length,
+				})),
+			];
 			// console.log(mixList);
 			currentMix.set({
 				videoId: `${mixList[autoId].videoId}`,
 				playlistId: `${list.playlistId}`,
 				continuation: res.continuation,
-				list: mixList
-			})
+				list: mixList,
+			});
 
-			// autoId++
-			player.src = utils.getSrc(mixList[autoId].videoId).then((url) => url)
-			key.set(autoId++)
-			once = false
-			return mixList
+			player.src = utils.getSrc(mixList[autoId].videoId).then((url) => url);
+			autoId++;
+			key.set(autoId);
+			once = false;
+			return mixList;
 		} else {
-			autoId++
+			autoId++;
 
 			// console.log(autoId)
-			key.set(autoId)
+			key.set(autoId);
 
-			player.src = utils.getSrc(mixList[autoId].videoId).then((url) => url)
+			player.src = utils.getSrc(mixList[autoId].videoId).then((url) => url);
 
-			currentTitle.set(mixList[autoId].title)
-			once = false
+			currentTitle.set(mixList[autoId].title);
+			once = false;
 		}
-		once = false
-	}
+		once = false;
+	};
 	/* TODO: implement this eventually.
     format seconds to MM:SS for UI
     */
 	function format(seconds) {
-		if (isNaN(seconds)) return '...'
+		if (isNaN(seconds)) return "...";
 
-		const minutes = Math.floor(seconds / 60)
-		seconds = Math.floor(seconds % 60)
-		if (seconds < 10) seconds = '0' + seconds
+		const minutes = Math.floor(seconds / 60);
+		seconds = Math.floor(seconds % 60);
+		if (seconds < 10) seconds = "0" + seconds;
 
-		return `${minutes}:${seconds}`
+		return `${minutes}:${seconds}`;
 	}
 
 	const progress = tweened(0, {
 		duration: duration,
-		easing: cubicOut
-	})
+		easing: cubicOut,
+	});
 	function trackMouse(event) {
-		if (seeking) seekAudio(event)
+		if (seeking) seekAudio(event);
 		// if (hovering) hover(event)
 	}
 	function seek(event, bounds) {
-		let x = event.pageX - bounds.left
+		let x = event.pageX - bounds.left;
 
-		return Math.min(Math.max(x / bounds.width, 0), 1)
+		return Math.min(Math.max(x / bounds.width, 0), 1);
 	}
 
 	function seekAudio(event) {
-		if (!songBar) return
+		if (!songBar) return;
 
-		player.currentTime = seek(event, songBar.getBoundingClientRect()) * duration
+		player.currentTime =
+			seek(event, songBar.getBoundingClientRect()) * duration;
 		player.currentTime =
 			isWebkit == true
 				? (seek(event, songBar.getBoundingClientRect()) * duration) / 2
-				: seek(event, songBar.getBoundingClientRect()) * duration
+				: seek(event, songBar.getBoundingClientRect()) * duration;
 	}
 
-	let width
+	let width;
 </script>
 
 <svelte:window
@@ -202,12 +202,12 @@
 
 <Playlist
 	on:updated={(event) => {
-		player.src = event.detail.src
-		autoId = event.detail.id
+		player.src = event.detail.src;
+		autoId = event.detail.id;
 		// console.log(autoId);
 	}}
 	on:hide={(event) => {
-		showing = !event.detail.showing
+		showing = !event.detail.showing;
 		// console.log(showing)
 	}}
 	bind:show={listShow}
@@ -225,7 +225,7 @@
 		<div class="player-left">
 			<div
 				on:click={() => {
-					showing = !showing
+					showing = !showing;
 				}}
 				class="listButton">
 				<svelte:component this={Icon} name="radio" size="2em" />
@@ -237,11 +237,11 @@
 					class="player-btn"
 					on:click={async () => {
 						if (!autoId || autoId < 0) {
-							console.log('cant do that!')
+							console.log("cant do that!");
 						} else {
-							autoId--
-							key.set(autoId)
-							await getSrc(mixList[autoId].videoId)
+							autoId--;
+							key.set(autoId);
+							await getSrc(mixList[autoId].videoId);
 						}
 					}}>
 					<svelte:component this={Icon} name="skip-back" size="2em" />
@@ -250,9 +250,9 @@
 					class="player-btn player-title"
 					on:click={() => {
 						if (!isPlaying) {
-							startPlay()
+							startPlay();
 						} else {
-							pause()
+							pause();
 						}
 					}}>
 					{#if !isPlaying}
@@ -264,18 +264,18 @@
 				<div
 					class="player-btn"
 					on:click={async () => {
-						let gettingNext = false
+						let gettingNext = false;
 						if (!gettingNext) {
 							if (autoId == mixList.length - 1) {
-								gettingNext = true
-								await getNext()
-								gettingNext = false
+								gettingNext = true;
+								await getNext();
+								gettingNext = false;
 							} else {
-								gettingNext = true
-								autoId++
-								key.set(autoId)
-								await getSrc(mixList[autoId].videoId)
-								gettingNext = false
+								gettingNext = true;
+								autoId++;
+								key.set(autoId);
+								await getSrc(mixList[autoId].videoId);
+								gettingNext = false;
 							}
 						}
 					}}>
@@ -290,12 +290,12 @@
 					class="volume"
 					use:clickOutside
 					on:click_outside={() => {
-						volumeHover = false
+						volumeHover = false;
 					}}>
 					<div
 						class="volume-icon"
 						on:click={() => {
-							volumeHover = !volumeHover
+							volumeHover = !volumeHover;
 						}}>
 						<svelte:component this={Icon} name="volume" size="2em" />
 					</div>
@@ -323,7 +323,7 @@
 							<div
 								class="dd-item"
 								on:click={() => {
-									goto(`/artist?id=${mixList[autoId].artistId}`)
+									goto(`/artist?id=${mixList[autoId].artistId}`);
 								}}>
 								<Icon name="artist" size="2em" />
 								<span class="dd-text">View Artist</span>

@@ -1,76 +1,84 @@
 <script context="module">
 	// import { search } from '$stores/stores'
 	export async function load({ page, fetch }) {
-		const { slug } = page.params
-		const filter = page.query.get('filter')
+		const { slug } = page.params;
+		const filter = page.query.get("filter");
 		const url =
-			`/api/search.json?q=${page.params.slug}` +
-			`&params=${page.query.get('filter')}`
-		const response = await fetch(url)
+			`/api/search.json?q=` +
+			encodeURIComponent(page.params.slug) +
+			`&filter=` +
+			encodeURIComponent(page.query.get("filter"));
+		const response = await fetch(url);
+
 		let {
 			contents,
 			continuation,
 			correctedQuery,
-			error
-		} = await response.json()
+			error,
+		} = await response.json();
 		if (response.ok) {
 			return {
 				props: { filter, contents, continuation, correctedQuery, error },
-				maxage: 3600,
-				status: 200
-			}
+				maxage: 0,
+				status: 200,
+			};
 		}
 	}
 </script>
 
 <script lang="ts">
-	export let continuation
-	export let contents
-	export let correctedQuery
-	export let error
-	export let filter
+	export let continuation;
+	export let contents;
+	export let correctedQuery;
+	export let error;
+	export let filter;
 	// $: console.log(slug, filter, `TEST`)
 	// $: contents = contents
 	// $: console.log(continuation)
-	import { currentTitle, search } from '$stores/stores'
-	import { page } from '$app/stores'
-	import { invalidate } from '$app/navigation'
-	import Item from '$components/Item/Item.svelte'
+	import { currentTitle, search } from "$stores/stores";
+	import { page } from "$app/stores";
+	import { invalidate } from "$app/navigation";
+	import Item from "$components/Item/Item.svelte";
+	import { tick } from "svelte";
 
-	$: search.set([...contents])
-	let songTitle = $page.params.slug
-	let ctoken = continuation?.continuation
-	let itct = continuation?.clickTrackingParams
+	(async () => {
+		await tick();
+		console.log("waited!");
+	})();
+	$: search.set([...contents]);
+	// $:
+	let songTitle = $page.params.slug;
+	let ctoken = continuation?.continuation;
+	let itct = continuation?.clickTrackingParams;
+	console.log(filter);
 	async function paginate() {
 		return await fetch(
 			`/api/search.json?q=` +
-				`&params=${continuation.clickTrackingParams}${
-					continuation.continuation
-						? `&ctoken=${continuation.continuation}`
-						: ''
-				}`
+				`&filter=` +
+				filter +
+				`&params=${itct}${continuation.continuation ? `&ctoken=${ctoken}` : ""}`
 		)
 			.then((data) => data.json())
 			.then((data) => {
-				const res = data
+				const res = data;
 
-				search.update((u) => [...u, ...res.contents])
+				search.update((u) => [...u, ...res.contents]);
 
 				if (data?.error) {
-					error = data?.error
+					error = data?.error;
 				}
-				ctoken = res.continuation.continuation
-				itct = res.continuation.clickTrackingParams
-				return { params: itct, continuation: ctoken }
-			})
+				ctoken = res.continuation.continuation;
+				itct = res.continuation.clickTrackingParams;
+				return { params: itct, continuation: ctoken };
+			});
 	}
 </script>
 
 <svelte:head>
 	<title
-		>{$currentTitle !== ''
+		>{$currentTitle !== ""
 			? `${$currentTitle} - `
-			: 'Search - '}Beatbump</title>
+			: "Search - "}Beatbump</title>
 </svelte:head>
 <!-- {JSON.stringify(results)} -->
 {#key contents}
@@ -91,7 +99,7 @@
 					Did you mean: <em
 						class="link"
 						on:click={() => {
-							invalidate($page.path)
+							invalidate($page.path);
 						}}>{correctedQuery}?</em>
 				</p>
 			{/if}
@@ -104,13 +112,13 @@
 		<button
 			class="button--block button--outlined"
 			on:click={() => {
-				paginate()
+				paginate();
 			}}>Load More</button>
 	{/if}
 {/key}
 
 <style scoped lang="scss">
-	@import '../../global/scss/components/mixins';
+	@import "../../global/scss/components/mixins";
 	button {
 		margin-bottom: 0.8rem;
 	}

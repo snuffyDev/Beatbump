@@ -30,7 +30,7 @@ export default {
 	}),
 	kit: {
 		adapter: dev ? node() : worker(),
-
+		target: "#app",
 		files: {
 			assets: 'static',
 			lib: 'src/lib',
