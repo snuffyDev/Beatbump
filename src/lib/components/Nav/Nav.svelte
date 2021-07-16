@@ -37,7 +37,7 @@
 
 <div class="logo">
 	{#if $page.path !== "/trending"}
-		<div class="back-button" transition:fade on:click={naviBack}>
+		<div class="back-button" transition:fade on:click={() => naviBack}>
 			<Icon name="chevron-left" size="1.5em" />
 		</div>
 	{:else}
