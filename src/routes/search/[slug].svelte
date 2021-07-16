@@ -10,15 +10,10 @@
 			encodeURIComponent(page.query.get("filter"));
 		const response = await fetch(url);
 
-		let {
-			contents,
-			continuation,
-			correctedQuery,
-			error,
-		} = await response.json();
+		let { contents, continuation, didYouMean, error } = await response.json();
 		if (response.ok) {
 			return {
-				props: { filter, contents, continuation, correctedQuery, error },
+				props: { filter, contents, continuation, didYouMean, error },
 				maxage: 0,
 				status: 200,
 			};
@@ -29,7 +24,7 @@
 <script lang="ts">
 	export let continuation;
 	export let contents;
-	export let correctedQuery;
+	export let didYouMean;
 	export let error;
 	export let filter;
 	// $: console.log(slug, filter, `TEST`)
@@ -40,17 +35,15 @@
 	import { invalidate } from "$app/navigation";
 	import Item from "$components/Item/Item.svelte";
 	import { tick } from "svelte";
-
 	(async () => {
 		await tick();
-		console.log("waited!");
 	})();
 	$: search.set([...contents]);
 	// $:
 	let songTitle = $page.params.slug;
 	let ctoken = continuation?.continuation;
 	let itct = continuation?.clickTrackingParams;
-	console.log(filter);
+	console.log(contents);
 	async function paginate() {
 		return await fetch(
 			`/api/search.json?q=` +
@@ -81,44 +74,60 @@
 			: "Search - "}Beatbump</title>
 </svelte:head>
 <!-- {JSON.stringify(results)} -->
-{#key contents}
-	{#if error}
-		<section class="searchHeader">
+{#if error}
+	<section class="searchHeader">
+		<p>
+			{error} for <em>'{songTitle}'</em>
+		</p>
+	</section>
+{:else}
+	<section class="searchHeader">
+		<p>All Results for...</p>
+		{#key songTitle}
+			<em>'{songTitle}'</em>
+		{/key}
+		{#if didYouMean}
 			<p>
-				{error} for <em>'{songTitle}'</em>
+				Did you mean: <em
+					class="link"
+					on:click={() => {
+						invalidate($page.path);
+					}}>{didYouMean}?</em>
 			</p>
-		</section>
-	{:else}
-		<section class="searchHeader">
-			<p>All Results for...</p>
-			{#key songTitle}
-				<em>'{songTitle}'</em>
-			{/key}
-			{#if correctedQuery}
-				<p>
-					Did you mean: <em
-						class="link"
-						on:click={() => {
-							invalidate($page.path);
-						}}>{correctedQuery}?</em>
-				</p>
-			{/if}
-		</section>
-		<main class="parent">
-			{#each $search as data (data.hash)}
-				<Item {data} />
-			{/each}
-		</main>
+		{/if}
+	</section>
+	<main class="parent">
+		{#each $search as data (data.hash)}
+			<Item {data} />
+		{/each}
+	</main>
+	{#if continuation}
 		<button
 			class="button--block button--outlined"
 			on:click={() => {
 				paginate();
 			}}>Load More</button>
+	{:else}
+		<div class="end">
+			<h5><em>End of results!</em></h5>
+		</div>
 	{/if}
-{/key}
+{/if}
 
 <style scoped lang="scss">
 	@import "../../global/scss/components/mixins";
+	.end {
+		position: relative;
+		display: flex;
+		justify-content: center;
+		padding: 1.5rem 0;
+		overflow: hidden;
+		margin: 0;
+		h5,
+		em {
+			margin: 0;
+		}
+	}
 	button {
 		margin-bottom: 0.8rem;
 	}

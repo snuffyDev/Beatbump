@@ -1,24 +1,24 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte'
-	import { slide } from 'svelte/transition'
-	import { goto } from '$app/navigation'
+	import { createEventDispatcher } from "svelte";
+	import { slide } from "svelte/transition";
+	import { goto } from "$app/navigation";
 
-	import Icon from '$components/Icon/Icon.svelte'
+	import Icon from "$components/Icon/Icon.svelte";
 
-	import { clickOutside } from '$lib/js/clickOutside'
-	import { quartInOut, quintIn } from 'svelte/easing'
-	export let type = ''
+	import { clickOutside } from "$lib/js/clickOutside";
+	import { quartInOut, quintIn } from "svelte/easing";
+	export let type = "";
 
-	let showing = false
-	$: menuToggle = showing ? true : false
-	const dispatch = createEventDispatcher()
+	let showing = false;
+	$: menuToggle = showing ? true : false;
+	const dispatch = createEventDispatcher();
 </script>
 
 <div
 	class="menuButtons"
 	on:click|stopPropagation={() => {
-		showing = !showing
-		console.log(showing)
+		showing = !showing;
+		console.log(showing);
 	}}>
 	<svelte:component this={Icon} size="1.5em" name="dots" />
 </div>
@@ -26,10 +26,10 @@
 	<div
 		use:clickOutside
 		on:click_outside={() => {
-			showing = false
+			showing = false;
 		}}
 		transition:slide={{ duration: 125, easing: quartInOut }}
-		class={type == 'player' ? 'dd-player' : 'dd-menu'}>
+		class={type == "player" ? "dd-player" : "dd-menu"}>
 		<slot name="content" />
 		<!-- <div class="dd-item">
 				<slot name="item" itemprop="item" />
@@ -39,12 +39,14 @@
 
 <style lang="scss">
 	.menuButtons {
-		z-index: 1;
+		z-index: 6;
 		margin-right: 0.2rem;
 		stroke: rgba(0, 0, 0, 0.692);
 		height: 2%;
 		margin: 0pt;
+		// box-shadow: 0 0 0.5rem 0.125rem #000;
 		/* position: relative; */
+
 		margin-left: auto;
 		/* place-items: flex-end; */
 		cursor: pointer;

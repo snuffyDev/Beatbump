@@ -65,67 +65,52 @@ export const parseSearchResult = async (data, cont, filter?) => {
 	if (ctx.itemSectionRenderer) return [];
 
 	let results = [];
-
-	ctx.map(async (c) => {
-		let contents = [];
-		if (cont) {
-			let { musicShelfContinuation } = c;
-			contents = musicShelfContinuation;
-		} else {
-			let { musicShelfRenderer } = c;
-			contents = musicShelfRenderer;
-		}
-		/* Search for if the request is for Playlists
+	try {
+		ctx.map(async (c) => {
+			let contents = [];
+			if (cont) {
+				let { musicShelfContinuation } = c;
+				contents = musicShelfContinuation;
+			} else {
+				let { musicShelfRenderer } = c;
+				contents = musicShelfRenderer;
+			}
+			/* Search for if the request is for Playlists
            If not, then parse song request.
         */
-		// filter = encodeURIComponent(filter);
-		const paramList = [
-			"EgWKAQIoAWoKEAMQBBAKEAUQCQ==",
-			"EgeKAQQoADgBagwQDhAKEAkQAxAEEAU=",
-			"EgeKAQQoAEABagwQDhAKEAkQAxAEEAU=",
-		];
+			// filter = encodeURIComponent(filter);
+			const paramList = [
+				"EgWKAQIoAWoKEAMQBBAKEAUQCQ==",
+				"EgeKAQQoADgBagwQDhAKEAkQAxAEEAU=",
+				"EgeKAQQoAEABagwQDhAKEAkQAxAEEAU=",
+			];
 
-		if (!paramList.includes(filter)) {
-			if (contents.hasOwnProperty("continuations")) {
-				continuation = contents.continuations[0].nextContinuationData;
+			if (!paramList.includes(filter)) {
+				if (contents.hasOwnProperty("continuations")) {
+					continuation = contents.continuations[0].nextContinuationData;
+				}
+				contents = contents.contents;
+				results = parseSong(contents);
+			} else {
+				if (contents.hasOwnProperty("continuations")) {
+					continuation = contents.continuations[0].nextContinuationData;
+				}
+				contents = contents.contents;
+				results = parsePlaylist(contents);
 			}
-			contents = contents.contents;
-			results = parseSong(contents);
-		} else {
-			if (contents.hasOwnProperty("continuations")) {
-				continuation = contents.continuations[0].nextContinuationData;
-			}
-			contents = contents.contents;
-			results = playlist(contents);
+		});
+
+		if (didYouMean !== undefined) {
+			return {
+				contents: results,
+				didYouMean: didYouMean,
+				continuation: false,
+			};
 		}
-	});
-	// 	if (contents?.title?.runs[0]?.text?.includes("playlists")) {
-	// 		// Check for continuation request
-	// 		if (contents.hasOwnProperty("continuations")) {
-	// 			continuation = contents.continuations[0].nextContinuationData;
-	// 		}
-	// 		contents = contents.contents;
-
-	// 		results = playlist(contents);
-	// 	} else {
-	// 		/* Search for if the request is for songs/videos
-	// 			 Then check if request contains a continuation request
-	// 		*/
-	// 		if (contents.hasOwnProperty("continuations")) {
-	// 			continuation = contents.continuations[0].nextContinuationData;
-	// 		}
-	// 		contents = contents.contents;
-	// 		results = parseSong(contents);
-	// 	}
-	// });
-	if (didYouMean !== undefined) {
-		return {
-			contents: results,
-			didYouMean: didYouMean,
-			continuation: false,
-		};
+		return { contents: results, continuation: continuation };
+	} catch (error) {
+		return { status: 404 };
 	}
-	return { contents: results, continuation: continuation };
 };
 /* Return the data for if there is a corrected query */
 const correctedQuery = (ctx) => {
@@ -213,7 +198,7 @@ function parseSong(contents) {
 	return results;
 }
 // Parse the playlist results for search.
-export function playlist(contents) {
+function parsePlaylist(contents) {
 	let results = [];
 
 	let type = "playlist";
@@ -238,8 +223,8 @@ export function playlist(contents) {
 		let result = {
 			thumbnails: thumbnails,
 			browseId: browseId,
-			playlistInfo: metaData,
-			shuffle: watchPlaylistEndpoint,
+			metaInfo: metaData,
+			endpoint: watchPlaylistEndpoint,
 			hash:
 				Math.random().toString(36).substring(2, 15) +
 				Math.random().toString(36).substring(2, 15),

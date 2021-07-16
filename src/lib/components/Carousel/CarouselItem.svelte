@@ -16,14 +16,13 @@
 	export let index;
 	export let item: SearchResult;
 	export let type = "";
-	export let imgWidth;
-	export let imgHeight;
 	let hovering = false;
 	let isLoading = false;
 	let loading = isLoading ? true : false;
 	let showing = false;
 	let menuToggle = showing ? true : false;
 	let width;
+	let mobile = width < 525;
 	// $: if (width < 525) {
 	// 	hovering = false
 	// }
@@ -57,6 +56,35 @@
 					});
 					loading = !loading;
 				} else if (type == "artist" && !loading) {
+					const data = await fetch(
+						`/api/artistNext.json?playlistId=${item.playlistId}&videoId=${item.videoId}`
+					).then((data) => data.json());
+					const res = await data;
+					await getSrc(res[0].videoId).then((url) => url);
+					currentMix.set({
+						videoId: `${res.videoId}`,
+						playlistId: `${res.playlistId}`,
+						continuation: "",
+						list: [
+							...res.map((d, i) => ({
+								continuation: "",
+								itct: d.itct,
+								autoMixList: d.autoMixList,
+								artistId: d.artistInfo.browseId,
+								id: d.index,
+								videoId: d.videoId,
+								title: d.title,
+								artist: d.artistInfo.artist,
+								thumbnail: d.thumbnail,
+								length: d.length,
+							})),
+						],
+					});
+					currentTrack.set({ ...res[0] });
+					currentTitle.set(res[0].title);
+					key.set(0);
+					console.log(data);
+					loading = false;
 				}
 			}}>
 			<div class="img">
@@ -67,9 +95,10 @@
 				<div class="container">
 					{#if type == "artist"}
 						<img
-							style="aspect-ratio:{imgWidth}/{imgHeight}"
 							alt="thumbnail"
 							transition:fade|local
+							width="256"
+							height="256"
 							loading="lazy"
 							type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 							data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
@@ -99,7 +128,7 @@
 			</div>
 		</div>
 		{#if width < 525}
-			<div class="menu">
+			<div class="menu mobile">
 				<Dropdown>
 					<div slot="content">
 						<div
@@ -209,10 +238,16 @@
 	}
 	.menu {
 		position: absolute;
-		right: 2%;
-		top: 50%;
+		right: 5%;
+		top: 0%;
 		padding-top: 0.125rem;
 		padding-right: 0.625rem;
+		z-index: 6;
+		&.mobile {
+			top: 0%;
+			right: 7%;
+			padding-right: 0.5rem;
+		}
 	}
 	.title {
 		cursor: pointer;
@@ -246,6 +281,9 @@
 		// aspect-ratio: 16/9;
 		height: auto;
 		width: 100%;
+		max-width: 13rem;
+		min-height: 7rem;
+
 		// display: flex;
 		// flex: none;
 		// max-height: 10rem;
@@ -262,6 +300,8 @@
 
 			cursor: pointer;
 			width: 100%;
+			height: 100%;
+			min-height: 100%;
 			max-width: inherit;
 			max-height: inherit;
 			aspect-ratio: inherit;
@@ -269,19 +309,50 @@
 			position: relative;
 
 			justify-self: center;
+			// background: linear-gradient(0turn, #000, transparent);
+			// z-index: 5;
+			&::before {
+				position: absolute;
+				content: "";
+				top: 0;
+				right: 0;
+
+				bottom: 0;
+				left: 0;
+				background: linear-gradient(
+						-180deg,
+						rgba(0, 0, 0, 0.425),
+						rgba(44, 44, 44, 0.308),
+						transparent
+					),
+					linear-gradient(-45deg, rgba(255, 255, 255, 0.034), transparent);
+				transition: all ease-out 0.2s !important;
+				z-index: 1;
+				opacity: 0.6;
+			}
+			&:hover::before {
+				background: linear-gradient(-180deg, rgba(0, 0, 0, 0.712), transparent),
+					linear-gradient(-45deg, rgba(255, 255, 255, 0.068), transparent);
+				transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
+
+				opacity: 0.7;
+				z-index: 1;
+				// 	-180deg,
+				// 	rgba(0, 0, 0, 0.171) 32%,
+				// 	rgba(70, 70, 70, 0.253),
+				// 	rgba(0, 0, 0, 0.596) 75%
+				// );
+			}
 			img {
-				width: auto;
+				width: 100%;
 				height: auto;
 				min-width: 100%;
 				max-height: 100%;
+				max-width: 13rem;
 				-o-object-fit: scale-down;
 				object-fit: scale-down;
 				aspect-ratio: inherit;
-				// position: absolute;
-				// bottom: 0;
-				// top: 0;
-				// right: 0;
-				// left: 0;
+				position: relative;
 			}
 		}
 	}

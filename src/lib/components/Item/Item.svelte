@@ -1,75 +1,76 @@
 <script lang="ts">
-	import Dropdown from '$components/Dropdown/Dropdown.svelte'
+	import Dropdown from "$components/Dropdown/Dropdown.svelte";
 
-	export let data
-	import { fade } from 'svelte/transition'
-	import Loading from '$components/Loading/Loading.svelte'
-	import { afterUpdate, beforeUpdate, onMount, tick } from 'svelte'
+	export let data;
+	import { fade } from "svelte/transition";
+	import Loading from "$components/Loading/Loading.svelte";
+	import { afterUpdate, beforeUpdate, onMount, tick } from "svelte";
 
-	import { currentMix, currentTitle, key, currentTrack } from '$stores/stores'
-	import * as utils from '$lib/utils'
-	import Icon from '$components/Icon/Icon.svelte'
-	import { goto } from '$app/navigation'
+	import { currentMix, currentTitle, key, currentTrack } from "$stores/stores";
+	import * as utils from "$lib/utils";
+	import Icon from "$components/Icon/Icon.svelte";
+	import { goto } from "$app/navigation";
+	import { addToQueue } from "$lib/actions/dropdown";
 	// import { addToQueue } from '$lib/utils'
 
-	let ctoken = ''
-	let videoId = ''
-	let playlistId = ''
-	$: title = songTitle = '...'
+	let ctoken = "";
+	let videoId = "";
+	let playlistId = "";
+	$: title = songTitle = "...";
 
-	let src
-	let songTitle
-	let video
-	let thumbnail
+	let src;
+	let songTitle;
+	let video;
+	let thumbnail;
 
-	let explicit
-	let clicked
-	let artist
-	let hidden = clicked ? true : false
-	$: loading = false
-
+	let explicit;
+	let clicked;
+	let artist;
+	let hidden = clicked ? true : false;
+	$: loading = false;
+	let id = $key;
 	onMount(() => {
-		itemHandler()
-	})
+		itemHandler();
+	});
 
 	const itemHandler = async () => {
-		explicit = data.explicit
-		title = data.title
+		explicit = data.explicit;
+		title = data.title;
 		thumbnail = data.thumbnails[0].url.replace(
 			/=(w(\d+))-(h(\d+))/g,
-			'=w256-h256'
-		)
-		if (data.type !== 'playlist') {
-			artist = data.artistInfo.artists[0]
+			"=w256-h256"
+		);
+		if (data.type !== "playlist") {
+			artist = data.artistInfo.artists[0];
 		}
 		if (title.length > 48) {
-			title = title.substring(0, 48) + '...'
+			title = title.substring(0, 48) + "...";
 		} else {
-			title = title
+			title = title;
 		}
-	}
+	};
 
 	// console.log(type)
 
 	const clickHandler = async () => {
-		loading = true
+		loading = true;
 
-		videoId = data.videoId ? data.videoId : ''
-		let radio
-		playlistId = data.playlistId ? data.playlistId : data.shuffle.playlistId
-		if (data.type == 'playlist') {
+		videoId = data.videoId ? data.videoId : "";
+		let radio;
+		playlistId = data.playlistId ? data.playlistId : data.shuffle.playlistId;
+		if (data.type == "playlist") {
 			radio = await utils
-				.getNext(0, '', videoId, playlistId, ctoken)
-				.catch((err) => console.log(`error:` + err))
+				.getNext(0, "", videoId, playlistId, ctoken)
+				.catch((err) => console.log(`error:` + err));
 		} else {
 			radio = await utils
-				.getNext(0, '', videoId, playlistId, ctoken)
-				.catch((err) => console.log(`error:` + err))
+				.getNext(0, "", videoId, playlistId, ctoken)
+				.catch((err) => console.log(`error:` + err));
 		}
-		videoId = radio.results[0].videoId
+		videoId = radio.results[0].videoId;
 		// console.log(radio, `radio`)
-		await utils.getSrc(videoId)
-		let thumbnail = radio.results[0].thumbnail
+		await utils.getSrc(videoId);
+		let thumbnail = radio.results[0].thumbnail;
 		currentMix.set({
 			videoId: `${videoId}`,
 			playlistId: `${playlistId}`,
@@ -84,19 +85,20 @@
 					title: d.title,
 					artist: d.artistInfo.artist,
 					thumbnail: d.thumbnail,
-					length: d.length
-				}))
-			]
-		})
-		currentTitle.set(title)
+					length: d.length,
+				})),
+			],
+		});
+		currentTitle.set(title);
 
-		currentTrack.set({ ...radio[0] })
-		key.set(0)
+		currentTrack.set({ ...radio[0] });
+		key.set(0);
 
-		loading = false
-	}
-	let showing
-	$: toggle = showing ? true : false
+		loading = false;
+	};
+	let mixList = $currentMix.list;
+	let showing;
+	$: toggle = showing ? true : false;
 </script>
 
 <div class="container" class:hidden>
@@ -104,11 +106,8 @@
 		<div
 			class="itemWrapper"
 			on:click={() => {
-				if (!loading && data.type !== 'playlist') {
-					clickHandler()
-				}
-				if (data.type == 'playlist') {
-					clickHandler()
+				if (!loading) {
+					clickHandler();
 				}
 			}}>
 			<div class="img-container">
@@ -132,7 +131,7 @@
 				{#if explicit}
 					<span class="explicit"> E </span>
 				{/if}
-				<p class:hidden={data.type == 'playlist'}>
+				<p class:hidden={data.type == "playlist"}>
 					by {artist}
 				</p>
 			</div>
@@ -141,31 +140,28 @@
 			<Dropdown>
 				<div slot="content">
 					<div
+						class:hidden={data.type == "playlist"}
 						class="dd-item"
 						on:click={() => {
-							goto(`/artist?id=${data.artistInfo.browseId}`)
+							goto(`/artist?id=${data.artistInfo?.browseId}`);
 						}}
-						href={`/artist?id=${data.artistInfo.browseId}`}>
+						href={`/artist?id=${data.artistInfo?.browseId}`}>
 						<Icon name="artist" size="1.5em" />
 						<div class="dd-text">View Artist</div>
 					</div>
 					<div
 						class="dd-item"
-						on:click={async () => {
-							let mixList = $currentMix.list
-							let next = {
-								continuation: mixList[0].continuation,
-								autoMixList: data.playlistId,
-								artistId: data.artistInfo.browseId,
-								id: $key + 1,
-								videoId: data.videoId,
-								title: data.title,
-								artist: data.artistInfo.artists[0],
-								thumbnail: data.thumbnail,
-								length: data.length
-							}
-							mixList.splice($key + 1, 0, next)
-							console.log(mixList)
+						on:click={() => {
+							goto(`/playlist?list=${data?.browseId}`);
+						}}
+						class:hidden={data.type !== "playlist"}>
+						<Icon name="list" size="1.5em" />
+						<div class="dd-text">Go to Playlist Page</div>
+					</div>
+					<div
+						class="dd-item"
+						on:click={() => {
+							addToQueue(data, mixList, id);
 						}}>
 						<Icon name="queue" size="1.5rem" />
 						<div class="dd-text">Add to Queue</div>
@@ -268,7 +264,7 @@
 	}
 	img::before {
 		display: block;
-		content: '';
+		content: "";
 		padding-top: calc(100% * 2 / 3);
 		/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
 	}

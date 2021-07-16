@@ -13,6 +13,35 @@ export interface Song {
 	hash?: string;
 }
 
+export interface Continuation {
+	nextContinuationData: NextContinuationData;
+}
+
+export interface NextContinuationData {
+	continuation: string;
+	clickTrackingParams: string;
+}
+
+export interface TitleEndpoint {
+	title: string;
+	playlistId: string;
+	videoId: string;
+}
+export interface Artist {
+	browseId: string;
+	name: string;
+}
+export interface Thumbnail {
+	url: string;
+}
+export interface PlaylistItem {
+	length?: string;
+	title: string | TitleEndpoint;
+	artist: Artist;
+	thumbnail: Thumbnail[];
+	videoId?: string;
+	playlistId?: string;
+}
 export interface ArtistInfo {
 	pageType?: string;
 	artists?: [];
@@ -33,7 +62,7 @@ export interface SearchResult {
 	playlistId: string;
 	params?: string;
 	thumbnails: [{ url: string }];
-	subtitle?: [Subtitle];
+	subtitle?: Subtitle[];
 }
 export interface CarouselItem {
 	title: string;
@@ -42,8 +71,8 @@ export interface CarouselItem {
 	videoId: string;
 	playlistId: string;
 	params?: string;
-	thumbnails: [{ url: string }];
-	subtitle?: [Subtitle];
+	thumbnails: [{ url: string }[]];
+	subtitle?: Subtitle[];
 }
 
 export interface mixList {

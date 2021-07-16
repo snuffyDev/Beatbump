@@ -33,7 +33,6 @@ export const sort = (data) => {
 				}
 			})
 		}
-
 		return null
 	} catch (e) {
 		console.log('Fetch error', e)

@@ -1,21 +1,21 @@
 <script>
-	import Search from '$components/Search/Search.svelte'
-	import { fade } from 'svelte/transition'
-	import Icon from '$components/Icon/Icon.svelte'
-	import { circIn } from 'svelte/easing'
-	import { goto } from '$app/navigation'
-	import { clickOutside } from '$lib/js/clickOutside'
-	import { theme } from '$stores/stores'
-	import { onMount } from 'svelte'
+	import Search from "$components/Search/Search.svelte";
+	import { fade } from "svelte/transition";
+	import Icon from "$components/Icon/Icon.svelte";
+	import { circIn } from "svelte/easing";
+	import { goto } from "$app/navigation";
+	import { clickOutside } from "$lib/js/clickOutside";
+	import { theme } from "$stores/stores";
+	import { onMount } from "svelte";
 
-	export let width
+	export let width;
 
-	let isHidden = true
-	let hidden = isHidden ? true : false
-	$: curTheme = $theme
-	let isSettings = true
-	let settingsHidden = isSettings ? true : false
-	let setTheme = $theme
+	let isHidden = true;
+	let hidden = isHidden ? true : false;
+	$: curTheme = $theme;
+	let isSettings = true;
+	let settingsHidden = isSettings ? true : false;
+	let setTheme = $theme;
 	// onMount(() => {
 	// 	if (!$theme) {
 	// 		setTheme = $theme
@@ -23,9 +23,9 @@
 	// 		setTheme = $theme
 	// 	}
 	// })
-	let themeSet = $theme
+	let themeSet = $theme;
 
-	let themes = [{ name: 'dark' }, { name: 'dim' }, { name: 'ytm' }]
+	let themes = [{ name: "dark" }, { name: "dim" }, { name: "ytm" }];
 	// $: theme.set($theme)
 </script>
 
@@ -36,7 +36,7 @@
 		height="0.5rem"
 		alt="logo"
 		title="Beatbump Home"
-		on:click={() => goto('/')} />
+		on:click={() => goto("/")} />
 </div>
 {#if width > 640}
 	<div
@@ -46,7 +46,7 @@
 		<div
 			class="nav-item-desktop"
 			on:click={() => {
-				settingsHidden = !settingsHidden
+				settingsHidden = !settingsHidden;
 			}}>
 			<svelte:component this={Icon} name="settings" size="1.75em" />
 		</div>
@@ -54,7 +54,7 @@
 			<div
 				use:clickOutside
 				on:click_outside={() => {
-					settingsHidden = !settingsHidden
+					settingsHidden = !settingsHidden;
 				}}
 				class="nav-settings"
 				style={`background-color: var(--${curTheme}-top)}`}
@@ -67,7 +67,7 @@
 							class="select"
 							bind:value={setTheme}
 							on:blur={() => {
-								theme.set(setTheme)
+								theme.set(setTheme);
 							}}>
 							{#each themes as theme}
 								<option value={theme.name}>{theme.name}</option>
@@ -80,7 +80,7 @@
 	</div>
 {/if}
 {#if width < 640}
-	<section class="homeIcon" on:click={() => goto('/')}>
+	<section class="homeIcon" on:click={() => goto("/")}>
 		<Icon name="home" size="1.75em" />
 	</section>
 	<section class="items">
@@ -88,7 +88,7 @@
 			<div
 				use:clickOutside
 				on:click_outside={() => {
-					hidden = !hidden
+					hidden = !hidden;
 				}}
 				class="nav-search"
 				transition:fade={{ duration: 120, easing: circIn }}
@@ -97,7 +97,7 @@
 				<Search type="inline" />
 				<div
 					on:click={() => {
-						hidden = !hidden
+						hidden = !hidden;
 					}}
 					class="x-button">
 					<Icon name="x" size="1.5em" />
@@ -107,7 +107,7 @@
 		<div
 			class="nav-item"
 			on:click={() => {
-				hidden = !hidden
+				hidden = !hidden;
 			}}>
 			<svelte:component this={Icon} name="search" size="1.75em" />
 		</div>
@@ -115,7 +115,7 @@
 			<div
 				use:clickOutside
 				on:click_outside={() => {
-					settingsHidden = !settingsHidden
+					settingsHidden = !settingsHidden;
 				}}
 				class="nav-settings"
 				style={`background-color: var(--${curTheme}-top)}`}
@@ -128,7 +128,7 @@
 							class="select"
 							bind:value={setTheme}
 							on:blur={() => {
-								theme.set(setTheme)
+								theme.set(setTheme);
 							}}>
 							{#each themes as theme}
 								<option value={theme.name}>{theme.name}</option>
@@ -141,7 +141,7 @@
 		<div
 			class="nav-item"
 			on:click={() => {
-				settingsHidden = !settingsHidden
+				settingsHidden = !settingsHidden;
 			}}>
 			<svelte:component this={Icon} name="settings" size="1.75em" />
 		</div>
@@ -197,11 +197,15 @@
 		padding: 0.5em 0em 0.5em 0;
 		z-index: 10;
 
-		border-radius: 0.5em;
+		border-radius: 0 0rem 0.5rem 0.5rem;
 		flex-direction: row;
 		width: 100%;
 		max-width: 11.4rem;
 		max-height: 4rem;
+		box-shadow: -0.125rem 0.3rem 0.25rem 0.125rem #00000052;
+		border: 0.125px solid #aaaaaa45;
+		border-top: 0;
+
 		.setting {
 			display: flex;
 			flex-wrap: nowrap;

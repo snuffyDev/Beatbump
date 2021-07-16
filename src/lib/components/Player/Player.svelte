@@ -5,7 +5,7 @@
 	import { iOS } from "$stores/stores.js";
 	import { tweened } from "svelte/motion";
 	import { getSrc } from "$lib/utils";
-	import Playlist from "$components/Playlist/Playlist.svelte";
+	import Queue from "./Queue.svelte";
 	import "../../../global/scss/components/_player.scss";
 	import Icon from "$components/Icon/Icon.svelte";
 	import { updateTrack, key, currentMix, currentTitle } from "$stores/stores";
@@ -200,7 +200,7 @@
 	on:mouseup={() => (seeking = false)}
 	on:mousemove={trackMouse} />
 
-<Playlist
+<Queue
 	on:updated={(event) => {
 		player.src = event.detail.src;
 		autoId = event.detail.id;
@@ -394,7 +394,7 @@
 		appearance: none;
 		background: transparent;
 		background-color: #232530;
-
+		z-index: 7;
 		outline: none;
 		border: none;
 		border-color: transparent;

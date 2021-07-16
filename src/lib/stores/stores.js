@@ -8,6 +8,11 @@ export const ctxKey = {}
 export const currentTitle = writable('')
 export const searchManager = _searchIndex()
 
+export const searchState = writable({
+	option: '',
+	text: '',
+})
+
 export const searchCtoken = _ctoken()
 export const currentTrack = writable({
 	continuation: '',

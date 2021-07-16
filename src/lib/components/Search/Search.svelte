@@ -15,17 +15,24 @@
 	export let type;
 	import { goto, invalidate } from "$app/navigation";
 	import { page } from "$app/stores";
-	import { search } from "$lib/stores/stores";
+	import { search, searchState } from "$lib/stores/stores";
 	import { tick } from "svelte";
 	let endpoint = "search";
 	let filterType;
 	let songTitle = "";
 	let filter = filterType ? filterType : options[0].params;
-	async function handleSubmit(s, f) {
+	// searchState.set({ option: undefined, text: undefined });
+	$: console.log($searchState);
+	async function handleSubmit(e) {
+		e.preventDefault();
+		searchState.set({ option: filter, text: songTitle });
 		// invalidate($page.path)
 		// let URL_BASE = new URL();
 		let url =
-			`/search/` + encodeURIComponent(encodeURIComponent(s)) + `?filter=` + f;
+			`/search/` +
+			encodeURIComponent(encodeURIComponent(songTitle)) +
+			`?filter=` +
+			filter;
 
 		await tick();
 		search.set([]);
@@ -38,11 +45,11 @@
 	}
 </script>
 
-<form class={type} on:submit|preventDefault={handleSubmit(songTitle, filter)}>
+<form class={type} on:submit|preventDefault={(e) => handleSubmit(e)}>
 	<!-- <label for="search"><em>search</em></label> -->
 	<div class="nav-item">
-		<div class="input">
-			<div class="searchBtn" on:click={handleSubmit(songTitle, filter)} />
+		<div class="input" class:inline={type == "inline" ? true : false}>
+			<div class="searchBtn" on:click={(e) => handleSubmit(e)} />
 			{#if type == "inline"}<input
 					autofocus
 					autocorrect="off"
@@ -59,8 +66,13 @@
 
 	<!-- <label for="option"><em>search type</em></label> -->
 	<div class="nav-item">
-		<div class="selectCont">
-			<select class="select" bind:value={filter}>
+		<div class="selectCont" class:inline={type == "inline" ? true : false}>
+			<select
+				class="select"
+				on:blur={() => {
+					searchState.set({ option: filter, text: songTitle });
+				}}
+				bind:value={filter}>
 				{#each options as option (option.params)}
 					<option value={option.params}>{option.label}</option>
 				{/each}
@@ -70,6 +82,12 @@
 </form>
 
 <style lang="scss">
+	.selectCont {
+		max-width: 100%;
+		&.inline {
+			max-width: 8rem;
+		}
+	}
 	.sidebar {
 		padding: 0 0.3125rem;
 		/* position: fixed; */

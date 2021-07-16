@@ -42,14 +42,14 @@
 </script>
 
 <svelte:window bind:innerWidth={width} />
-<body style={`background-color: var(--${curTheme}-base)`}>
+<div class="body" style={`background-color: var(--${curTheme}-base)`}>
+	<nav class="nav" style={`background-color: var(--${curTheme}-top)`}>
+		<Nav {width} />
+	</nav>
+	{#if width > 640}
+		<Sidebar />
+	{/if}
 	{#if browser}
-		<nav class="nav" style={`background-color: var(--${curTheme}-top)`}>
-			<Nav {width} />
-		</nav>
-		{#if width > 640}
-			<Sidebar />
-		{/if}
 		<div class="wrapper" id="wrapper">
 			<Wrapper {page}>
 				<slot />
@@ -61,7 +61,7 @@
 			<Player nowPlaying={current} />
 		</footer>
 	{/if}
-</body>
+</div>
 
 <style lang="scss" global>
 	:root {
@@ -103,7 +103,7 @@
 		border-bottom: 0.25px rgba(170, 170, 170, 0.116) solid;
 		// background-color: rgb(20 24 32 / 59%);
 	}
-	:global(body) {
+	:global(.body) {
 		scroll-behavior: smooth;
 		text-rendering: optimizeLegibility;
 	}
