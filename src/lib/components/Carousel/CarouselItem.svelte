@@ -9,7 +9,6 @@
 	import Icon from "$components/Icon/Icon.svelte";
 
 	import { addToQueue, getSrc } from "$lib/utils";
-	import { clickOutside } from "$lib/js/clickOutside";
 	import type { SearchResult } from "$lib/types";
 
 	export let section;
@@ -102,7 +101,7 @@
 							loading="lazy"
 							type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 							data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
-							src={item.thumbnails[0].url} />
+							use:lazy={{ src: item.thumbnails[0].url }} />
 					{:else}
 						<img
 							alt="thumbnail"
@@ -110,7 +109,7 @@
 							loading="lazy"
 							type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 							data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
-							src={item.thumbnails[0].url} />
+							use:lazy={{ src: item.thumbnails[0].url }} />
 					{/if}
 				</div>
 			</div>
@@ -136,7 +135,8 @@
 							on:click={() => {
 								if (item?.subtitle[0]?.navigationEndpoint) {
 									goto(
-										`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
+										`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`,
+										{ replaceState: true }
 									);
 								}
 							}}
@@ -186,7 +186,8 @@
 							on:click={() => {
 								if (item?.subtitle[0]?.navigationEndpoint) {
 									goto(
-										`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
+										`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`,
+										{ replaceState: true }
 									);
 								}
 							}}

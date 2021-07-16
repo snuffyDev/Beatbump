@@ -1,16 +1,16 @@
 <script>
-	import { goto } from '$app/navigation'
+	import { goto } from "$app/navigation";
 
-	$: redir = 10
+	$: redir = 10;
 	const redirect = () => {
-		redir = redir - 1
+		redir = redir - 1;
 		if (redir <= 0) {
-			goto('/')
+			goto("/", { replaceState: true });
 		} else {
-			setTimeout(redirect, 1000)
+			setTimeout(redirect, 1000);
 		}
-	}
-	redirect()
+	};
+	redirect();
 </script>
 
 <main>

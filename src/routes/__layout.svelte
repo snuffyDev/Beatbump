@@ -1,13 +1,3 @@
-<script context="module">
-	export const load = async ({ page }) => {
-		return {
-			props: {
-				page: page.path,
-			},
-		};
-	};
-</script>
-
 <script>
 	import "../global/stylesheet.scss";
 	import "../app.css";
@@ -19,12 +9,11 @@
 	import Nav from "$components/Nav/Nav.svelte";
 	import Sidebar from "$components/Sidebar/Sidebar.svelte";
 	import Player from "$components/Player/Player.svelte";
-	import Wrapper from "$components/Wrapper/Wrapper.svelte";
-	export let page;
-	$: page = page;
+	// import Wrapper from "$components/Wrapper/Wrapper.svelte";
 	onMount(() => {
 		iOS.init();
 		const getTheme = () => {
+			console.log("themeswitch");
 			let ls = localStorage.getItem("theme");
 			if (ls) {
 				theme.init(ls);
@@ -33,6 +22,7 @@
 			}
 		};
 		getTheme();
+		return;
 	});
 
 	let current = $currentTrack;
@@ -51,9 +41,7 @@
 	{/if}
 	{#if browser}
 		<div class="wrapper" id="wrapper">
-			<Wrapper {page}>
-				<slot />
-			</Wrapper>
+			<slot />
 		</div>
 		<footer
 			class="footer-container"

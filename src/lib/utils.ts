@@ -30,73 +30,6 @@ export const getData = (
 		})
 		.catch((err) => console.log(err));
 };
-// Parse search results
-
-export const searchTracks = async (
-	songTitle: string,
-	filter: string,
-	browseId?: string,
-	ctoken?: string,
-	index?: number
-) => {
-	let resHandler: { json: () => any };
-	let contents: string;
-
-	if (ctoken) {
-		const response = await fetch(
-			`/api/search.json?q=${songTitle ? songTitle : ""}${
-				filter ? `&params=${filter}` : ""
-			}${ctoken ? `&ctoken=${ctoken}` : ""}${index ? `&index=${index}` : ""}`
-		).then((res) => {
-			console.log(res.contents);
-			searchManager.update((u) => [...u, ...res.contents]);
-			return res;
-		});
-	} else {
-		return await fetch(
-			`/api/search.json?q=${songTitle ? songTitle : ""}${
-				filter ? `&params=${filter}` : ""
-			}`
-		)
-			.then((data) => data.json())
-			.then((res) => {
-				console.log(res.contents);
-				searchManager.reset();
-				searchManager.set([...res.contents]);
-				return res;
-			})
-			.catch((err) => console.log(err));
-	}
-
-	// console.log(data);
-};
-
-// TODO: Get playlist
-export const getPlaylist = async (browseId: any) => {
-	const res = await fetch(`/api/playlist.json?browseId=${browseId}`, {
-		headers: { accept: "application/json" },
-	});
-	const data = await res.json();
-	let {
-		header,
-		contents: {
-			singleColumnBrowseResultsRenderer: {
-				tabs: [
-					{
-						tabRenderer: {
-							content: {
-								sectionListRenderer: {
-									contents: [{ musicPlaylistShelfRenderer }],
-								},
-							},
-						},
-					},
-				],
-			},
-		},
-	} = await data;
-	console.log(header, musicPlaylistShelfRenderer);
-};
 // Moods and Genres for trending page
 export const moodsAndGenres = (browseId: any) => {
 	return getData("", "", "browse", browseId).then(
@@ -224,9 +157,10 @@ export const getSrc = async (videoId?: string, playlistId?: string) => {
 	return parsedURL;
 };
 // parse array object input for child
+
 export const pb = (input: any, query: string, justOne = false) => {
 	const iterate = (x: string | any[], y: string | number) => {
-		var r = [];
+		let r = [];
 
 		x.hasOwnProperty(y) && r.push(x[y]);
 		if (justOne && x.hasOwnProperty(y)) {

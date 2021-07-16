@@ -64,7 +64,14 @@ export async function get({ query }) {
 												content: {
 													playlistPanelRenderer: {
 														contents,
-														continuations: [{ ...rest }],
+														continuations: [
+															{
+																nextRadioContinuationData: {
+																	clickTrackingParams,
+																	continuation,
+																},
+															},
+														],
 													},
 												},
 											},
@@ -78,7 +85,6 @@ export async function get({ query }) {
 			},
 			currentVideoEndpoint: { watchEndpoint },
 		} = data;
-		let { clickTrackingParams, continuation } = rest;
 		async function parser(
 			contents,
 			continuation,

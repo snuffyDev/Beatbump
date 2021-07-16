@@ -64,6 +64,7 @@
 /* OTHERS                           */
 /* ================================ */
 .menuButtons svg circle {
-	box-shadow: 0 0 0.5rem 0.125rem #000;
-	outline: solid #11111161 1px;
+	/* box-shadow: 0 0 0.5rem 0.125rem filter: drop-shadow(0rem 0.02rem 0.5rem black) contrast(1);#000; */
+	/* outline: solid #11111161 1px; */
+	filter: drop-shadow(0rem 0.02rem 0.5rem black) contrast(1);
 }

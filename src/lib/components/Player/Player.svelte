@@ -128,6 +128,7 @@
 					length: d.length,
 				})),
 			];
+
 			// console.log(mixList);
 			currentMix.set({
 				videoId: `${mixList[autoId].videoId}`,
@@ -139,12 +140,12 @@
 			player.src = utils.getSrc(mixList[autoId].videoId).then((url) => url);
 			autoId++;
 			key.set(autoId);
+
 			once = false;
+
 			return mixList;
 		} else {
-			autoId++;
-
-			// console.log(autoId)
+			autoId++; // console.log(autoId)
 			key.set(autoId);
 
 			player.src = utils.getSrc(mixList[autoId].videoId).then((url) => url);
@@ -323,7 +324,9 @@
 							<div
 								class="dd-item"
 								on:click={() => {
-									goto(`/artist?id=${mixList[autoId].artistId}`);
+									goto(`/artist?id=${mixList[autoId].artistId}`, {
+										replaceState: true,
+									});
 								}}>
 								<Icon name="artist" size="2em" />
 								<span class="dd-text">View Artist</span>

@@ -1,14 +1,15 @@
 function lazy(node, data) {
-	const datasrc = node.dataset.src
-	node.setAttribute('src', datasrc)
+	let once = true;
 	if (IntersectionObserver) {
+		const datasrc = node.dataset.src
+		node.setAttribute('src', datasrc)
 		const observer = new IntersectionObserver(onIntersect, {
 			rootMargin: '250px 250px',
-			threshold: 0.1
+			threshold: 0.2
 		})
 		function onIntersect(entries) {
 			entries.forEach((entry) => {
-				if (entry.isIntersecting) {
+				if (entry.isIntersecting && once) {
 					node.setAttribute('src', data.src)
 				}
 			})

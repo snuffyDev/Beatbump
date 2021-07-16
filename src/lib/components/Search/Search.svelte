@@ -13,18 +13,19 @@
 		},
 	];
 	export let type;
-	import { goto, invalidate } from "$app/navigation";
-	import { page } from "$app/stores";
+	import { goto } from "$app/navigation";
 	import { search, searchState } from "$lib/stores/stores";
-	import { tick } from "svelte";
+	import { createEventDispatcher, tick } from "svelte";
 	let endpoint = "search";
 	let filterType;
 	let songTitle = "";
 	let filter = filterType ? filterType : options[0].params;
+	const dispatch = createEventDispatcher();
 	// searchState.set({ option: undefined, text: undefined });
 	$: console.log($searchState);
 	async function handleSubmit(e) {
 		e.preventDefault();
+		dispatch("submitted", { submitted: true });
 		searchState.set({ option: filter, text: songTitle });
 		// invalidate($page.path)
 		// let URL_BASE = new URL();
@@ -39,9 +40,10 @@
 		scrollTo({
 			behavior: "smooth",
 			top: 0,
+			left: 0,
 		});
 
-		goto(url, { replaceState: true, state: {} });
+		goto(url, { replaceState: true });
 	}
 </script>
 

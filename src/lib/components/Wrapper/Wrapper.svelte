@@ -15,8 +15,4 @@
 	});
 </script>
 
-{#key page}
-	<div transition:fade={{ duration: 175, easing: quintInOut }}>
-		<slot />
-	</div>
-{/key}
+<slot />

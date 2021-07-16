@@ -6,27 +6,10 @@
 	import lazy from "$lib/lazy";
 	import { fade } from "svelte/transition";
 	import { goto } from "$app/navigation";
-	import type { SearchResult } from "$lib/types";
-	function splitArray(flatArray, numCols) {
-		const newArray = [];
-		for (let c = 0; c < numCols; c++) {
-			newArray.push([]);
-		}
-		for (let i = 0; i < flatArray.length; i++) {
-			const mod = i % numCols;
-			newArray[mod].push(flatArray[i]);
-		}
-		return newArray;
-	}
+
 	let section = [];
 	let arr = items;
 	let carousel;
-	let pos = 0;
-	// console.log(items)
-	arr = splitArray(arr, 5);
-	// let notComplete = setTitle.includes('Fans Might')
-	// console.log()
-	// let notComplete = setTitle.includes('Fans') ? true : false
 </script>
 
 <div class="header">
@@ -36,34 +19,6 @@
 </div>
 <div class="section">
 	<div class="scroll" id="scrollItem" bind:this={carousel}>
-		<!-- <span
-			on:click={() => {
-				console.log(section)
-				if (pos > 0) {
-					pos--
-
-					let child = section[pos].children
-					console.log(child.offsetLeft)
-					// console.log(section)
-					carousel.scrollLeft -= child[0].offsetLeft
-				}
-			}}
-			class="left"
-			><Icon name="chevron-left" size="2em" />
-		</span>
-		<span
-			class="right"
-			on:click={() => {
-				if (pos < section.length - 1) {
-					// console.log(section)
-					pos++
-					let child = section[pos]
-					console.log(child, child.offsetLeft)
-					// console.log(section)
-					carousel.scrollLeft += child.offsetLeft
-				}
-			}}><Icon name="chevron-right" size="2em" /></span> -->
-
 		<!-- {#each arr as item, index} -->
 		<div class="contents" style="display:contents">
 			{#each items as item, i}
@@ -85,7 +40,8 @@
 								"/release?type=" +
 									encodeURIComponent(type) +
 									"&id=" +
-									encodeURIComponent(id)
+									encodeURIComponent(id),
+								{ replaceState: true }
 							);
 						}}>
 						<!-- svelte-ignore a11y-missing-attribute -->

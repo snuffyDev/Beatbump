@@ -4,9 +4,9 @@
 			const data = await fetch(
 				"/api/playlist.json?list=" + encodeURIComponent(page.query.get("list"))
 			);
-			const { parseTrack, parseHeader: header } = await data.json();
+			const { tracks, header, continuations } = await data.json();
 			return {
-				props: { parseTrack, header },
+				props: { tracks, continuations, header },
 				maxage: 3600,
 				status: 200,
 			};
@@ -21,14 +21,15 @@
 <script lang="ts">
 	import ListItem from "$components/ListItem/ListItem.svelte";
 	import lazy from "$lib/lazy";
-	export let parseTrack;
+	export let tracks;
 	export let header;
 	export let error;
-	console.log(parseTrack, header);
+	export let continuations;
+	console.log(tracks, continuations, header);
 	// import { getPlaylist } from '$lib/utils'
 </script>
 
-{#await parseTrack}
+{#await tracks}
 	<!-- promise is pending -->
 	Loading
 {:then _}
@@ -56,7 +57,7 @@
 					<div class="info">
 						<div class="info-title">
 							<h4>{header.title}</h4>
-							<p>{header.description}</p>
+							<p class="hidden">{header.description}</p>
 							<span>
 								<p>
 									{header.subtitles.join(" ", "")}
@@ -73,7 +74,7 @@
 			</div>
 		</div>
 
-		{#each parseTrack as res, i}
+		{#each tracks as res, i}
 			<ListItem item={res} index={i} />
 
 			<!-- <img
@@ -120,11 +121,15 @@
 		object-fit: contain;
 		max-width: 18.2857rem;
 		max-height: 18.2857rem;
+		min-width: 5rem;
+		min-height: 5rem;
 		img {
 			box-shadow: 0 0 1.5rem 0.125rem rgb(0 0 0 / 37%);
 			/* max-width: inherit; */
 			/* max-height: inherit; */
 			max-width: 18.2857rem;
+			min-width: inherit;
+			min-height: inherit;
 			max-height: 18.2857rem;
 			-o-object-fit: scale-down;
 			object-fit: scale-down;
@@ -193,6 +198,12 @@
 			display: flex;
 			flex-direction: column;
 			flex: none;
+		}
+	}
+
+	@media screen and (max-width: 525px) {
+		.hidden {
+			display: none;
 		}
 	}
 </style>

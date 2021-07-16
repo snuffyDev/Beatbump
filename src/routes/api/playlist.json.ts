@@ -1,15 +1,16 @@
-import type { Artist, Thumbnail } from "$lib/types";
+import type { Artist, Playlist, Thumbnail } from "$lib/types";
 import { pb } from "$lib/utils";
 import type { NextContinuationData, PlaylistItem } from "$lib/types";
+import type { EndpointOutput } from "@sveltejs/kit";
 
 /** Hits the YouTube Music API for a playlist page
  *	Currently is not fully implemented.
  *
  * @export get
  * @param {*} { query }
- * @return {*}  {Promise<PlaylistItem[]>}
+ * @return {*}  {Promise<EndpointOutput>}
  */
-export async function get({ query }): Promise<PlaylistItem[]> {
+export async function get({ query }): Promise<EndpointOutput> {
 	const browseId = query.get("list");
 	// console.log(videoId,playlistId)
 	try {
@@ -42,7 +43,7 @@ export async function get({ query }): Promise<PlaylistItem[]> {
 
 		if (!response.ok) {
 			// NOT res.status >= 200 && res.status < 300
-			return { statusCode: response.status, body: response.statusText };
+			return { status: response.status, body: response.statusText };
 		}
 		const {
 			header: { musicDetailHeaderRenderer },
@@ -59,12 +60,6 @@ export async function get({ query }): Promise<PlaylistItem[]> {
 			"continuations:0:nextContinuationData",
 			false
 		);
-
-		const objectMap = (obj, fn) =>
-			Object.fromEntries(
-				Object.entries(obj).map(([k, v], i) => [k, fn(v, k, i)])
-			);
-
 		const parseHeader = Array(musicDetailHeaderRenderer).map((d) => {
 			const description = pb(d, "description:runs:0:text", true);
 			const subtitles: string = pb(d, "subtitle:runs:text", true);
@@ -126,7 +121,11 @@ export async function get({ query }): Promise<PlaylistItem[]> {
 		// parsePlaylistContents(contents);
 		return {
 			statusCode: 200,
-			body: JSON.stringify({ parseTrack, parseHeader }),
+			body: JSON.stringify({
+				continuations: continuations,
+				tracks: parseTrack,
+				header: parseHeader,
+			}),
 		};
 	} catch (error) {
 		// output to netlify function log

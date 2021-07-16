@@ -1,5 +1,4 @@
 <script>
-	import { fade } from "svelte/transition";
 	import Icon from "$components/Icon/Icon.svelte";
 	import { currentMix, currentTitle, key } from "$stores/stores";
 	import * as utils from "$lib/utils";

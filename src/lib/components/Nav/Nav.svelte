@@ -7,6 +7,7 @@
 	import { clickOutside } from "$lib/js/clickOutside";
 	import { theme } from "$stores/stores";
 	import { onMount } from "svelte";
+	import { page } from "$app/stores";
 
 	export let width;
 
@@ -23,20 +24,32 @@
 	// 		setTheme = $theme
 	// 	}
 	// })
+	const naviBack = (home = "/trending") => {
+		const ref = document.referrer;
+		goto(ref.length > 0 ? ref : home);
+	};
 	let themeSet = $theme;
+	$: console.log($page.path);
 
 	let themes = [{ name: "dark" }, { name: "dim" }, { name: "ytm" }];
 	// $: theme.set($theme)
 </script>
 
 <div class="logo">
-	<img
-		src="/logo-header.png"
-		width="2.5rem"
-		height="0.5rem"
-		alt="logo"
-		title="Beatbump Home"
-		on:click={() => goto("/")} />
+	{#if $page.path !== "/trending"}
+		<div class="back-button" transition:fade on:click={naviBack}>
+			<Icon name="chevron-left" size="1.5em" />
+		</div>
+	{:else}
+		<img
+			src="/logo-header.png"
+			width="2.5rem"
+			height="0.5rem"
+			transition:fade
+			alt="logo"
+			title="Beatbump Home"
+			on:click={() => goto("/")} />
+	{/if}
 </div>
 {#if width > 640}
 	<div
@@ -63,10 +76,11 @@
 				<span class="setting">
 					<span class="s-text">Theme:</span>
 					<div class="selectCont">
+						<!-- svelte-ignore a11y-no-onchange -->
 						<select
 							class="select"
 							bind:value={setTheme}
-							on:blur={() => {
+							on:change={() => {
 								theme.set(setTheme);
 							}}>
 							{#each themes as theme}
@@ -94,7 +108,11 @@
 				transition:fade={{ duration: 120, easing: circIn }}
 				class:hidden>
 				<!-- <label for="search"><em>search</em></label> -->
-				<Search type="inline" />
+				<Search
+					type="inline"
+					on:submitted={(event) => {
+						hidden = !hidden;
+					}} />
 				<div
 					on:click={() => {
 						hidden = !hidden;

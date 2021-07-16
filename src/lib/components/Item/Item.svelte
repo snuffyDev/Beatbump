@@ -4,7 +4,7 @@
 	export let data;
 	import { fade } from "svelte/transition";
 	import Loading from "$components/Loading/Loading.svelte";
-	import { afterUpdate, beforeUpdate, onMount, tick } from "svelte";
+	import { onMount } from "svelte";
 
 	import { currentMix, currentTitle, key, currentTrack } from "$stores/stores";
 	import * as utils from "$lib/utils";
@@ -33,7 +33,7 @@
 		itemHandler();
 	});
 
-	const itemHandler = async () => {
+	const itemHandler = () => {
 		explicit = data.explicit;
 		title = data.title;
 		thumbnail = data.thumbnails[0].url.replace(
@@ -143,7 +143,9 @@
 						class:hidden={data.type == "playlist"}
 						class="dd-item"
 						on:click={() => {
-							goto(`/artist?id=${data.artistInfo?.browseId}`);
+							goto(`/artist?id=${data.artistInfo?.browseId}`, {
+								replaceState: true,
+							});
 						}}
 						href={`/artist?id=${data.artistInfo?.browseId}`}>
 						<Icon name="artist" size="1.5em" />
@@ -152,7 +154,7 @@
 					<div
 						class="dd-item"
 						on:click={() => {
-							goto(`/playlist?list=${data?.browseId}`);
+							goto(`/playlist?list=${data?.browseId}`, { replaceState: true });
 						}}
 						class:hidden={data.type !== "playlist"}>
 						<Icon name="list" size="1.5em" />

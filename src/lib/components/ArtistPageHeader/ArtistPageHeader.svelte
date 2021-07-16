@@ -1,50 +1,50 @@
 <script lang="ts">
-	import { getData } from '$lib/utils'
-	import { page } from '$app/stores'
+	import { getData } from "$lib/utils";
+	import { page } from "$app/stores";
 
-	import { onMount } from 'svelte'
-	export let headerContent
-	export let items = []
-	export let thumbnail = []
-	export let description
-	export let width
-	let container
-	let y = 0
+	import { onMount } from "svelte";
+	export let headerContent;
+	export let items = [];
+	export let thumbnail = [];
+	export let description;
+	export let width;
+	let container;
+	let y = 0;
 	onMount(() => {
-		let start
+		let start;
 
-		let gradient = document.getElementById('gradient')
+		let gradient = document.getElementById("gradient");
 
 		function handler(event) {
-			if (start === undefined) start = event.timestamp
-			const scroll = gradient.getBoundingClientRect()
+			if (start === undefined) start = event.timestamp;
+			const scroll = gradient.getBoundingClientRect();
 
-			const elapsed = event.timestamp - start
+			const elapsed = event.timestamp - start;
 
 			window.requestAnimationFrame(function (e) {
-				y = Math.min(Math.max(-scroll.top / window.innerWidth, 0), 5) * 200
+				y = Math.min(Math.max(-scroll.top / window.innerWidth, 0), 5) * 200;
 
 				// Math.min(-0.2 * scroll.top);
 				// console.log(y);
 				if (elapsed < 2000) {
 					// Stop the animation after 2 seconds
-					window.requestAnimationFrame(handler)
+					window.requestAnimationFrame(handler);
 				}
 
-				window.cancelAnimationFrame(y)
+				window.cancelAnimationFrame(y);
 				// -scroll.top * 2;
 				// (-scroll.top Math.max(0, y / 40)0) * 2;
-			})
+			});
 
 			// console.log(y);
 		}
 		// window.requestAnimationFrame(handler);
 		// window.addEventListener("scroll", handler);
-		let wrapper = document.getElementById('wrapper')
+		let wrapper = document.getElementById("wrapper");
 
-		wrapper.addEventListener('scroll', handler, { passive: true })
-		return () => window.removeEventListener('scroll', handler)
-	})
+		wrapper.addEventListener("scroll", handler, { passive: true });
+		return () => window.removeEventListener("scroll", handler);
+	});
 </script>
 
 <!-- <svelte:window bind:scrollY={y} /> -->
@@ -62,6 +62,7 @@
 			<img
 				referrerpolicy="origin-when-cross-origin"
 				class="header-thumbnail"
+				loading="eager"
 				src={thumbnail[1].url}
 				alt="Artist Thumbnail" />
 		</picture>
@@ -77,7 +78,7 @@
 </div>
 
 <style lang="scss">
-	@import '../../../global/vars.css';
+	@import "../../../global/vars.css";
 	.artist-body {
 		padding: 0 1rem;
 	}
@@ -115,28 +116,18 @@
 	.artist-header {
 		display: block;
 		margin-bottom: 0.5rem;
-
-		// width: 100%;
-		// height: 100%;
 	}
 	.artist-thumbnail {
 		display: block;
 		position: relative;
-		background: linear-gradient(360deg, #000 8.98%, rgba(0, 0, 0, 0) 100%);
 		height: 100%;
+		min-height: 13rem;
 		&::before {
-			// background: linear-gradient(346deg, white, transparent);
 			position: absolute;
-			content: '';
-			// width: 100%;
-			// height: 100%;
-			// background: linear-gradient(360deg, #000 8.98%, rgba(0, 0, 0, 0) 100%);
-			// box-shadow: 0rem 0rem 0.5rem 0.1rem rgba(19, 19, 20, 0.384);
+			content: "";
 			top: 0;
 			bottom: 0;
 			left: 0;
-			/* z-index: 100; */
-			/* margin-bottom: 5rem; */
 			right: 0;
 		}
 	}
@@ -146,54 +137,15 @@
 		width: 100%;
 		height: inherit;
 		position: absolute;
-		// transition: background-image 13s ease-in;
 
 		top: 0;
 	}
 	.header-thumbnail {
-		// position: absolute;
 		z-index: -1;
 		top: 0;
 		width: 100%;
 		max-height: 25%;
 		overflow: hidden;
-
-		// &::before {
-		// 	position: absolute;
-		// 	content: '';
-		// 	top: 0;
-		// 	right: 0;
-
-		// 	// background: linear-gradient(
-		// 	// 	0turn,
-		// 	// 	#09090a 0%,
-		// 	// 	#0b0b0b 1.2%,
-		// 	// 	#0a0a0bed 14.98%,
-		// 	// 	#1313149e 23%,
-		// 	// 	#14141440 38%,
-		// 	// 	#ababaf17
-		// 	// );
-		// 	// background: linear-gradient(
-		// 	// 	0turn,
-		// 	// 	#09090a,
-		// 	// 	#0b0b0b 1.2%,
-		// 	// 	rgba(10, 10, 11, 0.9294117647058824) 14.98%,
-		// 	// 	rgb(12 12 13 / 85%) 24%,
-		// 	// 	rgb(19 19 20 / 65%) 36%,
-		// 	// 	rgb(19 19 20 / 51%) 50%,
-		// 	// 	rgb(20 20 20 / 16%) 70%,
-		// 	// 	rgb(171 171 175 / 0%) 100%
-		// 	// );
-		// 	background: linear-gradient(1turn, var(--ytm-base) 0, transparent);
-		// 	// background: linear-gradient(1turn, #09090a 8.98%, #d29e9e05 67%);
-		// 	bottom: 0;
-		// 	left: 0;
-		// 	// @include scrim(#09090a, 'to top');
-		// 	// background: linear-gradient(360deg, #09090a 8.98%, rgba(0, 0, 0, 0) 100%);
-		// 	z-index: 1;
-		// 	transition: all cubic-bezier(0.42, 0, 0.58, 1) 0.2s !important;
-		// 	opacity: 1;
-		// }
 	}
 	.artist-content {
 		position: relative;
@@ -211,27 +163,13 @@
 				font-weight: 700;
 				font-size: 2.5rem;
 				display: inline-block;
-				font-family: 'Commissioner', sans-serif;
+				font-family: "Commissioner", sans-serif;
 
 				// white-space: pre;
 				text-shadow: rgba(0, 0, 0, 0.171) 0.2rem -0.12rem 0.5rem;
 
 				letter-spacing: -0.02em;
 				padding: 0.8em 0 0.8rem 0.5rem;
-				// @media screen and (max-width: 550px) {
-				// 	// padding: 0 2rem 0 2rem;
-				// 	color: red;
-				// }
-				// @media screen and (max-width: 600px) {
-				// 	inline-size: 100%;
-				// 	overflow-wrap: break-word;
-				// 	font-size: 3.5rem;
-				// 	// white-space: pre-line;
-				// 	// padding: 1rem 0.8rem;
-				// 	// padding: 0 2rem 0 2rem;
-
-				// 	padding: 0em 0 0 0.2em;
-				// }
 
 				@media (min-width: 320px) and (max-width: 499px) {
 					padding: 0.8em 0 0.8rem 0.5rem;
@@ -257,14 +195,6 @@
 					padding: 0 2rem 0.8rem 2rem;
 					font-size: 4.5rem;
 				}
-
-				// @media screen and (min-width: 641px) {
-				// 	inline-size: 100%;
-				// 	overflow-wrap: break-word;
-				// 	padding: 2rem 0 0 2rem;
-
-				// 	font-size: 3.5em; // padding: 0 2rem 0 1.5rem;
-				// }
 			}
 		}
 		@media screen and (max-width: 500px) {
