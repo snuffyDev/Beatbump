@@ -140,6 +140,7 @@ export async function get({ query }) {
 					subtitle?: {}[];
 				};
 				let result: result;
+
 				switch (type) {
 					case "musicTwoRowItemRenderer":
 						result = {

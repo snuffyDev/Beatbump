@@ -34,6 +34,28 @@ export interface Artist {
 export interface Thumbnail {
 	url: string;
 }
+
+export interface Playlist {
+	playlistId: string;
+	metaData?: string | string[];
+	browseId?: string;
+	hash?: string;
+	title: string;
+	type?: string;
+	thumbnails?: Thumbnail[];
+	continuation?: NextContinuationData;
+	contents: PlaylistItem[];
+}
+export interface PlaylistSearch {
+	playlistId: string;
+	metaData?: string | string[];
+	browseId?: string;
+	hash?: string;
+	title: string;
+	type?: string;
+	thumbnails?: Thumbnail[];
+	continuation?: NextContinuationData;
+}
 export interface PlaylistItem {
 	length?: string;
 	title: string | TitleEndpoint;

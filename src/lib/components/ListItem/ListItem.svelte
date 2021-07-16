@@ -1,27 +1,27 @@
 <script>
-	import { fade } from 'svelte/transition'
-	import Icon from '$components/Icon/Icon.svelte'
-	import { currentMix, currentTitle, key } from '$stores/stores'
-	import * as utils from '$lib/utils'
-	export let item
-	export let index
+	import { fade } from "svelte/transition";
+	import Icon from "$components/Icon/Icon.svelte";
+	import { currentMix, currentTitle, key } from "$stores/stores";
+	import * as utils from "$lib/utils";
+	export let item;
+	export let index;
 
-	let radio = []
-	let isHovering = false
+	let radio = [];
+	let isHovering = false;
 </script>
 
 <li
 	class="item"
 	on:click={async () => {
 		let mix = await utils
-			.getNext(0, '', item.videoId, item.playlistId, '')
-			.then((data) => data)
+			.getNext(0, "", item.videoId, item.playlistId, "")
+			.then((data) => data);
 		// console.log(mix)
 		const play = await utils
 			.getSrc(mix.results[0].videoId)
-			.then((p) => console.log(p))
+			.then((p) => console.log(p));
 		// @ts-ignore
-		let videoId = await mix.results[0].videoId
+		let videoId = await mix.results[0].videoId;
 
 		// @ts-ignore
 		currentMix.set({
@@ -38,24 +38,24 @@
 					title: d.title,
 					artist: d.artistInfo.artist,
 					thumbnail: d.thumbnail,
-					length: d.length
-				}))
-			]
-		})
-		key.set(0)
+					length: d.length,
+				})),
+			],
+		});
+		key.set(0);
 		// currentTrack.set({
 		// 	id: 0,
 		// 	videoId: id,
 		// 	title: radio[0].title,
 		// 	thumbnail: thumbnail
 		// })
-		currentTitle.set(mix.results[0].title)
+		currentTitle.set(mix.results[0].title);
 	}}
 	on:mouseenter={() => {
-		isHovering = true
+		isHovering = true;
 	}}
 	on:mouseout={() => {
-		isHovering = false
+		isHovering = false;
 	}}>
 	<span class="number"
 		>{#if isHovering}
@@ -72,12 +72,16 @@
 			>{item.title}
 			{#if item.explicit}
 				<span class="explicit">
-					{item.explicit ? 'E' : ''}
+					{item.explicit ? "E" : ""}
 				</span>
 			{/if}
 		</span>
-		<span class="artist"
-			>{item.artistNames ? item.artistNames : item.artistInfo.artists}</span>
+		{#if item.artistNames || item.artistInfo?.artists}
+			<span class="artist"
+				>{item.artistNames ? item.artistNames : item.artistInfo.artists}</span>
+		{:else}
+			<span class="artist">{item.artist.name}</span>
+		{/if}
 	</span>
 </li>
 

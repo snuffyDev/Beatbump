@@ -2,6 +2,13 @@ import type { Artist, Thumbnail } from "$lib/types";
 import { pb } from "$lib/utils";
 import type { NextContinuationData, PlaylistItem } from "$lib/types";
 
+/** Hits the YouTube Music API for a playlist page
+ *	Currently is not fully implemented.
+ *
+ * @export get
+ * @param {*} { query }
+ * @return {*}  {Promise<PlaylistItem[]>}
+ */
 export async function get({ query }): Promise<PlaylistItem[]> {
 	const browseId = query.get("list");
 	// console.log(videoId,playlistId)
@@ -38,7 +45,7 @@ export async function get({ query }): Promise<PlaylistItem[]> {
 			return { statusCode: response.status, body: response.statusText };
 		}
 		const {
-			header: musicDetailHeaderRenderer,
+			header: { musicDetailHeaderRenderer },
 			contents,
 		} = await response.json();
 		const playlist = pb(
@@ -52,6 +59,26 @@ export async function get({ query }): Promise<PlaylistItem[]> {
 			"continuations:0:nextContinuationData",
 			false
 		);
+
+		const objectMap = (obj, fn) =>
+			Object.fromEntries(
+				Object.entries(obj).map(([k, v], i) => [k, fn(v, k, i)])
+			);
+
+		const parseHeader = Array(musicDetailHeaderRenderer).map((d) => {
+			const description = pb(d, "description:runs:0:text", true);
+			const subtitles: string = pb(d, "subtitle:runs:text", true);
+			const thumbnails = pb(
+				d,
+				"thumbnail:croppedSquareThumbnailRenderer:thumbnail:thumbnails",
+				false
+			);
+			const secondSubtitle: string = pb(d, "secondSubtitle:runs:text", true);
+			const title = pb(d, "title:runs:0:text", true);
+
+			return { description, subtitles, thumbnails, secondSubtitle, title };
+		})[0];
+
 		const parseTrack: Array<PlaylistItem> = playlist.contents.map(
 			({ musicResponsiveListItemRenderer: ctx }) => {
 				const length = pb(
@@ -99,7 +126,7 @@ export async function get({ query }): Promise<PlaylistItem[]> {
 		// parsePlaylistContents(contents);
 		return {
 			statusCode: 200,
-			body: JSON.stringify({ parseTrack }),
+			body: JSON.stringify({ parseTrack, parseHeader }),
 		};
 	} catch (error) {
 		// output to netlify function log

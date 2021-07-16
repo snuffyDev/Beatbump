@@ -132,7 +132,7 @@
 					<span class="explicit"> E </span>
 				{/if}
 				<p class:hidden={data.type == "playlist"}>
-					by {artist}
+					{data.type == "playlist" ? `${data.metaData}` : `by ${artist}`}
 				</p>
 			</div>
 		</div>

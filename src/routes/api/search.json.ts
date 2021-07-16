@@ -1,4 +1,4 @@
-import { searchManager } from "$lib/stores/stores";
+import type { PlaylistSearch } from "$lib/types";
 const pb = (input, query, justOne = false) => {
 	const iterate = (x, y) => {
 		var r = [];
@@ -308,7 +308,7 @@ function parseSong(contents) {
 		let mixInfo =
 			d.menu.menuRenderer.items[0].menuNavigationItemRenderer
 				.navigationEndpoint;
-		let { videoId, playlistId, params } = mixInfo.watchEndpoint;
+		let { videoId = "", playlistId, params } = mixInfo.watchEndpoint;
 		let metaInfo = pb(flexColumns[1], "runs:text", true);
 
 		let length = metaInfo[metaInfo.length - 1];
@@ -364,14 +364,13 @@ function parsePlaylist(contents) {
 		let metaData = pb(flexColumns[1], "runs:text", true);
 		metaData = metaData.join("");
 
-		let watchPlaylistEndpoint =
-			d.menu.menuRenderer?.items[0]?.menuNavigationItemRenderer
-				.navigationEndpoint.watchPlaylistEndpoint;
-		let result = {
+		const result: PlaylistSearch = {
 			thumbnails: thumbnails,
 			browseId: browseId,
-			metaInfo: metaData,
-			endpoint: watchPlaylistEndpoint,
+			metaData: metaData,
+			playlistId:
+				d.menu.menuRenderer?.items[0]?.menuNavigationItemRenderer
+					.navigationEndpoint.watchPlaylistEndpoint.playlistId,
 			hash:
 				Math.random().toString(36).substring(2, 15) +
 				Math.random().toString(36).substring(2, 15),

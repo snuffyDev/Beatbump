@@ -10,3 +10,4 @@ node_modules
 /workers-site
 wrangler.toml
 .vscode/Component.code-snippets
+src/routes/api/backup
