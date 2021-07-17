@@ -7,8 +7,8 @@
 	import Nav from "$components/Nav/Nav.svelte";
 	import Sidebar from "$components/Sidebar/Sidebar.svelte";
 	import Player from "$components/Player/Player.svelte";
-	import "../app.css";
-	import "../global/stylesheet.scss";
+	// import "../app.css";
+	// import "../global/stylesheet.scss";
 	// import Wrapper from "$components/Wrapper/Wrapper.svelte";
 	onMount(() => {
 		iOS.init();
@@ -37,13 +37,13 @@
 
 <svelte:window bind:innerWidth={width} />
 <div class="body" style={`background-color: var(--${curTheme}-base)`}>
-	<nav class="nav" style={`background-color: var(--${curTheme}-top)`}>
-		<Nav {width} />
-	</nav>
-	{#if width > 640}
-		<Sidebar />
-	{/if}
 	{#if browser}
+		<nav class="nav" style={`background-color: var(--${curTheme}-top)`}>
+			<Nav {width} />
+		</nav>
+		{#if width > 640}
+			<Sidebar />
+		{/if}
 		<div class="wrapper" id="wrapper">
 			<slot />
 		</div>
@@ -56,6 +56,8 @@
 </div>
 
 <style lang="scss" global>
+	@import "../global/stylesheet.scss";
+	@import "../global/vars.css";
 	:root {
 		--ytm-bottom: #121018;
 		--ytm-base: #09090a;

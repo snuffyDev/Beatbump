@@ -7,7 +7,7 @@
 	import { getData } from "$lib/utils";
 	import { page } from "$app/stores";
 
-	import { parseArtistPage,  } from "$lib/js/artistUtils";
+	import { parseArtistPage } from "$lib/js/artistUtils";
 	import Icon from "$components/Icon/Icon.svelte";
 	import ListItem from "$components/ListItem/ListItem.svelte";
 	import CarouselItem from "$components/Carousel/CarouselItem.svelte";
@@ -223,7 +223,7 @@
 		display: flex;
 		place-items: center;
 		color: #09090a !important;
-		font-weight: 550;
+		font-weight: 500;
 		border: #09090a;
 		background: white !important;
 		margin-bottom: 0.8rem;

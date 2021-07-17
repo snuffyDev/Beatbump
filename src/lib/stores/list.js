@@ -26,7 +26,7 @@ export default {
 		const response = await getNext(0, "", videoId, playlistId, '');
 		const data = await response;
 		await getSrc(videoId);
-		continuation.push(data.continuation);
+		continuation.push(...data.continuation);
 		mix.push(...data.results);
 		list.set({ continuation, mix });
 	},
@@ -47,14 +47,28 @@ export default {
 		mix.splice(key + 1, 0, nextItem);
 		console.log(mix, nextItem)
 		list.set({ continuation, mix });
-	}, async getMore(autoId, itct, videoId, playlistId, ctoken) {
+
+
+	},
+	async startPlaylist(playlistId) {
+		const data = await fetch(`/api/getQueue.json?playlistId=${playlistId}`);
+		const response = await data.json();
+		mix = [...response];
+		await getSrc(mix[0].videoId);
+		list.set({ continuation, mix })
+
+		console.log(response);
+	},
+	async getMore(autoId, itct, videoId, playlistId, ctoken) {
 		const data = await getNext(autoId, itct, videoId, playlistId, ctoken);
+
 		mix.pop();
 		await getSrc(data.results[0].videoId);
+
 		filterSetting ? mix = [...mix, ...data.results].filter(
 			((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set())
 		) : mix = [...mix, ...data.results];
-		list.set({ continuation, mix });
 
+		list.set({ continuation, mix });
 	}
 }

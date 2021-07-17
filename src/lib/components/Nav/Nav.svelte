@@ -16,7 +16,9 @@
 	$: curTheme = $theme;
 	let isSettings = true;
 	let settingsHidden = isSettings ? true : false;
-	let setTheme = $theme;
+	let setTheme = localStorage.getItem("theme")
+		? localStorage.getItem("theme")
+		: "";
 	let setFilter = $filterAutoPlay;
 	// onMount(() => {
 	// 	if (!$theme) {
@@ -34,6 +36,7 @@
 	$: console.log($page.path);
 
 	let themes = [{ name: "dark" }, { name: "dim" }, { name: "ytm" }];
+	$: console.log(setTheme);
 	// $: theme.set($theme)
 </script>
 
@@ -87,7 +90,8 @@
 								theme.set(setTheme);
 							}}>
 							{#each themes as theme}
-								<option value={theme.name}>{theme.name}</option>
+								<option value={theme.name} selected={setTheme}
+									>{theme.name}</option>
 							{/each}
 						</select>
 					</div>
@@ -259,7 +263,8 @@
 			flex-wrap: nowrap;
 			align-items: stretch;
 			padding: 0.2rem 0.4rem;
-			border-bottom: 0.0143rem #63636352 solid;
+			margin-bottom: 0.5rem;
+			// border-bottom: 0.0143rem #63636352 solid;
 			// box-shadow: -0.125rem 0.3rem 0.25rem 0.125rem #63636352;
 			// justify-content: space-around;
 			// margin-bottom: 0.8rem;

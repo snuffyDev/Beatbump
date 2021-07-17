@@ -53,8 +53,13 @@ export async function get({ query }): Promise<EndpointOutput> {
 						{
 							tabRenderer: {
 								content: {
+									sectionListRenderer,
 									sectionListRenderer: {
-										contents: [{ musicPlaylistShelfRenderer }],
+										contents: [
+											{
+												musicPlaylistShelfRenderer: { contents },
+											},
+										],
 									},
 								},
 							},
@@ -70,13 +75,14 @@ export async function get({ query }): Promise<EndpointOutput> {
 		// );
 		const playlist: {
 			contents: [];
-			continuations: [];
+			continuations: unknown;
 			playlistId: string;
-		} = musicPlaylistShelfRenderer;
-		const playlistId = playlist.playlistId;
+		} = await sectionListRenderer;
+		const playlistId = playlist?.playlistId;
+
 		// console.log(playlist)
-		const continuations: NextContinuationData =
-			playlist.continuations[0].nextContinuationData;
+		const continuations: NextContinuationData = await playlist?.continuations[0]
+			.nextContinuationData;
 		//  pb(
 		// 	playlist,
 		// 	"continuations:0:nextContinuationData",
@@ -85,13 +91,13 @@ export async function get({ query }): Promise<EndpointOutput> {
 		const parseHeader = Array(musicDetailHeaderRenderer).map(
 			({ description, subtitle, thumbnail, secondSubtitle, title }) => {
 				// const description = description.runs[0].text
-				const subtitles: string = pb(subtitle, "runs:text", true);
+				const subtitles: string = pb(subtitle, "runs:text", false);
 				// const thumbnails = pb(
 				// 	d,
 				// 	"thumbnail:croppedSquareThumbnailRenderer:thumbnail:thumbnails",
 				// 	false
 				// );
-				secondSubtitle = pb(secondSubtitle, "runs:text", true);
+				secondSubtitle = pb(secondSubtitle, "runs:text", false);
 				// const title = pb(d, "title:runs:0:text", true);
 
 				return {
@@ -101,20 +107,25 @@ export async function get({ query }): Promise<EndpointOutput> {
 						thumbnail["croppedSquareThumbnailRenderer"]["thumbnail"][
 							"thumbnails"
 						],
+					playlistId,
 					secondSubtitle,
 					title: title.runs[0].text,
 				};
 			}
 		)[0];
-
-		const parseTrack: Array<PlaylistItem> = playlist.contents.map(
-			({ musicResponsiveListItemRenderer: ctx }) => {
+		// const [contents] = playlist;
+		const parseTrack: Array<PlaylistItem> = contents.map(
+			({ musicResponsiveListItemRenderer }) => {
 				const length = pb(
-					ctx,
+					musicResponsiveListItemRenderer,
 					"fixedColumns:0:musicResponsiveListItemFixedColumnRenderer:text:runs:0:text",
 					true
 				);
-				const flexColumns = pb(ctx, "flexColumns");
+				const flexColumns = pb(
+					musicResponsiveListItemRenderer,
+					"flexColumns",
+					true
+				);
 
 				const artistEndpoint = pb(
 					flexColumns,
@@ -131,13 +142,14 @@ export async function get({ query }): Promise<EndpointOutput> {
 					playlistId,
 				} = titleBody.navigationEndpoint.watchEndpoint;
 				const title = titleBody.text;
-
+				// console.log(artistEndpoint);
 				const artist: Artist = {
 					name: artistEndpoint.text,
-					browseId: artistEndpoint.navigationEndpoint.browseEndpoint.browseId,
+					browseId:
+						artistEndpoint?.navigationEndpoint?.browseEndpoint?.browseId,
 				};
 				const thumbnail: Thumbnail = pb(
-					ctx,
+					musicResponsiveListItemRenderer,
 					"thumbnail:musicThumbnailRenderer:thumbnail:thumbnails",
 					true
 				);

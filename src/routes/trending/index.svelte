@@ -56,7 +56,8 @@
 </script>
 
 <svelte:head>
-	<title>{$currentTitle == "" ? "Home" : $currentTitle} - Beatbump</title>
+	<title
+		>{$currentTitle === undefined || null ? "Trending" : $currentTitle} - Beatbump</title>
 </svelte:head>
 {#await carouselItems}
 	<Loading />

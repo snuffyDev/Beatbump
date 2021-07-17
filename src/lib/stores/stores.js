@@ -32,7 +32,9 @@ export const currentMix = writable({
 		{ id: '', videoId: '', thumbnail: '', artist: '', title: '', length: '' }
 	]
 })
-export const key = writable(0)
+export const isPagePlaying = writable(''
+)
+export const key = writable(undefined)
 export const iOS = _verifyUserAgent()
 export function updateSource() {
 	const { subscribe, set, update } = writable(undefined)

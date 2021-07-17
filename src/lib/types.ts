@@ -29,7 +29,7 @@ export interface TitleEndpoint {
 }
 export interface Artist {
 	browseId: string;
-	name: string;
+	artist: string;
 }
 export interface Thumbnail {
 	url: string;

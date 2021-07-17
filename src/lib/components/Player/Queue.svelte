@@ -10,12 +10,13 @@
 	import { currentTitle } from "$stores/stores";
 	import { getSrc } from "$lib/utils";
 	import { clickOutside } from "$lib/js/clickOutside";
+	import list from "$lib/stores/list";
 
 	export let autoId;
 	export let mixList = [];
 	export let show;
 
-	$: list = mixList;
+	$: mixList = $list.mix;
 
 	let songList;
 	let items = [];
@@ -61,7 +62,7 @@
 		}}
 		transition:fly={{ y: 0, duration: 125, easing: cubicInOut }}>
 		<div class="list">
-			{#if list.length > 1}
+			{#if mixList.length > 1}
 				<ul class="list-m" id="list" bind:this={songList}>
 					{#each mixList as item, index}
 						<li
@@ -184,6 +185,7 @@
 	}
 	.subtitle {
 		/* text-transform: uppercase; */
+
 		font-size: 1.2rem;
 		font-weight: 200;
 		line-height: 1.1;
@@ -243,10 +245,13 @@
 	}
 
 	h1 {
+		font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+			sans-serif;
 		text-transform: capitalize;
 		text-align: center;
 		font-size: 4rem;
-		font-weight: 300;
+		letter-spacing: -0.02em;
+		font-weight: 500;
 		line-height: 1.1;
 		margin: 4rem auto;
 		max-width: 14rem;

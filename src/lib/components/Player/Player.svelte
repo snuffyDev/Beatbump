@@ -13,22 +13,19 @@
 	import * as utils from "$lib/utils";
 	import list from "$lib/stores/list";
 
-	export let title;
-	export let nowPlaying;
-
-	const player = new Audio();
-	$: player.autoplay = true;
+	const player: HTMLAudioElement = new Audio();
+	player.autoplay = true;
 
 	$: player.src = $updateTrack;
-	$: nowPlaying = nowPlaying;
 	$: isWebkit = $iOS;
-	// $: title = mixList[autoId].title;
-	$: mixList = $list.mix;
+	let title;
+
+	$: currentTitle.set(title);
+
 	// $: list = $currentMix;
-	let autoId = $key;
+	$: autoId = $key;
 
 	$: time = player.currentTime;
-	// $: currentTitle.set(title);
 	$: duration = 1000;
 	let remainingTime = 55;
 
@@ -44,18 +41,17 @@
 	let showing;
 	$: toggle = menuShow ? true : false;
 	$: listShow = showing ? true : false;
-	$: hasList = mixList.length > 1;
-
+	$: hasList = $list.mix.length > 1;
+	$: mixList = $list.mix;
 	// log any and all updates to the list for testing
-	// $: console.log(mixList)
-
+	// $: console.log($list.mix)
+	// $: console.log(mixList, $list.mix[autoId]?.videoId);
 	const playing = () => player.play();
 	const paused = () => player.pause();
 	function pause() {
 		paused();
 	}
 	function startPlay() {
-		console.log(mixList);
 		playing();
 	}
 	// $: console.log(volume)
@@ -63,6 +59,7 @@
 
 	player.addEventListener("loadedmetadata", () => {
 		isPlaying = true;
+
 		startPlay();
 	});
 
@@ -102,7 +99,7 @@
 		startPlay();
 	});
 	const getNext = async () => {
-		if (autoId == mixList.length - 1) {
+		if (autoId == $list.mix.length - 1) {
 			list.getMore(
 				autoId,
 				$list.mix[autoId].itct,
@@ -120,13 +117,14 @@
 			autoId++; // console.log(autoId)
 			key.set(autoId);
 
-			player.src = utils.getSrc(mixList[autoId].videoId).then((url) => url);
+			player.src = utils.getSrc($list.mix[autoId].videoId).then((url) => url);
 
-			// currentTitle.set(mixList[autoId].title);
+			// currentTitle.set($list.mix[autoId].title);
 			once = false;
 		}
 		once = false;
 	};
+	// $: console.log($key, autoId);
 	/* TODO: implement this eventually.
     format seconds to MM:SS for UI
     */
@@ -184,7 +182,6 @@
 		// console.log(showing)
 	}}
 	bind:show={listShow}
-	bind:mixList
 	bind:autoId={$key} />
 
 <div class="f-container">
@@ -214,7 +211,7 @@
 						} else {
 							autoId--;
 							key.set(autoId);
-							await getSrc(mixList[autoId].videoId);
+							await getSrc($list.mix[autoId].videoId);
 						}
 					}}>
 					<svelte:component this={Icon} name="skip-back" size="2em" />
@@ -226,6 +223,49 @@
 							startPlay();
 						} else {
 							pause();
+						}
+						if ("mediaSession" in navigator) {
+							navigator.mediaSession.metadata = new MediaMetadata({
+								title: title,
+								artist: $list.mix[autoId].artistInfo.artist,
+								artwork: [
+									{
+										src: $list.mix[autoId].thumbnail,
+										sizes: "96x96",
+										type: "image/jpeg",
+									},
+									{
+										src: $list.mix[autoId].thumbnail,
+										sizes: "128x128",
+										type: "image/jpeg",
+									},
+									{
+										src: $list.mix[autoId].thumbnail,
+										sizes: "192x192",
+										type: "image/jpeg",
+									},
+									{
+										src: $list.mix[autoId].thumbnail,
+										sizes: "256x256",
+										type: "image/jpeg",
+									},
+									{
+										src: $list.mix[autoId].thumbnail,
+										sizes: "384x384",
+										type: "image/jpeg",
+									},
+									{
+										src: $list.mix[autoId].thumbnail,
+										sizes: "512x512",
+										type: "image/jpeg",
+									},
+								],
+							});
+							navigator.mediaSession.setActionHandler("play", startPlay);
+							navigator.mediaSession.setActionHandler("pause", pause);
+							navigator.mediaSession.setActionHandler("nexttrack", () => {
+								time = player.duration;
+							});
 						}
 					}}>
 					{#if !isPlaying}
@@ -239,15 +279,20 @@
 					on:click={async () => {
 						let gettingNext = false;
 						if (!gettingNext) {
-							if (autoId == mixList.length - 1) {
+							if (autoId == $list.mix.length - 1) {
 								gettingNext = true;
 								await getNext();
 								gettingNext = false;
 							} else {
 								gettingNext = true;
 								autoId++;
+								console.log(
+									mixList[autoId].videoId,
+									$list.mix,
+									$list.mix[autoId]
+								);
+								await getSrc(mixList[autoId]?.videoId);
 								key.set(autoId);
-								await getSrc(mixList[autoId].videoId);
 								gettingNext = false;
 							}
 						}
@@ -302,7 +347,7 @@
 										left: 0,
 									});
 
-									goto(`/artist?id=${mixList[autoId].artistId}`, {
+									goto(`/artist?id=${$list.mix[autoId].artistId}`, {
 										replaceState: true,
 									});
 								}}>

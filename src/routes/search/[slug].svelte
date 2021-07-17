@@ -42,7 +42,7 @@
 	let songTitle = $page.params.slug;
 	let ctoken = continuation?.continuation;
 	let itct = continuation?.clickTrackingParams;
-	console.log(contents);
+	// console.log(contents);
 	async function paginate() {
 		return await fetch(
 			`/api/search.json?q=` +
@@ -68,9 +68,9 @@
 
 <svelte:head>
 	<title
-		>{$currentTitle !== ""
-			? `${$currentTitle} - `
-			: "Search - "}Beatbump</title>
+		>{$currentTitle === undefined
+			? "Search - "
+			: `${$currentTitle} - `}Beatbump</title>
 </svelte:head>
 <!-- {JSON.stringify(results)} -->
 {#if error}

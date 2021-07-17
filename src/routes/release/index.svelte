@@ -1,68 +1,71 @@
 <script context="module">
 	export async function load({ query, page, fetch }) {
-		const browseId = page.query.get('id') || ''
-		const pt = page.query.get('type') || ''
+		const browseId = page.query.get("id") || "";
+		const pt = page.query.get("type") || "";
 		const response = await fetch(
 			`/api/main.json?q=&endpoint=browse${
-				browseId ? `&browseId=${browseId}` : ''
-			}${pt ? `&pt=${pt}` : ''}`
-		)
-		const data = await response.json()
+				browseId ? `&browseId=${browseId}` : ""
+			}${pt ? `&pt=${pt}` : ""}`
+		);
+		const data = await response.json();
 		if (!response.ok) {
 			return {
 				props: {
 					status: response.statusCode,
-					msg: response.statusText
-				}
-			}
+					msg: response.statusText,
+				},
+			};
 		}
 
 		return {
 			props: {
-				data: data
+				data: data,
+				id: browseId,
 			},
 			maxage: 3600,
-			status: 200
-		}
+			status: 200,
+		};
 	}
 </script>
 
 <script lang="ts">
-	import Loading from '$components/Loading/Loading.svelte'
-	import { page } from '$app/stores'
-	import { getData } from '$lib/utils'
-	import type { mixList } from '$lib/types'
-	import { onMount } from 'svelte'
-	import * as utils from '$lib/utils'
-	import Icon from '$components/Icon/Icon.svelte'
-	import ListItem from '$components/ListItem/ListItem.svelte'
-	import { currentMix, currentTitle, currentTrack, key } from '$stores/stores'
-	import lazy from '$lib/lazy'
-	import { parsePageContents } from '$lib/js/releaseUtils'
-	let browseId = $page.query.get('id')
+	import Loading from "$components/Loading/Loading.svelte";
+	import { page } from "$app/stores";
+	import { getData } from "$lib/utils";
+	import type { mixList } from "$lib/types";
+	import { onMount } from "svelte";
+	import * as utils from "$lib/utils";
+	import Icon from "$components/Icon/Icon.svelte";
+	import ListItem from "$components/ListItem/ListItem.svelte";
+	import { currentMix, currentTitle, currentTrack, key } from "$stores/stores";
+	import lazy from "$lib/lazy";
+	import { parsePageContents } from "$lib/js/releaseUtils";
+	let browseId = $page.query.get("id");
 	// console.log(browseId)
-	let pageType = $page.query.get('type')
-
-	export let data
-	let loading = false
-	let explicit
-	let type
-	let playlistId = ''
+	let pageType = $page.query.get("type");
+	import { isPagePlaying } from "$stores/stores";
+	import list from "$lib/stores/list";
+	export let data;
+	export let id;
+	let loading = false;
+	let explicit;
+	let type;
+	let playlistId = "";
 	onMount(async () => {
-		loading = true
-	})
-	const promise = parsePageContents(data)
-	let { details, items } = promise
-	console.log(promise)
+		loading = true;
+	});
+	const promise = parsePageContents(data);
+	let { details, items } = promise;
+	console.log(promise);
 	const playRadio = async () => {
 		let mix = await utils
-			.getNext(0, '', '', details.radioAutomixPlaylistId)
+			.getNext(0, "", "", details.radioAutomixPlaylistId)
 			.then((data) => {
-				let tempList = []
+				let tempList = [];
 				// console.log(data)
 				// let rList = data.results
 				// console.log(rList)
-				let rList = data.results
+				let rList = data.results;
 
 				radio = [
 					...rList.map((d, i) => ({
@@ -76,35 +79,46 @@
 						title: d.title,
 						artist: d.artistInfo.artist,
 						thumbnail: d.thumbnail,
-						length: d.length
-					}))
-				]
-				return radio
-			})
+						length: d.length,
+					})),
+				];
+				return radio;
+			});
 		// console.log(radio)
 		const play = await utils
 			.getSrc(radio[0].videoId)
-			.then((p) => console.log(p))
+			.then((p) => console.log(p));
 		// @ts-ignore
 		currentMix.set({
-			list: [...radio]
-		})
-		key.set(0)
+			list: [...radio],
+		});
+		key.set(0);
 		// currentTrack.set({
 		// 	id: 0,
 		// 	videoId: id,
 		// 	title: radio[0].title,
 		// 	thumbnail: thumbnail
 		// })
-		currentTitle.set(radio[0].title)
+		currentTitle.set(radio[0].title);
+	};
+
+	$: hasList = $list.mix.length > 0;
+	$: isThisPage = false;
+
+	if (hasList && $isPagePlaying !== id) {
+		isThisPage = false;
+	} else if (hasList && $isPagePlaying == id) {
+		isThisPage = true;
+	} else {
+		isThisPage = false;
 	}
 
-	let radio: mixList
-	radio = {}
+	let radio: mixList;
+	radio = {};
 </script>
 
 <svelte:head>
-	<title>{$currentTitle == '' ? 'Album' : $currentTitle} - Beatbump</title>
+	<title>{$currentTitle == "" ? "Album" : $currentTitle} - Beatbump</title>
 </svelte:head>
 
 {#await promise then _}
@@ -126,8 +140,8 @@
 							use:lazy={{
 								src: details.thumbnailDetails.thumbnails[1].url.replace(
 									/=(w(\d+))-(h(\d+))/g,
-									'=w256-h256'
-								)
+									"=w256-h256"
+								),
 							}}
 							alt="album" />
 					</div>
@@ -149,7 +163,7 @@
 						<button
 							class="playAlbum"
 							on:click={async () => {
-								playRadio()
+								playRadio();
 							}}
 							><Icon name="play" size="1.5em" />
 							Album Radio</button>
@@ -164,7 +178,12 @@
 		</div>
 		<ul>
 			{#each items as item, index}
-				<ListItem {item} {index} />
+				<ListItem
+					on:pagePlaying={() => {
+						isPagePlaying.set(id);
+					}}
+					{item}
+					{index} />
 			{/each}
 		</ul>
 	</main>
@@ -190,7 +209,7 @@
 		/* margin-left: auto; */
 	}
 	button {
-		font-family: 'Commissioner', sans-serif;
+		font-family: "Commissioner", sans-serif;
 
 		flex-wrap: nowrap;
 		display: flex;
