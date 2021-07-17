@@ -24,10 +24,11 @@
 	// 		setTheme = $theme
 	// 	}
 	// })
-	const naviBack = (home = "/trending") => {
-		const ref = document.referrer;
-		goto(ref.length > 0 ? ref : home);
-	};
+	// const naviBack = (home = "/trending") => {
+	// 	const ref = document.referrer;
+	// 	history.back();
+	// 	goto(ref.length > 0 ? ref : home);
+	// };
 	let themeSet = $theme;
 	$: console.log($page.path);
 
@@ -36,20 +37,21 @@
 </script>
 
 <div class="logo">
-	{#if $page.path !== "/trending"}
+	<!-- {#if $page.path !== "/trending"}
 		<div class="back-button" transition:fade on:click={() => naviBack}>
 			<Icon name="chevron-left" size="1.5em" />
 		</div>
-	{:else}
+	{:else} --><a
+		href="/trending">
 		<img
 			src="/logo-header.png"
 			width="2.5rem"
 			height="0.5rem"
 			transition:fade
 			alt="logo"
-			title="Beatbump Home"
-			on:click={() => goto("/")} />
-	{/if}
+			title="Beatbump Home" />
+	</a>
+	<!-- {/if} -->
 </div>
 {#if width > 640}
 	<div

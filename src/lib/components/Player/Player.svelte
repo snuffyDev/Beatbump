@@ -324,6 +324,12 @@
 							<div
 								class="dd-item"
 								on:click={() => {
+									scrollTo({
+										behavior: "smooth",
+										top: 0,
+										left: 0,
+									});
+
 									goto(`/artist?id=${mixList[autoId].artistId}`, {
 										replaceState: true,
 									});

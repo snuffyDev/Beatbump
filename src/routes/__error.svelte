@@ -5,7 +5,7 @@
 	const redirect = () => {
 		redir = redir - 1;
 		if (redir <= 0) {
-			goto("/", { replaceState: true });
+			goto("/");
 		} else {
 			setTimeout(redirect, 1000);
 		}
@@ -14,7 +14,9 @@
 </script>
 
 <main>
-	<div class="logo"><img src="/logo-header.png" alt="logo" /></div>
+	<a href="/" class="logolink">
+		<div class="logo"><img src="/logo-header.png" alt="logo" /></div>
+</a>
 	<h1>Uh-Oh!</h1>
 	<h5>Looks like you hit a dead end!</h5>
 
@@ -23,6 +25,9 @@
 </main>
 
 <style lang="scss">
+	.logolink {
+
+	}
 	main {
 		text-align: center;
 

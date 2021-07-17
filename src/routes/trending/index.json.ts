@@ -1,6 +1,7 @@
 import { pb } from "$lib/utils";
+import type { EndpointOutput } from "@sveltejs/kit";
 
-export async function get({ query }) {
+export async function get({ query }): Promise<EndpointOutput> {
 	const endpoint = query.get("q") || "";
 	const browseId = "FEmusic_explore";
 	let carouselItems = [];
@@ -191,9 +192,9 @@ export async function get({ query }) {
 						};
 						// console.log(result, 'musicResponse')
 						break;
-					case "musicNavigationButtonRenderer":
-						// console.log('nav')
-						break;
+					// case "musicNavigationButtonRenderer":
+					// 	// console.log('nav')
+					// 	break;
 					default:
 						break;
 				}
@@ -204,7 +205,6 @@ export async function get({ query }) {
 				results,
 			};
 		});
-		let newList = contents[1].musicCarouselShelfRenderer;
 		if (carouselItems.length > 0) {
 			return {
 				status: 200,

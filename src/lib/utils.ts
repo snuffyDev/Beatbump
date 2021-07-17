@@ -18,7 +18,7 @@ export const getData = (
 			${filter ? `&params=${filter}` : ""}${endpoint ? `&endpoint=${endpoint}` : ""}
 			${browseId ? `&browseId=${browseId}` : ""}
 			${pt ? `&pt=${pt}` : ""}
-			${ctoken ? `&ctoken=${ctoken}` : ""} 
+			${ctoken ? `&ctoken=${ctoken}` : ""}
 			${index ? `&index=${index}` : ""}`,
 
 		{
@@ -157,6 +157,8 @@ export const getSrc = async (videoId?: string, playlistId?: string) => {
 	return parsedURL;
 };
 // parse array object input for child
+
+
 
 export const pb = (input: any, query: string, justOne = false) => {
 	const iterate = (x: string | any[], y: string | number) => {

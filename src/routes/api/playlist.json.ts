@@ -47,19 +47,21 @@ export async function get({ query }): Promise<EndpointOutput> {
 		}
 		const {
 			header: { musicDetailHeaderRenderer },
-			contents,
-		} = await response.json();
-		const playlist = pb(
-			contents,
-			"singleColumnBrowseResultsRenderer:tabs:0:tabRenderer:content:sectionListRenderer:contents:0:musicPlaylistShelfRenderer",
-			true
-		);
+			contents: {singleColumnBrowseResultsRenderer: {tabs: [{tabRenderer:{content:{ sectionListRenderer:{contents:[{musicPlaylistShelfRenderer}]}}}}]}}} = await response.json();
+		// const playlist = pb(
+		// 	contents,
+		// 	"singleColumnBrowseResultsRenderer:tabs:0:tabRenderer:content:sectionListRenderer:contents:0:musicPlaylistShelfRenderer",
+		// 	true
+		// );
+		const playlist: {contents: [], continuations: [], playlistId: string} = musicPlaylistShelfRenderer
 		const playlistId = playlist.playlistId;
-		const continuations: NextContinuationData = pb(
-			playlist,
-			"continuations:0:nextContinuationData",
-			false
-		);
+		console.log(playlist)
+		const continuations: NextContinuationData = playlist.continuations[0].nextContinuationData;
+		//  pb(
+		// 	playlist,
+		// 	"continuations:0:nextContinuationData",
+		// 	false
+		// );
 		const parseHeader = Array(musicDetailHeaderRenderer).map((d) => {
 			const description = pb(d, "description:runs:0:text", true);
 			const subtitles: string = pb(d, "subtitle:runs:text", true);

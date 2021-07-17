@@ -134,9 +134,14 @@
 							class="dd-item"
 							on:click={() => {
 								if (item?.subtitle[0]?.navigationEndpoint) {
+									scrollTo({
+										behavior: "smooth",
+										top: 0,
+										left: 0,
+									});
+
 									goto(
-										`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`,
-										{ replaceState: true }
+										`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
 									);
 								}
 							}}
@@ -185,9 +190,14 @@
 							class="dd-item"
 							on:click={() => {
 								if (item?.subtitle[0]?.navigationEndpoint) {
+									scrollTo({
+										behavior: "smooth",
+										top: 0,
+										left: 0,
+									});
+
 									goto(
-										`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`,
-										{ replaceState: true }
+										`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
 									);
 								}
 							}}

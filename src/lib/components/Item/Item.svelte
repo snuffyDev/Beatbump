@@ -131,7 +131,7 @@
 				{#if explicit}
 					<span class="explicit"> E </span>
 				{/if}
-				<p class:hidden={data.type == "playlist"}>
+				<p>
 					{data.type == "playlist" ? `${data.metaData}` : `by ${artist}`}
 				</p>
 			</div>
@@ -143,6 +143,7 @@
 						class:hidden={data.type == "playlist"}
 						class="dd-item"
 						on:click={() => {
+							scrollTo({ top: 0, left: 0, behavior: "smooth" });
 							goto(`/artist?id=${data.artistInfo?.browseId}`, {
 								replaceState: true,
 							});
@@ -154,7 +155,8 @@
 					<div
 						class="dd-item"
 						on:click={() => {
-							goto(`/playlist?list=${data?.browseId}`, { replaceState: true });
+							scrollTo({ top: 0, left: 0, behavior: "smooth" });
+							goto(`/playlist?list=${data?.browseId}`);
 						}}
 						class:hidden={data.type !== "playlist"}>
 						<Icon name="list" size="1.5em" />

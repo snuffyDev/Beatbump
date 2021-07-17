@@ -35,13 +35,12 @@
 							console.log();
 							let id = item.endpoint.browseId;
 							let type = item.endpoint.pageType;
-
+							scrollTo({ top: 0, left: 0, behavior: "smooth" });
 							goto(
 								"/release?type=" +
 									encodeURIComponent(type) +
 									"&id=" +
-									encodeURIComponent(id),
-								{ replaceState: true }
+									encodeURIComponent(id)
 							);
 						}}>
 						<!-- svelte-ignore a11y-missing-attribute -->

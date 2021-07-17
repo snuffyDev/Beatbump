@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getData } from "$lib/utils";
 	import { page } from "$app/stores";
-
+	import "../../../global/vars.css";
 	import { onMount } from "svelte";
 	export let headerContent;
 	export let items = [];
@@ -77,8 +77,9 @@
 	</div>
 </div>
 
+<!--  -->
 <style lang="scss">
-	@import "../../../global/vars.css";
+	// @import "../../../global/vars.css";
 	.artist-body {
 		padding: 0 1rem;
 	}

@@ -1,6 +1,6 @@
 <script>
-	import "../global/stylesheet.scss";
-	import "../app.css";
+	// import "../app.css";
+	// import "../global/stylesheet.scss";
 	import { browser } from "$app/env";
 	import { fade, scale } from "svelte/transition";
 	import { onMount } from "svelte";
@@ -13,13 +13,14 @@
 	onMount(() => {
 		iOS.init();
 		const getTheme = () => {
-			console.log("themeswitch");
+			// console.log("themeswitch");
 			let ls = localStorage.getItem("theme");
-			if (ls) {
-				theme.init(ls);
-			} else {
-				theme.init("dark");
-			}
+			ls ? theme.init(ls) : theme.init("dark");
+			// if (ls) {
+			// 	theme.init(ls);
+			// } else {
+			// 	theme.init("dark");
+			// }
 		};
 		getTheme();
 		return;
@@ -52,6 +53,9 @@
 </div>
 
 <style lang="scss" global>
+	@import "../app.css";
+	// @import "../global/vars";
+	@import "../global/stylesheet";
 	:root {
 		--ytm-bottom: #121018;
 		--ytm-base: #09090a;

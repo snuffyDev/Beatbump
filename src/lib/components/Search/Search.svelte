@@ -43,7 +43,7 @@
 			left: 0,
 		});
 
-		goto(url, { replaceState: true });
+		goto(url);
 	}
 </script>
 
