@@ -11,6 +11,7 @@
 	import Icon from "$components/Icon/Icon.svelte";
 	import { goto } from "$app/navigation";
 	import { addToQueue } from "$lib/actions/dropdown";
+	import list from "$stores/list";
 	// import { addToQueue } from '$lib/utils'
 
 	let ctoken = "";
@@ -27,7 +28,7 @@
 	let clicked;
 	let artist;
 	let hidden = clicked ? true : false;
-	$: loading = false;
+	let loading = false;
 	let id = $key;
 	onMount(() => {
 		itemHandler();
@@ -53,49 +54,61 @@
 	// console.log(type)
 
 	const clickHandler = async () => {
-		loading = true;
-
-		videoId = data.videoId ? data.videoId : "";
-		let radio;
-		playlistId = data.playlistId ? data.playlistId : data.shuffle.playlistId;
-		if (data.type == "playlist") {
-			radio = await utils
-				.getNext(0, "", videoId, playlistId, ctoken)
-				.catch((err) => console.log(`error:` + err));
-		} else {
-			radio = await utils
-				.getNext(0, "", videoId, playlistId, ctoken)
-				.catch((err) => console.log(`error:` + err));
+		try {
+			loading = true;
+			videoId = data.videoId ? data.videoId : "";
+			playlistId = data.playlistId ? data.playlistId : data.shuffle.playlistId;
+			await list.initList(videoId, playlistId);
+			key.set(0);
+			console.log($list.mix);
+			currentTrack.set({ ...$list.mix[0] });
+			loading = false;
+			return;
+		} catch (error) {
+			console.log(error);
+			return;
 		}
-		videoId = radio.results[0].videoId;
-		// console.log(radio, `radio`)
-		await utils.getSrc(videoId);
-		let thumbnail = radio.results[0].thumbnail;
-		currentMix.set({
-			videoId: `${videoId}`,
-			playlistId: `${playlistId}`,
-			list: [
-				...radio.results.map((d, i) => ({
-					autoMixList: d.autoMixList,
-					continuation: radio.continuation,
-					artistId: d.artistInfo.browseId,
-					itct: radio.itct,
-					id: d.index,
-					videoId: d.videoId,
-					title: d.title,
-					artist: d.artistInfo.artist,
-					thumbnail: d.thumbnail,
-					length: d.length,
-				})),
-			],
-		});
-		currentTitle.set(title);
-
-		currentTrack.set({ ...radio[0] });
-		key.set(0);
-
-		loading = false;
 	};
+
+	// 	if (data.type == "playlist") {
+	// 		radio = await utils
+	// 			.getNext(0, "", videoId, playlistId, ctoken)
+	// 			.catch((err) => console.log(`error:` + err));
+	// 	} else {
+	// 		radio = await utils
+	// 			.getNext(0, "", videoId, playlistId, ctoken)
+	// 			.catch((err) => console.log(`error:` + err));
+	// 	}
+	// 	videoId = radio.results[0].videoId;
+	// 	// console.log(radio, `radio`)
+	// 	await utils.getSrc(videoId);
+	// 	let thumbnail = radio.results[0].thumbnail;
+	// 	currentMix.set({
+	// 		videoId: `${videoId}`,
+	// 		playlistId: `${playlistId}`,
+	// 		list: [
+	// 			...radio.results.map((d, i) => ({
+	// 				autoMixList: d.autoMixList,
+	// 				continuation: radio.continuation,
+	// 				artistId: d.artistInfo.browseId,
+	// 				itct: radio.itct,
+	// 				id: d.index,
+	// 				videoId: d.videoId,
+	// 				title: d.title,
+	// 				artist: d.artistInfo.artist,
+	// 				thumbnail: d.thumbnail,
+	// 				length: d.length,
+	// 			})),
+	// 		],
+	// 	});
+	// 	currentTitle.set(title);
+
+	// 	currentTrack.set({ ...radio[0] });
+	// 	key.set(0);
+
+	// 	loading = false;
+	// };
+
 	let mixList = $currentMix.list;
 	let showing;
 	$: toggle = showing ? true : false;

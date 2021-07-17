@@ -60,7 +60,7 @@ select {
 	}
 }
 
-input:not([type="range"]) {
+input:not([type="range"]):not([type="checkbox"]) {
 	appearance: none;
 	background: transparent;
 	border: none;
@@ -99,7 +99,7 @@ input[type="search"]::-webkit-search-results-decoration {
 		transition: all cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s;
 	}
 }
-input :not([type="range"]) {
+input :not([type="range"]) :not([type="checkbox"]) {
 	border: 0.0625rem solid rgba(170, 170, 170, 0.219);
 	font-family: inherit;
 	width: auto;

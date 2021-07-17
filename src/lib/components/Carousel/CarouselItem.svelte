@@ -10,6 +10,7 @@
 
 	import { addToQueue, getSrc } from "$lib/utils";
 	import type { SearchResult } from "$lib/types";
+	import list from "$lib/stores/list";
 
 	export let section;
 	export let index;
@@ -49,40 +50,16 @@
 			class="clickable"
 			on:click={async () => {
 				if (type == "trending" && !loading) {
-					trendingHandler(item).then(() => {
-						loading = !loading;
-						key.set(0);
-					});
-					loading = !loading;
+					list.initList(item.videoId, item.playlistId);
+					currentTrack.set({ ...$list.mix[0] });
+					loading = false;
 				} else if (type == "artist" && !loading) {
-					const data = await fetch(
-						`/api/artistNext.json?playlistId=${item.playlistId}&videoId=${item.videoId}`
-					).then((data) => data.json());
-					const res = await data;
-					await getSrc(res[0].videoId).then((url) => url);
-					currentMix.set({
-						videoId: `${res.videoId}`,
-						playlistId: `${res.playlistId}`,
-						continuation: "",
-						list: [
-							...res.map((d, i) => ({
-								continuation: "",
-								itct: d.itct,
-								autoMixList: d.autoMixList,
-								artistId: d.artistInfo.browseId,
-								id: d.index,
-								videoId: d.videoId,
-								title: d.title,
-								artist: d.artistInfo.artist,
-								thumbnail: d.thumbnail,
-								length: d.length,
-							})),
-						],
-					});
-					currentTrack.set({ ...res[0] });
-					currentTitle.set(res[0].title);
+					list.initArtistList(item.videoId, item.playlistId);
+					await getSrc(item.videoId);
+					currentTrack.set({ ...$list.mix[0] });
+					// currentTitle.set(res[0].title);
 					key.set(0);
-					console.log(data);
+					// console.log(data);
 					loading = false;
 				}
 			}}>
@@ -157,23 +134,7 @@
 							class="dd-item"
 							on:click={async () => {
 								if (index !== $key) {
-									let mixList = $currentMix.list;
-									let length = await addToQueue(item.videoId);
-									let next = {
-										continuation: mixList[0].continuation,
-										autoMixList: item.playlistId,
-										artistId:
-											item.subtitle[0].navigationEndpoint.browseEndpoint
-												.browseId,
-										id: $key + 1,
-										videoId: item.videoId,
-										title: item.title,
-										artist: item.subtitle[0].text,
-										thumbnail: item.thumbnails[0].url,
-										length: length,
-									};
-									mixList.splice($key + 1, 0, next);
-									console.log(mixList);
+									list.addNext(item, $key);
 								}
 							}}>
 							<Icon name="queue" size="1.5rem" />
@@ -213,23 +174,7 @@
 							class="dd-item"
 							on:click={async () => {
 								if (index !== $key) {
-									let mixList = $currentMix.list;
-									let length = await addToQueue(item.videoId);
-									let next = {
-										continuation: mixList[0].continuation,
-										autoMixList: item.playlistId,
-										artistId:
-											item.subtitle[0].navigationEndpoint.browseEndpoint
-												.browseId,
-										id: $key + 1,
-										videoId: item.videoId,
-										title: item.title,
-										artist: item.subtitle[0].text,
-										thumbnail: item.thumbnails[0].url,
-										length: length,
-									};
-									mixList.splice($key + 1, 0, next);
-									console.log(mixList);
+									list.addNext(item, $key);
 								}
 							}}>
 							<Icon name="queue" size="1.5rem" />
@@ -253,7 +198,7 @@
 		top: 0%;
 		padding-top: 0.125rem;
 		padding-right: 0.625rem;
-		z-index: 6;
+		z-index: 1;
 		&.mobile {
 			top: 0%;
 			right: 7%;

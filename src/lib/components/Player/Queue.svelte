@@ -25,14 +25,12 @@
 
 	onMount(() => {
 		if (active) active.scrollIntoView(true);
-		console.log("active Mounted" + active);
 	});
 
 	$: if (active) active.scrollIntoView(true);
 	afterUpdate(() => {
 		let active = document.getElementById(autoId);
 		if (active) active.scrollIntoView(true);
-		console.log("active " + active);
 	});
 	async function handleClick(i) {
 		autoId = i;
@@ -88,7 +86,7 @@
 									<span>{item.title}</span>
 								</span>
 								<span class="p-artist">
-									<span>{item.artist}</span>
+									<span>{item.artistInfo.artist}</span>
 								</span>
 							</div>
 							<span class="p-length">

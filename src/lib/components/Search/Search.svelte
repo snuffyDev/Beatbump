@@ -40,7 +40,7 @@
 		scrollTo({
 			behavior: "smooth",
 			top: 0,
-			left: 0,
+			// left: 0,
 		});
 
 		goto(url);

@@ -14,7 +14,6 @@
 		if (response.ok) {
 			return {
 				props: { filter, contents, continuation, didYouMean, error },
-				maxage: 0,
 				status: 200,
 			};
 		}
@@ -29,7 +28,7 @@
 	export let filter;
 	// $: console.log(slug, filter, `TEST`)
 	// $: contents = contents
-	// $: console.log(continuation)
+	$: console.log(contents);
 	import { currentTitle, search } from "$stores/stores";
 	import { page } from "$app/stores";
 	import { invalidate } from "$app/navigation";
@@ -38,7 +37,7 @@
 	(async () => {
 		await tick();
 	})();
-	$: search.set([...contents]);
+	$: search.set(contents);
 	// $:
 	let songTitle = $page.params.slug;
 	let ctoken = continuation?.continuation;

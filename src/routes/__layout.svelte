@@ -1,14 +1,14 @@
 <script>
-	// import "../app.css";
-	// import "../global/stylesheet.scss";
-	import { browser } from "$app/env";
+	import { browser, dev } from "$app/env";
 	import { fade, scale } from "svelte/transition";
 	import { onMount } from "svelte";
-	import { currentTrack, theme } from "$stores/stores";
+	import { currentTrack, filterAutoPlay, theme } from "$stores/stores";
 	import { iOS } from "$stores/stores";
 	import Nav from "$components/Nav/Nav.svelte";
 	import Sidebar from "$components/Sidebar/Sidebar.svelte";
 	import Player from "$components/Player/Player.svelte";
+	import "../app.css";
+	import "../global/stylesheet.scss";
 	// import Wrapper from "$components/Wrapper/Wrapper.svelte";
 	onMount(() => {
 		iOS.init();
@@ -16,6 +16,9 @@
 			// console.log("themeswitch");
 			let ls = localStorage.getItem("theme");
 			ls ? theme.init(ls) : theme.init("dark");
+			let filter = localStorage.getItem("filterAutoPlay");
+			filter ? filterAutoPlay.init(filter) : filterAutoPlay.init(false);
+			console.log($filterAutoPlay);
 			// if (ls) {
 			// 	theme.init(ls);
 			// } else {
@@ -53,9 +56,6 @@
 </div>
 
 <style lang="scss" global>
-	@import "../app.css";
-	// @import "../global/vars";
-	@import "../global/stylesheet";
 	:root {
 		--ytm-bottom: #121018;
 		--ytm-base: #09090a;

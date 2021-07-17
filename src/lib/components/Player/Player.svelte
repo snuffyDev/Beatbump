@@ -11,6 +11,7 @@
 	import { updateTrack, key, currentMix, currentTitle } from "$stores/stores";
 	import { cubicOut } from "svelte/easing";
 	import * as utils from "$lib/utils";
+	import list from "$lib/stores/list";
 
 	export let title;
 	export let nowPlaying;
@@ -21,13 +22,13 @@
 	$: player.src = $updateTrack;
 	$: nowPlaying = nowPlaying;
 	$: isWebkit = $iOS;
-	$: title = mixList[autoId].title;
-	$: mixList = $currentMix.list;
-	$: list = $currentMix;
+	// $: title = mixList[autoId].title;
+	$: mixList = $list.mix;
+	// $: list = $currentMix;
 	let autoId = $key;
 
 	$: time = player.currentTime;
-	$: currentTitle.set(title);
+	// $: currentTitle.set(title);
 	$: duration = 1000;
 	let remainingTime = 55;
 
@@ -102,55 +103,26 @@
 	});
 	const getNext = async () => {
 		if (autoId == mixList.length - 1) {
-			const data = await utils.getNext(
+			list.getMore(
 				autoId,
-				mixList[autoId].itct,
-				mixList[autoId].videoId,
-				mixList[autoId].autoMixList,
-				list.continuation
+				$list.mix[autoId].itct,
+				$list.mix[autoId].videoId,
+				$list.mix[autoId].autoMixList,
+				$list.continuation
 			);
-			const res = await data;
-
-			mixList.pop();
-
-			mixList = [
-				...mixList,
-				...data.results.map((d, i) => ({
-					continuation: res.continuation,
-					autoMixList: d.autoMixList,
-					artistId: d.artistInfo.browseId,
-					itct: d.itct,
-					index: d.index,
-					videoId: d.videoId,
-					title: d.title,
-					artist: d.artistInfo.artist,
-					thumbnail: d.thumbnail,
-					length: d.length,
-				})),
-			];
-
-			// console.log(mixList);
-			currentMix.set({
-				videoId: `${mixList[autoId].videoId}`,
-				playlistId: `${list.playlistId}`,
-				continuation: res.continuation,
-				list: mixList,
-			});
-
-			player.src = utils.getSrc(mixList[autoId].videoId).then((url) => url);
-			autoId++;
+			// autoId++;
 			key.set(autoId);
 
 			once = false;
 
-			return mixList;
+			return;
 		} else {
 			autoId++; // console.log(autoId)
 			key.set(autoId);
 
 			player.src = utils.getSrc(mixList[autoId].videoId).then((url) => url);
 
-			currentTitle.set(mixList[autoId].title);
+			// currentTitle.set(mixList[autoId].title);
 			once = false;
 		}
 		once = false;

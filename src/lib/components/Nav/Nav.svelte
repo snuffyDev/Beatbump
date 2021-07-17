@@ -5,7 +5,7 @@
 	import { circIn } from "svelte/easing";
 	import { goto } from "$app/navigation";
 	import { clickOutside } from "$lib/js/clickOutside";
-	import { theme } from "$stores/stores";
+	import { filterAutoPlay, theme } from "$stores/stores";
 	import { onMount } from "svelte";
 	import { page } from "$app/stores";
 
@@ -17,6 +17,7 @@
 	let isSettings = true;
 	let settingsHidden = isSettings ? true : false;
 	let setTheme = $theme;
+	let setFilter = $filterAutoPlay;
 	// onMount(() => {
 	// 	if (!$theme) {
 	// 		setTheme = $theme
@@ -55,7 +56,7 @@
 </div>
 {#if width > 640}
 	<div
-		style="background:inherit;"
+		style="background-color:inherit;"
 		class:shown={width > 640}
 		class:desktop={width < 640}>
 		<div
@@ -75,7 +76,7 @@
 				style={`background-color: var(--${curTheme}-top)}`}
 				transition:fade={{ duration: 120, easing: circIn }}>
 				<!-- <label for="search"><em>search</em></label> -->
-				<span class="setting">
+				<div class="setting">
 					<span class="s-text">Theme:</span>
 					<div class="selectCont">
 						<!-- svelte-ignore a11y-no-onchange -->
@@ -90,7 +91,18 @@
 							{/each}
 						</select>
 					</div>
-				</span>
+				</div>
+				<div class="setting">
+					<span class="s-text"
+						>Dedupe Automix: <input
+							type="checkbox"
+							bind:checked={setFilter}
+							on:change={() => {
+								filterAutoPlay.set(setFilter);
+
+								// console.log(setFilter);
+							}} /></span>
+				</div>
 			</div>
 		{/if}
 	</div>
@@ -141,13 +153,14 @@
 				style={`background-color: var(--${curTheme}-top)}`}
 				transition:fade={{ duration: 120, easing: circIn }}>
 				<!-- <label for="search"><em>search</em></label> -->
-				<span class="setting">
+				<div class="setting">
 					<span class="s-text">Theme:</span>
 					<div class="selectCont">
+						<!-- svelte-ignore a11y-no-onchange -->
 						<select
 							class="select"
 							bind:value={setTheme}
-							on:blur={() => {
+							on:change={() => {
 								theme.set(setTheme);
 							}}>
 							{#each themes as theme}
@@ -155,7 +168,18 @@
 							{/each}
 						</select>
 					</div>
-				</span>
+				</div>
+				<div class="setting">
+					<span class="s-text"
+						>Dedupe Automix: <input
+							type="checkbox"
+							bind:checked={setFilter}
+							on:change={() => {
+								filterAutoPlay.set(setFilter);
+
+								console.log(setFilter);
+							}} /></span>
+				</div>
 			</div>
 		{/if}
 		<div
@@ -182,6 +206,7 @@
 	.s-text {
 		padding: 0 0.8rem 0.2rem 0.8rem; /* align-self: start; */
 		font-size: 1.1rem;
+		// margin-right: 4rem;
 	}
 	.x-button {
 		padding: 1em;
@@ -210,7 +235,7 @@
 	.nav-settings {
 		position: absolute;
 		right: 0;
-		bottom: -4em;
+		top: 4em;
 		display: flex;
 		border-top: 0.125px inset hsla(0, 0%, 66.7%, 0.26);
 		background-color: inherit;
@@ -218,19 +243,31 @@
 		z-index: 10;
 
 		border-radius: 0 0rem 0.5rem 0.5rem;
-		flex-direction: row;
+		flex-direction: column;
 		width: 100%;
-		max-width: 11.4rem;
-		max-height: 4rem;
-		box-shadow: -0.125rem 0.3rem 0.25rem 0.125rem #00000052;
+		overflow: hidden;
+		max-width: 25%;
+		@media screen and (max-width: 640px) {
+			max-width: 100%;
+		}
+		// box-shadow: -0.125rem 0.3rem 0.25rem 0.125rem #00000052;
 		border: 0.125px solid #aaaaaa45;
 		border-top: 0;
 
 		.setting {
 			display: flex;
 			flex-wrap: nowrap;
-			align-items: center;
+			align-items: stretch;
+			padding: 0.2rem 0.4rem;
+			border-bottom: 0.0143rem #63636352 solid;
+			// box-shadow: -0.125rem 0.3rem 0.25rem 0.125rem #63636352;
+			// justify-content: space-around;
+			// margin-bottom: 0.8rem;
+			flex-direction: column;
 			vertical-align: top;
+			&:last-child {
+				border-bottom: 0;
+			}
 		}
 	}
 

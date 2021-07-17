@@ -27,6 +27,7 @@
 	export let continuations;
 	console.log(tracks, continuations, header);
 	// import { getPlaylist } from '$lib/utils'
+
 </script>
 
 {#await tracks}
@@ -138,7 +139,12 @@
 			width: 100%;
 		}
 	}
-
+	.info-wrapper {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		flex: 1 1 auto;
+	}
 	.info {
 		/* margin-left: auto; */
 		margin-right: auto;

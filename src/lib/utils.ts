@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { sort } from "./endpoints/playerUtils";
-import { parseSearchResult } from "./parsers";
 import { searchManager, updateTrack } from "./stores/stores";
 
 // General data endpoint
@@ -157,8 +156,6 @@ export const getSrc = async (videoId?: string, playlistId?: string) => {
 	return parsedURL;
 };
 // parse array object input for child
-
-
 
 export const pb = (input: any, query: string, justOne = false) => {
 	const iterate = (x: string | any[], y: string | number) => {

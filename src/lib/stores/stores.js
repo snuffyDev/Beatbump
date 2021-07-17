@@ -24,6 +24,7 @@ export const currentTrack = writable({
 	length: ''
 })
 export const theme = _theme()
+export const filterAutoPlay = _filterAutoPlay()
 export const currentMix = writable({
 	videoId: '',
 	playlistId: '',
@@ -123,6 +124,33 @@ function _theme() {
 		reset: () => {
 			set(undefined)
 			browser ? localStorage.removeItem('theme') : null
+		}
+	}
+}
+
+function _filterAutoPlay() {
+	const { subscribe, set, update } = writable(undefined)
+	return {
+		subscribe,
+		update: (setting) => get(setting),
+		get: (setting) => get(setting),
+		set: (setting) => {
+			set(setting)
+			localStorage.setItem('filterAutoPlay', setting)
+		},
+		init: (setting) => {
+			if (!localStorage.getItem('filterAutoPlay')) {
+				set(setting)
+				localStorage.setItem('filterAutoPlay', setting)
+			} else {
+				localStorage.getItem('filterAutoPlay')
+				set(setting)
+			}
+			// if (localStorage.getItem('filterAutoPlay')) return;
+		},
+		reset: () => {
+			set(undefined)
+			browser ? localStorage.removeItem('filterAutoPlay') : null
 		}
 	}
 }

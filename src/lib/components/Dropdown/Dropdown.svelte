@@ -39,7 +39,7 @@
 
 <style lang="scss">
 	.menuButtons {
-		z-index: 6;
+		z-index: 1;
 		margin-right: 0.2rem;
 		stroke: rgba(0, 0, 0, 0.692);
 		height: 2%;
