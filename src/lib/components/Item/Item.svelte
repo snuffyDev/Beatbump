@@ -58,7 +58,11 @@
 			loading = true;
 			videoId = data.videoId ? data.videoId : "";
 			playlistId = data.playlistId ? data.playlistId : data.shuffle.playlistId;
-			await list.initList(videoId, playlistId);
+			if (data.type == "playlist") {
+				await list.startPlaylist(playlistId);
+			} else {
+				await list.initList(videoId, playlistId);
+			}
 			key.set(0);
 			console.log($list.mix);
 			currentTrack.set({ ...$list.mix[0] });

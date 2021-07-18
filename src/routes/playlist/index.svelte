@@ -86,19 +86,21 @@
 					<div class="info">
 						<div class="info-title">
 							<h4 class="title">{header?.title}</h4>
-							<p class="subtitle" class:hidden={width < 640 ? true : false}>
-								{header.description}
-							</p>
-							<span>
-								<p class="subtitle">
-									{header.subtitles.join(" ", "")}
+							{#if header?.description}
+								<p class="subtitle" class:hidden={width < 640 ? true : false}>
+									{header?.description ? header?.description : ""}
 								</p>
-								<em
-									><small class="subtitle">
-										{header.secondSubtitle.join(" ", "")}
-									</small>
-								</em>
-							</span>
+								<span>
+									<p class="subtitle">
+										{header.subtitles.join(" ", "")}
+									</p>
+									<em
+										><small class="subtitle">
+											{header.secondSubtitle.join(" ", "")}
+										</small>
+									</em>
+								</span>
+							{/if}
 							<div class="button-group">
 								<button class="button--outlined">Start Listening</button>
 							</div>

@@ -37,10 +37,10 @@
 
 		await tick();
 		search.set([]);
-		scrollTo({
+		window.scrollTo({
 			behavior: "smooth",
 			top: 0,
-			// left: 0,
+			left: 0,
 		});
 
 		goto(url);

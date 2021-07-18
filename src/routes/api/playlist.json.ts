@@ -57,6 +57,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 									sectionListRenderer: {
 										contents: [
 											{
+												musicPlaylistShelfRenderer,
 												musicPlaylistShelfRenderer: { contents },
 											},
 										],
@@ -88,10 +89,14 @@ export async function get({ query }): Promise<EndpointOutput> {
 		// 	"continuations:0:nextContinuationData",
 		// 	false
 		// );
+		console.log(sectionListRenderer, musicDetailHeaderRenderer);
 		const parseHeader = Array(musicDetailHeaderRenderer).map(
 			({ description, subtitle, thumbnail, secondSubtitle, title }) => {
 				// const description = description.runs[0].text
 				const subtitles: string = pb(subtitle, "runs:text", false);
+				description = description?.runs[0]?.text
+					? description?.runs[0]?.text
+					: undefined;
 				// const thumbnails = pb(
 				// 	d,
 				// 	"thumbnail:croppedSquareThumbnailRenderer:thumbnail:thumbnails",
@@ -101,7 +106,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 				// const title = pb(d, "title:runs:0:text", true);
 
 				return {
-					description: description.runs[0].text,
+					description,
 					subtitles,
 					thumbnails:
 						thumbnail["croppedSquareThumbnailRenderer"]["thumbnail"][
@@ -114,7 +119,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 			}
 		)[0];
 		// const [contents] = playlist;
-		const parseTrack: Array<PlaylistItem> = contents.map(
+		let parseTrack: Array<PlaylistItem> = contents.map(
 			({ musicResponsiveListItemRenderer }) => {
 				const length = pb(
 					musicResponsiveListItemRenderer,
@@ -137,10 +142,23 @@ export async function get({ query }): Promise<EndpointOutput> {
 					"musicResponsiveListItemFlexColumnRenderer:0:text:runs:0",
 					true
 				);
-				const {
-					videoId,
-					playlistId,
-				} = titleBody.navigationEndpoint.watchEndpoint;
+				let videoId = undefined;
+				console.log(titleBody);
+				let r = musicResponsiveListItemRenderer.playlistItemData;
+				if (
+					!musicResponsiveListItemRenderer.playlistItemData &&
+					!musicResponsiveListItemRenderer?.navigationEndpoint?.watchEndpoint
+						?.videoId
+				)
+					return;
+				if (musicResponsiveListItemRenderer?.playlistItemData) {
+					videoId = musicResponsiveListItemRenderer?.playlistItemData.videoId;
+				} else {
+					videoId = titleBody?.navigationEndpoint?.watchEndpoint?.videoId
+						? titleBody?.navigationEndpoint?.watchEndpoint?.videoId
+						: undefined;
+				}
+
 				const title = titleBody.text;
 				// console.log(artistEndpoint);
 				const artist: Artist = {
@@ -155,20 +173,31 @@ export async function get({ query }): Promise<EndpointOutput> {
 				);
 
 				// console.log(length, flexColumns, artist);
-				return { length, videoId, playlistId, thumbnail, title, artist };
+				return {
+					length,
+					videoId: videoId ? videoId : undefined,
+					playlistId: musicPlaylistShelfRenderer.playlistId,
+					thumbnail,
+					title,
+					artist,
+				};
 			}
 		);
+
+		const Tracks = parseTrack.filter((e) => {
+			return e != null;
+		});
 		// if (Object.prototype.hasOwnProperty.call(playlist,"continuations") {
-
 		// }
-
+		// console.log(parseTrack);
 		// console.log(items)
 		// parsePlaylistContents(contents);
+
 		return {
 			status: 200,
 			body: JSON.stringify({
 				continuations: continuations,
-				tracks: parseTrack,
+				tracks: Tracks,
 				header: parseHeader,
 			}),
 		};

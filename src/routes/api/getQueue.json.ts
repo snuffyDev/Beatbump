@@ -78,16 +78,16 @@ export async function get({ query, headers }) {
 		const q = queueDatas.map(
 			({ content: { playlistPanelVideoRenderer } }): PlaylistItem => {
 				const { ctx } = playlistPanelVideoRenderer;
-				const length = playlistPanelVideoRenderer.lengthText.runs[0].text;
+				const length = playlistPanelVideoRenderer?.lengthText?.runs[0].text;
 				const artistInfo = {
-					artist: playlistPanelVideoRenderer.longBylineText.runs[0].text,
+					artist: playlistPanelVideoRenderer?.longBylineText?.runs[0]?.text,
 					browseId:
 						playlistPanelVideoRenderer?.longBylineText?.runs[0]
 							?.navigationEndpoint?.browseEndpoint?.browseId,
 				};
 				const thumbnails =
-					playlistPanelVideoRenderer.thumbnail.thumbnails[0].url;
-				const title = playlistPanelVideoRenderer.title.runs[0].text;
+					playlistPanelVideoRenderer?.thumbnail?.thumbnails[0]?.url;
+				const title = playlistPanelVideoRenderer?.title?.runs[0]?.text;
 				const { videoId, playlistId } = {
 					...playlistPanelVideoRenderer?.navigationEndpoint?.watchEndpoint,
 				};
