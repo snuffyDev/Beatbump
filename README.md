@@ -16,6 +16,7 @@ Alternative frontend for YouTube Music created using Svelte/SvelteKit.
 - Search for songs, playlists, and videos
   - Note: all content is audio-only.
 - View Artist pages for your favorite content
+- Uses a custom wrapper around the YouTube Music API
 
 ## Development
 
