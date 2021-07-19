@@ -112,6 +112,7 @@
 		<hr />
 		{#each tracks as res, i}
 			<ListItem
+				type="playlist"
 				on:pagePlaying={() => {
 					isPagePlaying.set(header.playlistId)
 				}}

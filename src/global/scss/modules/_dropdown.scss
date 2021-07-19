@@ -2,7 +2,7 @@
 	display: flex;
 	flex-direction: row;
 	flex-wrap: nowrap;
-
+	z-index: auto;
 	padding: 0.5rem;
 	align-items: center;
 	cursor: pointer;
@@ -30,11 +30,11 @@
 	outline: 0.0714rem solid rgba(231, 231, 231, 0.329);
 	display: flex;
 	top: 2rem;
-	z-index: 1;
+
 	isolation: isolate;
 	/* position: absolute; */
 	/* flex: none; */
-	flex-direction: row;
+	flex-direction: column;
 }
 .dd-player {
 	/* margin-top: 0; */
@@ -47,7 +47,7 @@
 	outline: 0.0714rem solid rgba(231, 231, 231, 0.329);
 	/* display: flex; */
 	/* top: 0; */
-	isolation: isolate;
+	// isolation: isolate;
 
 	transform: translateY(-3.25rem);
 	flex-direction: column;

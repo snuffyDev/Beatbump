@@ -28,15 +28,14 @@
 	import * as utils from '$lib/utils'
 
 	import Carousel from '$components/Carousel/Carousel.svelte'
-
+	import viewport from '$lib/actions/viewport'
 	let moods = []
 	let genres = []
 	$: console.log(carouselItems)
 	let browseId = 'FEmusic_explore'
 
-	const handler = getTracks()
-
-	function getTracks() {
+	let isLoaded = false
+	function getMnG() {
 		utils
 			.moodsAndGenres('FEmusic_moods_and_genres')
 			.then((data) => {
@@ -50,6 +49,7 @@
 			})
 			.finally((msg) => {
 				console.log(genres, moods)
+				isLoaded = true
 			})
 		// @ts-ignore
 	}
@@ -76,36 +76,50 @@
 			setTitle={carouselItems[0].header[0].title}
 			items={carouselItems[0].results}
 			type="new" />
-		<div class="breakout">
-			<div class="box-cont">
-				<section-header>Moods</section-header>
-				<div class="m-alert-info"><em>Coming Soon!</em></div>
-				<box>
-					{#each moods as moods}
-						<div
-							style={`border-left: 0.4286rem solid ${moods.colorCode}`}
-							class="box">
-							{moods.text}
-						</div>
-					{/each}
-				</box>
-				<span class="link" on:click={() => alert('Coming Soon!')}>See All</span>
+		<div
+			class="load"
+			use:viewport
+			on:enterViewport={() => {
+				getMnG()
+			}}>
 
-				<hr />
-				<section-header>Genres</section-header>
-				<div class="m-alert-info"><em>Coming Soon!</em></div>
+			{#await isLoaded}
+				<Loading />
+			{:then _}
+				<div class="breakout">
+					<div class="box-cont">
+						<section-header>Moods</section-header>
+						<div class="m-alert-info"><em>Coming Soon!</em></div>
+						<box>
+							{#each moods as moods}
+								<div
+									style={`border-left: 0.4286rem solid ${moods.colorCode}`}
+									class="box">
+									{moods.text}
+								</div>
+							{/each}
+						</box>
+						<span class="link" on:click={() => alert('Coming Soon!')}
+							>See All</span>
 
-				<box>
-					{#each genres as genres}
-						<div
-							style={`border-left: 0.4286rem solid ${genres.colorCode}`}
-							class="box">
-							{genres.text}
-						</div>
-					{/each}
-				</box>
-				<span class="link" on:click={() => alert('Coming Soon!')}>See All</span>
-			</div>
+						<hr />
+						<section-header>Genres</section-header>
+						<div class="m-alert-info"><em>Coming Soon!</em></div>
+
+						<box>
+							{#each genres as genres}
+								<div
+									style={`border-left: 0.4286rem solid ${genres.colorCode}`}
+									class="box">
+									{genres.text}
+								</div>
+							{/each}
+						</box>
+						<span class="link" on:click={() => alert('Coming Soon!')}
+							>See All</span>
+					</div>
+				</div>
+			{/await}
 		</div>
 	</main>
 {/await}
@@ -122,7 +136,6 @@
 		// padding: 0.8rem;
 	}
 	.box-cont {
-
 		justify-content: space-around;
 
 		padding: 0.8rem;

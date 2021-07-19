@@ -74,11 +74,13 @@
 			class="clickable"
 			on:click={async () => {
 				if (type == 'trending' && !loading) {
+					loading = true
 					list.initList(item.videoId, item.playlistId)
 					currentTrack.set({ ...$list.mix[0] })
 					key.set(0)
 					loading = false
 				} else if (type == 'artist' && !loading) {
+					loading = true
 					list.initArtistList(item.videoId, item.playlistId)
 					await getSrc(item.videoId)
 					currentTrack.set({ ...$list.mix[0] })
@@ -130,16 +132,7 @@
 		</div>
 
 		<div class="menu" class:mobile={width < 550}>
-			<Dropdown>
-				<div slot="items">
-					{#each DropdownItems as item}
-						<DropdownItem
-							on:click={item.action}
-							text={item.text}
-							icon={item.icon} />
-					{/each}
-				</div>
-			</Dropdown>
+			<Dropdown items={DropdownItems} />
 		</div>
 	</section>
 </div>

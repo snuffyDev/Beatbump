@@ -6,7 +6,7 @@
 	import list from '$lib/stores/list'
 	export let item
 	export let index
-
+	export let page
 	// $: id = $key >= 1 ? $key : index - 1;
 	const dispatch = createEventDispatcher()
 	function dispatchPlaying(playing) {
@@ -24,7 +24,11 @@
 	on:click={async () => {
 		// @ts-ignore
 		key.set(0)
-		await list.startPlaylist(item.playlistId)
+		if (type == 'playlist') {
+			await list.startPlaylist(item.playlistId)
+		} else {
+			await list.initList(item.videoId, item.playlistId)
+		}
 		console.log($list.mix)
 		dispatchPlaying(true)
 		// currentTrack.set({
@@ -67,8 +71,8 @@
 				<span class="artist">{item.artistInfo.artist}</span>
 			{/if}
 		</span>
-		<span class="length" class:hidden={!item.length ? true : false}
-			>{item.length}</span>
+		<span class="length" class:hidden={!item?.length ? true : false}
+			>{item?.length}</span>
 	</div>
 </div>
 

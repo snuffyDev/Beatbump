@@ -77,7 +77,7 @@
 			<svelte:component this={Icon} name="settings" size="1.75em" />
 		</div>
 		{#if !settingsHidden}
-			<Settings />
+			<Settings bind:isHidden />
 		{/if}
 	</div>
 {/if}
@@ -118,7 +118,7 @@
 			<svelte:component this={Icon} name="search" size="1.75em" />
 		</div>
 		{#if !settingsHidden}
-			<Settings />
+			<Settings bind:isHidden />
 		{/if}
 		<div
 			class="nav-item"

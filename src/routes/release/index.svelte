@@ -140,16 +140,15 @@
 				<div class="play-box" />
 			</div>
 		</div>
-		<ul>
-			{#each items as item, index}
-				<ListItem
-					on:pagePlaying={() => {
-						isPagePlaying.set(id)
-					}}
-					{item}
-					{index} />
-			{/each}
-		</ul>
+		{#each items as item, index}
+			<ListItem
+				type="release"
+				on:pagePlaying={() => {
+					isPagePlaying.set(id)
+				}}
+				{item}
+				{index} />
+		{/each}
 	</main>
 {:catch error}
 	{error}

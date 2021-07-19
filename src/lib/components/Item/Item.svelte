@@ -74,7 +74,7 @@
 					top: 0,
 					left: 0
 				})
-				goto(`/playlist?list=${data?.playlistId}`)
+				goto(`/playlist?list=${data?.browseId}`)
 			}
 		})
 	}
@@ -124,14 +124,14 @@
 </script>
 
 <div class="container" class:hidden>
-	<div
-		class="innercard"
-		on:click|stopPropagation={() => {
-			if (!loading) {
-				clickHandler()
-			}
-		}}>
-		<div class="itemWrapper">
+	<div class="innercard">
+		<div
+			class="itemWrapper"
+			on:click|stopPropagation={(e) => {
+				if (!loading) {
+					clickHandler()
+				}
+			}}>
 			<div class="img-container">
 				{#if loading}
 					<Loading size="3em" />
@@ -155,24 +155,16 @@
 				<p>
 					{data.type == 'playlist' ? `${data.metaData}` : `by ${artist}`}
 				</p>
-				<div class="album">
+				<span class="album">
 					{#if data.album}<Icon name="album" size="1em" /><a
 							href="/release?id={data?.album?.browseId}">{data.album.title}</a>
 					{/if}
-				</div>
+				</span>
 			</div>
 		</div>
+
 		<div class="menu">
-			<Dropdown>
-				<div slot="items">
-					{#each DropdownItems as item}
-						<DropdownItem
-							on:click={item.action}
-							text={item.text}
-							icon={item.icon} />
-					{/each}
-				</div>
-			</Dropdown>
+			<Dropdown items={DropdownItems} />
 		</div>
 	</div>
 </div>
@@ -183,6 +175,7 @@
 		// right: 0.8rem;
 		// top: 50%;
 		position: relative;
+
 		padding-top: 0.125rem;
 		padding-right: 0.625rem;
 	}
@@ -190,8 +183,8 @@
 		display: none;
 	}
 	.album {
-		display: flex;
-		flex-direction: row;
+		// display: flex;
+		// flex-direction: row;
 		font-size: 0.9em;
 		font-weight: 300;
 		align-items: center;
@@ -208,6 +201,7 @@
 		flex-direction: row;
 		flex-wrap: nowrap;
 		align-items: center;
+		// isolation:isolate;
 	}
 	p {
 		margin: 0.2em 0;
@@ -237,16 +231,16 @@
 		flex: 1 1 auto;
 		// margin-top: 0.125rem;
 		// margin-bottom: 0.125rem;
-
+		// pointer-events: bounding-box;
 		// isolation: isolate;
 		border-bottom: 0.0714rem solid hsla(0, 0%, 66.7%, 0.24);
 		width: 100%;
 		/* height: 6rem; */
 		/* margin: 0; */
-		flex-direction: column;
+		flex-direction: row;
 		flex-wrap: nowrap;
 
-		&:active:not(.menuButtons):not(.menu) {
+		&:active {
 			background: lighten(#212225, 3%);
 			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
 		}
@@ -333,8 +327,8 @@
 	}
 	@media (min-width: 640px) {
 		.container:hover:not(.menu) {
-			pointer-events: all;
-			background: lighten(#212225, 3%);
+			pointer-events: bounding-box;
+			background: lighten(#212225, 5%);
 			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
 		}
 	}

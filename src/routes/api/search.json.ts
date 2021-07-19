@@ -105,8 +105,8 @@ export async function get({ query }) {
 		const data = await response.json()
 
 		if (data.hasOwnProperty('continuationContents')) {
-			let { continuationContents } = data
-			let results = await parseSearchResult(continuationContents, true, filter)
+			const { continuationContents } = data
+			const results = await parseSearchResult(continuationContents, true, filter)
 
 			// console.log(`contents: `, results);
 			return {
@@ -114,7 +114,7 @@ export async function get({ query }) {
 				body: await results
 			}
 		} else {
-			let {
+			const {
 				contents: {
 					sectionListRenderer: {
 						contents: [...rest]
@@ -122,7 +122,7 @@ export async function get({ query }) {
 				}
 			} = await data
 
-			let results = await parseSearchResult(rest, false, filter)
+			const results = await parseSearchResult(rest, false, filter)
 			if (results?.error) {
 				console.log(results?.error)
 				return { error: results?.error }
@@ -182,10 +182,10 @@ function parseSearchResult(data, cont, filter?) {
 	ctx.map(async (c) => {
 		let contents = []
 		if (cont) {
-			let { musicShelfContinuation } = c
+			const { musicShelfContinuation } = c
 			contents.push(musicShelfContinuation)
 		} else {
-			let { musicShelfRenderer } = c
+			const { musicShelfRenderer } = c
 			contents.push(musicShelfRenderer)
 		}
 		/* Search for if the request is for Playlists
@@ -229,8 +229,8 @@ function parseSearchResult(data, cont, filter?) {
 
 /* Return the data for if there is a corrected query */
 function correctedQuery(ctx) {
-	let correctTerm = ctx?.correctedQuery?.runs[0].text
-	let correctedEndpoint = ctx?.correctedQueryEndpoint?.searchEndpoint
+	const correctTerm = ctx?.correctedQuery?.runs[0].text
+	const correctedEndpoint = ctx?.correctedQueryEndpoint?.searchEndpoint
 
 	return {
 		term: correctTerm,
@@ -240,23 +240,23 @@ function correctedQuery(ctx) {
 
 function parseSong(contents) {
 	const type = 'song'
-	let results = []
+	const results = []
 	contents.map(({ musicResponsiveListItemRenderer: d }) => {
 		// let d = musicResponsiveListItemRenderer
 		let explicit
 		if (d.hasOwnProperty('badges')) explicit = true
 		const flexColumns = pb(d, 'musicResponsiveListItemFlexColumnRenderer', true)
 
-		let thumbnails = d.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails
-		let title = pb(flexColumns[0], 'runs:text', true)
+		const thumbnails = d.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails
+		const title = pb(flexColumns[0], 'runs:text', true)
 
 		let browseId
 		if (
 			d.menu.menuRenderer?.items[5]?.menuNavigationItemRenderer
 				?.navigationEndpoint.browseEndpoint
 		) {
-			let menu = pb(d.menu.menuRenderer, 'items', true)
-			let items = pb(menu, 'menuNavigationItemRenderer')
+			const menu = pb(d.menu.menuRenderer, 'items', true)
+			const items = pb(menu, 'menuNavigationItemRenderer')
 			// console.log(items);
 			if (items.length > 4) {
 				browseId = items[3].navigationEndpoint.browseEndpoint.browseId
@@ -271,9 +271,9 @@ function parseSong(contents) {
 		const {
 			watchEndpoint
 		} = d.menu.menuRenderer?.items[0]?.menuNavigationItemRenderer?.navigationEndpoint
-		let { videoId = '', playlistId, params } = watchEndpoint
+		const { videoId = '', playlistId, params } = watchEndpoint
 
-		let metaInfo = pb(flexColumns[1], 'runs:text', true)
+		const metaInfo = pb(flexColumns[1], 'runs:text', true)
 		// console.log(metaInfo);
 		const albumArr: [] = flexColumns[1].text.runs
 		const album: {
@@ -287,22 +287,22 @@ function parseSong(contents) {
 		}
 
 		// let album = {};
-		let length = metaInfo[metaInfo.length - 1]
+		const length = metaInfo[metaInfo.length - 1]
 
-		let artistsArr = metaInfo.reverse()
-		let artists = artistsArr.slice(4)
+		const artistsArr = metaInfo.reverse()
+		const artists = artistsArr.slice(4)
 		if (artists.length > 1) {
 			for (let i = 0; i < artists.length; i++) {
 				artists.splice(i + 1, 1)
 			}
 		}
 		artists.reverse()
-		let artist: Artist = {
+		const artist: Artist = {
 			browseId: browseId,
 			artist: artists
 		}
 		// console.log(artists, artists)
-		let result: Song = {
+		const result: Song = {
 			album: albumInfo,
 			artistInfo: artist,
 			title: title,
@@ -324,13 +324,13 @@ function parseSong(contents) {
 
 // Parse the playlist results for search.
 function parsePlaylist(contents) {
-	let results = []
-	let type = 'playlist'
+	const results = []
+	const type = 'playlist'
 	contents.map(({ musicResponsiveListItemRenderer: d }) => {
 		// const d = musicResponsiveListItemRenderer
-		let thumbnails = d.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails
-		let browseId = d.navigationEndpoint.browseEndpoint.browseId
-		let title =
+		const thumbnails = d.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails
+		const browseId = d.navigationEndpoint.browseEndpoint.browseId
+		const title =
 			d.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0]
 				.text
 		const flexColumns = pb(d, 'musicResponsiveListItemFlexColumnRenderer', true)

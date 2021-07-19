@@ -10,9 +10,9 @@
 	import { page } from '$app/stores'
 
 	export let width
-
-	let isHidden = true
-	let hidden = isHidden ? true : false
+	export let isHidden
+	// let isHidden = true
+	// let hidden = isHidden ? true : false
 	$: curTheme = $theme
 	let isSettings = true
 	let settingsHidden = isSettings ? true : false
@@ -112,22 +112,27 @@
 		}
 	}
 	.nav-settings {
+		// padding-left: 2em !important;
 		position: absolute;
 		right: 0;
+		// left: 0;
 		top: 4em;
 		display: flex;
-		border-top: 0.125px inset hsla(0, 0%, 66.7%, 0.26);
 		background-color: inherit;
-		padding: 0.5em 0em 0.5em 0;
+		padding: 0.5em 0;
 		z-index: 10;
-
-		border-radius: 0 0rem 0.5rem 0.5rem;
+		border-radius: 0 0 0.5rem 0.5rem;
 		flex-direction: column;
 		width: 100%;
 		overflow: hidden;
 		max-width: 25%;
+		border: 0.125px solid hsla(0, 0%, 66.7%, 0.27058823529411763);
+		border-top: 0;
+		justify-content: space-evenly;
 		@media screen and (max-width: 640px) {
 			max-width: 100%;
+			align-items: center;
+			flex-direction: row;
 		}
 		// box-shadow: -0.125rem 0.3rem 0.25rem 0.125rem #00000052;
 		border: 0.125px solid #aaaaaa45;
@@ -135,16 +140,18 @@
 
 		.setting {
 			display: flex;
-			flex-wrap: nowrap;
-			align-items: stretch;
+			// flex-wrap: nowrap;
+			// align-items: stretch;
 			padding: 0.2rem 0.4rem;
 			margin-bottom: 0.5rem;
 			// border-bottom: 0.0143rem #63636352 solid;
 			// box-shadow: -0.125rem 0.3rem 0.25rem 0.125rem #63636352;
 			// justify-content: space-around;
 			// margin-bottom: 0.8rem;
-			flex-direction: column;
+			flex-direction: row;
 			vertical-align: top;
+			align-items: center;
+
 			&:last-child {
 				border-bottom: 0;
 			}

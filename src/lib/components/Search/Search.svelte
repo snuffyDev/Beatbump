@@ -50,7 +50,7 @@
 
 <form class={type} on:submit|preventDefault={(e) => handleSubmit(e)}>
 	<!-- <label for="search"><em>search</em></label> -->
-	<div class:mobile-search={type == 'inline' ? true : false} class="nav-item">
+	<div class="nav-item">
 		<div
 			class="input"
 			style={`background-color: var(--${$theme}-forms)`}
@@ -68,32 +68,40 @@
 					placeholder="Search"
 					bind:value={songTitle} />{/if}
 		</div>
-		<div class="nav-item inline">
-			<button class="search"><Icon name="search" size="1.5em" /></button>
+		<!-- <div class="nav-item inline">
+				</div> -->
+	</div>
+
+	<!-- <label for="option"><em>search type</em></label> -->
+	<div class="nav-item">
+		<div
+			class="selectCont"
+			style={`background-color: var(--${$theme}-forms)`}
+			class:inline={type == 'inline' ? true : false}>
+			<select
+				style={`background-color: var(--${$theme}-forms)`}
+				class="select"
+				on:blur={() => {
+					searchState.set({ option: filter, text: songTitle })
+				}}
+				bind:value={filter}>
+				{#each options as option (option.params)}
+					<option value={option.params}>{option.label}</option>
+				{/each}
+			</select>
 		</div>
 	</div>
-	<!-- <label for="option"><em>search type</em></label> -->
+	<button class="search" class:hidden={type == 'inline' ? false : true}
+		><Icon name="search" size="1.5em" /></button>
 </form>
-<div class="nav-item">
-	<div
-		class="selectCont"
-		style={`background-color: var(--${$theme}-forms)`}
-		class:inline={type == 'inline' ? true : false}>
-		<select
-			style={`background-color: var(--${$theme}-forms)`}
-			class="select"
-			on:blur={() => {
-				searchState.set({ option: filter, text: songTitle })
-			}}
-			bind:value={filter}>
-			{#each options as option (option.params)}
-				<option value={option.params}>{option.label}</option>
-			{/each}
-		</select>
-	</div>
-</div>
 
 <style lang="scss">
+	button {
+		background: transparent !important;
+		color: inherit !important;
+		padding: 0.4em;
+		border: none !important;
+	}
 	.mobile-search {
 		display: flex;
 		/* flex-direction: row; */
@@ -137,6 +145,7 @@
 		margin-bottom: 0.53125rem;
 	}
 	.inline {
+		flex-direction: row !important;
 		.nav-item {
 			margin-bottom: 0;
 		}
