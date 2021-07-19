@@ -1,63 +1,63 @@
 <script context="module">
 	// import { getTrending } from './index.json'
 	export async function load({ page, fetch }) {
-		const slug = page.params.slug;
-		const data = await fetch("/trending.json?q=browse");
-		const { carouselItems } = await data.json();
+		const slug = page.params.slug
+		const data = await fetch('/trending.json?q=browse')
+		const { carouselItems } = await data.json()
 
 		if (!data.ok) {
 			return {
 				status: 400,
-				error: data.statusText,
-			};
+				error: data.statusText
+			}
 		}
 		return {
 			props: {
-				carouselItems,
+				carouselItems
 			},
 			maxage: 3600,
-			status: 200,
-		};
+			status: 200
+		}
 	}
 </script>
 
 <script lang="ts">
-	export let carouselItems;
-	import { currentTitle } from "$stores/stores";
-	import Loading from "$components/Loading/Loading.svelte";
-	import * as utils from "$lib/utils";
+	export let carouselItems
+	import { currentTitle } from '$stores/stores'
+	import Loading from '$components/Loading/Loading.svelte'
+	import * as utils from '$lib/utils'
 
-	import Carousel from "$components/Carousel/Carousel.svelte";
+	import Carousel from '$components/Carousel/Carousel.svelte'
 
-	let moods = [];
-	let genres = [];
-	$: console.log(carouselItems);
-	let browseId = "FEmusic_explore";
+	let moods = []
+	let genres = []
+	$: console.log(carouselItems)
+	let browseId = 'FEmusic_explore'
 
-	const handler = getTracks();
+	const handler = getTracks()
 
 	function getTracks() {
 		utils
-			.moodsAndGenres("FEmusic_moods_and_genres")
+			.moodsAndGenres('FEmusic_moods_and_genres')
 			.then((data) => {
-				let moodsArr = data[0][0];
-				let genresArr = data[1][0];
+				let moodsArr = data[0][0]
+				let genresArr = data[1][0]
 
-				genres = [...genresArr.items.slice(0, 10)];
-				utils.shuffle(genres);
-				moods = [...moodsArr.items.slice(0, 10)];
-				return { genres, moods };
+				genres = [...genresArr.items.slice(0, 10)]
+				utils.shuffle(genres)
+				moods = [...moodsArr.items.slice(0, 10)]
+				return { genres, moods }
 			})
 			.finally((msg) => {
-				console.log(genres, moods);
-			});
+				console.log(genres, moods)
+			})
 		// @ts-ignore
 	}
 </script>
 
 <svelte:head>
 	<title
-		>{$currentTitle === undefined || null ? "Trending" : $currentTitle} - Beatbump</title>
+		>{$currentTitle === undefined || null ? 'Trending' : $currentTitle} - Beatbump</title>
 </svelte:head>
 {#await carouselItems}
 	<Loading />
@@ -89,7 +89,7 @@
 						</div>
 					{/each}
 				</box>
-				<span class="link" on:click={() => alert("Coming Soon!")}>See All</span>
+				<span class="link" on:click={() => alert('Coming Soon!')}>See All</span>
 
 				<hr />
 				<section-header>Genres</section-header>
@@ -104,7 +104,7 @@
 						</div>
 					{/each}
 				</box>
-				<span class="link" on:click={() => alert("Coming Soon!")}>See All</span>
+				<span class="link" on:click={() => alert('Coming Soon!')}>See All</span>
 			</div>
 		</div>
 	</main>
@@ -122,10 +122,7 @@
 		// padding: 0.8rem;
 	}
 	.box-cont {
-		// display: flex;
-		// width: 100%;
-		// flex-direction: column;
-		// flex-wrap: wrap;
+
 		justify-content: space-around;
 
 		padding: 0.8rem;

@@ -10,7 +10,7 @@ export const searchManager = _searchIndex()
 
 export const searchState = writable({
 	option: '',
-	text: '',
+	text: ''
 })
 
 export const searchCtoken = _ctoken()
@@ -32,8 +32,7 @@ export const currentMix = writable({
 		{ id: '', videoId: '', thumbnail: '', artist: '', title: '', length: '' }
 	]
 })
-export const isPagePlaying = writable(''
-)
+export const isPagePlaying = writable('')
 export const key = writable(undefined)
 export const iOS = _verifyUserAgent()
 export function updateSource() {

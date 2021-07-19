@@ -1,10 +1,14 @@
 <script>
-	import { fade, slide, fly } from "svelte/transition";
-	import Icon from "$components/Icon/Icon.svelte";
-	import Search from "$components/Search/Search.svelte";
+	import { fade, slide, fly } from 'svelte/transition'
+	import Icon from '$components/Icon/Icon.svelte'
+	import Search from '$components/Search/Search.svelte'
+	import { theme } from '$lib/stores/stores'
 </script>
 
-<div class="sidebar" transition:fly>
+<div
+	class="sidebar"
+	style={`background-color: var(--${$theme}-side)`}
+	transition:fly>
 	<section class="head">
 		<slot name="head">
 			<Search /></slot>

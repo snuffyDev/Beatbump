@@ -1,44 +1,43 @@
 <script>
-	import { browser, dev } from "$app/env";
-	import { fade, scale } from "svelte/transition";
-	import { onMount } from "svelte";
-	import { currentTrack, filterAutoPlay, theme } from "$stores/stores";
-	import { iOS } from "$stores/stores";
-	import Nav from "$components/Nav/Nav.svelte";
-	import Sidebar from "$components/Sidebar/Sidebar.svelte";
-	import Player from "$components/Player/Player.svelte";
-	import "../app.css";
-	import "../global/stylesheet.scss";
+	import { browser } from '$app/env'
+	import { onMount } from 'svelte'
+	import { currentTrack, filterAutoPlay, theme } from '$stores/stores'
+	import { iOS } from '$stores/stores'
+	import Nav from '$components/Nav/Nav.svelte'
+	import Sidebar from '$components/Sidebar/Sidebar.svelte'
+	import Player from '$components/Player/Player.svelte'
+	// import '../app.css'
+	// import '../global/stylesheet.scss'
 	// import Wrapper from "$components/Wrapper/Wrapper.svelte";
 	onMount(() => {
-		iOS.init();
+		iOS.init()
 		const getTheme = () => {
 			// console.log("themeswitch");
-			let ls = localStorage.getItem("theme");
-			ls ? theme.init(ls) : theme.init("dark");
-			let filter = localStorage.getItem("filterAutoPlay");
-			filter ? filterAutoPlay.init(filter) : filterAutoPlay.init(false);
-			console.log($filterAutoPlay);
+			let ls = localStorage.getItem('theme')
+			ls ? theme.init(ls) : theme.init('dark')
+			let filter = localStorage.getItem('filterAutoPlay')
+			filter ? filterAutoPlay.init(filter) : filterAutoPlay.init(false)
+			console.log($filterAutoPlay)
 			// if (ls) {
 			// 	theme.init(ls);
 			// } else {
 			// 	theme.init("dark");
 			// }
-		};
-		getTheme();
-		return;
-	});
+		}
+		getTheme()
+		return
+	})
 
-	let current = $currentTrack;
-	let width;
-	let route = "";
-	$: curTheme = $theme;
+	let current = $currentTrack
+	let width
+	let route = ''
+	$: curTheme = $theme
 </script>
 
 <svelte:window bind:innerWidth={width} />
 <div
 	class="body"
-	class:light={curTheme.includes("light") ? true : false}
+	class:light={curTheme.includes('light') ? true : false}
 	style={`background-color: var(--${curTheme}-base)`}>
 	{#if browser}
 		<nav class="nav" style={`background-color: var(--${curTheme}-top)`}>
@@ -53,13 +52,13 @@
 		<footer
 			class="footer-container"
 			style={`background-color: var(--${curTheme}-bottom)`}>
-			<Player nowPlaying={current} />
+			<Player {curTheme} />
 		</footer>
 	{/if}
 </div>
 
 <style lang="scss" global>
-	// @import "../global/stylesheet.scss";
+	@import '../global/stylesheet.scss';
 	// @import "../global/vars.css";
 	:root {
 		--ytm-bottom: #121018;
@@ -80,17 +79,22 @@
 		--dim-forms: #181a1a86;
 		--dim-side: #0b0c0f;
 
-		--light-base: #f6f6f6ff;
+		--light-base: rgb(243, 235, 235);
 		--light-bottom: #121018;
-		--light-top: #e3e4e8ff;
-		--darker-light: #aba9c3ff;
-		--light-side: #5b616aff;
+		--light-top: #cac8c9;
+		--light-forms: #aba9c3ff;
+		--light-side: #cac8c9;
 		--rich-black-fogra-29: #0c1217ff;
 		--light-text: #0d0d0fff;
 		--raisin-black: #171824ff;
 	}
+	.input {
+		&.light {
+			background-color: var(--darker-light);
+		}
+	}
 	:global(.light) {
-		* :not(.footer-container) {
+		* {
 			color: var(--light-text);
 		}
 	}
@@ -108,14 +112,18 @@
 		z-index: 1;
 	}
 	:global(.sidebar) {
-		background-color: theme-color("ytm", "side");
+		background-color: theme-color('ytm', 'side');
 	}
 	:global(.input) {
-		background-color: theme-color("ytm", "forms");
+		// background-color: theme-color('ytm', 'forms');
+		background-color: var(--ytm-forms);
+		&.light {
+			background-color: var(--darker-light);
+		}
 	}
-	:global(.selectCont) {
-		background-color: theme-color("ytm", "forms");
-	}
+	// :global(.selectCont) {
+	// 	background-color: theme-color('ytm', 'forms');
+	// }
 	:global(nav) {
 		border-bottom: 0.25px rgba(170, 170, 170, 0.116) solid;
 		// background-color: rgb(20 24 32 / 59%);

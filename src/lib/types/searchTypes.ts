@@ -1,3 +1,3 @@
 export type Search = {
-	contents: [];
-};
+	contents: []
+}

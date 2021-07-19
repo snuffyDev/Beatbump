@@ -1,51 +1,51 @@
 <script lang="ts">
-	import { getData } from "$lib/utils";
-	import { page } from "$app/stores";
-	import "../../../global/vars.css";
-	import { onMount } from "svelte";
-	import { theme } from "$lib/stores/stores";
-	export let headerContent;
-	export let items = [];
-	export let thumbnail = [];
-	export let description;
-	export let width;
-	let container;
-	let y = 0;
+	import { getData } from '$lib/utils'
+	import { page } from '$app/stores'
+	import '../../../global/vars.css'
+	import { onMount } from 'svelte'
+	import { theme } from '$lib/stores/stores'
+	export let headerContent
+	export let items = []
+	export let thumbnail = []
+	export let description
+	export let width
+	let container
+	let y = 0
 	onMount(() => {
-		let start;
+		let start
 
-		let gradient = document.getElementById("gradient");
+		let gradient = document.getElementById('gradient')
 
 		function handler(event) {
-			if (start === undefined) start = event.timestamp;
-			const scroll = gradient.getBoundingClientRect();
+			if (start === undefined) start = event.timestamp
+			const scroll = gradient.getBoundingClientRect()
 
-			const elapsed = event.timestamp - start;
+			const elapsed = event.timestamp - start
 
 			window.requestAnimationFrame(function (e) {
-				y = Math.min(Math.max(-scroll.top / window.innerHeight, 0), 1) * 125;
+				y = Math.min(Math.max(-scroll.top / window.innerHeight, 0), 1) * 125
 
 				// Math.min(-0.2 * scroll.top);
 				// console.log(y);
 				if (elapsed < 200) {
 					// Stop the animation after 2 seconds
-					window.requestAnimationFrame(handler);
+					window.requestAnimationFrame(handler)
 				}
 
-				window.cancelAnimationFrame(y);
+				window.cancelAnimationFrame(y)
 				// -scroll.top * 2;
 				// (-scroll.top Math.max(0, y / 40)0) * 2;
-			});
+			})
 
 			// console.log(y);
 		}
 		// window.requestAnimationFrame(handler);
 		// window.addEventListener("scroll", handler);
-		let wrapper = document.getElementById("wrapper");
+		let wrapper = document.getElementById('wrapper')
 
-		wrapper.addEventListener("scroll", handler, { passive: true });
-		return () => window.removeEventListener("scroll", handler);
-	});
+		wrapper.addEventListener('scroll', handler, { passive: true })
+		return () => window.removeEventListener('scroll', handler)
+	})
 </script>
 
 <!-- <svelte:window bind:scrollY={y} /> -->
@@ -126,7 +126,7 @@
 		min-height: 13rem;
 		&::before {
 			position: absolute;
-			content: "";
+			content: '';
 			top: 0;
 			bottom: 0;
 			left: 0;
@@ -165,7 +165,7 @@
 				font-weight: 700;
 				font-size: 2.5rem;
 				display: inline-block;
-				font-family: "Commissioner", sans-serif;
+				font-family: 'Commissioner', sans-serif;
 
 				// white-space: pre;
 				text-shadow: rgba(0, 0, 0, 0.171) 0.2rem -0.12rem 0.5rem;

@@ -1,15 +1,15 @@
 <script lang="ts">
-	import CarouselItem from "./CarouselItem.svelte";
-	export let setTitle = "";
-	export let items = [];
-	export let type = "";
-	import lazy from "$lib/lazy";
-	import { fade } from "svelte/transition";
-	import { goto } from "$app/navigation";
+	import CarouselItem from './CarouselItem.svelte'
+	export let setTitle = ''
+	export let items = []
+	export let type = ''
+	import lazy from '$lib/lazy'
+	import { fade } from 'svelte/transition'
+	import { goto } from '$app/navigation'
 
-	let section = [];
-	let arr = items;
-	let carousel;
+	let section = []
+	let arr = items
+	let carousel
 </script>
 
 <div class="header">
@@ -22,26 +22,26 @@
 		<!-- {#each arr as item, index} -->
 		<div class="contents" style="display:contents">
 			{#each items as item, i}
-				{#if type == "trending"}
+				{#if type == 'trending'}
 					<!-- {JSON.stringify(item[1], title, thumbnail, subtitle)} -->
 					<CarouselItem type="trending" {item} index={i} bind:section />
-				{:else if type == "artist"}
+				{:else if type == 'artist'}
 					<CarouselItem type="artist" {item} index={i} bind:section />
-				{:else if type == "new"}
+				{:else if type == 'new'}
 					<!-- content here -->
 					<section
 						class="item"
 						on:click={() => {
-							console.log();
-							let id = item.endpoint.browseId;
-							let type = item.endpoint.pageType;
-							scrollTo({ top: 0, left: 0, behavior: "smooth" });
+							console.log()
+							let id = item.endpoint.browseId
+							let type = item.endpoint.pageType
+							scrollTo({ top: 0, left: 0, behavior: 'smooth' })
 							goto(
-								"/release?type=" +
+								'/release?type=' +
 									encodeURIComponent(type) +
-									"&id=" +
+									'&id=' +
 									encodeURIComponent(id)
-							);
+							)
 						}}>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<div class="img">
@@ -55,7 +55,7 @@
 									type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 									data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PGRlZnM+PHBhdGggZD0iTTAgMGg1MTJ2NTEySDBWMHoiIGlkPSJwcmVmaXhfX2EiLz48L2RlZnM+PHVzZSB4bGluazpocmVmPSIjcHJlZml4X19hIiBvcGFjaXR5PSIuMjUiIGZpbGw9IiMyMjIiLz48L3N2Zz4="
 									use:lazy={{
-										src: item.thumbnails[0].url,
+										src: item.thumbnails[0].url
 									}} />
 							</div>
 						</div>
@@ -182,7 +182,7 @@
 		margin-bottom: 0;
 		display: block;
 		cursor: pointer;
-		content: "";
+		content: '';
 
 		::before {
 			display: block;

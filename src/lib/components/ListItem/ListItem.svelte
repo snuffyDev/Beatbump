@@ -60,11 +60,9 @@
 					</span>
 				{/if}
 			</span>
-			{#if item.artistNames || item.artistInfo?.artists}
+			{#if item.artistNames || item.artist?.artists}
 				<span class="artist"
-					>{item.artistNames
-						? item.artistNames
-						: item.artistInfo.artists}</span>
+					>{item.artistNames ? item.artistNames : item.artist.artists}</span>
 			{:else}
 				<span class="artist">{item.artist.name}</span>
 			{/if}

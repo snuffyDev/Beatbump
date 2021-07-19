@@ -1,53 +1,53 @@
 <script lang="ts">
-	import { fly, fade, slide } from "svelte/transition";
+	import { fly, fade, slide } from 'svelte/transition'
 	import {
 		afterUpdate,
 		beforeUpdate,
 		createEventDispatcher,
-		onMount,
-	} from "svelte";
-	import { cubicIn, cubicInOut } from "svelte/easing";
-	import { currentTitle } from "$stores/stores";
-	import { getSrc } from "$lib/utils";
-	import { clickOutside } from "$lib/js/clickOutside";
-	import list from "$lib/stores/list";
+		onMount
+	} from 'svelte'
+	import { cubicIn, cubicInOut } from 'svelte/easing'
+	import { currentTitle } from '$stores/stores'
+	import { getSrc } from '$lib/utils'
+	import { clickOutside } from '$lib/js/clickOutside'
+	import list from '$lib/stores/list'
 
-	export let autoId;
-	export let mixList = [];
-	export let show;
+	export let autoId
+	export let mixList = []
+	export let show
 
-	$: mixList = $list.mix;
+	$: mixList = $list.mix
 
-	let songList;
-	let items = [];
-	let active = document.getElementById(autoId);
+	let songList
+	let items = []
+	let active = document.getElementById(autoId)
 
-	const dispatch = createEventDispatcher();
+	const dispatch = createEventDispatcher()
 
 	onMount(() => {
-		if (active) active.scrollIntoView(true);
-	});
+		if (active) active.scrollIntoView(true)
+	})
 
-	$: if (active) active.scrollIntoView(true);
+	$: if (active) active.scrollIntoView(true)
 	afterUpdate(() => {
-		let active = document.getElementById(autoId);
-		if (active) active.scrollIntoView(true);
-	});
+		let active = document.getElementById(autoId)
+		if (active) active.scrollIntoView(true)
+	})
 	async function handleClick(i) {
-		autoId = i;
+		autoId = i
 		const src = await getSrc(mixList[i].videoId)
 			.then((url) => url)
-			.catch((err) => console.log(err));
-		currentTitle.set(mixList[autoId].title);
-		dispatch("updated", {
+			.catch((err) => console.log(err))
+		currentTitle.set(mixList[autoId].title)
+		dispatch('updated', {
 			src: `${src}`,
-			id: `${autoId}`,
-		});
+			id: `${autoId}`
+		})
 	}
 	function showList() {
-		dispatch("hide", {
-			showing: false,
-		});
+		dispatch('hide', {
+			showing: false
+		})
 	}
 </script>
 
@@ -57,8 +57,8 @@
 		class="listContainer"
 		use:clickOutside
 		on:click_outside={() => {
-			show = !show;
-			showList(show);
+			show = !show
+			showList(show)
 		}}
 		transition:fly={{ y: 0, duration: 125, easing: cubicInOut }}>
 		<div class="list">
@@ -73,7 +73,7 @@
 							class="item"
 							on:click={async () => {
 								// console.log(`${autoId}`)
-								handleClick(index);
+								handleClick(index)
 							}}>
 							<div class="pl-thumbnail" style="min-width:5rem; max-width:5rem;">
 								<img
@@ -87,7 +87,7 @@
 									<span>{item.title}</span>
 								</span>
 								<span class="p-artist">
-									<span>{item.artistInfo.artist}</span>
+									<span>{item.artist.artist}</span>
 								</span>
 							</div>
 							<span class="p-length">
@@ -97,7 +97,7 @@
 					{/each}
 				</ul>
 			{:else}
-				<div>
+				<div class="empty">
 					<h1>Empty!</h1>
 					<div class="subtitle">Choose a song to see your feed</div>
 				</div>
@@ -107,6 +107,9 @@
 {/if}
 
 <style lang="scss">
+	.empty > * {
+		color: white;
+	}
 	.p-length {
 		margin-left: auto;
 		align-self: center;
@@ -115,10 +118,12 @@
 	}
 	.listContainer {
 		isolation: auto;
-		box-shadow: 0.2em 0 3em 0em #00000040;
+		box-shadow: 0.1em -0.1em 0.1em 0em #00000040;
 		position: fixed;
 		margin: 0;
 		left: 0;
+		border-radius: 0.8em 0.8em 0 0;
+		color: white;
 		// bottom: -10em;
 		display: flex;
 		flex: 1 1 auto;
@@ -142,9 +147,10 @@
 		}
 		.list {
 			// background: #11151c;
-			background: theme-color("dim", "side");
+			background: theme-color('dim', 'side');
 			border-radius: 0.8em 0.8em 0 0;
 			border: 1px solid rgb(170 170 170);
+			color: white;
 			/* overflow-y: scroll; */
 			padding: 0;
 			/* display: inline; */
@@ -245,7 +251,7 @@
 	}
 
 	h1 {
-		font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+		font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS',
 			sans-serif;
 		text-transform: capitalize;
 		text-align: center;
@@ -259,7 +265,7 @@
 
 	img::before {
 		display: block;
-		content: "";
+		content: '';
 		padding-top: calc(100% * 2 / 3);
 		/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
 	}

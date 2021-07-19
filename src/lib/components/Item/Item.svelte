@@ -87,12 +87,9 @@
 	const itemHandler = () => {
 		explicit = data.explicit
 		title = data.title
-		thumbnail = data.thumbnails[0].url.replace(
-			/=(w(\d+))-(h(\d+))/g,
-			'=w96-h96'
-		)
+		thumbnail = data.thumbnails[0].url
 		if (data.type !== 'playlist') {
-			artist = data.artistInfo.artists[0]
+			artist = data.artistInfo.artist
 		}
 		if (title.length > 48) {
 			title = title.substring(0, 48) + '...'
@@ -132,7 +129,7 @@
 	<div class="innercard">
 		<div
 			class="itemWrapper"
-			on:click|capture|self={() => {
+			on:click|self={() => {
 				if (!loading) {
 					clickHandler()
 				}
@@ -146,7 +143,6 @@
 					<img
 						id="img"
 						referrerpolicy="origin-when-cross-origin"
-						data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PGRlZnM+PHBhdGggZD0iTTAgMGg1MTJ2NTEySDBWMHoiIGlkPSJwcmVmaXhfX2EiLz48L2RlZnM+PHVzZSB4bGluazpocmVmPSIjcHJlZml4X19hIiBvcGFjaXR5PSIuMjUiIGZpbGw9IiMyMjIiLz48L3N2Zz4="
 						loading="lazy"
 						src={thumbnail}
 						alt="thumbnail"

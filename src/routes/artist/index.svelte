@@ -1,29 +1,29 @@
 <script>
-	import { goto } from "$app/navigation";
-	import Carousel from "$components/Carousel/Carousel.svelte";
-	import ArtistPageHeader from "../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte";
+	import { goto } from '$app/navigation'
+	import Carousel from '$components/Carousel/Carousel.svelte'
+	import ArtistPageHeader from '../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte'
 
-	import Loading from "$components/Loading/Loading.svelte";
-	import { getData } from "$lib/utils";
-	import { page } from "$app/stores";
+	import Loading from '$components/Loading/Loading.svelte'
+	import { getData } from '$lib/utils'
+	import { page } from '$app/stores'
 
-	import { parseArtistPage } from "$lib/js/artistUtils";
-	import Icon from "$components/Icon/Icon.svelte";
-	import ListItem from "$components/ListItem/ListItem.svelte";
-	import CarouselItem from "$components/Carousel/CarouselItem.svelte";
-	import { browser } from "$app/env";
-	import { onMount, tick } from "svelte";
+	import { parseArtistPage } from '$lib/js/artistUtils'
+	import Icon from '$components/Icon/Icon.svelte'
+	import ListItem from '$components/ListItem/ListItem.svelte'
+	import CarouselItem from '$components/Carousel/CarouselItem.svelte'
+	import { browser } from '$app/env'
+	import { onMount, tick } from 'svelte'
 
-	let id = $page.query.get("id");
-	let description = "";
-	let width;
-	let headerContent = {};
-	let items = [];
-	let thumbnail = [];
-	let carouselItems = [];
-	let promise = parser();
+	let id = $page.query.get('id')
+	let description = ''
+	let width
+	let headerContent = {}
+	let items = []
+	let thumbnail = []
+	let carouselItems = []
+	let promise = parser()
 	async function parser() {
-		return await getData("", "", "browse", id, "MUSIC_PAGE_TYPE_ARTIST")
+		return await getData('', '', 'browse', id, 'MUSIC_PAGE_TYPE_ARTIST')
 			.then(
 				({
 					header: { musicImmersiveHeaderRenderer },
@@ -33,38 +33,38 @@
 								{
 									tabRenderer: {
 										content: {
-											sectionListRenderer: { contents },
-										},
-									},
-								},
-							],
-						},
-					},
+											sectionListRenderer: { contents }
+										}
+									}
+								}
+							]
+						}
+					}
 				}) => {
-					return parseArtistPage(musicImmersiveHeaderRenderer, contents);
+					return parseArtistPage(musicImmersiveHeaderRenderer, contents)
 				}
 			)
 			.then((d) => {
-				console.log(d);
-				carouselItems = [...d.carouselItems];
-				headerContent = d[0];
+				console.log(d)
+				carouselItems = [...d.carouselItems]
+				headerContent = d[0]
 				headerContent.thumbnails.forEach((h) => {
-					thumbnail.push(h);
-				});
+					thumbnail.push(h)
+				})
 				if (d.songs) {
-					items = [...d.songs];
+					items = [...d.songs]
 				} else {
-					items = undefined;
+					items = undefined
 				}
 
-				description = headerContent.description.split(".");
+				description = headerContent.description.split('.')
 				// console.log(headerContent, d, description, items)
-				return { headerContent, items };
-			});
+				return { headerContent, items }
+			})
 	}
-	let section = [];
+	let section = []
 	if (width < 501) {
-		description = headerContent.description.split(".");
+		description = headerContent.description.split('.')
 		// console.log(description)
 	}
 </script>
@@ -72,7 +72,7 @@
 <svelte:head>
 	<title
 		>{headerContent.name == undefined
-			? "Artist - "
+			? 'Artist - '
 			: `${headerContent.name} - `}Beatbump</title>
 </svelte:head>
 
@@ -146,7 +146,7 @@
 		padding: 1rem 0.8rem 0.8rem 0.8rem;
 		margin: 0;
 		&:before {
-			content: "";
+			content: '';
 			position: absolute;
 			top: 0;
 			right: 0;

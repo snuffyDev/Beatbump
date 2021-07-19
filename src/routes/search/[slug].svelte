@@ -46,7 +46,7 @@
 
 	$: search.set(contents)
 	// $:
-	let songTitle = $page.params.slug
+	$: songTitle = $page.params.slug
 	let ctoken = continuation?.continuation
 	let itct = continuation?.clickTrackingParams
 	// console.log(contents);

@@ -1,5 +1,4 @@
-
-import { derived, writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store'
 
 const settings = writable({
 	theme: '',
@@ -7,7 +6,5 @@ const settings = writable({
 })
 
 export default {
-	subscribe: settings.subscribe,
-
-
+	subscribe: settings.subscribe
 }

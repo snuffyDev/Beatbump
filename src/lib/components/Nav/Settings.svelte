@@ -1,41 +1,41 @@
 <script>
-	import Search from "$components/Search/Search.svelte";
-	import { fade } from "svelte/transition";
-	import Icon from "$components/Icon/Icon.svelte";
-	import { circIn } from "svelte/easing";
-	import { goto } from "$app/navigation";
-	import { clickOutside } from "$lib/js/clickOutside";
-	import { filterAutoPlay, theme } from "$stores/stores";
-	import { onMount } from "svelte";
-	import { page } from "$app/stores";
+	import Search from '$components/Search/Search.svelte'
+	import { fade } from 'svelte/transition'
+	import Icon from '$components/Icon/Icon.svelte'
+	import { circIn } from 'svelte/easing'
+	import { goto } from '$app/navigation'
+	import { clickOutside } from '$lib/js/clickOutside'
+	import { filterAutoPlay, theme } from '$stores/stores'
+	import { onMount } from 'svelte'
+	import { page } from '$app/stores'
 
-	export let width;
+	export let width
 
-	let isHidden = true;
-	let hidden = isHidden ? true : false;
-	$: curTheme = $theme;
-	let isSettings = true;
-	let settingsHidden = isSettings ? true : false;
-	let setTheme = localStorage.getItem("theme")
-		? localStorage.getItem("theme")
-		: "";
-	$: setFilter = $filterAutoPlay;
+	let isHidden = true
+	let hidden = isHidden ? true : false
+	$: curTheme = $theme
+	let isSettings = true
+	let settingsHidden = isSettings ? true : false
+	let setTheme = localStorage.getItem('theme')
+		? localStorage.getItem('theme')
+		: ''
+	$: setFilter = $filterAutoPlay
 
-	let themeSet = $theme;
-	$: console.log($page.path);
+	let themeSet = $theme
+	$: console.log($page.path)
 
 	let themes = [
-		{ name: "dark" },
-		{ name: "dim" },
-		{ name: "ytm" },
-		{ name: "light" },
-	];
+		{ name: 'dark' },
+		{ name: 'dim' },
+		{ name: 'ytm' },
+		{ name: 'light' }
+	]
 </script>
 
 <div
 	use:clickOutside
 	on:click_outside={() => {
-		settingsHidden = !settingsHidden;
+		settingsHidden = !settingsHidden
 	}}
 	class="nav-settings"
 	style={`background-color: var(--${curTheme}-top)}`}
@@ -43,14 +43,14 @@
 	<!-- <label for="search"><em>search</em></label> -->
 	<div class="setting">
 		<label for="select" class="s-text">Theme:</label>
-		<div class="selectCont">
+		<div class="selectCont" style={`background-color: var(--${$theme}-forms)`}>
 			<!-- svelte-ignore a11y-no-onchange -->
 			<select
 				id="select"
 				class="select"
 				bind:value={setTheme}
 				on:change={() => {
-					theme.set(setTheme);
+					theme.set(setTheme)
 				}}>
 				{#each themes as theme}
 					<option value={theme.name} selected={setTheme}>{theme.name}</option>
@@ -64,7 +64,7 @@
 				type="checkbox"
 				bind:checked={setFilter}
 				on:change={() => {
-					filterAutoPlay.set(setFilter);
+					filterAutoPlay.set(setFilter)
 
 					// console.log(setFilter);
 				}} /></span>

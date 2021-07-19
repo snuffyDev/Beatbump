@@ -1,27 +1,27 @@
 <script>
-	import Settings from "./Settings.svelte";
+	import Settings from './Settings.svelte'
 
-	import Search from "$components/Search/Search.svelte";
-	import { fade } from "svelte/transition";
-	import Icon from "$components/Icon/Icon.svelte";
-	import { circIn } from "svelte/easing";
-	import { goto } from "$app/navigation";
-	import { clickOutside } from "$lib/js/clickOutside";
-	import { filterAutoPlay, theme } from "$stores/stores";
-	import { onMount } from "svelte";
-	import { page } from "$app/stores";
+	import Search from '$components/Search/Search.svelte'
+	import { fade } from 'svelte/transition'
+	import Icon from '$components/Icon/Icon.svelte'
+	import { circIn } from 'svelte/easing'
+	import { goto } from '$app/navigation'
+	import { clickOutside } from '$lib/js/clickOutside'
+	import { filterAutoPlay, theme } from '$stores/stores'
+	import { onMount } from 'svelte'
+	import { page } from '$app/stores'
 
-	export let width;
+	export let width
 
-	let isHidden = true;
-	let hidden = isHidden ? true : false;
-	$: curTheme = $theme;
-	let isSettings = true;
-	let settingsHidden = isSettings ? true : false;
-	let setTheme = localStorage.getItem("theme")
-		? localStorage.getItem("theme")
-		: "";
-	$: setFilter = $filterAutoPlay;
+	let isHidden = true
+	let hidden = isHidden ? true : false
+	$: curTheme = $theme
+	let isSettings = true
+	let settingsHidden = isSettings ? true : false
+	let setTheme = localStorage.getItem('theme')
+		? localStorage.getItem('theme')
+		: ''
+	$: setFilter = $filterAutoPlay
 	// onMount(() => {
 	// 	if (!$theme) {
 	// 		setTheme = $theme
@@ -34,16 +34,16 @@
 	// 	history.back();
 	// 	goto(ref.length > 0 ? ref : home);
 	// };
-	let themeSet = $theme;
-	$: console.log($page.path);
+	let themeSet = $theme
+	$: console.log($page.path)
 
 	let themes = [
-		{ name: "dark" },
-		{ name: "dim" },
-		{ name: "ytm" },
-		{ name: "light" },
-	];
-	$: console.log(setTheme);
+		{ name: 'dark' },
+		{ name: 'dim' },
+		{ name: 'ytm' },
+		{ name: 'light' }
+	]
+	$: console.log(setTheme)
 	// $: theme.set($theme)
 </script>
 
@@ -72,7 +72,7 @@
 		<div
 			class="nav-item-desktop"
 			on:click={() => {
-				settingsHidden = !settingsHidden;
+				settingsHidden = !settingsHidden
 			}}>
 			<svelte:component this={Icon} name="settings" size="1.75em" />
 		</div>
@@ -82,7 +82,7 @@
 	</div>
 {/if}
 {#if width < 640}
-	<section class="homeIcon" on:click={() => goto("/")}>
+	<section class="homeIcon" on:click={() => goto('/')}>
 		<Icon name="home" size="1.75em" />
 	</section>
 	<section class="items">
@@ -90,7 +90,7 @@
 			<div
 				use:clickOutside
 				on:click_outside={() => {
-					hidden = !hidden;
+					hidden = !hidden
 				}}
 				class="nav-search"
 				transition:fade={{ duration: 120, easing: circIn }}
@@ -99,11 +99,11 @@
 				<Search
 					type="inline"
 					on:submitted={(event) => {
-						hidden = !hidden;
+						hidden = !hidden
 					}} />
 				<div
 					on:click={() => {
-						hidden = !hidden;
+						hidden = !hidden
 					}}
 					class="x-button">
 					<Icon name="x" size="1.5em" />
@@ -113,7 +113,7 @@
 		<div
 			class="nav-item"
 			on:click={() => {
-				hidden = !hidden;
+				hidden = !hidden
 			}}>
 			<svelte:component this={Icon} name="search" size="1.75em" />
 		</div>
@@ -123,7 +123,7 @@
 		<div
 			class="nav-item"
 			on:click={() => {
-				settingsHidden = !settingsHidden;
+				settingsHidden = !settingsHidden
 			}}>
 			<svelte:component this={Icon} name="settings" size="1.75em" />
 		</div>

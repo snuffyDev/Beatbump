@@ -100,7 +100,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 			}
 		)[0];
 		// const [contents] = playlist;
-		let parseTrack: Array<PlaylistItem> = contents.map(
+		const parseTrack: Array<PlaylistItem> = contents.map(
 			({ musicResponsiveListItemRenderer }) => {
 				const length = pb(
 					musicResponsiveListItemRenderer,
@@ -141,7 +141,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 				const title = titleBody.text;
 				// console.log(artistEndpoint);
 				const artist: Artist = {
-					name: artistEndpoint.text,
+					artist: artistEndpoint.text,
 					browseId:
 						artistEndpoint?.navigationEndpoint?.browseEndpoint?.browseId,
 				};

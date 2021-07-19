@@ -21,7 +21,11 @@
 		showing = !showing
 		console.log(showing)
 	}}>
-	<svelte:component this={Icon} size="1.5em" name="dots" />
+	<svelte:component
+		this={Icon}
+		color={type == 'player' ? 'white' : 'currentColor'}
+		size="1.5em"
+		name="dots" />
 </div>
 {#if menuToggle}
 	<div

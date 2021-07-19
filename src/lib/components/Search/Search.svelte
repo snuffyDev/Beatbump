@@ -1,58 +1,61 @@
 <script>
 	let options = [
-		{ label: "Songs", params: "EgWKAQIIAWoKEAMQBBAKEAUQCQ%3D%3D" },
-		{ label: "Videos", params: "EgWKAQIQAWoKEAMQBBAKEAUQCQ%3D%3D" },
-		{ label: "All Playlists", params: "EgWKAQIoAWoKEAMQBBAKEAUQCQ%3D%3D" },
+		{ label: 'Songs', params: 'EgWKAQIIAWoKEAMQBBAKEAUQCQ%3D%3D' },
+		{ label: 'Videos', params: 'EgWKAQIQAWoKEAMQBBAKEAUQCQ%3D%3D' },
+		{ label: 'All Playlists', params: 'EgWKAQIoAWoKEAMQBBAKEAUQCQ%3D%3D' },
 		{
-			label: "Featured Playlists",
-			params: "EgeKAQQoADgBagwQDhAKEAkQAxAEEAU%3D",
+			label: 'Featured Playlists',
+			params: 'EgeKAQQoADgBagwQDhAKEAkQAxAEEAU%3D'
 		},
 		{
-			label: "Community Playlists",
-			params: "EgeKAQQoAEABagwQDhAKEAkQAxAEEAU%3D",
-		},
-	];
-	export let type;
-	import { goto } from "$app/navigation";
-	import { search, searchState } from "$lib/stores/stores";
-	import { createEventDispatcher, tick } from "svelte";
-	let endpoint = "search";
-	let filterType;
-	let songTitle = "";
-	let filter = filterType ? filterType : options[0].params;
-	const dispatch = createEventDispatcher();
+			label: 'Community Playlists',
+			params: 'EgeKAQQoAEABagwQDhAKEAkQAxAEEAU%3D'
+		}
+	]
+	export let type
+	import { goto } from '$app/navigation'
+	import { search, searchState, theme } from '$lib/stores/stores'
+	import { createEventDispatcher, tick } from 'svelte'
+	let endpoint = 'search'
+	let filterType
+	let songTitle = ''
+	let filter = filterType ? filterType : options[0].params
+	const dispatch = createEventDispatcher()
 	// searchState.set({ option: undefined, text: undefined });
-	$: console.log($searchState);
+	$: console.log($searchState)
 	async function handleSubmit(e) {
-		e.preventDefault();
-		dispatch("submitted", { submitted: true });
-		searchState.set({ option: filter, text: songTitle });
+		e.preventDefault()
+		dispatch('submitted', { submitted: true })
+		searchState.set({ option: filter, text: songTitle })
 		// invalidate($page.path)
 		// let URL_BASE = new URL();
 		let url =
 			`/search/` +
 			encodeURIComponent(encodeURIComponent(songTitle)) +
 			`?filter=` +
-			filter;
+			filter
 
-		await tick();
-		search.set([]);
+		await tick()
+		search.set([])
 		window.scrollTo({
-			behavior: "smooth",
+			behavior: 'smooth',
 			top: 0,
-			left: 0,
-		});
+			left: 0
+		})
 
-		goto(url);
+		goto(url)
 	}
 </script>
 
 <form class={type} on:submit|preventDefault={(e) => handleSubmit(e)}>
 	<!-- <label for="search"><em>search</em></label> -->
 	<div class="nav-item">
-		<div class="input" class:inline={type == "inline" ? true : false}>
+		<div
+			class="input"
+			style={`background-color: var(--${$theme}-forms)`}
+			class:inline={type == 'inline' ? true : false}>
 			<div class="searchBtn" on:click={(e) => handleSubmit(e)} />
-			{#if type == "inline"}<input
+			{#if type == 'inline'}<input
 					autofocus
 					autocorrect="off"
 					type="search"
@@ -68,11 +71,15 @@
 
 	<!-- <label for="option"><em>search type</em></label> -->
 	<div class="nav-item">
-		<div class="selectCont" class:inline={type == "inline" ? true : false}>
+		<div
+			class="selectCont"
+			style={`background-color: var(--${$theme}-forms)`}
+			class:inline={type == 'inline' ? true : false}>
 			<select
+				style={`background-color: var(--${$theme}-forms)`}
 				class="select"
 				on:blur={() => {
-					searchState.set({ option: filter, text: songTitle });
+					searchState.set({ option: filter, text: songTitle })
 				}}
 				bind:value={filter}>
 				{#each options as option (option.params)}

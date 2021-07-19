@@ -75,7 +75,7 @@ export async function get({ query }) {
 		const data = await response.json()
 		const trimResponse = () => {
 			// Use destructuring to get the contents of the playlistPanelRenderer
-			let {
+			const {
 				contents: {
 					singleColumnMusicWatchNextResultsRenderer: {
 						tabbedRenderer: {
@@ -99,7 +99,7 @@ export async function get({ query }) {
 				}
 			} = data
 
-			let temp = []
+			const temp = []
 			/* We require playlistPanelVideoRenderer as our only responses
                only one other response is automixPreviewVideoRenderer which is not going to be used*/
 			rest.contents.forEach(({ playlistPanelVideoRenderer }) => {
@@ -114,22 +114,22 @@ export async function get({ query }) {
                 by the automix and other components.
             */
 			const response = temp.map((item) => {
-				let title = item.title.runs[0].text
-				let {
+				const title = item.title.runs[0].text
+				const {
 					videoId,
 					playlistId,
 					index,
 					params
 				} = item.navigationEndpoint.watchEndpoint
-				let length = item.lengthText.runs[0].text
-				let mixList =
+				const length = item.lengthText.runs[0].text
+				const mixList =
 					item.menu.menuRenderer.items[0].menuNavigationItemRenderer
 						.navigationEndpoint.watchEndpoint.playlistId
-				let browseId =
+				const browseId =
 					item?.longBylineText?.runs[0]?.navigationEndpoint?.browseEndpoint
 						?.browseId
-				let thumbnail = item.thumbnail.thumbnails[0].url
-				let artistInfo = {
+				const thumbnail = item.thumbnail.thumbnails[0].url
+				const artistInfo = {
 					pageType: 'MUSIC_PAGE_TYPE_ARTIST',
 					artist: item.shortBylineText.runs[0].text,
 					browseId:

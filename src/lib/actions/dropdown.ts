@@ -8,8 +8,8 @@ export function addToQueue(data, mixList, key) {
 		title: data.title,
 		artist: data.artistInfo.artists[0],
 		thumbnail: data.thumbnail,
-		length: data.length,
-	};
-	return mixList.splice(key + 1, 0, next);
-	console.log(mixList);
+		length: data.length
+	}
+	return mixList.splice(key + 1, 0, next)
+	console.log(mixList)
 }
