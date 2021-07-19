@@ -1,130 +1,140 @@
 <script lang="ts">
-	import Dropdown from "$components/Dropdown/Dropdown.svelte";
+	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 
-	export let data;
-	import { fade } from "svelte/transition";
-	import Loading from "$components/Loading/Loading.svelte";
-	import { onMount } from "svelte";
+	export let data
+	import { fade } from 'svelte/transition'
+	import Loading from '$components/Loading/Loading.svelte'
+	import { onMount } from 'svelte'
 
-	import { currentMix, currentTitle, key, currentTrack } from "$stores/stores";
-	import * as utils from "$lib/utils";
-	import Icon from "$components/Icon/Icon.svelte";
-	import { goto } from "$app/navigation";
-	import { addToQueue } from "$lib/actions/dropdown";
-	import list from "$stores/list";
+	import { currentMix, currentTitle, key, currentTrack } from '$stores/stores'
+	import * as utils from '$lib/utils'
+	import Icon from '$components/Icon/Icon.svelte'
+	import { goto } from '$app/navigation'
+	import { addToQueue } from '$lib/actions/dropdown'
+	import list from '$stores/list'
+	import DropdownItem from '../Carousel/DropdownItem.svelte'
 	// import { addToQueue } from '$lib/utils'
 
-	let ctoken = "";
-	let videoId = "";
-	let playlistId = "";
-	$: title = songTitle = "...";
+	let ctoken = ''
+	let videoId = ''
+	let playlistId = ''
+	let songTitle
+	$: title = songTitle = '...'
 
-	let src;
-	let songTitle;
-	let video;
-	let thumbnail;
+	let src
+	let video
+	let thumbnail
 
-	let explicit;
-	let clicked;
-	let artist;
-	let hidden = clicked ? true : false;
-	let loading = false;
-	let id = $key;
+	let explicit
+	let clicked
+	let artist
+	let hidden = clicked ? true : false
+	let loading = false
+	let id = $key
+	$: mixList = $list.mix
+
+	let DropdownItems = [
+		{
+			text: 'View Artist',
+			icon: 'artist',
+			action: () => {
+				window.scrollTo({
+					behavior: 'smooth',
+					top: 0,
+					left: 0
+				})
+				goto(
+					`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
+				)
+			}
+		},
+		{
+			text: 'Go to album',
+			icon: 'list',
+			action: () => {
+				window.scrollTo({
+					behavior: 'smooth',
+					top: 0,
+					left: 0
+				})
+				goto(`/release?id=${item?.albumInfo?.browseId}`)
+			}
+		},
+		{
+			text: 'Add to Queue',
+			icon: 'queue',
+			action: () => list.addNext(item, $key)
+		}
+	]
+	if (data.type == 'playlist') {
+		DropdownItems.splice(1, 1, {
+			text: 'View Playlist',
+			icon: 'list',
+			action: () => {
+				window.scrollTo({
+					behavior: 'smooth',
+					top: 0,
+					left: 0
+				})
+				goto(`/playlist?list=${item?.playlistId}`)
+			}
+		})
+	}
 	onMount(() => {
-		itemHandler();
-	});
+		itemHandler()
+	})
 
 	const itemHandler = () => {
-		explicit = data.explicit;
-		title = data.title;
+		explicit = data.explicit
+		title = data.title
 		thumbnail = data.thumbnails[0].url.replace(
 			/=(w(\d+))-(h(\d+))/g,
-			"=w256-h256"
-		);
-		if (data.type !== "playlist") {
-			artist = data.artistInfo.artists[0];
+			'=w96-h96'
+		)
+		if (data.type !== 'playlist') {
+			artist = data.artistInfo.artists[0]
 		}
 		if (title.length > 48) {
-			title = title.substring(0, 48) + "...";
+			title = title.substring(0, 48) + '...'
 		} else {
-			title = title;
+			title = title
 		}
-	};
+	}
 
 	// console.log(type)
 
 	const clickHandler = async () => {
 		try {
-			loading = true;
-			videoId = data.videoId ? data.videoId : "";
-			playlistId = data.playlistId ? data.playlistId : data.shuffle.playlistId;
-			if (data.type == "playlist") {
-				await list.startPlaylist(playlistId);
+			loading = true
+			videoId = data.videoId ? data.videoId : ''
+			playlistId = data.playlistId ? data.playlistId : data.shuffle.playlistId
+			if (data.type == 'playlist') {
+				await list.startPlaylist(playlistId)
 			} else {
-				await list.initList(videoId, playlistId);
+				await list.initList(videoId, playlistId)
 			}
-			key.set(0);
-			console.log($list.mix);
-			currentTrack.set({ ...$list.mix[0] });
-			loading = false;
-			return;
+			key.set(0)
+			console.log($list.mix)
+			currentTrack.set({ ...$list.mix[0] })
+			loading = false
+			return
 		} catch (error) {
-			console.log(error);
-			return;
+			console.log(error)
+			return
 		}
-	};
+	}
 
-	// 	if (data.type == "playlist") {
-	// 		radio = await utils
-	// 			.getNext(0, "", videoId, playlistId, ctoken)
-	// 			.catch((err) => console.log(`error:` + err));
-	// 	} else {
-	// 		radio = await utils
-	// 			.getNext(0, "", videoId, playlistId, ctoken)
-	// 			.catch((err) => console.log(`error:` + err));
-	// 	}
-	// 	videoId = radio.results[0].videoId;
-	// 	// console.log(radio, `radio`)
-	// 	await utils.getSrc(videoId);
-	// 	let thumbnail = radio.results[0].thumbnail;
-	// 	currentMix.set({
-	// 		videoId: `${videoId}`,
-	// 		playlistId: `${playlistId}`,
-	// 		list: [
-	// 			...radio.results.map((d, i) => ({
-	// 				autoMixList: d.autoMixList,
-	// 				continuation: radio.continuation,
-	// 				artistId: d.artistInfo.browseId,
-	// 				itct: radio.itct,
-	// 				id: d.index,
-	// 				videoId: d.videoId,
-	// 				title: d.title,
-	// 				artist: d.artistInfo.artist,
-	// 				thumbnail: d.thumbnail,
-	// 				length: d.length,
-	// 			})),
-	// 		],
-	// 	});
-	// 	currentTitle.set(title);
-
-	// 	currentTrack.set({ ...radio[0] });
-	// 	key.set(0);
-
-	// 	loading = false;
-	// };
-
-	let mixList = $currentMix.list;
-	let showing;
-	$: toggle = showing ? true : false;
+	let showing
+	$: toggle = showing ? true : false
 </script>
 
 <div class="container" class:hidden>
 	<div class="innercard">
 		<div
 			class="itemWrapper"
-			on:click={() => {
+			on:click|capture|self={() => {
 				if (!loading) {
-					clickHandler();
+					clickHandler()
 				}
 			}}>
 			<div class="img-container">
@@ -149,44 +159,23 @@
 					<span class="explicit"> E </span>
 				{/if}
 				<p>
-					{data.type == "playlist" ? `${data.metaData}` : `by ${artist}`}
+					{data.type == 'playlist' ? `${data.metaData}` : `by ${artist}`}
+					{#if data.albumInfo}&centerdot; <a
+							href="/release?id={data?.albumInfo?.browseId}"
+							>{data.albumInfo.title}</a>
+					{/if}
 				</p>
 			</div>
 		</div>
 		<div class="menu">
 			<Dropdown>
-				<div slot="content">
-					<div
-						class:hidden={data.type == "playlist"}
-						class="dd-item"
-						on:click={() => {
-							scrollTo({ top: 0, left: 0, behavior: "smooth" });
-							goto(`/artist?id=${data.artistInfo?.browseId}`, {
-								replaceState: true,
-							});
-						}}
-						href={`/artist?id=${data.artistInfo?.browseId}`}>
-						<Icon name="artist" size="1.5em" />
-						<div class="dd-text">View Artist</div>
-					</div>
-					<div
-						class="dd-item"
-						on:click={() => {
-							scrollTo({ top: 0, left: 0, behavior: "smooth" });
-							goto(`/playlist?list=${data?.browseId}`);
-						}}
-						class:hidden={data.type !== "playlist"}>
-						<Icon name="list" size="1.5em" />
-						<div class="dd-text">Go to Playlist Page</div>
-					</div>
-					<div
-						class="dd-item"
-						on:click={() => {
-							addToQueue(data, mixList, id);
-						}}>
-						<Icon name="queue" size="1.5rem" />
-						<div class="dd-text">Add to Queue</div>
-					</div>
+				<div slot="items">
+					{#each DropdownItems as item}
+						<DropdownItem
+							on:click={() => item.action}
+							text={item.text}
+							icon={item.icon} />
+					{/each}
 				</div>
 			</Dropdown>
 		</div>
@@ -252,7 +241,7 @@
 		flex-direction: column;
 		flex-wrap: nowrap;
 
-		&:active:not(.menu) {
+		&:active:not(.menuButtons):not(.menu) {
 			background: lighten(#212225, 3%);
 			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
 		}
@@ -285,7 +274,7 @@
 	}
 	img::before {
 		display: block;
-		content: "";
+		content: '';
 		padding-top: calc(100% * 2 / 3);
 		/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
 	}

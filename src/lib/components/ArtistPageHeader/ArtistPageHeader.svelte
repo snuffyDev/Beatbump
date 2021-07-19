@@ -3,6 +3,7 @@
 	import { page } from "$app/stores";
 	import "../../../global/vars.css";
 	import { onMount } from "svelte";
+	import { theme } from "$lib/stores/stores";
 	export let headerContent;
 	export let items = [];
 	export let thumbnail = [];
@@ -22,11 +23,11 @@
 			const elapsed = event.timestamp - start;
 
 			window.requestAnimationFrame(function (e) {
-				y = Math.min(Math.max(-scroll.top / window.innerWidth, 0), 5) * 200;
+				y = Math.min(Math.max(-scroll.top / window.innerHeight, 0), 1) * 125;
 
 				// Math.min(-0.2 * scroll.top);
 				// console.log(y);
-				if (elapsed < 2000) {
+				if (elapsed < 200) {
 					// Stop the animation after 2 seconds
 					window.requestAnimationFrame(handler);
 				}
@@ -52,10 +53,10 @@
 	<div class="artist-thumbnail">
 		<div
 			bind:this={container}
-			style={`background-image: linear-gradient(0turn, var(--ytm-base) ${Math.min(
+			style={`background-image: linear-gradient(0turn, var(--${$theme}-base) ${Math.min(
 				y,
 				75
-			)}%, transparent); transition: cubic-bezier(0.6, -0.28, 0.74, 0.05) background-image 125ms`}
+			)}%, transparent); transition: cubic-bezier(0.6, -0.28, 0.74, 0.05) all 120ms`}
 			id="gradient"
 			class="gradient" />
 		<picture class="header-thumbnail">

@@ -117,26 +117,13 @@
 			autoId++; // console.log(autoId)
 			key.set(autoId);
 
-			player.src = utils.getSrc($list.mix[autoId].videoId).then((url) => url);
+			player.src = utils.getSrc(mixList[autoId].videoId).then((url) => url);
 
 			// currentTitle.set($list.mix[autoId].title);
 			once = false;
 		}
 		once = false;
 	};
-	// $: console.log($key, autoId);
-	/* TODO: implement this eventually.
-    format seconds to MM:SS for UI
-    */
-	function format(seconds) {
-		if (isNaN(seconds)) return "...";
-
-		const minutes = Math.floor(seconds / 60);
-		seconds = Math.floor(seconds % 60);
-		if (seconds < 10) seconds = "0" + seconds;
-
-		return `${minutes}:${seconds}`;
-	}
 
 	const progress = tweened(0, {
 		duration: duration,

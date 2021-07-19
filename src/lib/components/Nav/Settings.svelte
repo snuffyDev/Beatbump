@@ -1,6 +1,4 @@
 <script>
-	import Settings from "./Settings.svelte";
-
 	import Search from "$components/Search/Search.svelte";
 	import { fade } from "svelte/transition";
 	import Icon from "$components/Icon/Icon.svelte";
@@ -22,18 +20,7 @@
 		? localStorage.getItem("theme")
 		: "";
 	$: setFilter = $filterAutoPlay;
-	// onMount(() => {
-	// 	if (!$theme) {
-	// 		setTheme = $theme
-	// 	} else {
-	// 		setTheme = $theme
-	// 	}
-	// })
-	// const naviBack = (home = "/trending") => {
-	// 	const ref = document.referrer;
-	// 	history.back();
-	// 	goto(ref.length > 0 ? ref : home);
-	// };
+
 	let themeSet = $theme;
 	$: console.log($page.path);
 
@@ -43,92 +30,46 @@
 		{ name: "ytm" },
 		{ name: "light" },
 	];
-	$: console.log(setTheme);
-	// $: theme.set($theme)
 </script>
 
-<div class="logo">
-	<!-- {#if $page.path !== "/trending"}
-		<div class="back-button" transition:fade on:click={() => naviBack}>
-			<Icon name="chevron-left" size="1.5em" />
+<div
+	use:clickOutside
+	on:click_outside={() => {
+		settingsHidden = !settingsHidden;
+	}}
+	class="nav-settings"
+	style={`background-color: var(--${curTheme}-top)}`}
+	transition:fade={{ duration: 120, easing: circIn }}>
+	<!-- <label for="search"><em>search</em></label> -->
+	<div class="setting">
+		<label for="select" class="s-text">Theme:</label>
+		<div class="selectCont">
+			<!-- svelte-ignore a11y-no-onchange -->
+			<select
+				id="select"
+				class="select"
+				bind:value={setTheme}
+				on:change={() => {
+					theme.set(setTheme);
+				}}>
+				{#each themes as theme}
+					<option value={theme.name} selected={setTheme}>{theme.name}</option>
+				{/each}
+			</select>
 		</div>
-	{:else} --><a
-		href="/trending">
-		<img
-			src="/logo-header.png"
-			width="2.5rem"
-			height="0.5rem"
-			transition:fade
-			alt="logo"
-			title="Beatbump Home" />
-	</a>
-	<!-- {/if} -->
-</div>
-{#if width > 640}
-	<div
-		style="background-color:inherit;"
-		class:shown={width > 640}
-		class:desktop={width < 640}>
-		<div
-			class="nav-item-desktop"
-			on:click={() => {
-				settingsHidden = !settingsHidden;
-			}}>
-			<svelte:component this={Icon} name="settings" size="1.75em" />
-		</div>
-		{#if !settingsHidden}
-			<Settings />
-		{/if}
 	</div>
-{/if}
-{#if width < 640}
-	<section class="homeIcon" on:click={() => goto("/")}>
-		<Icon name="home" size="1.75em" />
-	</section>
-	<section class="items">
-		{#if !hidden}
-			<div
-				use:clickOutside
-				on:click_outside={() => {
-					hidden = !hidden;
-				}}
-				class="nav-search"
-				transition:fade={{ duration: 120, easing: circIn }}
-				class:hidden>
-				<!-- <label for="search"><em>search</em></label> -->
-				<Search
-					type="inline"
-					on:submitted={(event) => {
-						hidden = !hidden;
-					}} />
-				<div
-					on:click={() => {
-						hidden = !hidden;
-					}}
-					class="x-button">
-					<Icon name="x" size="1.5em" />
-				</div>
-			</div>
-		{/if}
-		<div
-			class="nav-item"
-			on:click={() => {
-				hidden = !hidden;
-			}}>
-			<svelte:component this={Icon} name="search" size="1.75em" />
-		</div>
-		{#if !settingsHidden}
-			<Settings />
-		{/if}
-		<div
-			class="nav-item"
-			on:click={() => {
-				settingsHidden = !settingsHidden;
-			}}>
-			<svelte:component this={Icon} name="settings" size="1.75em" />
-		</div>
-	</section>
-{/if}
+	<div class="setting">
+		<span class="s-text"
+			>Dedupe Automix: <input
+				type="checkbox"
+				bind:checked={setFilter}
+				on:change={() => {
+					filterAutoPlay.set(setFilter);
+
+					// console.log(setFilter);
+				}} /></span>
+	</div>
+</div>
 
 <style lang="scss">
 	.desktop.nav-item {

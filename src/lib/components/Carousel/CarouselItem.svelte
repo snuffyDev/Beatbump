@@ -1,28 +1,52 @@
 <script lang="ts">
-	import lazy from "$lib/lazy";
-	import { trendingHandler } from "$lib/js/indexUtils";
-	import Loading from "$components/Loading/Loading.svelte";
-	import { currentMix, currentTitle, currentTrack, key } from "$stores/stores";
-	import { fade } from "svelte/transition";
-	import Dropdown from "$components/Dropdown/Dropdown.svelte";
-	import { goto } from "$app/navigation";
-	import Icon from "$components/Icon/Icon.svelte";
+	import lazy from '$lib/lazy'
+	import { trendingHandler } from '$lib/js/indexUtils'
+	import Loading from '$components/Loading/Loading.svelte'
+	import { currentMix, currentTitle, currentTrack, key } from '$stores/stores'
+	import { fade } from 'svelte/transition'
+	import Dropdown from '$components/Dropdown/Dropdown.svelte'
+	import { goto } from '$app/navigation'
+	import Icon from '$components/Icon/Icon.svelte'
 
-	import { addToQueue, getSrc } from "$lib/utils";
-	import type { SearchResult } from "$lib/types";
-	import list from "$lib/stores/list";
+	import { addToQueue, getSrc } from '$lib/utils'
+	import type { SearchResult } from '$lib/types'
+	import list from '$lib/stores/list'
+	import { ddData } from './CarouselDropdown'
+	import DropdownItem from './DropdownItem.svelte'
 
-	export let section;
-	export let index;
-	export let item: SearchResult;
-	export let type = "";
-	let hovering = false;
-	let isLoading = false;
-	let loading = isLoading ? true : false;
-	let showing = false;
-	let menuToggle = showing ? true : false;
-	let width;
-	let mobile = width < 525;
+	export let section
+	export let index
+	export let item: SearchResult
+	export let type = ''
+	let hovering = false
+	let isLoading = false
+	let loading = isLoading ? true : false
+	let showing = false
+	let menuToggle = showing ? true : false
+	let width
+	let mobile = width < 525
+
+	let DropdownItems = [
+		{
+			text: 'View Artist',
+			icon: 'artist',
+			action: () => {
+				window.scrollTo({
+					behavior: 'smooth',
+					top: 0,
+					left: 0
+				})
+				goto(
+					`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
+				)
+			}
+		},
+		{
+			text: 'Add to Queue',
+			icon: 'queue',
+			action: () => list.addNext(item, $key)
+		}
+	]
 	// $: if (width < 525) {
 	// 	hovering = false
 	// }
@@ -36,12 +60,12 @@
 	<section
 		class="item"
 		on:mouseover={() => {
-			hovering = true;
+			hovering = true
 		}}
 		on:mouseleave={() => {
-			hovering = false;
+			hovering = false
 			if (width > 550) {
-				menuToggle = false;
+				menuToggle = false
 			}
 		}}
 		transition:fade|local
@@ -49,18 +73,19 @@
 		<div
 			class="clickable"
 			on:click={async () => {
-				if (type == "trending" && !loading) {
-					list.initList(item.videoId, item.playlistId);
-					currentTrack.set({ ...$list.mix[0] });
-					loading = false;
-				} else if (type == "artist" && !loading) {
-					list.initArtistList(item.videoId, item.playlistId);
-					await getSrc(item.videoId);
-					currentTrack.set({ ...$list.mix[0] });
+				if (type == 'trending' && !loading) {
+					list.initList(item.videoId, item.playlistId)
+					currentTrack.set({ ...$list.mix[0] })
+					key.set(0)
+					loading = false
+				} else if (type == 'artist' && !loading) {
+					list.initArtistList(item.videoId, item.playlistId)
+					await getSrc(item.videoId)
+					currentTrack.set({ ...$list.mix[0] })
 					// currentTitle.set(res[0].title);
-					key.set(0);
+					key.set(0)
 					// console.log(data);
-					loading = false;
+					loading = false
 				}
 			}}>
 			<div class="img">
@@ -69,7 +94,7 @@
 				{/if}
 				<!-- svelte-ignore a11y-missing-attribute -->
 				<div class="container">
-					{#if type == "artist"}
+					{#if type == 'artist'}
 						<img
 							alt="thumbnail"
 							transition:fade|local
@@ -103,87 +128,19 @@
 				</div>
 			</div>
 		</div>
-		{#if width < 525}
-			<div class="menu mobile">
-				<Dropdown>
-					<div slot="content">
-						<div
-							class="dd-item"
-							on:click={() => {
-								if (item?.subtitle[0]?.navigationEndpoint) {
-									scrollTo({
-										behavior: "smooth",
-										top: 0,
-										left: 0,
-									});
 
-									goto(
-										`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
-									);
-								}
-							}}
-							href={`/artist?id=${
-								item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
-									? item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
-									: ""
-							}`}>
-							<Icon name="artist" size="1.5em" />
-							<div class="dd-text">View Artist</div>
-						</div>
-						<div
-							class="dd-item"
-							on:click={async () => {
-								if (index !== $key) {
-									list.addNext(item, $key);
-								}
-							}}>
-							<Icon name="queue" size="1.5rem" />
-							<div class="dd-text">Add to Queue</div>
-						</div>
-					</div>
-				</Dropdown>
-			</div>
-		{:else if hovering}
-			<div class="menu">
-				<Dropdown>
-					<div slot="content">
-						<div
-							class="dd-item"
-							on:click={() => {
-								if (item?.subtitle[0]?.navigationEndpoint) {
-									scrollTo({
-										behavior: "smooth",
-										top: 0,
-										left: 0,
-									});
-
-									goto(
-										`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
-									);
-								}
-							}}
-							href={`/artist?id=${
-								item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
-									? item.subtitle[0].navigationEndpoint.browseEndpoint.browseId
-									: ""
-							}`}>
-							<Icon name="artist" size="1.5em" />
-							<div class="dd-text">View Artist</div>
-						</div>
-						<div
-							class="dd-item"
-							on:click={async () => {
-								if (index !== $key) {
-									list.addNext(item, $key);
-								}
-							}}>
-							<Icon name="queue" size="1.5rem" />
-							<div class="dd-text">Add to Queue</div>
-						</div>
-					</div>
-				</Dropdown>
-			</div>
-		{/if}
+		<div class="menu" class:mobile={width < 550}>
+			<Dropdown>
+				<div slot="items">
+					{#each DropdownItems as item}
+						<DropdownItem
+							on:click={item.action}
+							text={item.text}
+							icon={item.icon} />
+					{/each}
+				</div>
+			</Dropdown>
+		</div>
 	</section>
 </div>
 
@@ -216,7 +173,7 @@
 		margin-top: 1.5rem;
 		margin-bottom: 0rem;
 		display: block;
-		content: "";
+		content: '';
 		::before {
 			display: block;
 		}
@@ -269,7 +226,7 @@
 			// z-index: 5;
 			&::before {
 				position: absolute;
-				content: "";
+				content: '';
 				top: 0;
 				right: 0;
 

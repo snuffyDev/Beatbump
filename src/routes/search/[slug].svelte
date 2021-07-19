@@ -1,75 +1,82 @@
 <script context="module">
 	// import { search } from '$stores/stores'
 	export async function load({ page, fetch }) {
-		const { slug } = page.params;
-		const filter = page.query.get("filter");
+		const { slug } = page.params
+		const filter = page.query.get('filter')
 		const url =
 			`/api/search.json?q=` +
 			encodeURIComponent(page.params.slug) +
 			`&filter=` +
-			encodeURIComponent(page.query.get("filter"));
-		const response = await fetch(url);
+			encodeURIComponent(page.query.get('filter'))
+		const response = await fetch(url)
 
-		let { contents, continuation, didYouMean, error } = await response.json();
+		let { contents, continuation, didYouMean, error } = await response.json()
 		if (response.ok) {
 			return {
-				props: { filter, contents, continuation, didYouMean, error },
-				status: 200,
-			};
+				props: {
+					filter: await filter,
+					contents: await contents,
+					continuation: await continuation,
+					didYouMean: await didYouMean
+				},
+				status: 200
+			}
+		} else {
+			return {
+				error: new Error('Uh oh!')
+			}
 		}
 	}
 </script>
 
 <script lang="ts">
-	export let continuation;
-	export let contents;
-	export let didYouMean;
-	export let error;
-	export let filter;
+	export let continuation
+	export let contents
+	export let didYouMean
+	export let error
+	export let filter
 	// $: console.log(slug, filter, `TEST`)
 	// $: contents = contents
-	$: console.log(contents);
-	import { currentTitle, search } from "$stores/stores";
-	import { page } from "$app/stores";
-	import { invalidate } from "$app/navigation";
-	import Item from "$components/Item/Item.svelte";
-	import { tick } from "svelte";
-	(async () => {
-		await tick();
-	})();
-	$: search.set(contents);
+	$: console.log(contents)
+	import { currentTitle, search } from '$stores/stores'
+	import { page } from '$app/stores'
+	import { invalidate } from '$app/navigation'
+	import Item from '$components/Item/Item.svelte'
+	import { tick } from 'svelte'
+
+	$: search.set(contents)
 	// $:
-	let songTitle = $page.params.slug;
-	let ctoken = continuation?.continuation;
-	let itct = continuation?.clickTrackingParams;
+	let songTitle = $page.params.slug
+	let ctoken = continuation?.continuation
+	let itct = continuation?.clickTrackingParams
 	// console.log(contents);
 	async function paginate() {
 		return await fetch(
 			`/api/search.json?q=` +
 				`&filter=` +
 				filter +
-				`&params=${itct}${continuation.continuation ? `&ctoken=${ctoken}` : ""}`
+				`&params=${itct}${continuation.continuation ? `&ctoken=${ctoken}` : ''}`
 		)
 			.then((data) => data.json())
 			.then((data) => {
-				const res = data;
+				const res = data
 
-				search.update((u) => [...u, ...res.contents]);
+				search.update((u) => [...u, ...res.contents])
 
 				if (data?.error) {
-					error = data?.error;
+					error = data?.error
 				}
-				ctoken = res.continuation.continuation;
-				itct = res.continuation.clickTrackingParams;
-				return { params: itct, continuation: ctoken };
-			});
+				ctoken = res.continuation.continuation
+				itct = res.continuation.clickTrackingParams
+				return { params: itct, continuation: ctoken }
+			})
 	}
 </script>
 
 <svelte:head>
 	<title
 		>{$currentTitle === undefined
-			? "Search - "
+			? 'Search - '
 			: `${$currentTitle} - `}Beatbump</title>
 </svelte:head>
 <!-- {JSON.stringify(results)} -->
@@ -90,7 +97,7 @@
 				Did you mean: <em
 					class="link"
 					on:click={() => {
-						invalidate($page.path);
+						invalidate($page.path)
 					}}>{didYouMean}?</em>
 			</p>
 		{/if}
@@ -104,7 +111,7 @@
 		<button
 			class="button--block button--outlined"
 			on:click={() => {
-				paginate();
+				paginate()
 			}}>Load More</button>
 	{:else}
 		<div class="end">
@@ -114,7 +121,7 @@
 {/if}
 
 <style scoped lang="scss">
-	@import "../../global/scss/components/mixins";
+	@import '../../global/scss/components/mixins';
 	.end {
 		position: relative;
 		display: flex;

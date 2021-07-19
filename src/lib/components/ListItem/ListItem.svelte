@@ -1,21 +1,21 @@
 <script>
-	import Icon from "$components/Icon/Icon.svelte";
-	import { currentMix, currentTitle, key } from "$stores/stores";
-	import * as utils from "$lib/utils";
-	import { createEventDispatcher } from "svelte";
-	import list from "$lib/stores/list";
-	export let item;
-	export let index;
+	import Icon from '$components/Icon/Icon.svelte'
+	import { currentMix, currentTitle, key } from '$stores/stores'
+	import * as utils from '$lib/utils'
+	import { createEventDispatcher } from 'svelte'
+	import list from '$lib/stores/list'
+	export let item
+	export let index
 
 	// $: id = $key >= 1 ? $key : index - 1;
-	const dispatch = createEventDispatcher();
+	const dispatch = createEventDispatcher()
 	function dispatchPlaying(playing) {
-		dispatch("pagePlaying", {
-			isPlaying: true,
-		});
+		dispatch('pagePlaying', {
+			isPlaying: true
+		})
 	}
-	let radio = [];
-	let isHovering = false;
+	let radio = []
+	let isHovering = false
 </script>
 
 <div
@@ -23,10 +23,10 @@
 	class:playing={index == $key}
 	on:click={async () => {
 		// @ts-ignore
-		key.set(0);
-		await list.startPlaylist(item.playlistId);
-		console.log($list.mix);
-		dispatchPlaying(true);
+		key.set(0)
+		await list.startPlaylist(item.playlistId)
+		console.log($list.mix)
+		dispatchPlaying(true)
 		// currentTrack.set({
 		// 	id: 0,
 		// 	videoId: id,
@@ -35,11 +35,10 @@
 		// })
 	}}
 	on:mouseover={() => {
-		isHovering = true;
+		isHovering = true
 	}}
-	
 	on:mouseout={() => {
-		isHovering = false;
+		isHovering = false
 	}}>
 	<div class="item-wrapper">
 		<div class="number">
@@ -53,11 +52,11 @@
 			{/if}
 		</div>
 		<span class="itemInfo">
-			<span class="title"
+			<span class="item-title"
 				>{item.title}
 				{#if item.explicit}
 					<span class="explicit">
-						{item.explicit ? "E" : ""}
+						{item.explicit ? 'E' : ''}
 					</span>
 				{/if}
 			</span>
@@ -70,12 +69,17 @@
 				<span class="artist">{item.artist.name}</span>
 			{/if}
 		</span>
-		<span class="length">{item.length}</span>
+		<span class="length" class:hidden={!item.length ? true : false}
+			>{item.length}</span>
 	</div>
 </div>
 
 <!-- markup (zero or more items) goes here -->
 <style lang="scss">
+	.hidden {
+		display: none;
+		visibility: hidden;
+	}
 	.length {
 		align-self: center;
 		margin-right: 1.5rem;
@@ -108,7 +112,7 @@
 		flex-direction: column;
 		flex: 1 0;
 		margin-right: 1.8rem;
-		.title {
+		.item-title {
 			font-weight: 400;
 		}
 		.artist {
@@ -146,7 +150,7 @@
 	}
 	img::before {
 		display: block;
-		content: "";
+		content: '';
 		padding-top: calc(100% * 2 / 3);
 		/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
 	}

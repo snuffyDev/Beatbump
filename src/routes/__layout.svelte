@@ -7,8 +7,8 @@
 	import Nav from "$components/Nav/Nav.svelte";
 	import Sidebar from "$components/Sidebar/Sidebar.svelte";
 	import Player from "$components/Player/Player.svelte";
-	// import "../app.css";
-	// import "../global/stylesheet.scss";
+	import "../app.css";
+	import "../global/stylesheet.scss";
 	// import Wrapper from "$components/Wrapper/Wrapper.svelte";
 	onMount(() => {
 		iOS.init();
@@ -36,7 +36,10 @@
 </script>
 
 <svelte:window bind:innerWidth={width} />
-<div class="body" style={`background-color: var(--${curTheme}-base)`}>
+<div
+	class="body"
+	class:light={curTheme.includes("light") ? true : false}
+	style={`background-color: var(--${curTheme}-base)`}>
 	{#if browser}
 		<nav class="nav" style={`background-color: var(--${curTheme}-top)`}>
 			<Nav {width} />
@@ -56,8 +59,8 @@
 </div>
 
 <style lang="scss" global>
-	@import "../global/stylesheet.scss";
-	@import "../global/vars.css";
+	// @import "../global/stylesheet.scss";
+	// @import "../global/vars.css";
 	:root {
 		--ytm-bottom: #121018;
 		--ytm-base: #09090a;
@@ -76,6 +79,26 @@
 		--dim-top: rgb(20, 24, 32);
 		--dim-forms: #181a1a86;
 		--dim-side: #0b0c0f;
+
+		--light-base: #f6f6f6ff;
+		--light-bottom: #121018;
+		--light-top: #e3e4e8ff;
+		--darker-light: #aba9c3ff;
+		--light-side: #5b616aff;
+		--rich-black-fogra-29: #0c1217ff;
+		--light-text: #0d0d0fff;
+		--raisin-black: #171824ff;
+	}
+	:global(.light) {
+		* :not(.footer-container) {
+			color: var(--light-text);
+		}
+	}
+	:root.dark {
+		color: #f3f3f3;
+	}
+	.player {
+		color: #f3f3f3;
 	}
 	.footer-container {
 		/* position: fixed; */

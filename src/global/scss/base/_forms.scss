@@ -52,6 +52,7 @@ select {
 	-moz-appearance: auto;
 	appearance: auto;
 	margin-bottom: $small-spacing;
+	font-family: $base-font-family;
 	width: 100%;
 	&:focus {
 		border-color: $base-color;
@@ -68,6 +69,7 @@ input:not([type="range"]):not([type="checkbox"]) {
 	color: inherit;
 	box-sizing: border-box;
 	padding: 0.6666666667rem;
+	font-family: $base-font-family;
 
 	font-size: 100% !important;
 }

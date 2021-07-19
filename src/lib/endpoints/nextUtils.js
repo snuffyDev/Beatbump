@@ -1,4 +1,4 @@
-import * as utils from '$lib/utils'
+import { pb } from '$lib/utils'
 export function parseContents(
 	contents,
 	continuation,
@@ -28,7 +28,7 @@ export function parseContents(
 				const mix =
 					item.menu.menuRenderer.items[0].menuNavigationItemRenderer
 						.navigationEndpoint.watchEndpoint.playlistId
-				let menu = utils.pb(item, 'menu:menuRenderer', false)
+				let menu = pb(item, 'menu:menuRenderer', false)
 				if (!Array.isArray(menu)) {
 					menu = [menu]
 				}

@@ -1,8 +1,8 @@
-import type { Artist, Playlist, Thumbnail } from "$lib/types";
-import { pb } from "$lib/utils";
-import type { NextContinuationData, PlaylistItem } from "$lib/types";
+import type { Artist, Thumbnail } from "$lib/types";
+import type { NextContinuationData } from "$lib/types";
 import type { EndpointOutput } from "@sveltejs/kit";
-
+import type { PlaylistItem } from "$lib/types/playlist";
+import { pb } from "$lib/utils";
 /** Hits the YouTube Music API for a playlist page
  *	Currently is not fully implemented.
  *
@@ -42,7 +42,6 @@ export async function get({ query }): Promise<EndpointOutput> {
 		);
 
 		if (!response.ok) {
-			// NOT res.status >= 200 && res.status < 300
 			return { status: response.status, body: response.statusText };
 		}
 		const {
@@ -69,11 +68,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 				},
 			},
 		} = await response.json();
-		// const playlist = pb(
-		// 	contents,
-		// 	"singleColumnBrowseResultsRenderer:tabs:0:tabRenderer:content:sectionListRenderer:contents:0:musicPlaylistShelfRenderer",
-		// 	true
-		// );
+
 		const playlist: {
 			contents: [];
 			continuations: unknown;
@@ -81,30 +76,16 @@ export async function get({ query }): Promise<EndpointOutput> {
 		} = await sectionListRenderer;
 		const playlistId = playlist?.playlistId;
 
-		// console.log(playlist)
 		const continuations: NextContinuationData = await playlist?.continuations[0]
 			.nextContinuationData;
-		//  pb(
-		// 	playlist,
-		// 	"continuations:0:nextContinuationData",
-		// 	false
-		// );
-		console.log(sectionListRenderer, musicDetailHeaderRenderer);
 		const parseHeader = Array(musicDetailHeaderRenderer).map(
 			({ description, subtitle, thumbnail, secondSubtitle, title }) => {
-				// const description = description.runs[0].text
 				const subtitles: string = pb(subtitle, "runs:text", false);
 				description = description?.runs[0]?.text
 					? description?.runs[0]?.text
 					: undefined;
-				// const thumbnails = pb(
-				// 	d,
-				// 	"thumbnail:croppedSquareThumbnailRenderer:thumbnail:thumbnails",
-				// 	false
-				// );
-				secondSubtitle = pb(secondSubtitle, "runs:text", false);
-				// const title = pb(d, "title:runs:0:text", true);
 
+				secondSubtitle = pb(secondSubtitle, "runs:text", false);
 				return {
 					description,
 					subtitles,
@@ -143,8 +124,6 @@ export async function get({ query }): Promise<EndpointOutput> {
 					true
 				);
 				let videoId = undefined;
-				console.log(titleBody);
-				let r = musicResponsiveListItemRenderer.playlistItemData;
 				if (
 					!musicResponsiveListItemRenderer.playlistItemData &&
 					!musicResponsiveListItemRenderer?.navigationEndpoint?.watchEndpoint
@@ -171,8 +150,6 @@ export async function get({ query }): Promise<EndpointOutput> {
 					"thumbnail:musicThumbnailRenderer:thumbnail:thumbnails",
 					true
 				);
-
-				// console.log(length, flexColumns, artist);
 				return {
 					length,
 					videoId: videoId ? videoId : undefined,
@@ -183,16 +160,9 @@ export async function get({ query }): Promise<EndpointOutput> {
 				};
 			}
 		);
-
 		const Tracks = parseTrack.filter((e) => {
 			return e != null;
 		});
-		// if (Object.prototype.hasOwnProperty.call(playlist,"continuations") {
-		// }
-		// console.log(parseTrack);
-		// console.log(items)
-		// parsePlaylistContents(contents);
-
 		return {
 			status: 200,
 			body: JSON.stringify({

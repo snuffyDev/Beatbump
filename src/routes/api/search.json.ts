@@ -1,35 +1,4 @@
-import type { PlaylistSearch } from "$lib/types";
-const pb = (input, query, justOne = false) => {
-	const iterate = (x, y) => {
-		var r = [];
-
-		x.hasOwnProperty(y) && r.push(x[y]);
-		if (justOne && x.hasOwnProperty(y)) {
-			return r.shift();
-		}
-
-		if (x instanceof Array) {
-			for (let i = 0; i < x.length; i++) {
-				r = r.concat(iterate(x[i], y));
-			}
-		} else if (x instanceof Object) {
-			const c = Object.keys(x);
-			if (c.length > 0) {
-				for (let i = 0; i < c.length; i++) {
-					r = r.concat(iterate(x[c[i]], y));
-				}
-			}
-		}
-		return r.length == 1 ? r.shift() : r;
-	};
-
-	let d = query.split(":"),
-		v = input;
-	for (let i = 0; i < d.length; i++) {
-		v = iterate(v, d[i]);
-	}
-	return v;
-};
+import { pb } from "$lib/utils";
 
 export async function get({ query }) {
 	const q = query.get("q") || "";
@@ -130,7 +99,7 @@ export async function get({ query }) {
 
 		if (!response.ok) {
 			// NOT res.status >= 200 && res.status < 300
-			return { statusCode: response.status, body: response.statusText };
+			return { status: response.status, body: response.statusText };
 		}
 		const data = await response.json();
 
@@ -141,7 +110,7 @@ export async function get({ query }) {
 
 			// console.log(`contents: `, results);
 			return {
-				statusCode: 200,
+				status: 200,
 				body: JSON.stringify(results),
 			};
 		} else {
@@ -160,7 +129,7 @@ export async function get({ query }) {
 			}
 
 			return {
-				statusCode: 200,
+				status: 200,
 				body: JSON.stringify(results),
 			};
 			return results;
@@ -169,7 +138,7 @@ export async function get({ query }) {
 		// output to netlify function log
 		console.log(error);
 		return {
-			statusCode: 500,
+			status: 500,
 			// Could be a custom message or object i.e. JSON.stringify(err)
 			body: JSON.stringify({ msg: error.message }),
 		};
@@ -310,7 +279,17 @@ function parseSong(contents) {
 				.navigationEndpoint;
 		let { videoId = "", playlistId, params } = mixInfo.watchEndpoint;
 		let metaInfo = pb(flexColumns[1], "runs:text", true);
+		// console.log(metaInfo);
+		let albumArr: any[] = flexColumns[1].text.runs;
+		const album = albumArr.slice(2, 3);
+		console.log(flexColumns[1]);
+		console.log(album);
+		const albumInfo = {
+			browseId: album[0].navigationEndpoint?.browseEndpoint?.browseId,
+			title: album[0].text,
+		};
 
+		// let album = {};
 		let length = metaInfo[metaInfo.length - 1];
 
 		let artistsArr = metaInfo.reverse();
@@ -327,6 +306,7 @@ function parseSong(contents) {
 		};
 		// console.log(artists, artists)
 		let result = {
+			albumInfo,
 			artistInfo: artistInfo,
 			title: title,
 			videoId: videoId,

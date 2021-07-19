@@ -45,7 +45,8 @@ export default {
 		const length = await addToQueue(item.videoId);
 		const nextItem = parseItem(item, length);
 		mix.splice(key + 1, 0, nextItem);
-		console.log(mix, nextItem)
+		// console.log(mix, nextItem)
+
 		list.set({ continuation, mix });
 
 

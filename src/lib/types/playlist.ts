@@ -38,8 +38,8 @@ export interface PlaylistItem {
 	navigation?: Menu[];
 	length?: string;
 	title: string | TitleEndpoint;
-	artist: Artist;
 	thumbnail: Thumbnail[];
+	artist: Artist;
 	videoId?: string;
 	playlistId?: string;
 }
