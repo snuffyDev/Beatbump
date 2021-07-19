@@ -59,15 +59,15 @@
 		</div>
 	</div>
 	<div class="setting">
-		<span class="s-text"
-			>Dedupe Automix: <input
+		<label for="checkbox" class="s-text"
+			>Dedupe Automix:
+			<input
 				type="checkbox"
 				bind:checked={setFilter}
 				on:change={() => {
 					filterAutoPlay.set(setFilter)
-
-					// console.log(setFilter);
-				}} /></span>
+				}} />
+		</label>
 	</div>
 </div>
 

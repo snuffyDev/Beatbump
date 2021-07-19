@@ -4,10 +4,11 @@
 	import { currentTrack, filterAutoPlay, theme } from '$stores/stores'
 	import { iOS } from '$stores/stores'
 	import Nav from '$components/Nav/Nav.svelte'
+	// import NewNav from '$lib/components/Nav/NewNav.svelte'
 	import Sidebar from '$components/Sidebar/Sidebar.svelte'
 	import Player from '$components/Player/Player.svelte'
 	// import '../app.css'
-	// import '../global/stylesheet.scss'
+	import '../global/stylesheet.scss'
 	// import Wrapper from "$components/Wrapper/Wrapper.svelte";
 	onMount(() => {
 		iOS.init()
@@ -42,6 +43,7 @@
 	{#if browser}
 		<nav class="nav" style={`background-color: var(--${curTheme}-top)`}>
 			<Nav {width} />
+			<!-- <NewNav {width} /> -->
 		</nav>
 		{#if width > 640}
 			<Sidebar />
@@ -58,7 +60,7 @@
 </div>
 
 <style lang="scss" global>
-	@import '../global/stylesheet.scss';
+	// @import '../global/stylesheet.scss';
 	// @import "../global/vars.css";
 	:root {
 		--ytm-bottom: #121018;

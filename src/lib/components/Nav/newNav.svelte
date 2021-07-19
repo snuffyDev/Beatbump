@@ -34,25 +34,42 @@
 	// $: theme.set($theme)
 </script>
 
-<div class="navigation">
-	<div class="logo">
-		<!-- {#if $page.path !== "/trending"}
+<div class="logo">
+	<!-- {#if $page.path !== "/trending"}
 		<div class="back-button" transition:fade on:click={() => naviBack}>
 			<Icon name="chevron-left" size="1.5em" />
 		</div>
 		{:else} --><a
-			href="/trending">
-			<img
-				src="/logo-header.png"
-				width="2.5rem"
-				height="0.5rem"
-				transition:fade
-				alt="logo"
-				title="Beatbump Home" />
-		</a>
-		<!-- {/if} -->
-	</div>
+		href="/trending">
+		<img
+			src="/logo-header.png"
+			width="2.5rem"
+			height="0.5rem"
+			transition:fade
+			alt="logo"
+			title="Beatbump Home" />
+	</a>
+	<!-- {/if} -->
 </div>
+{#if width > 550}
+	<div class="mobile-search">
+		<div class="nav-search">
+			<Search type="inline" />
+		</div>
+	</div>
+{/if}
 
 <style lang="scss">
+	.mobile-search {
+		position: absolute;
+		background: hsl(0, 0%, 9%);
+		width: 100%;
+		height: 4rem;
+		top: 0;
+		right: 0;
+		left: 0;
+		bottom: 0;
+		display: flex;
+		flex-direction: row;
+	}
 </style>

@@ -16,6 +16,7 @@
 	import { goto } from '$app/navigation'
 	import { search, searchState, theme } from '$lib/stores/stores'
 	import { createEventDispatcher, tick } from 'svelte'
+	import Icon from '../Icon/Icon.svelte'
 	let endpoint = 'search'
 	let filterType
 	let songTitle = ''
@@ -49,7 +50,7 @@
 
 <form class={type} on:submit|preventDefault={(e) => handleSubmit(e)}>
 	<!-- <label for="search"><em>search</em></label> -->
-	<div class="nav-item">
+	<div class:mobile-search={type == 'inline' ? true : false} class="nav-item">
 		<div
 			class="input"
 			style={`background-color: var(--${$theme}-forms)`}
@@ -67,30 +68,39 @@
 					placeholder="Search"
 					bind:value={songTitle} />{/if}
 		</div>
-	</div>
-
-	<!-- <label for="option"><em>search type</em></label> -->
-	<div class="nav-item">
-		<div
-			class="selectCont"
-			style={`background-color: var(--${$theme}-forms)`}
-			class:inline={type == 'inline' ? true : false}>
-			<select
-				style={`background-color: var(--${$theme}-forms)`}
-				class="select"
-				on:blur={() => {
-					searchState.set({ option: filter, text: songTitle })
-				}}
-				bind:value={filter}>
-				{#each options as option (option.params)}
-					<option value={option.params}>{option.label}</option>
-				{/each}
-			</select>
+		<div class="nav-item inline">
+			<button class="search"><Icon name="search" size="1.5em" /></button>
 		</div>
 	</div>
+	<!-- <label for="option"><em>search type</em></label> -->
 </form>
+<div class="nav-item">
+	<div
+		class="selectCont"
+		style={`background-color: var(--${$theme}-forms)`}
+		class:inline={type == 'inline' ? true : false}>
+		<select
+			style={`background-color: var(--${$theme}-forms)`}
+			class="select"
+			on:blur={() => {
+				searchState.set({ option: filter, text: songTitle })
+			}}
+			bind:value={filter}>
+			{#each options as option (option.params)}
+				<option value={option.params}>{option.label}</option>
+			{/each}
+		</select>
+	</div>
+</div>
 
 <style lang="scss">
+	.mobile-search {
+		display: flex;
+		/* flex-direction: row; */
+		/* flex-wrap: nowrap; */
+		max-height: 4rem;
+		flex-flow: row nowrap !important;
+	}
 	.selectCont {
 		max-width: 100%;
 		&.inline {

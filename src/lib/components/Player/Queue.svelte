@@ -87,7 +87,7 @@
 									<span>{item.title}</span>
 								</span>
 								<span class="p-artist">
-									<span>{item.artist.artist}</span>
+									<span>{item.artistInfo.artist}</span>
 								</span>
 							</div>
 							<span class="p-length">

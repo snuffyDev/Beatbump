@@ -43,9 +43,7 @@
 					top: 0,
 					left: 0
 				})
-				goto(
-					`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
-				)
+				goto(`/artist?id=${data.artistInfo.browseId}`)
 			}
 		},
 		{
@@ -57,13 +55,13 @@
 					top: 0,
 					left: 0
 				})
-				goto(`/release?id=${item?.albumInfo?.browseId}`)
+				goto(`/release?id=${data?.album?.browseId}`)
 			}
 		},
 		{
 			text: 'Add to Queue',
 			icon: 'queue',
-			action: () => list.addNext(item, $key)
+			action: () => list.addNext(data, $key)
 		}
 	]
 	if (data.type == 'playlist') {
@@ -76,7 +74,7 @@
 					top: 0,
 					left: 0
 				})
-				goto(`/playlist?list=${item?.playlistId}`)
+				goto(`/playlist?list=${data?.playlistId}`)
 			}
 		})
 	}
@@ -126,14 +124,14 @@
 </script>
 
 <div class="container" class:hidden>
-	<div class="innercard">
-		<div
-			class="itemWrapper"
-			on:click|self={() => {
-				if (!loading) {
-					clickHandler()
-				}
-			}}>
+	<div
+		class="innercard"
+		on:click|stopPropagation={() => {
+			if (!loading) {
+				clickHandler()
+			}
+		}}>
+		<div class="itemWrapper">
 			<div class="img-container">
 				{#if loading}
 					<Loading size="3em" />
@@ -156,11 +154,12 @@
 				{/if}
 				<p>
 					{data.type == 'playlist' ? `${data.metaData}` : `by ${artist}`}
-					{#if data.albumInfo}&centerdot; <a
-							href="/release?id={data?.albumInfo?.browseId}"
-							>{data.albumInfo.title}</a>
-					{/if}
 				</p>
+				<div class="album">
+					{#if data.album}<Icon name="album" size="1em" /><a
+							href="/release?id={data?.album?.browseId}">{data.album.title}</a>
+					{/if}
+				</div>
 			</div>
 		</div>
 		<div class="menu">
@@ -168,7 +167,7 @@
 				<div slot="items">
 					{#each DropdownItems as item}
 						<DropdownItem
-							on:click={() => item.action}
+							on:click={item.action}
 							text={item.text}
 							icon={item.icon} />
 					{/each}
@@ -189,6 +188,16 @@
 	}
 	.hidden {
 		display: none;
+	}
+	.album {
+		display: flex;
+		flex-direction: row;
+		font-size: 0.9em;
+		font-weight: 300;
+		align-items: center;
+		a {
+			margin-left: 0.25em;
+		}
 	}
 	.itemWrapper {
 		display: flex;
@@ -287,6 +296,7 @@
 		display: inline-block;
 		width: 100%;
 		margin-left: 1rem;
+		line-height: 1.25;
 	}
 	.img-container {
 		// position: relative;

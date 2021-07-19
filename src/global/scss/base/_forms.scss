@@ -25,7 +25,7 @@ legend {
 label {
 	display: block;
 	font-weight: 500;
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 	font-variant-caps: all-small-caps;
 	margin-bottom: $small-spacing * 0.5;
 }
@@ -34,14 +34,14 @@ textarea {
 	resize: vertical;
 }
 
-[type='checkbox'],
-[type='radio'] {
+[type="checkbox"],
+[type="radio"] {
 	display: inline;
 	font-family: initial;
 	margin-right: $small-spacing * 0.5;
 }
 
-[type='file'] {
+[type="file"] {
 	margin-bottom: $small-spacing;
 	width: 100%;
 }
@@ -61,7 +61,7 @@ select {
 	}
 }
 
-input:not([type='range']):not([type='checkbox']) {
+input:not([type="range"]):not([type="checkbox"]) {
 	appearance: none;
 	background: transparent;
 	border: none;
@@ -70,13 +70,13 @@ input:not([type='range']):not([type='checkbox']) {
 	box-sizing: border-box;
 	padding: 0.6666666667rem;
 	font-family: $base-font-family;
-
+	letter-spacing: -0.02rem;
 	font-size: 100% !important;
 }
-input[type='search']::-webkit-search-decoration,
-input[type='search']::-webkit-search-cancel-button,
-input[type='search']::-webkit-search-results-button,
-input[type='search']::-webkit-search-results-decoration {
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
 	display: none;
 }
 
@@ -101,7 +101,7 @@ input[type='search']::-webkit-search-results-decoration {
 		transition: all cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s;
 	}
 }
-input :not([type='range']) :not([type='checkbox']) {
+input :not([type="range"]) :not([type="checkbox"]) {
 	border: 0.0625rem solid rgba(170, 170, 170, 0.219);
 	font-family: inherit;
 	width: auto;
@@ -132,7 +132,7 @@ input :not([type='range']) :not([type='checkbox']) {
 
 		z-index: 10;
 
-		content: '›';
+		content: "›";
 		/* position: relative; */
 		pointer-events: all;
 		font-size: 1.25em;

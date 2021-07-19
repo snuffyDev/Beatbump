@@ -47,6 +47,15 @@
   <circle cx="12" cy="7" r="4" />`
 		},
 		{
+			name: 'search',
+			svg: `  <circle cx="11" cy="11" r="8" />
+  <line x1="21" y1="21" x2="16.65" y2="16.65" />`
+		},
+		{
+			name: 'album',
+			svg: `<circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle>`
+		},
+		{
 			name: 'queue',
 			svg: ` <g>
   <line stroke="currentColor" id="svg_1" y2="6" x2="21" y1="6" x1="3"/>

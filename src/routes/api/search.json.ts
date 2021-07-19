@@ -16,121 +16,128 @@ export async function get({ query }) {
 	const index = query.get('index') || ''
 
 	const gl = query.get('gl') || ''
-
-	const response = await fetch(
-		`https://music.youtube.com/youtubei/v1/search?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${
-			ctoken !== '' ? '' : `&sp=EgWKAQIIAWoKEAoQAxAEEAUQCQ%3D%3D`
-		}${
-			ctoken !== ''
-				? `&ctoken=${ctoken}&continuation=${ctoken}&itct=${itct}&type='next'`
-				: ''
-		}`,
-		{
-			method: 'POST',
-			body: JSON.stringify({
-				context: {
-					client: {
-						clientName: 'WEB_REMIX',
-						clientVersion: '0.1',
-						deviceMake: 'google',
-						platform: 'DESKTOP',
-						deviceModel: 'bot',
-						experimentIds: [],
-						experimentsToken: '',
-						osName: 'Googlebot',
-						osVersion: '2.1',
-						locationInfo: {
-							locationPermissionAuthorizationStatus:
-								'LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED'
-						},
-						musicAppInfo: {
-							musicActivityMasterSwitch:
-								'MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE',
-							musicLocationMasterSwitch:
-								'MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE',
-							pwaInstallabilityStatus: 'PWA_INSTALLABILITY_STATUS_UNKNOWN'
-						},
-						utcOffsetMinutes: -new Date().getTimezoneOffset()
-					},
-					capabilities: {},
-					request: {
-						internalExperimentFlags: [
-							{
-								key: 'force_music_enable_outertube_tastebuilder_browse',
-								value: 'true'
+	try {
+		const response = await fetch(
+			`https://music.youtube.com/youtubei/v1/search?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${
+				ctoken !== '' ? '' : `&sp=EgWKAQIIAWoKEAoQAxAEEAUQCQ%3D%3D`
+			}${
+				ctoken !== ''
+					? `&ctoken=${ctoken}&continuation=${ctoken}&itct=${itct}&type='next'`
+					: ''
+			}`,
+			{
+				method: 'POST',
+				body: JSON.stringify({
+					context: {
+						client: {
+							clientName: 'WEB_REMIX',
+							clientVersion: '0.1',
+							deviceMake: 'google',
+							platform: 'DESKTOP',
+							deviceModel: 'bot',
+							experimentIds: [],
+							experimentsToken: '',
+							osName: 'Googlebot',
+							osVersion: '2.1',
+							locationInfo: {
+								locationPermissionAuthorizationStatus:
+									'LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED'
 							},
-							{
-								key: 'force_music_enable_outertube_playlist_detail_browse',
-								value: 'true'
+							musicAppInfo: {
+								musicActivityMasterSwitch:
+									'MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE',
+								musicLocationMasterSwitch:
+									'MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE',
+								pwaInstallabilityStatus: 'PWA_INSTALLABILITY_STATUS_UNKNOWN'
 							},
-							{
-								key: 'force_music_enable_outertube_search_suggestions',
-								value: 'true'
-							}
-						],
-						sessionIndex: {}
+							utcOffsetMinutes: -new Date().getTimezoneOffset()
+						},
+						capabilities: {},
+						request: {
+							internalExperimentFlags: [
+								{
+									key: 'force_music_enable_outertube_tastebuilder_browse',
+									value: 'true'
+								},
+								{
+									key: 'force_music_enable_outertube_playlist_detail_browse',
+									value: 'true'
+								},
+								{
+									key: 'force_music_enable_outertube_search_suggestions',
+									value: 'true'
+								}
+							],
+							sessionIndex: {}
+						},
+						user: {
+							enableSafetyMode: false
+						},
+						activePlayers: {}
 					},
-					user: {
-						enableSafetyMode: false
-					},
-					activePlayers: {}
-				},
-				browseEndpointContextMusicConfig: {
 					browseEndpointContextMusicConfig: {
-						pageType: `${pageType}`
-					}
-				},
-				browseId: `${browseId}`,
+						browseEndpointContextMusicConfig: {
+							pageType: `${pageType}`
+						}
+					},
+					browseId: `${browseId}`,
 
-				isAudioOnly: true,
-				query: `${q}`,
+					isAudioOnly: true,
+					query: `${q}`,
 
-				params: `${filter}`,
-				videoId: `${videoId}`,
-				playlistId: `${playlistId}`
-			}),
-			headers: {
-				'Content-Type': 'application/json; charset=utf-8',
-				Origin: 'https://music.youtube.com',
-				'User-Agent':
-					'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-			}
-		}
-	)
-
-	if (!response.ok) {
-		// NOT res.status >= 200 && res.status < 300
-		return { status: response.status, body: response.statusText }
-	}
-	const data = await response.json()
-
-	if (data.hasOwnProperty('continuationContents')) {
-		let { continuationContents } = data
-		let results = await parseSearchResult(continuationContents, true, filter)
-
-		// console.log(`contents: `, results);
-		return {
-			status: 200,
-			body: JSON.stringify(results)
-		}
-	} else {
-		let {
-			contents: {
-				sectionListRenderer: {
-					contents: [...rest]
+					params: `${filter}`,
+					videoId: `${videoId}`,
+					playlistId: `${playlistId}`
+				}),
+				headers: {
+					'Content-Type': 'application/json; charset=utf-8',
+					Origin: 'https://music.youtube.com',
+					'User-Agent':
+						'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 				}
 			}
-		} = data
+		)
 
-		let results = await parseSearchResult(rest, false, filter)
-		if (results?.error) {
-			console.log(results?.error)
-			return { error: results?.error }
+		if (!response.ok) {
+			// NOT res.status >= 200 && res.status < 300
+			return { status: response.status, body: response.statusText }
 		}
+		const data = await response.json()
 
+		if (data.hasOwnProperty('continuationContents')) {
+			let { continuationContents } = data
+			let results = await parseSearchResult(continuationContents, true, filter)
+
+			// console.log(`contents: `, results);
+			return {
+				status: 200,
+				body: await results
+			}
+		} else {
+			let {
+				contents: {
+					sectionListRenderer: {
+						contents: [...rest]
+					}
+				}
+			} = await data
+
+			let results = await parseSearchResult(rest, false, filter)
+			if (results?.error) {
+				console.log(results?.error)
+				return { error: results?.error }
+			}
+
+			return {
+				status: 200,
+				body: await results
+			}
+		}
+	} catch (error) {
+		console.log(error)
 		return {
-			status: 200,
-			body: JSON.stringify(results)
+			status: 400,
+			body: error
 		}
 	}
 }
@@ -159,7 +166,7 @@ function parseSearchResult(data, cont, filter?) {
 			if (data[0].itemSectionRenderer?.contents[0].messageRenderer)
 				return { error: 'No Results Found' }
 			didYouMean = correctedQuery(
-				data[0].itemSectionRenderer?.contents[0].didYouMeanRenderer
+				data[0]?.itemSectionRenderer?.contents[0].didYouMeanRenderer
 			)
 
 			ctx = [data[1]]
@@ -171,14 +178,15 @@ function parseSearchResult(data, cont, filter?) {
 	if (ctx.itemSectionRenderer) return []
 
 	let results = []
+
 	ctx.map(async (c) => {
 		let contents = []
 		if (cont) {
 			let { musicShelfContinuation } = c
-			contents = musicShelfContinuation
+			contents.push(musicShelfContinuation)
 		} else {
 			let { musicShelfRenderer } = c
-			contents = musicShelfRenderer
+			contents.push(musicShelfRenderer)
 		}
 		/* Search for if the request is for Playlists
            If not, then parse song request.
@@ -191,17 +199,21 @@ function parseSearchResult(data, cont, filter?) {
 		]
 
 		if (!paramList.includes(filter)) {
-			if (contents?.hasOwnProperty('continuations')) {
-				continuation = contents?.continuations[0].nextContinuationData
+			if (contents[0]?.hasOwnProperty('continuations')) {
+				continuation = contents[0].continuations[0].nextContinuationData
 			}
-			contents = contents?.contents
+			// console.log(contents)
+			contents = contents[0]?.contents
 			results = parseSong(contents)
+			return { results, continuation }
 		} else {
-			if (contents.hasOwnProperty('continuations')) {
-				continuation = contents?.continuations[0].nextContinuationData
+			if (contents[0]?.hasOwnProperty('continuations')) {
+				continuation = contents[0]?.continuations[0].nextContinuationData
 			}
-			contents = contents?.contents
+			// console.log(contents)
+			contents = contents[0]?.contents
 			results = parsePlaylist(contents)
+			return { results, continuation }
 		}
 	})
 
@@ -209,7 +221,7 @@ function parseSearchResult(data, cont, filter?) {
 		return {
 			contents: results,
 			didYouMean: didYouMean,
-			continuation: false
+			continuation: continuation
 		}
 	}
 	return { contents: results, continuation: continuation }
@@ -217,8 +229,8 @@ function parseSearchResult(data, cont, filter?) {
 
 /* Return the data for if there is a corrected query */
 function correctedQuery(ctx) {
-	let correctTerm = ctx.correctedQuery.runs[0].text
-	let correctedEndpoint = ctx.correctedQueryEndpoint.searchEndpoint
+	let correctTerm = ctx?.correctedQuery?.runs[0].text
+	let correctedEndpoint = ctx?.correctedQueryEndpoint?.searchEndpoint
 
 	return {
 		term: correctTerm,
@@ -256,10 +268,10 @@ function parseSong(contents) {
 				d.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text
 					?.runs[0]?.navigationEndpoint?.browseEndpoint?.browseId
 		}
-		const mixInfo =
-			d.menu.menuRenderer?.items[0]?.menuNavigationItemRenderer
-				?.navigationEndpoint
-		let { videoId = '', playlistId, params } = mixInfo.watchEndpoint
+		const {
+			watchEndpoint
+		} = d.menu.menuRenderer?.items[0]?.menuNavigationItemRenderer?.navigationEndpoint
+		let { videoId = '', playlistId, params } = watchEndpoint
 
 		let metaInfo = pb(flexColumns[1], 'runs:text', true)
 		// console.log(metaInfo);
@@ -270,8 +282,8 @@ function parseSong(contents) {
 		}[] = albumArr.slice(2, 3)
 
 		const albumInfo = {
-			browseId: album[0].navigationEndpoint.browseEndpoint.browseId,
-			title: album[0].text
+			browseId: album[0]?.navigationEndpoint?.browseEndpoint?.browseId,
+			title: album[0]?.text
 		}
 
 		// let album = {};

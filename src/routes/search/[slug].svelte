@@ -9,8 +9,8 @@
 			`&filter=` +
 			encodeURIComponent(page.query.get('filter'))
 		const response = await fetch(url)
-
-		let { contents, continuation, didYouMean, error } = await response.json()
+		let data = await response.json()
+		let { contents, continuation, didYouMean, error } = await data
 		if (response.ok) {
 			return {
 				props: {
@@ -20,10 +20,6 @@
 					didYouMean: await didYouMean
 				},
 				status: 200
-			}
-		} else {
-			return {
-				error: new Error('Uh oh!')
 			}
 		}
 	}
@@ -35,9 +31,8 @@
 	export let didYouMean
 	export let error
 	export let filter
-	// $: console.log(slug, filter, `TEST`)
-	// $: contents = contents
-	$: console.log(contents)
+
+	$: console.log(contents, continuation)
 	import { currentTitle, search } from '$stores/stores'
 	import { page } from '$app/stores'
 	import { invalidate } from '$app/navigation'
@@ -98,7 +93,7 @@
 					class="link"
 					on:click={() => {
 						invalidate($page.path)
-					}}>{didYouMean}?</em>
+					}}>{JSON.stringify(didYouMean)}?</em>
 			</p>
 		{/if}
 	</section>
