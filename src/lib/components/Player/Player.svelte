@@ -232,12 +232,10 @@
 				<div
 					class="player-btn player-title"
 					on:click={() => {
-						if (loading) {
-							if (!isPlaying) {
-								startPlay()
-							} else {
-								pause()
-							}
+						if (!isPlaying) {
+							startPlay()
+						} else {
+							pause()
 						}
 					}}>
 					{#if loading}
