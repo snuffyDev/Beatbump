@@ -4,19 +4,19 @@ import type {
 	Artist,
 	TitleEndpoint
 } from '$lib/types'
-export interface Header {
-	description: string
-	title: string
-	thumbnails: Thumbnail[]
-	secondSubtitle?: string[] | string
-	playlistId: string
-	subtitles?: string
-}
-export interface Playlist {
-	thumbnails?: Thumbnail[]
-	continuation?: NextContinuationData
-	contents: PlaylistItem[]
-}
+// export interface Header {
+// 	description: string
+// 	title: string
+// 	thumbnails: Thumbnail[]
+// 	secondSubtitle?: string[] | string
+// 	playlistId: string
+// 	subtitles?: string
+// }
+// export interface Playlist {
+// 	thumbnails?: Thumbnail[]
+// 	continuation?: NextContinuationData
+// 	contents: PlaylistItem[]
+// }
 export interface PlaylistSearch {
 	playlistId: string
 	metaData?: string | string[]
@@ -42,4 +42,19 @@ export interface PlaylistItem {
 	artist: Artist
 	videoId?: string
 	playlistId?: string
+}
+
+export type Header = {
+	description: string
+	subtitles: []
+	thumbnails: []
+	playlistId: string
+	secondSubtitle: []
+	title: string
+}
+
+export type PlaylistData = {
+	continuations: NextContinuationData[]
+	header: Header
+	contents: PlaylistItem[]
 }

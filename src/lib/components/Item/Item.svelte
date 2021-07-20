@@ -1,18 +1,17 @@
 <script lang="ts">
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 
-	export let data
+	export let data: Song | PlaylistSearch
 	import { fade } from 'svelte/transition'
 	import Loading from '$components/Loading/Loading.svelte'
-	import { onMount } from 'svelte'
+	import { onMount, tick } from 'svelte'
 
-	import { currentMix, currentTitle, key, currentTrack } from '$stores/stores'
-	import * as utils from '$lib/utils'
+	import { key, currentTrack } from '$stores/stores'
 	import Icon from '$components/Icon/Icon.svelte'
 	import { goto } from '$app/navigation'
-	import { addToQueue } from '$lib/actions/dropdown'
 	import list from '$stores/list'
-	import DropdownItem from '../Carousel/DropdownItem.svelte'
+	import type { Song } from '$lib/types'
+	import type { PlaylistSearch } from '$lib/types/playlist'
 	// import { addToQueue } from '$lib/utils'
 
 	let ctoken = ''
@@ -21,10 +20,8 @@
 	let songTitle
 	$: title = songTitle = '...'
 
-	let src
-	let video
 	let thumbnail
-
+	let isHidden: Boolean
 	let explicit
 	let clicked
 	let artist
@@ -37,13 +34,14 @@
 		{
 			text: 'View Artist',
 			icon: 'artist',
-			action: () => {
+			action: async () => {
 				window.scrollTo({
 					behavior: 'smooth',
 					top: 0,
 					left: 0
 				})
-				goto(`/artist?id=${data.artistInfo.browseId}`)
+				await tick()
+				goto(`/artist/${data.artistInfo.browseId}`)
 			}
 		},
 		{
@@ -77,6 +75,8 @@
 				goto(`/playlist?list=${data?.browseId}`)
 			}
 		})
+		DropdownItems.shift()
+		DropdownItems.pop()
 	}
 	onMount(() => {
 		itemHandler()
@@ -85,9 +85,9 @@
 	const itemHandler = () => {
 		explicit = data.explicit
 		title = data.title
-		thumbnail = data.thumbnails[0].url
+		thumbnail = data?.thumbnails[0]?.url
 		if (data.type !== 'playlist') {
-			artist = data.artistInfo.artist
+			artist = data?.artistInfo?.artist
 		}
 		if (title.length > 48) {
 			title = title.substring(0, 48) + '...'
@@ -143,8 +143,7 @@
 						referrerpolicy="origin-when-cross-origin"
 						loading="lazy"
 						src={thumbnail}
-						alt="thumbnail"
-						transition:fade />
+						alt="thumbnail" />
 				</div>
 			</div>
 			<div class="title">
@@ -164,7 +163,7 @@
 		</div>
 
 		<div class="menu">
-			<Dropdown items={DropdownItems} />
+			<Dropdown bind:isHidden items={DropdownItems} />
 		</div>
 	</div>
 </div>
@@ -242,7 +241,7 @@
 
 		&:active {
 			background: lighten(#212225, 3%);
-			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
+			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) background 0.125s;
 		}
 	}
 
@@ -310,7 +309,7 @@
 		.thumbnail {
 			width: 100%;
 			height: 100%;
-			background: rgba(13, 13, 15, 0.3411764705882353);
+			background: rgba(13, 13, 15, 0.192);
 			img {
 				// height: inherit;
 				// -o-object-fit: scale-down;
@@ -320,7 +319,6 @@
 				// max-width: 18rem;
 				width: 100%;
 				height: 100%;
-				-o-object-fit: scale-down;
 				object-fit: scale-down;
 			}
 		}
@@ -329,7 +327,7 @@
 		.container:hover:not(.menu) {
 			pointer-events: bounding-box;
 			background: lighten(#212225, 5%);
-			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
+			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) background 0.125s;
 		}
 	}
 </style>

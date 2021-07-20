@@ -1,8 +1,8 @@
-import type { Artist, Thumbnail } from "$lib/types";
-import type { NextContinuationData } from "$lib/types";
-import type { EndpointOutput } from "@sveltejs/kit";
-import type { PlaylistItem } from "$lib/types/playlist";
-import { pb } from "$lib/utils";
+import type { Artist, Thumbnail } from '$lib/types'
+import type { NextContinuationData } from '$lib/types'
+import type { EndpointOutput } from '@sveltejs/kit'
+import type { PlaylistItem } from '$lib/types/playlist'
+import { pb } from '$lib/utils'
 /** Hits the YouTube Music API for a playlist page
  *	Currently is not fully implemented.
  *
@@ -11,38 +11,38 @@ import { pb } from "$lib/utils";
  * @return {*}  {Promise<EndpointOutput>}
  */
 export async function get({ query }): Promise<EndpointOutput> {
-	const browseId = query.get("list");
+	const browseId = query.get('list')
 	// console.log(videoId,playlistId)
 	try {
 		const response = await fetch(
-			"https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30",
+			'https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
 			{
-				method: "POST",
+				method: 'POST',
 				body: JSON.stringify({
 					context: {
 						client: {
-							clientName: "WEB_REMIX",
-							clientVersion: "0.1",
+							clientName: 'WEB_REMIX',
+							clientVersion: '0.1'
 						},
 
 						user: {
-							enableSafetyMode: false,
-						},
+							enableSafetyMode: false
+						}
 					},
 					browseId: `${browseId}`,
 					browseEndpointContextMusicConfig: {
-						pageType: "MUSIC_PAGE_TYPE_PLAYLIST",
-					},
+						pageType: 'MUSIC_PAGE_TYPE_PLAYLIST'
+					}
 				}),
 				headers: {
-					"Content-Type": "application/json; charset=utf-8",
-					Origin: "https://music.youtube.com",
-				},
+					'Content-Type': 'application/json; charset=utf-8',
+					Origin: 'https://music.youtube.com'
+				}
 			}
-		);
+		)
 
 		if (!response.ok) {
-			return { status: response.status, body: response.statusText };
+			return { status: response.status, body: response.statusText }
 		}
 		const {
 			header: { musicDetailHeaderRenderer },
@@ -57,127 +57,126 @@ export async function get({ query }): Promise<EndpointOutput> {
 										contents: [
 											{
 												musicPlaylistShelfRenderer,
-												musicPlaylistShelfRenderer: { contents },
-											},
-										],
-									},
-								},
-							},
-						},
-					],
-				},
-			},
-		} = await response.json();
+												musicPlaylistShelfRenderer: { contents }
+											}
+										]
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		} = await response.json()
 
 		const playlist: {
-			contents: [];
-			continuations: unknown;
-			playlistId: string;
-		} = await sectionListRenderer;
-		const playlistId = playlist?.playlistId;
+			contents: []
+			continuations: unknown
+			playlistId: string
+		} = await sectionListRenderer
+		const playlistId = playlist?.playlistId
 
 		const continuations: NextContinuationData = await playlist?.continuations[0]
-			.nextContinuationData;
+			.nextContinuationData
 		const parseHeader = Array(musicDetailHeaderRenderer).map(
 			({ description, subtitle, thumbnail, secondSubtitle, title }) => {
-				const subtitles: string = pb(subtitle, "runs:text", false);
+				const subtitles: string = pb(subtitle, 'runs:text', false)
 				description = description?.runs[0]?.text
 					? description?.runs[0]?.text
-					: undefined;
+					: undefined
 
-				secondSubtitle = pb(secondSubtitle, "runs:text", false);
+				secondSubtitle = pb(secondSubtitle, 'runs:text', false)
 				return {
 					description,
 					subtitles,
 					thumbnails:
-						thumbnail["croppedSquareThumbnailRenderer"]["thumbnail"][
-							"thumbnails"
+						thumbnail['croppedSquareThumbnailRenderer']['thumbnail'][
+							'thumbnails'
 						],
 					playlistId,
 					secondSubtitle,
-					title: title.runs[0].text,
-				};
+					title: title.runs[0].text
+				}
 			}
-		)[0];
+		)[0]
 		// const [contents] = playlist;
 		const parseTrack: Array<PlaylistItem> = contents.map(
 			({ musicResponsiveListItemRenderer }) => {
 				const length = pb(
 					musicResponsiveListItemRenderer,
-					"fixedColumns:0:musicResponsiveListItemFixedColumnRenderer:text:runs:0:text",
+					'fixedColumns:0:musicResponsiveListItemFixedColumnRenderer:text:runs:0:text',
 					true
-				);
+				)
 				const flexColumns = pb(
 					musicResponsiveListItemRenderer,
-					"flexColumns",
+					'flexColumns',
 					true
-				);
+				)
 
 				const artistEndpoint = pb(
 					flexColumns,
-					"musicResponsiveListItemFlexColumnRenderer:1:text:runs:0",
+					'musicResponsiveListItemFlexColumnRenderer:1:text:runs:0',
 					true
-				);
+				)
 				const titleBody = pb(
 					flexColumns,
-					"musicResponsiveListItemFlexColumnRenderer:0:text:runs:0",
+					'musicResponsiveListItemFlexColumnRenderer:0:text:runs:0',
 					true
-				);
-				let videoId = undefined;
+				)
+				let videoId = undefined
 				if (
 					!musicResponsiveListItemRenderer.playlistItemData &&
 					!musicResponsiveListItemRenderer?.navigationEndpoint?.watchEndpoint
 						?.videoId
 				)
-					return;
+					return
 				if (musicResponsiveListItemRenderer?.playlistItemData) {
-					videoId = musicResponsiveListItemRenderer?.playlistItemData.videoId;
+					videoId = musicResponsiveListItemRenderer?.playlistItemData.videoId
 				} else {
 					videoId = titleBody?.navigationEndpoint?.watchEndpoint?.videoId
 						? titleBody?.navigationEndpoint?.watchEndpoint?.videoId
-						: undefined;
+						: undefined
 				}
 
-				const title = titleBody.text;
+				const title = titleBody.text
 				// console.log(artistEndpoint);
-				const artist: Artist = {
+				const artistInfo: Artist = {
 					artist: artistEndpoint.text,
-					browseId:
-						artistEndpoint?.navigationEndpoint?.browseEndpoint?.browseId,
-				};
+					browseId: artistEndpoint?.navigationEndpoint?.browseEndpoint?.browseId
+				}
 				const thumbnail: Thumbnail = pb(
 					musicResponsiveListItemRenderer,
-					"thumbnail:musicThumbnailRenderer:thumbnail:thumbnails",
+					'thumbnail:musicThumbnailRenderer:thumbnail:thumbnails',
 					true
-				);
+				)
 				return {
 					length,
 					videoId: videoId ? videoId : undefined,
 					playlistId: musicPlaylistShelfRenderer.playlistId,
 					thumbnail,
 					title,
-					artist,
-				};
+					artistInfo
+				}
 			}
-		);
+		)
 		const Tracks = parseTrack.filter((e) => {
-			return e != null;
-		});
+			return e != null
+		})
 		return {
 			status: 200,
 			body: JSON.stringify({
 				continuations: continuations,
 				tracks: Tracks,
-				header: parseHeader,
-			}),
-		};
+				header: parseHeader
+			})
+		}
 	} catch (error) {
 		// output to netlify function log
-		console.log(error);
+		console.log(error)
 		return {
 			status: 500,
 			// Could be a custom message or object i.e. JSON.stringify(err)
-			body: JSON.stringify({ msg: error.message }),
-		};
+			body: JSON.stringify({ msg: error.message })
+		}
 	}
 }

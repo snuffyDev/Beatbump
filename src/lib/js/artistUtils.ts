@@ -1,17 +1,18 @@
-import type { Song, ArtistInfo } from '$lib/types'
+import type { Song, ArtistInfo, Artist } from '$lib/types'
 import { pb } from '$lib/utils'
 
 export const parseArtistPage = (header, items) => {
 	console.log(items)
 	header = [header]
 	const parsedHeader = header.map((h) => {
-		const name = h.title.runs[0].text
+		const name = h?.title.runs[0].text
 		let description
-		const thumbnail = h.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails
+		const thumbnail = h?.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails
 		const mixInfo =
-			h.startRadioButton.buttonRenderer.navigationEndpoint.watchPlaylistEndpoint
-		if (h.description) {
-			description = h.description.runs[0].text
+			h?.startRadioButton.buttonRenderer.navigationEndpoint
+				.watchPlaylistEndpoint
+		if (h?.description) {
+			description = h?.description.runs[0].text
 		} else {
 			description = ''
 		}
@@ -24,18 +25,19 @@ export const parseArtistPage = (header, items) => {
 	})
 	let songs
 	let carouselItems = []
+
 	items.map((i) => {
-		if (i.musicShelfRenderer) {
-			songs = parseSongs(i.musicShelfRenderer.contents)
+		if (i?.musicShelfRenderer) {
+			songs = parseSongs(i?.musicShelfRenderer.contents)
 			console.log(songs)
 		}
-		if (i.musicCarouselShelfRenderer) {
+		if (i?.musicCarouselShelfRenderer) {
 			carouselItems = [
 				...carouselItems,
 				parseCarouselItem(
-					i.musicCarouselShelfRenderer.contents,
-					i.musicCarouselShelfRenderer.header
-						.musicCarouselShelfBasicHeaderRenderer?.title.runs[0]
+					i?.musicCarouselShelfRenderer.contents,
+					i?.musicCarouselShelfRenderer.header
+						.musicCarouselShelfBasicHeaderRenderer?.title.runs
 				)
 			]
 		}
@@ -90,9 +92,9 @@ function parseSongs(items) {
 			metaInfo = [...metaInfo]
 			artist = metaInfo.join('')
 		}
-		const artistInfo: ArtistInfo = {
+		const artistInfo: Artist = {
 			browseId: browseId,
-			artists: [artist]
+			artist: [artist]
 		}
 		// console.log(artists, artists)
 		const result: Song = {
@@ -115,17 +117,16 @@ function parseSongs(items) {
 
 function parseCarouselItem(items, header) {
 	console.log(items, header)
-	header = [header]
-	const contents = items.map(({ musicTwoRowItemRenderer }) => {
-		const ctx = musicTwoRowItemRenderer
+	const contents = items.map(({ musicTwoRowItemRenderer: ctx }) => {
+		// console.log(ctx, ctx?.musicTwoRowItemRenderer)
 		let explicit
 		const thumbnails =
-			ctx.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails
-		if (ctx.subtitleBadges) {
+			ctx?.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails
+		if (ctx?.subtitleBadges) {
 			explicit = true
 		}
 		let playlistId = ''
-		const title = ctx.title.runs[0].text
+		const title = ctx?.title.runs[0].text
 		let videoId = ''
 		if (
 			ctx?.menu?.menuRenderer?.items[2]?.menuServiceItemRenderer
@@ -140,7 +141,7 @@ function parseCarouselItem(items, header) {
 					?.serviceEndpoint?.queueAddEndpoint?.queueTarget?.playlistId
 		}
 		const browseEndpoint =
-			ctx.title?.runs[0]?.navigationEndpoint?.browseEndpoint
+			ctx?.title?.runs[0]?.navigationEndpoint?.browseEndpoint
 		if (playlistId !== undefined || playlistId !== null) {
 			return {
 				playlistId,
@@ -154,21 +155,21 @@ function parseCarouselItem(items, header) {
 			return { browseEndpoint, title, thumbnails, explicit }
 		}
 	})
-	const head = [
-		...header.map((i) => {
-			const title = i.text
-			const endpoint = i.navigationEndpoint?.browseEndpoint
-			if (endpoint) {
-				return {
-					title,
 
-					browseId: endpoint.browseId,
-					params: endpoint.params
-				}
-			} else {
-				return title
+	const head = header.map((i) => {
+		const title = i.text
+		const endpoint = i.navigationEndpoint?.browseEndpoint
+		if (endpoint) {
+			return {
+				title,
+
+				browseId: endpoint.browseId,
+				params: endpoint.params
 			}
-		})
-	]
-	return { header: head, contents }
+		} else {
+			return title
+		}
+	})
+	// console.log(head)
+	return { header: head[0], contents }
 }

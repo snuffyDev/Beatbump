@@ -4,24 +4,24 @@
 	import { goto } from '$app/navigation'
 
 	import Icon from '$components/Icon/Icon.svelte'
-
 	import { clickOutside } from '$lib/js/clickOutside'
 	import { quartInOut, quintIn } from 'svelte/easing'
 	import DropdownItem from '../Carousel/DropdownItem.svelte'
+	export let isHidden = false
 	export let type = ''
 	export let items = []
 	let showing = false
 	$: menuToggle = showing ? true : false
 	const dispatch = createEventDispatcher()
-	setContext('menu', { update: menuToggle })
+	setContext('menu', { update: isHidden })
 </script>
 
 <div class="menu">
-	{#if menuToggle}
+	{#if isHidden}
 		<div
 			use:clickOutside
 			on:click_outside={() => {
-				showing = false
+				isHidden = !isHidden
 			}}
 			transition:slide={{ duration: 125, easing: quartInOut }}
 			class={type == 'player' ? 'dd-player' : 'dd-menu'}>
@@ -36,8 +36,8 @@
 	<div
 		class="menuButtons"
 		on:click|stopPropagation={() => {
-			showing = !showing
-			console.log(showing)
+			isHidden = !isHidden
+			console.log(isHidden)
 		}}>
 		<svelte:component
 			this={Icon}

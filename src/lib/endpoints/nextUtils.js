@@ -9,14 +9,14 @@ export function parseContents(
 		let arr = []
 		let currentMix = current.playlistId
 		contents.forEach((d) => {
-			if (d.hasOwnProperty('playlistPanelVideoRenderer')) {
+			if (Object.prototype.hasOwnProperty.call(d, 'playlistPanelVideoRenderer')) {
 				arr.push(d.playlistPanelVideoRenderer)
 			}
 
-			if (d.hasOwnProperty('musicTwoRowItemRenderer')) {
+			if (Object.prototype.hasOwnProperty.call(d, 'musicTwoRowItemRenderer')) {
 				arr.push(d.musicTwoRowItemRenderer)
 			}
-			if (d.hasOwnProperty('musicResponsiveListItemRenderer')) {
+			if (Object.prototype.hasOwnProperty.call(d, 'musicResponsiveListItemRenderer')) {
 				arr.push(d.musicResponsiveListItemRenderer)
 			}
 		})
@@ -39,12 +39,12 @@ export function parseContents(
 				menu.forEach((l) => {
 					let [navigationEndpoint] = temp
 
-					if (l.hasOwnProperty('menuNavigationItemRenderer')) {
+					if (Object.prototype.hasOwnProperty.call(l, 'menuNavigationItemRenderer')) {
 						temp.push(l.menuNavigationItemRenderer)
 					}
 					if (
 						temp.length !== 0 &&
-						navigationEndpoint.hasOwnProperty('browseEndpoint')
+						Object.prototype.hasOwnProperty.call(navigationEndpoint, 'browseEndpoint')
 					) {
 						menu.push(navigationEndpoint.browseEndpoint)
 					}
@@ -71,6 +71,10 @@ export function parseContents(
 				continuation: continuation,
 				results: results
 			}
+		}
+	} else {
+		return {
+			error: new Error("error in parsing data")
 		}
 	}
 }

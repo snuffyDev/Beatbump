@@ -4,12 +4,12 @@
 	import { currentTrack, filterAutoPlay, theme } from '$stores/stores'
 	import { iOS } from '$stores/stores'
 	import Nav from '$components/Nav/Nav.svelte'
-	// import NewNav from '$lib/components/Nav/NewNav.svelte'
 	import Sidebar from '$components/Sidebar/Sidebar.svelte'
 	import Player from '$components/Player/Player.svelte'
 	// import '../app.css'
-	import '../global/stylesheet.scss'
-	// import Wrapper from "$components/Wrapper/Wrapper.svelte";
+	// import '../global/stylesheet.scss'
+	import Wrapper from '$components/Wrapper/Wrapper.svelte'
+	import { page } from '$app/stores'
 	onMount(() => {
 		iOS.init()
 		const getTheme = () => {
@@ -18,7 +18,7 @@
 			ls ? theme.init(ls) : theme.init('dark')
 			let filter = localStorage.getItem('filterAutoPlay')
 			filter ? filterAutoPlay.init(filter) : filterAutoPlay.init(false)
-			console.log($filterAutoPlay)
+			// console.log($filterAutoPlay)
 			// if (ls) {
 			// 	theme.init(ls);
 			// } else {
@@ -28,40 +28,48 @@
 		getTheme()
 		return
 	})
-
-	let current = $currentTrack
 	let width
-	let route = ''
+
 	$: curTheme = $theme
+	let main
 </script>
 
 <svelte:window bind:innerWidth={width} />
 <div
 	class="body"
-	class:light={curTheme.includes('light') ? true : false}
-	style={`background-color: var(--${curTheme}-base)`}>
+	class:light={$theme.includes('light') ? true : false}
+	style={`background-color: var(--${$theme}-base)`}>
 	{#if browser}
-		<nav class="nav" style={`background-color: var(--${curTheme}-top)`}>
+		<nav class="nav" style={`background-color: var(--${$theme}-top)`}>
 			<Nav {width} />
-			<!-- <NewNav {width} /> -->
 		</nav>
 		{#if width > 640}
 			<Sidebar />
 		{/if}
-		<div class="wrapper" id="wrapper">
-			<slot />
+		<div
+			class="wrapper"
+			class:no-scroll={$page.path.includes('/search/') ? true : false}
+			bind:this={main}
+			id="wrapper">
+			<Wrapper {main}>
+				<slot />
+			</Wrapper>
 		</div>
 		<footer
 			class="footer-container"
-			style={`background-color: var(--${curTheme}-bottom)`}>
-			<Player {curTheme} />
+			style={`background-color: var(--${$theme}-bottom)`}>
+			<Player curTheme={$theme} />
 		</footer>
 	{/if}
 </div>
 
 <style lang="scss" global>
-	// @import '../global/stylesheet.scss';
+	@import '../global/stylesheet.scss';
 	// @import "../global/vars.css";
+	.no-scroll {
+		overflow: hidden;
+		overflow-y: hidden;
+	}
 	:root {
 		--ytm-bottom: #121018;
 		--ytm-base: #09090a;

@@ -103,12 +103,11 @@
 							loading="lazy"
 							type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 							data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0icHJlZml4X19wcmVmaXhfX2ZlYXRoZXIgcHJlZml4X19wcmVmaXhfX2ZlYXRoZXItbGlzdCI+PHBhdGggb3BhY2l0eT0iLjciIHN0cm9rZT0iI2NjYyIgZmlsbD0iIzMzMyIgZD0iTTAgMGgyNHYyNEgweiIvPjwvc3ZnPg=="
-							use:lazy={{
-								src: details.thumbnailDetails.thumbnails[1].url.replace(
+							src={details?.thumbnailDetails.thumbnails[1].url.replace(
 									/=(w(\d+))-(h(\d+))/g,
 									'=w256-h256'
-								)
-							}}
+								)}
+
 							alt="album" />
 					</div>
 					<div class="info">

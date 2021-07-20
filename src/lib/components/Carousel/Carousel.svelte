@@ -3,6 +3,7 @@
 	export let setTitle = ''
 	export let items = []
 	export let type = ''
+	export let isBrowse = false
 	import lazy from '$lib/lazy'
 	import { fade } from 'svelte/transition'
 	import { goto } from '$app/navigation'
@@ -26,7 +27,12 @@
 					<!-- {JSON.stringify(item[1], title, thumbnail, subtitle)} -->
 					<CarouselItem type="trending" {item} index={i} bind:section />
 				{:else if type == 'artist'}
-					<CarouselItem type="artist" {item} index={i} bind:section />
+					<CarouselItem
+						type="artist"
+						{isBrowse}
+						{item}
+						index={i}
+						bind:section />
 				{:else if type == 'new'}
 					<!-- content here -->
 					<section

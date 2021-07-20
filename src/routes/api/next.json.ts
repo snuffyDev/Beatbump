@@ -9,133 +9,126 @@ export async function get({ query }) {
 	const video_id = query.get('videoId')
 	const playlist_id = query.get('playlistId')
 	const ctoken = query.get('ctoken')
+	try {
+		const response = await fetch(
+			`https://music.youtube.com/youtubei/v1/next?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
+			{
+				method: 'POST',
+				body: JSON.stringify({
+					context: {
+						client: {
+							clientName: 'WEB_REMIX',
+							clientVersion: '0.1'
+						},
 
-	const response = await fetch(
-		`https://music.youtube.com/youtubei/v1/next?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
-		{
-			method: 'POST',
-			body: JSON.stringify({
-				context: {
-					client: {
-						clientName: 'WEB_REMIX',
-						clientVersion: '0.1'
+						user: {
+							enableSafetyMode: false
+						}
 					},
-
-					user: {
-						enableSafetyMode: false
+					continuation: `${ctoken}`,
+					isAudioOnly: true,
+					enablePersistentPlaylistPanel: true,
+					index: `${i}`,
+					params: `${params}`,
+					tunerSettingValue: 'AUTOMIX_SETTING_NORMAL',
+					videoId: `${video_id}`,
+					playlistId: `${playlist_id}`,
+					watchEndpointMusicConfig: {
+						hasPersistentPlaylistPanel: true,
+						musicVideoType: 'MUSIC_VIDEO_TYPE_ATV'
 					}
-				},
-				continuation: `${ctoken}`,
-				isAudioOnly: true,
-				enablePersistentPlaylistPanel: true,
-				index: `${i}`,
-				params: `${params}`,
-				tunerSettingValue: 'AUTOMIX_SETTING_NORMAL',
-				videoId: `${video_id}`,
-				playlistId: `${playlist_id}`,
-				watchEndpointMusicConfig: {
-					hasPersistentPlaylistPanel: true,
-					musicVideoType: 'MUSIC_VIDEO_TYPE_ATV'
+				}),
+				headers: {
+					'Content-Type': 'application/json; charset=utf-8',
+					Origin: 'https://music.youtube.com'
 				}
-			}),
-			headers: {
-				'Content-Type': 'application/json; charset=utf-8',
-				Origin: 'https://music.youtube.com'
 			}
-			// referrer: `https://music.youtube.com/watch?v=${videoId}&list=${playlistId}`,
+		)
+		if (!response.ok) {
+			// NOT res.status >= 200 && res.status < 300
+			return { status: response.status, body: response.statusText }
 		}
-	)
-	if (!response.ok) {
-		// NOT res.status >= 200 && res.status < 300
-		return { status: response.status, body: response.statusText }
-	}
-	const data = await response.json()
-	if (!params) {
-		const {
-			contents: {
-				singleColumnMusicWatchNextResultsRenderer: {
-					tabbedRenderer: {
-						watchNextTabbedResultsRenderer: {
-							tabs: [
-								{
-									tabRenderer: {
-										content: {
-											musicQueueRenderer: {
-												content: {
-													playlistPanelRenderer: {
-														contents,
-														continuations: [
-															{
-																nextRadioContinuationData: {
-																	clickTrackingParams,
-																	continuation
+		const data = await response.json()
+		/* For when you are NOT listening to a song.
+		 ********************************************/
+		if (!params) {
+			const {
+				contents: {
+					singleColumnMusicWatchNextResultsRenderer: {
+						tabbedRenderer: {
+							watchNextTabbedResultsRenderer: {
+								tabs: [
+									{
+										tabRenderer: {
+											content: {
+												musicQueueRenderer: {
+													content: {
+														playlistPanelRenderer: {
+															contents,
+															continuations: [
+																{
+																	nextRadioContinuationData: {
+																		clickTrackingParams,
+																		continuation
+																	}
 																}
-															}
-														]
+															]
+														}
 													}
 												}
 											}
 										}
 									}
-								}
-							]
+								]
+							}
 						}
 					}
-				}
-			},
-			currentVideoEndpoint: { watchEndpoint }
-		} = data
-		async function parser(
-			contents,
-			continuation,
-			clickTrackingParams,
-			watchEndpoint?
-		) {
+				},
+				currentVideoEndpoint: { watchEndpoint }
+			} = data
 			const parsed = parseContents(
 				contents,
 				continuation,
 				clickTrackingParams,
 				watchEndpoint ? watchEndpoint : ''
 			)
-
-			return parsed
+			return {
+				status: 200,
+				body: parsed
+			}
 		}
-
-		return {
-			status: 200,
-			body: JSON.stringify(
-				await parser(contents, continuation, clickTrackingParams, watchEndpoint)
-			)
-		}
-	}
-	let watchEndpoint
-	const {
-		continuationContents: {
-			playlistPanelContinuation: {
-				contents,
-				continuations: [
-					{
-						nextRadioContinuationData: { clickTrackingParams, continuation }
-					}
-				],
-				playlistId,
-				...rest
-			} = watchEndpoint
-		}
-	} = data
-	async function parser(contents, continuation, clickTrackingParams, rest) {
+		/*
+		 * This is for when you are already listening to a song
+		 * !params above looks for the ITCT as a check.
+		 **************************************/
+		let watchEndpoint
+		const {
+			continuationContents: {
+				playlistPanelContinuation: {
+					contents,
+					continuations: [
+						{
+							nextRadioContinuationData: { clickTrackingParams, continuation }
+						}
+					],
+					...rest
+				} = watchEndpoint
+			}
+		} = data
 		const parsed = parseContents(
 			contents,
 			continuation,
 			clickTrackingParams,
 			rest
 		)
-		return parsed
-	}
-	return {
-		status: 200,
-		body: JSON.stringify(
-			await parser(contents, continuation, clickTrackingParams, rest)
-		)
+		return {
+			status: 200,
+			body: parsed
+		}
+	} catch (error) {
+		return {
+			status: 500,
+			error: new Error('Error: ' + error)
+		}
 	}
 }

@@ -1,11 +1,12 @@
 import type { Artist, Song } from '$lib/types'
 import type { PlaylistSearch } from '$lib/types/playlist'
 import { pb } from '$lib/utils'
+import type { EndpointOutput } from '@sveltejs/kit'
+import type { DefaultBody } from '@sveltejs/kit/types/endpoint'
 
-export async function get({ query }) {
+export async function get({ query }): Promise<EndpointOutput<DefaultBody>> {
 	const q = query.get('q') || ''
 	const filter = query.get('filter') || ''
-	const endpoint = query.get('endpoint') || ''
 	const videoId = query.get('videoId') || ''
 	const itct = query.get('itct') || ''
 	const playlistId = query.get('playlistId') || ''
@@ -13,9 +14,7 @@ export async function get({ query }) {
 	const browseId = query.get('browseId') || ''
 	// console.log(endpoint)
 	const pageType = query.get('pt') || ''
-	const index = query.get('index') || ''
 
-	const gl = query.get('gl') || ''
 	try {
 		const response = await fetch(
 			`https://music.youtube.com/youtubei/v1/search?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${
@@ -104,33 +103,27 @@ export async function get({ query }) {
 		}
 		const data = await response.json()
 
-		if (data.hasOwnProperty('continuationContents')) {
+		if (Object.prototype.hasOwnProperty.call(data, 'continuationContents')) {
 			const { continuationContents } = data
-			const results = await parseSearchResult(continuationContents, true, filter)
+			const results = parseSearchResult(continuationContents, true, filter)
 
 			// console.log(`contents: `, results);
 			return {
 				status: 200,
-				body: await results
+				body: JSON.stringify(results)
 			}
 		} else {
 			const {
 				contents: {
-					sectionListRenderer: {
-						contents: [...rest]
-					}
+					sectionListRenderer: { contents: [...rest] = [] }
 				}
 			} = await data
 
-			const results = await parseSearchResult(rest, false, filter)
-			if (results?.error) {
-				console.log(results?.error)
-				return { error: results?.error }
-			}
+			const results = parseSearchResult(rest, false, filter)
 
 			return {
 				status: 200,
-				body: await results
+				body: JSON.stringify(results)
 			}
 		}
 	} catch (error) {
@@ -141,121 +134,81 @@ export async function get({ query }) {
 		}
 	}
 }
+// Parse the playlist results for search.
+const parsePlaylist = (contents) => {
+	const results: PlaylistSearch[] = []
+	const type = 'playlist'
+	contents.map(({ musicResponsiveListItemRenderer }) => {
+		// const d = musicResponsiveListItemRenderer
+		const thumbnails =
+			musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail
+				.thumbnails
+		const browseId =
+			musicResponsiveListItemRenderer.navigationEndpoint.browseEndpoint.browseId
+		const title =
+			musicResponsiveListItemRenderer.flexColumns[0]
+				.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text
+		const flexColumns = pb(
+			musicResponsiveListItemRenderer,
+			'musicResponsiveListItemFlexColumnRenderer',
+			true
+		)
+		let metaData = pb(flexColumns[1], 'runs:text', true)
+		metaData = metaData.join('')
 
-function parseSearchResult(data, cont, filter?) {
-	/*
-        data = response data
-        cont = continuation
-				*/
-
-	let continuation
-
-	let didYouMean
-	let ctx
-
-	if (cont) {
-		// if has continuation, context = data
-		ctx = [data]
-	} else {
-		/*  Error Handling
-            Message Renderer is for when something goes horribly wrong,
-            itemSectionRenderer is for when there's an error
-        */
-		if (data[0].messageRenderer) return []
-		if (data[0].itemSectionRenderer) {
-			if (data[0].itemSectionRenderer?.contents[0].messageRenderer)
-				return { error: 'No Results Found' }
-			didYouMean = correctedQuery(
-				data[0]?.itemSectionRenderer?.contents[0].didYouMeanRenderer
-			)
-
-			ctx = [data[1]]
-		} else {
-			ctx = [data[0]]
+		const result: PlaylistSearch = {
+			thumbnails: thumbnails,
+			browseId: browseId,
+			metaData: metaData,
+			playlistId:
+				musicResponsiveListItemRenderer.menu?.menuRenderer?.items[0]
+					?.menuNavigationItemRenderer?.navigationEndpoint
+					?.watchPlaylistEndpoint?.playlistId,
+			hash:
+				Math.random().toString(36).substring(2, 15) +
+				Math.random().toString(36).substring(2, 15),
+			title: title,
+			type: type
 		}
-	}
-	// Safety net
-	if (ctx.itemSectionRenderer) return []
-
-	let results = []
-
-	ctx.map(async (c) => {
-		let contents = []
-		if (cont) {
-			const { musicShelfContinuation } = c
-			contents.push(musicShelfContinuation)
-		} else {
-			const { musicShelfRenderer } = c
-			contents.push(musicShelfRenderer)
-		}
-		/* Search for if the request is for Playlists
-           If not, then parse song request.
-        */
-		// filter = encodeURIComponent(filter);
-		const paramList = [
-			'EgWKAQIoAWoKEAMQBBAKEAUQCQ==',
-			'EgeKAQQoADgBagwQDhAKEAkQAxAEEAU=',
-			'EgeKAQQoAEABagwQDhAKEAkQAxAEEAU='
-		]
-
-		if (!paramList.includes(filter)) {
-			if (contents[0]?.hasOwnProperty('continuations')) {
-				continuation = contents[0].continuations[0].nextContinuationData
-			}
-			// console.log(contents)
-			contents = contents[0]?.contents
-			results = parseSong(contents)
-			return { results, continuation }
-		} else {
-			if (contents[0]?.hasOwnProperty('continuations')) {
-				continuation = contents[0]?.continuations[0].nextContinuationData
-			}
-			// console.log(contents)
-			contents = contents[0]?.contents
-			results = parsePlaylist(contents)
-			return { results, continuation }
-		}
+		results.push(result)
 	})
-
-	if (didYouMean !== undefined) {
-		return {
-			contents: results,
-			didYouMean: didYouMean,
-			continuation: continuation
-		}
-	}
-	return { contents: results, continuation: continuation }
+	return results
 }
 
-/* Return the data for if there is a corrected query */
-function correctedQuery(ctx) {
-	const correctTerm = ctx?.correctedQuery?.runs[0].text
-	const correctedEndpoint = ctx?.correctedQueryEndpoint?.searchEndpoint
-
-	return {
-		term: correctTerm,
-		endpoint: correctedEndpoint
-	}
-}
-
-function parseSong(contents) {
+const parseSong = (contents) => {
 	const type = 'song'
-	const results = []
-	contents.map(({ musicResponsiveListItemRenderer: d }) => {
+	const results: Song[] = []
+	contents.map(({ musicResponsiveListItemRenderer }, i) => {
 		// let d = musicResponsiveListItemRenderer
 		let explicit
-		if (d.hasOwnProperty('badges')) explicit = true
-		const flexColumns = pb(d, 'musicResponsiveListItemFlexColumnRenderer', true)
+		if (
+			Object.prototype.hasOwnProperty.call(
+				musicResponsiveListItemRenderer,
+				'badges'
+			)
+		)
+			explicit = true
+		const flexColumns = pb(
+			musicResponsiveListItemRenderer,
+			'musicResponsiveListItemFlexColumnRenderer',
+			true
+		)
 
-		const thumbnails = d.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails
+		const thumbnails =
+			musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail
+				.thumbnails
 		const title = pb(flexColumns[0], 'runs:text', true)
 
 		let browseId
 		if (
-			d.menu.menuRenderer?.items[5]?.menuNavigationItemRenderer
-				?.navigationEndpoint.browseEndpoint
+			musicResponsiveListItemRenderer.menu?.menuRenderer?.items[5]
+				?.menuNavigationItemRenderer?.navigationEndpoint?.browseEndpoint
 		) {
-			const menu = pb(d.menu.menuRenderer, 'items', true)
+			const menu = pb(
+				musicResponsiveListItemRenderer.menu?.menuRenderer,
+				'items',
+				true
+			)
 			const items = pb(menu, 'menuNavigationItemRenderer')
 			// console.log(items);
 			if (items.length > 4) {
@@ -265,13 +218,22 @@ function parseSong(contents) {
 			}
 		} else {
 			browseId =
-				d.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text
-					?.runs[0]?.navigationEndpoint?.browseEndpoint?.browseId
+				musicResponsiveListItemRenderer.flexColumns[1]
+					?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
+					?.navigationEndpoint?.browseEndpoint?.browseId
 		}
-		const {
-			watchEndpoint
-		} = d.menu.menuRenderer?.items[0]?.menuNavigationItemRenderer?.navigationEndpoint
-		const { videoId = '', playlistId, params } = watchEndpoint
+
+		// const { videoId = '', playlistId, params }
+		const videoId =
+			musicResponsiveListItemRenderer.menu?.menuRenderer?.items[0]
+				?.menuNavigationItemRenderer?.navigationEndpoint.watchEndpoint?.videoId
+		const playlistId =
+			musicResponsiveListItemRenderer.menu?.menuRenderer?.items[0]
+				?.menuNavigationItemRenderer?.navigationEndpoint.watchEndpoint
+				?.playlistId
+		const params =
+			musicResponsiveListItemRenderer.menu?.menuRenderer?.items[0]
+				?.menuNavigationItemRenderer?.navigationEndpoint.watchEndpoint?.params
 
 		const metaInfo = pb(flexColumns[1], 'runs:text', true)
 		// console.log(metaInfo);
@@ -313,6 +275,7 @@ function parseSong(contents) {
 			playlistId: playlistId,
 			thumbnails: thumbnails,
 			explicit: explicit,
+			index: i++,
 			hash:
 				Math.random().toString(36).substring(2, 15) +
 				Math.random().toString(36).substring(2, 15)
@@ -322,35 +285,98 @@ function parseSong(contents) {
 	return results
 }
 
-// Parse the playlist results for search.
-function parsePlaylist(contents) {
-	const results = []
-	const type = 'playlist'
-	contents.map(({ musicResponsiveListItemRenderer: d }) => {
-		// const d = musicResponsiveListItemRenderer
-		const thumbnails = d.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails
-		const browseId = d.navigationEndpoint.browseEndpoint.browseId
-		const title =
-			d.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0]
-				.text
-		const flexColumns = pb(d, 'musicResponsiveListItemFlexColumnRenderer', true)
-		let metaData = pb(flexColumns[1], 'runs:text', true)
-		metaData = metaData.join('')
+function parseSearchResult(data, cont, filter?) {
+	/*
+        data = response data
+        cont = continuation
+				*/
 
-		const result: PlaylistSearch = {
-			thumbnails: thumbnails,
-			browseId: browseId,
-			metaData: metaData,
-			playlistId:
-				d.menu.menuRenderer?.items[0]?.menuNavigationItemRenderer
-					.navigationEndpoint.watchPlaylistEndpoint.playlistId,
-			hash:
-				Math.random().toString(36).substring(2, 15) +
-				Math.random().toString(36).substring(2, 15),
-			title: title,
-			type: type
+	let continuation
+
+	let didYouMean
+	let ctx
+
+	if (cont) {
+		// if has continuation, context = data
+		ctx = [data]
+	} else {
+		/*  Error Handling
+            Message Renderer is for when something goes horribly wrong,
+            itemSectionRenderer is for when there's an error
+        */
+		if (data[0].messageRenderer) return []
+		if (data[0].itemSectionRenderer) {
+			if (data[0].itemSectionRenderer?.contents[0].messageRenderer)
+				return { error: 'No Results Found' }
+			didYouMean = correctedQuery(
+				data[0]?.itemSectionRenderer?.contents[0].didYouMeanRenderer
+			)
+
+			ctx = [data[1]]
+		} else {
+			ctx = [data[0]]
 		}
-		results.push(result)
+	}
+	// Safety net
+	if (ctx.itemSectionRenderer) return []
+
+	let results: Song[] | PlaylistSearch[] = []
+
+	ctx.map(async (c) => {
+		let contents = []
+		if (cont) {
+			const { musicShelfContinuation } = c
+			contents.push(musicShelfContinuation)
+		} else {
+			const { musicShelfRenderer } = c
+			contents.push(musicShelfRenderer)
+		}
+		/* Search for if the request is for Playlists
+           If not, then parse song request.
+        */
+		// filter = encodeURIComponent(filter);
+		const paramList = [
+			'EgWKAQIoAWoKEAMQBBAKEAUQCQ==',
+			'EgeKAQQoADgBagwQDhAKEAkQAxAEEAU=',
+			'EgeKAQQoAEABagwQDhAKEAkQAxAEEAU='
+		]
+
+		if (!paramList.includes(filter)) {
+			if (contents[0]?.hasOwnProperty('continuations')) {
+				continuation = contents[0].continuations[0].nextContinuationData
+			}
+			// console.log(contents)
+			const { contents: ctx } = contents[0]
+			results = parseSong(ctx)
+			return { results, continuation }
+		} else {
+			if (contents[0]?.hasOwnProperty('continuations')) {
+				continuation = contents[0]?.continuations[0].nextContinuationData
+			}
+			// console.log(contents)
+			contents = contents[0]?.contents
+			results = parsePlaylist(contents)
+			return { results, continuation }
+		}
 	})
-	return results
+
+	if (didYouMean !== undefined) {
+		return {
+			contents: results,
+			didYouMean: didYouMean,
+			continuation: continuation
+		}
+	}
+	return { contents: results, continuation: continuation }
+}
+
+/* Return the data for if there is a corrected query */
+function correctedQuery(ctx) {
+	const correctTerm = ctx?.correctedQuery?.runs[0].text
+	const correctedEndpoint = ctx?.correctedQueryEndpoint?.searchEndpoint
+
+	return {
+		term: correctTerm,
+		endpoint: correctedEndpoint
+	}
 }

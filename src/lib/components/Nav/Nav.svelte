@@ -9,14 +9,14 @@
 	import { clickOutside } from '$lib/js/clickOutside'
 	import { filterAutoPlay, theme } from '$stores/stores'
 	import { onMount } from 'svelte'
-	import { page } from '$app/stores'
+	import { navigating, page } from '$app/stores'
 
 	export let width
 
 	let isHidden = true
 	let hidden = isHidden ? true : false
 	$: curTheme = $theme
-	let isSettings = true
+	let isSettings
 	let settingsHidden = isSettings ? true : false
 	let setTheme = localStorage.getItem('theme')
 		? localStorage.getItem('theme')
@@ -72,13 +72,12 @@
 		<div
 			class="nav-item-desktop"
 			on:click={() => {
-				settingsHidden = !settingsHidden
+				isSettings = !isSettings
 			}}>
 			<svelte:component this={Icon} name="settings" size="1.75em" />
 		</div>
-		{#if !settingsHidden}
-			<Settings bind:isHidden />
-		{/if}
+
+		<Settings bind:isSettings />
 	</div>
 {/if}
 {#if width < 640}
@@ -117,13 +116,11 @@
 			}}>
 			<svelte:component this={Icon} name="search" size="1.75em" />
 		</div>
-		{#if !settingsHidden}
-			<Settings bind:isHidden />
-		{/if}
+		<Settings bind:isSettings />
 		<div
 			class="nav-item"
-			on:click={() => {
-				settingsHidden = !settingsHidden
+			on:click|stopPropagation={() => {
+				isSettings = !isSettings
 			}}>
 			<svelte:component this={Icon} name="settings" size="1.75em" />
 		</div>

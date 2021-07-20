@@ -20,16 +20,15 @@ select {
 	appearance: none;
 	* {
 		// background-color: #272f3a;
-		background-color: #111818c9;
+	}
+	option {
+		background-color: #0d0e0ee0;
 
 		color: rgb(255, 255, 255);
-		&:hover {
-			background-color: transparentize(#000000, 0);
-		}
 	}
 }
 .selectCont::after {
-	content: '▼';
+	content: "▼";
 	position: absolute;
 	top: 27.5%;
 	right: 8%;

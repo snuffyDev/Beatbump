@@ -1,26 +1,24 @@
 <script lang="ts">
 	import lazy from '$lib/lazy'
-	import { trendingHandler } from '$lib/js/indexUtils'
 	import Loading from '$components/Loading/Loading.svelte'
-	import { currentMix, currentTitle, currentTrack, key } from '$stores/stores'
+	import { currentTrack, key } from '$stores/stores'
 	import { fade } from 'svelte/transition'
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 	import { goto } from '$app/navigation'
-	import Icon from '$components/Icon/Icon.svelte'
 
-	import { addToQueue, getSrc } from '$lib/utils'
+	import { getSrc } from '$lib/utils'
 	import type { SearchResult } from '$lib/types'
 	import list from '$lib/stores/list'
-	import { ddData } from './CarouselDropdown'
-	import DropdownItem from './DropdownItem.svelte'
-
+	import { tick } from 'svelte'
 	export let section
 	export let index
 	export let item: SearchResult
 	export let type = ''
+	export let isBrowse = false
 	let hovering = false
 	let isLoading = false
 	let loading = isLoading ? true : false
+	let isHidden
 	let showing = false
 	let menuToggle = showing ? true : false
 	let width
@@ -30,14 +28,16 @@
 		{
 			text: 'View Artist',
 			icon: 'artist',
-			action: () => {
+			action: async () => {
 				window.scrollTo({
 					behavior: 'smooth',
 					top: 0,
 					left: 0
 				})
+				await tick()
+
 				goto(
-					`/artist?id=${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
+					`/artist/${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
 				)
 			}
 		},
@@ -80,14 +80,25 @@
 					key.set(0)
 					loading = false
 				} else if (type == 'artist' && !loading) {
-					loading = true
-					list.initArtistList(item.videoId, item.playlistId)
-					await getSrc(item.videoId)
-					currentTrack.set({ ...$list.mix[0] })
-					// currentTitle.set(res[0].title);
-					key.set(0)
-					// console.log(data);
-					loading = false
+					if (isBrowse) {
+						let main = document.getElementById('wrapper')
+						// main.scrollTo({ top: 0, behavior: 'smooth' })
+						// await tick()
+						goto(`/artist/${item?.browseEndpoint?.browseId}`)
+					} else if (item.videoId !== undefined) {
+						loading = true
+						list.initArtistList(item.videoId, item.playlistId)
+						await getSrc(item.videoId)
+						currentTrack.set({ ...$list.mix[0] })
+						// currentTitle.set(res[0].title);
+						key.set(0)
+						// console.log(data);
+						loading = false
+					} else {
+						list.startPlaylist(item.playlistId)
+						key.set(0)
+						loading = false
+					}
 				}
 			}}>
 			<div class="img">
@@ -100,8 +111,6 @@
 						<img
 							alt="thumbnail"
 							transition:fade|local
-							width="256"
-							height="256"
 							loading="lazy"
 							type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 							src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
@@ -132,7 +141,7 @@
 		</div>
 
 		<div class="menu" class:mobile={width < 550}>
-			<Dropdown items={DropdownItems} />
+			<Dropdown bind:isHidden items={DropdownItems} />
 		</div>
 	</section>
 </div>

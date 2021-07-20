@@ -64,13 +64,13 @@
 				referrerpolicy="origin-when-cross-origin"
 				class="header-thumbnail"
 				loading="eager"
-				src={thumbnail[1].url}
+				src={thumbnail[1]?.url}
 				alt="Artist Thumbnail" />
 		</picture>
 	</div>
 	<div class="artist-content">
 		<div class="content-wrapper">
-			<div class="name">{headerContent.name}</div>
+			<div class="name">{headerContent?.name}</div>
 			{#if width > 500 && !!description}
 				<div class="description">{description[0]}</div>
 			{/if}

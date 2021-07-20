@@ -23,8 +23,8 @@
 	class:playing={index == $key}
 	on:click={async () => {
 		// @ts-ignore
-		key.set(0)
-		if (type == 'playlist') {
+		key.set(index)
+		if (page == 'playlist') {
 			await list.startPlaylist(item.playlistId)
 		} else {
 			await list.initList(item.videoId, item.playlistId)

@@ -24,12 +24,14 @@
 
 <script lang="ts">
 	import ListItem from '$components/ListItem/ListItem.svelte'
+	import Icon from '$lib/components/Icon/Icon.svelte'
 	import lazy from '$lib/lazy'
 	import list from '$lib/stores/list'
 	import { isPagePlaying } from '$lib/stores/stores'
+	import type { Header, PlaylistItem } from '$lib/types/playlist'
 	import { onMount, setContext } from 'svelte'
-	export let tracks
-	export let header
+	export let tracks: PlaylistItem[]
+	export let header: Header
 	// export let error;
 	export let continuations
 	const key = {}
@@ -86,7 +88,7 @@
 					<div class="info">
 						<div class="info-title">
 							<h4 class="box-title">{header?.title}</h4>
-							{#if header?.description}
+							{#if header.description}
 								<p class="subtitle" class:hidden={width < 640 ? true : false}>
 									{header?.description ? header?.description : ''}
 								</p>
@@ -102,7 +104,12 @@
 								</span>
 							{/if}
 							<div class="button-group">
-								<button class="button--outlined">Start Listening</button>
+								<button
+									on:click={() => {
+										list.startPlaylist(tracks[0].playlistId)
+									}}
+									class="button--outlined"
+									><Icon name="play" size="1em" /> Play</button>
 							</div>
 						</div>
 					</div>
@@ -112,7 +119,7 @@
 		<hr />
 		{#each tracks as res, i}
 			<ListItem
-				type="playlist"
+				page="playlist"
 				on:pagePlaying={() => {
 					isPagePlaying.set(header.playlistId)
 				}}

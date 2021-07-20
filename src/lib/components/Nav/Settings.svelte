@@ -10,12 +10,12 @@
 	import { page } from '$app/stores'
 
 	export let width
-	export let isHidden
+	export let isSettings
 	// let isHidden = true
 	// let hidden = isHidden ? true : false
 	$: curTheme = $theme
-	let isSettings = true
-	let settingsHidden = isSettings ? true : false
+	// let isSettings = true
+	// let isSettings = isSettings ? true : false
 	let setTheme = localStorage.getItem('theme')
 		? localStorage.getItem('theme')
 		: ''
@@ -32,44 +32,48 @@
 	]
 </script>
 
-<div
-	use:clickOutside
-	on:click_outside={() => {
-		settingsHidden = !settingsHidden
-	}}
-	class="nav-settings"
-	style={`background-color: var(--${curTheme}-top)}`}
-	transition:fade={{ duration: 120, easing: circIn }}>
-	<!-- <label for="search"><em>search</em></label> -->
-	<div class="setting">
-		<label for="select" class="s-text">Theme:</label>
-		<div class="selectCont" style={`background-color: var(--${$theme}-forms)`}>
-			<!-- svelte-ignore a11y-no-onchange -->
-			<select
-				id="select"
-				class="select"
-				bind:value={setTheme}
-				on:change={() => {
-					theme.set(setTheme)
-				}}>
-				{#each themes as theme}
-					<option value={theme.name} selected={setTheme}>{theme.name}</option>
-				{/each}
-			</select>
+{#if isSettings}
+	<div
+		use:clickOutside
+		on:click_outside={() => {
+			isSettings = !isSettings
+		}}
+		class="nav-settings"
+		style={`background-color: var(--${curTheme}-top)}`}
+		transition:fade={{ duration: 120, easing: circIn }}>
+		<!-- <label for="search"><em>search</em></label> -->
+		<div class="setting">
+			<label for="select" class="s-text">Theme:</label>
+			<div
+				class="selectCont"
+				style={`background-color: var(--${$theme}-forms)`}>
+				<!-- svelte-ignore a11y-no-onchange -->
+				<select
+					id="select"
+					class="select"
+					bind:value={setTheme}
+					on:change={() => {
+						theme.set(setTheme)
+					}}>
+					{#each themes as theme}
+						<option value={theme.name} selected={setTheme}>{theme.name}</option>
+					{/each}
+				</select>
+			</div>
+		</div>
+		<div class="setting">
+			<label for="checkbox" class="s-text"
+				>Dedupe Automix:
+				<input
+					type="checkbox"
+					bind:checked={setFilter}
+					on:change={() => {
+						filterAutoPlay.set(setFilter)
+					}} />
+			</label>
 		</div>
 	</div>
-	<div class="setting">
-		<label for="checkbox" class="s-text"
-			>Dedupe Automix:
-			<input
-				type="checkbox"
-				bind:checked={setFilter}
-				on:change={() => {
-					filterAutoPlay.set(setFilter)
-				}} />
-		</label>
-	</div>
-</div>
+{/if}
 
 <style lang="scss">
 	.desktop.nav-item {

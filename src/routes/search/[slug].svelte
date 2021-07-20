@@ -26,7 +26,7 @@
 </script>
 
 <script lang="ts">
-	export let continuation
+	export let continuation: NextContinuationData
 	export let contents
 	export let didYouMean
 	export let error
@@ -37,35 +37,49 @@
 	import { page } from '$app/stores'
 	import { invalidate } from '$app/navigation'
 	import Item from '$components/Item/Item.svelte'
-	import { tick } from 'svelte'
+	import type { NextContinuationData, Song } from '$lib/types'
+	import VirtualList from '$lib/components/SearchList/VirtualList.svelte'
+	import viewport from '$lib/actions/viewport'
 
 	$: search.set(contents)
+
 	// $:
 	$: songTitle = $page.params.slug
-	let ctoken = continuation?.continuation
-	let itct = continuation?.clickTrackingParams
+	let ctoken = continuation.continuation
+	let itct = continuation.clickTrackingParams
 	// console.log(contents);
+	let isLoading = false
+	let hasData = false
+
 	async function paginate() {
-		return await fetch(
+		if (isLoading || hasData) return
+		isLoading = true
+		const response = await fetch(
 			`/api/search.json?q=` +
 				`&filter=` +
 				filter +
 				`&params=${itct}${continuation.continuation ? `&ctoken=${ctoken}` : ''}`
 		)
-			.then((data) => data.json())
-			.then((data) => {
-				const res = data
+		const newPage = await response.json()
+		const res = await newPage
 
-				search.update((u) => [...u, ...res.contents])
-
-				if (data?.error) {
-					error = data?.error
-				}
-				ctoken = res.continuation.continuation
-				itct = res.continuation.clickTrackingParams
-				return { params: itct, continuation: ctoken }
-			})
+		if (newPage?.error) {
+			error = newPage?.error
+		}
+		ctoken = res.continuation.continuation
+		itct = res.continuation.clickTrackingParams
+		search.update((u) => [...u, ...res.contents])
+		isLoading = false
+		hasData = newPage.length === 0
+		// console.log(isLoading, hasData)
+		// return { params: itct, continuation: ctoken }
 	}
+	let start = 0
+	let items: [] = []
+	$: items = $search
+	let ending
+	// $: if (items) ending = items.length - 1
+	// $: if ($search.length >= 1) listEnd = $search.length - 1
 </script>
 
 <svelte:head>
@@ -98,21 +112,34 @@
 		{/if}
 	</section>
 	<main class="parent">
-		{#each $search as data (data.hash)}
+		{#if $search.length > 1}
+			<!-- {#each $search as data (data.hash)}
 			<Item {data} />
-		{/each}
+			{/each} -->
+			<VirtualList
+				on:endList={() => {
+					paginate()
+				}}
+				bind:isLoading
+				bind:hasData
+				bind:start
+				bind:end={ending}
+				height="85%"
+				{items}
+				let:item>
+				<Item name="item" data={item} />
+			</VirtualList>
+
+			<!-- <SearchList
+				on:end={paginate}
+				bind:isLoading
+				bind:hasData
+				let:item
+				items={$search}>
+				<Item slot="item" data={item} />
+			</SearchList> -->
+		{/if}
 	</main>
-	{#if continuation}
-		<button
-			class="button--block button--outlined"
-			on:click={() => {
-				paginate()
-			}}>Load More</button>
-	{:else}
-		<div class="end">
-			<h5><em>End of results!</em></h5>
-		</div>
-	{/if}
 {/if}
 
 <style scoped lang="scss">

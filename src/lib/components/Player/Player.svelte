@@ -2,13 +2,20 @@
 	import { clickOutside } from '$lib/js/clickOutside'
 	import { goto } from '$app/navigation'
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
-	import { iOS } from '$stores/stores.js'
+	import { iOS } from '$stores/stores'
+	import { fade } from 'svelte/transition'
 	import { tweened } from 'svelte/motion'
 	import { getSrc } from '$lib/utils'
 	import Queue from './Queue.svelte'
 	import '../../../global/scss/components/_player.scss'
 	import Icon from '$components/Icon/Icon.svelte'
-	import { updateTrack, key, currentMix, currentTitle } from '$stores/stores'
+	import {
+		updateTrack,
+		key,
+		currentMix,
+		currentTitle,
+		playerLoading
+	} from '$stores/stores'
 	import { cubicOut } from 'svelte/easing'
 	import * as utils from '$lib/utils'
 	import list from '$lib/stores/list'
@@ -39,6 +46,7 @@
 
 	let menuShow = false
 	let showing
+	$: loading = $playerLoading
 	$: toggle = menuShow ? true : false
 	$: listShow = showing ? true : false
 	$: hasList = $list.mix.length > 1
@@ -46,6 +54,21 @@
 	// log any and all updates to the list for testing
 	// $: console.log($list.mix)
 	// $: console.log(mixList, $list.mix[autoId]?.videoId);
+	let DropdownItems = [
+		{
+			text: 'View Artist',
+			icon: 'artist',
+			action: () => {
+				window.scrollTo({
+					behavior: 'smooth',
+					top: 0,
+					left: 0
+				})
+				goto(`/artist/${mixList[0].artistInfo.browseId}`)
+			}
+		}
+	]
+
 	const playing = () => player.play()
 	const paused = () => player.pause()
 	function pause() {
@@ -209,58 +232,21 @@
 				<div
 					class="player-btn player-title"
 					on:click={() => {
-						if (!isPlaying) {
-							startPlay()
-						} else {
-							pause()
-						}
-						if ('mediaSession' in navigator) {
-							navigator.mediaSession.metadata = new MediaMetadata({
-								title: title,
-								artist: $list.mix[autoId].artist.artist,
-								artwork: [
-									{
-										src: $list.mix[autoId].thumbnail,
-										sizes: '96x96',
-										type: 'image/jpeg'
-									},
-									{
-										src: $list.mix[autoId].thumbnail,
-										sizes: '128x128',
-										type: 'image/jpeg'
-									},
-									{
-										src: $list.mix[autoId].thumbnail,
-										sizes: '192x192',
-										type: 'image/jpeg'
-									},
-									{
-										src: $list.mix[autoId].thumbnail,
-										sizes: '256x256',
-										type: 'image/jpeg'
-									},
-									{
-										src: $list.mix[autoId].thumbnail,
-										sizes: '384x384',
-										type: 'image/jpeg'
-									},
-									{
-										src: $list.mix[autoId].thumbnail,
-										sizes: '512x512',
-										type: 'image/jpeg'
-									}
-								]
-							})
-							navigator.mediaSession.setActionHandler('play', startPlay)
-							navigator.mediaSession.setActionHandler('pause', pause)
-							navigator.mediaSession.setActionHandler('nexttrack', () => {
-								time = player.duration
-							})
+						if (loading) {
+							if (!isPlaying) {
+								startPlay()
+							} else {
+								pause()
+							}
 						}
 					}}>
-					{#if !isPlaying}
+					{#if loading}
+						<div
+							class="player-spinner"
+							class:fade-out={loading ? true : false} />
+					{:else if !isPlaying}
 						<Icon color="white" name="play" size="2em" />
-					{:else}
+					{:else if !loading && isPlaying}
 						<Icon color="white" name="pause" size="2em" />
 					{/if}
 				</div>
@@ -346,7 +332,7 @@
 										left: 0
 									})
 
-									goto(`/artist?id=${$list.mix[autoId].artistId}`, {
+									goto(`/artist/${$list.mix[autoId].artistId}`, {
 										replaceState: true
 									})
 								}}>
@@ -362,6 +348,37 @@
 </div>
 
 <style lang="scss">
+	.player-spinner {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		justify-self: center;
+		width: 2em;
+		// background: white;
+		height: 2em;
+		border: rgba(255, 255, 255, 0.26) solid 0.25em;
+		border-radius: 50%;
+		border-top-color: rgba(255, 255, 255, 0.904);
+		animation: loading 1s infinite cubic-bezier(0.785, 0.135, 0.15, 0.86);
+		width: 2em;
+		opacity: 0;
+		// background: white;
+		transition: all ease-in-out 1s;
+		&.fade-out {
+			opacity: 1;
+			transition: all ease-in-out 1s;
+		}
+		height: 2em;
+	}
+	@keyframes loading {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+	@keyframes loaddone {
+		to {
+		}
+	}
 	.f-container {
 		background-color: inherit;
 	}

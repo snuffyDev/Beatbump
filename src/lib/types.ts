@@ -1,6 +1,12 @@
+import type { PlaylistSearch } from './types/playlist'
+
 export interface Album {
 	browseId: string
 	title: string
+}
+export type SearchContents = {
+	results: PlaylistSearch[] | Song[]
+	length: number
 }
 export interface Song {
 	album?: Album
