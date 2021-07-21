@@ -19,6 +19,9 @@
 <div class="menu">
 	{#if isHidden}
 		<div
+			on:mouseleave={() => {
+				isHidden = !isHidden
+			}}
 			use:clickOutside
 			on:click_outside={() => {
 				isHidden = !isHidden

@@ -2,14 +2,25 @@
 	position: relative;
 	height: 100%;
 }
-
+iframe {
+	// z-index: 5 !important;
+	// position: absolute;
+	// right: 0;
+	// left: 0;
+	// top: 0;
+	// bottom: 0;
+	// padding-bottom: 1rem;
+}
 .parent {
 	/* row-gap: .8rem; */
 	width: 100%;
 	align-items: center;
 	justify-items: center;
-	height: calc(100% - 5rem);
-	grid-area: m/m/m/m;
+	// display: grid;
+	// height: auto;
+	// overflow-y: hidden;
+	// overflow: hidden;
+	height: 100%;
 }
 
 .wrapper {

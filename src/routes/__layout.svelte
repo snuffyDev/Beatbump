@@ -1,7 +1,7 @@
 <script>
 	import { browser } from '$app/env'
 	import { onMount } from 'svelte'
-	import { currentTrack, filterAutoPlay, theme } from '$stores/stores'
+	import { filterAutoPlay, theme } from '$stores/stores'
 	import { iOS } from '$stores/stores'
 	import Nav from '$components/Nav/Nav.svelte'
 	import Sidebar from '$components/Sidebar/Sidebar.svelte'

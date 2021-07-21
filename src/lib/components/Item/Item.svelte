@@ -2,7 +2,6 @@
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 
 	export let data: Song | PlaylistSearch
-	import { fade } from 'svelte/transition'
 	import Loading from '$components/Loading/Loading.svelte'
 	import { onMount, tick } from 'svelte'
 
@@ -12,7 +11,6 @@
 	import list from '$stores/list'
 	import type { Song } from '$lib/types'
 	import type { PlaylistSearch } from '$lib/types/playlist'
-	// import { addToQueue } from '$lib/utils'
 
 	let ctoken = ''
 	let videoId = ''
@@ -78,14 +76,11 @@
 		DropdownItems.shift()
 		DropdownItems.pop()
 	}
-	onMount(() => {
-		itemHandler()
-	})
 
 	const itemHandler = () => {
 		explicit = data.explicit
 		title = data.title
-		thumbnail = data?.thumbnails[0]?.url
+
 		if (data.type !== 'playlist') {
 			artist = data?.artistInfo?.artist
 		}
@@ -95,7 +90,7 @@
 			title = title
 		}
 	}
-
+	$: if (data) itemHandler()
 	// console.log(type)
 
 	const clickHandler = async () => {
@@ -142,7 +137,7 @@
 						id="img"
 						referrerpolicy="origin-when-cross-origin"
 						loading="lazy"
-						src={thumbnail}
+						src={data?.thumbnails[0]?.url}
 						alt="thumbnail" />
 				</div>
 			</div>

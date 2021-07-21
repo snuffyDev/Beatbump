@@ -35,7 +35,6 @@
 	import { parseArtistPage } from '$lib/js/artistUtils'
 
 	import Loading from '$components/Loading/Loading.svelte'
-	import { getData } from '$lib/utils'
 	import { page } from '$app/stores'
 
 	import Icon from '$components/Icon/Icon.svelte'

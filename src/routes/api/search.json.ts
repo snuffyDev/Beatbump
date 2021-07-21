@@ -101,7 +101,28 @@ export async function get({ query }): Promise<EndpointOutput<DefaultBody>> {
 			// NOT res.status >= 200 && res.status < 300
 			return { status: response.status, body: response.statusText }
 		}
-		const data = await response.json()
+		const data: {
+			continuationContents?
+			contents: {
+				sectionListRenderer: {
+					contents: [
+						{
+							messageRenderer?
+							itemSectionRenderer?: {
+								contents: [
+									{
+										didYouMeanRenderer
+										messageRenderer?
+										musicShelfRenderer?
+										musicShelfContinuation?
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		} = await response.json()
 
 		if (Object.prototype.hasOwnProperty.call(data, 'continuationContents')) {
 			const { continuationContents } = data
@@ -115,9 +136,9 @@ export async function get({ query }): Promise<EndpointOutput<DefaultBody>> {
 		} else {
 			const {
 				contents: {
-					sectionListRenderer: { contents: [...rest] = [] }
-				}
-			} = await data
+					sectionListRenderer: { contents: [...rest] = [] } = {}
+				} = {}
+			} = data
 
 			const results = parseSearchResult(rest, false, filter)
 

@@ -29,31 +29,18 @@
 </script>
 
 <script lang="ts">
-	import Loading from '$components/Loading/Loading.svelte'
 	import { page } from '$app/stores'
-	import { getData } from '$lib/utils'
 	import type { mixList } from '$lib/types'
 	import { onMount } from 'svelte'
-	import * as utils from '$lib/utils'
 	import Icon from '$components/Icon/Icon.svelte'
 	import ListItem from '$components/ListItem/ListItem.svelte'
-	import { currentMix, currentTitle, currentTrack, key } from '$stores/stores'
-	import lazy from '$lib/lazy'
+	import { currentTitle, currentTrack, key } from '$stores/stores'
 	import { parsePageContents } from '$lib/js/releaseUtils'
-	let browseId = $page.query.get('id')
-	// console.log(browseId)
-	let pageType = $page.query.get('type')
 	import { isPagePlaying } from '$stores/stores'
 	import list from '$lib/stores/list'
 	export let data
 	export let id
-	let loading = false
-	let explicit
-	let type
-	let playlistId = ''
-	onMount(async () => {
-		loading = true
-	})
+
 	const promise = parsePageContents(data)
 	let { details, items } = promise
 	console.log(promise)
@@ -104,10 +91,9 @@
 							type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 							data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0icHJlZml4X19wcmVmaXhfX2ZlYXRoZXIgcHJlZml4X19wcmVmaXhfX2ZlYXRoZXItbGlzdCI+PHBhdGggb3BhY2l0eT0iLjciIHN0cm9rZT0iI2NjYyIgZmlsbD0iIzMzMyIgZD0iTTAgMGgyNHYyNEgweiIvPjwvc3ZnPg=="
 							src={details?.thumbnailDetails.thumbnails[1].url.replace(
-									/=(w(\d+))-(h(\d+))/g,
-									'=w256-h256'
-								)}
-
+								/=(w(\d+))-(h(\d+))/g,
+								'=w256-h256'
+							)}
 							alt="album" />
 					</div>
 					<div class="info">
@@ -141,7 +127,7 @@
 		</div>
 		{#each items as item, index}
 			<ListItem
-				type="release"
+				page="release"
 				on:pagePlaying={() => {
 					isPagePlaying.set(id)
 				}}

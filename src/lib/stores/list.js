@@ -1,14 +1,38 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { parseItem } from '$lib/parsers'
-import { getNext, getSrc } from '$lib/utils'
+import { getSrc } from '$lib/utils'
 import { writable } from 'svelte/store'
 import { filterAutoPlay, playerLoading } from './stores'
 import { addToQueue } from './../utils'
+
+const fetchNext = async (
+	index,
+	params,
+	videoId,
+	playlistId,
+	ctoken
+) => {
+	return await fetch(
+		'/api/next.json?playlistId=' +
+		encodeURIComponent(playlistId) +
+		`${videoId ? `&videoId=${videoId}` : ''}` +
+		`${params ? `&params=${params}` : ''}` +
+		`${ctoken ? `&ctoken=${ctoken}` : ''}` +
+		'&index=' +
+		encodeURIComponent(index),
+		{
+			headers: { accept: 'application/json' }
+		}
+	)
+		.then((json) => json.json())
+		.catch((err) => console.log(err))
+}
 
 let filterSetting = false
 filterAutoPlay.subscribe((setting) => {
 	filterSetting = setting
 })
+
 let loading = false;
 playerLoading.subscribe((load) => {
 	loading = load
@@ -28,7 +52,7 @@ export default {
 		playerLoading.set(loading)
 		if (hasList) mix = []
 		hasList = true
-		const response = await getNext(0, '', videoId, playlistId, '')
+		const response = await fetchNext(0, '', videoId, playlistId, '')
 		const data = await response
 		await getSrc(videoId)
 		loading = false;
@@ -76,7 +100,7 @@ export default {
 	async getMore(autoId, itct, videoId, playlistId, ctoken) {
 		loading = true;
 		playerLoading.set(loading)
-		const data = await getNext(autoId, itct, videoId, playlistId, ctoken)
+		const data = await fetchNext(autoId, itct, videoId, playlistId, ctoken)
 
 		mix.pop()
 		await getSrc(data.results[0].videoId)

@@ -130,7 +130,7 @@
 		visibility: visible;
 		height: auto;
 		width: auto;
-
+		background: inherit;
 		max-height: 75%;
 		// transition: all cubic-bezier(0.23, 1, 0.32, 1) 1300ms;
 		min-height: 55%;
@@ -147,7 +147,7 @@
 		}
 		.list {
 			// background: #11151c;
-			background: theme-color('dim', 'side');
+
 			border-radius: 0.8em 0.8em 0 0;
 			border: 1px solid rgb(170 170 170);
 			color: white;

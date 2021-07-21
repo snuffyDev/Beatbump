@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { getData } from '$lib/utils'
-	import { page } from '$app/stores'
 	import '../../../global/vars.css'
 	import { onMount } from 'svelte'
 	import { theme } from '$lib/stores/stores'

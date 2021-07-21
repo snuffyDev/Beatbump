@@ -9,13 +9,7 @@
 	import Queue from './Queue.svelte'
 	import '../../../global/scss/components/_player.scss'
 	import Icon from '$components/Icon/Icon.svelte'
-	import {
-		updateTrack,
-		key,
-		currentMix,
-		currentTitle,
-		playerLoading
-	} from '$stores/stores'
+	import { updateTrack, key, currentTitle, playerLoading } from '$stores/stores'
 	import { cubicOut } from 'svelte/easing'
 	import * as utils from '$lib/utils'
 	import list from '$lib/stores/list'
@@ -121,7 +115,7 @@
 	player.addEventListener('seeked', () => {
 		startPlay()
 	})
-	const getNext = async () => {
+	const getNext = () => {
 		if (autoId == $list.mix.length - 1) {
 			list.getMore(
 				autoId,

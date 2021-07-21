@@ -1,6 +1,6 @@
 <script>
 	import Icon from '$components/Icon/Icon.svelte'
-	import { currentMix, currentTitle, key } from '$stores/stores'
+	import { currentTitle, key } from '$stores/stores'
 	import * as utils from '$lib/utils'
 	import { createEventDispatcher } from 'svelte'
 	import list from '$lib/stores/list'

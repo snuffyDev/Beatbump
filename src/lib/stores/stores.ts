@@ -1,27 +1,28 @@
 import { browser } from '$app/env'
-import type { SearchContents, Song } from '$lib/types'
-import type { PlaylistSearch } from '$lib/types/playlist'
-import { get, writable } from 'svelte/store'
+import type { SearchContents } from '$lib/types'
 import type { Writable } from 'svelte/store'
-export const playbackStatus = writable({})
-
+import { get, writable } from 'svelte/store'
 export const updateTrack = updateSource()
 export const ctxKey = {}
 export const currentTitle = writable('')
-export const searchManager = _searchIndex()
 
 type SearchStore = {
 	subscribe: Writable<SearchContents>['subscribe']
 	set: Writable<SearchContents>['set']
 	update: Writable<SearchContents>['update']
 }
+
+export const search: SearchStore = writable()
+
+export const isPagePlaying = writable('')
+export const key = writable(undefined)
+
 export const playerLoading = writable(false)
 export const searchState = writable({
 	option: '',
 	text: ''
 })
 
-export const searchCtoken = _ctoken()
 export const currentTrack = writable({
 	continuation: '',
 	id: '',
@@ -40,8 +41,6 @@ export const currentMix = writable({
 		{ id: '', videoId: '', thumbnail: '', artist: '', title: '', length: '' }
 	]
 })
-export const isPagePlaying = writable('')
-export const key = writable(undefined)
 export const iOS = _verifyUserAgent()
 export function updateSource() {
 	const { subscribe, set, update } = writable(undefined)
@@ -57,33 +56,6 @@ export function updateSource() {
 	}
 }
 
-export function _ctoken() {
-	const { subscribe, set, update } = writable({ continuation: '', itct: '' })
-
-	return {
-		set,
-		subscribe,
-		update,
-		get: (token) => get(token),
-		reset: () => {
-			set({ continuation: '', itct: '' })
-		}
-	}
-}
-
-function _searchIndex() {
-	const { subscribe, set, update } = writable([])
-	return {
-		subscribe,
-		set,
-		update,
-		get: (arr) => get(arr),
-		reset: () => {
-			set([])
-		}
-	}
-}
-export const search: SearchStore = writable()
 function _verifyUserAgent() {
 	const { subscribe, set, update } = writable(undefined)
 	let CheckiOS

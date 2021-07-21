@@ -70,7 +70,7 @@
 		class:shown={width > 640}
 		class:desktop={width < 640}>
 		<div
-			class="nav-item-desktop"
+			class="nav-item-desktop btn-settings"
 			on:click={() => {
 				isSettings = !isSettings
 			}}>
@@ -118,7 +118,7 @@
 		</div>
 		<Settings bind:isSettings />
 		<div
-			class="nav-item"
+			class="nav-item btn-settings"
 			on:click|stopPropagation={() => {
 				isSettings = !isSettings
 			}}>
@@ -128,6 +128,9 @@
 {/if}
 
 <style lang="scss">
+	.btn-settings {
+		cursor: pointer;
+	}
 	.desktop.nav-item {
 		// position: absolute;
 		// right: 0;

@@ -59,7 +59,7 @@
 									width="256"
 									height="256"
 									type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-									data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PGRlZnM+PHBhdGggZD0iTTAgMGg1MTJ2NTEySDBWMHoiIGlkPSJwcmVmaXhfX2EiLz48L2RlZnM+PHVzZSB4bGluazpocmVmPSIjcHJlZml4X19hIiBvcGFjaXR5PSIuMjUiIGZpbGw9IiMyMjIiLz48L3N2Zz4="
+									src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PGRlZnM+PHBhdGggZD0iTTAgMGg1MTJ2NTEySDBWMHoiIGlkPSJwcmVmaXhfX2EiLz48L2RlZnM+PHVzZSB4bGluazpocmVmPSIjcHJlZml4X19hIiBvcGFjaXR5PSIuMjUiIGZpbGw9IiMyMjIiLz48L3N2Zz4="
 									use:lazy={{
 										src: item.thumbnails[0].url
 									}} />
@@ -109,39 +109,17 @@
 		border-radius: 0.5em;
 		/* width: 100%; */
 		/* max-width: 100%; */
-		-ms-scroll-snap-type: x mandatory;
-		scroll-snap-type: x mandatory;
+		-ms-scroll-snap-type: x proximity;
+		scroll-snap-type: x proximity;
 		/* overflow: scroll;*/
 	}
 
 	.header {
 		padding: 0.5em;
-		// position: sticky;
-		// /* top: 0; */
-		// width: 100%;
-		// left: 0;
-		/* display: flow-root; */
-		/* right: 0; */
 	}
 	.scroll {
 		margin-bottom: 2.5rem;
 
-		// padding-bottom: 1.25rem;
-		// @include scrim(#1f1a2c2c, 'to top', 0.4125);
-		// background: linear-gradient(
-		// 	180deg,
-		// 	#120f1854 1%,
-		// 	#312b4230 9%,
-		// 	#1b17255e 17%,
-		// 	#2c253c57 25%,
-		// 	#332c4975 32%,
-		// 	#352d4b29 45%,
-		// 	#2a234057 56%,
-		// 	#332c4659 70%,
-		// 	#30284766 80%,
-		// 	#2e25435e 90%,
-		// 	#2f27435c 100%
-		// );
 		background: linear-gradient(
 			180deg,
 			rgb(18 15 24 / 8%) 1%,
@@ -176,8 +154,8 @@
 
 		border-radius: inherit;
 		overflow-anchor: none;
-		-ms-scroll-snap-type: x mandatory;
-		scroll-snap-type: x mandatory;
+		-ms-scroll-snap-type: x proximity;
+		scroll-snap-type: x proximity;
 		-webkit-overflow-scrolling: touch;
 	}
 

@@ -1,0 +1,116 @@
+// BASE LAYOUT STYLES
+
+html {
+	box-sizing: border-box;
+	scroll-behavior: smooth;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+}
+
+html,
+body {
+	height: 100%;
+	line-height: 1.5;
+}
+
+body {
+	margin: 0;
+}
+
+:root {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+		Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	word-wrap: break-word;
+	// background-color: #0e1117;
+	background-color: theme-color('dim', 'base');
+	color: rgb(255, 255, 255);
+
+	-webkit-text-size-adjust: 100%;
+
+	/* ===== Scrollbar CSS ===== */
+	/* Firefox */
+	* {
+		scrollbar-gutter: 10px;
+		scrollbar-width: thin;
+		scrollbar-color: #c7c7c7 #5e5e5e2f;
+	}
+
+	/* Chrome, Edge, and Safari */
+	*::-webkit-scrollbar {
+		width: 0.916667rem;
+		height: 0.916667rem;
+	}
+
+	*::-webkit-scrollbar-track {
+		background: #5e5e5e2f;
+		border-radius: 0.625rem;
+		height: 0.916667rem;
+		width: 100%;
+		background-clip: content-box;
+		border-radius: 10px;
+		border: transparent solid 0.0983333rem;
+	}
+
+	*::-webkit-scrollbar-thumb {
+		background-color: #e0e0e0a8;
+		border-radius: 0.5625rem;
+		width: 0.5625rem;
+		scrollbar-width: 0.625rem;
+		border: 0.25rem solid #b8b8b800;
+		background-clip: content-box;
+	}
+
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-tap-highlight-color: transparent;
+	font-size: 12px;
+	@media screen and (min-width: 620px) and (max-width: 1440px) {
+		font-size: 14px;
+	}
+	@media screen and (min-width: 1441px) {
+		font-size: 16px;
+	}
+}
+
+body {
+	margin: 0;
+	overflow: hidden;
+}
+.body {
+	grid-template-rows: 4rem auto 4rem;
+	position: fixed;
+	height: 100%;
+	width: 100%;
+	margin: 0;
+
+	line-height: 1.5;
+	display: grid;
+	grid-template-areas:
+		'n n n n'
+		'm m m m'
+		'f f f f';
+	grid-template-columns: 16.1255rem 1fr;
+
+	overflow: hidden;
+	max-width: 100%;
+}
+@media (min-width: 640px) {
+	.body {
+		grid-template-areas:
+			'n n n n'
+			's m m m'
+			'f f f f';
+	}
+}
+main {
+	margin: 0 auto;
+	padding: 1rem;
+}

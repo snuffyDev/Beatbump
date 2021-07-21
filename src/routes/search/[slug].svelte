@@ -1,23 +1,29 @@
 <script context="module">
 	// import { search } from '$stores/stores'
 	export async function load({ page, fetch }) {
-		const { slug } = page.params
+		const slug = page.params.slug
 		const filter = page.query.get('filter')
+		// console.log(filter, page, slug)
 		const url =
 			`/api/search.json?q=` +
-			encodeURIComponent(page.params.slug) +
+			encodeURIComponent(slug) +
 			`&filter=` +
-			encodeURIComponent(page.query.get('filter'))
+			encodeURIComponent(filter)
 		const response = await fetch(url)
-		let data = await response.json()
-		let { contents, continuation, didYouMean, error } = await data
+		const data = await response.json()
+		const {
+			contents = {},
+			continuation = {},
+			didYouMean,
+			error = {}
+		} = await data
 		if (response.ok) {
 			return {
 				props: {
-					filter: await filter,
-					contents: await contents,
-					continuation: await continuation,
-					didYouMean: await didYouMean
+					filter: filter,
+					contents: contents,
+					continuation: continuation,
+					didYouMean: didYouMean
 				},
 				status: 200
 			}
@@ -40,17 +46,22 @@
 	import type { NextContinuationData, Song } from '$lib/types'
 	import VirtualList from '$lib/components/SearchList/VirtualList.svelte'
 	import viewport from '$lib/actions/viewport'
+	import { onMount } from 'svelte'
+	import Loading from '$components/Loading/Loading.svelte'
 
 	$: search.set(contents)
 
-	// $:
 	$: songTitle = $page.params.slug
 	let ctoken = continuation.continuation
 	let itct = continuation.clickTrackingParams
 	// console.log(contents);
 	let isLoading = false
 	let hasData = false
-
+	onMount(() => {
+		if (contents) {
+		}
+		return
+	})
 	async function paginate() {
 		if (isLoading || hasData) return
 		isLoading = true
@@ -75,7 +86,6 @@
 		// return { params: itct, continuation: ctoken }
 	}
 	let start = 0
-	let items: [] = []
 	$: items = $search
 	let ending
 	// $: if (items) ending = items.length - 1
@@ -103,34 +113,40 @@
 		{/key}
 		{#if didYouMean}
 			<p>
-				Did you mean: <em
-					class="link"
-					on:click={() => {
-						invalidate($page.path)
-					}}>{JSON.stringify(didYouMean)}?</em>
+				Did you mean: <em class="link"
+					><a
+						on:click={() => {
+							invalidate(
+								`/search/${$page.path}?filter=${$page.query.get('filter')}`
+							)
+						}}
+						href={`/search/${didYouMean.term}?filter=${didYouMean.endpoint.params}`}
+						>{didYouMean.term}?</a
+					></em>
 			</p>
 		{/if}
 	</section>
 	<main class="parent">
-		{#if $search.length > 1}
-			<!-- {#each $search as data (data.hash)}
+		<!-- {#each $search as data (data.hash)}
 			<Item {data} />
 			{/each} -->
-			<VirtualList
-				on:endList={() => {
-					paginate()
-				}}
-				bind:isLoading
-				bind:hasData
-				bind:start
-				bind:end={ending}
-				height="85%"
-				{items}
-				let:item>
-				<Item name="item" data={item} />
-			</VirtualList>
 
-			<!-- <SearchList
+		<!-- $search was fulfilled -->
+		<VirtualList
+			on:endList={() => {
+				paginate()
+			}}
+			bind:isLoading
+			bind:hasData
+			bind:start
+			bind:end={ending}
+			height="100%"
+			{items}
+			let:item>
+			<Item name="item" data={item} />
+		</VirtualList>
+
+		<!-- <SearchList
 				on:end={paginate}
 				bind:isLoading
 				bind:hasData
@@ -138,7 +154,6 @@
 				items={$search}>
 				<Item slot="item" data={item} />
 			</SearchList> -->
-		{/if}
 	</main>
 {/if}
 

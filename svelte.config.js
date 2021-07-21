@@ -17,7 +17,7 @@ export default {
 	preprocess: sveltePreprocess({
 		scss: {
 			includePaths: ['src'],
-			prependData: `@import 'src/global/scss/utility/themes.scss'; @import 'src/global/scss/utility/_mixins.scss';`
+			prependData: `@import 'src/global/scss/utility/_mixins.scss';`
 		},
 		defaults: {
 			style: 'postcss',
