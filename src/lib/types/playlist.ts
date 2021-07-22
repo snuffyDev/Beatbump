@@ -27,14 +27,14 @@ export interface PlaylistSearch {
 	thumbnails?: Thumbnail[]
 	continuation?: NextContinuationData
 }
-export interface Menu {
+export type Menu = {
 	text: string
 	playlistId?: string
 	videoId?: string
 	params?: string
 	browseId?: string
 }
-export interface PlaylistItem {
+export interface IPlaylistItem {
 	navigation?: Menu[]
 	length?: string
 	title: string | TitleEndpoint
@@ -54,7 +54,7 @@ export type Header = {
 }
 
 export type PlaylistData = {
-	continuations: NextContinuationData[]
+	continuations: NextContinuationData
 	header: Header
-	contents: PlaylistItem[]
+	contents: IPlaylistItem[]
 }

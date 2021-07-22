@@ -1,5 +1,5 @@
 import type { PlaylistSearch } from './types/playlist'
-
+export type Item =  Song | PlaylistSearch
 export interface Album {
 	browseId: string
 	title: string
@@ -51,6 +51,7 @@ export interface Thumbnail {
 export interface ArtistInfo {
 	pageType?: string
 	artists?: [] | string
+	artist?: [] | string
 	browseId?: string
 }
 

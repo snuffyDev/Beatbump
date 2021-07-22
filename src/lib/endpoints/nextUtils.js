@@ -8,17 +8,8 @@ export function parseContents(
 	if (contents) {
 		let arr = []
 		let currentMix = current.playlistId
-		contents.forEach((d) => {
-			if (Object.prototype.hasOwnProperty.call(d, 'playlistPanelVideoRenderer')) {
-				arr.push(d.playlistPanelVideoRenderer)
-			}
-
-			if (Object.prototype.hasOwnProperty.call(d, 'musicTwoRowItemRenderer')) {
-				arr.push(d.musicTwoRowItemRenderer)
-			}
-			if (Object.prototype.hasOwnProperty.call(d, 'musicResponsiveListItemRenderer')) {
-				arr.push(d.musicResponsiveListItemRenderer)
-			}
+		contents.map(({ playlistPanelVideoRenderer: ctx }) => {
+			arr.push(ctx)
 		})
 		if (arr.length !== 0) {
 			const results = arr.map((item) => {

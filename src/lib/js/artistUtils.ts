@@ -2,7 +2,7 @@ import type { Song, ArtistInfo, Artist } from '$lib/types'
 import { pb } from '$lib/utils'
 
 export const parseArtistPage = (header, items) => {
-	console.log(items)
+	// console.log(items)
 	header = [header]
 	const parsedHeader = header.map((h) => {
 		const name = h?.title.runs[0].text

@@ -4,7 +4,7 @@ import type { Writable } from 'svelte/store'
 import { get, writable } from 'svelte/store'
 export const updateTrack = updateSource()
 export const ctxKey = {}
-export const currentTitle = writable('')
+export const currentTitle = writable(undefined)
 
 type SearchStore = {
 	subscribe: Writable<SearchContents>['subscribe']

@@ -128,7 +128,7 @@ export async function get({ query }): Promise<EndpointOutput<DefaultBody>> {
 			const { continuationContents } = data
 			const results = parseSearchResult(continuationContents, true, filter)
 
-			// console.log(`contents: `, results);
+			// console.log(`contents: `, results;
 			return {
 				status: 200,
 				body: JSON.stringify(results)
@@ -148,7 +148,7 @@ export async function get({ query }): Promise<EndpointOutput<DefaultBody>> {
 			}
 		}
 	} catch (error) {
-		console.log(error)
+		// console.log(error)
 		return {
 			status: 400,
 			body: error
@@ -156,10 +156,9 @@ export async function get({ query }): Promise<EndpointOutput<DefaultBody>> {
 	}
 }
 // Parse the playlist results for search.
-const parsePlaylist = (contents) => {
-	const results: PlaylistSearch[] = []
-	const type = 'playlist'
-	contents.map(({ musicResponsiveListItemRenderer }) => {
+const parsePlaylist = (contents): Promise<PlaylistSearch[]> => {
+
+	return contents.map(({ musicResponsiveListItemRenderer }) => {
 		// const d = musicResponsiveListItemRenderer
 		const thumbnails =
 			musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail
@@ -177,7 +176,7 @@ const parsePlaylist = (contents) => {
 		let metaData = pb(flexColumns[1], 'runs:text', true)
 		metaData = metaData.join('')
 
-		const result: PlaylistSearch = {
+		return {
 			thumbnails: thumbnails,
 			browseId: browseId,
 			metaData: metaData,
@@ -189,17 +188,14 @@ const parsePlaylist = (contents) => {
 				Math.random().toString(36).substring(2, 15) +
 				Math.random().toString(36).substring(2, 15),
 			title: title,
-			type: type
+			type: 'playlist'
 		}
-		results.push(result)
 	})
-	return results
 }
 
-const parseSong = (contents) => {
-	const type = 'song'
-	const results: Song[] = []
-	contents.map(({ musicResponsiveListItemRenderer }, i) => {
+const parseSong = (contents, type):Promise<Song[]> => {
+
+	return contents.map(({ musicResponsiveListItemRenderer }, i) => {
 		// let d = musicResponsiveListItemRenderer
 		let explicit
 		if (
@@ -218,7 +214,10 @@ const parseSong = (contents) => {
 		const thumbnails =
 			musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail
 				.thumbnails
-		const title = pb(flexColumns[0], 'runs:text', true)
+		const title =
+			musicResponsiveListItemRenderer.flexColumns[0]
+				.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text
+		// console.log(title)
 
 		let browseId
 		if (
@@ -258,17 +257,21 @@ const parseSong = (contents) => {
 
 		const metaInfo = pb(flexColumns[1], 'runs:text', true)
 		// console.log(metaInfo);
-		const albumArr: [] = flexColumns[1].text.runs
-		const album: {
-			text
-			navigationEndpoint: { browseEndpoint: { browseId } }
-		}[] = albumArr.slice(2, 3)
+		let albumInfo
+		if (type !== 'video') {
+			const albumArr: [] = flexColumns[1].text.runs
+			const album: {
+				text
+				navigationEndpoint: { browseEndpoint: { browseId } }
+			}[] = albumArr.slice(2, 3)
 
-		const albumInfo = {
-			browseId: album[0]?.navigationEndpoint?.browseEndpoint?.browseId,
-			title: album[0]?.text
+			albumInfo = {
+				browseId: album[0]?.navigationEndpoint?.browseEndpoint?.browseId,
+				title: album[0]?.text
+			}
+		} else {
+			albumInfo = null
 		}
-
 		// let album = {};
 		const length = metaInfo[metaInfo.length - 1]
 
@@ -285,7 +288,7 @@ const parseSong = (contents) => {
 			artist: artists
 		}
 		// console.log(artists, artists)
-		const result: Song = {
+		return {
 			album: albumInfo,
 			artistInfo: artist,
 			title: title,
@@ -301,9 +304,7 @@ const parseSong = (contents) => {
 				Math.random().toString(36).substring(2, 15) +
 				Math.random().toString(36).substring(2, 15)
 		}
-		results.push(result)
 	})
-	return results
 }
 
 function parseSearchResult(data, cont, filter?) {
@@ -343,7 +344,7 @@ function parseSearchResult(data, cont, filter?) {
 
 	let results: Song[] | PlaylistSearch[] = []
 
-	ctx.map(async (c) => {
+	ctx.map((c) => {
 		let contents = []
 		if (cont) {
 			const { musicShelfContinuation } = c
@@ -355,26 +356,29 @@ function parseSearchResult(data, cont, filter?) {
 		/* Search for if the request is for Playlists
            If not, then parse song request.
         */
-		// filter = encodeURIComponent(filter);
+		filter = decodeURIComponent(filter)
 		const paramList = [
 			'EgWKAQIoAWoKEAMQBBAKEAUQCQ==',
 			'EgeKAQQoADgBagwQDhAKEAkQAxAEEAU=',
 			'EgeKAQQoAEABagwQDhAKEAkQAxAEEAU='
 		]
+		const videoParams = 'EgWKAQIQAWoKEAMQBBAKEAUQCQ=='
 
-		if (!paramList.includes(filter)) {
-			if (contents[0]?.hasOwnProperty('continuations')) {
-				continuation = contents[0].continuations[0].nextContinuationData
-			}
-			// console.log(contents)
+		if (!paramList.includes(filter) && !videoParams.includes(filter)) {
 			const { contents: ctx } = contents[0]
-			results = parseSong(ctx)
+			continuation = continuationCheck(contents[0])
+
+			// console.log(contents)
+			results = parseSong(ctx, 'song')
+			return { results, continuation }
+		} else if (videoParams == filter) {
+			continuation = continuationCheck(contents[0])
+
+			const { contents: ctx } = contents[0]
+			results = parseSong(ctx, 'video')
 			return { results, continuation }
 		} else {
-			if (contents[0]?.hasOwnProperty('continuations')) {
-				continuation = contents[0]?.continuations[0].nextContinuationData
-			}
-			// console.log(contents)
+			continuation = continuationCheck(contents[0])
 			contents = contents[0]?.contents
 			results = parsePlaylist(contents)
 			return { results, continuation }
@@ -390,7 +394,12 @@ function parseSearchResult(data, cont, filter?) {
 	}
 	return { contents: results, continuation: continuation }
 }
-
+function continuationCheck(contents) {
+	if (!contents.hasOwnProperty('continuations')) {
+		return
+	}
+	return { ...contents?.continuations[0].nextContinuationData }
+}
 /* Return the data for if there is a corrected query */
 function correctedQuery(ctx) {
 	const correctTerm = ctx?.correctedQuery?.runs[0].text

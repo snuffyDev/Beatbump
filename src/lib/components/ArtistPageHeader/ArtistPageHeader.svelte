@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../../../global/vars.css'
-	import { onMount } from 'svelte'
+	import { onDestroy, onMount } from 'svelte'
 	import { theme } from '$lib/stores/stores'
 	export let headerContent
 	export let items = []
@@ -40,10 +40,14 @@
 		// window.requestAnimationFrame(handler);
 		// window.addEventListener("scroll", handler);
 		let wrapper = document.getElementById('wrapper')
-
+		// console.log(wrapper)
 		wrapper.addEventListener('scroll', handler, { passive: true })
-		return () => window.removeEventListener('scroll', handler)
+		return () => {
+			window.removeEventListener('scroll', handler, { passive: true })
+			wrapper.removeEventListener('scroll', handler, { passive: true })
+		}
 	})
+	// onDestroy(()=>{window.removeEventListener('scroll', handler)})
 </script>
 
 <!-- <svelte:window bind:scrollY={y} /> -->
@@ -66,7 +70,9 @@
 				alt="Artist Thumbnail" />
 		</picture>
 	</div>
-	<div class="artist-content">
+	<div
+		class="artist-content"
+		style="		box-shadow:-1.5rem -0.5rem 0.5rem 0.5rem var(--{$theme}-base), 1.5rem 0.5rem 0.8rem 0.5rem inset var(--{$theme}-base);">
 		<div class="content-wrapper">
 			<div class="name">{headerContent?.name}</div>
 			{#if width > 500 && !!description}
@@ -150,6 +156,7 @@
 	.artist-content {
 		position: relative;
 		z-index: 1;
+		height: 0.25rem;
 		.content-wrapper {
 			position: absolute;
 			bottom: 0;

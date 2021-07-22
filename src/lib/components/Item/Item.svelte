@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 
-	export let data: Song | PlaylistSearch
+	export let data: Item
 	import Loading from '$components/Loading/Loading.svelte'
 	import { onMount, tick } from 'svelte'
 
@@ -9,8 +9,9 @@
 	import Icon from '$components/Icon/Icon.svelte'
 	import { goto } from '$app/navigation'
 	import list from '$stores/list'
-	import type { Song } from '$lib/types'
+	import type { Item, Song } from '$lib/types'
 	import type { PlaylistSearch } from '$lib/types/playlist'
+	import lazy from '$lib/lazy'
 
 	let ctoken = ''
 	let videoId = ''
@@ -44,7 +45,7 @@
 		},
 		{
 			text: 'Go to album',
-			icon: 'list',
+			icon: 'album',
 			action: () => {
 				window.scrollTo({
 					behavior: 'smooth',
@@ -76,7 +77,11 @@
 		DropdownItems.shift()
 		DropdownItems.pop()
 	}
-
+	if (data.type == 'video') {
+		DropdownItems = DropdownItems.filter((d) => {
+			if (d.text == 'View Artist') return
+		})
+	}
 	const itemHandler = () => {
 		explicit = data.explicit
 		title = data.title
@@ -137,8 +142,10 @@
 						id="img"
 						referrerpolicy="origin-when-cross-origin"
 						loading="lazy"
-						src={data?.thumbnails[0]?.url}
-						alt="thumbnail" />
+						type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+						src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiPjxkZWZzPjxwYXRoIGQ9Ik0wIDBoNjR2NjRIMFYweiIgaWQ9InByZWZpeF9fYSIvPjwvZGVmcz48dXNlIHhsaW5rOmhyZWY9IiNwcmVmaXhfX2EiIG9wYWNpdHk9Ii4yNSIgZmlsbD0iIzIyMiIvPjwvc3ZnPg=="
+						alt="thumbnail"
+						use:lazy={{ src: data?.thumbnails[0]?.url }} />
 				</div>
 			</div>
 			<div class="title">
@@ -146,7 +153,7 @@
 				{#if explicit}
 					<span class="explicit"> E </span>
 				{/if}
-				<p>
+				<p class="text-artist">
 					{data.type == 'playlist' ? `${data.metaData}` : `by ${artist}`}
 				</p>
 				<span class="album">
@@ -255,7 +262,12 @@
 		padding: 0 0.4em;
 		margin-left: 0.3em;
 	}
+	.text-artist {
+		font-size: 0.95rem;
+	}
 	.text-title {
+		font-size: 1.05rem;
+
 		&:hover {
 			text-decoration: underline solid white 0.0714rem;
 			cursor: pointer;
@@ -278,13 +290,17 @@
 		align-items: center;
 		/* padding: 0.3rem 0.3rem; */
 		flex-wrap: nowrap;
+		padding: 0.4rem 0rem;
+		@media screen and (min-width: 640px) {
+			padding: 0.2rem 0rem;
+		}
 	}
 
 	.title {
 		display: inline-block;
 		width: 100%;
 		margin-left: 1rem;
-		line-height: 1.25;
+		line-height: 1.3125;
 	}
 	.img-container {
 		// position: relative;

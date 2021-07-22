@@ -4,6 +4,7 @@ import { getSrc } from '$lib/utils'
 import { writable } from 'svelte/store'
 import { filterAutoPlay, playerLoading } from './stores'
 import { addToQueue } from './../utils'
+import { currentTitle } from '$stores/stores';
 
 const fetchNext = async (
 	index,
@@ -40,6 +41,7 @@ playerLoading.subscribe((load) => {
 let hasList = false
 let mix = []
 let continuation = []
+let index = 0
 const list = writable({
 	continuation,
 	mix
@@ -54,7 +56,10 @@ export default {
 		hasList = true
 		const response = await fetchNext(0, '', videoId, playlistId, '')
 		const data = await response
+		console.log(data)
 		await getSrc(videoId)
+		currentTitle.set(data.results[index].title)
+		index++
 		loading = false;
 		playerLoading.set(loading)
 		continuation.push(...data.continuation)
@@ -85,7 +90,7 @@ export default {
 
 		list.set({ continuation, mix })
 	},
-	async startPlaylist(playlistId) {
+	async startPlaylist(playlistId, index) {
 		loading = true;
 		playerLoading.set(loading)
 		const data = await fetch(`/api/getQueue.json?playlistId=${playlistId}`).then(data => data.json())

@@ -1,3 +1,4 @@
+import BaseContext from './../../lib/context'
 export async function get({ query }) {
 	const browseId = query.get('browseId')
 	// console.log(endpoint)
@@ -7,58 +8,8 @@ export async function get({ query }) {
 		{
 			method: 'POST',
 			body: JSON.stringify({
-				context: {
-					client: {
-						clientName: 'WEB_REMIX',
-						clientVersion: '0.1',
-						deviceMake: 'google',
-						platform: 'DESKTOP',
-						deviceModel: 'bot',
-						experimentIds: [],
-						experimentsToken: '',
-						osName: 'Googlebot',
-						osVersion: '2.1',
-						locationInfo: {
-							locationPermissionAuthorizationStatus:
-								'LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED'
-						},
-						musicAppInfo: {
-							musicActivityMasterSwitch:
-								'MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE',
-							musicLocationMasterSwitch:
-								'MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE',
-							pwaInstallabilityStatus: 'PWA_INSTALLABILITY_STATUS_UNKNOWN'
-						},
-						utcOffsetMinutes: -new Date().getTimezoneOffset()
-					},
-					capabilities: {},
-					request: {
-						internalExperimentFlags: [
-							{
-								key: 'force_music_enable_outertube_tastebuilder_browse',
-								value: 'true'
-							},
-							{
-								key: 'force_music_enable_outertube_playlist_detail_browse',
-								value: 'true'
-							},
-							{
-								key: 'force_music_enable_outertube_search_suggestions',
-								value: 'true'
-							}
-						],
-						sessionIndex: {}
-					},
-					user: {
-						enableSafetyMode: false
-					},
-					activePlayers: {}
-				},
-				browseEndpointContextMusicConfig: {
-					browseEndpointContextMusicConfig: {
-						pageType: 'MUSIC_PAGE_TYPE_ARTIST'
-					}
-				},
+				...BaseContext,
+
 				browseId: `${browseId}`
 			}),
 			headers: {

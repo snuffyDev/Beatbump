@@ -15,7 +15,7 @@ export const sort = (data) => {
 		)
 		let arr = []
 
-		formatParent.forEach((i) => {
+		formatParent.map((i) => {
 			if (i.mimeType.includes('audio')) {
 				if (
 					i.audioChannels === 2 &&

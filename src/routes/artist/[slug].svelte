@@ -32,16 +32,11 @@
 	import { goto } from '$app/navigation'
 	import Carousel from '$components/Carousel/Carousel.svelte'
 	import ArtistPageHeader from '../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte'
-	import { parseArtistPage } from '$lib/js/artistUtils'
-
-	import Loading from '$components/Loading/Loading.svelte'
 	import { page } from '$app/stores'
 
 	import Icon from '$components/Icon/Icon.svelte'
 	import ListItem from '$components/ListItem/ListItem.svelte'
-	import CarouselItem from '$components/Carousel/CarouselItem.svelte'
-	import { browser } from '$app/env'
-	import { onMount, tick } from 'svelte'
+
 	export let headerContent
 	export let description
 	export let thumbnail

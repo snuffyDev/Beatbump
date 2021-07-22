@@ -32,7 +32,7 @@
 
 	$: volume = 0.5
 	let volumeHover = false
-
+	$: hideEvent = false
 	$: isPlaying = false
 	let seeking = false
 	let once = false
@@ -62,23 +62,13 @@
 			}
 		}
 	]
-
-	const playing = () => player.play()
-	const paused = () => player.pause()
-	function pause() {
-		paused()
-	}
-	function startPlay() {
-		playing()
-	}
+	player.addEventListener('loadedmetadata', () => {
+		title = $list.mix[0].title
+	})
+	const play = () => player.play()
+	const pause = () => player.pause()
 	// $: console.log(volume)
 	$: player.volume = volume
-
-	player.addEventListener('loadedmetadata', () => {
-		isPlaying = true
-
-		startPlay()
-	})
 
 	player.addEventListener('timeupdate', async () => {
 		time = player.currentTime
@@ -101,7 +91,7 @@
 
 	player.addEventListener('play', () => {
 		isPlaying = true
-		startPlay()
+		play()
 	})
 
 	player.addEventListener('ended', () => {
@@ -113,7 +103,7 @@
 	})
 
 	player.addEventListener('seeked', () => {
-		startPlay()
+		play()
 	})
 	const getNext = () => {
 		if (autoId == $list.mix.length - 1) {
@@ -181,7 +171,9 @@
 		// console.log(autoId);
 	}}
 	on:hide={(event) => {
+		hideEvent = true
 		showing = !event.detail.showing
+		hideEvent = false
 		// console.log(showing)
 	}}
 	bind:show={listShow}
@@ -198,7 +190,7 @@
 		<div class="player-left">
 			<div
 				on:click={() => {
-					showing = !showing
+					if (!hideEvent) showing = !showing
 				}}
 				class="listButton">
 				<svelte:component this={Icon} color="white" name="radio" size="2em" />

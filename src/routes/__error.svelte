@@ -1,8 +1,10 @@
 <script>
 	import { goto } from '$app/navigation'
+import { page } from '$app/stores';
 
-	$: redir = 10
+	let redir = 5
 	const redirect = () => {
+
 		redir = redir - 1
 		if (redir <= 0) {
 			goto('/')

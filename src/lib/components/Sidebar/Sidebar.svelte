@@ -56,6 +56,7 @@
 		border-right: 0.0625rem outset hsla(0, 0%, 66.7%, 0.123);
 		box-sizing: border-box;
 		display: none;
+		visibility: hidden;
 		contain: layout;
 		grid-area: s;
 		grid-template-rows: 1fr 1fr 1fr;
@@ -85,6 +86,8 @@
 	@media (min-width: 640px) {
 		.sidebar {
 			display: grid;
+
+			visibility: visible;
 		}
 	}
 </style>

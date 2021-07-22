@@ -1,17 +1,30 @@
 <script lang="ts">
-	import { navigating } from '$app/stores'
-
-	import { afterUpdate, beforeUpdate } from 'svelte'
-
-	import { quintInOut } from 'svelte/easing'
-
-	import { fade } from 'svelte/transition'
-
+	import { navigating, page } from '$app/stores'
+	import { fade, fly } from 'svelte/transition'
+	import { expoInOut } from 'svelte/easing'
 	export let main
-	$: if ($navigating !== null) {
+	export let key
+	// console.log($page.path, $page.query, $navigating)
+	$: nav = $navigating ? true : false
+	let isNavigating
+	$: if (nav == true) isNavigating = !isNavigating
+	$: if ($navigating == true) {
 		main.scrollTo({ top: 0, behavior: 'smooth' })
-		// console.log('null')
 	}
+	// $: console.log(isNavigating)
 </script>
 
-<slot />
+{#key key}
+	<div
+		in:fly={{ x: -5, duration: 500, delay: 500, easing: expoInOut }}
+		out:fly={{ x: 5, duration: 500, easing: expoInOut }}>
+		<slot />
+	</div>
+{/key}
+
+<style>
+	div {
+		position: block;
+		height: 100%;
+	}
+</style>

@@ -29,7 +29,7 @@ export default {
 		typescript: { tsconfigFile: './tsconfig.json' }
 	}),
 	kit: {
-		adapter: dev ? node() : worker(),
+		adapter:  		dev ? node() : worker(),
 		target: '#app',
 		files: {
 			assets: 'static',
@@ -45,7 +45,13 @@ export default {
 					$stores: path.resolve('./src/lib/stores'),
 					$components: path.resolve('./src/lib/components')
 				}
-			}
+			},
+			cleanCssOptions: {level: {
+				2: {
+					all:true,
+					removeDuplicateRules: true
+				}
+			}}
 		}
 	}
 }

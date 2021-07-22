@@ -45,9 +45,7 @@
 	import Item from '$components/Item/Item.svelte'
 	import type { NextContinuationData, Song } from '$lib/types'
 	import VirtualList from '$lib/components/SearchList/VirtualList.svelte'
-	import viewport from '$lib/actions/viewport'
 	import { onMount } from 'svelte'
-	import Loading from '$components/Loading/Loading.svelte'
 
 	$: search.set(contents)
 
@@ -82,14 +80,8 @@
 		search.update((u) => [...u, ...res.contents])
 		isLoading = false
 		hasData = newPage.length === 0
-		// console.log(isLoading, hasData)
-		// return { params: itct, continuation: ctoken }
 	}
-	let start = 0
 	$: items = $search
-	let ending
-	// $: if (items) ending = items.length - 1
-	// $: if ($search.length >= 1) listEnd = $search.length - 1
 </script>
 
 <svelte:head>
@@ -106,44 +98,48 @@
 		</p>
 	</section>
 {:else}
-	<section class="searchHeader">
-		<p>All Results for...</p>
-		{#key songTitle}
-			<em>'{songTitle}'</em>
-		{/key}
-		{#if didYouMean}
-			<p>
-				Did you mean: <em class="link"
-					><a
-						on:click={() => {
-							invalidate(
-								`/search/${$page.path}?filter=${$page.query.get('filter')}`
-							)
-						}}
-						href={`/search/${didYouMean.term}?filter=${didYouMean.endpoint.params}`}
-						>{didYouMean.term}?</a
-					></em>
-			</p>
-		{/if}
-	</section>
 	<main class="parent">
-		<!-- {#each $search as data (data.hash)}
-			<Item {data} />
-			{/each} -->
-
-		<!-- $search was fulfilled -->
+		<section class="searchHeader">
+			<div class="text">
+				<p>All Results for...</p>
+				{#key songTitle}
+					<em>'{songTitle}'</em>
+				{/key}
+				{#if didYouMean}
+					<p>
+						Did you mean: <em class="link"
+							><a
+								on:click={() => {
+									invalidate(
+										`/search/${$page.path}?filter=${$page.query.get('filter')}`
+									)
+								}}
+								href={`/search/${didYouMean.term}?filter=${didYouMean.endpoint.params}`}
+								>{didYouMean.term}?</a
+							></em>
+					</p>
+				{/if}
+			</div>
+			<!-- <section class="filters">
+				<label for="filter">Filters: </label>
+				<div class="select">
+					<select name="filter" id="filter"
+						><option value="testing"> testing </option><option value="testing2">
+							testing2
+						</option></select>
+				</div>
+			</section> -->
+		</section>
 		<VirtualList
 			on:endList={() => {
 				paginate()
 			}}
 			bind:isLoading
 			bind:hasData
-			bind:start
-			bind:end={ending}
-			height="100%"
+			height=" calc(100% - 6.3rem)"
 			{items}
 			let:item>
-			<Item name="item" data={item} />
+			<Item data={item} />
 		</VirtualList>
 
 		<!-- <SearchList
@@ -159,6 +155,71 @@
 
 <style scoped lang="scss">
 	@import '../../global/scss/components/mixins';
+	.select {
+		color: white;
+		display: grid;
+		grid-template-columns: 1fr 0.1em;
+		color: #fff;
+		display: grid;
+		grid-template-areas: selext;
+		/* grid-area: select; */
+		align-content: center;
+		font-size: 0.95rem;
+		grid-template-areas: 'select';
+		/* position: relative; */
+		/* overflow: visible; */
+		width: 100%;
+		min-width: 8ch;
+		max-width: 16ch;
+		&::after {
+			grid-area: select;
+			content: '';
+			justify-self: end;
+			align-self: center;
+			margin-right: 0.7rem;
+			width: 0.6rem;
+			height: 0.5rem;
+			color: inherit;
+			background-color: currentColor;
+			-webkit-clip-path: polygon(100% 0, 0 0, 50% 100%);
+			clip-path: polygon(100% 0, 0 0, 50% 100%);
+		}
+	}
+	select {
+		outline: none;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+		min-width: 5ch;
+		/* max-width: 25ch; */
+		background-color: transparent;
+		border: 1px solid hsla(0, 0%, 66.7%, 0.5);
+		padding: 0.2rem 2rem 0.5rem 0.5rem;
+		margin: 0;
+		width: 100%;
+		font-family: inherit;
+		font-size: inherit;
+		white-space: pre;
+		cursor: inherit;
+		position: relative;
+		grid-area: select;
+		align-content: center;
+	}
+
+	.filters {
+		margin-left: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		padding-block: 1em;
+		font-size: inherit;
+		line-height: inherit;
+		label {
+			margin-bottom: 0.8rem;
+		}
+	}
+	main {
+		padding: 0 1rem;
+	}
 	.end {
 		position: relative;
 		display: flex;
@@ -175,22 +236,28 @@
 		margin-bottom: 0.8rem;
 	}
 	.searchHeader {
-		padding: 0rem 1.5rem 0;
+		padding: 0.5rem 0 0.8rem 0;
+		font-family: 'Commissioner', sans-serif;
 		margin-left: auto;
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
 
 		white-space: pre;
 		font-size: 1.125rem;
 		margin: 0;
-		font-weight: 400;
-		padding-bottom: 0;
+		// font-weight: 500;
+		line-height: 1.5;
+		.text {
+			display: flex;
+			flex-direction: column;
+		}
 		h5 {
 			font-size: 1.95rem;
 		}
 		em {
 			// padding-top: 0.5rem;
 			font-size: 0.95em;
+			margin-bottom: 0.5rem;
 		}
 	}
 </style>

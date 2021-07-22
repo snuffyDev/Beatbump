@@ -1,11 +1,10 @@
 <script context="module">
 	export async function load({ page, fetch }) {
 		const data = await fetch('/trending.json?q=browse')
-		const carouselItems = await data.json()
-
+		const response = await data.json()
 		return {
 			props: {
-				carouselItems
+				carouselItems: await response
 			},
 			maxage: 3600,
 			status: 200
@@ -17,13 +16,15 @@
 	export let carouselItems
 	import { currentTitle } from '$stores/stores'
 	import Carousel from '$components/Carousel/Carousel.svelte'
+	$: console.log(carouselItems)
 </script>
 
 <svelte:head>
-	<title
-		>{$currentTitle == undefined || null ? 'Trending' : $currentTitle} - Beatbump</title>
+	<title>{$currentTitle ? $currentTitle : 'Trending'} - Beatbump</title>
 	<meta name="description" content="The latest trending songs" />
 	<meta name="keywords" content="Trending, music, stream" />
+	<meta name="og:url" content="https://beatbump.ml/trending" />
+	<meta name="og:title" content="Trending" />
 </svelte:head>
 
 <main>
@@ -60,11 +61,6 @@
 </main>
 
 <style lang="scss">
-	section-header {
-		font-weight: 700;
-		font-size: 1.5rem;
-		margin: 0 0 0rem 0;
-	}
 	.breakout {
 		// border: 2px solid rgba(119, 136, 153, 0.171);
 		border-radius: 0.8rem;

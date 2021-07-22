@@ -14,6 +14,7 @@
 	export let index
 	export let item: SearchResult
 	export let type = ''
+	export let aspectRatio
 	export let isBrowse = false
 	let hovering = false
 	let isLoading = false
@@ -106,7 +107,11 @@
 					<Loading />
 				{/if}
 				<!-- svelte-ignore a11y-missing-attribute -->
-				<div class="container">
+				<div
+					class="container"
+					class:AR16x9={aspectRatio?.includes('16_9')
+						? true
+						: false || type == 'trending'}>
 					{#if type == 'artist'}
 						<img
 							alt="thumbnail"
@@ -147,6 +152,9 @@
 </div>
 
 <style lang="scss">
+	.AR16x9 {
+		padding-top: 56.25% !important;
+	}
 	.item {
 		position: relative;
 		padding-bottom: 0.8em;
@@ -186,47 +194,25 @@
 		min-height: 16.75rem;
 		height: auto;
 
-		width: 16rem;
+		width: 21rem;
+		@media screen and (max-width: 500px) {
+			width: 17rem;
+		}
 	}
 
 	.img {
-		/* display: block; */
-		// min-width: 12.125rem;
-		// max-width: 12rem;
-		// aspect-ratio: 16/9;
+
+		border-radius: var(--md-radius);
 		height: auto;
 		width: 100%;
-		max-width: 13rem;
-		min-height: 7rem;
-
-		// display: flex;
-		// flex: none;
-		// max-height: 10rem;
 		.container {
-			// display: flex;
-			// align-items: center;
-			// width: 100%;
-			// height: 100%;
-			// background: rgba(13, 13, 15, 0.3411764705882353);
-			// max-width: inherit;
-			// max-height: inherit;
-			// aspect-ratio: inherit;
-			// position: relative;
+			position: relative; /* If you want text inside of it */
 
 			cursor: pointer;
 			width: 100%;
-			height: 100%;
-			min-height: 100%;
-			max-width: inherit;
-			max-height: inherit;
-			aspect-ratio: inherit;
-			// height: 100%;
 			position: relative;
-
-			justify-self: center;
-			// background: linear-gradient(0turn, #000, transparent);
-			// z-index: 5;
-			&::before {
+			padding-top: 100%; /* 1:1 Aspect Ratio */
+		&::before {
 				position: absolute;
 				content: '';
 				top: 0;
@@ -234,46 +220,34 @@
 
 				bottom: 0;
 				left: 0;
-				background: linear-gradient(
-						-180deg,
-						rgba(0, 0, 0, 0.425),
-						rgba(44, 44, 44, 0.308),
-						transparent
-					),
-					linear-gradient(-45deg, rgba(255, 255, 255, 0.034), transparent);
-				transition: all ease-out 0.2s !important;
+				background: linear-gradient(rgba(0, 0, 0, 0.473), rgba(0, 0, 0, 0.473));
+
+				transition: opacity cubic-bezier(0.29, -0.3, 0.7, 0.95) 0.15s;
+				opacity: 0.001;
 				z-index: 1;
-				opacity: 0.6;
 			}
 			&:hover::before {
-				background: linear-gradient(-180deg, rgba(0, 0, 0, 0.712), transparent),
-					linear-gradient(-45deg, rgba(255, 255, 255, 0.068), transparent);
-				transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
-
-				opacity: 0.7;
+				// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
+				background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.534));
+				opacity: 0.6;
 				z-index: 1;
-				// 	-180deg,
-				// 	rgba(0, 0, 0, 0.171) 32%,
-				// 	rgba(70, 70, 70, 0.253),
-				// 	rgba(0, 0, 0, 0.596) 75%
-				// );
+
 			}
 			img {
 				width: 100%;
 				height: auto;
-				min-width: 100%;
-				max-height: 100%;
-				max-width: 13rem;
-				-o-object-fit: scale-down;
-				object-fit: scale-down;
-				aspect-ratio: inherit;
-				position: relative;
+
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
 			}
 		}
 	}
 	.cont {
 		margin-top: 1em;
-		margin-right: 1em;
+		// margin-right: var(--lg-spacing);
 	}
 	.scroll-container {
 	}

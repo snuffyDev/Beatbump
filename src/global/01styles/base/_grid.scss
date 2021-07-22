@@ -1,81 +1,25 @@
-.l-container {
-	position: relative;
-	height: 100%;
-}
-iframe {
-	// z-index: 5 !important;
-	// position: absolute;
-	// right: 0;
-	// left: 0;
-	// top: 0;
-	// bottom: 0;
-	// padding-bottom: 1rem;
-}
+.l-search,
 .parent {
-	/* row-gap: .8rem; */
 	width: 100%;
 	align-items: center;
 	justify-items: center;
-	// display: grid;
-	// height: auto;
-	// overflow-y: hidden;
-	// overflow: hidden;
+	grid-area: m/m/m/m;
 	height: 100%;
 }
 
+.l-wrapper,
 .wrapper {
 	overflow: hidden;
-	/* position: relative; */
 	overflow-y: scroll;
 	-webkit-overflow-scrolling: touch;
-	/* align-items: center; */
-	/* left: 0; */
-	// height: auto;
-	/* right: 0; */
-	// height: 100%;
 	display: block;
-	/* top: 4.5rem; */
-	// width: 100%;
 	touch-action: pan-y;
 	grid-area: m/m/m/m;
-	// padding-bottom: 2rem;
-	/* bottom: 4.5rem; */
-	@media (min-width: 640px) {
-		// bottom: 4.5rem;
-
-		// margin-left: 16rem;
-	}
 }
 
-.parentWrapper {
-	height: -webkit-max-content;
-	height: -moz-max-content;
-	height: max-content;
-	width: auto;
-	max-width: 100%;
-	border-radius: 7px;
-	/* padding: 2rem; */
-	box-sizing: border-box;
-	color: #999;
-	/* overflow-y: scroll; */
-}
 @media (min-width: 640px) {
-	.l-container {
-		overflow-x: hidden;
-	}
+	.l-search,
 	.parent {
 		width: calc(100% - 40px);
-		// row-gap: 2rem;
-		// column-gap: 2rem;
-		// width: calc(100% - 40px);
-		// grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-
-		// // box-sizing: content-box;
-		// align-items: center;
-		// /* margin-top: 0em; */
-		// justify-content: center;
-		// justify-items: center;
-		// overflow-y: hidden;
-		// height: auto;
 	}
 }

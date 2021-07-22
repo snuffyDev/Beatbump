@@ -9,20 +9,12 @@
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
 
-	export let width
 	export let isSettings
-	// let isHidden = true
-	// let hidden = isHidden ? true : false
 	$: curTheme = $theme
-	// let isSettings = true
-	// let isSettings = isSettings ? true : false
 	let setTheme = localStorage.getItem('theme')
 		? localStorage.getItem('theme')
 		: ''
 	$: setFilter = $filterAutoPlay
-
-	let themeSet = $theme
-	$: console.log($page.path)
 
 	let themes = [
 		{ name: 'dark' },
@@ -76,104 +68,48 @@
 {/if}
 
 <style lang="scss">
-	.desktop.nav-item {
-		// position: absolute;
-		// right: 0;
-		// z-index: 5;
-	}
-	.homeIcon {
-		width: 2rem;
-		max-width: 2rem;
-		display: inline;
-	}
 	.s-text {
 		padding: 0 0.8rem 0.2rem 0.8rem; /* align-self: start; */
 		font-size: 1.1rem;
 		// margin-right: 4rem;
 	}
-	.x-button {
-		padding: 1em;
-	}
-	.hidden {
-		display: none;
-	}
-	.shown {
-		visibility: visible;
-		display: block;
-	}
-	.desktop {
-		visibility: hidden;
-		display: none;
-	}
-	.nav-search > :nth-child(2) {
-		right: 0;
-		position: fixed;
-	}
-	.nav-item {
-		margin-bottom: 0;
-		&-desktop {
-			place-items: end;
-		}
-	}
+
 	.nav-settings {
 		// padding-left: 2em !important;
-		position: absolute;
 		right: 0;
-		// left: 0;
-		top: 4em;
+		top: 4rem;
 		display: flex;
 		background-color: inherit;
+		position: fixed;
 		padding: 0.5em 0;
 		z-index: 10;
 		border-radius: 0 0 0.5rem 0.5rem;
-		flex-direction: column;
+		flex-direction: row;
 		width: 100%;
 		overflow: hidden;
-		max-width: 25%;
+		max-width: 44ch;
 		border: 0.125px solid hsla(0, 0%, 66.7%, 0.27058823529411763);
 		border-top: 0;
-		justify-content: space-evenly;
+		white-space: pre-line;
+		line-break: normal;
+		word-break: break-all;
+		justify-content: space-between;
 		@media screen and (max-width: 640px) {
 			max-width: 100%;
 			align-items: center;
 			flex-direction: row;
 		}
-		// box-shadow: -0.125rem 0.3rem 0.25rem 0.125rem #00000052;
 		border: 0.125px solid #aaaaaa45;
 		border-top: 0;
 
 		.setting {
 			display: flex;
-			// flex-wrap: nowrap;
-			// align-items: stretch;
 			padding: 0.2rem 0.4rem;
 			margin-bottom: 0.5rem;
-			// border-bottom: 0.0143rem #63636352 solid;
-			// box-shadow: -0.125rem 0.3rem 0.25rem 0.125rem #63636352;
-			// justify-content: space-around;
-			// margin-bottom: 0.8rem;
+			color: inherit;
 			flex-direction: row;
 			vertical-align: top;
 			align-items: center;
-
-			&:last-child {
-				border-bottom: 0;
-			}
-		}
-	}
-
-	.items {
-		display: flex;
-		flex-direction: row;
-		background-color: inherit;
-
-		// width: 100%;
-		margin-left: auto;
-		.nav-item {
-			margin-right: 1.75em;
-		}
-		:last-child {
-			margin-right: 0;
 		}
 	}
 

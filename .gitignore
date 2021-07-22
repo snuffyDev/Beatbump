@@ -11,3 +11,4 @@ node_modules
 wrangler.toml
 .vscode/Component.code-snippets
 src/routes/api/backup
+.env

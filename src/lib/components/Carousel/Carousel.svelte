@@ -21,64 +21,68 @@
 <div class="section">
 	<div class="scroll" id="scrollItem" bind:this={carousel}>
 		<!-- {#each arr as item, index} -->
-		<div class="contents" style="display:contents">
-			{#each items as item, i}
-				{#if type == 'trending'}
-					<!-- {JSON.stringify(item[1], title, thumbnail, subtitle)} -->
-					<CarouselItem type="trending" {item} index={i} bind:section />
-				{:else if type == 'artist'}
-					<CarouselItem
-						type="artist"
-						{isBrowse}
-						{item}
-						index={i}
-						bind:section />
-				{:else if type == 'new'}
-					<!-- content here -->
-					<section
-						class="item"
-						on:click={() => {
-							console.log()
-							let id = item.endpoint.browseId
-							let type = item.endpoint.pageType
-							scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-							goto(
-								'/release?type=' +
-									encodeURIComponent(type) +
-									'&id=' +
-									encodeURIComponent(id)
-							)
-						}}>
-						<!-- svelte-ignore a11y-missing-attribute -->
-						<div class="img">
-							<div class="container">
-								<img
-									alt="thumbnail"
-									referrerpolicy="origin-when-cross-origin"
-									transition:fade|local
-									width="256"
-									height="256"
-									type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-									src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PGRlZnM+PHBhdGggZD0iTTAgMGg1MTJ2NTEySDBWMHoiIGlkPSJwcmVmaXhfX2EiLz48L2RlZnM+PHVzZSB4bGluazpocmVmPSIjcHJlZml4X19hIiBvcGFjaXR5PSIuMjUiIGZpbGw9IiMyMjIiLz48L3N2Zz4="
-									use:lazy={{
-										src: item.thumbnails[0].url
-									}} />
-							</div>
+		{#each items as item, i}
+			{#if type == 'trending'}
+				<!-- {JSON.stringify(item[1], title, thumbnail, subtitle)} -->
+				<CarouselItem
+					type="trending"
+					aspectRatio={item.aspectRatio}
+					{item}
+					index={i}
+					bind:section />
+			{:else if type == 'artist'}
+				<CarouselItem
+					type="artist"
+					aspectRatio={item.aspectRatio}
+					{isBrowse}
+					{item}
+					index={i}
+					bind:section />
+			{:else if type == 'new'}
+				<!-- content here -->
+				<section
+					class="item"
+					on:click={() => {
+						console.log()
+						let id = item.endpoint.browseId
+						let type = item.endpoint.pageType
+						scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+						goto(
+							'/release?type=' +
+								encodeURIComponent(type) +
+								'&id=' +
+								encodeURIComponent(id)
+						)
+					}}>
+					<!-- svelte-ignore a11y-missing-attribute -->
+					<div class="img">
+						<div class="container">
+							<img
+								alt="thumbnail"
+								referrerpolicy="origin-when-cross-origin"
+								transition:fade|local
+								width="256"
+								height="256"
+								type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+								src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PGRlZnM+PHBhdGggZD0iTTAgMGg1MTJ2NTEySDBWMHoiIGlkPSJwcmVmaXhfX2EiLz48L2RlZnM+PHVzZSB4bGluazpocmVmPSIjcHJlZml4X19hIiBvcGFjaXR5PSIuMjUiIGZpbGw9IiMyMjIiLz48L3N2Zz4="
+								use:lazy={{
+									src: item.thumbnails[0].url
+								}} />
 						</div>
-						<div class="cont">
-							<h6 class="title">
-								{item.title}
-							</h6>
-							<span class="details">
-								{#each item.subtitle as sub}
-									<span>{sub.text}</span>
-								{/each}
-							</span>
-						</div>
-					</section>
-				{/if}
-			{/each}
-		</div>
+					</div>
+					<div class="cont">
+						<h6 class="title">
+							{item.title}
+						</h6>
+						<span class="details">
+							{#each item.subtitle as sub}
+								<span>{sub.text}</span>
+							{/each}
+						</span>
+					</div>
+				</section>
+			{/if}
+		{/each}
 		<!-- {/each} -->
 	</div>
 </div>
@@ -109,11 +113,10 @@
 		border-radius: 0.5em;
 		/* width: 100%; */
 		/* max-width: 100%; */
-		-ms-scroll-snap-type: x proximity;
-		scroll-snap-type: x proximity;
 		/* overflow: scroll;*/
 	}
-
+	.scrollsnap {
+	}
 	.header {
 		padding: 0.5em;
 	}
@@ -147,6 +150,7 @@
 		grid-template-columns: repeat(auto, 1fr);
 
 		width: auto;
+		scroll-snap-type: x proximity;
 		// /* flex: 1 1 auto; */
 		// box-shadow: 0 0 10px 3px rgb(0 0 0 / 13%),
 		// 	inset -2px -2px 20px 0 hsl(0deg 0% 57% / 10%),
@@ -154,8 +158,6 @@
 
 		border-radius: inherit;
 		overflow-anchor: none;
-		-ms-scroll-snap-type: x proximity;
-		scroll-snap-type: x proximity;
 		-webkit-overflow-scrolling: touch;
 	}
 
@@ -175,44 +177,51 @@
 	}
 	.item {
 		scroll-snap-align: start;
-		// min-height: 16.75rem;
+		min-height: 16.75rem;
 		height: auto;
-
-		// width: 16rem;
+		width: 16rem;
 	}
 
 	.img {
-		// position: relative;
-		/* width: 100%; */
-		/* height: clamp(10rem,12.5rem,15rem); */
-		/* min-width: 100%; */
-		// box-shadow: 0 0 1rem 0.5rem rgb(0 0 0 / 36%);
-		position: relative;
-		top: 0;
-		max-height: 12.5rem;
-		min-width: 12.5rem;
-		border-radius: 2px;
-		overflow: hidden;
-
+		border-radius: var(--md-radius);
+		height: auto;
+		width: 100%;
 		.container {
-			display: flex;
-			align-items: center;
-			width: 100%;
-			height: 100%;
-			img {
-				// height: inherit;
-				// -o-object-fit: scale-down;
-				// object-fit: scale-down;
-				// // max-height: 12rem;
-				// width: 100%;
-				// max-width: 18rem;
-				width: 100%;
-				height: 100%;
-				-o-object-fit: cover;
-				object-fit: cover;
+			position: relative; /* If you want text inside of it */
 
-				max-width: inherit;
-				max-height: inherit;
+			cursor: pointer;
+			width: 100%;
+			position: relative;
+			padding-top: 100%; /* 1:1 Aspect Ratio */
+			&::before {
+				position: absolute;
+				content: '';
+				top: 0;
+				right: 0;
+
+				bottom: 0;
+				left: 0;
+				background: linear-gradient(rgba(0, 0, 0, 0.473), rgba(0, 0, 0, 0.473));
+
+				transition: opacity cubic-bezier(0.29, -0.3, 0.7, 0.95) 0.15s;
+				opacity: 0.001;
+				z-index: 1;
+			}
+			&:hover::before {
+				// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
+				background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.534));
+				opacity: 0.6;
+				z-index: 1;
+			}
+			img {
+				width: 100%;
+				height: auto;
+
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
 			}
 		}
 	}

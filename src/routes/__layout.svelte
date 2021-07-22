@@ -1,3 +1,11 @@
+<script context="module">
+	export const load = async ({ page }) => ({
+		props: {
+			key: page.path
+		}
+	})
+</script>
+
 <script>
 	import { browser } from '$app/env'
 	import { onMount } from 'svelte'
@@ -6,10 +14,9 @@
 	import Nav from '$components/Nav/Nav.svelte'
 	import Sidebar from '$components/Sidebar/Sidebar.svelte'
 	import Player from '$components/Player/Player.svelte'
-	// import '../app.css'
-	// import '../global/stylesheet.scss'
 	import Wrapper from '$components/Wrapper/Wrapper.svelte'
 	import { page } from '$app/stores'
+	export let key
 	onMount(() => {
 		iOS.init()
 		const getTheme = () => {
@@ -43,15 +50,13 @@
 		<nav class="nav" style={`background-color: var(--${$theme}-top)`}>
 			<Nav {width} />
 		</nav>
-		{#if width > 640}
-			<Sidebar />
-		{/if}
+		<Sidebar />
 		<div
 			class="wrapper"
 			class:no-scroll={$page.path.includes('/search/') ? true : false}
 			bind:this={main}
 			id="wrapper">
-			<Wrapper {main}>
+			<Wrapper {key} {main}>
 				<slot />
 			</Wrapper>
 		</div>
@@ -64,8 +69,8 @@
 </div>
 
 <style lang="scss" global>
-	@import '../global/stylesheet.scss';
-	// @import "../global/vars.css";
+	// @import '../global/01styles/main';
+	@import '../global/stylesheet.scss'; // @import "../global/vars.css";
 	.no-scroll {
 		overflow: hidden;
 		overflow-y: hidden;
@@ -74,7 +79,7 @@
 		--ytm-bottom: #121018;
 		--ytm-base: #09090a;
 		--ytm-top: #09090a;
-		--ytm-forms: #12101844;
+		--ytm-forms: rgb(21, 20, 29);
 		--ytm-side: #1210183a;
 
 		--dark-bottom: #111214;

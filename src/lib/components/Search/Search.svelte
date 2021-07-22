@@ -37,7 +37,6 @@
 			filter
 
 		await tick()
-		search.set([])
 		window.scrollTo({
 			behavior: 'smooth',
 			top: 0,
@@ -75,32 +74,41 @@
 	<!-- <label for="option"><em>search type</em></label> -->
 	<div class="nav-item">
 		<div
-			class="selectCont"
+			class="select"
 			style={`background-color: var(--${$theme}-forms)`}
 			class:inline={type == 'inline' ? true : false}>
 			<select
 				style={`background-color: var(--${$theme}-forms)`}
-				class="select"
 				on:blur={() => {
 					searchState.set({ option: filter, text: songTitle })
 				}}
 				bind:value={filter}>
 				{#each options as option (option.params)}
-					<option value={option.params}>{option.label}</option>
+					<option style="background-color:inherit;" value={option.params}
+						>{option.label}</option>
 				{/each}
 			</select>
 		</div>
 	</div>
-	<button class="search" class:hidden={type == 'inline' ? false : true}
+	<button class="search nav-item" class:hidden={type == 'inline' ? false : true}
 		><Icon name="search" size="1.5em" /></button>
 </form>
 
 <style lang="scss">
+	.hidden {
+		display: none;
+		visiblity: hidden;
+	}
 	button {
 		background: transparent !important;
 		color: inherit !important;
-		padding: 0.4em;
+		padding: 0.1em;
 		border: none !important;
+		visibility: visible;
+		@media screen and (max-width: 365px) {
+			display: none !important;
+			visibility: none !important;
+		}
 	}
 	.mobile-search {
 		display: flex;
@@ -109,11 +117,11 @@
 		max-height: 4rem;
 		flex-flow: row nowrap !important;
 	}
-	.selectCont {
-		max-width: 100%;
-		&.inline {
-			max-width: 8rem;
-		}
+	.x-button {
+		padding: 1em;
+
+		right: 0;
+		position: fixed;
 	}
 	.sidebar {
 		padding: 0 0.3125rem;
@@ -146,6 +154,7 @@
 	}
 	.inline {
 		flex-direction: row !important;
+		display: flex;
 		.nav-item {
 			margin-bottom: 0;
 		}
