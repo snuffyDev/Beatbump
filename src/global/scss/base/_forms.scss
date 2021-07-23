@@ -76,8 +76,7 @@ input[type="search"] {
 	min-width: 15ch;
 	max-width: 30ch;
 	transition: color cubic-bezier(0.455, 0.03, 0.515, 0.955) 0.1s;
-	&:focus-within::placeholder {
-		color: #fff;
+	&:focus-within ::placeholder {
 	}
 }
 .input {
@@ -91,9 +90,10 @@ input[type="search"] {
 	box-shadow: inset 0.1125em -0.1125em 1em 0.5em hsla(0, 0%, 96.9%, 0.014), 0 0 0.25em 0.02em hsla(0, 0%, 66.7%, 0) !important;
 	transition: all 0.1s cubic-bezier(0.47, 0.25, 0.745, 0.715);
 	width: 100%;
-	&:active {
+	&:active,
+	&:focus-within {
 		// background: #262e38;
-		background-color: #35353523;
+		background-color: #ffffff27 !important;
 
 		transition: all cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s;
 	}

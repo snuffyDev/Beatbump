@@ -1,15 +1,19 @@
 <script>
 	import { goto } from '$app/navigation'
-import { page } from '$app/stores';
+	import { navigating } from '$app/stores'
 
 	let redir = 5
+	let timeout
 	const redirect = () => {
-
-		redir = redir - 1
-		if (redir <= 0) {
-			goto('/')
+		if (!$navigating) {
+			redir = redir - 1
+			if (redir <= 0) {
+				goto('/')
+			} else {
+				timeout = setTimeout(redirect, 1000)
+			}
 		} else {
-			setTimeout(redirect, 1000)
+			clearTimeout(timeout)
 		}
 	}
 	redirect()

@@ -12,6 +12,7 @@
 	import type { Item, Song } from '$lib/types'
 	import type { PlaylistSearch } from '$lib/types/playlist'
 	import lazy from '$lib/lazy'
+	import longpress from '$lib/actions/longpress'
 
 	let ctoken = ''
 	let videoId = ''
@@ -20,7 +21,7 @@
 	$: title = songTitle = '...'
 
 	let thumbnail
-	let isHidden: Boolean
+	let isHidden: Boolean = false
 	let explicit
 	let clicked
 	let artist
@@ -132,13 +133,17 @@
 					clickHandler()
 				}
 			}}>
-			<div class="img-container">
+			<div class="img-container" on:longpress|capture={() => {
+				alert('longpress!')
+			}}>
 				{#if loading}
 					<Loading size="3em" />
 				{/if}
 				<div class="thumbnail">
 					<!-- svelte-ignore a11y-missing-attribute -->
 					<img
+						use:longpress
+
 						id="img"
 						referrerpolicy="origin-when-cross-origin"
 						loading="lazy"

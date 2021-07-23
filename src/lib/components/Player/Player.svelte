@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation'
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 	import { iOS } from '$stores/stores'
-	import { fade } from 'svelte/transition'
 	import { tweened } from 'svelte/motion'
 	import { getSrc } from '$lib/utils'
 	import Queue from './Queue.svelte'
@@ -11,7 +10,6 @@
 	import Icon from '$components/Icon/Icon.svelte'
 	import { updateTrack, key, currentTitle, playerLoading } from '$stores/stores'
 	import { cubicOut } from 'svelte/easing'
-	import * as utils from '$lib/utils'
 	import list from '$lib/stores/list'
 	export let curTheme
 	const player: HTMLAudioElement = new Audio()
@@ -45,25 +43,29 @@
 	$: listShow = showing ? true : false
 	$: hasList = $list.mix.length > 1
 	$: mixList = $list.mix
+
+	let isHidden = false
+	let DropdownItems: Array<any>
 	// log any and all updates to the list for testing
 	// $: console.log($list.mix)
 	// $: console.log(mixList, $list.mix[autoId]?.videoId);
-	let DropdownItems = [
-		{
-			text: 'View Artist',
-			icon: 'artist',
-			action: () => {
-				window.scrollTo({
-					behavior: 'smooth',
-					top: 0,
-					left: 0
-				})
-				goto(`/artist/${mixList[0].artistInfo.browseId}`)
-			}
-		}
-	]
+
 	player.addEventListener('loadedmetadata', () => {
 		title = $list.mix[0].title
+		DropdownItems = [
+			{
+				text: 'View Artist',
+				icon: 'artist',
+				action: () => {
+					window.scrollTo({
+						behavior: 'smooth',
+						top: 0,
+						left: 0
+					})
+					goto(`/artist/${mixList[autoId].artistInfo.browseId}`)
+				}
+			}
+		]
 	})
 	const play = () => player.play()
 	const pause = () => player.pause()
@@ -105,7 +107,7 @@
 	player.addEventListener('seeked', () => {
 		play()
 	})
-	const getNext = () => {
+	const getNext = async () => {
 		if (autoId == $list.mix.length - 1) {
 			list.getMore(
 				autoId,
@@ -121,10 +123,10 @@
 
 			return
 		} else {
-			autoId++ // console.log(autoId)
+			autoId++
 			key.set(autoId)
 
-			player.src = utils.getSrc(mixList[autoId].videoId).then((url) => url)
+			await getSrc(mixList[autoId].videoId)
 
 			currentTitle.set($list.mix[autoId].title)
 			once = false
@@ -166,8 +168,8 @@
 
 <Queue
 	on:updated={(event) => {
-		player.src = event.detail.src
-		autoId = event.detail.id
+		autoId = event.detail.id - 1
+		getNext()
 		// console.log(autoId);
 	}}
 	on:hide={(event) => {
@@ -219,7 +221,7 @@
 					class="player-btn player-title"
 					on:click={() => {
 						if (!isPlaying) {
-							startPlay()
+							play()
 						} else {
 							pause()
 						}
@@ -301,7 +303,7 @@
 										bind:value={volume}
 										min="0"
 										max="1"
-										step="0.1" />
+										step="any" />
 								</div>
 							</div>
 						</div>
@@ -309,28 +311,7 @@
 				</div>
 			{/if}
 			<div class="menu-container">
-				<Dropdown isHidden type="player">
-					<div slot="content">
-						{#if hasList}
-							<div
-								class="dd-item"
-								on:click={() => {
-									scrollTo({
-										behavior: 'smooth',
-										top: 0,
-										left: 0
-									})
-
-									goto(`/artist/${$list.mix[autoId].artistId}`, {
-										replaceState: true
-									})
-								}}>
-								<Icon color="white" name="artist" size="2em" />
-								<span class="dd-text">View Artist</span>
-							</div>
-						{/if}
-					</div>
-				</Dropdown>
+				<Dropdown bind:isHidden type="player" items={DropdownItems} />
 			</div>
 		</div>
 	</div>

@@ -1,16 +1,11 @@
 <script lang="ts">
-	import { fly, fade, slide } from 'svelte/transition'
-	import {
-		afterUpdate,
-		beforeUpdate,
-		createEventDispatcher,
-		onMount
-	} from 'svelte'
-	import { cubicIn, cubicInOut } from 'svelte/easing'
+	import { fly } from 'svelte/transition'
+	import { afterUpdate, createEventDispatcher, onMount } from 'svelte'
+	import { cubicInOut } from 'svelte/easing'
 	import { currentTitle } from '$stores/stores'
-	import { getSrc } from '$lib/utils'
 	import { clickOutside } from '$lib/js/clickOutside'
 	import list from '$lib/stores/list'
+	import longpress from '$lib/actions/longpress'
 
 	export let autoId
 	export let mixList = []
@@ -33,14 +28,10 @@
 		let active = document.getElementById(autoId)
 		if (active) active.scrollIntoView(true)
 	})
-	async function handleClick(i) {
+	function handleClick(i) {
 		autoId = i
-		const src = await getSrc(mixList[i].videoId)
-			.then((url) => url)
-			.catch((err) => console.log(err))
-		currentTitle.set(mixList[autoId].title)
+		currentTitle.set($list.mix[i - 1])
 		dispatch('updated', {
-			src: `${src}`,
 			id: `${autoId}`
 		})
 	}
@@ -69,13 +60,18 @@
 							id={index}
 							bind:this={items[index]}
 							class:active={autoId == index}
-							transition:fade|local
 							class="item"
-							on:click={async () => {
+							on:click={() => {
 								// console.log(`${autoId}`)
 								handleClick(index)
 							}}>
-							<div class="pl-thumbnail" style="min-width:5rem; max-width:5rem;">
+							<div
+								class="pl-thumbnail"
+								use:longpress
+								on:longpress={() => {
+									alert('Nice!')
+								}}
+								style="min-width:5rem; max-width:5rem;">
 								<img
 									referrerpolicy="origin-when-cross-origin"
 									src={item.thumbnail}

@@ -1,7 +1,6 @@
-<script>
+<script lang="ts">
 	import { createEventDispatcher, onMount, tick } from 'svelte'
 	import vp from '$lib/actions/viewport'
-	import { fly } from 'svelte/transition'
 	const dispatch = createEventDispatcher()
 	// props
 	export let items
@@ -150,11 +149,12 @@
 		{/each}
 		{#if !hasData}
 			<div
-				style="padding:1em;"
 				use:vp
-				on:enterViewport={() => dispatch('endList')} />
+				on:enterViewport={() => {
+					dispatch('endList')
+				}} />
 			{#if isLoading}
-				<div class="loading-results">
+				<div class="loading-results" style="padding: 0em 1em 1em 1em;">
 					<svg
 						role="img"
 						width="39.0714rem"
@@ -253,7 +253,7 @@
 		width: 100%;
 		padding: 0;
 		margin: 0;
-		height: 100%;
+		/* height: 100%; */
 		display: block;
 		position: relative;
 		padding-left: 0.8rem;

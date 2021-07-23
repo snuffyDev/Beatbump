@@ -77,7 +77,7 @@
 		display: grid;
 		// grid-gap: 1rem;
 
-		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
 
 		grid-gap: 0.8rem;
 	}
@@ -91,7 +91,6 @@
 		flex-wrap: nowrap;
 		text-overflow: clip;
 		font-size: 100%;
-		min-width: 180px;
 		border-radius: 0.8rem;
 		width: 100%;
 		align-items: center;

@@ -140,10 +140,15 @@ function parseCarouselItem(items, header) {
 				ctx?.menu?.menuRenderer?.items[2]?.menuServiceItemRenderer
 					?.serviceEndpoint?.queueAddEndpoint?.queueTarget?.playlistId
 		}
+		if (ctx?.navigationEndpoint?.watchEndpoint) {
+			playlistId = ctx?.navigationEndpoint?.watchEndpoint.playistId
+			videoId = ctx?.navigationEndpoint?.watchEndpoint.videoId
+		}
 		const browseEndpoint =
 			ctx?.title?.runs[0]?.navigationEndpoint?.browseEndpoint
 		if (playlistId !== undefined || playlistId !== null) {
 			return {
+				aspectRatio: ctx.aspectRatio,
 				playlistId,
 				videoId,
 				browseEndpoint,

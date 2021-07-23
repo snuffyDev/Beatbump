@@ -27,43 +27,38 @@ export async function get({ params }) {
 	)
 
 	let {
-		header,
 		contents: {
 			singleColumnBrowseResultsRenderer: {
 				tabs: [
 					{
 						tabRenderer: {
-							content: {
-								sectionListRenderer: { contents }
-							}
-						}
-					}
-				]
-			}
-		}
+							content: { sectionListRenderer: { contents = [] } = {} } = {}
+						} = {}
+					} = {}
+				] = []
+			} = {}
+		} = {}
 	} = await response.json()
-	console.log(contents, header)
-	// const sections = contents.map(({ gridRenderer = {} }) => {
-	// 	const { items = [], header = {} } = gridRenderer
-	// 	const section = items.map(({ musicTwoRowItemRenderer = {} }) => ({
-	// 		text: musicNavigationButtonRenderer.buttonText.runs[0].text,
-	// 		color: `#${(
-	// 			'00000000' +
-	// 			(
-	// 				musicNavigationButtonRenderer.solid.leftStripeColor & 0xffffff
-	// 			).toString(16)
-	// 		).slice(-6)}`,
-	// 		endpoint: {
-	// 			params:
-	// 				musicNavigationButtonRenderer.clickCommand.browseEndpoint.params,
-	// 			browseId:
-	// 				musicNavigationButtonRenderer.clickCommand.browseEndpoint.browseId
-	// 		}
-	// 	}))
-	// 	return { section, title: header.gridHeaderRenderer.title.runs[0].text }
-	// })
+	console.log(contents)
+	const sections = contents.map(({ gridRenderer = {} }) => {
+		const { items = [], header = {} } = gridRenderer
+		const section = items.map(({ musicTwoRowItemRenderer = {} }) => ({
+			thumbnail:
+				musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer
+					.thumbnail.thumbnails[0].url,
+			title: musicTwoRowItemRenderer.title.runs[0].text,
+			subtitles: musicTwoRowItemRenderer.subtitle.runs,
+			browseId:
+				musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseId,
+			shuffle:
+				musicTwoRowItemRenderer.menu.menuRenderer.items[0]
+					.menuNavigationItemRenderer.navigationEndpoint.watchPlaylistEndpoint
+					.playlistId
+		}))
+		return { section, title: header.gridHeaderRenderer.title.runs[0].text }
+	})
 	return {
-		body: { header, contents },
+		body: sections,
 		status: 200
 	}
 }

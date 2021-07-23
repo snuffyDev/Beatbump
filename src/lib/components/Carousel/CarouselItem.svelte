@@ -17,14 +17,14 @@
 	export let aspectRatio
 	export let isBrowse = false
 	let hovering = false
-	let isLoading = false
-	let loading = isLoading ? true : false
+	let loading
+	$: isLoading = loading ? true : false
 	let isHidden
 	let showing = false
 	let menuToggle = showing ? true : false
 	let width
 	let mobile = width < 525
-
+	// $: console.log(loading)
 	let DropdownItems = [
 		{
 			text: 'View Artist',
@@ -57,9 +57,13 @@
 </script>
 
 <svelte:window bind:outerWidth={width} />
-<div class="item">
+<div class="container carouselitem">
 	<section
 		class="item"
+		class:item16x9={aspectRatio?.includes('16_9')
+			? true
+			: false || type == 'trending'}
+		class:item1x1={aspectRatio?.includes('SQUARE') ? true : false}
 		on:mouseover={() => {
 			hovering = true
 		}}
@@ -74,33 +78,29 @@
 		<div
 			class="clickable"
 			on:click={async () => {
-				if (type == 'trending' && !loading) {
-					loading = true
-					list.initList(item.videoId, item.playlistId)
+				loading = true
+				if (type == 'trending') {
+					await list.initList(item.videoId, item.playlistId)
 					currentTrack.set({ ...$list.mix[0] })
 					key.set(0)
-					loading = false
-				} else if (type == 'artist' && !loading) {
+				} else if (type == 'artist') {
 					if (isBrowse) {
-						let main = document.getElementById('wrapper')
-						// main.scrollTo({ top: 0, behavior: 'smooth' })
-						// await tick()
 						goto(`/artist/${item?.browseEndpoint?.browseId}`)
 					} else if (item.videoId !== undefined) {
 						loading = true
-						list.initArtistList(item.videoId, item.playlistId)
-						await getSrc(item.videoId)
+						await list.initArtistList(item.videoId, item.playlistId)
+						getSrc(item.videoId)
 						currentTrack.set({ ...$list.mix[0] })
 						// currentTitle.set(res[0].title);
 						key.set(0)
 						// console.log(data);
-						loading = false
 					} else {
-						list.startPlaylist(item.playlistId)
+						loading = true
+						await list.startPlaylist(item.playlistId)
 						key.set(0)
-						loading = false
 					}
 				}
+				loading = false
 			}}>
 			<div class="img">
 				{#if loading}
@@ -109,9 +109,10 @@
 				<!-- svelte-ignore a11y-missing-attribute -->
 				<div
 					class="container"
-					class:AR16x9={aspectRatio?.includes('16_9')
+					class:img16x9={aspectRatio?.includes('16_9')
 						? true
-						: false || type == 'trending'}>
+						: false || type == 'trending'}
+					class:img1x1={aspectRatio?.includes('SQUARE') ? true : false}>
 					{#if type == 'artist'}
 						<img
 							alt="thumbnail"
@@ -146,31 +147,40 @@
 		</div>
 
 		<div class="menu" class:mobile={width < 550}>
-			<Dropdown bind:isHidden items={DropdownItems} />
+			{#if hovering || width < 550}
+				<Dropdown bind:isHidden items={DropdownItems} />
+			{/if}
 		</div>
 	</section>
 </div>
 
 <style lang="scss">
-	.AR16x9 {
+	.item1x1 {
+		// padding-top: 100% !important;
+		width: 13rem !important;
+	}
+	.item16x9 {
+		// padding-top: 56.25% !important;
+		width: 17rem !important;
+	}
+	.img1x1 {
+		padding-top: 100% !important;
+	}
+	.img16x9 {
 		padding-top: 56.25% !important;
 	}
-	.item {
+	.container.carouselItem {
 		position: relative;
 		padding-bottom: 0.8em;
 	}
 	.menu {
 		position: absolute;
 		right: 5%;
-		top: 0%;
-		padding-top: 0.125rem;
-		padding-right: 0.625rem;
+		top: 2.5%;
+		padding-top: 0rem;
+		// padding-right: 0.0125rem;
 		z-index: 1;
-		&.mobile {
-			top: 0%;
-			right: 7%;
-			padding-right: 0.5rem;
-		}
+		padding: 0.5ch;
 	}
 	.title {
 		cursor: pointer;
@@ -178,12 +188,14 @@
 	}
 
 	section {
-		padding-left: 1.5rem;
-		padding-right: 1.5rem;
-		margin-top: 1.5rem;
+		padding-left: 1rem;
+		padding-right: 0.5rem;
+		margin-top: 0.5rem;
 		margin-bottom: 0rem;
 		display: block;
 		content: '';
+		padding-bottom: 1.8em;
+
 		::before {
 			display: block;
 		}
@@ -193,15 +205,16 @@
 		scroll-snap-align: start;
 		min-height: 16.75rem;
 		height: auto;
-
-		width: 21rem;
+		width: 100%;
+		min-width: 12rem;
+		max-width: 20rem;
+		position: relative;
 		@media screen and (max-width: 500px) {
-			width: 17rem;
+			max-width: 17rem;
 		}
 	}
 
 	.img {
-
 		border-radius: var(--md-radius);
 		height: auto;
 		width: 100%;
@@ -212,7 +225,7 @@
 			width: 100%;
 			position: relative;
 			padding-top: 100%; /* 1:1 Aspect Ratio */
-		&::before {
+			&::before {
 				position: absolute;
 				content: '';
 				top: 0;
@@ -220,18 +233,17 @@
 
 				bottom: 0;
 				left: 0;
-				background: linear-gradient(rgba(0, 0, 0, 0.473), rgba(0, 0, 0, 0.473));
+				background: linear-gradient(rgba(0, 0, 0, 0.473), rgba(0, 0, 0, 0));
 
 				transition: opacity cubic-bezier(0.29, -0.3, 0.7, 0.95) 0.15s;
-				opacity: 0.001;
+				opacity: 0.1;
 				z-index: 1;
 			}
 			&:hover::before {
 				// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
-				background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.534));
+				background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
 				opacity: 0.6;
 				z-index: 1;
-
 			}
 			img {
 				width: 100%;

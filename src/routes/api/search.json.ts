@@ -1,10 +1,15 @@
-import type { Artist, Song } from '$lib/types'
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import BaseContext from '$lib/context'
+import type { Artist, NextContinuationData, Song } from '$lib/types'
 import type { PlaylistSearch } from '$lib/types/playlist'
 import { pb } from '$lib/utils'
 import type { EndpointOutput } from '@sveltejs/kit'
-import type { DefaultBody } from '@sveltejs/kit/types/endpoint'
-
-export async function get({ query }): Promise<EndpointOutput<DefaultBody>> {
+interface SearchOutput extends EndpointOutput {
+	contents?: Song | PlaylistSearch
+	didYouMean?: { term: string; endpoint: { query; params } }
+	continuation?: NextContinuationData
+}
+export async function get({ query }): Promise<SearchOutput> {
 	const q = query.get('q') || ''
 	const filter = query.get('filter') || ''
 	const videoId = query.get('videoId') || ''
@@ -27,52 +32,9 @@ export async function get({ query }): Promise<EndpointOutput<DefaultBody>> {
 			{
 				method: 'POST',
 				body: JSON.stringify({
-					context: {
-						client: {
-							clientName: 'WEB_REMIX',
-							clientVersion: '0.1',
-							deviceMake: 'google',
-							platform: 'DESKTOP',
-							deviceModel: 'bot',
-							experimentIds: [],
-							experimentsToken: '',
-							osName: 'Googlebot',
-							osVersion: '2.1',
-							locationInfo: {
-								locationPermissionAuthorizationStatus:
-									'LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED'
-							},
-							musicAppInfo: {
-								musicActivityMasterSwitch:
-									'MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE',
-								musicLocationMasterSwitch:
-									'MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE',
-								pwaInstallabilityStatus: 'PWA_INSTALLABILITY_STATUS_UNKNOWN'
-							},
-							utcOffsetMinutes: -new Date().getTimezoneOffset()
-						},
-						capabilities: {},
-						request: {
-							internalExperimentFlags: [
-								{
-									key: 'force_music_enable_outertube_tastebuilder_browse',
-									value: 'true'
-								},
-								{
-									key: 'force_music_enable_outertube_playlist_detail_browse',
-									value: 'true'
-								},
-								{
-									key: 'force_music_enable_outertube_search_suggestions',
-									value: 'true'
-								}
-							],
-							sessionIndex: {}
-						},
-						user: {
-							enableSafetyMode: false
-						},
-						activePlayers: {}
+					...BaseContext,
+					user: {
+						enableSafetyMode: false
 					},
 					browseEndpointContextMusicConfig: {
 						browseEndpointContextMusicConfig: {
@@ -156,8 +118,7 @@ export async function get({ query }): Promise<EndpointOutput<DefaultBody>> {
 	}
 }
 // Parse the playlist results for search.
-const parsePlaylist = (contents): Promise<PlaylistSearch[]> => {
-
+const parsePlaylist = (contents): PlaylistSearch[] => {
 	return contents.map(({ musicResponsiveListItemRenderer }) => {
 		// const d = musicResponsiveListItemRenderer
 		const thumbnails =
@@ -193,8 +154,7 @@ const parsePlaylist = (contents): Promise<PlaylistSearch[]> => {
 	})
 }
 
-const parseSong = (contents, type):Promise<Song[]> => {
-
+const parseSong = (contents, type): Song[] => {
 	return contents.map(({ musicResponsiveListItemRenderer }, i) => {
 		// let d = musicResponsiveListItemRenderer
 		let explicit
@@ -395,7 +355,7 @@ function parseSearchResult(data, cont, filter?) {
 	return { contents: results, continuation: continuation }
 }
 function continuationCheck(contents) {
-	if (!contents.hasOwnProperty('continuations')) {
+	if (!Object.prototype.hasOwnProperty.call(contents, 'continuations')) {
 		return
 	}
 	return { ...contents?.continuations[0].nextContinuationData }

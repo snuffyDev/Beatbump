@@ -4,6 +4,7 @@ const directives = {
 	'base-uri': ["'self'"],
 	'child-src': ["'self'"],
 	'connect-src': ["'self'", 'ws://localhost:*'],
+	// 'connect-src': ["'self'", 'ws://localhost:*', 'ws://*', '*'],
 	'img-src': [
 		"'self'",
 		'data:',

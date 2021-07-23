@@ -36,33 +36,32 @@
 		<!-- <label for="search"><em>search</em></label> -->
 		<div class="setting">
 			<label for="select" class="s-text">Theme:</label>
-			<div
-				class="selectCont"
-				style={`background-color: var(--${$theme}-forms)`}>
+			<div class="select" style={`background-color: var(--${$theme}-forms)`}>
 				<!-- svelte-ignore a11y-no-onchange -->
 				<select
 					id="select"
-					class="select"
 					bind:value={setTheme}
 					on:change={() => {
 						theme.set(setTheme)
 					}}>
 					{#each themes as theme}
-						<option value={theme.name} selected={setTheme}>{theme.name}</option>
+						<option
+
+							value={theme.name}
+							style={`background-color: var(--${setTheme}-forms); color: inherit;`}
+							selected={setTheme}>{theme.name}</option>
 					{/each}
 				</select>
 			</div>
 		</div>
 		<div class="setting">
-			<label for="checkbox" class="s-text"
-				>Dedupe Automix:
-				<input
-					type="checkbox"
-					bind:checked={setFilter}
-					on:change={() => {
-						filterAutoPlay.set(setFilter)
-					}} />
-			</label>
+			<label for="checkbox" class="s-text">Dedupe Automix: </label>
+			<input
+				type="checkbox"
+				bind:checked={setFilter}
+				on:change={() => {
+					filterAutoPlay.set(setFilter)
+				}} />
 		</div>
 	</div>
 {/if}
@@ -92,8 +91,8 @@
 		border-top: 0;
 		white-space: pre-line;
 		line-break: normal;
-		word-break: break-all;
-		justify-content: space-between;
+		word-break: normal;
+		justify-content: space-evenly;
 		@media screen and (max-width: 640px) {
 			max-width: 100%;
 			align-items: center;
@@ -103,7 +102,7 @@
 		border-top: 0;
 
 		.setting {
-			display: flex;
+			display: inline-flex;
 			padding: 0.2rem 0.4rem;
 			margin-bottom: 0.5rem;
 			color: inherit;

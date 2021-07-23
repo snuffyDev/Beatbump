@@ -1,9 +1,8 @@
 <script context="module">
 	export async function load({ page, fetch }) {
-		const { slug } = page.params
 		const url =
 			'/api/artist.json?endpoint=browse&browseId=' +
-			encodeURIComponent(slug) +
+			encodeURIComponent(page.params.slug) +
 			'&pt=MUSIC_PAGE_TYPE_ARTIST'
 		const response = await fetch(url)
 		const data = await response.json()
@@ -49,7 +48,7 @@
 	let width
 
 	let newData: []
-	// console.log(carouselItems, description, thumbnail, headerContent)
+	$: console.log(carouselItems, description, thumbnail, headerContent)
 
 	// parse(header, content)
 	// let section = []
@@ -67,52 +66,54 @@
 
 <svelte:head>
 	<title
-		>{headerContent.name == undefined
+		>{headerContent?.name == undefined
 			? 'Artist - '
 			: `${headerContent.name} - `}Beatbump</title>
 </svelte:head>
 
 <svelte:window bind:innerWidth={width} />
-
-<main>
-	<ArtistPageHeader {description} {headerContent} {width} {thumbnail} />
-	<div class="artist-body">
-		<button class="radio-button"
-			><Icon size="1.5rem" name="radio" /><span class="btn-text">
-				Play Radio</span
-			></button>
-		{#if items !== undefined}
-			<section>
-				<h4 class="grid-title">Songs</h4>
-				<section class="songs">
-					{#each items as item, index}
-						<ListItem {item} {index} />
-					{/each}
+{#await headerContent then _}
+	<main>
+		<ArtistPageHeader {description} {headerContent} {width} {thumbnail} />
+		<div class="artist-body">
+			<button class="radio-button"
+				><Icon size="1.5rem" name="radio" /><span class="btn-text">
+					Play Radio</span
+				></button>
+			{#if items !== undefined}
+				<section>
+					<h4 class="grid-title">Songs</h4>
+					<section class="songs">
+						{#each items as item, index}
+							<ListItem {item} {index} />
+						{/each}
+					</section>
 				</section>
-			</section>
-		{/if}
-		{#key carouselItems}
-			{#each carouselItems as { contents, header }, i}
-				{#if i < 3}
-					<Carousel
-						items={contents}
-						type="artist"
-						setTitle={header?.title ? header.title : header}>
-						>
-					</Carousel>
-				{:else}
-					<Carousel
-						items={contents}
-						type="artist"
-						isBrowse={true}
-						setTitle={header.title ? header.title : header}>
-						>
-					</Carousel>
-				{/if}
-			{/each}
-		{/key}
-	</div>
-</main>
+			{/if}
+			{#key carouselItems}
+				{#each carouselItems as { contents, header }, i}
+					{#if i < 4}
+						<Carousel
+							items={contents}
+							type="artist"
+							isBrowse={false}
+							setTitle={header?.title ? header.title : header}>
+							>
+						</Carousel>
+					{:else}
+						<Carousel
+							items={contents}
+							type="artist"
+							isBrowse={true}
+							setTitle={header.title ? header.title : header}>
+							>
+						</Carousel>
+					{/if}
+				{/each}
+			{/key}
+		</div>
+	</main>
+{/await}
 
 <style lang="scss">
 	.row {

@@ -6,8 +6,8 @@
 	import Icon from '$components/Icon/Icon.svelte'
 	import { clickOutside } from '$lib/js/clickOutside'
 	import { quartInOut, quintIn } from 'svelte/easing'
-	import DropdownItem from '../Carousel/DropdownItem.svelte'
-	export let isHidden
+	import DropdownItem from './DropdownItem.svelte'
+	export let isHidden = false
 	export let type = ''
 	export let items = []
 	let showing = false

@@ -8,12 +8,13 @@
 	export let width
 	let container
 	let y = 0
+	let handler = (event) => {}
 	onMount(() => {
 		let start
 
 		let gradient = document.getElementById('gradient')
 
-		function handler(event) {
+		handler = (event) => {
 			if (start === undefined) start = event.timestamp
 			const scroll = gradient.getBoundingClientRect()
 
@@ -21,35 +22,26 @@
 
 			window.requestAnimationFrame(function (e) {
 				y = Math.min(Math.max(-scroll.top / window.innerHeight, 0), 1) * 125
-
-				// Math.min(-0.2 * scroll.top);
-				// console.log(y);
 				if (elapsed < 200) {
-					// Stop the animation after 2 seconds
 					window.requestAnimationFrame(handler)
 				}
 
 				window.cancelAnimationFrame(y)
-				// -scroll.top * 2;
-				// (-scroll.top Math.max(0, y / 40)0) * 2;
 			})
-
-			// console.log(y);
 		}
-		// window.requestAnimationFrame(handler);
-		// window.addEventListener("scroll", handler);
 		let wrapper = document.getElementById('wrapper')
 
 		wrapper.addEventListener('scroll', handler, { passive: true })
 		return () => {
-			window.removeEventListener('scroll', handler, { passive: true })
-			wrapper.removeEventListener('scroll', handler, { passive: true })
+			window.removeEventListener('scroll', handler)
+			wrapper.removeEventListener('scroll', handler)
 		}
 	})
-	// onDestroy(()=>{window.removeEventListener('scroll', handler)})
+	onDestroy(() => {
+		window.removeEventListener('scroll', handler)
+	})
 </script>
 
-<!-- <svelte:window bind:scrollY={y} /> -->
 <div class="artist-header">
 	<div class="artist-thumbnail">
 		<div
@@ -71,7 +63,7 @@
 	</div>
 	<div
 		class="artist-content"
-		style="		box-shadow:-1.5rem -0.5rem 0.5rem 0.5rem var(--{$theme}-base), 1.5rem 0.5rem 0.8rem 0.5rem inset var(--{$theme}-base);">
+		style="		box-shadow:0rem 0rem 0.5rem 0.5rem var(--{$theme}-base), 1.5rem 0.5rem 0.8rem 0.5rem inset var(--{$theme}-base);">
 		<div class="content-wrapper">
 			<div class="name">{headerContent?.name}</div>
 			{#if width > 500 && !!description}

@@ -19,6 +19,10 @@ type moodsAndGenres = {
 		params: string
 	}
 }
+type header = {
+	title: string
+	browseId: string
+}
 export async function get({ query }): Promise<EndpointOutput> {
 	console.time('timer')
 	const endpoint = query.get('q') || ''
@@ -85,6 +89,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 			body: carouselItems.map(({ musicCarouselShelfRenderer }) => {
 				const { header, contents } = musicCarouselShelfRenderer
 				// console.log(header)
+
 				return {
 					header: parseHeader([header])[0],
 					results: parseBody(contents)
@@ -114,7 +119,7 @@ function parseBody(contents) {
 		...contents.map((r: []) => {
 			const type = Object.getOwnPropertyNames(r).toString()
 			let result: result | moodsAndGenres
-
+			// console.log(type)
 			switch (type) {
 				case 'musicTwoRowItemRenderer':
 					result = {

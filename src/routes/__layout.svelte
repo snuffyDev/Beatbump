@@ -52,9 +52,7 @@
 	class:light={$theme.includes('light') ? true : false}
 	style={`background-color: var(--${$theme}-base)`}>
 	{#if browser}
-		<nav class="nav" style={`background-color: var(--${$theme}-top)`}>
-			<Nav {width} />
-		</nav>
+		<Nav {width} />
 		<Sidebar />
 		<div
 			class="wrapper"
@@ -104,13 +102,13 @@
 		--dark-bottom: #111214;
 		--dark-base: #09090a;
 		--dark-top: #111214;
-		--dark-forms: #181a1a86;
+		--dark-forms: #131516;
 		--dark-side: #0b0c0c;
 
 		--dim-bottom: rgb(20, 24, 32);
 		--dim-base: rgb(9 9 10);
 		--dim-top: rgb(20, 24, 32);
-		--dim-forms: #181a1a86;
+		--dim-forms: #131516;
 		--dim-side: #0b0c0f;
 
 		--light-base: rgb(243, 235, 235);

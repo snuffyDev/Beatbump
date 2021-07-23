@@ -16,6 +16,9 @@ export async function get({ query }) {
 							clientName: 'ANDROID',
 							clientVersion: '16.02'
 						},
+						user: {
+							enableSafetyMode: false
+						},
 						playlistId: `${playlistId}`,
 
 						captionParams: {},

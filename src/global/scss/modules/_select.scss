@@ -13,9 +13,16 @@
 	min-width: 15ch;
 	max-width: 30ch;
 	position: relative;
-	height: 100%;
-	min-height: 4.5ch;
+	height: auto;
+	min-height: 5ch;
 	max-height: 30ch;
+	&:active,
+	&:focus-within {
+		// background: #262e38;
+		background-color: #ffffff27 !important;
+
+		transition: all cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s;
+	}
 	&.inline {
 		max-width: 8rem;
 	}
@@ -39,7 +46,6 @@
 	option {
 		background-color: #0d0e0ee0;
 		transition: ease-in-out 0.5s all;
-		color: inherit;
 	}
 }
 select {
@@ -49,9 +55,15 @@ select {
 		background-color: inherit;
 		// margin-inline: 0.2rem;
 		// margin-block-start: 0.125rem;
-		color: inherit;
 	}
 	outline: none;
+	&:active,
+	&:focus-within {
+		// background: #262e38;
+		background-color: #ffffff27 !important;
+
+		transition: all cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s;
+	}
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
@@ -66,8 +78,6 @@ select {
 	width: auto;
 	display: grid;
 	grid-template-columns: 1fr 0.5px;
-	align-content: center;
-	font-size: 0.95rem;
 	font-weight: 500;
 	background-color: inherit;
 	grid-template-areas: "select end";
@@ -77,11 +87,9 @@ select {
 	min-width: 15ch;
 	max-width: 30ch;
 	position: relative;
-	height: 100%;
-	min-height: 4.5ch;
+	min-height: inherit;
 	max-height: 30ch;
 	height: inherit;
-	min-height: inherit;
 	font-family: inherit;
 	font-size: inherit;
 	white-space: pre;

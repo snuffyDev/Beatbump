@@ -137,6 +137,7 @@
 
 <style scoped lang="scss">
 	@import '../../global/scss/components/mixins';
+
 	.select {
 		color: white;
 		display: grid;

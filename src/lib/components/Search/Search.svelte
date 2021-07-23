@@ -83,8 +83,9 @@
 				}}
 				bind:value={filter}>
 				{#each options as option (option.params)}
-					<option style="background-color:inherit;" value={option.params}
-						>{option.label}</option>
+					<option
+						style={`background-color: var(--${$theme}-forms); color: inherit;`}
+						value={option.params}>{option.label}</option>
 				{/each}
 			</select>
 		</div>
