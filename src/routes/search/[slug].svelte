@@ -120,15 +120,6 @@
 					</p>
 				{/if}
 			</div>
-			<!-- <section class="filters">
-				<label for="filter">Filters: </label>
-				<div class="select">
-					<select name="filter" id="filter"
-						><option value="testing"> testing </option><option value="testing2">
-							testing2
-						</option></select>
-				</div>
-			</section> -->
 		</section>
 		<VirtualList
 			on:endList={() => {
@@ -136,20 +127,11 @@
 			}}
 			bind:isLoading
 			bind:hasData
-			height=" calc(100% - 6.3rem)"
+			height=" calc(100% - 8.3rem)"
 			{items}
 			let:item>
 			<Item data={item} />
 		</VirtualList>
-
-		<!-- <SearchList
-				on:end={paginate}
-				bind:isLoading
-				bind:hasData
-				let:item
-				items={$search}>
-				<Item slot="item" data={item} />
-			</SearchList> -->
 	</main>
 {/if}
 

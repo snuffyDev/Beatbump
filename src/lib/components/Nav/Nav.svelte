@@ -40,7 +40,6 @@
 			class="nav-search"
 			transition:fade={{ duration: 75, easing: circIn }}
 			class:hidden={width > 640 || hidden}>
-			<!-- <label for="search"><em>search</em></label> -->
 			<Search
 				type="inline"
 				on:submitted={(event) => {
@@ -87,11 +86,6 @@
 			display: none;
 			visibility: hidden;
 		}
-	}
-	.s-text {
-		padding: 0 0.8rem 0.2rem 0.8rem; /* align-self: start; */
-		font-size: 1.1rem;
-		// margin-right: 4rem;
 	}
 	.x-button {
 		padding: 1em;

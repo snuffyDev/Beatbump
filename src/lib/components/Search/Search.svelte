@@ -50,11 +50,10 @@
 <form class={type} on:submit|preventDefault={(e) => handleSubmit(e)}>
 	<!-- <label for="search"><em>search</em></label> -->
 	<div class="nav-item">
-		<div
-			class="input"
-			style={`background-color: var(--${$theme}-forms)`}
-			class:inline={type == 'inline' ? true : false}>
-			<div class="searchBtn" on:click={(e) => handleSubmit(e)} />
+		<div class="input" style={`background-color: var(--${$theme}-forms)`}>
+			<div class="searchBtn" on:click={(e) => handleSubmit(e)}>
+				<Icon name="search" size="1rem" />
+			</div>
 			{#if type == 'inline'}<input
 					autofocus
 					autocorrect="off"
@@ -90,8 +89,6 @@
 			</select>
 		</div>
 	</div>
-	<button class="search nav-item" class:hidden={type == 'inline' ? false : true}
-		><Icon name="search" size="1.5em" /></button>
 </form>
 
 <style lang="scss">
@@ -147,14 +144,18 @@
 	}
 
 	.nav-item {
-		width: 100%;
 		display: flex;
 		flex-direction: column;
 		margin-bottom: 0.53125rem;
 	}
-	.inline {
-		flex-direction: row !important;
-		display: flex;
+	form.inline {
+		flex-direction: row;
+		display: flex !important;
+		/* align-items: stretch; */
+		/* justify-content: space-between; */
+		/* width: 100%; */
+		/* place-content: space-evenly; */
+		flex-wrap: nowrap;
 		.nav-item {
 			margin-bottom: 0;
 		}

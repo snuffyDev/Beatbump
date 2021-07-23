@@ -7,7 +7,7 @@
 	import lazy from '$lib/lazy'
 	import { fade } from 'svelte/transition'
 	import { goto } from '$app/navigation'
-
+	let isHidden
 	let section = []
 	let arr = items
 	let carousel
@@ -46,7 +46,7 @@
 						console.log()
 						let id = item.endpoint.browseId
 						let type = item.endpoint.pageType
-						scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+						window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
 						goto(
 							'/release?type=' +
 								encodeURIComponent(type) +
@@ -114,8 +114,6 @@
 		/* width: 100%; */
 		/* max-width: 100%; */
 		/* overflow: scroll;*/
-	}
-	.scrollsnap {
 	}
 	.header {
 		padding: 0.5em;
@@ -230,7 +228,5 @@
 		flex-direction: column;
 		margin-top: 0.8571rem;
 		padding-right: 1em;
-	}
-	.scroll-container {
 	}
 </style>

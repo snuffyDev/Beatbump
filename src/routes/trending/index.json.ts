@@ -79,7 +79,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 				return content.musicCarouselShelfRenderer
 			})
 		)
-		// const resultsBody =
+
 		console.timeEnd('timer')
 		return {
 			body: carouselItems.map(({ musicCarouselShelfRenderer }) => {

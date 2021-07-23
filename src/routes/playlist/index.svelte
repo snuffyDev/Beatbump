@@ -27,7 +27,7 @@
 	import Icon from '$lib/components/Icon/Icon.svelte'
 	import lazy from '$lib/lazy'
 	import list from '$lib/stores/list'
-	import { isPagePlaying } from '$lib/stores/stores'
+	import { currentTitle, isPagePlaying } from '$lib/stores/stores'
 	import type { Header, PlaylistItem } from '$lib/types/playlist'
 	import { onMount, setContext } from 'svelte'
 	export let tracks: PlaylistItem[]
@@ -43,6 +43,8 @@
 	console.log(continuations)
 	$: console.log(isThisPage, $isPagePlaying)
 	onMount(() => {
+		pageTitle =
+			pageTitle.length > 64 ? pageTitle.substring(0, 64) + '...' : header.title
 		if (header !== undefined) {
 			if ((!hasList && !$isPagePlaying) || !header.playlistId) {
 				isThisPage = false
@@ -58,7 +60,8 @@
 </script>
 
 <svelte:head>
-	<title>Playlist - Beatbump</title>
+	<title
+		>{$currentTitle !== undefined ? $currentTitle : 'Playlist'} - Beatbump</title>
 </svelte:head>
 
 <svelte:window bind:innerWidth={width} />
@@ -87,7 +90,7 @@
 					</div>
 					<div class="info">
 						<div class="info-title">
-							<h4 class="box-title">{header?.title}</h4>
+							<h4 class="box-title">{pageTitle}</h4>
 							{#if header.description}
 								<p class="subtitle" class:hidden={width < 640 ? true : false}>
 									{header?.description ? header?.description : ''}

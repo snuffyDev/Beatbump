@@ -25,7 +25,7 @@ legend {
 label {
 	display: block;
 	font-weight: 500;
-	font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+	font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 	font-variant-caps: all-small-caps;
 	// margin-bottom: $small-spacing * 0.5;
 }
@@ -63,70 +63,6 @@ input[type="search"]::-webkit-search-results-button,
 input[type="search"]::-webkit-search-results-decoration {
 	display: none;
 }
-.select {
-	display: grid;
-	grid-template-columns: 1fr 0.5px;
-	align-content: center;
-	font-size: 0.95rem;
-	font-weight: 500;
-	background-color: inherit;
-	grid-template-areas: "select end";
-	color: inherit;
-	width: 100%;
-	min-width: 15ch;
-	max-width: 30ch;
-	position: relative;
-	transition: ease-in-out 0.5s all;
-
-	height: 100%;
-	min-height: 4.5ch;
-	max-height: 30ch;
-	&.inline {
-		max-width: 8rem;
-	}
-	&::after {
-		content: "";
-		place-self: end;
-		grid-area: end !important;
-		align-self: center;
-		position: absolute;
-		right: 0;
-		margin-right: 0.7rem;
-
-		color: inherit;
-		width: 0.6rem;
-		height: 0.5rem;
-		background-color: currentColor;
-		-webkit-clip-path: polygon(100% 0, 0 0, 50% 100%);
-		clip-path: polygon(100% 0, 0 0, 50% 100%);
-	}
-}
-select {
-	outline: none;
-	// background-color: #66ccaa;
-
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
-	min-width: inherit;
-	// background-color: transparent;
-	// border: transparentize(#000, 10%) solid 1px;
-	// color: invert(#aaaa);
-	border-radius: inherit;
-	padding: 0.2rem 2rem 0.6rem 0.6rem;
-	color: inherit;
-	margin: 0;
-	width: auto;
-	height: inherit;
-	min-height: inherit;
-	font-family: inherit;
-	font-size: inherit;
-	// white-space: pre;
-	cursor: inherit;
-	position: relative;
-	align-content: center;
-	grid-area: select;
-}
 
 .input,
 input[type="search"] {
@@ -139,21 +75,21 @@ input[type="search"] {
 
 	min-width: 15ch;
 	max-width: 30ch;
-	// display: grid;
-	// grid-template-columns: 1fr 20px;
+	transition: color cubic-bezier(0.455, 0.03, 0.515, 0.955) 0.1s;
+	&:focus-within::placeholder {
+		color: #fff;
+	}
 }
 .input {
 	display: grid;
-	grid-template-columns: 1fr 20px;
+	grid-template-columns: 1fr 31px;
+	grid-template-areas: "start end";
 	position: relative;
 	background-color: transparent;
-	border: 0.0625rem solid rgba(170, 170, 170, 0.219);
+	border: 0.0625rem solid hsla(0, 0%, 66.7%, 0.219);
 	border-radius: 0.2em;
-	box-shadow: 0.1125em -0.1125em 1em 0.5em inset rgba(247, 247, 247, 0.014),
-		0 0 0.25em 0.02em transparentize(rgba(170, 170, 170, 0.116), 0.9) !important;
-	width: 100%;
-	transition: all cubic-bezier(0.47, 0.25, 0.745, 0.715) 0.1s;
-
+	box-shadow: inset 0.1125em -0.1125em 1em 0.5em hsla(0, 0%, 96.9%, 0.014), 0 0 0.25em 0.02em hsla(0, 0%, 66.7%, 0) !important;
+	transition: all 0.1s cubic-bezier(0.47, 0.25, 0.745, 0.715);
 	width: 100%;
 	&:active {
 		// background: #262e38;
@@ -170,31 +106,20 @@ input :not([type="range"]) :not([type="checkbox"]) {
 	font-size: 1.25em;
 }
 .searchBtn {
-	position: absolute;
 	pointer-events: all;
 	cursor: pointer;
-	right: 0;
 	z-index: 5;
-	bottom: 0;
-	width: 1.5rem;
-	// grid-: ;
-	// grid-column: span 3 / span 3;
-	height: 100%;
-	&::before {
-		// padding: 2em;
-	}
-	content: "";
+	/* width: 1rem; */
+	/* height: 1rem; */
+	display: flex;
+	align-content: center;
 	align-self: center;
-	position: absolute;
-	margin-right: 0.5rem;
+	padding: 1.566666ch;
+	/* margin-right: .5rem; */
+	justify-self: center;
+	z-index: 10;
 	color: inherit;
-	right: 0;
-	top: calc(66.6666% / 1.75);
-	bottom: 0;
-	width: 0.6rem;
-	height: 0.5rem;
-	// z-index: 10;
-	background-color: currentColor;
-	-webkit-clip-path: polygon(100% 0, 0 0, 50% 50%);
-	clip-path: polygon(100% 45%, 0 0, 0 100%);
+	/* right: 0; */
+	/* top: 0; */
+	grid-area: end;
 }

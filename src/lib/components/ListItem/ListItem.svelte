@@ -1,9 +1,9 @@
 <script>
 	import Icon from '$components/Icon/Icon.svelte'
 	import { currentTitle, key } from '$stores/stores'
-	import * as utils from '$lib/utils'
 	import { createEventDispatcher } from 'svelte'
 	import list from '$lib/stores/list'
+import { getSrc } from '$lib/utils';
 	export let item
 	export let index
 	export let page
@@ -25,7 +25,16 @@
 		// @ts-ignore
 		key.set(index)
 		if (page == 'playlist') {
-			await list.startPlaylist(item.playlistId)
+			if (!$key){
+				console.log('key: ' + $key)
+				await list.startPlaylist(item.playlistId)
+			}else {
+
+				console.log('key: ' + $key)
+				await getSrc($list.mix[index]?.videoId)
+			}
+
+			// await list.initList(item.videoId, item.playlistId)
 		} else {
 			await list.initList(item.videoId, item.playlistId)
 		}

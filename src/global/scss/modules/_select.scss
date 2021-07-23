@@ -57,7 +57,7 @@ select {
 	appearance: none;
 	min-width: inherit;
 	background-color: inherit;
-	// border: transparentize(#000, 10%) solid 1px;
+	border: 1px rgba(170, 170, 170, 0.233) solid;
 	color: invert(#aaaa);
 	border-radius: inherit;
 	padding: 0.2rem 2rem 0.5rem 0.5rem;

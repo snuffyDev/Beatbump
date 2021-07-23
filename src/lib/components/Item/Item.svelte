@@ -172,9 +172,6 @@
 
 <style lang="scss">
 	.menu {
-		// position: absolute;
-		// right: 0.8rem;
-		// top: 50%;
 		position: relative;
 
 		padding-top: 0.125rem;
@@ -184,8 +181,6 @@
 		display: none;
 	}
 	.album {
-		// display: flex;
-		// flex-direction: row;
 		font-size: 0.9em;
 		font-weight: 300;
 		align-items: center;
@@ -207,26 +202,6 @@
 	p {
 		margin: 0.2em 0;
 	}
-	// .listItem {
-	// 	width: 100%;
-	// 	display: flex;
-	// 	padding: 0rem 1rem;
-	// 	align-items: center;
-	// 	cursor: pointer;
-	// 	margin: 0;
-	// 	.list-icon {
-	// 		display: inline;
-	// 	}
-	// 	.list-item-text {
-	// 		display: inline;
-	// 		margin-left: 0.5rem;
-	// 	}
-	// 	&:hover {
-	// 		background: #313338;
-	// 		transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.1s;
-	// 	}
-	// }
-
 	.container:not(.menu) {
 		display: flex;
 		flex: 1 1 auto;

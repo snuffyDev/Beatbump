@@ -4,7 +4,8 @@
 		const response = await data.json()
 		return {
 			props: {
-				carouselItems: await response
+				carouselItems: await response,
+				test: await response
 			},
 			maxage: 3600,
 			status: 200
@@ -14,9 +15,10 @@
 
 <script lang="ts">
 	export let carouselItems
+	export let test
 	import { currentTitle } from '$stores/stores'
 	import Carousel from '$components/Carousel/Carousel.svelte'
-	$: console.log(carouselItems)
+	$: console.log(carouselItems, test)
 </script>
 
 <svelte:head>

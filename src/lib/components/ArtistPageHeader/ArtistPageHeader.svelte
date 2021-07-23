@@ -3,7 +3,6 @@
 	import { onDestroy, onMount } from 'svelte'
 	import { theme } from '$lib/stores/stores'
 	export let headerContent
-	export let items = []
 	export let thumbnail = []
 	export let description
 	export let width
@@ -40,7 +39,7 @@
 		// window.requestAnimationFrame(handler);
 		// window.addEventListener("scroll", handler);
 		let wrapper = document.getElementById('wrapper')
-		// console.log(wrapper)
+
 		wrapper.addEventListener('scroll', handler, { passive: true })
 		return () => {
 			window.removeEventListener('scroll', handler, { passive: true })
@@ -85,40 +84,7 @@
 <!--  -->
 <style lang="scss">
 	// @import "../../../global/vars.css";
-	.artist-body {
-		padding: 0 1rem;
-	}
-	button {
-		flex-wrap: nowrap;
-		display: flex;
-		place-items: center;
-		color: #09090a !important;
-		font-weight: 500;
-		border: #09090a;
-		background: white !important;
-		margin-bottom: 0.8rem;
 
-		padding: 0.3rem;
-	}
-	.radio-button {
-		background: transparent !important;
-		border: white 0.1rem solid !important;
-		color: white !important;
-		svg > * {
-			fill: white;
-		}
-
-		&:active,
-		&:hover {
-			border: rgb(158, 158, 158) 0.1rem solid !important;
-			background: rgba(255, 255, 255, 0.027) !important;
-			box-shadow: 0 0 0.1em 0 inset black;
-			color: rgb(236, 236, 236) !important;
-		}
-	}
-	.btn-text {
-		margin-left: 0.25rem;
-	}
 	.artist-header {
 		display: block;
 		margin-bottom: 0.5rem;
@@ -207,9 +173,5 @@
 		@media screen and (max-width: 500px) {
 			padding: 0.8rem;
 		}
-	}
-	main {
-		margin: 0;
-		padding: 0;
 	}
 </style>

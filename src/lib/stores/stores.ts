@@ -12,6 +12,11 @@ type SearchStore = {
 	update: Writable<SearchContents>['update']
 }
 
+export const errorHandler = writable({
+	msg: undefined,
+	action: undefined
+})
+
 export const search: SearchStore = writable()
 
 export const isPagePlaying = writable('')

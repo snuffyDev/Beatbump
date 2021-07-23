@@ -126,7 +126,7 @@
 
 			player.src = utils.getSrc(mixList[autoId].videoId).then((url) => url)
 
-			// currentTitle.set($list.mix[autoId].title);
+			currentTitle.set($list.mix[autoId].title)
 			once = false
 		}
 		once = false
@@ -251,9 +251,14 @@
 									$list.mix,
 									$list.mix[autoId]
 								)
-								await getSrc(mixList[autoId]?.videoId)
-								key.set(autoId)
-								gettingNext = false
+								const src = await getSrc(mixList[autoId]?.videoId)
+								src.error ? getNext() : setNext()
+
+								function setNext() {
+									currentTitle.set($list.mix[autoId].title)
+									key.set(autoId)
+									gettingNext = false
+								}
 							}
 						}
 					}}>
@@ -304,7 +309,7 @@
 				</div>
 			{/if}
 			<div class="menu-container">
-				<Dropdown type="player">
+				<Dropdown isHidden type="player">
 					<div slot="content">
 						{#if hasList}
 							<div

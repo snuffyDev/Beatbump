@@ -9,13 +9,15 @@
 <script>
 	import { browser } from '$app/env'
 	import { onMount } from 'svelte'
-	import { filterAutoPlay, theme } from '$stores/stores'
+	import { errorHandler, filterAutoPlay, theme } from '$stores/stores'
 	import { iOS } from '$stores/stores'
 	import Nav from '$components/Nav/Nav.svelte'
 	import Sidebar from '$components/Sidebar/Sidebar.svelte'
 	import Player from '$components/Player/Player.svelte'
 	import Wrapper from '$components/Wrapper/Wrapper.svelte'
 	import { page } from '$app/stores'
+	import Alert from '$lib/components/Alert/Alert.svelte'
+	import { fly } from 'svelte/transition'
 	export let key
 	onMount(() => {
 		iOS.init()
@@ -36,9 +38,12 @@
 		return
 	})
 	let width
-
+	let shown
 	$: curTheme = $theme
 	let main
+	$: errorKey = $errorHandler
+	$: hasError = $errorHandler.msg !== undefined ? true : false
+	// $: console.log(hasError, errorKey)
 </script>
 
 <svelte:window bind:innerWidth={width} />
@@ -60,6 +65,11 @@
 				<slot />
 			</Wrapper>
 		</div>
+		{#if hasError}
+			<div class="alert-container">
+				<Alert message={$errorHandler.msg} color="red" />
+			</div>
+		{/if}
 		<footer
 			class="footer-container"
 			style={`background-color: var(--${$theme}-bottom)`}>
@@ -71,6 +81,15 @@
 <style lang="scss" global>
 	// @import '../global/01styles/main';
 	@import '../global/stylesheet.scss'; // @import "../global/vars.css";
+	.alert-container {
+		display: flex;
+		position: fixed;
+		/* width: 100%; */
+		bottom: 5rem;
+		left: 0;
+		right: 0;
+		justify-content: center;
+	}
 	.no-scroll {
 		overflow: hidden;
 		overflow-y: hidden;

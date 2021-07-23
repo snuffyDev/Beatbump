@@ -148,104 +148,104 @@
 				<slot item={row.data}>Missing template</slot>
 			</svelte-virtual-list-row>
 		{/each}
-	</svelte-virtual-list-contents>
-
-	{#if !hasData}
-		<div
-			style="padding:0em;"
-			use:vp
-			on:enterViewport={() => dispatch('endList')} />
-		{#if !isLoading}
-			<div class="loading-results">
-				<svg
-					role="img"
-					width="39.0714rem"
-					height="5.7143rem"
-					aria-labelledby="loading-aria"
-					viewBox="0 0 575 90"
-					preserveAspectRatio="none"
-					class="s-iYjv5-ishYhK"
-					><rect
-						x="2"
-						y="0"
-						width="100%"
-						height="100%"
-						clip-path="url(#clip-path)"
+		{#if !hasData}
+			<div
+				style="padding:1em;"
+				use:vp
+				on:enterViewport={() => dispatch('endList')} />
+			{#if isLoading}
+				<div class="loading-results">
+					<svg
+						role="img"
+						width="39.0714rem"
+						height="5.7143rem"
+						aria-labelledby="loading-aria"
+						viewBox="0 0 575 90"
+						preserveAspectRatio="none"
 						class="s-iYjv5-ishYhK"
-						style="fill: url(&quot;#fill&quot;);" /><defs class="s-iYjv5-ishYhK"
-						><clipPath id="clip-path" class="s-iYjv5-ishYhK"
-							><rect
-								x="0"
-								y="19"
-								rx="0"
-								ry="0"
-								width="56"
-								height="56"
-								class="s-iYjv5-ishYhK" /><rect
-								x="75"
-								y="43"
-								rx="0"
-								ry="0"
-								width="177"
-								height="9"
-								class="s-iYjv5-ishYhK" /><rect
-								x="75"
-								y="64"
-								rx="0"
-								ry="0"
-								width="94"
-								height="9"
-								class="s-iYjv5-ishYhK" /><rect
-								x="75"
-								y="21"
-								rx="0"
-								ry="0"
-								width="72"
-								height="9"
-								class="s-iYjv5-ishYhK" /></clipPath
-						><linearGradient id="fill" class="s-iYjv5-ishYhK"
-							><stop
-								offset="0.599964"
-								stop-color="#4f4f4f"
-								stop-opacity="1"
-								class="s-iYjv5-ishYhK"
-								><animate
-									attributeName="offset"
-									values="-2; -2; 1"
-									keyTimes="0; 0.25; 1"
-									dur="2s"
-									repeatCount="indefinite"
-									class="s-iYjv5-ishYhK" /></stop
-							><stop
-								offset="1.59996"
-								stop-color="#757575"
-								stop-opacity="1"
-								class="s-iYjv5-ishYhK"
-								><animate
-									attributeName="offset"
-									values="-1; -1; 2"
-									keyTimes="0; 0.25; 1"
-									dur="2s"
-									repeatCount="indefinite"
-									class="s-iYjv5-ishYhK" /></stop
-							><stop
-								offset="2.59996"
-								stop-color="#4f4f4f"
-								stop-opacity="1"
-								class="s-iYjv5-ishYhK"
-								><animate
-									attributeName="offset"
-									values="0; 0; 3"
-									keyTimes="0; 0.25; 1"
-									dur="2s"
-									repeatCount="indefinite"
-									class="s-iYjv5-ishYhK" /></stop
-							></linearGradient
-						></defs
-					></svg>
-			</div>
+						><rect
+							x="2"
+							y="0"
+							width="100%"
+							height="100%"
+							clip-path="url(#clip-path)"
+							class="s-iYjv5-ishYhK"
+							style="fill: url(&quot;#fill&quot;);" /><defs
+							class="s-iYjv5-ishYhK"
+							><clipPath id="clip-path" class="s-iYjv5-ishYhK"
+								><rect
+									x="0"
+									y="19"
+									rx="0"
+									ry="0"
+									width="56"
+									height="56"
+									class="s-iYjv5-ishYhK" /><rect
+									x="75"
+									y="43"
+									rx="0"
+									ry="0"
+									width="177"
+									height="9"
+									class="s-iYjv5-ishYhK" /><rect
+									x="75"
+									y="64"
+									rx="0"
+									ry="0"
+									width="94"
+									height="9"
+									class="s-iYjv5-ishYhK" /><rect
+									x="75"
+									y="21"
+									rx="0"
+									ry="0"
+									width="72"
+									height="9"
+									class="s-iYjv5-ishYhK" /></clipPath
+							><linearGradient id="fill" class="s-iYjv5-ishYhK"
+								><stop
+									offset="0.599964"
+									stop-color="#4f4f4f"
+									stop-opacity="1"
+									class="s-iYjv5-ishYhK"
+									><animate
+										attributeName="offset"
+										values="-2; -2; 1"
+										keyTimes="0; 0.25; 1"
+										dur="2s"
+										repeatCount="indefinite"
+										class="s-iYjv5-ishYhK" /></stop
+								><stop
+									offset="1.59996"
+									stop-color="#757575"
+									stop-opacity="1"
+									class="s-iYjv5-ishYhK"
+									><animate
+										attributeName="offset"
+										values="-1; -1; 2"
+										keyTimes="0; 0.25; 1"
+										dur="2s"
+										repeatCount="indefinite"
+										class="s-iYjv5-ishYhK" /></stop
+								><stop
+									offset="2.59996"
+									stop-color="#4f4f4f"
+									stop-opacity="1"
+									class="s-iYjv5-ishYhK"
+									><animate
+										attributeName="offset"
+										values="0; 0; 3"
+										keyTimes="0; 0.25; 1"
+										dur="2s"
+										repeatCount="indefinite"
+										class="s-iYjv5-ishYhK" /></stop
+								></linearGradient
+							></defs
+						></svg>
+				</div>
+			{/if}
 		{/if}
-	{/if}
+	</svelte-virtual-list-contents>
 </svelte-virtual-list-viewport>
 
 <style>
@@ -253,7 +253,7 @@
 		width: 100%;
 		padding: 0;
 		margin: 0;
-		height: auto;
+		height: 100%;
 		display: block;
 		position: relative;
 		padding-left: 0.8rem;

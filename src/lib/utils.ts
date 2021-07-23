@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { sort } from './endpoints/playerUtils'
-import { updateTrack } from './stores/stores'
+import { errorHandler, updateTrack } from './stores/stores'
 
 // Shuffle array possitions
 export function shuffle(array: any[]) {
@@ -23,12 +23,26 @@ export const getSrc = async (videoId?: string, playlistId?: string) => {
 		playlistId ? `?list=${playlistId}` : ''
 	}`
 
-	const res = await fetch(url).then((data) => {
-		return data.json()
-	})
-	const formats = sort(res)
+	const res = await fetch(url).then((data) => data.json())
+	const formats = await sort(res)
+	// console.log(formats)
+	return formats[0].url !== null ? setTrack(formats) : handleError()
+}
+function setTrack(formats) {
 	const parsedURL = formats[0].url
 	updateTrack.set(parsedURL)
+	return { body: parsedURL, error: false }
+}
+function handleError() {
+	console.log('error')
+	errorHandler.set({
+		msg: 'No audio stream found, skipping.',
+		action: 'getNextTrack'
+	})
+	return {
+		body: null,
+		error: true
+	}
 }
 // parse array object input for child
 

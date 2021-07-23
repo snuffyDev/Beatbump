@@ -94,20 +94,22 @@ hr {
 	margin-bottom: 0.1em;
 }
 .img {
+	max-width: 12rem;
+	max-height: 12rem;
+	min-width: 12rem;
 	position: relative;
 	aspect-ratio: 1/1;
 	height: auto;
 	width: 100%;
-	max-width: 18.8571rem;
-	border-radius: 2%;
-	// min-width: 100%;
-	max-height: 18.8571rem;
 	img {
 		box-shadow: 0 0 1.5rem 0.125rem rgb(0 0 0 / 37%);
 		/* max-width: inherit; */
 		/* max-height: inherit; */
 		max-width: inherit;
 		border-radius: 2%;
+		box-shadow: 0 0 1.5rem 0.125rem rgb(0 0 0 / 37%);
+
+		filter: drop-shadow(0.012rem 0.024rem 0.05rem black);
 
 		// min-width: inherit;
 		// min-height: inherit;
@@ -117,16 +119,6 @@ hr {
 		aspect-ratio: inherit;
 		height: auto;
 		width: 100%;
-	}
-	@media screen and (max-width: 896px) {
-		.img {
-			max-width: 12rem;
-			max-height: 12rem;
-			img {
-				max-width: inherit;
-				max-height: inherit;
-			}
-		}
 	}
 }
 .info-wrapper {
@@ -164,14 +156,14 @@ hr {
 	}
 	.info {
 		/* margin-right: auto; */
-		padding-left: 0.5rem;
-		padding-top: 0rem;
+		padding-left: 1.5rem;
+		// padding-top: .5rem;
 	}
 	.info-wrapper {
 		flex-direction: row;
 	}
 }
-@media screen and (min-width: 640px) and (max-width: 719px) {
+@media screen and (max-width: 719px) {
 	.info-wrapper {
 		flex-direction: column;
 	}
@@ -184,39 +176,6 @@ hr {
 		align-self: center;
 	}
 }
-@media screen and (max-width: 640px) {
-	.img {
-		margin-right: auto;
-		max-width: 10rem;
-		max-height: 10rem;
-		align-self: center;
-	}
-	.info {
-		/* margin-right: auto; */
-		margin-left: 0.5rem;
-		padding-left: 1rem;
-		// padding-top: 1rem;
-	}
-	.info-wrapper {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: nowrap;
-		flex: 1 1 auto;
-		/* margin-left: auto; */
-	}
-	.info-box {
-		display: flex;
-		flex-direction: column;
-		flex: none;
-	}
-}
-
-@media screen and (max-width: 525px) {
-	.hidden {
-		display: none;
-	}
-}
-
 li,
 .box {
 	align-content: center;
@@ -242,12 +201,11 @@ li,
 	object-fit: contain;
 	max-width: 18.2857rem;
 	max-height: 18.2857rem;
+	min-width: 18.2856rem;
 	img {
-		box-shadow: 0 0 1.5rem 0.125rem rgb(0 0 0 / 37%);
 		/* max-width: inherit; */
 		/* max-height: inherit; */
 		max-width: 18.2857rem;
-		filter: drop-shadow(0.012rem 0.024rem 0.05rem black);
 		max-height: 18.2857rem;
 		object-fit: cover;
 		aspect-ratio: inherit;

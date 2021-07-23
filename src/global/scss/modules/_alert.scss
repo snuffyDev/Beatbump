@@ -4,13 +4,13 @@
 .m-alert-danger {
 	position: relative;
 	display: block;
-	max-width: $max-width;
+	max-width: 29.375rem;
 	padding: $small-spacing $base-spacing;
-	// border: $base-border;
 	border-radius: 0.8rem;
-	margin: 1em 1em 0em 1em;
-	color: white;
-	background-color: transparentize(#5c0805, 0.6);
+	width: calc(100% - 2rem);
+	margin: 1em 1em 0 1em;
+	color: #fff;
+	background-color: #b32f2a;
 }
 
 .m-alert-success {
