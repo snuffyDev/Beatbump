@@ -101,7 +101,7 @@ export async function get({ query, headers }) {
 				}
 			}
 		)
-
+		//
 		return {
 			status: 200,
 			body: JSON.stringify(q)
