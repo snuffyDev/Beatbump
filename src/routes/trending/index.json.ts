@@ -1,30 +1,14 @@
-import { pb } from '$lib/utils'
+import BaseContext from '$lib/context'
+import {
+	MoodsAndGenresItem,
+	MusicResponsiveListItemRenderer,
+	MusicTwoRowItemRenderer
+} from '$lib/parsers'
+import type { CarouselItem } from '$lib/types'
 import type { EndpointOutput } from '@sveltejs/kit'
-type result = {
-	title: string
-	artist?: string
-	endpoint?: { browseId: string; pageType: string }
-	videoId: string
-	playlistId: string
-	params?: string
-	thumbnails: []
-	subtitle?: {}[]
-	aspectRatio?: string
-}
-type moodsAndGenres = {
-	text: string
-	color: string
-	endpoint: {
-		browseId: string
-		params: string
-	}
-}
-type header = {
-	title: string
-	browseId: string
-}
+
 export async function get({ query }): Promise<EndpointOutput> {
-	console.time('timer')
+	// console.time('timer')
 	const endpoint = query.get('q') || ''
 	const browseId = 'FEmusic_explore'
 	let carouselItems = []
@@ -34,17 +18,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 			{
 				method: 'POST',
 				body: JSON.stringify({
-					context: {
-						client: {
-							clientName: 'WEB_REMIX',
-							clientVersion: '0.1'
-						},
-
-						user: {
-							enableSafetyMode: false
-						},
-						utcOffsetMinutes: -new Date().getTimezoneOffset()
-					},
+					...BaseContext,
 
 					browseId: `${browseId}`
 				}),
@@ -62,7 +36,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 			return { status: response.status, body: response.statusText }
 		}
 		// const data = await response.json();
-		let {
+		const {
 			contents: {
 				singleColumnBrowseResultsRenderer: {
 					tabs: [
@@ -84,15 +58,12 @@ export async function get({ query }): Promise<EndpointOutput> {
 			})
 		)
 
-		console.timeEnd('timer')
 		return {
-			body: carouselItems.map(({ musicCarouselShelfRenderer }) => {
-				const { header, contents } = musicCarouselShelfRenderer
-				// console.log(header)
-
+			body: await carouselItems.map(({ musicCarouselShelfRenderer }) => {
+				// console.timeEnd('timer')
 				return {
-					header: parseHeader([header])[0],
-					results: parseBody(contents)
+					header: parseHeader([musicCarouselShelfRenderer.header])[0],
+					results: parseBody(musicCarouselShelfRenderer.contents)
 				}
 			}),
 			status: 200
@@ -114,88 +85,19 @@ function parseHeader(header: any[]) {
 	}))
 }
 
-function parseBody(contents) {
+function parseBody(contents): CarouselItem[] {
 	return [
-		...contents.map((r: []) => {
-			const type = Object.getOwnPropertyNames(r).toString()
-			let result: result | moodsAndGenres
-			// console.log(type)
-			switch (type) {
-				case 'musicTwoRowItemRenderer':
-					result = {
-						title: r.musicTwoRowItemRenderer.title.runs[0].text,
-						thumbnails:
-							r.musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer
-								.thumbnail.thumbnails,
-						aspectRatio: r.musicTwoRowItemRenderer.aspectRatio,
-						videoId:
-							r.musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint
-								?.videoId,
-						playlistId:
-							r.musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint
-								?.playlistId,
-						endpoint: {
-							browseId:
-								r.musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint
-									?.browseId,
-							pageType:
-								r.musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint
-									?.browseEndpointContextSupportedConfigs
-									?.browseEndpointContextMusicConfig?.pageType
-						},
-
-						subtitle: [...r.musicTwoRowItemRenderer.subtitle.runs]
-					}
-
-					break
-				case 'musicResponsiveListItemRenderer':
-					result = {
-						subtitle: [
-							...r.musicResponsiveListItemRenderer.flexColumns[1]
-								.musicResponsiveListItemFlexColumnRenderer.text.runs
-						],
-						title:
-							r.musicResponsiveListItemRenderer.flexColumns[0]
-								.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text,
-						videoId:
-							r.musicResponsiveListItemRenderer.flexColumns[0]
-								.musicResponsiveListItemFlexColumnRenderer.text.runs[0]
-								.navigationEndpoint.watchEndpoint.videoId,
-						playlistId:
-							r.musicResponsiveListItemRenderer.menu.menuRenderer.items[0]
-								.menuNavigationItemRenderer.navigationEndpoint.watchEndpoint
-								.playlistId,
-						thumbnails:
-							r.musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer
-								.thumbnail.thumbnails
-					}
-					// console.log(result, 'musicResponse')
-					break
-				case 'musicNavigationButtonRenderer':
-					// console.log('nav')
-					result = {
-						text: r.musicNavigationButtonRenderer?.buttonText.runs[0].text,
-						color: (
-							'00000000' +
-							(
-								r.musicNavigationButtonRenderer?.solid.leftStripeColor &
-								0xffffff
-							).toString(16)
-						).slice(-6),
-						endpoint: {
-							params:
-								r.musicNavigationButtonRenderer?.clickCommand.browseEndpoint
-									.params,
-							browseId:
-								r.musicNavigationButtonRenderer?.clickCommand.browseEndpoint
-									.browseId
-						}
-					}
-					break
-				default:
-					break
+		...contents.map(({ ...r }) => {
+			if (r.musicTwoRowItemRenderer) {
+				return MusicTwoRowItemRenderer(r)
 			}
-			return result
+			if (r.musicResponsiveListItemRenderer) {
+				return MusicResponsiveListItemRenderer(r)
+			}
+			if (r.musicNavigationButtonRenderer) {
+				return MoodsAndGenresItem(r)
+			}
+			throw new Error("Unable to parse items, can't find " + `${r}`)
 		})
 	]
 }

@@ -31,14 +31,13 @@ export const sort = (data) => {
 		if (arr.length !== 0) {
 			return arr.map((format) => {
 				return {
-					url: format.url,
+					url: format.url
 				}
 			})
 		}
 
 		return [{ url: null }]
 		// return null
-
 	} catch (e) {
 		console.log('Fetch error', e)
 

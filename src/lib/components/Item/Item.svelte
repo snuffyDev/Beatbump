@@ -14,21 +14,16 @@
 	import lazy from '$lib/lazy'
 	import longpress from '$lib/actions/longpress'
 
-	let ctoken = ''
 	let videoId = ''
 	let playlistId = ''
-	let songTitle
+	let songTitle = ''
 	$: title = songTitle = '...'
-
-	let thumbnail
 	let isHidden: Boolean = false
 	let explicit
 	let clicked
 	let artist
 	let hidden = clicked ? true : false
 	let loading = false
-	let id = $key
-	$: mixList = $list.mix
 
 	let DropdownItems = [
 		{
@@ -97,8 +92,6 @@
 		}
 	}
 	$: if (data) itemHandler()
-	// console.log(type)
-
 	const clickHandler = async () => {
 		try {
 			loading = true
@@ -119,9 +112,6 @@
 			return
 		}
 	}
-
-	let showing
-	$: toggle = showing ? true : false
 </script>
 
 <div class="container" class:hidden>
@@ -133,9 +123,11 @@
 					clickHandler()
 				}
 			}}>
-			<div class="img-container" on:longpress|capture={() => {
-				alert('longpress!')
-			}}>
+			<div
+				class="img-container"
+				on:longpress|capture={() => {
+					alert('longpress!')
+				}}>
 				{#if loading}
 					<Loading size="3em" />
 				{/if}
@@ -143,7 +135,6 @@
 					<!-- svelte-ignore a11y-missing-attribute -->
 					<img
 						use:longpress
-
 						id="img"
 						referrerpolicy="origin-when-cross-origin"
 						loading="lazy"
@@ -197,12 +188,10 @@
 		display: flex;
 		width: 100%;
 		margin: 0;
-		/* margin-bottom: auto; */
 		padding: 0.3rem;
 		flex-direction: row;
 		flex-wrap: nowrap;
 		align-items: center;
-		// isolation:isolate;
 	}
 	p {
 		margin: 0.2em 0;
@@ -210,14 +199,8 @@
 	.container:not(.menu) {
 		display: flex;
 		flex: 1 1 auto;
-		// margin-top: 0.125rem;
-		// margin-bottom: 0.125rem;
-		// pointer-events: bounding-box;
-		// isolation: isolate;
 		border-bottom: 0.0714rem solid hsla(0, 0%, 66.7%, 0.24);
 		width: 100%;
-		/* height: 6rem; */
-		/* margin: 0; */
 		flex-direction: row;
 		flex-wrap: nowrap;
 
@@ -261,14 +244,12 @@
 		display: block;
 		content: '';
 		padding-top: calc(100% * 2 / 3);
-		/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
 	}
 	.innercard {
 		display: flex;
 		width: 100%;
 		flex-direction: row;
 		align-items: center;
-		/* padding: 0.3rem 0.3rem; */
 		flex-wrap: nowrap;
 		padding: 0.4rem 0rem;
 		@media screen and (min-width: 640px) {
@@ -283,12 +264,6 @@
 		line-height: 1.3125;
 	}
 	.img-container {
-		// position: relative;
-		/* width: 100%; */
-
-		/* height: clamp(10rem,12.5rem,15rem); */
-		/* min-width: 100%; */
-		// box-shadow: 0 0 1rem 0.5rem rgb(0 0 0 / 36%);
 		position: relative;
 		display: block;
 		width: auto;
@@ -302,12 +277,6 @@
 			height: 100%;
 			background: rgba(13, 13, 15, 0.192);
 			img {
-				// height: inherit;
-				// -o-object-fit: scale-down;
-				// object-fit: scale-down;
-				// // max-height: 12rem;
-				// width: 100%;
-				// max-width: 18rem;
 				width: 100%;
 				height: 100%;
 				object-fit: scale-down;

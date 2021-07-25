@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64" height="64">
-	<defs>
-		<path d="M0 0h64v64H0V0z" id="prefix__a" />
-	</defs>
-	<use xlink:href="#prefix__a" opacity=".25" fill="#222" />
-</svg>

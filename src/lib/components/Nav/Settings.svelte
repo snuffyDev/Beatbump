@@ -46,7 +46,6 @@
 					}}>
 					{#each themes as theme}
 						<option
-
 							value={theme.name}
 							style={`background-color: var(--${setTheme}-forms); color: inherit;`}
 							selected={setTheme}>{theme.name}</option>

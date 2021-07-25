@@ -62,24 +62,36 @@
 	})
 	async function paginate() {
 		if (isLoading || hasData) return
-		isLoading = true
-		const response = await fetch(
-			`/api/search.json?q=` +
-				`&filter=` +
-				filter +
-				`&params=${itct}${continuation.continuation ? `&ctoken=${ctoken}` : ''}`
-		)
-		const newPage = await response.json()
-		const res = await newPage
+		try {
+			isLoading = true
+			const response = await fetch(
+				`/api/search.json?q=` +
+					`&filter=` +
+					filter +
+					`&params=${itct}${
+						continuation.continuation ? `&ctoken=${ctoken}` : ''
+					}`
+			)
+			const newPage = await response.json()
+			const res = await newPage
 
-		if (newPage?.error) {
-			error = newPage?.error
+			if (newPage?.error) {
+				error = newPage?.error
+			}
+			if (res.continuation.continuation) {
+				ctoken = res.continuation.continuation
+				itct = res.continuation.clickTrackingParams
+				search.update((u) => [...u, ...res.contents])
+				isLoading = false
+				hasData = newPage.length === 0
+				return hasData
+			}
+			return !isLoading
+		} catch (error) {
+			hasData = null
+			isLoading = false
+			throw new Error(error + ' Unable to get more!')
 		}
-		ctoken = res.continuation.continuation
-		itct = res.continuation.clickTrackingParams
-		search.update((u) => [...u, ...res.contents])
-		isLoading = false
-		hasData = newPage.length === 0
 	}
 	$: items = $search
 </script>

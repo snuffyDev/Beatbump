@@ -1,5 +1,5 @@
 import type { PlaylistSearch } from './types/playlist'
-export type Item =  Song | PlaylistSearch
+export type Item = Song | PlaylistSearch
 export interface Album {
 	browseId: string
 	title: string
@@ -74,7 +74,8 @@ export interface SearchResult {
 export interface CarouselItem {
 	title: string
 	artist?: string
-	endpoint?: string
+	endpoint?: string | { browseId: string; pageType: string }
+	aspectRatio?: string
 	videoId: string
 	playlistId: string
 	params?: string

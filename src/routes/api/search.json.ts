@@ -74,7 +74,7 @@ export async function get({ query }): Promise<SearchOutput> {
 								contents: [
 									{
 										didYouMeanRenderer
-										messageRenderer?
+										messageRenderer?: {text: {runs: [{text:string}]}}
 										musicShelfRenderer?
 										musicShelfContinuation?
 									}

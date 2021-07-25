@@ -1,15 +1,14 @@
-import { writable } from 'svelte/store';
+import { writable } from 'svelte/store'
 
 let items = []
-let loading = false;
-let hasData = false;
+let loading = false
+let hasData = false
 
 const searchList = writable({
 	items,
 	loading,
 	hasData
 })
-
 
 export default {
 	subscribe: searchList.subscribe,

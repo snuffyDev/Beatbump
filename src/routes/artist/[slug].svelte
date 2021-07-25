@@ -20,7 +20,8 @@
 				description,
 				thumbnail,
 				headerContent,
-				items
+				items,
+				data
 			},
 			status: 200
 		}
@@ -35,33 +36,25 @@
 
 	import Icon from '$components/Icon/Icon.svelte'
 	import ListItem from '$components/ListItem/ListItem.svelte'
+	import { isPagePlaying } from '$lib/stores/stores'
+	import list from '$lib/stores/list'
 
 	export let headerContent
 	export let description
 	export let thumbnail
 	export let carouselItems
 	export let items
-
-	// export let header
-	// export let content
-	let id = $page.query.get('id')
+	export let data
 	let width
 
-	let newData: []
-	$: console.log(carouselItems, description, thumbnail, headerContent)
-
-	// parse(header, content)
-	// let section = []
-	// if (width < 501) {
-	// 	description = headerContent.description.split('.')
-	// 	// console.log(description)
-	// }
-	// $: console.log(
-	// 	header?.musicImmersiveHeaderRenderer,
-	// 	parse(header?.musicImmersiveHeaderRenderer, contents),
-	// 	newData
-	// )
-	// console.log(newData, headerContent, items)
+	$: console.log(
+		data,
+		carouselItems,
+		items,
+		description,
+		thumbnail,
+		headerContent
+	)
 </script>
 
 <svelte:head>
@@ -76,16 +69,24 @@
 	<main>
 		<ArtistPageHeader {description} {headerContent} {width} {thumbnail} />
 		<div class="artist-body">
-			<button class="radio-button"
-				><Icon size="1.5rem" name="radio" /><span class="btn-text">
+			<button
+				class="radio-button"
+				on:click={list.startPlaylist(headerContent.mixInfo.playlistId)}
+				><Icon size="1.25em" name="radio" /><span class="btn-text">
 					Play Radio</span
 				></button>
-			{#if items !== undefined}
+			{#if items.length > 0}
 				<section>
 					<h4 class="grid-title">Songs</h4>
 					<section class="songs">
 						{#each items as item, index}
-							<ListItem {item} {index} />
+							<ListItem
+								{item}
+								{index}
+								page="artist"
+								on:pagePlaying={() => {
+									isPagePlaying.set($page.path + $page.params)
+								}} />
 						{/each}
 					</section>
 				</section>
@@ -116,13 +117,6 @@
 {/await}
 
 <style lang="scss">
-	.row {
-		display: grid;
-		/* flex-direction: row; */
-		/* flex: 1 0 auto; */
-		place-items: center;
-		grid-template-rows: repeat(auto-fill, minmax(50px, 1fr));
-	}
 	.content-wrapper {
 		display: flex;
 		max-width: inherit;
@@ -130,68 +124,7 @@
 		width: auto;
 		max-width: 9rem;
 	}
-	.grid-title {
-		font-weight: 600;
-		font-size: 1.75rem;
-		padding: 0 0em 0 0.75rem;
-		margin: 1.5rem 0;
-	}
-	.grid-item {
-		/* display: flex; */
-		/* flex-direction: column; */
-		/* flex-wrap: nowrap; */
-		transition: all 50ms cubic-bezier(0.16, 0.73, 0.85, 0.49);
-		position: relative;
-		padding: 1rem 0.8rem 0.8rem 0.8rem;
-		margin: 0;
-		&:before {
-			content: '';
-			position: absolute;
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
-			width: auto;
-			border-radius: 0.8rem;
-			background: rgb(255 255 255 / 1%);
-		}
-		&:before:hover {
-			background: rgba(170, 170, 170, 0.041);
-		}
-		.thumbnail-wrapper {
-			cursor: pointer;
-			width: 100%;
-			height: auto;
-			max-width: 9rem;
-			max-height: 9rem;
-			aspect-ratio: 1/1;
-			position: relative;
 
-			justify-self: center;
-		}
-		&:hover {
-			background: rgba(170, 170, 170, 0.041);
-			.thumbnail-wrapper {
-				box-shadow: 0em 0em 1em 0.1em #bbbbbb0a;
-
-				// outline: #1f1c3173 solid 0.0125rem;
-			}
-		}
-		.thumbnail {
-			width: auto;
-			height: auto;
-			-o-object-fit: scale-down;
-			object-fit: scale-down;
-			max-height: inherit;
-			max-width: inherit;
-			aspect-ratio: inherit;
-			// position: absolute;
-			// bottom: 0;
-			// top: 0;
-			// right: 0;
-			// left: 0;
-		}
-	}
 	.item-title {
 		font-size: 1rem;
 		cursor: pointer;
@@ -212,14 +145,15 @@
 		margin-bottom: 1rem;
 	}
 	.artist-body {
-		padding: 0 2rem;
+		padding: 2rem;
+		padding-bottom: 2rem;
 		@media screen and (max-width: 500px) {
 			padding: 0 1rem;
 		}
 	}
 	button {
 		flex-wrap: nowrap;
-		display: flex;
+		display: inline-flex;
 		place-items: center;
 		color: #09090a !important;
 		font-weight: 500;
@@ -227,7 +161,7 @@
 		background: white !important;
 		margin-bottom: 0.8rem;
 
-		padding: 0.3rem;
+		padding: 0.3em;
 	}
 	.radio-button {
 		margin-left: 0.5rem;

@@ -14,9 +14,9 @@
 </script>
 
 <div class="header">
-	<h3>
+	<h1>
 		{setTitle}
-	</h3>
+	</h1>
 </div>
 <div class="section">
 	<div class="scroll" id="scrollItem" bind:this={carousel}>
@@ -40,47 +40,12 @@
 					bind:section />
 			{:else if type == 'new'}
 				<!-- content here -->
-				<section
-					class="item"
-					on:click={() => {
-						console.log()
-						let id = item.endpoint.browseId
-						let type = item.endpoint.pageType
-						window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-						goto(
-							'/release?type=' +
-								encodeURIComponent(type) +
-								'&id=' +
-								encodeURIComponent(id)
-						)
-					}}>
-					<!-- svelte-ignore a11y-missing-attribute -->
-					<div class="img">
-						<div class="container">
-							<img
-								alt="thumbnail"
-								referrerpolicy="origin-when-cross-origin"
-								transition:fade|local
-								width="256"
-								height="256"
-								type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-								src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PGRlZnM+PHBhdGggZD0iTTAgMGg1MTJ2NTEySDBWMHoiIGlkPSJwcmVmaXhfX2EiLz48L2RlZnM+PHVzZSB4bGluazpocmVmPSIjcHJlZml4X19hIiBvcGFjaXR5PSIuMjUiIGZpbGw9IiMyMjIiLz48L3N2Zz4="
-								use:lazy={{
-									src: item.thumbnails[0].url
-								}} />
-						</div>
-					</div>
-					<div class="cont">
-						<h6 class="title">
-							{item.title}
-						</h6>
-						<span class="details">
-							{#each item.subtitle as sub}
-								<span>{sub.text}</span>
-							{/each}
-						</span>
-					</div>
-				</section>
+				<CarouselItem
+					type="new"
+					aspectRatio={item.aspectRatio}
+					{item}
+					index={i}
+					bind:section />
 			{/if}
 		{/each}
 		<!-- {/each} -->
@@ -110,17 +75,21 @@
 		-webkit-overflow-scrolling: touch;
 		position: relative;
 
+		margin-bottom: 1.5rem;
+
 		border-radius: 0.5em;
 		/* width: 100%; */
 		/* max-width: 100%; */
 		/* overflow: scroll;*/
 	}
 	.header {
-		padding: 0.5em;
-	}
-	.scroll {
-		margin-bottom: 2.5rem;
+		padding: 0.4em 0.4em 0.2em;
+		margin-bottom: 0.4em;
 
+		letter-spacing: -0.01em;
+	}
+
+	.scroll {
 		background: linear-gradient(
 			180deg,
 			rgb(18 15 24 / 8%) 1%,
@@ -218,6 +187,8 @@
 				position: absolute;
 				top: 0;
 				right: 0;
+				border-radius: var(--sm-radius);
+
 				bottom: 0;
 				left: 0;
 			}

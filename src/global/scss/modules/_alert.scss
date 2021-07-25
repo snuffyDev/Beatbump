@@ -4,7 +4,7 @@
 .m-alert-danger {
 	position: relative;
 	display: block;
-	max-width: 29.375rem;
+	max-width: $max-width;
 	padding: $small-spacing $base-spacing;
 	border-radius: 0.8rem;
 	width: calc(100% - 2rem);

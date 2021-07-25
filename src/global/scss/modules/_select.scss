@@ -56,6 +56,12 @@ select {
 		// margin-inline: 0.2rem;
 		// margin-block-start: 0.125rem;
 	}
+	@media screen and (min-width: 620px) and (max-width: 1440px) {
+		font-size: 14px;
+	}
+	@media screen and (min-width: 1441px) {
+		font-size: 16px;
+	}
 	outline: none;
 	&:active,
 	&:focus-within {

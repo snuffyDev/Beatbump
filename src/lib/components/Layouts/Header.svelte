@@ -1,7 +1,6 @@
 <script>
 	import { page } from '$app/stores'
 	import { currentTitle } from '$lib/stores/stores'
-
 </script>
 
 <svelte:head>

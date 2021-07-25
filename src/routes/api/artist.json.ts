@@ -1,3 +1,4 @@
+import BaseContext from '$lib/context'
 import { parseArtistPage } from '$lib/js/artistUtils'
 
 export async function get({ query }) {
@@ -11,53 +12,7 @@ export async function get({ query }) {
 			{
 				method: 'POST',
 				body: JSON.stringify({
-					context: {
-						client: {
-							clientName: 'WEB_REMIX',
-							clientVersion: '0.1',
-							deviceMake: 'google',
-							platform: 'DESKTOP',
-							deviceModel: 'bot',
-							experimentIds: [],
-							experimentsToken: '',
-							osName: 'Googlebot',
-							osVersion: '2.1',
-							locationInfo: {
-								locationPermissionAuthorizationStatus:
-									'LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED'
-							},
-							musicAppInfo: {
-								musicActivityMasterSwitch:
-									'MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE',
-								musicLocationMasterSwitch:
-									'MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE',
-								pwaInstallabilityStatus: 'PWA_INSTALLABILITY_STATUS_UNKNOWN'
-							},
-							utcOffsetMinutes: -new Date().getTimezoneOffset()
-						},
-						capabilities: {},
-						request: {
-							internalExperimentFlags: [
-								{
-									key: 'force_music_enable_outertube_tastebuilder_browse',
-									value: 'true'
-								},
-								{
-									key: 'force_music_enable_outertube_playlist_detail_browse',
-									value: 'true'
-								},
-								{
-									key: 'force_music_enable_outertube_search_suggestions',
-									value: 'true'
-								}
-							],
-							sessionIndex: {}
-						},
-						user: {
-							enableSafetyMode: false
-						},
-						activePlayers: {}
-					},
+					...BaseContext,
 					browseEndpointContextMusicConfig: {
 						browseEndpointContextMusicConfig: {
 							pageType: 'MUSIC_PAGE_TYPE_ARTIST'
@@ -87,13 +42,13 @@ export async function get({ query }) {
 					tabs: [
 						{
 							tabRenderer: {
-								content: { sectionListRenderer }
-							}
-						}
-					]
-				}
-			}
-		} = await data
+								content: { sectionListRenderer: { contents = [] } = {} } = {}
+							} = {}
+						} = {}
+					] = []
+				} = {}
+			} = {}
+		} = data
 
 		const carouselItems = []
 		const thumbnail = []
@@ -101,12 +56,9 @@ export async function get({ query }) {
 		let items = []
 		// console.log(contents)
 		let headerContent = []
-		const parse = async (header, sectionListRenderer) => {
+		const parse = async (header, contents) => {
 			const newData = await [
-				parseArtistPage(
-					header?.musicImmersiveHeaderRenderer,
-					sectionListRenderer?.contents
-				)
+				parseArtistPage(header?.musicImmersiveHeaderRenderer, contents)
 			]
 			// console.log(newData)
 
@@ -114,9 +66,11 @@ export async function get({ query }) {
 				// console.log(d)
 				carouselItems.push([...d.carouselItems])
 				headerContent.push(d[0])
-				d[0].thumbnails.forEach((h) => {
-					thumbnail.push(h)
-				})
+				if (d[0]) {
+					d[0].thumbnails?.forEach((h) => {
+						thumbnail.push(h)
+					})
+				}
 				if (d?.songs) {
 					items = [...d.songs]
 				} else {
@@ -128,7 +82,7 @@ export async function get({ query }) {
 				return { headerContent, items }
 			})
 		}
-		const body = await parse(header, sectionListRenderer)
+		const body = await parse(header, contents)
 		// console.log(data)
 		if (carouselItems.length >= 0) {
 			return {
@@ -144,6 +98,7 @@ export async function get({ query }) {
 			}
 		}
 	} catch (err) {
-		return { error: err }
+		console.log(err)
+		throw new Error(err)
 	}
 }

@@ -11,6 +11,7 @@
 	import { updateTrack, key, currentTitle, playerLoading } from '$stores/stores'
 	import { cubicOut } from 'svelte/easing'
 	import list from '$lib/stores/list'
+	import { tick } from 'svelte'
 	export let curTheme
 	const player: HTMLAudioElement = new Audio()
 	player.autoplay = true
@@ -29,26 +30,20 @@
 	let remainingTime = 55
 
 	$: volume = 0.5
-	let volumeHover = false
+	let volumeHover
 	$: hideEvent = false
 	$: isPlaying = false
 	let seeking = false
 	let once = false
 	let songBar
 
-	let menuShow = false
 	let showing
 	$: loading = $playerLoading
-	$: toggle = menuShow ? true : false
 	$: listShow = showing ? true : false
-	$: hasList = $list.mix.length > 1
 	$: mixList = $list.mix
 
-	let isHidden = false
+	$: isHidden = false
 	let DropdownItems: Array<any>
-	// log any and all updates to the list for testing
-	// $: console.log($list.mix)
-	// $: console.log(mixList, $list.mix[autoId]?.videoId);
 
 	player.addEventListener('loadedmetadata', () => {
 		title = $list.mix[0].title
@@ -109,6 +104,7 @@
 	})
 	const getNext = async () => {
 		if (autoId == $list.mix.length - 1) {
+			await tick()
 			list.getMore(
 				autoId,
 				$list.mix[autoId].itct,
@@ -125,7 +121,7 @@
 		} else {
 			autoId++
 			key.set(autoId)
-
+			await tick()
 			await getSrc(mixList[autoId].videoId)
 
 			currentTitle.set($list.mix[autoId].title)
@@ -159,6 +155,8 @@
 	}
 
 	let width
+
+	$: console.log($list.mix)
 </script>
 
 <svelte:window
@@ -167,8 +165,9 @@
 	on:mousemove={trackMouse} />
 
 <Queue
-	on:updated={(event) => {
+	on:updated={async (event) => {
 		autoId = event.detail.id - 1
+		await tick()
 		getNext()
 		// console.log(autoId);
 	}}
@@ -309,15 +308,34 @@
 						</div>
 					{/if}
 				</div>
+				<div class="menu-container">
+					<Dropdown
+						bind:isHidden
+						on:click_outside={() => {
+							isHidden = !isHidden
+						}}
+						type="player"
+						items={DropdownItems} />
+				</div>
 			{/if}
-			<div class="menu-container">
-				<Dropdown bind:isHidden type="player" items={DropdownItems} />
+			<div class:hidden={width > 500} class="menu-container">
+				<Dropdown
+					on:click_outside={() => {
+						isHidden = !isHidden
+					}}
+					bind:isHidden
+					type="player"
+					items={DropdownItems} />
 			</div>
 		</div>
 	</div>
 </div>
 
 <style lang="scss">
+	.hidden {
+		display: none !important;
+		visibility: hidden !important;
+	}
 	.player-spinner {
 		display: inline-flex;
 		align-items: center;
@@ -360,40 +378,45 @@
 		background-color: inherit;
 	}
 	.volume-wrapper {
-		background: inherit;
 		background: var(--dark-bottom);
 		display: block;
 		position: absolute;
 		bottom: 7.9rem;
 		transform: rotate(-90deg);
-		padding: 0 0rem;
+		padding: 0;
 	}
 	.volume-icon {
 		cursor: pointer;
 	}
 
 	.menu-container {
-		position: relative;
-
-		@media (min-width: 37.1429rem) {
-			right: 5%;
-			/* bottom: 50%; */
-			padding: 0;
-			/* top: 50%; */
-			/* overflow: hidden; */
-			position: absolute;
+		right: 5%;
+		/* bottom: 50%; */
+		padding: 0;
+		/* top: 50%; */
+		/* overflow: hidden; */
+		position: absolute;
+		@media (max-width: 512px) {
+			position: relative !important;
 		}
 	}
-	.player-right {
-		display: flex;
-		flex-wrap: nowrap;
-		align-items: center;
-	}
-	.player-left {
-		width: auto;
-		display: flex;
 
-		max-width: 100%;
+	.player-left,
+	.player-right {
+		-webkit-text-size-adjust: 100%;
+		align-self: center;
+		cursor: pointer;
+		display: inline-block;
+		height: auto;
+		max-height: 44pt;
+		max-width: 44pt;
+		margin: 10pt;
+		width: auto;
+		width: 100%;
+		width: 100%;
+		align-items: center;
+		display: flex;
+		justify-content: center;
 	}
 	.f-container {
 		position: absolute;

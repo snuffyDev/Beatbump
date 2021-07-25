@@ -17,7 +17,6 @@
 	import Wrapper from '$components/Wrapper/Wrapper.svelte'
 	import { page } from '$app/stores'
 	import Alert from '$lib/components/Alert/Alert.svelte'
-	import { fly } from 'svelte/transition'
 	export let key
 	onMount(() => {
 		iOS.init()
@@ -41,7 +40,6 @@
 	let shown
 	$: curTheme = $theme
 	let main
-	$: errorKey = $errorHandler
 	$: hasError = $errorHandler.msg !== undefined ? true : false
 	// $: console.log(hasError, errorKey)
 </script>

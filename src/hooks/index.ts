@@ -3,14 +3,15 @@ const rootDomain = import.meta.env.VITE_DOMAIN // or your server IP for dev
 const directives = {
 	'base-uri': ["'self'"],
 	'child-src': ["'self'"],
-	'connect-src': ["'self'", 'ws://localhost:*'],
-	// 'connect-src': ["'self'", 'ws://localhost:*', 'ws://*', '*'],
+	// 'connect-src': ["'self'", 'ws://localhost:*'],
+	'connect-src': ["'self'", 'ws://localhost:*', 'ws://*', '*'],
 	'img-src': [
 		"'self'",
 		'data:',
 		'https://*.ytimg.com',
 		'https://*.googleusercontent.com',
-		'https://*.ggpht.com'
+		'https://*.ggpht.com',
+		'https://www.gstatic.com/'
 	],
 	'font-src': ["'self'", 'data:'],
 	'form-action': ["'self'"],

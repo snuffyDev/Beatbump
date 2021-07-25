@@ -16,14 +16,15 @@
 	setContext('menu', { update: isHidden })
 </script>
 
-<div class="menu">
+<div
+	class="menu"
+	use:clickOutside
+	on:click_outside={() => {
+		isHidden = false
+	}}>
 	{#if isHidden}
 		<div
 			on:mouseleave={() => {
-				isHidden = !isHidden
-			}}
-			use:clickOutside
-			on:click_outside={() => {
 				isHidden = !isHidden
 			}}
 			transition:slide={{ duration: 125, easing: quartInOut }}

@@ -30,12 +30,20 @@ export function parseContents(
 				menu.forEach((l) => {
 					let [navigationEndpoint] = temp
 
-					if (Object.prototype.hasOwnProperty.call(l, 'menuNavigationItemRenderer')) {
+					if (
+						Object.prototype.hasOwnProperty.call(
+							l,
+							'menuNavigationItemRenderer'
+						)
+					) {
 						temp.push(l.menuNavigationItemRenderer)
 					}
 					if (
 						temp.length !== 0 &&
-						Object.prototype.hasOwnProperty.call(navigationEndpoint, 'browseEndpoint')
+						Object.prototype.hasOwnProperty.call(
+							navigationEndpoint,
+							'browseEndpoint'
+						)
 					) {
 						menu.push(navigationEndpoint.browseEndpoint)
 					}
@@ -52,6 +60,9 @@ export function parseContents(
 						browseId: browseId
 					},
 					videoId: metaPath.videoId,
+					hash:
+						Math.random().toString(36).substring(2, 15) +
+						Math.random().toString(36).substring(2, 15),
 					autoMixList: mix,
 					thumbnail: item.thumbnail.thumbnails[0].url,
 					length: item.lengthText.runs[0].text
@@ -65,7 +76,7 @@ export function parseContents(
 		}
 	} else {
 		return {
-			error: new Error("error in parsing data")
+			error: new Error('error in parsing data')
 		}
 	}
 }

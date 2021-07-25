@@ -46,7 +46,7 @@
 
 	<div class="breakout">
 		<div class="box-cont">
-			<h3>{carouselItems[1].header.title}</h3>
+			<h2>{carouselItems[1].header.title}</h2>
 			<div class="m-alert-info"><em>Coming Soon!</em></div>
 			<box>
 				{#each carouselItems[1].results as item}

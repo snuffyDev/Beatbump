@@ -12,36 +12,36 @@
 }
 
 :root {
-		/* ===== Scrollbar CSS ===== */
-		* {
-			scrollbar-gutter: 10px;
-			scrollbar-width: thin;
-			scrollbar-color: #c7c7c7 #5e5e5e2f;
-		}
+	/* ===== Scrollbar CSS ===== */
+	* {
+		scrollbar-gutter: 10px;
+		scrollbar-width: thin;
+		scrollbar-color: #c7c7c7 #5e5e5e2f;
+	}
 
-		*::-webkit-scrollbar {
-			width: 0.916667rem;
-			height: 0.916667rem;
-		}
+	*::-webkit-scrollbar {
+		width: 0.916667rem;
+		height: 0.916667rem;
+	}
 
-		*::-webkit-scrollbar-track {
-			background: #5e5e5e2f;
-			border-radius: 0.625rem;
-			height: 0.916667rem;
-			width: 100%;
-			background-clip: content-box;
-			border-radius: 10px;
-			border: transparent solid 0.0983333rem;
-		}
+	*::-webkit-scrollbar-track {
+		background: #5e5e5e2f;
+		border-radius: 0.625rem;
+		height: 0.916667rem;
+		width: 100%;
+		background-clip: content-box;
+		border-radius: 10px;
+		border: transparent solid 0.0983333rem;
+	}
 
-		*::-webkit-scrollbar-thumb {
-			background-color: #e0e0e0a8;
-			border-radius: 0.5625rem;
-			width: 0.5625rem;
-			scrollbar-width: 0.625rem;
-			border: 0.25rem solid #b8b8b800;
-			background-clip: content-box;
-		}
+	*::-webkit-scrollbar-thumb {
+		background-color: #e0e0e0a8;
+		border-radius: 0.5625rem;
+		width: 0.5625rem;
+		scrollbar-width: 0.625rem;
+		border: 0.25rem solid #b8b8b800;
+		background-clip: content-box;
+	}
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -323,9 +323,9 @@ button {
   */
 
 button,
-[type="button"],
-[type="reset"],
-[type="submit"] {
+[type='button'],
+[type='reset'],
+[type='submit'] {
 	-webkit-appearance: button;
 }
 
@@ -393,8 +393,8 @@ textarea {
   * Remove the padding in IE 10-.
   */
 
-[type="checkbox"],
-[type="radio"] {
+[type='checkbox'],
+[type='radio'] {
 	padding: 0;
 }
 
@@ -403,7 +403,7 @@ textarea {
   * 2. Correct the outline style in Safari.
   */
 
-[type="search"] {
+[type='search'] {
 	-webkit-appearance: textfield; /* 1 */
 	outline-offset: -2px; /* 2 */
 }
@@ -570,7 +570,7 @@ textarea,
   * Change the cursor on busy elements in all browsers (opinionated).
   */
 
-[aria-busy="true"] {
+[aria-busy='true'] {
 	cursor: progress;
 }
 
@@ -587,7 +587,7 @@ textarea,
   * inoperable elements in all browsers (opinionated).
   */
 
-[aria-disabled="true"],
+[aria-disabled='true'],
 [disabled] {
 	cursor: not-allowed;
 }
@@ -597,11 +597,11 @@ textarea,
   * in all browsers (opinionated).
   */
 
-[aria-hidden="false"][hidden] {
+[aria-hidden='false'][hidden] {
 	display: initial;
 }
 
-[aria-hidden="false"][hidden]:not(:focus) {
+[aria-hidden='false'][hidden]:not(:focus) {
 	clip: rect(0, 0, 0, 0);
 	position: absolute;
 }

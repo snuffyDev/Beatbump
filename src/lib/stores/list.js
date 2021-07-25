@@ -4,23 +4,17 @@ import { getSrc } from '$lib/utils'
 import { writable } from 'svelte/store'
 import { filterAutoPlay, playerLoading } from './stores'
 import { addToQueue } from './../utils'
-import { currentTitle } from '$stores/stores';
+import { currentTitle } from '$stores/stores'
 
-const fetchNext = async (
-	index,
-	params,
-	videoId,
-	playlistId,
-	ctoken
-) => {
+const fetchNext = async (index, params, videoId, playlistId, ctoken) => {
 	return await fetch(
 		'/api/next.json?playlistId=' +
-		encodeURIComponent(playlistId) +
-		`${videoId ? `&videoId=${videoId}` : ''}` +
-		`${params ? `&params=${params}` : ''}` +
-		`${ctoken ? `&ctoken=${ctoken}` : ''}` +
-		'&index=' +
-		encodeURIComponent(index),
+			encodeURIComponent(playlistId) +
+			`${videoId ? `&videoId=${videoId}` : ''}` +
+			`${params ? `&params=${params}` : ''}` +
+			`${ctoken ? `&ctoken=${ctoken}` : ''}` +
+			'&index=' +
+			encodeURIComponent(index),
 		{
 			headers: { accept: 'application/json' }
 		}
@@ -34,7 +28,7 @@ filterAutoPlay.subscribe((setting) => {
 	filterSetting = setting
 })
 
-let loading = false;
+let loading = false
 playerLoading.subscribe((load) => {
 	loading = load
 })
@@ -50,7 +44,7 @@ const list = writable({
 export default {
 	subscribe: list.subscribe,
 	async initList(videoId, playlistId) {
-		loading = true;
+		loading = true
 		playerLoading.set(loading)
 		if (hasList) mix = []
 		hasList = true
@@ -59,22 +53,22 @@ export default {
 		// console.log(data)
 		await getSrc(videoId)
 		currentTitle.set(data.results[index].title)
-		loading = false;
+		loading = false
 		playerLoading.set(loading)
 		continuation.push(...data.continuation)
 		mix.push(...data.results)
 		list.set({ continuation, mix })
 	},
 	async initArtistList(videoId, playlistId) {
-		loading = true;
+		loading = true
 		playerLoading.set(loading)
 		if (hasList) mix = []
 		hasList = true
 		const response = await fetch(
 			`/api/artistNext.json?playlistId=${playlistId}&videoId=${videoId}`
-		).then(data => data.json())
+		).then((data) => data.json())
 		// await getSrc(videoId);
-		loading = false;
+		loading = false
 		playerLoading.set(loading)
 		continuation.push(response.continuation)
 		mix.push(...response)
@@ -90,11 +84,13 @@ export default {
 		list.set({ continuation, mix })
 	},
 	async startPlaylist(playlistId) {
-		loading = true;
+		loading = true
 		playerLoading.set(loading)
-		const data = await fetch(`/api/getQueue.json?playlistId=${playlistId}`).then(data => data.json())
+		const data = await fetch(
+			`/api/getQueue.json?playlistId=${playlistId}`
+		).then((data) => data.json())
 		mix = [...data]
-		loading = false;
+		loading = false
 		playerLoading.set(loading)
 		await getSrc(mix[0].videoId)
 		list.set({ continuation, mix })
@@ -102,22 +98,21 @@ export default {
 		// console.log(data)
 	},
 	async getMore(autoId, itct, videoId, playlistId, ctoken) {
-		loading = true;
+		loading = true
 		playerLoading.set(loading)
 		const data = await fetchNext(autoId, itct, videoId, playlistId, ctoken)
 
 		mix.pop()
 		await getSrc(data.results[0].videoId)
 
-		loading = false;
+		loading = false
 		playerLoading.set(loading)
 
 		filterSetting
 			? (mix = [...mix, ...data.results].filter(
-				((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set())
-			))
+					((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set())
+			  ))
 			: (mix = [...mix, ...data.results])
 		list.set({ continuation, mix })
-
 	}
 }

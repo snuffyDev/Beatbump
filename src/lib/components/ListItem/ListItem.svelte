@@ -1,9 +1,9 @@
 <script>
 	import Icon from '$components/Icon/Icon.svelte'
-	import { currentTitle, key } from '$stores/stores'
+	import { currentTitle, isPagePlaying, key } from '$stores/stores'
 	import { createEventDispatcher } from 'svelte'
 	import list from '$lib/stores/list'
-import { getSrc } from '$lib/utils';
+	import { getSrc } from '$lib/utils'
 	export let item
 	export let index
 	export let page
@@ -20,16 +20,15 @@ import { getSrc } from '$lib/utils';
 
 <div
 	class="item"
-	class:playing={index == $key}
+	class:playing={index == $key && isPagePlaying}
 	on:click={async () => {
 		// @ts-ignore
 		key.set(index)
 		if (page == 'playlist') {
-			if (!$key){
+			if (!$key) {
 				console.log('key: ' + $key)
 				await list.startPlaylist(item.playlistId)
-			}else {
-
+			} else {
 				console.log('key: ' + $key)
 				await getSrc($list.mix[index]?.videoId)
 			}
@@ -40,12 +39,6 @@ import { getSrc } from '$lib/utils';
 		}
 		console.log($list.mix)
 		dispatchPlaying(true)
-		// currentTrack.set({
-		// 	id: 0,
-		// 	videoId: id,
-		// 	title: radio[0].title,
-		// 	thumbnail: thumbnail
-		// })
 	}}
 	on:mouseover={() => {
 		isHovering = true

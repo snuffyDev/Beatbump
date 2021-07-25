@@ -19,6 +19,7 @@
 </div>
 
 <style lang="scss">
-	.alert {
+	.m-alert-danger {
+		max-width: 29.375rem !important;
 	}
 </style>

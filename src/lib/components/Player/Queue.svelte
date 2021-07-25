@@ -2,10 +2,9 @@
 	import { fly } from 'svelte/transition'
 	import { afterUpdate, createEventDispatcher, onMount } from 'svelte'
 	import { cubicInOut } from 'svelte/easing'
-	import { currentTitle } from '$stores/stores'
 	import { clickOutside } from '$lib/js/clickOutside'
 	import list from '$lib/stores/list'
-	import longpress from '$lib/actions/longpress'
+	import QueueListItem from './QueueListItem.svelte'
 
 	export let autoId
 	export let mixList = []
@@ -14,7 +13,6 @@
 	$: mixList = $list.mix
 
 	let songList
-	let items = []
 	let active = document.getElementById(autoId)
 
 	const dispatch = createEventDispatcher()
@@ -22,19 +20,12 @@
 	onMount(() => {
 		if (active) active.scrollIntoView(true)
 	})
-
 	$: if (active) active.scrollIntoView(true)
 	afterUpdate(() => {
 		let active = document.getElementById(autoId)
 		if (active) active.scrollIntoView(true)
 	})
-	function handleClick(i) {
-		autoId = i
-		currentTitle.set($list.mix[i - 1])
-		dispatch('updated', {
-			id: `${autoId}`
-		})
-	}
+
 	function showList() {
 		dispatch('hide', {
 			showing: false
@@ -49,53 +40,20 @@
 		use:clickOutside
 		on:click_outside={() => {
 			show = !show
-			showList(show)
+			showList()
 		}}
 		transition:fly={{ y: 0, duration: 125, easing: cubicInOut }}>
 		<div class="list">
 			{#if mixList.length > 1}
 				<ul class="list-m" id="list" bind:this={songList}>
 					{#each mixList as item, index}
-						<li
-							id={index}
-							bind:this={items[index]}
-							class:active={autoId == index}
-							class="item"
-							on:click={() => {
-								// console.log(`${autoId}`)
-								handleClick(index)
-							}}>
-							<div
-								class="pl-thumbnail"
-								use:longpress
-								on:longpress={() => {
-									alert('Nice!')
-								}}
-								style="min-width:5rem; max-width:5rem;">
-								<img
-									referrerpolicy="origin-when-cross-origin"
-									src={item.thumbnail}
-									loading="lazy"
-									alt="thumbnail" />
-							</div>
-							<div class="p-text">
-								<span class="p-title">
-									<span>{item.title}</span>
-								</span>
-								<span class="p-artist">
-									<span>{item.artistInfo.artist}</span>
-								</span>
-							</div>
-							<span class="p-length">
-								<span>{item.length}</span>
-							</span>
-						</li>
+						<QueueListItem on:updated {item} {index} />
 					{/each}
 				</ul>
 			{:else}
 				<div class="empty">
-					<h1>Empty!</h1>
-					<div class="subtitle">Choose a song to see your feed</div>
+					<span class="empty-title">Empty!</span>
+					<span class="subtitle">Choose a song to see your feed</span>
 				</div>
 			{/if}
 		</div>
@@ -106,12 +64,16 @@
 	.empty > * {
 		color: white;
 	}
-	.p-length {
-		margin-left: auto;
-		align-self: center;
-		padding-right: 0.2rem;
-		white-space: nowrap;
+	.empty {
+		display: inline-flex;
+		flex-direction: column;
+		/* place-items: center; */
+		/* flex-wrap: nowrap; */
+		justify-content: center;
+		width: 100%;
+		height: 100%;
 	}
+
 	.listContainer {
 		isolation: auto;
 		box-shadow: 0.1em -0.1em 0.1em 0em #00000040;
@@ -136,10 +98,20 @@
 		/* overflow-y: scroll !important; */
 		overflow-y: hidden;
 		opacity: 1;
-		transition: all 125ms ease-in;
+		transition: all 250ms ease-in-out;
 		bottom: 4em;
 		&.slide {
 			opacity: 1;
+		}
+		.subtitle {
+			/* text-transform: uppercase; */
+			font-size: 1.2rem;
+			font-weight: 200;
+			line-height: 1.1;
+			margin: 4rem auto;
+			max-width: 20rem;
+			text-align: center;
+			letter-spacing: 0.016em;
 		}
 		.list {
 			// background: #11151c;
@@ -168,85 +140,8 @@
 		height: 100%;
 		scroll-padding-top: 0.8rem;
 	}
-	.item {
-		user-select: none;
-		margin-right: 0.75rem;
-		margin-left: 0.75rem;
-		margin-top: 0.5rem;
-		margin-bottom: 0.5rem;
-		background-color: transparentize(rgba(170, 170, 170, 0.801), 0.7);
-		padding: 0.8em;
-		border-color: #aaa;
-		border-width: 1px;
-		border-radius: 0.8em;
-		cursor: pointer;
-		flex-direction: row;
-		// transition: all cubic-bezier(0.39, 0.575, 0.565, 1) 0.23s;
-		display: flex;
-		flex-wrap: nowrap;
-	}
-	.subtitle {
-		/* text-transform: uppercase; */
 
-		font-size: 1.2rem;
-		font-weight: 200;
-		line-height: 1.1;
-		margin: 4rem auto;
-		max-width: 20rem;
-		text-align: center;
-		letter-spacing: 0.016em;
-	}
-	.pl-thumbnail {
-		width: auto;
-		height: 5rem;
-		border-radius: 0.2em;
-
-		img {
-			aspect-ratio: inherit;
-		}
-	}
-	.active {
-		user-select: none;
-		margin-right: 0.75rem;
-		margin-left: 0.75rem;
-		margin-top: 0.5rem;
-		margin-bottom: 0.5rem;
-		padding: 0.8em;
-		background-color: hsl(0deg 0% 64% / 29%) !important;
-		border-radius: 0.8em;
-		cursor: pointer;
-		flex-direction: row;
-		transition: all cubic-bezier(0.39, 0.575, 0.565, 1) 0.23s;
-		display: flex;
-		flex-wrap: nowrap;
-	}
-	img {
-		width: auto;
-		height: 100%;
-		aspect-ratio: inherit;
-		max-width: 100%;
-		-o-object-fit: scale-down;
-		object-fit: cover;
-		// border: 0.2em solid rgb(17 21 28);
-		border-radius: 0.2em;
-	}
-	.p-artist {
-		font-size: 1.0125rem;
-		font-weight: 600;
-	}
-	.p-text {
-		/*margin-left: .5em; */
-		padding-left: 0.5em;
-		display: inline-flex;
-		font-size: 1rem;
-		line-height: 1.75;
-		flex-flow: wrap;
-		justify-content: center;
-		flex-direction: column;
-		padding-inline: 0.8em;
-	}
-
-	h1 {
+	.empty-title {
 		font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS',
 			sans-serif;
 		text-transform: capitalize;
@@ -257,18 +152,9 @@
 		line-height: 1.1;
 		margin: 4rem auto;
 		max-width: 14rem;
+		margin: 2rem auto;
 	}
 
-	img::before {
-		display: block;
-		content: '';
-		padding-top: calc(100% * 2 / 3);
-		/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
-	}
-	.p-title {
-		padding: 0em;
-		font-size: 1.0125rem;
-	}
 	@media screen and (min-width: 641px) and (max-width: 800px) {
 		.listContainer {
 			width: 47.5%;
@@ -280,23 +166,6 @@
 			width: 100%;
 			height: auto;
 			max-height: 75%;
-		}
-		.p-text {
-			/*margin-left: .5em; */
-			padding-left: 0.5em;
-			display: inline-flex;
-			font-size: 1rem;
-
-			flex-flow: wrap;
-			justify-content: center;
-			flex-direction: column;
-			padding-inline: 0.8em;
-
-			line-height: 1.2;
-		}
-		.p-title {
-			padding: 0em;
-			font-size: 1.0175rem;
 		}
 	}
 </style>

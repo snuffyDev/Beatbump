@@ -9,6 +9,6 @@ const BaseContext = {
 			enableSafetyMode: false
 		},
 		utcOffsetMinutes: -new Date().getTimezoneOffset()
-	},
+	}
 }
 export default BaseContext

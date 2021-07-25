@@ -1,3 +1,16 @@
+interface destructure {
+	contents: {
+		singleColumnBrowseResultsRenderer: {
+			tabs: [
+				{
+					tabRenderer: {
+						content: { sectionListRenderer: { contents: [] } }
+					}
+				}
+			]
+		}
+	}
+}
 export async function get({ params }) {
 	const { slug } = params
 
@@ -26,20 +39,10 @@ export async function get({ params }) {
 		}
 	)
 
-	let {
-		contents: {
-			singleColumnBrowseResultsRenderer: {
-				tabs: [
-					{
-						tabRenderer: {
-							content: { sectionListRenderer: { contents = [] } = {} } = {}
-						} = {}
-					} = {}
-				] = []
-			} = {}
-		} = {}
-	} = await response.json()
-	console.log(contents)
+	let { contents } = await response.json()
+	contents =
+		contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer.content
+			.sectionListRenderer.contents
 	const sections = contents.map(({ gridRenderer = {} }) => {
 		const { items = [], header = {} } = gridRenderer
 		const section = items.map(({ musicTwoRowItemRenderer = {} }) => ({

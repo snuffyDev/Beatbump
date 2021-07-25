@@ -48,6 +48,7 @@
 			action: () => list.addNext(item, $key)
 		}
 	]
+	let srcImg = item.thumbnails[0].url
 	// $: if (width < 525) {
 	// 	hovering = false
 	// }
@@ -57,7 +58,7 @@
 </script>
 
 <svelte:window bind:outerWidth={width} />
-<div class="container carouselitem">
+<div class="container carouselItem">
 	<section
 		class="item"
 		class:item16x9={aspectRatio?.includes('16_9')
@@ -83,12 +84,24 @@
 					await list.initList(item.videoId, item.playlistId)
 					currentTrack.set({ ...$list.mix[0] })
 					key.set(0)
-				} else if (type == 'artist') {
+				}
+				if (type == 'new') {
+					let id = item.endpoint?.browseId
+					let type = item.endpoint?.pageType
+					window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+					goto(
+						'/release?type=' +
+							encodeURIComponent(type) +
+							'&id=' +
+							encodeURIComponent(id)
+					)
+				}
+				if (type == 'artist') {
 					if (isBrowse) {
-						goto(`/artist/${item?.browseEndpoint?.browseId}`)
+						goto(`/artist/${item?.endpoint?.browseId}`)
 					} else if (item.videoId !== undefined) {
 						loading = true
-						await list.initArtistList(item.videoId, item.playlistId)
+						await list.initList(item.videoId, item.playlistId)
 						getSrc(item.videoId)
 						currentTrack.set({ ...$list.mix[0] })
 						// currentTitle.set(res[0].title);
@@ -100,6 +113,7 @@
 						key.set(0)
 					}
 				}
+
 				loading = false
 			}}>
 			<div class="img">
@@ -117,44 +131,58 @@
 						<img
 							alt="thumbnail"
 							transition:fade|local
+							class:img16x9={aspectRatio?.includes('16_9')}
 							loading="lazy"
 							type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 							src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
-							use:lazy={{ src: item.thumbnails[0].url }} />
+							use:lazy={{ src: srcImg }} />
 					{:else}
 						<img
 							alt="thumbnail"
 							transition:fade|local
+							class:img16x9={aspectRatio?.includes('16_9')}
 							loading="lazy"
 							type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 							src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
-							use:lazy={{ src: item.thumbnails[0].url }} />
+							use:lazy={{ src: srcImg }} />
 					{/if}
 				</div>
 			</div>
 
 			<div class="cont">
 				<div class="text-wrapper">
-					<h6 class="title">
+					<span class="title">
 						{item.title}
-					</h6>
+					</span>
 					{#if item.subtitle}
-						{#each item.subtitle as sub}
-							<span>{sub.text}</span>
-						{/each}{/if}
+						<div class="subtitles">
+							{#each item.subtitle as sub}
+								<span>{sub.text}</span>
+							{/each}
+						</div>
+					{/if}
 				</div>
 			</div>
 		</div>
 
-		<div class="menu" class:mobile={width < 550}>
-			{#if hovering || width < 550}
-				<Dropdown bind:isHidden items={DropdownItems} />
-			{/if}
-		</div>
+		{#if !isBrowse}
+			<div class="menu" class:mobile={width < 550}>
+				{#if hovering || width < 550}
+					<Dropdown bind:isHidden items={DropdownItems} />
+				{/if}
+			</div>
+		{/if}
 	</section>
 </div>
 
 <style lang="scss">
+	.subtitles {
+		display: inline;
+	}
+	.text-wrapper {
+		display: inline-flex;
+		flex-direction: column;
+	}
 	.item1x1 {
 		// padding-top: 100% !important;
 		width: 13rem !important;
@@ -164,14 +192,16 @@
 		width: 17rem !important;
 	}
 	.img1x1 {
-		padding-top: 100% !important;
+		// padding-top: 100% !important;
+		aspect-ratio: 1/1 !important;
 	}
 	.img16x9 {
-		padding-top: 56.25% !important;
+		// padding-top: 56.25% !important;
+		aspect-ratio: 16/9 !important;
 	}
 	.container.carouselItem {
 		position: relative;
-		padding-bottom: 0.8em;
+		padding-bottom: 5ch;
 	}
 	.menu {
 		position: absolute;
@@ -184,7 +214,12 @@
 	}
 	.title {
 		cursor: pointer;
-		// letter-spacing: 0.02em;
+		display: inline;
+		font-weight: 450;
+		font-size: 1.05em;
+		font-family: 'Commissioner', sans-serif;
+		margin-bottom: 0.8em;
+		letter-spacing: -0.02em;
 	}
 
 	section {
@@ -194,7 +229,7 @@
 		margin-bottom: 0rem;
 		display: block;
 		content: '';
-		padding-bottom: 1.8em;
+		// padding-bottom: 1.8em;
 
 		::before {
 			display: block;
@@ -215,16 +250,18 @@
 	}
 
 	.img {
-		border-radius: var(--md-radius);
 		height: auto;
 		width: 100%;
+		aspect-ratio: inherit;
 		.container {
 			position: relative; /* If you want text inside of it */
 
+			aspect-ratio: inherit;
 			cursor: pointer;
 			width: 100%;
 			position: relative;
-			padding-top: 100%; /* 1:1 Aspect Ratio */
+
+			// padding-top: 100%; /* 1:1 Aspect Ratio */
 			&::before {
 				position: absolute;
 				content: '';
@@ -248,8 +285,10 @@
 			img {
 				width: 100%;
 				height: auto;
+				aspect-ratio: inherit;
+				// position: absolute;
+				border-radius: var(--sm-radius);
 
-				position: absolute;
 				top: 0;
 				right: 0;
 				bottom: 0;

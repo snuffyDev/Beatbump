@@ -33,10 +33,7 @@ export async function get({ query }) {
 					tunerSettingValue: 'AUTOMIX_SETTING_NORMAL',
 					videoId: `${video_id}`,
 					playlistId: `${playlist_id}`,
-					watchEndpointMusicConfig: {
-						hasPersistentPlaylistPanel: true,
-						musicVideoType: 'MUSIC_VIDEO_TYPE_ATV'
-					}
+
 				}),
 				headers: {
 					'Content-Type': 'application/json; charset=utf-8',

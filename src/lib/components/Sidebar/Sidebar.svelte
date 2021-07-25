@@ -11,7 +11,7 @@
 	transition:fly>
 	<section class="head">
 		<slot name="head">
-			<Search /></slot>
+			<Search type="block" /></slot>
 		<br />
 	</section>
 	<section class="mid">

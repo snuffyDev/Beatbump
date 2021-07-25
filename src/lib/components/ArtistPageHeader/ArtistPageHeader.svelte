@@ -1,27 +1,33 @@
 <script lang="ts">
 	import '../../../global/vars.css'
-	import { onDestroy, onMount } from 'svelte'
+	import { afterUpdate, onDestroy, onMount } from 'svelte'
 	import { theme } from '$lib/stores/stores'
 	export let headerContent
 	export let thumbnail = []
 	export let description
 	export let width
-	let container
+	let container: HTMLDivElement
 	let y = 0
-	let handler = (event) => {}
+	afterUpdate(() => {
+		container = container
+	})
 	onMount(() => {
 		let start
 
-		let gradient = document.getElementById('gradient')
+		// let gradient = document.getElementById('gradient')
 
-		handler = (event) => {
+		function handler(event) {
 			if (start === undefined) start = event.timestamp
-			const scroll = gradient.getBoundingClientRect()
+			const scroll = container.getBoundingClientRect()
 
 			const elapsed = event.timestamp - start
 
 			window.requestAnimationFrame(function (e) {
-				y = Math.min(Math.max(-scroll.top / window.innerHeight, 0), 1) * 125
+				y =
+					Math.min(Math.max(-scroll.top / window.innerHeight, 0), 250) *
+					-scroll.top *
+					2
+				console.log(y)
 				if (elapsed < 200) {
 					window.requestAnimationFrame(handler)
 				}
@@ -30,15 +36,11 @@
 			})
 		}
 		let wrapper = document.getElementById('wrapper')
-
 		wrapper.addEventListener('scroll', handler, { passive: true })
 		return () => {
 			window.removeEventListener('scroll', handler)
 			wrapper.removeEventListener('scroll', handler)
 		}
-	})
-	onDestroy(() => {
-		window.removeEventListener('scroll', handler)
 	})
 </script>
 
@@ -48,18 +50,30 @@
 			bind:this={container}
 			style={`background-image: linear-gradient(0turn, var(--${$theme}-base) ${Math.min(
 				y,
-				75
+				72
 			)}%, transparent); transition: cubic-bezier(0.6, -0.28, 0.74, 0.05) all 120ms`}
 			id="gradient"
 			class="gradient" />
-		<picture class="header-thumbnail">
-			<img
-				referrerpolicy="origin-when-cross-origin"
-				class="header-thumbnail"
-				loading="eager"
-				src={thumbnail[1]?.url}
-				alt="Artist Thumbnail" />
-		</picture>
+		{#if thumbnail !== undefined}
+			<picture class="header-thumbnail">
+				{#each thumbnail as img, i}
+					{#if i == 0}
+						<source media="(max-width:{img.width}px)" srcset={img.url} />
+					{:else}
+						<source
+							media="(min-width:{img.width}px) and (max-width: {thumbnail[i]
+								.width}px)"
+							srcset={img.url} />
+					{/if}
+				{/each}
+				<img
+					referrerpolicy="origin-when-cross-origin"
+					class="header-thumbnail"
+					loading="eager"
+					src={thumbnail[1]?.url}
+					alt="Artist Thumbnail" />
+			</picture>
+		{/if}
 	</div>
 	<div
 		class="artist-content"
@@ -119,7 +133,6 @@
 			position: absolute;
 			bottom: 0;
 			margin-bottom: 0.5rem;
-
 			.description {
 				display: block;
 				padding: 0 2rem 2rem 2rem;

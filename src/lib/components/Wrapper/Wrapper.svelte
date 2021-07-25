@@ -8,15 +8,15 @@
 	$: nav = $navigating ? true : false
 	let isNavigating
 	$: if (nav == true) isNavigating = !isNavigating
-	$: if ($navigating == true) {
-		main.scrollTo({ top: 0, behavior: 'smooth' })
+	$: if (key) {
+		if (main) main.scrollTo({ top: 0, behavior: 'smooth' })
 	}
 	// $: console.log(isNavigating)
 </script>
 
 {#key key}
 	<div
-		in:fly={{ x: -5, duration: 500, delay: 500, easing: expoInOut }}
+		in:fly={{ x: -5, duration: 500, delay: 400, easing: expoInOut }}
 		out:fly={{ x: 5, duration: 500, easing: expoInOut }}>
 		<slot />
 	</div>

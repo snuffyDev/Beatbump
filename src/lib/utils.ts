@@ -6,14 +6,22 @@ import { errorHandler, updateTrack } from './stores/stores'
 export function shuffle(array: any[]) {
 	array.sort(() => Math.random() - 0.5)
 }
+function format(seconds) {
+	if (isNaN(seconds)) return '...'
 
+	const minutes = Math.floor(seconds / 60)
+	seconds = Math.floor(seconds % 60)
+	if (seconds < 10) seconds = '0' + seconds
+
+	return `${minutes}:${seconds}`
+}
 // adds song to queue
 export const addToQueue = async (videoId: any) => {
-	let url = `/api/player.json${videoId ? `?videoId=${videoId}` : ''}`
+	const url = `/api/player.json${videoId ? `?videoId=${videoId}` : ''}`
 	const data = await fetch(url, { headers: { accept: 'application/json' } })
 		.then((json) => json.json())
 		.catch((err) => console.log(err))
-	let length = format(data.videoDetails.lengthSeconds)
+	const length = format(data.videoDetails.lengthSeconds)
 	return length
 }
 
