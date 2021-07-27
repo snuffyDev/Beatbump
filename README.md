@@ -50,10 +50,12 @@ Make sure the SvelteKit packages are marked 'next' in the `package.json` before 
 
 The default deployment is configured for Cloudflare Workers. For information on how to setup and configure Cloudflare Workers, visit the [official repo](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare-workers) for the adapter.
 
-For deploying to Cloudflare Workers, there's two commands in `package.json` for this.
+For deploying to Cloudflare Workers, there's two commands in `package.json` for this: 
+| command  | description |
+|--        |-- |
+| `deploy` |  Is a typical deployment to Cloudflare Workers.<br> - Run this if you don't have the `.svelte-kit` & `build` folders.|                                          
+| `deploy:clean` |  Will delete the `.svelte-kit` and the `build` folders <br>   - This deletes the old files left over from the dev server for a clean starting point next time you run `dev` 
 
-- To delete the `.svelte-kit` and any prior `build` folders, run `deploy:clean`.
-- To deploy if you don't have those folders (so you can't delete them), or you don't want to delete them, run `deploy`.
 
 For other adapters, visit the official [adapters section](https://kit.svelte.dev/docs#adapters) of the SvelteKit documentation.
 
