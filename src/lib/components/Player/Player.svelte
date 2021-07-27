@@ -145,9 +145,8 @@
 	$: console.log($list.mix)
 
 	const getNext = async () => {
+		key.set(autoId)
 		if (autoId == $list.mix.length - 1) {
-			await tick()
-			// autoId++
 			list.getMore(
 				autoId,
 				$list.mix[autoId]?.itct,
@@ -156,7 +155,6 @@
 				$list.continuation
 			)
 			// autoId++;
-			key.set(autoId)
 
 			once = false
 
@@ -448,19 +446,20 @@
 			position: relative !important;
 		}
 	}
-
+	.progress-bar {
+		position: relative;
+	}
 	.player-left,
 	.player-right {
-		-webkit-text-size-adjust: 100%;
+		webkit-text-size-adjust: 100%;
 		align-self: center;
 		cursor: pointer;
 		height: auto;
 		max-height: 44pt;
 		max-width: 44pt;
-		margin: 10pt;
+		/* margin: 10pt; */
 		padding: 10pt;
 		width: auto;
-		width: 100%;
 		width: 100%;
 		align-items: center;
 		display: flex;
@@ -475,15 +474,17 @@
 	progress {
 		display: block;
 		width: 100%;
-		height: 0.5315rem;
-		-webkit-appearance: none;
+		height: 0.4315rem;
+		position: absolute;
+		top: -0.1rem;
+		margin: 0;
 		-moz-appearance: none;
 		appearance: none;
 		background: transparent;
 		background-color: #232530;
-		/* z-index: 7; */
 		outline: none;
 		border: transparent;
+		padding: 0;
 	}
 
 	progress::-webkit-progress-bar {

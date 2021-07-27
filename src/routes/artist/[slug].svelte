@@ -47,14 +47,7 @@
 	export let data
 	let width
 
- console.log(
-		data,
-		carouselItems,
-		items,
-		description,
-		thumbnail,
-		headerContent
-	)
+	console.log(data, carouselItems, items, description, thumbnail, headerContent)
 </script>
 
 <svelte:head>
@@ -69,7 +62,6 @@
 	<main>
 		<ArtistPageHeader {description} {headerContent} {width} {thumbnail} />
 		<div class="artist-body">
-
 			{#if items.length > 0}
 				<section>
 					<h4 class="grid-title">Songs</h4>
@@ -140,7 +132,7 @@
 		margin-bottom: 1rem;
 	}
 	.artist-body {
-		padding: 2rem;
+		padding: 0 2rem;
 		padding-bottom: 2rem;
 		@media screen and (max-width: 500px) {
 			padding: 0 1rem;

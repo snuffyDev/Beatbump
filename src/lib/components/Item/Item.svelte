@@ -37,6 +37,7 @@
 					top: 0,
 					left: 0
 				})
+
 				await tick()
 				goto(`/artist/${data.artistInfo.browseId}`)
 			}
@@ -180,6 +181,9 @@
 		font-size: 0.9em;
 		font-weight: 300;
 		align-items: center;
+		/* white-space: revert; */
+		display: inline-flex;
+		pointer-events: auto;
 		a {
 			margin-left: 0.25em;
 		}

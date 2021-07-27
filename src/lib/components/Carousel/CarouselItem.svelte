@@ -159,7 +159,9 @@
 			<div class="cont">
 				<div class="text-wrapper">
 					<span class="title">
-						{item.title}
+						{item.title.length > 32
+							? item.title.substring(0, 32) + '...'
+							: item.title}
 					</span>
 					{#if item.subtitle}
 						<div class="subtitles">

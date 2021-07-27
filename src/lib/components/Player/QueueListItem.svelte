@@ -87,15 +87,13 @@
 	}
 	.item {
 		user-select: none;
-		margin-right: 0.75rem;
-		margin-left: 0.75rem;
-		margin-top: 0.5rem;
-		margin-bottom: 0.5rem;
-		background-color: transparentize(rgba(170, 170, 170, 0.801), 0.7);
-		padding: 0.8em;
-		border-color: #aaa;
+		margin: 0.5em 0.65rem;
+
+		background-color: hsl(0deg 0% 61% / 9%);
+		padding: var(--md-radius);
+		border-color: rgba(170, 170, 170, 0.014);
 		border-width: 1px;
-		border-radius: 0.8em;
+		border-radius: var(--md-radius);
 		cursor: pointer;
 		flex-direction: row;
 		// transition: all cubic-bezier(0.39, 0.575, 0.565, 1) 0.23s;
@@ -143,18 +141,19 @@
 		}
 	}
 	.active {
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
 		user-select: none;
-		margin-right: 0.75rem;
-		margin-left: 0.75rem;
-		margin-top: 0.5rem;
-		margin-bottom: 0.5rem;
-		padding: 0.8em;
+		margin: 0.5em 0.65rem;
 		background-color: hsl(0deg 0% 64% / 29%) !important;
-		border-radius: 0.8em;
+		padding: var(--md-radius);
+		border-color: rgba(170, 170, 170, 0.199) !important;
+		border-width: 1px;
+		border-radius: var(--md-radius);
 		cursor: pointer;
 		flex-direction: row;
-		transition: all cubic-bezier(0.39, 0.575, 0.565, 1) 0.23s;
-		display: flex;
+
 		flex-wrap: nowrap;
 		.pl-thumbnail {
 			background: rgba(126, 126, 126, 0.11);

@@ -7,7 +7,7 @@
 }
 .item1x1 {
 	// padding-top: 100% !important;
-	width: 13rem !important;
+	width: 11rem !important;
 }
 .item16x9 {
 	// padding-top: 56.25% !important;
@@ -23,7 +23,7 @@
 }
 .container.carouselItem {
 	position: relative;
-	padding-bottom: 5ch;
+	// padding-bottom: 5ch;
 }
 .menu {
 	position: absolute;
@@ -37,11 +37,11 @@
 .title {
 	cursor: pointer;
 	display: inline;
-	font-weight: 450;
-	font-size: 1.05rem;
+	font-weight: 500;
+	font-size: 1.1em;
 	font-family: "Commissioner", sans-serif;
-	margin-bottom: 0.8em;
-	letter-spacing: -0.02em;
+	margin-bottom: 0.25rem;
+	letter-spacing: -0.05em;
 }
 
 section {
@@ -51,7 +51,7 @@ section {
 	margin-bottom: 0rem;
 	display: block;
 	content: "";
-	// padding-bottom: 1.8em;
+	padding-bottom: 1em;
 
 	::before {
 		display: block;
@@ -64,11 +64,8 @@ section.item {
 	height: auto;
 	width: 100%;
 	min-width: 12rem;
-	max-width: 20rem;
+	max-width: 17rem;
 	position: relative;
-	@media screen and (max-width: 500px) {
-		max-width: 17rem;
-	}
 }
 
 .img {
@@ -130,4 +127,23 @@ section.item {
 	// margin-right: var(--lg-spacing);
 }
 .scroll-container {
+}
+
+@media screen and (min-width: 640px) {
+	.img16x9 {
+		max-width: 23rem !important;
+	}
+	section.item {
+		max-width: 27rem;
+	}
+	.item16x9 {
+		width: 23rem !important;
+	}
+
+	.img1x1 {
+		max-width: 15rem !important;
+	}
+	.item1x1 {
+		width: 15rem !important;
+	}
 }

@@ -71,7 +71,8 @@
 </script>
 
 <svelte:head>
-	<title>{$currentTitle == '' ? 'Album' : $currentTitle} - Beatbump</title>
+	<title
+		>{$currentTitle !== '' || undefined ? 'Album' : $currentTitle} - Beatbump</title>
 </svelte:head>
 
 {#await promise then _}

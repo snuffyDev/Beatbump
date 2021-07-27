@@ -74,7 +74,7 @@ export default {
 		currentTitle.set(data.results[index].title)
 		loading = false
 		playerLoading.set(loading)
-		continuation.push(...data.continuation)
+		continuation.push(data.continuation)
 		mix.push(...data.results)
 		list.set({ continuation, mix })
 	},
@@ -133,10 +133,9 @@ export default {
 		// console.log(data)
 	},
 	async getMore(autoId, itct, videoId, playlistId, ctoken) {
-		loading = true
 		// console.log([...splitList].length, [...splitList])
+		let loading = true
 		playerLoading.set(loading)
-		if (mix.length >= Chunked.origLength - 1) { loading = false; playerLoading.set(loading); return }
 		if (splitList && mix.length < Chunked.origLength - 1) {
 
 			splitListIndex++

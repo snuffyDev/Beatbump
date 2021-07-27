@@ -30,7 +30,7 @@ export const parseArtistPage = (header, items) => {
 
 	items.map((i) => {
 		if (i?.musicShelfRenderer) {
-			songs = parseSongs(i?.musicShelfRenderer.contents)
+			songs = parseSongs(i?.musicShelfRenderer?.contents)
 			// console.log(songs)
 		}
 		if (i?.musicCarouselShelfRenderer) {
@@ -49,17 +49,20 @@ export const parseArtistPage = (header, items) => {
 }
 
 function parseSongs(items) {
-	const results = []
+	let results = []
 	let explicit
-	items.map((song) => {
-		const Item = MusicResponsiveListItemRenderer(song)
-		return Item
-	})
+	results = [
+		...items.map((song) => {
+			const Item = MusicResponsiveListItemRenderer(song)
+			return Item
+		})
+	]
 	return results
 }
 
 function parseCarouselItem(items, header) {
 	// console.log(items, header)
+	// console.log(items)
 	const contents = items.map((item) => {
 		// console.log(ctx, ctx?.musicTwoRowItemRenderer)\
 		const Item = MusicTwoRowItemRenderer(item)

@@ -79,7 +79,7 @@
 
 		border-radius: 0.5em;
 		@media screen and (min-width: 960px) {
-			margin-bottom: 4rem;
+			margin-bottom: 2.5rem;
 		}
 		/* width: 100%; */
 		/* max-width: 100%; */
@@ -91,10 +91,9 @@
 			padding: 0.4rem 0.4rem 0.2rem;
 			margin-bottom: 0.7rem;
 			font-weight: 600;
-			letter-spacing: -0.02rem;
-			font-size: 1.85rem;
+			letter-spacing: -0.05rem;
 			@media screen and (min-width: 800px) {
-				font-size: 2.35rem;
+				// font-size: 2.35rem;
 			}
 		}
 	}
@@ -127,7 +126,7 @@
 		grid-template-columns: repeat(auto, 1fr);
 
 		width: auto;
-		scroll-snap-type: x proximity;
+		scroll-snap-type: x mandatory;
 		// /* flex: 1 1 auto; */
 		// box-shadow: 0 0 10px 3px rgb(0 0 0 / 13%),
 		// 	inset -2px -2px 20px 0 hsl(0deg 0% 57% / 10%),

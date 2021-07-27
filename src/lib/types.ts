@@ -72,6 +72,7 @@ export interface SearchResult {
 	subtitle?: Subtitle[]
 }
 export interface CarouselItem {
+	artistInfo?: ArtistInfo
 	title: string
 	artist?: string
 	endpoint?: string | { browseId: string; pageType: string }

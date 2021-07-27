@@ -57,7 +57,7 @@ export async function get({ query }) {
 		// console.log(contents)
 		let headerContent = []
 		const parse = async (header, contents) => {
-			const newData = await [
+			const newData = [
 				parseArtistPage(header?.musicImmersiveHeaderRenderer, contents)
 			]
 			// console.log(newData)

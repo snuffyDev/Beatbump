@@ -144,7 +144,6 @@
 		display: block;
 		position: relative;
 		height: 100%;
-		min-height: 13rem;
 		&::before {
 			padding-top: 100%;
 			position: absolute;

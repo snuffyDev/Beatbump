@@ -236,13 +236,13 @@
 		font-family: 'Commissioner', sans-serif;
 		margin-left: auto;
 		display: flex;
-		flex-direction: row;
+		// flex-direction: row;
 
-		white-space: pre;
+		// white-space: pre;
 		font-size: 1.125rem;
 		margin: 0;
 		// font-weight: 500;
-		line-height: 1.5;
+		// line-height: 1.5;
 		.text {
 			display: flex;
 			flex-direction: column;
@@ -250,9 +250,12 @@
 		h5 {
 			font-size: 1.95rem;
 		}
+		p {
+			font-size: calc(var(--base-font-size) * 1.1);
+		}
 		em {
-			// padding-top: 0.5rem;
-			font-size: 0.95em;
+			padding-top: 0.5rem;
+			font-size: 1.1em;
 			margin-bottom: 0.5rem;
 		}
 	}

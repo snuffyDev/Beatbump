@@ -62,8 +62,7 @@
 }
 .player-controls {
 	display: flex;
-
-	flex-direction: column;
+	/* flex-direction: column; */
 	width: auto;
 }
 .timer {
@@ -84,15 +83,16 @@
 	flex-direction: row;
 }
 .player {
-	height: 4rem;
+	height: 100%;
 	z-index: auto;
-	align-items: center;
+	align-items: unset;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-evenly;
 	max-width: 100%;
 	min-width: calc(100% - 40px);
 	width: auto;
+	/* max-height: 100%; */
 }
 input[type="range"].volume {
 	width: auto;

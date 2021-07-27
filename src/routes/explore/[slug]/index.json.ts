@@ -1,10 +1,10 @@
-interface destructure {
+type destructure = {
 	contents: {
 		singleColumnBrowseResultsRenderer: {
 			tabs: [
 				{
 					tabRenderer: {
-						content: { sectionListRenderer: { contents: [] } }
+						content?: { sectionListRenderer: { contents?: [] } }
 					}
 				}
 			]
@@ -39,10 +39,10 @@ export async function get({ params }) {
 		}
 	)
 
-	let { contents } = await response.json()
+	let contents: destructure = await response.json()
 	contents =
-		contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer.content
-			.sectionListRenderer.contents
+		contents.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer
+			.content?.sectionListRenderer.contents
 	const sections = contents.map(({ gridRenderer = {} }) => {
 		const { items = [], header = {} } = gridRenderer
 		const section = items.map(({ musicTwoRowItemRenderer = {} }) => ({

@@ -16,15 +16,8 @@
 </script>
 
 <nav class="nav" style={`background-color: var(--${$theme}-top)`}>
-	<div class="logo">
-		<div on:click={() => go()}>
-			<img
-				src="/logo-header.png"
-				width="2.5rem"
-				height="0.5rem"
-				alt="logo"
-				title="Beatbump Home" />
-		</div>
+	<div class="logo" on:click={() => goto('/')}>
+		<img src="/logo-header.png" alt="logo" title="Beatbump Home" />
 		<!-- {/if} -->
 	</div>
 
@@ -80,12 +73,12 @@
 		cursor: pointer;
 	}
 	.homeIcon {
-		max-width: 2rem;
-		visibility: visible;
 		grid-area: m;
 		visibility: visible;
 		justify-self: center;
 		justify-content: center;
+		margin-left: auto;
+		margin-right: auto;
 		@media screen and (min-width: 640px) {
 			display: none;
 			visibility: hidden;
@@ -136,9 +129,11 @@
 
 	.items {
 		background-color: inherit;
-		/* margin-left: auto; */
 		grid-area: r;
-		justify-self: end;
+		/* align-self: center; */
+		/* justify-self: end; */
+		display: inline-flex;
+		margin-left: auto;
 		.nav-item {
 			margin-right: 1.75em;
 		}

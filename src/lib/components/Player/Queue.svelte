@@ -115,15 +115,14 @@
 		}
 		.list {
 			// background: #11151c;
-
 			border-radius: 0.8em 0.8em 0 0;
-			border: 1px solid rgb(170 170 170);
-			color: white;
-			/* overflow-y: scroll; */
+			border: 1px solid #aaa;
+			color: #fff;
 			padding: 0;
-			/* display: inline; */
 			min-width: 100%;
-			/* height: 100%;*/
+			/* height: 100%; */
+			/* overflow: scroll; */
+			padding-bottom: 0.8rem;
 		}
 	}
 

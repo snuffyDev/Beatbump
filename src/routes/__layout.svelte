@@ -140,7 +140,7 @@
 	.footer-container {
 		/* position: fixed; */
 		grid-area: f/f/f/f;
-		height: 4rem;
+		/* height: 4rem; */
 		display: block;
 		z-index: 1;
 	}
