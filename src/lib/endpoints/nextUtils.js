@@ -1,4 +1,4 @@
-import * as utils from '$lib/utils'
+import { pb } from '$lib/utils'
 export function parseContents(
 	contents,
 	continuation,
@@ -8,17 +8,8 @@ export function parseContents(
 	if (contents) {
 		let arr = []
 		let currentMix = current.playlistId
-		contents.forEach((d) => {
-			if (d.hasOwnProperty('playlistPanelVideoRenderer')) {
-				arr.push(d.playlistPanelVideoRenderer)
-			}
-
-			if (d.hasOwnProperty('musicTwoRowItemRenderer')) {
-				arr.push(d.musicTwoRowItemRenderer)
-			}
-			if (d.hasOwnProperty('musicResponsiveListItemRenderer')) {
-				arr.push(d.musicResponsiveListItemRenderer)
-			}
+		contents.map(({ playlistPanelVideoRenderer: ctx }) => {
+			arr.push(ctx)
 		})
 		if (arr.length !== 0) {
 			const results = arr.map((item) => {
@@ -28,10 +19,13 @@ export function parseContents(
 				const mix =
 					item.menu.menuRenderer.items[0].menuNavigationItemRenderer
 						.navigationEndpoint.watchEndpoint.playlistId
-				let menu = utils.pb(item, 'menu:menuRenderer', false)
+				let menu = pb(item, 'menu:menuRenderer', false)
 				if (!Array.isArray(menu)) {
 					menu = [menu]
 				}
+				let longText = [...item.longBylineText.runs]
+				let album = longText.reverse().slice(-3);
+				album = album[0]
 				let temp = []
 				let browseId =
 					item?.longBylineText?.runs[0]?.navigationEndpoint?.browseEndpoint
@@ -39,12 +33,20 @@ export function parseContents(
 				menu.forEach((l) => {
 					let [navigationEndpoint] = temp
 
-					if (l.hasOwnProperty('menuNavigationItemRenderer')) {
+					if (
+						Object.prototype.hasOwnProperty.call(
+							l,
+							'menuNavigationItemRenderer'
+						)
+					) {
 						temp.push(l.menuNavigationItemRenderer)
 					}
 					if (
 						temp.length !== 0 &&
-						navigationEndpoint.hasOwnProperty('browseEndpoint')
+						Object.prototype.hasOwnProperty.call(
+							navigationEndpoint,
+							'browseEndpoint'
+						)
 					) {
 						menu.push(navigationEndpoint.browseEndpoint)
 					}
@@ -54,6 +56,7 @@ export function parseContents(
 				return {
 					index: metaPath.index,
 					itct: metaPath.params,
+					album: album,
 					title: title,
 					artistInfo: {
 						pageType: 'MUSIC_PAGE_TYPE_ARTIST',
@@ -61,6 +64,9 @@ export function parseContents(
 						browseId: browseId
 					},
 					videoId: metaPath.videoId,
+					hash:
+						Math.random().toString(36).substring(2, 15) +
+						Math.random().toString(36).substring(2, 15),
 					autoMixList: mix,
 					thumbnail: item.thumbnail.thumbnails[0].url,
 					length: item.lengthText.runs[0].text
@@ -71,6 +77,10 @@ export function parseContents(
 				continuation: continuation,
 				results: results
 			}
+		}
+	} else {
+		return {
+			error: new Error('error in parsing data')
 		}
 	}
 }

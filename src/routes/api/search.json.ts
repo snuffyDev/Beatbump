@@ -1,114 +1,46 @@
-import type { PlaylistSearch } from "$lib/types";
-const pb = (input, query, justOne = false) => {
-	const iterate = (x, y) => {
-		var r = [];
-
-		x.hasOwnProperty(y) && r.push(x[y]);
-		if (justOne && x.hasOwnProperty(y)) {
-			return r.shift();
-		}
-
-		if (x instanceof Array) {
-			for (let i = 0; i < x.length; i++) {
-				r = r.concat(iterate(x[i], y));
-			}
-		} else if (x instanceof Object) {
-			const c = Object.keys(x);
-			if (c.length > 0) {
-				for (let i = 0; i < c.length; i++) {
-					r = r.concat(iterate(x[c[i]], y));
-				}
-			}
-		}
-		return r.length == 1 ? r.shift() : r;
-	};
-
-	let d = query.split(":"),
-		v = input;
-	for (let i = 0; i < d.length; i++) {
-		v = iterate(v, d[i]);
-	}
-	return v;
-};
-
-export async function get({ query }) {
-	const q = query.get("q") || "";
-	const filter = query.get("filter") || "";
-	const endpoint = query.get("endpoint") || "";
-	const videoId = query.get("videoId") || "";
-	const itct = query.get("itct") || "";
-	const playlistId = query.get("playlistId") || "";
-	const ctoken = query.get("ctoken") || "";
-	const browseId = query.get("browseId") || "";
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import BaseContext from '$lib/context'
+import type { Artist, NextContinuationData, Song } from '$lib/types'
+import type { PlaylistSearch } from '$lib/types/playlist'
+import { pb } from '$lib/utils'
+import type { EndpointOutput } from '@sveltejs/kit'
+interface SearchOutput extends EndpointOutput {
+	contents?: Song | PlaylistSearch
+	didYouMean?: { term: string; endpoint: { query; params } }
+	continuation?: NextContinuationData
+}
+export async function get({ query }): Promise<SearchOutput> {
+	let q = query.get('q') || ''
+	q = decodeURIComponent(q)
+	const filter = query.get('filter') || ''
+	const videoId = query.get('videoId') || ''
+	const itct = query.get('itct') || ''
+	const playlistId = query.get('playlistId') || ''
+	const ctoken = query.get('ctoken') || ''
+	const browseId = query.get('browseId') || ''
 	// console.log(endpoint)
-	const pageType = query.get("pt") || "";
-	const index = query.get("index") || "";
-
-	const gl = query.get("gl") || "";
+	const pageType = query.get('pt') || ''
 
 	try {
 		const response = await fetch(
 			`https://music.youtube.com/youtubei/v1/search?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${
-				ctoken !== "" ? "" : `&sp=EgWKAQIIAWoKEAoQAxAEEAUQCQ%3D%3D`
+				ctoken !== '' ? '' : `&sp=EgWKAQIIAWoKEAoQAxAEEAUQCQ%3D%3D`
 			}${
-				ctoken !== ""
+				ctoken !== ''
 					? `&ctoken=${ctoken}&continuation=${ctoken}&itct=${itct}&type='next'`
-					: ""
+					: ''
 			}`,
 			{
-				method: "POST",
+				method: 'POST',
 				body: JSON.stringify({
-					context: {
-						client: {
-							clientName: "WEB_REMIX",
-							clientVersion: "0.1",
-							deviceMake: "google",
-							platform: "DESKTOP",
-							deviceModel: "bot",
-							experimentIds: [],
-							experimentsToken: "",
-							osName: "Googlebot",
-							osVersion: "2.1",
-							locationInfo: {
-								locationPermissionAuthorizationStatus:
-									"LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED",
-							},
-							musicAppInfo: {
-								musicActivityMasterSwitch:
-									"MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
-								musicLocationMasterSwitch:
-									"MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE",
-								pwaInstallabilityStatus: "PWA_INSTALLABILITY_STATUS_UNKNOWN",
-							},
-							utcOffsetMinutes: -new Date().getTimezoneOffset(),
-						},
-						capabilities: {},
-						request: {
-							internalExperimentFlags: [
-								{
-									key: "force_music_enable_outertube_tastebuilder_browse",
-									value: "true",
-								},
-								{
-									key: "force_music_enable_outertube_playlist_detail_browse",
-									value: "true",
-								},
-								{
-									key: "force_music_enable_outertube_search_suggestions",
-									value: "true",
-								},
-							],
-							sessionIndex: {},
-						},
-						user: {
-							enableSafetyMode: false,
-						},
-						activePlayers: {},
+					...BaseContext,
+					user: {
+						enableSafetyMode: false
 					},
 					browseEndpointContextMusicConfig: {
 						browseEndpointContextMusicConfig: {
-							pageType: `${pageType}`,
-						},
+							pageType: `${pageType}`
+						}
 					},
 					browseId: `${browseId}`,
 
@@ -117,217 +49,209 @@ export async function get({ query }) {
 
 					params: `${filter}`,
 					videoId: `${videoId}`,
-					playlistId: `${playlistId}`,
+					playlistId: `${playlistId}`
 				}),
 				headers: {
-					"Content-Type": "application/json; charset=utf-8",
-					Origin: "https://music.youtube.com",
-					"User-Agent":
-						"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-				},
+					'Content-Type': 'application/json; charset=utf-8',
+					Origin: 'https://music.youtube.com',
+					'User-Agent':
+						'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+				}
 			}
-		);
+		)
 
 		if (!response.ok) {
 			// NOT res.status >= 200 && res.status < 300
-			return { statusCode: response.status, body: response.statusText };
+			return { status: response.status, body: response.statusText }
 		}
-		const data = await response.json();
+		const data: {
+			continuationContents?
+			contents: {
+				sectionListRenderer: {
+					contents: [
+						{
+							messageRenderer?
+							itemSectionRenderer?: {
+								contents: [
+									{
+										didYouMeanRenderer
+										messageRenderer?: { text: { runs: [{ text: string }] } }
+										musicShelfRenderer?
+										musicShelfContinuation?
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		} = await response.json()
 
-		let contents;
-		if (data.hasOwnProperty("continuationContents")) {
-			contents = data.continuationContents;
-			let results = await parseSearchResult(contents, true, filter);
+		if (Object.prototype.hasOwnProperty.call(data, 'continuationContents')) {
+			const { continuationContents } = data
+			const results = parseSearchResult(continuationContents, true, filter)
 
-			// console.log(`contents: `, results);
+			// console.log(`contents: `, results;
 			return {
-				statusCode: 200,
-				body: JSON.stringify(results),
-			};
+				status: 200,
+				body: JSON.stringify(results)
+			}
 		} else {
-			let {
+			const {
 				contents: {
-					sectionListRenderer: {
-						contents: [...rest],
-					},
-				},
-			} = data;
+					sectionListRenderer: { contents: [...rest] = [] } = {}
+				} = {}
+			} = data
 
-			let results = await parseSearchResult(rest, false, filter);
-			if (results?.error) {
-				console.log(results?.error);
-				return { error: results?.error };
-			}
+			const results = parseSearchResult(rest, false, filter)
 
 			return {
-				statusCode: 200,
-				body: JSON.stringify(results),
-			};
-			return results;
+				status: 200,
+				body: JSON.stringify(results)
+			}
 		}
 	} catch (error) {
-		// output to netlify function log
-		console.log(error);
+		// console.log(error)
 		return {
-			statusCode: 500,
-			// Could be a custom message or object i.e. JSON.stringify(err)
-			body: JSON.stringify({ msg: error.message }),
-		};
-	}
-}
-
-function parseSearchResult(data, cont, filter?) {
-	/*
-        data = response data
-        cont = continuation
-    */
-
-	let continuation;
-
-	let didYouMean;
-	let ctx;
-
-	if (cont) {
-		// if has continuation, context = data
-		ctx = [data];
-	} else {
-		/*  Error Handling
-            Message Renderer is for when something goes horribly wrong,
-            itemSectionRenderer is for when there's an error
-        */
-		if (data[0].messageRenderer) return [];
-		if (data[0].itemSectionRenderer) {
-			if (data[0].itemSectionRenderer.contents[0].messageRenderer)
-				return { error: "No Results Found" };
-			didYouMean = correctedQuery(
-				data[0].itemSectionRenderer.contents[0].didYouMeanRenderer
-			);
-
-			ctx = [data[1]];
-		} else {
-			ctx = [data[0]];
+			status: 400,
+			body: error
 		}
 	}
-	// Safety net
-	if (ctx.itemSectionRenderer) return [];
-
-	let results = [];
-	try {
-		ctx.map(async (c) => {
-			let contents = [];
-			if (cont) {
-				let { musicShelfContinuation } = c;
-				contents = musicShelfContinuation;
-			} else {
-				let { musicShelfRenderer } = c;
-				contents = musicShelfRenderer;
-			}
-			/* Search for if the request is for Playlists
-           If not, then parse song request.
-        */
-			// filter = encodeURIComponent(filter);
-			const paramList = [
-				"EgWKAQIoAWoKEAMQBBAKEAUQCQ==",
-				"EgeKAQQoADgBagwQDhAKEAkQAxAEEAU=",
-				"EgeKAQQoAEABagwQDhAKEAkQAxAEEAU=",
-			];
-
-			if (!paramList.includes(filter)) {
-				if (contents.hasOwnProperty("continuations")) {
-					continuation = contents.continuations[0].nextContinuationData;
-				}
-				contents = contents.contents;
-				results = parseSong(contents);
-			} else {
-				if (contents.hasOwnProperty("continuations")) {
-					continuation = contents.continuations[0].nextContinuationData;
-				}
-				contents = contents.contents;
-				results = parsePlaylist(contents);
-			}
-		});
-
-		if (didYouMean !== undefined) {
-			return {
-				contents: results,
-				didYouMean: didYouMean,
-				continuation: false,
-			};
-		}
-		return { contents: results, continuation: continuation };
-	} catch (error) {
-		return { status: 404 };
-	}
 }
-/* Return the data for if there is a corrected query */
-function correctedQuery(ctx) {
-	let correctTerm = ctx.correctedQuery.runs[0].text;
-	let correctedEndpoint = ctx.correctedQueryEndpoint.searchEndpoint;
-
-	return {
-		term: correctTerm,
-		endpoint: correctedEndpoint,
-	};
-}
-
-function parseSong(contents) {
-	const type = "song";
-	let results = [];
-
-	contents.map(({ musicResponsiveListItemRenderer }) => {
-		let d = musicResponsiveListItemRenderer;
-		let explicit;
-		if (d.hasOwnProperty("badges")) explicit = true;
+// Parse the playlist results for search.
+const parsePlaylist = (contents): PlaylistSearch[] => {
+	return contents.map(({ musicResponsiveListItemRenderer }) => {
+		// const d = musicResponsiveListItemRenderer
+		const thumbnails =
+			musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail
+				.thumbnails
+		const browseId =
+			musicResponsiveListItemRenderer.navigationEndpoint.browseEndpoint.browseId
+		const title =
+			musicResponsiveListItemRenderer.flexColumns[0]
+				.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text
 		const flexColumns = pb(
-			d,
-			"musicResponsiveListItemFlexColumnRenderer",
+			musicResponsiveListItemRenderer,
+			'musicResponsiveListItemFlexColumnRenderer',
 			true
-		);
+		)
+		let metaData = pb(flexColumns[1], 'runs:text', true)
+		metaData = metaData.join('')
 
-		let thumbnails = d.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
-		let title = pb(flexColumns[0], "runs:text", true);
+		return {
+			thumbnails: thumbnails,
+			browseId: browseId,
+			metaData: metaData,
+			playlistId:
+				musicResponsiveListItemRenderer.menu?.menuRenderer?.items[0]
+					?.menuNavigationItemRenderer?.navigationEndpoint
+					?.watchPlaylistEndpoint?.playlistId,
+			hash:
+				Math.random().toString(36).substring(2, 15) +
+				Math.random().toString(36).substring(2, 15),
+			title: title,
+			type: 'playlist'
+		}
+	})
+}
 
-		let browseId;
+const parseSong = (contents, type): Song[] => {
+	return contents.map(({ musicResponsiveListItemRenderer }, i) => {
+		// let d = musicResponsiveListItemRenderer
+		let explicit
 		if (
-			d.menu.menuRenderer?.items[5]?.menuNavigationItemRenderer
-				?.navigationEndpoint.browseEndpoint
+			Object.prototype.hasOwnProperty.call(
+				musicResponsiveListItemRenderer,
+				'badges'
+			)
+		)
+			explicit = true
+		const flexColumns = pb(
+			musicResponsiveListItemRenderer,
+			'musicResponsiveListItemFlexColumnRenderer',
+			true
+		)
+
+		const thumbnails =
+			musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail
+				.thumbnails
+		const title =
+			musicResponsiveListItemRenderer.flexColumns[0]
+				.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text
+		// console.log(title)
+
+		let browseId
+		if (
+			musicResponsiveListItemRenderer.menu?.menuRenderer?.items[5]
+				?.menuNavigationItemRenderer?.navigationEndpoint?.browseEndpoint
 		) {
-			let menu = pb(d.menu.menuRenderer, "items", true);
-			let items = pb(menu, "menuNavigationItemRenderer");
+			const menu = pb(
+				musicResponsiveListItemRenderer.menu?.menuRenderer,
+				'items',
+				true
+			)
+			const items = pb(menu, 'menuNavigationItemRenderer')
 			// console.log(items);
 			if (items.length > 4) {
-				browseId = items[3].navigationEndpoint.browseEndpoint.browseId;
+				browseId = items[3].navigationEndpoint.browseEndpoint.browseId
 			} else {
-				browseId = undefined;
+				browseId = undefined
 			}
 		} else {
 			browseId =
-				d.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text
-					?.runs[0]?.navigationEndpoint?.browseEndpoint?.browseId;
+				musicResponsiveListItemRenderer.flexColumns[1]
+					?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
+					?.navigationEndpoint?.browseEndpoint?.browseId
 		}
-		let mixInfo =
-			d.menu.menuRenderer.items[0].menuNavigationItemRenderer
-				.navigationEndpoint;
-		let { videoId = "", playlistId, params } = mixInfo.watchEndpoint;
-		let metaInfo = pb(flexColumns[1], "runs:text", true);
 
-		let length = metaInfo[metaInfo.length - 1];
+		// const { videoId = '', playlistId, params }
+		const videoId =
+			musicResponsiveListItemRenderer.menu?.menuRenderer?.items[0]
+				?.menuNavigationItemRenderer?.navigationEndpoint.watchEndpoint?.videoId
+		const playlistId =
+			musicResponsiveListItemRenderer.menu?.menuRenderer?.items[0]
+				?.menuNavigationItemRenderer?.navigationEndpoint.watchEndpoint
+				?.playlistId
+		const params =
+			musicResponsiveListItemRenderer.menu?.menuRenderer?.items[0]
+				?.menuNavigationItemRenderer?.navigationEndpoint.watchEndpoint?.params
 
-		let artistsArr = metaInfo.reverse();
-		let artists = artistsArr.slice(4);
+		const metaInfo = pb(flexColumns[1], 'runs:text', true)
+		// console.log(metaInfo);
+		let albumInfo
+		if (type == 'song') {
+			const albumArr: [] = flexColumns[1].text.runs
+			const album: {
+				text
+				navigationEndpoint: { browseEndpoint: { browseId } }
+			}[] = albumArr.slice(2, 3)
+
+			albumInfo = {
+				browseId: album[0]?.navigationEndpoint?.browseEndpoint?.browseId,
+				title: album[0]?.text
+			}
+		} else {
+			albumInfo = null
+		}
+		// let album = {};
+		const length = metaInfo[metaInfo.length - 1]
+
+		const artistsArr = metaInfo.reverse()
+		const artists = artistsArr.slice(4)
 		if (artists.length > 1) {
 			for (let i = 0; i < artists.length; i++) {
-				artists.splice(i + 1, 1);
+				artists.splice(i + 1, 1)
 			}
 		}
-		artists.reverse();
-		let artistInfo = {
+		artists.reverse()
+		const artist: Artist = {
 			browseId: browseId,
-			artists: artists,
-		};
+			artist: artists
+		}
 		// console.log(artists, artists)
-		let result = {
-			artistInfo: artistInfo,
+		return {
+			album: albumInfo,
+			artistInfo: artist,
 			title: title,
 			videoId: videoId,
 			type: type,
@@ -336,48 +260,114 @@ function parseSong(contents) {
 			playlistId: playlistId,
 			thumbnails: thumbnails,
 			explicit: explicit,
+			index: i++,
 			hash:
 				Math.random().toString(36).substring(2, 15) +
-				Math.random().toString(36).substring(2, 15),
-		};
-		results.push(result);
-	});
-	return results;
+				Math.random().toString(36).substring(2, 15)
+		}
+	})
 }
-// Parse the playlist results for search.
-function parsePlaylist(contents) {
-	let results = [];
 
-	let type = "playlist";
-	contents.map(({ musicResponsiveListItemRenderer }) => {
-		const d = musicResponsiveListItemRenderer;
-		let thumbnails = d.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails;
-		let browseId = d.navigationEndpoint.browseEndpoint.browseId;
-		let title =
-			d.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0]
-				.text;
-		const flexColumns = pb(
-			d,
-			"musicResponsiveListItemFlexColumnRenderer",
-			true
-		);
-		let metaData = pb(flexColumns[1], "runs:text", true);
-		metaData = metaData.join("");
+function parseSearchResult(data, cont, filter?) {
+	/*
+        data = response data
+        cont = continuation
+				*/
 
-		const result: PlaylistSearch = {
-			thumbnails: thumbnails,
-			browseId: browseId,
-			metaData: metaData,
-			playlistId:
-				d.menu.menuRenderer?.items[0]?.menuNavigationItemRenderer
-					.navigationEndpoint.watchPlaylistEndpoint.playlistId,
-			hash:
-				Math.random().toString(36).substring(2, 15) +
-				Math.random().toString(36).substring(2, 15),
-			title: title,
-			type: type,
-		};
-		results.push(result);
-	});
-	return results;
+	let continuation
+
+	let didYouMean
+	let ctx
+
+	if (cont) {
+		// if has continuation, context = data
+		ctx = [data]
+	} else {
+		/*  Error Handling
+            Message Renderer is for when something goes horribly wrong,
+            itemSectionRenderer is for when there's an error
+        */
+		if (data[0].messageRenderer) return []
+		if (data[0].itemSectionRenderer) {
+			if (data[0].itemSectionRenderer?.contents[0].messageRenderer)
+				return { error: 'No Results Found' }
+			didYouMean = correctedQuery(
+				data[0]?.itemSectionRenderer?.contents[0].didYouMeanRenderer
+			)
+
+			ctx = [data[1]]
+		} else {
+			ctx = [data[0]]
+		}
+	}
+	// Safety net
+	if (ctx.itemSectionRenderer) return []
+
+	let results: Song[] | PlaylistSearch[] = []
+
+	ctx.map((c) => {
+		let contents = []
+		if (cont) {
+			const { musicShelfContinuation } = c
+			contents.push(musicShelfContinuation)
+		} else {
+			const { musicShelfRenderer } = c
+			contents.push(musicShelfRenderer)
+		}
+		/* Search for if the request is for Playlists
+           If not, then parse song request.
+        */
+		filter = decodeURIComponent(filter)
+		const paramList = [
+			'EgWKAQIoAWoKEAMQBBAKEAUQCQ==',
+			'EgeKAQQoADgBagwQDhAKEAkQAxAEEAU=',
+			'EgeKAQQoAEABagwQDhAKEAkQAxAEEAU='
+		]
+		const videoParams = 'EgWKAQIQAWoKEAMQBBAKEAUQCQ=='
+
+		if (!paramList.includes(filter) && !videoParams.includes(filter)) {
+			const { contents: ctx } = contents[0]
+			continuation = continuationCheck(contents[0])
+
+			// console.log(contents)
+			results = parseSong(ctx, 'song')
+			return { results, continuation }
+		} else if (videoParams == filter) {
+			continuation = continuationCheck(contents[0])
+
+			const { contents: ctx } = contents[0]
+			results = parseSong(ctx, 'video')
+			return { results, continuation }
+		} else {
+			continuation = continuationCheck(contents[0])
+			contents = contents[0]?.contents
+			results = parsePlaylist(contents)
+			return { results, continuation }
+		}
+	})
+
+	if (didYouMean !== undefined) {
+		return {
+			contents: results,
+			didYouMean: didYouMean,
+			continuation: continuation
+		}
+	}
+	return { contents: results, continuation: continuation }
+}
+function continuationCheck(contents) {
+	if (!Object.prototype.hasOwnProperty.call(contents, 'continuations')) {
+		return
+	}
+	return { ...contents?.continuations[0].nextContinuationData }
+}
+/* Return the data for if there is a corrected query */
+function correctedQuery(ctx) {
+	const correctTerm = ctx?.correctedQuery?.runs[0].text
+	const correctedEndpoint = ctx?.correctedQueryEndpoint?.searchEndpoint
+
+	return {
+		term: correctTerm,
+		endpoint: correctedEndpoint
+	}
 }

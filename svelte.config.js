@@ -17,7 +17,7 @@ export default {
 	preprocess: sveltePreprocess({
 		scss: {
 			includePaths: ['src'],
-			prependData: `@import 'src/global/scss/utility/themes.scss'; @import 'src/global/scss/utility/_mixins.scss';`
+			prependData: `@import 'src/global/scss/utility/_mixins.scss';`
 		},
 		defaults: {
 			style: 'postcss',
@@ -30,7 +30,7 @@ export default {
 	}),
 	kit: {
 		adapter: dev ? node() : worker(),
-		target: "#app",
+		target: '#app',
 		files: {
 			assets: 'static',
 			lib: 'src/lib',
@@ -44,6 +44,14 @@ export default {
 				alias: {
 					$stores: path.resolve('./src/lib/stores'),
 					$components: path.resolve('./src/lib/components')
+				}
+			},
+			cleanCssOptions: {
+				level: {
+					2: {
+						all: true,
+						removeDuplicateRules: true
+					}
 				}
 			}
 		}

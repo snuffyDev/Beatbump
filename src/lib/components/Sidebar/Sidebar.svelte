@@ -1,13 +1,17 @@
 <script>
-	import { fade, slide, fly } from "svelte/transition";
-	import Icon from "$components/Icon/Icon.svelte";
-	import Search from "$components/Search/Search.svelte";
+	import { fade, slide, fly } from 'svelte/transition'
+	import Icon from '$components/Icon/Icon.svelte'
+	import Search from '$components/Search/Search.svelte'
+	import { theme } from '$lib/stores/stores'
 </script>
 
-<div class="sidebar" transition:fly>
+<div
+	class="sidebar"
+	style={`background-color: var(--${$theme}-side)`}
+	transition:fly>
 	<section class="head">
 		<slot name="head">
-			<Search /></slot>
+			<Search type="block" /></slot>
 		<br />
 	</section>
 	<section class="mid">
@@ -52,6 +56,7 @@
 		border-right: 0.0625rem outset hsla(0, 0%, 66.7%, 0.123);
 		box-sizing: border-box;
 		display: none;
+		visibility: hidden;
 		contain: layout;
 		grid-area: s;
 		grid-template-rows: 1fr 1fr 1fr;
@@ -81,6 +86,8 @@
 	@media (min-width: 640px) {
 		.sidebar {
 			display: grid;
+
+			visibility: visible;
 		}
 	}
 </style>

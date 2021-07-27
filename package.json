@@ -2,7 +2,7 @@
 	"name": "beatbump",
 	"version": "0.0.8",
 	"scripts": {
-		"dev": "svelte-kit dev --host --port 5000",
+		"dev": "svelte-kit dev --port 5000 --host",
 		"cache:delete": "rmdir /S /Q build && rmdir /S /Q .svelte-kit",
 		"deploy:clean": "npm run cache:delete && npm run build && wrangler publish",
 		"deploy": "npm run build && wrangler publish",
@@ -41,5 +41,8 @@
 	"type": "module",
 	"engines": {
 		"node": ">= 12.17.0"
+	},
+	"dependencies": {
+		"@fontsource/commissioner": "^4.5.0"
 	}
 }

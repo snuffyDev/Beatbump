@@ -2,6 +2,7 @@
 	"compilerOptions": {
 		"moduleResolution": "node",
 		"module": "ES2020",
+		"lib": ["es2020"],
 		"target": "ES2020",
 		/**
 			svelte-preprocess cannot figure out whether you have a value or a type, so tell TypeScript
@@ -9,6 +10,8 @@
 			*/
 		"importsNotUsedAsValues": "error",
 		"isolatedModules": true,
+		"resolveJsonModule": true,
+
 		/**
 			To have warnings/errors of the Svelte compiler at the correct position,
 			enable source maps by default.

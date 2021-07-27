@@ -85,12 +85,10 @@ body {
 	overflow: hidden;
 }
 .body {
-	grid-template-rows: 4rem auto 4rem;
+	grid-template-rows: 4rem 1fr 4rem;
 	position: fixed;
 	height: 100%;
 	width: 100%;
-	margin: 0;
-
 	line-height: 1.5;
 	display: grid;
 	grid-template-areas:
@@ -98,8 +96,6 @@ body {
 		"m m m m"
 		"f f f f";
 	grid-template-columns: 16.1255rem 1fr;
-
-	overflow: hidden;
 	max-width: 100%;
 }
 @media (min-width: 640px) {
@@ -113,4 +109,5 @@ body {
 main {
 	margin: 0 auto;
 	padding: 1rem;
+	position: relative;
 }

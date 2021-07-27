@@ -1,22 +1,28 @@
 <script>
-	import { goto } from "$app/navigation";
+	import { goto } from '$app/navigation'
+	import { navigating } from '$app/stores'
 
-	$: redir = 10;
+	let redir = 5
+	let timeout
 	const redirect = () => {
-		redir = redir - 1;
-		if (redir <= 0) {
-			goto("/");
+		if (!$navigating) {
+			redir = redir - 1
+			if (redir <= 0) {
+				goto('/')
+			} else {
+				timeout = setTimeout(redirect, 1000)
+			}
 		} else {
-			setTimeout(redirect, 1000);
+			clearTimeout(timeout)
 		}
-	};
-	redirect();
+	}
+	redirect()
 </script>
 
 <main>
 	<a href="/" class="logolink">
 		<div class="logo"><img src="/logo-header.png" alt="logo" /></div>
-</a>
+	</a>
 	<h1>Uh-Oh!</h1>
 	<h5>Looks like you hit a dead end!</h5>
 
@@ -26,7 +32,6 @@
 
 <style lang="scss">
 	.logolink {
-
 	}
 	main {
 		text-align: center;

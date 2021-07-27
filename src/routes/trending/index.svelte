@@ -1,159 +1,166 @@
 <script context="module">
-	// import { getTrending } from './index.json'
 	export async function load({ page, fetch }) {
-		const slug = page.params.slug;
-		const data = await fetch("/trending.json?q=browse");
-		const { carouselItems } = await data.json();
-
-		if (!data.ok) {
-			return {
-				status: 400,
-				error: data.statusText,
-			};
-		}
+		const data = await fetch('/trending.json?q=browse')
+		const response = await data.json()
 		return {
 			props: {
-				carouselItems,
+				carouselItems: await response,
+				test: await response
 			},
 			maxage: 3600,
-			status: 200,
-		};
+			status: 200
+		}
 	}
 </script>
 
 <script lang="ts">
-	export let carouselItems;
-	import { currentTitle } from "$stores/stores";
-	import Loading from "$components/Loading/Loading.svelte";
-	import * as utils from "$lib/utils";
+	export let carouselItems
+	export let test
+	import { currentTitle } from '$stores/stores'
+	import Carousel from '$components/Carousel/Carousel.svelte'
+	import type { CarouselItem } from '$lib/types'
+	$: console.log(carouselItems, test)
 
-	import Carousel from "$components/Carousel/Carousel.svelte";
-
-	let moods = [];
-	let genres = [];
-	$: console.log(carouselItems);
-	let browseId = "FEmusic_explore";
-
-	const handler = getTracks();
-
-	function getTracks() {
-		utils
-			.moodsAndGenres("FEmusic_moods_and_genres")
-			.then((data) => {
-				let moodsArr = data[0][0];
-				let genresArr = data[1][0];
-
-				genres = [...genresArr.items.slice(0, 10)];
-				utils.shuffle(genres);
-				moods = [...moodsArr.items.slice(0, 10)];
-				return { genres, moods };
-			})
-			.finally((msg) => {
-				console.log(genres, moods);
-			});
-		// @ts-ignore
-	}
+	// const moodsAndGenres =  carouselItems[1].results.slice(0,15)
 </script>
 
 <svelte:head>
-	<title
-		>{$currentTitle === undefined || null ? "Trending" : $currentTitle} - Beatbump</title>
+	<title>{$currentTitle ? $currentTitle : 'Trending'} - Beatbump</title>
+	<meta name="description" content="The latest trending songs" />
+	<meta name="keywords" content="Trending, music, stream" />
+	<meta name="og:url" content="https://beatbump.ml/trending" />
+	<meta name="og:title" content="Trending" />
 </svelte:head>
-{#await carouselItems}
-	<Loading />
-{:then _}
+{#await carouselItems then _}
 	<main>
 		<Carousel
-			setTitle={carouselItems[2].header[0].title}
+			setTitle={carouselItems[2].header.title}
 			items={carouselItems[2].results}
 			type="trending" />
 
+		<div class="breakout">
+			<div class="box-cont">
+				<h1>{carouselItems[1].header.title}</h1>
+				<div class="m-alert-info"><em>Coming Soon!</em></div>
+				<box>
+					{#each carouselItems[1].results.slice(1, 15) as item}
+						<div
+							style={`border-left: var(--xs-radius) solid #${item.color}`}
+							class="box">
+							<div class="innerbox">
+								<a class="innerlink" href={`/explore/${item.endpoint.params}`}
+									>{item.text}</a>
+							</div>
+						</div>
+					{/each}
+				</box>
+				<a class="link" href="/explore">See All</a>
+			</div>
+		</div>
 		<Carousel
-			setTitle={carouselItems[3].header[0].title}
+			setTitle={carouselItems[3].header.title}
 			items={carouselItems[3].results}
 			type="trending" />
 		<Carousel
-			setTitle={carouselItems[0].header[0].title}
+			setTitle={carouselItems[0].header.title}
 			items={carouselItems[0].results}
 			type="new" />
-		<div class="breakout">
-			<div class="box-cont">
-				<section-header>Moods</section-header>
-				<div class="m-alert-info"><em>Coming Soon!</em></div>
-				<box>
-					{#each moods as moods}
-						<div
-							style={`border-left: 0.4286rem solid ${moods.colorCode}`}
-							class="box">
-							{moods.text}
-						</div>
-					{/each}
-				</box>
-				<span class="link" on:click={() => alert("Coming Soon!")}>See All</span>
-
-				<hr />
-				<section-header>Genres</section-header>
-				<div class="m-alert-info"><em>Coming Soon!</em></div>
-
-				<box>
-					{#each genres as genres}
-						<div
-							style={`border-left: 0.4286rem solid ${genres.colorCode}`}
-							class="box">
-							{genres.text}
-						</div>
-					{/each}
-				</box>
-				<span class="link" on:click={() => alert("Coming Soon!")}>See All</span>
-			</div>
-		</div>
 	</main>
+{:catch err}
+	{err}
 {/await}
 
 <style lang="scss">
-	section-header {
-		font-weight: 700;
-		font-size: 1.5rem;
-		margin: 0 0 0rem 0;
+	.header {
+		padding: 0.4em 0.4em 0.2em;
+		margin-bottom: 0.4em;
+		font-weight: 600;
+		letter-spacing: -0.02em;
+
+		h1 {
+			font-size: 1.85em;
+			@media screen and (min-width: 800px) {
+				font-size: 2.05em;
+			}
+		}
 	}
+	// h1 {
+	// 	cursor: pointer;
+	// 	display: inline;
+	// 	font-weight: 450;
+	// 	// font-size: 1.05rem;
+	// 	font-family: 'Commissioner', sans-serif;
+	// 	margin-bottom: 0.8em;
+	// 	letter-spacing: -0.02em;
+	// }
+
 	.breakout {
 		// border: 2px solid rgba(119, 136, 153, 0.171);
 		border-radius: 0.8rem;
 		// padding: 0.8rem;
 	}
 	.box-cont {
-		// display: flex;
-		// width: 100%;
-		// flex-direction: column;
-		// flex-wrap: wrap;
 		justify-content: space-around;
 
 		padding: 0.8rem;
 	}
 	box {
 		display: grid;
+		width: 100%;
+		// overflow-x: scroll;
+		white-space: nowrap;
 		// grid-gap: 1rem;
 
-		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
 
 		grid-gap: 0.8rem;
 	}
 	.box {
 		margin-bottom: 0.8rem;
 		cursor: pointer;
-		background: #17151c;
 		display: flex;
 		justify-content: flex-start;
 		flex-direction: row;
 		flex-wrap: nowrap;
-		text-overflow: clip;
+		// text-overflow: clip;
+		text-align: start;
 		font-size: 100%;
-		min-width: 180px;
-		border-radius: 0.8rem;
+		border-radius: var(--md-radius);
 		width: 100%;
 		align-items: center;
-		white-space: nowrap;
+		// white-space: normal;
+		border-right: none;
 		height: 3rem;
-		padding: 0 0 0 1rem;
+		position: relative;
+		.innerbox {
+			height: 100%;
+			padding: 0 0 0 1rem;
+			align-items: center;
+
+			display: flex;
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			// z-index: 5;
+			// display: inline-bloc // k;;
+			border-radius: var(--md-radius);
+			width: 100%;
+			background: #17151c;
+		}
+		&::before {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			content: '';
+			width: 100%;
+			z-index: 0;
+			border-radius: inherit;
+			height: 100%;
+			background: #17151c;
+		}
 	}
 </style>

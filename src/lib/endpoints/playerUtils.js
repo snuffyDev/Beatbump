@@ -14,8 +14,9 @@ export const sort = (data) => {
 			streamingData['adaptiveFormats']
 		)
 		let arr = []
-
-		formatParent.forEach((i) => {
+		let getNext
+		// console.log(formatParent, streamingData)
+		formatParent.map((i) => {
 			if (i.mimeType.includes('audio')) {
 				if (
 					i.audioChannels === 2 &&
@@ -26,6 +27,7 @@ export const sort = (data) => {
 				}
 			}
 		})
+		// console.log(arr)
 		if (arr.length !== 0) {
 			return arr.map((format) => {
 				return {
@@ -33,7 +35,9 @@ export const sort = (data) => {
 				}
 			})
 		}
-		return null
+
+		return [{ url: null }]
+		// return null
 	} catch (e) {
 		console.log('Fetch error', e)
 

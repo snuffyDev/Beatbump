@@ -1,0 +1,25 @@
+.l-search,
+.parent {
+	width: 100%;
+	align-items: center;
+	justify-items: center;
+	grid-area: m/m/m/m;
+	height: 100%;
+}
+
+.l-wrapper,
+.wrapper {
+	overflow: hidden;
+	overflow-y: scroll;
+	-webkit-overflow-scrolling: touch;
+	display: block;
+	touch-action: pan-y;
+	grid-area: m/m/m/m;
+}
+
+@media (min-width: 640px) {
+	.l-search,
+	.parent {
+		width: calc(100% - 40px);
+	}
+}

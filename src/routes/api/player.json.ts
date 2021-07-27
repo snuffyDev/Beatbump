@@ -16,6 +16,9 @@ export async function get({ query }) {
 							clientName: 'ANDROID',
 							clientVersion: '16.02'
 						},
+						user: {
+							enableSafetyMode: false
+						},
 						playlistId: `${playlistId}`,
 
 						captionParams: {},
@@ -31,19 +34,19 @@ export async function get({ query }) {
 
 		if (!response.ok) {
 			// NOT res.status >= 200 && res.status < 300
-			return { statusCode: response.status, body: response.statusText }
+			return { status: response.status, body: response.statusText }
 		}
 		const data = await response.json()
 
 		return {
-			statusCode: 200,
+			status: 200,
 			body: JSON.stringify(data)
 		}
 	} catch (error) {
 		// output to netlify function log
 		console.log(error)
 		return {
-			statusCode: 500,
+			status: 500,
 			// Could be a custom message or object i.e. JSON.stringify(err)
 			body: JSON.stringify({ msg: error.message })
 		}

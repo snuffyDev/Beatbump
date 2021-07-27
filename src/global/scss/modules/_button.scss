@@ -2,18 +2,19 @@
 // All rules related to the .button module
 
 %button-base {
-	transition: background, 0.2s;
+	transition: background, 75ms;
 	// display: inline-block;
 	padding: 0.5em 1em;
-	color: #fff !important; // !important is added to colors in order to make button utility immutable.  Otherwise, it's common for `a` styles to override button specificity.
-	background-color: $color-primary !important;
-	border: 1px solid $color-primary;
+	color: #0e0e0e !important; // !important is added to colors in order to make button utility immutable.  Otherwise, it's common for `a` styles to override button specificity.
+	background-color: #fffffff2 !important;
+	border: 1px solid #121212 !important;
 	border-radius: $base-border-radius;
+	font-family: 'Commissioner', sans-serif !important;
 	font-size: 1.2em;
-	font-weight: 400;
+	font-weight: 500 !important;
 	text-transform: none;
-	text-align: center;
-	vertical-align: middle;
+	// text-align: center;
+	// vertical-align: middle;
 	white-space: nowrap;
 	cursor: pointer;
 	-webkit-user-select: none;
@@ -30,8 +31,9 @@
 	&:active,
 	&.active {
 		color: #fff;
-		// background-color: lighten($base-color, 10%) !important;
-		border-color: $base-color !important;
+		background-color: darken(#f2f2f2f3, 10%) !important;
+		border-color: #202020 !important;
+		// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
 		outline: 0;
 		text-decoration: none;
 	}

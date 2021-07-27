@@ -1,118 +1,34 @@
 <script>
-	import Search from "$components/Search/Search.svelte";
-	import { fade } from "svelte/transition";
-	import Icon from "$components/Icon/Icon.svelte";
-	import { circIn } from "svelte/easing";
-	import { goto } from "$app/navigation";
-	import { clickOutside } from "$lib/js/clickOutside";
-	import { filterAutoPlay, theme } from "$stores/stores";
-	import { onMount } from "svelte";
-	import { page } from "$app/stores";
+	import Settings from './Settings.svelte'
 
-	export let width;
-
-	let isHidden = true;
-	let hidden = isHidden ? true : false;
-	$: curTheme = $theme;
-	let isSettings = true;
-	let settingsHidden = isSettings ? true : false;
-	let setTheme = localStorage.getItem("theme")
-		? localStorage.getItem("theme")
-		: "";
-	let setFilter = $filterAutoPlay;
-	// onMount(() => {
-	// 	if (!$theme) {
-	// 		setTheme = $theme
-	// 	} else {
-	// 		setTheme = $theme
-	// 	}
-	// })
-	// const naviBack = (home = "/trending") => {
-	// 	const ref = document.referrer;
-	// 	history.back();
-	// 	goto(ref.length > 0 ? ref : home);
-	// };
-	let themeSet = $theme;
-	$: console.log($page.path);
-
-	let themes = [{ name: "dark" }, { name: "dim" }, { name: "ytm" }];
-	$: console.log(setTheme);
-	// $: theme.set($theme)
+	import Search from '$components/Search/Search.svelte'
+	import { fade } from 'svelte/transition'
+	import Icon from '$components/Icon/Icon.svelte'
+	import { circIn } from 'svelte/easing'
+	import { goto } from '$app/navigation'
+	import { clickOutside } from '$lib/js/clickOutside'
+	export let width
+	import { theme } from '$stores/stores'
+	let isHidden = true
+	let hidden = isHidden ? true : false
+	let isSettings
+	let shown
 </script>
 
-<div class="logo">
-	<!-- {#if $page.path !== "/trending"}
-		<div class="back-button" transition:fade on:click={() => naviBack}>
-			<Icon name="chevron-left" size="1.5em" />
+<nav class="nav" style={`background-color: var(--${$theme}-top)`}>
+	<div class="logo">
+		<div on:click={() => go()}>
+			<img
+				src="/logo-header.png"
+				width="2.5rem"
+				height="0.5rem"
+				alt="logo"
+				title="Beatbump Home" />
 		</div>
-	{:else} --><a
-		href="/trending">
-		<img
-			src="/logo-header.png"
-			width="2.5rem"
-			height="0.5rem"
-			transition:fade
-			alt="logo"
-			title="Beatbump Home" />
-	</a>
-	<!-- {/if} -->
-</div>
-{#if width > 640}
-	<div
-		style="background-color:inherit;"
-		class:shown={width > 640}
-		class:desktop={width < 640}>
-		<div
-			class="nav-item-desktop"
-			on:click={() => {
-				settingsHidden = !settingsHidden;
-			}}>
-			<svelte:component this={Icon} name="settings" size="1.75em" />
-		</div>
-		{#if !settingsHidden}
-			<div
-				use:clickOutside
-				on:click_outside={() => {
-					settingsHidden = !settingsHidden;
-				}}
-				class="nav-settings"
-				style={`background-color: var(--${curTheme}-top)}`}
-				transition:fade={{ duration: 120, easing: circIn }}>
-				<!-- <label for="search"><em>search</em></label> -->
-				<div class="setting">
-					<span class="s-text">Theme:</span>
-					<div class="selectCont">
-						<!-- svelte-ignore a11y-no-onchange -->
-						<select
-							class="select"
-							bind:value={setTheme}
-							on:change={() => {
-								theme.set(setTheme);
-							}}>
-							{#each themes as theme}
-								<option value={theme.name} selected={setTheme}
-									>{theme.name}</option>
-							{/each}
-						</select>
-					</div>
-				</div>
-				<div class="setting">
-					<span class="s-text"
-						>Dedupe Automix: <input
-							type="checkbox"
-							bind:checked={setFilter}
-							on:change={() => {
-								filterAutoPlay.set(setFilter);
-
-								// console.log(setFilter);
-							}} /></span>
-				</div>
-			</div>
-		{/if}
+		<!-- {/if} -->
 	</div>
-{/if}
-{#if width < 640}
-	<section class="homeIcon" on:click={() => goto("/")}>
+
+	<section class="homeIcon" on:click={() => goto('/')}>
 		<Icon name="home" size="1.75em" />
 	</section>
 	<section class="items">
@@ -120,20 +36,19 @@
 			<div
 				use:clickOutside
 				on:click_outside={() => {
-					hidden = !hidden;
+					hidden = !hidden
 				}}
 				class="nav-search"
-				transition:fade={{ duration: 120, easing: circIn }}
-				class:hidden>
-				<!-- <label for="search"><em>search</em></label> -->
+				transition:fade={{ duration: 75, easing: circIn }}
+				class:hidden={width > 640 || hidden}>
 				<Search
 					type="inline"
 					on:submitted={(event) => {
-						hidden = !hidden;
+						hidden = !hidden
 					}} />
 				<div
 					on:click={() => {
-						hidden = !hidden;
+						hidden = !hidden
 					}}
 					class="x-button">
 					<Icon name="x" size="1.5em" />
@@ -141,148 +56,89 @@
 			</div>
 		{/if}
 		<div
-			class="nav-item"
+			class="nav-item__search"
 			on:click={() => {
-				hidden = !hidden;
+				shown = !shown
+				hidden = !hidden
 			}}>
 			<svelte:component this={Icon} name="search" size="1.75em" />
 		</div>
-		{#if !settingsHidden}
-			<div
-				use:clickOutside
-				on:click_outside={() => {
-					settingsHidden = !settingsHidden;
-				}}
-				class="nav-settings"
-				style={`background-color: var(--${curTheme}-top)}`}
-				transition:fade={{ duration: 120, easing: circIn }}>
-				<!-- <label for="search"><em>search</em></label> -->
-				<div class="setting">
-					<span class="s-text">Theme:</span>
-					<div class="selectCont">
-						<!-- svelte-ignore a11y-no-onchange -->
-						<select
-							class="select"
-							bind:value={setTheme}
-							on:change={() => {
-								theme.set(setTheme);
-							}}>
-							{#each themes as theme}
-								<option value={theme.name}>{theme.name}</option>
-							{/each}
-						</select>
-					</div>
-				</div>
-				<div class="setting">
-					<span class="s-text"
-						>Dedupe Automix: <input
-							type="checkbox"
-							bind:checked={setFilter}
-							on:change={() => {
-								filterAutoPlay.set(setFilter);
-
-								console.log(setFilter);
-							}} /></span>
-				</div>
-			</div>
-		{/if}
+		<Settings bind:isSettings />
 		<div
-			class="nav-item"
-			on:click={() => {
-				settingsHidden = !settingsHidden;
+			class:btn-settings-desktop={width > 640}
+			class="nav-item btn-settings"
+			on:click|stopPropagation={() => {
+				isSettings = !isSettings
 			}}>
 			<svelte:component this={Icon} name="settings" size="1.75em" />
 		</div>
 	</section>
-{/if}
+</nav>
 
 <style lang="scss">
-	.desktop.nav-item {
-		// position: absolute;
-		// right: 0;
-		// z-index: 5;
+	.btn-settings {
+		cursor: pointer;
 	}
 	.homeIcon {
-		width: 2rem;
 		max-width: 2rem;
-		display: inline;
-	}
-	.s-text {
-		padding: 0 0.8rem 0.2rem 0.8rem; /* align-self: start; */
-		font-size: 1.1rem;
-		// margin-right: 4rem;
+		visibility: visible;
+		grid-area: m;
+		visibility: visible;
+		justify-self: center;
+		justify-content: center;
+		@media screen and (min-width: 640px) {
+			display: none;
+			visibility: hidden;
+		}
 	}
 	.x-button {
 		padding: 1em;
+		right: 0;
+		position: absolute;
 	}
 	.hidden {
 		display: none;
+		visibility: hidden;
 	}
 	.shown {
-		visibility: visible;
-		display: block;
+		visibility: visible !important;
 	}
 	.desktop {
 		visibility: hidden;
 		display: none;
 	}
-	.nav-search > :nth-child(2) {
-		right: 0;
-		position: fixed;
-	}
+
 	.nav-item {
 		margin-bottom: 0;
+		display: initial;
+		visibility: visible;
+
+		.nav-item {
+			margin-right: 1.75em;
+		}
+		@media screen and (min-width: 640px) {
+			&__search {
+				display: none !important;
+				visibility: hidden !important;
+			}
+		}
+
+		&__search {
+			display: initial;
+			visibility: visible;
+
+			margin-right: 1.75rem;
+		}
 		&-desktop {
 			place-items: end;
 		}
 	}
-	.nav-settings {
-		position: absolute;
-		right: 0;
-		top: 4em;
-		display: flex;
-		border-top: 0.125px inset hsla(0, 0%, 66.7%, 0.26);
-		background-color: inherit;
-		padding: 0.5em 0em 0.5em 0;
-		z-index: 10;
-
-		border-radius: 0 0rem 0.5rem 0.5rem;
-		flex-direction: column;
-		width: 100%;
-		overflow: hidden;
-		max-width: 25%;
-		@media screen and (max-width: 640px) {
-			max-width: 100%;
-		}
-		// box-shadow: -0.125rem 0.3rem 0.25rem 0.125rem #00000052;
-		border: 0.125px solid #aaaaaa45;
-		border-top: 0;
-
-		.setting {
-			display: flex;
-			flex-wrap: nowrap;
-			align-items: stretch;
-			padding: 0.2rem 0.4rem;
-			margin-bottom: 0.5rem;
-			// border-bottom: 0.0143rem #63636352 solid;
-			// box-shadow: -0.125rem 0.3rem 0.25rem 0.125rem #63636352;
-			// justify-content: space-around;
-			// margin-bottom: 0.8rem;
-			flex-direction: column;
-			vertical-align: top;
-			&:last-child {
-				border-bottom: 0;
-			}
-		}
-	}
 
 	.items {
-		display: flex;
-		flex-direction: row;
 		background-color: inherit;
-
-		// width: 100%;
-		margin-left: auto;
+		/* margin-left: auto; */
+		grid-area: r;
+		justify-self: end;
 		.nav-item {
 			margin-right: 1.75em;
 		}

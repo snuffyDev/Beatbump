@@ -1,0 +1,216 @@
+.m-alert-danger {
+	h6 {
+		margin: 0;
+	}
+}
+.item {
+	cursor: pointer;
+}
+button {
+	font-family: inherit;
+	display: inline-flex;
+	font-weight: 500;
+}
+.button--outlined {
+	color: #070707 !important;
+	border-color: #fff !important;
+	background-color: #fff !important;
+	margin-top: 0.5rem;
+	font-weight: 700;
+	display: inline-flex;
+	align-items: center;
+	* {
+		margin-left: 1.5em;
+	}
+	// font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+	-webkit-font-smoothing: antialiased;
+}
+.subtitle {
+	margin: 0 0 0.25em 0;
+
+	@media screen and (max-width: 500px) {
+		// font-size: 1.5rem;
+		margin: 0 0 0em 0;
+	}
+}
+.box-title {
+	font-weight: bold;
+	font-size: 2.1em;
+	letter-spacing: -0.01rem;
+	text-overflow: ellipsis;
+	/* width: 100%; */
+	/* max-width: 90px; */
+	margin-right: 1.8rem;
+	line-break: strict;
+	line-break: strict;
+	margin: 0 0 0.5rem;
+	@media screen and (max-width: 640px) {
+		font-size: 1.75em;
+	}
+	@media screen and (max-width: 876px) {
+		font-size: 2em;
+	}
+	@media screen and (max-width: 500px) {
+		font-size: 1.5rem;
+	}
+}
+small {
+	display: inline;
+	justify-self: flex-end;
+}
+
+.box {
+	align-content: center;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	margin: 1em;
+	background-color: rgb(170 170 170 / 10%);
+	padding: 0.8em;
+	border-color: rgb(170 170 170);
+	border-width: 1px;
+	border-radius: 0.8em;
+	// display: flex;
+	// flex-wrap: wrap;
+	width: auto;
+
+	// flex-direction: row;
+	transition: all 0.23s cubic-bezier(0.39, 0.575, 0.565, 1);
+	// /* display: flex; */
+	/* flex-wrap: wrap; */
+	// display: block;
+}
+// .box {
+// 	display: block;
+// 	flex-wrap: unset;
+// }
+hr {
+	border-color: rgba(170, 170, 170, 0.062);
+	width: 100%;
+	border-width: 0.0143rem;
+	border-style: groove;
+
+	margin-bottom: 0.1em;
+}
+.img {
+	max-width: 12rem;
+	max-height: 12rem;
+	min-width: 12rem;
+	position: relative;
+	aspect-ratio: 1/1;
+	height: auto;
+	align-self: center;
+	width: 100%;
+	img {
+		box-shadow: 0 0 1.5rem 0.125rem rgb(0 0 0 / 37%);
+		/* max-width: inherit; */
+		/* max-height: inherit; */
+		max-width: inherit;
+		border-radius: 2%;
+		box-shadow: 0 0 1.5rem 0.125rem rgb(0 0 0 / 37%);
+
+		filter: drop-shadow(0.012rem 0.024rem 0.05rem black);
+
+		// min-width: inherit;
+		// min-height: inherit;
+		max-height: inherit;
+		-o-object-fit: cover;
+		object-fit: cover;
+		aspect-ratio: inherit;
+		height: auto;
+		width: 100%;
+	}
+}
+.info-wrapper {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	flex: 1 1 auto;
+}
+.info {
+	/* margin-left: auto; */
+	margin-right: auto;
+	padding-left: 1.5rem;
+	@media screen and (max-width: 500px) {
+		// margin-right: 0.5rem;
+		padding-left: 0.5rem;
+		// font-size: 1.5rem;
+	}
+	/* float: revert;*/
+}
+.info-box {
+	display: flex;
+	flex-direction: column;
+	flex: none;
+}
+.number {
+	width: 2rem;
+	font-size: 1.125rem;
+	font-weight: 600;
+	margin-right: 0.75rem;
+	margin-left: 0.75rem;
+}
+@media screen and (min-width: 720px) and (max-width: 896px) {
+	.img {
+		margin-right: auto;
+	}
+	.info {
+		/* margin-right: auto; */
+		padding-left: 1.5rem;
+		// padding-top: .5rem;
+	}
+	.info-wrapper {
+		flex-direction: row;
+	}
+}
+@media screen and (max-width: 719px) {
+	.info-wrapper {
+		flex-direction: column;
+	}
+	.info {
+		padding-left: 1rem;
+		padding-right: 1rem;
+	}
+	.img {
+		justify-self: center;
+		align-self: center;
+	}
+}
+li,
+.box {
+	align-content: center;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	margin: 1em;
+	background-color: #37455230;
+	padding: 0.8em;
+	border-color: rgb(170 170 170);
+	border-width: 1px;
+	border-radius: 0.8em;
+	transition: all 0.23s cubic-bezier(0.39, 0.575, 0.565, 1);
+	// /* display: flex; */
+	/* flex-wrap: wrap; */
+	display: block;
+}
+.img {
+	position: relative;
+	aspect-ratio: 1/1;
+
+	object-fit: contain;
+	max-width: 18.2857rem;
+	max-height: 18.2857rem;
+	min-width: 18.2856rem;
+	img {
+		/* max-width: inherit; */
+		/* max-height: inherit; */
+		max-width: 18.2857rem;
+		max-height: 18.2857rem;
+		object-fit: cover;
+		aspect-ratio: inherit;
+		height: 100%;
+		width: 100%;
+	}
+}

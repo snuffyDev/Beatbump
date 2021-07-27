@@ -1,169 +1,253 @@
 <script>
-	import { clickOutside } from "$lib/js/clickOutside";
-	import { goto } from "$app/navigation";
-	import Dropdown from "$components/Dropdown/Dropdown.svelte";
-	import { iOS } from "$stores/stores.js";
-	import { tweened } from "svelte/motion";
-	import { getSrc } from "$lib/utils";
-	import Queue from "./Queue.svelte";
-	import "../../../global/scss/components/_player.scss";
-	import Icon from "$components/Icon/Icon.svelte";
-	import { updateTrack, key, currentMix, currentTitle } from "$stores/stores";
-	import { cubicOut } from "svelte/easing";
-	import * as utils from "$lib/utils";
-	import list from "$lib/stores/list";
+	import { clickOutside } from '$lib/js/clickOutside'
+	import { goto } from '$app/navigation'
+	import Dropdown from '$components/Dropdown/Dropdown.svelte'
+	import { iOS } from '$stores/stores'
+	import { tweened } from 'svelte/motion'
+	import { getSrc } from '$lib/utils'
+	import Queue from './Queue.svelte'
+	import '../../../global/scss/components/_player.scss'
+	import Icon from '$components/Icon/Icon.svelte'
+	import { updateTrack, key, currentTitle, playerLoading } from '$stores/stores'
+	import { cubicOut } from 'svelte/easing'
+	import list from '$lib/stores/list'
+	import { tick } from 'svelte'
+	export let curTheme
+	const player: HTMLAudioElement = new Audio()
+	player.autoplay = true
+	// console.log($updateTrack)
+	$: player.src = $updateTrack
+	$: isWebkit = $iOS
+	let title
 
-	const player: HTMLAudioElement = new Audio();
-	player.autoplay = true;
-
-	$: player.src = $updateTrack;
-	$: isWebkit = $iOS;
-	let title;
-
-	$: currentTitle.set(title);
+	$: currentTitle.set(title)
 
 	// $: list = $currentMix;
-	$: autoId = $key;
+	$: autoId = $key
+	$: console.log($key, autoId)
+	$: time = player.currentTime
+	$: duration = 1000
+	let remainingTime = 55
 
-	$: time = player.currentTime;
-	$: duration = 1000;
-	let remainingTime = 55;
+	$: volume = 0.5
+	let volumeHover
+	$: hideEvent = false
+	$: isPlaying = false
+	let seeking = false
+	let once = false
+	let songBar
 
-	$: volume = 0.5;
-	let volumeHover = false;
+	let showing
+	$: loading = $playerLoading
+	$: listShow = showing ? true : false
+	$: mixList = $list.mix
 
-	$: isPlaying = false;
-	let seeking = false;
-	let once = false;
-	let songBar;
+	$: isHidden = false
+	let DropdownItems: Array<any>
 
-	let menuShow = false;
-	let showing;
-	$: toggle = menuShow ? true : false;
-	$: listShow = showing ? true : false;
-	$: hasList = $list.mix.length > 1;
-	$: mixList = $list.mix;
-	// log any and all updates to the list for testing
-	// $: console.log($list.mix)
-	// $: console.log(mixList, $list.mix[autoId]?.videoId);
-	const playing = () => player.play();
-	const paused = () => player.pause();
-	function pause() {
-		paused();
+	player.addEventListener('loadedmetadata', () => {
+		title = $list.mix[0].title
+		DropdownItems = [
+			{
+				text: 'View Artist',
+				icon: 'artist',
+				action: () => {
+					window.scrollTo({
+						behavior: 'smooth',
+						top: 0,
+						left: 0
+					})
+					goto(`/artist/${mixList[autoId].artistInfo.browseId}`)
+				}
+			}
+		]
+	})
+	const play = () => {
+		let playTrack = player.play()
+		if (playTrack !== undefined) {
+			playTrack.then(() => metaDataHandler())
+		} else {
+			metaDataHandler()
+		}
 	}
-	function startPlay() {
-		playing();
-	}
+	const pause = () => player.pause()
 	// $: console.log(volume)
-	$: player.volume = volume;
+	$: player.volume = volume
 
-	player.addEventListener("loadedmetadata", () => {
-		isPlaying = true;
-
-		startPlay();
-	});
-
-	player.addEventListener("timeupdate", async () => {
-		time = player.currentTime;
-		duration = player.duration;
-		remainingTime = duration - time;
-		$progress = isWebkit == true ? time * 2 : time;
+	player.addEventListener('timeupdate', async () => {
+		time = player.currentTime
+		duration = player.duration
+		remainingTime = duration - time
+		$progress = isWebkit == true ? time * 2 : time
 		// This checks if the user is on an iOS device
 		// due to the length of a song being doubled on iOS,
 		// we have to cut the time in half. Doesn't effect other devices.
 		if (isWebkit && remainingTime < duration / 2 && once == false) {
-			once = true;
-			getNext();
+			once = true
+			getNext()
 		}
-	});
+	})
 
-	player.addEventListener("pause", () => {
-		isPlaying = false;
-		pause();
-	});
+	player.addEventListener('pause', () => {
+		isPlaying = false
+		pause()
+	})
 
-	player.addEventListener("play", () => {
-		isPlaying = true;
-		startPlay();
-	});
+	player.addEventListener('play', () => {
+		isPlaying = true
+		play()
+	})
 
-	player.addEventListener("ended", () => {
+	player.addEventListener('ended', () => {
 		// console.log('ended')
 
-		key.set(autoId);
+		key.set(autoId)
 
-		getNext();
-	});
+		getNext()
+	})
 
-	player.addEventListener("seeked", () => {
-		startPlay();
-	});
+	player.addEventListener('seeked', () => {
+		play()
+	})
+
+	function metaDataHandler() {
+		if ('mediaSession' in navigator && player.src !== undefined) {
+			navigator.mediaSession.metadata = new MediaMetadata({
+				title: $list.mix[autoId].title,
+				artist: $list.mix[autoId].artistInfo.artist || null,
+				album:
+					$list.mix[autoId].album?.title ||
+					$list.mix[autoId].album?.text ||
+					undefined,
+
+				artwork: [
+					{
+						src: $list.mix[autoId].thumbnails
+							? $list.mix[autoId].thumbnails[0].url.replace(
+									/=(w(\d+))-(h(\d+))/g,
+									'=w128-h128'
+							  )
+							: $list.mix[autoId].thumbnail.replace(
+									/=(w(\d+))-(h(\d+))/g,
+									'=w128-h128'
+							  ),
+						sizes: '128x128',
+						type: 'image/jpeg'
+					}
+				]
+			})
+			navigator.mediaSession.setActionHandler('play', play)
+			navigator.mediaSession.setActionHandler('pause', pause)
+			navigator.mediaSession.setActionHandler('previoustrack', prevBtn)
+			navigator.mediaSession.setActionHandler('nexttrack', nextBtn)
+		}
+	}
+	$: console.log($list.mix)
+
 	const getNext = async () => {
 		if (autoId == $list.mix.length - 1) {
+			await tick()
+			// autoId++
 			list.getMore(
 				autoId,
-				$list.mix[autoId].itct,
-				$list.mix[autoId].videoId,
-				$list.mix[autoId].autoMixList,
+				$list.mix[autoId]?.itct,
+				$list.mix[autoId]?.videoId,
+				$list.mix[autoId]?.autoMixList,
 				$list.continuation
-			);
+			)
 			// autoId++;
-			key.set(autoId);
+			key.set(autoId)
 
-			once = false;
+			once = false
 
-			return;
+			return
 		} else {
-			autoId++; // console.log(autoId)
-			key.set(autoId);
+			autoId++
+			key.set(autoId)
+			const src = await getSrc(mixList[autoId].videoId)
+			src.error ? ErrorNext() : setNext()
+			await tick()
 
-			player.src = utils.getSrc($list.mix[autoId].videoId).then((url) => url);
-
-			// currentTitle.set($list.mix[autoId].title);
-			once = false;
+			console.log('got here')
+			currentTitle.set($list.mix[autoId].title)
+			once = false
 		}
-		once = false;
-	};
-	// $: console.log($key, autoId);
-	/* TODO: implement this eventually.
-    format seconds to MM:SS for UI
-    */
-	function format(seconds) {
-		if (isNaN(seconds)) return "...";
-
-		const minutes = Math.floor(seconds / 60);
-		seconds = Math.floor(seconds % 60);
-		if (seconds < 10) seconds = "0" + seconds;
-
-		return `${minutes}:${seconds}`;
+		once = false
 	}
+	async function ErrorNext() {
+		await tick()
+		getNext()
+		// autoId--
+		// key.set(autoId)
+		// const src = await getSrc(mixList[autoId].videoId)
 
+		// console.log('got here ErrorNext')
+		// currentTitle.set($list.mix[autoId].title)
+		// once = false
+	}
+	async function setNext() {
+		await getSrc(mixList[autoId].videoId)
+		currentTitle.set($list.mix[autoId].title)
+		key.set(autoId)
+	}
+	async function prevBtn() {
+		if (!autoId || autoId < 0) {
+			console.log('cant do that!')
+		} else {
+			autoId--
+			key.set(autoId)
+			await getSrc($list.mix[autoId].videoId)
+		}
+	}
+	async function nextBtn() {
+		let gettingNext = false
+		if (!gettingNext) {
+			if (autoId == $list.mix.length - 1) {
+				gettingNext = true
+				await getNext()
+				gettingNext = false
+			} else {
+				gettingNext = true
+				autoId++
+				console.log(mixList[autoId].videoId, $list.mix, $list.mix[autoId])
+				key.set(autoId)
+				const src = await getSrc(mixList[autoId]?.videoId)
+				src.error
+					? getNext()
+					: () => {
+							gettingNext = false
+							setNext()
+					  }
+			}
+		}
+	}
 	const progress = tweened(0, {
 		duration: duration,
-		easing: cubicOut,
-	});
+		easing: cubicOut
+	})
 	function trackMouse(event) {
-		if (seeking) seekAudio(event);
+		if (seeking) seekAudio(event)
 		// if (hovering) hover(event)
 	}
 	function seek(event, bounds) {
-		let x = event.pageX - bounds.left;
+		let x = event.pageX - bounds.left
 
-		return Math.min(Math.max(x / bounds.width, 0), 1);
+		return Math.min(Math.max(x / bounds.width, 0), 1)
 	}
 
 	function seekAudio(event) {
-		if (!songBar) return;
+		if (!songBar && !isPlaying) return
 
-		player.currentTime =
-			seek(event, songBar.getBoundingClientRect()) * duration;
+		player.currentTime = seek(event, songBar.getBoundingClientRect()) * duration
 		player.currentTime =
 			isWebkit == true
 				? (seek(event, songBar.getBoundingClientRect()) * duration) / 2
-				: seek(event, songBar.getBoundingClientRect()) * duration;
+				: seek(event, songBar.getBoundingClientRect()) * duration
 	}
 
-	let width;
+	let width
+
+	// $: console.log($list.mix)
 </script>
 
 <svelte:window
@@ -172,13 +256,16 @@
 	on:mousemove={trackMouse} />
 
 <Queue
-	on:updated={(event) => {
-		player.src = event.detail.src;
-		autoId = event.detail.id;
+	on:updated={async (event) => {
+		key.set(event.detail.id)
+		await tick()
+		getNext()
 		// console.log(autoId);
 	}}
 	on:hide={(event) => {
-		showing = !event.detail.showing;
+		hideEvent = true
+		showing = !event.detail.showing
+		hideEvent = false
 		// console.log(showing)
 	}}
 	bind:show={listShow}
@@ -191,113 +278,50 @@
 		on:mousedown={() => (seeking = true)}>
 		<progress bind:this={songBar} value={$progress} max={duration} />
 	</div>
-	<div class="player">
+	<div class="player" class:light={curTheme == 'light'}>
 		<div class="player-left">
 			<div
 				on:click={() => {
-					showing = !showing;
+					if (!hideEvent) showing = !showing
 				}}
-				class="listButton">
-				<svelte:component this={Icon} name="radio" size="2em" />
+				class="listButton player-btn">
+				<svelte:component this={Icon} color="white" name="radio" size="2em" />
 			</div>
 		</div>
 		<div class="player-controls">
 			<div class="buttons">
-				<div
-					class="player-btn"
-					on:click={async () => {
-						if (!autoId || autoId < 0) {
-							console.log("cant do that!");
-						} else {
-							autoId--;
-							key.set(autoId);
-							await getSrc($list.mix[autoId].videoId);
-						}
-					}}>
-					<svelte:component this={Icon} name="skip-back" size="2em" />
+				<div class="player-btn" on:click={prevBtn}>
+					<svelte:component
+						this={Icon}
+						color="white"
+						name="skip-back"
+						size="2em" />
 				</div>
 				<div
 					class="player-btn player-title"
 					on:click={() => {
 						if (!isPlaying) {
-							startPlay();
+							play()
 						} else {
-							pause();
-						}
-						if ("mediaSession" in navigator) {
-							navigator.mediaSession.metadata = new MediaMetadata({
-								title: title,
-								artist: $list.mix[autoId].artistInfo.artist,
-								artwork: [
-									{
-										src: $list.mix[autoId].thumbnail,
-										sizes: "96x96",
-										type: "image/jpeg",
-									},
-									{
-										src: $list.mix[autoId].thumbnail,
-										sizes: "128x128",
-										type: "image/jpeg",
-									},
-									{
-										src: $list.mix[autoId].thumbnail,
-										sizes: "192x192",
-										type: "image/jpeg",
-									},
-									{
-										src: $list.mix[autoId].thumbnail,
-										sizes: "256x256",
-										type: "image/jpeg",
-									},
-									{
-										src: $list.mix[autoId].thumbnail,
-										sizes: "384x384",
-										type: "image/jpeg",
-									},
-									{
-										src: $list.mix[autoId].thumbnail,
-										sizes: "512x512",
-										type: "image/jpeg",
-									},
-								],
-							});
-							navigator.mediaSession.setActionHandler("play", startPlay);
-							navigator.mediaSession.setActionHandler("pause", pause);
-							navigator.mediaSession.setActionHandler("nexttrack", () => {
-								time = player.duration;
-							});
+							pause()
 						}
 					}}>
-					{#if !isPlaying}
-						<Icon name="play" size="2em" />
-					{:else}
-						<Icon name="pause" size="2em" />
+					{#if loading}
+						<div
+							class="player-spinner"
+							class:fade-out={loading ? true : false} />
+					{:else if !isPlaying}
+						<Icon color="white" name="play" size="2em" />
+					{:else if !loading && isPlaying}
+						<Icon color="white" name="pause" size="2em" />
 					{/if}
 				</div>
-				<div
-					class="player-btn"
-					on:click={async () => {
-						let gettingNext = false;
-						if (!gettingNext) {
-							if (autoId == $list.mix.length - 1) {
-								gettingNext = true;
-								await getNext();
-								gettingNext = false;
-							} else {
-								gettingNext = true;
-								autoId++;
-								console.log(
-									mixList[autoId].videoId,
-									$list.mix,
-									$list.mix[autoId]
-								);
-								await getSrc(mixList[autoId]?.videoId);
-								key.set(autoId);
-								gettingNext = false;
-							}
-						}
-					}}>
-					<svelte:component this={Icon} name="skip-forward" size="2em" />
+				<div class="player-btn" on:click={nextBtn}>
+					<svelte:component
+						this={Icon}
+						color="white"
+						name="skip-forward"
+						size="2em" />
 				</div>
 			</div>
 		</div>
@@ -308,14 +332,19 @@
 					class="volume"
 					use:clickOutside
 					on:click_outside={() => {
-						volumeHover = false;
+						volumeHover = false
 					}}>
 					<div
+						color="white"
 						class="volume-icon"
 						on:click={() => {
-							volumeHover = !volumeHover;
+							volumeHover = !volumeHover
 						}}>
-						<svelte:component this={Icon} name="volume" size="2em" />
+						<svelte:component
+							this={Icon}
+							color="white"
+							name="volume"
+							size="2em" />
 					</div>
 					{#if volumeHover}
 						<div class="volume-wrapper">
@@ -327,83 +356,115 @@
 										bind:value={volume}
 										min="0"
 										max="1"
-										step="0.1" />
+										step="any" />
 								</div>
 							</div>
 						</div>
 					{/if}
 				</div>
+				<div class="menu-container">
+					<Dropdown
+						bind:isHidden
+						on:click_outside={() => {
+							isHidden = !isHidden
+						}}
+						type="player"
+						items={DropdownItems} />
+				</div>
 			{/if}
-			<div class="menu-container">
-				<Dropdown type="player">
-					<div slot="content">
-						{#if hasList}
-							<div
-								class="dd-item"
-								on:click={() => {
-									scrollTo({
-										behavior: "smooth",
-										top: 0,
-										left: 0,
-									});
-
-									goto(`/artist?id=${$list.mix[autoId].artistId}`, {
-										replaceState: true,
-									});
-								}}>
-								<Icon name="artist" size="2em" />
-								<span class="dd-text">View Artist</span>
-							</div>
-						{/if}
-					</div>
-				</Dropdown>
+			<div class:hidden={width > 500} class="menu-container">
+				<Dropdown bind:isHidden type="player" items={DropdownItems} />
 			</div>
 		</div>
 	</div>
 </div>
 
 <style lang="scss">
+	.hidden {
+		display: none !important;
+		visibility: hidden !important;
+	}
+	.player-spinner {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		justify-self: center;
+		width: 2em;
+		// background: white;
+		height: 2em;
+		border: rgba(255, 255, 255, 0.26) solid 0.25em;
+		border-radius: 50%;
+		border-top-color: rgba(255, 255, 255, 0.904);
+		animation: loading 1s infinite cubic-bezier(0.785, 0.135, 0.15, 0.86);
+		width: 2em;
+		opacity: 0;
+		// background: white;
+		transition: all ease-in-out 1s;
+		&.fade-out {
+			opacity: 1;
+			transition: all ease-in-out 1s;
+		}
+		height: 2em;
+	}
+	@keyframes loading {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+	@keyframes loaddone {
+		to {
+		}
+	}
 	.f-container {
 		background-color: inherit;
 	}
+	.light * {
+		color: white !important;
+	}
+
 	.player {
 		background-color: inherit;
 	}
 	.volume-wrapper {
-		background: inherit;
 		background: var(--dark-bottom);
 		display: block;
-		position: fixed;
-		bottom: 8.9rem;
+		position: absolute;
+		bottom: 7.9rem;
 		transform: rotate(-90deg);
-		padding: 0 0rem;
+		padding: 0;
 	}
 	.volume-icon {
 		cursor: pointer;
 	}
 
 	.menu-container {
-		position: relative;
-
-		@media (min-width: 37.1429rem) {
-			right: 5%;
-			/* bottom: 50%; */
-			padding: 0;
-			/* top: 50%; */
-			/* overflow: hidden; */
-			position: absolute;
+		right: 5%;
+		/* bottom: 50%; */
+		padding: 0;
+		/* top: 50%; */
+		/* overflow: hidden; */
+		position: absolute;
+		@media (max-width: 512px) {
+			position: relative !important;
 		}
 	}
-	.player-right {
-		display: flex;
-		flex-wrap: nowrap;
-		align-items: center;
-	}
-	.player-left {
-		width: auto;
-		display: flex;
 
-		max-width: 100%;
+	.player-left,
+	.player-right {
+		-webkit-text-size-adjust: 100%;
+		align-self: center;
+		cursor: pointer;
+		height: auto;
+		max-height: 44pt;
+		max-width: 44pt;
+		margin: 10pt;
+		padding: 10pt;
+		width: auto;
+		width: 100%;
+		width: 100%;
+		align-items: center;
+		display: flex;
+		justify-content: center;
 	}
 	.f-container {
 		position: absolute;
@@ -414,16 +475,15 @@
 	progress {
 		display: block;
 		width: 100%;
-		height: 0.4315rem;
+		height: 0.5315rem;
 		-webkit-appearance: none;
 		-moz-appearance: none;
 		appearance: none;
 		background: transparent;
 		background-color: #232530;
-		z-index: 7;
+		/* z-index: 7; */
 		outline: none;
-		border: none;
-		border-color: transparent;
+		border: transparent;
 	}
 
 	progress::-webkit-progress-bar {
