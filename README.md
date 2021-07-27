@@ -1,12 +1,14 @@
-# Beatbump
 
-Alternative frontend for YouTube Music created using Svelte/SvelteKit.
+
+
+# <img src="/.repo/images/logo-header.png" width=48 height=48 /> Beatbump 
+
+An Alternative frontend for YouTube Music created using Svelte/SvelteKit.
 
 **Live Site**: https://beatbump.ml/
 
-> Documentation coming soon! For both Beatbump's API and important portions of YouTube Music's API.
-
-![Artist Page](/.repo/images/Artist.png)
+|<img src="/.repo/images/artistpagegif.gif" width="480" height="auto"/> |<img src="/.repo/images/pwa.jpg" width="160" height="auto"/>|<img src="/.repo/images/trending.jpeg" width="480" height="auto"/> |
+|--  |-- |-- |
 
 ## Features
 
