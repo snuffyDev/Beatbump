@@ -23,6 +23,9 @@ export function parseContents(
 				if (!Array.isArray(menu)) {
 					menu = [menu]
 				}
+				let longText = [...item.longBylineText.runs]
+				let album = longText.reverse().slice(-3);
+				album = album[0]
 				let temp = []
 				let browseId =
 					item?.longBylineText?.runs[0]?.navigationEndpoint?.browseEndpoint
@@ -53,6 +56,7 @@ export function parseContents(
 				return {
 					index: metaPath.index,
 					itct: metaPath.params,
+					album: album,
 					title: title,
 					artistInfo: {
 						pageType: 'MUSIC_PAGE_TYPE_ARTIST',

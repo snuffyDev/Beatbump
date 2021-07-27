@@ -76,7 +76,10 @@
 
 <style lang="scss" global>
 	// @import '../global/01styles/main';
-	@import '../global/stylesheet.scss'; // @import "../global/vars.css";
+
+	@import '../global/stylesheet.scss';
+	//  @import "../global/vars.css";
+
 	.alert-container {
 		display: flex;
 		position: fixed;
@@ -141,9 +144,7 @@
 		display: block;
 		z-index: 1;
 	}
-	:global(.sidebar) {
-		background-color: theme-color('ytm', 'side');
-	}
+
 	:global(.input) {
 		// background-color: theme-color('ytm', 'forms');
 		background-color: var(--ytm-forms);

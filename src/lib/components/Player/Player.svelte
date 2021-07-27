@@ -15,7 +15,7 @@
 	export let curTheme
 	const player: HTMLAudioElement = new Audio()
 	player.autoplay = true
-
+	// console.log($updateTrack)
 	$: player.src = $updateTrack
 	$: isWebkit = $iOS
 	let title
@@ -24,7 +24,7 @@
 
 	// $: list = $currentMix;
 	$: autoId = $key
-
+	$: console.log($key, autoId)
 	$: time = player.currentTime
 	$: duration = 1000
 	let remainingTime = 55
@@ -62,7 +62,14 @@
 			}
 		]
 	})
-	const play = () => player.play()
+	const play = () => {
+		let playTrack = player.play()
+		if (playTrack !== undefined) {
+			playTrack.then(() => metaDataHandler())
+		} else {
+			metaDataHandler()
+		}
+	}
 	const pause = () => player.pause()
 	// $: console.log(volume)
 	$: player.volume = volume
@@ -102,14 +109,50 @@
 	player.addEventListener('seeked', () => {
 		play()
 	})
+
+	function metaDataHandler() {
+		if ('mediaSession' in navigator && player.src !== undefined) {
+			navigator.mediaSession.metadata = new MediaMetadata({
+				title: $list.mix[autoId].title,
+				artist: $list.mix[autoId].artistInfo.artist || null,
+				album:
+					$list.mix[autoId].album?.title ||
+					$list.mix[autoId].album?.text ||
+					undefined,
+
+				artwork: [
+					{
+						src: $list.mix[autoId].thumbnails
+							? $list.mix[autoId].thumbnails[0].url.replace(
+									/=(w(\d+))-(h(\d+))/g,
+									'=w128-h128'
+							  )
+							: $list.mix[autoId].thumbnail.replace(
+									/=(w(\d+))-(h(\d+))/g,
+									'=w128-h128'
+							  ),
+						sizes: '128x128',
+						type: 'image/jpeg'
+					}
+				]
+			})
+			navigator.mediaSession.setActionHandler('play', play)
+			navigator.mediaSession.setActionHandler('pause', pause)
+			navigator.mediaSession.setActionHandler('previoustrack', prevBtn)
+			navigator.mediaSession.setActionHandler('nexttrack', nextBtn)
+		}
+	}
+	$: console.log($list.mix)
+
 	const getNext = async () => {
 		if (autoId == $list.mix.length - 1) {
 			await tick()
+			// autoId++
 			list.getMore(
 				autoId,
-				$list.mix[autoId].itct,
-				$list.mix[autoId].videoId,
-				$list.mix[autoId].autoMixList,
+				$list.mix[autoId]?.itct,
+				$list.mix[autoId]?.videoId,
+				$list.mix[autoId]?.autoMixList,
 				$list.continuation
 			)
 			// autoId++;
@@ -121,15 +164,63 @@
 		} else {
 			autoId++
 			key.set(autoId)
+			const src = await getSrc(mixList[autoId].videoId)
+			src.error ? ErrorNext() : setNext()
 			await tick()
-			await getSrc(mixList[autoId].videoId)
 
+			console.log('got here')
 			currentTitle.set($list.mix[autoId].title)
 			once = false
 		}
 		once = false
 	}
+	async function ErrorNext() {
+		await tick()
+		getNext()
+		// autoId--
+		// key.set(autoId)
+		// const src = await getSrc(mixList[autoId].videoId)
 
+		// console.log('got here ErrorNext')
+		// currentTitle.set($list.mix[autoId].title)
+		// once = false
+	}
+	async function setNext() {
+		await getSrc(mixList[autoId].videoId)
+		currentTitle.set($list.mix[autoId].title)
+		key.set(autoId)
+	}
+	async function prevBtn() {
+		if (!autoId || autoId < 0) {
+			console.log('cant do that!')
+		} else {
+			autoId--
+			key.set(autoId)
+			await getSrc($list.mix[autoId].videoId)
+		}
+	}
+	async function nextBtn() {
+		let gettingNext = false
+		if (!gettingNext) {
+			if (autoId == $list.mix.length - 1) {
+				gettingNext = true
+				await getNext()
+				gettingNext = false
+			} else {
+				gettingNext = true
+				autoId++
+				console.log(mixList[autoId].videoId, $list.mix, $list.mix[autoId])
+				key.set(autoId)
+				const src = await getSrc(mixList[autoId]?.videoId)
+				src.error
+					? getNext()
+					: () => {
+							gettingNext = false
+							setNext()
+					  }
+			}
+		}
+	}
 	const progress = tweened(0, {
 		duration: duration,
 		easing: cubicOut
@@ -145,7 +236,7 @@
 	}
 
 	function seekAudio(event) {
-		if (!songBar) return
+		if (!songBar && !isPlaying) return
 
 		player.currentTime = seek(event, songBar.getBoundingClientRect()) * duration
 		player.currentTime =
@@ -156,7 +247,7 @@
 
 	let width
 
-	$: console.log($list.mix)
+	// $: console.log($list.mix)
 </script>
 
 <svelte:window
@@ -166,7 +257,7 @@
 
 <Queue
 	on:updated={async (event) => {
-		autoId = event.detail.id - 1
+		key.set(event.detail.id)
 		await tick()
 		getNext()
 		// console.log(autoId);
@@ -193,23 +284,13 @@
 				on:click={() => {
 					if (!hideEvent) showing = !showing
 				}}
-				class="listButton">
+				class="listButton player-btn">
 				<svelte:component this={Icon} color="white" name="radio" size="2em" />
 			</div>
 		</div>
 		<div class="player-controls">
 			<div class="buttons">
-				<div
-					class="player-btn"
-					on:click={async () => {
-						if (!autoId || autoId < 0) {
-							console.log('cant do that!')
-						} else {
-							autoId--
-							key.set(autoId)
-							await getSrc($list.mix[autoId].videoId)
-						}
-					}}>
+				<div class="player-btn" on:click={prevBtn}>
 					<svelte:component
 						this={Icon}
 						color="white"
@@ -235,34 +316,7 @@
 						<Icon color="white" name="pause" size="2em" />
 					{/if}
 				</div>
-				<div
-					class="player-btn"
-					on:click={async () => {
-						let gettingNext = false
-						if (!gettingNext) {
-							if (autoId == $list.mix.length - 1) {
-								gettingNext = true
-								await getNext()
-								gettingNext = false
-							} else {
-								gettingNext = true
-								autoId++
-								console.log(
-									mixList[autoId].videoId,
-									$list.mix,
-									$list.mix[autoId]
-								)
-								const src = await getSrc(mixList[autoId]?.videoId)
-								src.error ? getNext() : setNext()
-
-								function setNext() {
-									currentTitle.set($list.mix[autoId].title)
-									key.set(autoId)
-									gettingNext = false
-								}
-							}
-						}
-					}}>
+				<div class="player-btn" on:click={nextBtn}>
 					<svelte:component
 						this={Icon}
 						color="white"
@@ -319,13 +373,7 @@
 				</div>
 			{/if}
 			<div class:hidden={width > 500} class="menu-container">
-				<Dropdown
-					on:click_outside={() => {
-						isHidden = !isHidden
-					}}
-					bind:isHidden
-					type="player"
-					items={DropdownItems} />
+				<Dropdown bind:isHidden type="player" items={DropdownItems} />
 			</div>
 		</div>
 	</div>
@@ -406,11 +454,11 @@
 		-webkit-text-size-adjust: 100%;
 		align-self: center;
 		cursor: pointer;
-		display: inline-block;
 		height: auto;
 		max-height: 44pt;
 		max-width: 44pt;
 		margin: 10pt;
+		padding: 10pt;
 		width: auto;
 		width: 100%;
 		width: 100%;
@@ -427,16 +475,15 @@
 	progress {
 		display: block;
 		width: 100%;
-		height: 0.4315rem;
+		height: 0.5315rem;
 		-webkit-appearance: none;
 		-moz-appearance: none;
 		appearance: none;
 		background: transparent;
 		background-color: #232530;
-		z-index: 7;
+		/* z-index: 7; */
 		outline: none;
-		border: none;
-		border-color: transparent;
+		border: transparent;
 	}
 
 	progress::-webkit-progress-bar {

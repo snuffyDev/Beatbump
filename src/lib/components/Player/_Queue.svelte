@@ -5,6 +5,7 @@
 	import { clickOutside } from '$lib/js/clickOutside'
 	import list from '$lib/stores/list'
 	import QueueListItem from './QueueListItem.svelte'
+	import { spring } from 'svelte/motion'
 
 	export let autoId
 	export let mixList = []
@@ -16,16 +17,40 @@
 	let active = document.getElementById(autoId)
 
 	const dispatch = createEventDispatcher()
-	// import slide from '$lib/actions/slide'
-	onMount(() => {
-		if (active) active.scrollIntoView(true)
-	})
+	import slide from '$lib/actions/slide'
+
 	$: if (active) active.scrollIntoView(true)
 	afterUpdate(() => {
 		let active = document.getElementById(autoId)
 		if (active) active.scrollIntoView(true)
 	})
+	onMount(() => {
+		if (active) active.scrollIntoView(true)
+	})
+	const coords = spring(
+		{ x: 0, y: 0 },
+		{
+			stiffness: 0.2,
+			damping: 0.6
+		}
+	)
 
+	function handlePanStart() {
+		coords.stiffness = coords.damping = 0.1
+	}
+
+	function handlePanMove(event) {
+		coords.update(($coords) => ({
+			x: $coords.x + event.detail.dx,
+			y: Math.min(Math.max(-$coords.y, $coords.y + event.detail.dy), 150)
+		}))
+	}
+
+	function handlePanEnd(event) {
+		coords.stiffness = 0.05
+		coords.damping = 0.6
+		coords.set({ x: 0, y: 0 })
+	}
 	function showList() {
 		dispatch('hide', {
 			showing: false
@@ -38,8 +63,15 @@
 	<div
 		class="listContainer"
 		use:clickOutside
+		use:slide
+		on:panstart={handlePanStart}
+		on:panmove={handlePanMove}
+		on:panend={handlePanEnd}
+		style="transform:
+		translateY({$coords.y}%)
+	"
 		on:click_outside={() => {
-			show = false
+			show = !show
 			showList()
 		}}
 		transition:fly={{ y: 0, duration: 125, easing: cubicInOut }}>
@@ -77,7 +109,7 @@
 	.listContainer {
 		isolation: auto;
 		box-shadow: 0.1em -0.1em 0.1em 0em #00000040;
-		position: fixed;
+		position: absolute;
 		margin: 0;
 		left: 0;
 		border-radius: 0.8em 0.8em 0 0;
@@ -89,17 +121,19 @@
 		height: auto;
 		width: auto;
 		background: inherit;
-		max-height: 75%;
+		padding-top: 1.5rem;
+		// max-height: 75%;
 		// transition: all cubic-bezier(0.23, 1, 0.32, 1) 1300ms;
-		min-height: 55%;
-		width: 40%;
-		z-index: -1;
 
-		/* overflow-y: scroll !important; */
-		overflow-y: hidden;
+		max-height: calc(100% - 8rem);
+		width: 40%;
+		height: 100%;
+		z-index: -1;
+		/* overflow-y: hidden; */
 		opacity: 1;
-		transition: all 250ms ease-in-out;
-		bottom: 4em;
+		transition: all 0.125s ease-in-out;
+		top: calc(50% - 13rem);
+
 		&.slide {
 			opacity: 1;
 		}

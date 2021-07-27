@@ -25,13 +25,14 @@
 		// @ts-ignore
 		key.set(index)
 		if (page == 'playlist') {
-			if (!$key) {
-				console.log('key: ' + $key)
-				await list.startPlaylist(item.playlistId)
-			} else {
-				console.log('key: ' + $key)
-				await getSrc($list.mix[index]?.videoId)
-			}
+			// if (!$key) {
+			key.set(index)
+			console.log('key: ' + $key)
+			await list.startPlaylist(item.playlistId)
+			// } else {
+			// 	console.log('key: ' + $key)
+			// 	await getSrc($list.mix[index]?.videoId)
+			// }
 
 			// await list.initList(item.videoId, item.playlistId)
 		} else {

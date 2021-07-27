@@ -10,7 +10,8 @@ interface SearchOutput extends EndpointOutput {
 	continuation?: NextContinuationData
 }
 export async function get({ query }): Promise<SearchOutput> {
-	const q = query.get('q') || ''
+	let q = query.get('q') || ''
+	q = decodeURIComponent(q)
 	const filter = query.get('filter') || ''
 	const videoId = query.get('videoId') || ''
 	const itct = query.get('itct') || ''
@@ -74,7 +75,7 @@ export async function get({ query }): Promise<SearchOutput> {
 								contents: [
 									{
 										didYouMeanRenderer
-										messageRenderer?: {text: {runs: [{text:string}]}}
+										messageRenderer?: { text: { runs: [{ text: string }] } }
 										musicShelfRenderer?
 										musicShelfContinuation?
 									}
@@ -218,7 +219,7 @@ const parseSong = (contents, type): Song[] => {
 		const metaInfo = pb(flexColumns[1], 'runs:text', true)
 		// console.log(metaInfo);
 		let albumInfo
-		if (type !== 'video') {
+		if (type == 'song') {
 			const albumArr: [] = flexColumns[1].text.runs
 			const album: {
 				text

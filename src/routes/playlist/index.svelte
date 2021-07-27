@@ -1,23 +1,17 @@
 <script context="module">
 	export async function load({ page, fetch }) {
-		try {
-			const data = await fetch(
-				'/api/playlist.json?list=' + encodeURIComponent(page.query.get('list'))
-			)
-			const { tracks, header, continuations } = await data.json()
-			return {
-				props: {
-					tracks: await tracks,
-					continuations: await continuations,
-					header: await header
-				},
-				// maxage: 0,
-				status: 200
-			}
-		} catch (error) {
-			return {
-				error: new Error('it broke')
-			}
+		const data = await fetch(
+			'/api/playlist.json?list=' + encodeURIComponent(page.query.get('list'))
+		)
+		const { tracks, header, continuations } = await data.json()
+		return {
+			props: {
+				tracks: await tracks,
+				continuations: await continuations,
+				header: await header
+			},
+			// maxage: 0,
+			status: 200
 		}
 	}
 </script>
@@ -38,6 +32,7 @@
 	$: hasList = $list.mix.length > 0
 	$: isThisPage = false
 	let pageTitle = header?.title
+	let description = header?.description
 	// setContext(key, header.playlistId);
 	console.log(tracks, continuations, header)
 	console.log(continuations)
@@ -45,6 +40,10 @@
 	onMount(() => {
 		pageTitle =
 			pageTitle.length > 64 ? pageTitle.substring(0, 64) + '...' : header.title
+		description =
+			description.length > 240
+				? description.substring(0, 240) + '...'
+				: header.title
 		if (header !== undefined) {
 			if ((!hasList && !$isPagePlaying) || !header.playlistId) {
 				isThisPage = false
@@ -91,9 +90,9 @@
 					<div class="info">
 						<div class="info-title">
 							<h4 class="box-title">{pageTitle}</h4>
-							{#if header.description}
+							{#if header?.description}
 								<p class="subtitle" class:hidden={width < 640 ? true : false}>
-									{header?.description ? header?.description : ''}
+									{description ? description : ''}
 								</p>
 								<span>
 									<p class="subtitle">

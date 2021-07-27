@@ -78,15 +78,25 @@
 		margin-bottom: 1.5rem;
 
 		border-radius: 0.5em;
+		@media screen and (min-width: 960px) {
+			margin-bottom: 4rem;
+		}
 		/* width: 100%; */
 		/* max-width: 100%; */
 		/* overflow: scroll;*/
 	}
 	.header {
-		padding: 0.4em 0.4em 0.2em;
-		margin-bottom: 0.4em;
-
-		letter-spacing: -0.01em;
+		display: block;
+		h1 {
+			padding: 0.4rem 0.4rem 0.2rem;
+			margin-bottom: 0.7rem;
+			font-weight: 600;
+			letter-spacing: -0.02rem;
+			font-size: 1.85rem;
+			@media screen and (min-width: 800px) {
+				font-size: 2.35rem;
+			}
+		}
 	}
 
 	.scroll {

@@ -16,7 +16,7 @@
 
 {#key key}
 	<div
-		in:fly={{ x: -5, duration: 500, delay: 400, easing: expoInOut }}
+		in:fly={{ x: -10, duration: 500, delay: 300, easing: expoInOut }}
 		out:fly={{ x: 5, duration: 500, easing: expoInOut }}>
 		<slot />
 	</div>
@@ -24,7 +24,7 @@
 
 <style>
 	div {
-		position: block;
+		display: block;
 		height: 100%;
 	}
 </style>

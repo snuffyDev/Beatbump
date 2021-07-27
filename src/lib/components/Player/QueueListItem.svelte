@@ -18,15 +18,16 @@
 					top: 0,
 					left: 0
 				})
+				list.moreLikeThis(item)
 				// await tick()
 				// list.getMore()
-				alert('Coming soon!')
+				// alert('Coming soon!')
 			}
 		}
 	]
 	function handleClick(i) {
-		$key = i
-		currentTitle.set($list.mix[i - 1])
+		i--
+		currentTitle.set($list.mix[i].title)
 		dispatch('updated', {
 			id: `${i}`
 		})
@@ -44,7 +45,6 @@
 		on:click_outside={() => {
 			isHidden = false
 		}}
-		on:
 		class="pl-thumbnail"
 		style="min-width:5rem; max-width:5rem;">
 		<img
@@ -170,6 +170,7 @@
 		aspect-ratio: inherit;
 		max-width: 100%;
 		-o-object-fit: scale-down;
+		pointer-events: none;
 		object-fit: contain;
 		background: rgba(12, 12, 12, 0.26); // border: 0.2em solid rgb(17 21 28);
 		border-radius: 0.4em;

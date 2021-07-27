@@ -78,6 +78,7 @@ export interface CarouselItem {
 	aspectRatio?: string
 	videoId: string
 	playlistId: string
+	explicit?: boolean
 	params?: string
 	thumbnails: [{ url: string }[]]
 	subtitle?: Subtitle[]

@@ -24,7 +24,9 @@
 	let artist
 	let hidden = clicked ? true : false
 	let loading = false
-
+	onMount(() => {
+		itemHandler()
+	})
 	let DropdownItems = [
 		{
 			text: 'View Artist',
@@ -91,7 +93,6 @@
 			title = title
 		}
 	}
-	$: if (data) itemHandler()
 	const clickHandler = async () => {
 		try {
 			loading = true
@@ -139,9 +140,8 @@
 						referrerpolicy="origin-when-cross-origin"
 						loading="lazy"
 						type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-						src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiPjxkZWZzPjxwYXRoIGQ9Ik0wIDBoNjR2NjRIMFYweiIgaWQ9InByZWZpeF9fYSIvPjwvZGVmcz48dXNlIHhsaW5rOmhyZWY9IiNwcmVmaXhfX2EiIG9wYWNpdHk9Ii4yNSIgZmlsbD0iIzIyMiIvPjwvc3ZnPg=="
-						alt="thumbnail"
-						use:lazy={{ src: data?.thumbnails[0]?.url }} />
+						src={data.thumbnails[0].url}
+						alt="thumbnail" />
 				</div>
 			</div>
 			<div class="title">
@@ -238,6 +238,7 @@
 	}
 	img {
 		width: auto;
+
 		height: auto;
 	}
 	img::before {
@@ -272,14 +273,18 @@
 		max-width: 5rem;
 		min-width: 5rem;
 		height: 5rem;
+		border-radius: var(--xs-radius);
+
 		.thumbnail {
 			width: 100%;
 			height: 100%;
 			background: rgba(13, 13, 15, 0.192);
+			border-radius: inherit;
 			img {
+				border-radius: var(--xs-radius);
 				width: 100%;
 				height: 100%;
-				object-fit: scale-down;
+				object-fit: contain;
 			}
 		}
 	}

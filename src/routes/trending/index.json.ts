@@ -5,9 +5,7 @@ import {
 	MusicTwoRowItemRenderer
 } from '$lib/parsers'
 import type { CarouselItem } from '$lib/types'
-import type { EndpointOutput } from '@sveltejs/kit'
-
-export async function get({ query }): Promise<EndpointOutput> {
+export async function get({ query }) {
 	// console.time('timer')
 	const endpoint = query.get('q') || ''
 	const browseId = 'FEmusic_explore'
@@ -42,14 +40,12 @@ export async function get({ query }): Promise<EndpointOutput> {
 					tabs: [
 						{
 							tabRenderer: {
-								content: {
-									sectionListRenderer: { contents = [] }
-								}
-							}
-						}
-					]
-				}
-			}
+								content: { sectionListRenderer: { contents = [] } = {} } = {}
+							} = {}
+						} = {}
+					] = []
+				} = {}
+			} = {}
 		} = await response.json()
 
 		carouselItems.push(
@@ -59,7 +55,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 		)
 
 		return {
-			body: await carouselItems.map(({ musicCarouselShelfRenderer }) => {
+			body: await carouselItems.map(({ musicCarouselShelfRenderer } = {}) => {
 				// console.timeEnd('timer')
 				return {
 					header: parseHeader([musicCarouselShelfRenderer.header])[0],
@@ -77,7 +73,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 }
 
 function parseHeader(header: any[]) {
-	return header.map(({ musicCarouselShelfBasicHeaderRenderer }) => ({
+	return header.map(({ musicCarouselShelfBasicHeaderRenderer } = {}) => ({
 		title: musicCarouselShelfBasicHeaderRenderer['title']['runs'][0].text,
 		browseId:
 			musicCarouselShelfBasicHeaderRenderer.moreContentButton.buttonRenderer

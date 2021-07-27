@@ -17,14 +17,14 @@
 
 <nav class="nav" style={`background-color: var(--${$theme}-top)`}>
 	<div class="logo">
-		<a href="/trending">
+		<div on:click={() => go()}>
 			<img
 				src="/logo-header.png"
 				width="2.5rem"
 				height="0.5rem"
 				alt="logo"
 				title="Beatbump Home" />
-		</a>
+		</div>
 		<!-- {/if} -->
 	</div>
 
@@ -80,10 +80,12 @@
 		cursor: pointer;
 	}
 	.homeIcon {
-		// width: 2rem;
 		max-width: 2rem;
-		display: inline;
 		visibility: visible;
+		grid-area: m;
+		visibility: visible;
+		justify-self: center;
+		justify-content: center;
 		@media screen and (min-width: 640px) {
 			display: none;
 			visibility: hidden;
@@ -92,7 +94,7 @@
 	.x-button {
 		padding: 1em;
 		right: 0;
-		position: fixed;
+		position: absolute;
 	}
 	.hidden {
 		display: none;
@@ -133,12 +135,10 @@
 	}
 
 	.items {
-		display: flex;
-		flex-direction: row;
 		background-color: inherit;
-
-		// width: 100%;
-		margin-left: auto;
+		/* margin-left: auto; */
+		grid-area: r;
+		justify-self: end;
 		.nav-item {
 			margin-right: 1.75em;
 		}

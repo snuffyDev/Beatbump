@@ -11,10 +11,10 @@ export default function longpress(node: Node): SvelteActionReturnType {
 		clearTimeout(timer)
 	}
 
-	node.addEventListener('touchstart', startPress)
-	node.addEventListener('touchend', cancelPress)
-	node.addEventListener('mousedown', startPress)
-	node.addEventListener('mouseup', cancelPress)
+	node.addEventListener('touchstart', startPress, { passive: true })
+	node.addEventListener('touchend', cancelPress, { passive: true })
+	node.addEventListener('mousedown', startPress, { passive: true })
+	node.addEventListener('mouseup', cancelPress, { passive: true })
 	return {
 		destroy() {
 			node.removeEventListener('touchstart', startPress)

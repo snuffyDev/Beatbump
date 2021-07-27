@@ -2,6 +2,8 @@
 	import '../../../global/vars.css'
 	import { afterUpdate, onDestroy, onMount } from 'svelte'
 	import { theme } from '$lib/stores/stores'
+	import list from '$lib/stores/list'
+	import Icon from '../Icon/Icon.svelte'
 	export let headerContent
 	export let thumbnail = []
 	export let description
@@ -11,6 +13,7 @@
 	afterUpdate(() => {
 		container = container
 	})
+
 	onMount(() => {
 		let start
 
@@ -24,10 +27,15 @@
 
 			window.requestAnimationFrame(function (e) {
 				y =
-					Math.min(Math.max(-scroll.top / window.innerHeight, 0), 250) *
-					-scroll.top *
-					2
-				console.log(y)
+					window.innerWidth < 500
+						? Math.min(Math.max(-scroll.top / window.innerHeight, 0), 70) * 750
+						: Math.min(Math.max(-scroll.top / window.innerHeight, 0), 70) * 250
+				console.log(
+					y,
+					-scroll.top * -window.innerHeight,
+					Math.min(Math.max(-scroll.top / window.innerHeight, 0), 70) * 50,
+					50
+				)
 				if (elapsed < 200) {
 					window.requestAnimationFrame(handler)
 				}
@@ -83,6 +91,14 @@
 			{#if width > 500 && !!description}
 				<div class="description">{description[0]}</div>
 			{/if}
+			<div class="btn-wrpr">
+				<button
+					class="radio-button"
+					on:click={list.startPlaylist(headerContent.mixInfo.playlistId)}
+					><Icon size="1.25em" name="radio" /><span class="btn-text">
+						Play Radio</span
+					></button>
+			</div>
 		</div>
 	</div>
 </div>
@@ -90,6 +106,35 @@
 <!--  -->
 <style lang="scss">
 	// @import "../../../global/vars.css";
+	button {
+		flex-wrap: nowrap;
+		display: inline-flex;
+		place-items: center;
+		color: #09090a !important;
+		font-weight: 500;
+		border: #09090a;
+		background: white !important;
+		margin-bottom: 0.8rem;
+
+		padding: 0.3em;
+	}
+	.radio-button {
+		margin-left: 0.5rem;
+		background: transparent !important;
+		border: white 0.1rem solid !important;
+		color: white !important;
+
+		&:active,
+		&:hover {
+			border: rgb(158, 158, 158) 0.1rem solid !important;
+			background: rgba(255, 255, 255, 0.027) !important;
+			box-shadow: 0 0 0.1em 0 inset black;
+			color: rgb(236, 236, 236) !important;
+		}
+	}
+	.btn-text {
+		margin-left: 0.25rem;
+	}
 
 	.artist-header {
 		display: block;
@@ -101,6 +146,7 @@
 		height: 100%;
 		min-height: 13rem;
 		&::before {
+			padding-top: 100%;
 			position: absolute;
 			content: '';
 			top: 0;
@@ -129,6 +175,7 @@
 		position: relative;
 		z-index: 1;
 		height: 0.25rem;
+		padding-top: 4.5rem;
 		.content-wrapper {
 			position: absolute;
 			bottom: 0;
@@ -177,6 +224,34 @@
 		}
 		@media screen and (max-width: 500px) {
 			padding: 0.8rem;
+		}
+	}
+	.btn-wrpr {
+		@media (min-width: 320px) and (max-width: 499px) {
+			padding: 0 0 0.8rem 0.5rem;
+		}
+		@media (min-width: 500px) and (max-width: 640px) {
+			padding: 0 0 0.8rem 1.8rem;
+		}
+		@media screen and (min-width: 642px) and (max-width: 839px) {
+			// font-size: 2rem;
+			// color: pink;
+			padding: 0 0 0.8rem 2rem;
+		}
+		@media screen and (min-width: 840px) and (max-width: 960px) {
+			// font-size: 3.5rem;
+			// color: orange;
+			// inline-size: 100%;
+			// overflow-wrap: break-word;
+
+			// font-size: 2.75em;
+			padding: 0 2rem 0.8rem 2rem;
+		}
+		@media screen and (min-width: 961px) {
+			padding: 0 2rem 0.8rem 2rem;
+			// font-size: 4.5rem;
+		}
+		button {
 		}
 	}
 </style>

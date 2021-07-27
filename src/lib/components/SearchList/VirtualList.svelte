@@ -141,7 +141,7 @@
 	style="height: {height}; width:100%;">
 	<svelte-virtual-list-contents
 		bind:this={contents}
-		style="padding-top: {top}px; padding-bottom: {bottom}px;">
+		style="padding-top: {top}px; padding-bottom: calc({bottom}px + 1rem);">
 		{#each visible as row (row.index)}
 			<svelte-virtual-list-row>
 				<slot item={row.data}>Missing template</slot>
@@ -149,6 +149,7 @@
 		{/each}
 		{#if !hasData}
 			<div
+				style="height:1.5rem;"
 				use:vp
 				on:enterViewport={() => {
 					dispatch('endList')

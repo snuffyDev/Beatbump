@@ -28,7 +28,7 @@ export function parseItem(item, length) {
 			},
 			videoId: item.videoId,
 			autoMixList: item.playlistId,
-			thumbnail: item.thumbnails[0].url,
+			thumbnail: item?.thumbnail ? item?.thumbnail : item?.thumbnails[0]?.url,
 			length: length
 		}
 	})
@@ -36,7 +36,7 @@ export function parseItem(item, length) {
 	return result[0]
 }
 
-export const MusicTwoRowItemRenderer = (ctx: any) => {
+export const MusicTwoRowItemRenderer = (ctx: any): CarouselItem => {
 	const Item: CarouselItem = {
 		title: ctx.musicTwoRowItemRenderer.title.runs[0].text,
 		thumbnails:
@@ -67,12 +67,13 @@ export const MusicTwoRowItemRenderer = (ctx: any) => {
 	return Item
 }
 
-export const MusicResponsiveListItemRenderer = (ctx: any) => {
+export const MusicResponsiveListItemRenderer = (ctx: any): CarouselItem => {
 	const Item: CarouselItem = {
 		subtitle: [
 			...ctx.musicResponsiveListItemRenderer.flexColumns[1]
 				.musicResponsiveListItemFlexColumnRenderer.text.runs
 		],
+		explicit: ctx?.badges ? ctx?.badges : false,
 		title:
 			ctx.musicResponsiveListItemRenderer.flexColumns[0]
 				.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text,
@@ -80,9 +81,12 @@ export const MusicResponsiveListItemRenderer = (ctx: any) => {
 			ctx.musicResponsiveListItemRenderer.flexColumns[0]
 				.musicResponsiveListItemFlexColumnRenderer.text.runs[0]
 				.navigationEndpoint.watchEndpoint.videoId,
-		playlistId:
-			ctx.musicResponsiveListItemRenderer.menu.menuRenderer.items[0]
-				.menuNavigationItemRenderer.navigationEndpoint.watchEndpoint.playlistId,
+		playlistId: ctx.musicResponsiveListItemRenderer.menu.menuRenderer.items[0]
+			.menuNavigationItemRenderer.navigationEndpoint.watchEndpoint.playlistId
+			? ctx.musicResponsiveListItemRenderer.menu.menuRenderer.items[0]
+					.menuNavigationItemRenderer.navigationEndpoint.watchEndpoint
+					.playlistId
+			: ctx.navigationEndpoint.watchEndpoint,
 		thumbnails:
 			ctx.musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer
 				.thumbnail.thumbnails

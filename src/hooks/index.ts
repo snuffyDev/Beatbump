@@ -1,10 +1,15 @@
-const rootDomain = import.meta.env.VITE_DOMAIN // or your server IP for dev
+import { dev } from '$app/env'
 
+const rootDomain = import.meta.env.VITE_DOMAIN // or your server IP for dev
+dev
 const directives = {
 	'base-uri': ["'self'"],
 	'child-src': ["'self'"],
-	// 'connect-src': ["'self'", 'ws://localhost:*'],
-	'connect-src': ["'self'", 'ws://localhost:*', 'ws://*', '*'],
+	'connect-src':
+		dev
+			? ["'self'", 'ws://localhost:*', 'ws://*', '*']
+			: ["'self'", 'ws://localhost:*'],
+	// 'connect-src': ,
 	'img-src': [
 		"'self'",
 		'data:',

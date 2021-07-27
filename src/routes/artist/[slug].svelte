@@ -47,7 +47,7 @@
 	export let data
 	let width
 
-	$: console.log(
+ console.log(
 		data,
 		carouselItems,
 		items,
@@ -69,12 +69,7 @@
 	<main>
 		<ArtistPageHeader {description} {headerContent} {width} {thumbnail} />
 		<div class="artist-body">
-			<button
-				class="radio-button"
-				on:click={list.startPlaylist(headerContent.mixInfo.playlistId)}
-				><Icon size="1.25em" name="radio" /><span class="btn-text">
-					Play Radio</span
-				></button>
+
 			{#if items.length > 0}
 				<section>
 					<h4 class="grid-title">Songs</h4>
@@ -150,35 +145,6 @@
 		@media screen and (max-width: 500px) {
 			padding: 0 1rem;
 		}
-	}
-	button {
-		flex-wrap: nowrap;
-		display: inline-flex;
-		place-items: center;
-		color: #09090a !important;
-		font-weight: 500;
-		border: #09090a;
-		background: white !important;
-		margin-bottom: 0.8rem;
-
-		padding: 0.3em;
-	}
-	.radio-button {
-		margin-left: 0.5rem;
-		background: transparent !important;
-		border: white 0.1rem solid !important;
-		color: white !important;
-
-		&:active,
-		&:hover {
-			border: rgb(158, 158, 158) 0.1rem solid !important;
-			background: rgba(255, 255, 255, 0.027) !important;
-			box-shadow: 0 0 0.1em 0 inset black;
-			color: rgb(236, 236, 236) !important;
-		}
-	}
-	.btn-text {
-		margin-left: 0.25rem;
 	}
 	main {
 		margin: 0;

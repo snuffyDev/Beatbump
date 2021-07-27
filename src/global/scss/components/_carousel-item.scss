@@ -1,0 +1,133 @@
+.subtitles {
+	display: inline;
+}
+.text-wrapper {
+	display: inline-flex;
+	flex-direction: column;
+}
+.item1x1 {
+	// padding-top: 100% !important;
+	width: 13rem !important;
+}
+.item16x9 {
+	// padding-top: 56.25% !important;
+	width: 17rem !important;
+}
+.img1x1 {
+	// padding-top: 100% !important;
+	aspect-ratio: 1/1 !important;
+}
+.img16x9 {
+	// padding-top: 56.25% !important;
+	aspect-ratio: 16/9 !important;
+}
+.container.carouselItem {
+	position: relative;
+	padding-bottom: 5ch;
+}
+.menu {
+	position: absolute;
+	right: 5%;
+	top: 2.5%;
+	padding-top: 0rem;
+	// padding-right: 0.0125rem;
+	z-index: 1;
+	padding: 0.5ch;
+}
+.title {
+	cursor: pointer;
+	display: inline;
+	font-weight: 450;
+	font-size: 1.05rem;
+	font-family: "Commissioner", sans-serif;
+	margin-bottom: 0.8em;
+	letter-spacing: -0.02em;
+}
+
+section {
+	padding-left: 1rem;
+	padding-right: 0.5rem;
+	margin-top: 0.5rem;
+	margin-bottom: 0rem;
+	display: block;
+	content: "";
+	// padding-bottom: 1.8em;
+
+	::before {
+		display: block;
+	}
+	/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
+}
+section.item {
+	scroll-snap-align: start;
+	min-height: 16.75rem;
+	height: auto;
+	width: 100%;
+	min-width: 12rem;
+	max-width: 20rem;
+	position: relative;
+	@media screen and (max-width: 500px) {
+		max-width: 17rem;
+	}
+}
+
+.img {
+	height: auto;
+	width: 100%;
+	aspect-ratio: inherit;
+	.container {
+		position: relative; /* If you want text inside of it */
+
+		aspect-ratio: inherit;
+		cursor: pointer;
+		width: 100%;
+		position: relative;
+
+		// padding-top: 100%; /* 1:1 Aspect Ratio */
+		&::before {
+			position: absolute;
+			content: "";
+			top: 0;
+			right: 0;
+
+			bottom: 0;
+			left: 0;
+			background: linear-gradient(rgba(0, 0, 0, 0.502), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
+
+			transition: background cubic-bezier(0.29, -0.3, 0.7, 0.95) 0.15s,
+				opacity cubic-bezier(0.29, -0.3, 0.7, 0.95) 0.15s;
+			opacity: 0.1;
+			z-index: 1;
+		}
+		&:hover::before {
+			// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
+			background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
+			opacity: 0.8;
+			z-index: 1;
+		}
+		&:active:hover::before {
+			// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
+			background: linear-gradient(0.5turn, rgba(49, 49, 49, 0.534), rgba(0, 0, 0, 0.11));
+			opacity: 1;
+			z-index: 1;
+		}
+		img {
+			width: 100%;
+			height: auto;
+			aspect-ratio: inherit;
+			position: absolute;
+			border-radius: var(--xs-radius);
+			min-width: 100%;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+		}
+	}
+}
+.cont {
+	margin-top: 1em;
+	// margin-right: var(--lg-spacing);
+}
+.scroll-container {
+}

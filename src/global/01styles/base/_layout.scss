@@ -65,9 +65,9 @@ body {
 	line-height: 1.5;
 	display: grid;
 	grid-template-areas:
-		'n n n n'
-		'm m m m'
-		'f f f f';
+		"n n n n"
+		"m m m m"
+		"f f f f";
 	grid-template-columns: 16.1255rem 1fr;
 
 	overflow: hidden;
@@ -78,9 +78,9 @@ body {
 	.l-body,
 	.body {
 		grid-template-areas:
-			'n n n n'
-			's m m m'
-			'f f f f';
+			"n n n n"
+			"s m m m"
+			"f f f f";
 	}
 }
 main {
@@ -90,20 +90,16 @@ main {
 
 a,
 .link {
-	transition: 120ms ease-in color;
-	font-family: 'Commissioner', sans-serif, 'Segoe UI', Tahoma, Geneva, Verdana,
-		sans-serif;
+	transition: 120ms ease-in opacity;
+	font-family: "Commissioner", sans-serif, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 	$color: white;
 	text-decoration: none;
 	font-weight: 450;
 	color: $color;
 	cursor: pointer;
+	opacity: 1;
 	&:hover {
-		color: color.adjust(
-			$color,
-			$lightness: -10%,
-			$hue: 354deg,
-			$saturation: 5%
-		);
+		opacity: 0.9;
+		color: color.adjust($color, $lightness: -10%, $hue: 354deg, $saturation: 5%);
 	}
 }

@@ -15,6 +15,7 @@ $secondary-font-family: "Commissioner", sans-serif;
 	--xl-spacing: calc(var(--base-spacing) * 1.25);
 
 	--base-radius: 0.5ch;
+	--xs-radius: calc(var(--base-radius) / 0.95);
 	--sm-radius: calc(var(--base-radius) / 0.8);
 	--md-radius: calc(var(--base-radius) / 0.5);
 	--lg-radius: calc(var(--base-radius));
