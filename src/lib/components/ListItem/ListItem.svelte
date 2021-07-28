@@ -20,7 +20,7 @@
 
 <div
 	class="item"
-	class:playing={index == $key && isPagePlaying}
+	class:playing={$key == index && isPagePlaying}
 	on:click={async () => {
 		// @ts-ignore
 		key.set(index)
@@ -36,7 +36,8 @@
 
 			// await list.initList(item.videoId, item.playlistId)
 		} else {
-			await list.initList(item.videoId, item.playlistId)
+			key.set(0)
+			await list.initList(item.videoId, item.playlistId, index)
 		}
 		console.log($list.mix)
 		dispatchPlaying(true)
@@ -207,6 +208,7 @@
 		margin-left: 0.4rem;
 		margin-right: 1.1rem;
 		align-self: center;
+
 		justify-self: center;
 		&:hover {
 			opacity: 0;

@@ -6,6 +6,7 @@
 	import list from '$lib/stores/list'
 	import QueueListItem from './QueueListItem.svelte'
 
+	export let curTheme
 	export let autoId
 	export let mixList = []
 	export let show
@@ -89,12 +90,25 @@
 		height: auto;
 		width: auto;
 		background: inherit;
+
 		max-height: 75%;
 		// transition: all cubic-bezier(0.23, 1, 0.32, 1) 1300ms;
 		min-height: 55%;
 		width: 40%;
 		z-index: -1;
-
+		&::before {
+			position: absolute;
+			content: '';
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			filter: brightness(0.4);
+			width: 100%;
+			height: 100%;
+			z-index: -1;
+			background-color: inherit;
+		}
 		/* overflow-y: scroll !important; */
 		overflow-y: hidden;
 		opacity: 1;

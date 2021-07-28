@@ -30,12 +30,12 @@
 					window.innerWidth < 500
 						? Math.min(Math.max(-scroll.top / window.innerHeight, 0), 70) * 750
 						: Math.min(Math.max(-scroll.top / window.innerHeight, 0), 70) * 250
-				console.log(
-					y,
-					-scroll.top * -window.innerHeight,
-					Math.min(Math.max(-scroll.top / window.innerHeight, 0), 70) * 50,
-					50
-				)
+				// console.log(
+				// 	y,
+				// 	-scroll.top * -window.innerHeight,
+				// 	Math.min(Math.max(-scroll.top / window.innerHeight, 0), 70) * 50,
+				// 	50
+				// )
 				if (elapsed < 200) {
 					window.requestAnimationFrame(handler)
 				}
@@ -145,7 +145,7 @@
 		position: relative;
 		height: 100%;
 		&::before {
-			padding-top: 100%;
+			// padding-top: 100%;
 			position: absolute;
 			content: '';
 			top: 0;

@@ -3,21 +3,23 @@ import { parseItem } from '$lib/parsers'
 import { getSrc } from '$lib/utils'
 import { writable } from 'svelte/store'
 import { filterAutoPlay, playerLoading } from './stores'
-import { addToQueue } from './../utils'
+import { addToQueue } from '../utils'
 import { currentTitle } from '$stores/stores'
 
 const filterList = (list) => {
-	return mix = [...list].filter(((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set()))
+	return (mix = [...list].filter(
+		((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set())
+	))
 }
 const fetchNext = async (index, params, videoId, playlistId, ctoken) => {
 	return await fetch(
 		'/api/next.json?playlistId=' +
-		encodeURIComponent(playlistId) +
-		`${videoId ? `&videoId=${videoId}` : ''}` +
-		`${params ? `&params=${params}` : ''}` +
-		`${ctoken ? `&ctoken=${ctoken}` : ''}` +
-		'&index=' +
-		encodeURIComponent(index),
+			encodeURIComponent(playlistId) +
+			`${videoId ? `&videoId=${videoId}` : ''}` +
+			`${params ? `&params=${params}` : ''}` +
+			`${ctoken ? `&ctoken=${ctoken}` : ''}` +
+			'&index=' +
+			encodeURIComponent(index),
 		{
 			headers: { accept: 'application/json' }
 		}
@@ -50,7 +52,7 @@ const list = writable({
 	mix
 })
 function split(arr, chunk) {
-	const temp = [];
+	const temp = []
 	let i = 0
 
 	while (i < arr.length) {
@@ -58,20 +60,22 @@ function split(arr, chunk) {
 		i += chunk
 	}
 
-	return temp;
+	return temp
 }
 export default {
 	subscribe: list.subscribe,
-	async initList(videoId, playlistId) {
+	async initList(videoId: string, playlistId: string, key?: number) {
 		loading = true
+		key = key ? key : 0
 		playerLoading.set(loading)
 		if (hasList) mix = []
 		hasList = true
-		const response = await fetchNext(0, '', videoId, playlistId, '')
+		const response = await fetchNext(key || 0, '', videoId, playlistId, '')
 		const data = await response
 		// console.log(data)
+		// console.log(data)
 		await getSrc(videoId)
-		currentTitle.set(data.results[index].title)
+		currentTitle.set(data.results[key].title)
 		loading = false
 		playerLoading.set(loading)
 		continuation.push(data.continuation)
@@ -103,11 +107,11 @@ export default {
 		list.set({ continuation, mix })
 	},
 	async moreLikeThis(item) {
-		if (!item) return;
+		if (!item) return
 		loading = true
 		playerLoading.set(loading)
-		const response = await fetchNext(0, '', item.videoId, item.autoMixList, '');
-		const data = await response;
+		const response = await fetchNext(0, '', item.videoId, item.autoMixList, '')
+		const data = await response
 		console.log(data)
 		mix.push(...data.results)
 		continuation.push(data.continuation)
@@ -122,7 +126,11 @@ export default {
 			`/api/getQueue.json?playlistId=${playlistId}`
 		).then((data) => data.json())
 		mix = [...data]
-		if (mix.length > 50) { Chunked = { chunks: [...split(mix, 50)], origLength: mix.length }; splitList = Chunked.chunks; mix = splitList[0] }
+		if (mix.length > 50) {
+			Chunked = { chunks: [...split(mix, 50)], origLength: mix.length }
+			splitList = Chunked.chunks
+			mix = splitList[0]
+		}
 		console.log(mix)
 		console.log(splitList)
 		loading = false
@@ -137,20 +145,16 @@ export default {
 		let loading = true
 		playerLoading.set(loading)
 		if (splitList && mix.length < Chunked.origLength - 1) {
-
 			splitListIndex++
 			mix.pop()
 
 			mix = [...mix, ...splitList[splitListIndex]]
 			await getSrc(mix[autoId++].videoId)
 			loading = false
-			filterSetting
-				? filterList([...mix]) : (mix = [...mix])
+			filterSetting ? filterList([...mix]) : (mix = [...mix])
 			list.set({ continuation, mix })
 			playerLoading.set(loading)
-
 		} else {
-
 			const data = await fetchNext(autoId, itct, videoId, playlistId, ctoken)
 
 			mix.pop()
@@ -161,8 +165,10 @@ export default {
 
 			filterSetting
 				? (mix = [...mix, ...data.results].filter(
-					((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set())
-				))
+						((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(
+							new Set()
+						)
+				  ))
 				: (mix = [...mix, ...data.results])
 			list.set({ continuation, mix })
 		}

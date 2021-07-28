@@ -8,7 +8,7 @@
 	import { key, currentTrack } from '$stores/stores'
 	import Icon from '$components/Icon/Icon.svelte'
 	import { goto } from '$app/navigation'
-	import list from '$stores/list'
+	import list from '$lib/stores/list'
 	import type { Item, Song } from '$lib/types'
 	import type { PlaylistSearch } from '$lib/types/playlist'
 	import lazy from '$lib/lazy'

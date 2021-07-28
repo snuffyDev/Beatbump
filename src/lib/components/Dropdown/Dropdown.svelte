@@ -41,7 +41,7 @@
 		class="menuButtons"
 		on:click|stopPropagation={() => {
 			isHidden = !isHidden
-			console.log(isHidden)
+			// console.log(isHidden)
 		}}>
 		<svelte:component
 			this={Icon}

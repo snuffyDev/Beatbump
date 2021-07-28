@@ -47,6 +47,8 @@
 
 	player.addEventListener('loadedmetadata', () => {
 		title = $list.mix[0].title
+		isPlaying = true
+		play()
 		DropdownItems = [
 			{
 				text: 'View Artist',
@@ -266,6 +268,7 @@
 		hideEvent = false
 		// console.log(showing)
 	}}
+	bind:theme={curTheme}
 	bind:show={listShow}
 	bind:autoId={$key} />
 
@@ -277,12 +280,12 @@
 		<progress bind:this={songBar} value={$progress} max={duration} />
 	</div>
 	<div class="player" class:light={curTheme == 'light'}>
-		<div class="player-left">
-			<div
-				on:click={() => {
-					if (!hideEvent) showing = !showing
-				}}
-				class="listButton player-btn">
+		<div
+			class="player-left"
+			on:click={() => {
+				if (!hideEvent) showing = !showing
+			}}>
+			<div class="listButton player-btn">
 				<svelte:component this={Icon} color="white" name="radio" size="2em" />
 			</div>
 		</div>
@@ -415,6 +418,7 @@
 	}
 	.f-container {
 		background-color: inherit;
+		position: absolute;
 	}
 	.light * {
 		color: white !important;

@@ -25,6 +25,11 @@ export async function get({ query }) {
 							enableSafetyMode: false
 						}
 					},
+
+					watchEndpointMusicConfig: {
+						musicVideoType: 'MUSIC_VIDEO_TYPE_OMV'
+					},
+
 					continuation: `${ctoken}`,
 					isAudioOnly: true,
 					enablePersistentPlaylistPanel: true,
@@ -32,8 +37,7 @@ export async function get({ query }) {
 					params: `${params}`,
 					tunerSettingValue: 'AUTOMIX_SETTING_NORMAL',
 					videoId: `${video_id}`,
-					playlistId: `${playlist_id}`,
-
+					playlistId: `${playlist_id}`
 				}),
 				headers: {
 					'Content-Type': 'application/json; charset=utf-8',
@@ -61,28 +65,38 @@ export async function get({ query }) {
 												musicQueueRenderer: {
 													content: {
 														playlistPanelRenderer: {
-															contents,
+															contents = [],
 															continuations: [
 																{
 																	nextRadioContinuationData: {
-																		clickTrackingParams,
-																		continuation
-																	}
-																}
-															]
-														}
-													}
-												}
-											}
-										}
-									}
-								]
-							}
-						}
-					}
-				},
+																		clickTrackingParams = '',
+																		continuation = ''
+																	} = {}
+																} = {}
+															] = []
+														} = {}
+													} = {}
+												} = {}
+											} = {}
+										} = {}
+									} = {}
+								] = []
+							} = {}
+						} = {}
+					} = {}
+				} = {},
 				currentVideoEndpoint: { watchEndpoint }
 			} = data
+			// return {
+			// 	status: 200,
+			// 	body: {
+			// 		data,
+			// 		watchEndpoint,
+			// 		continuation,
+			// 		clickTrackingParams,
+			// 		contents
+			// 	}
+			// }
 			const parsed = parseContents(
 				contents,
 				continuation,
@@ -123,6 +137,7 @@ export async function get({ query }) {
 			body: parsed
 		}
 	} catch (error) {
+		console.log(error)
 		return {
 			status: 500,
 			error: new Error('Error: ' + error)

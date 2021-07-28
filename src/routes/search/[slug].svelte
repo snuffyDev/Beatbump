@@ -1,5 +1,4 @@
 <script context="module">
-	// import { search } from '$stores/stores'
 	export async function load({ page, fetch }) {
 		const slug = page.params.slug
 		const filter = page.query.get('filter')

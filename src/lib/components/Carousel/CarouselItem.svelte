@@ -100,12 +100,11 @@
 						goto(`/artist/${item?.endpoint?.browseId}`)
 					} else if (item.videoId !== undefined) {
 						loading = true
-						await list.initArtistList(item.videoId, item.playlistId)
-						getSrc(item.videoId)
-						currentTrack.set({ ...$list.mix[0] })
+						await list.initList(item.videoId, item.playlistId, index)
+						currentTrack.set({ ...$list.mix[index] })
 						// currentTitle.set(res[0].title);
-						key.set(0)
-						// console.log(data);
+						key.set(index)
+						// console.log('data')
 					} else {
 						loading = true
 						await list.startPlaylist(item.playlistId)
@@ -159,8 +158,8 @@
 			<div class="cont">
 				<div class="text-wrapper">
 					<span class="title">
-						{item.title.length > 32
-							? item.title.substring(0, 32) + '...'
+						{item.title.length > 48
+							? item.title.substring(0, 48) + '...'
 							: item.title}
 					</span>
 					{#if item.subtitle}
