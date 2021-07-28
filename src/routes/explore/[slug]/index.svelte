@@ -13,6 +13,7 @@
 
 <script lang="ts">
 	export let data
+	import { goto } from '$app/navigation'
 	$: console.log(data)
 </script>
 
@@ -21,7 +22,9 @@
 		<h1>{section.title}</h1>
 		<div class="grid">
 			{#each section.section as item}
-				<div class="item">
+				<div
+					class="item"
+					on:click={() => goto('/playlist?list=' + item.browseId)}>
 					<div class="img">
 						<img loading="lazy" src={item.thumbnail} alt="thumbnail" />
 					</div>

@@ -139,7 +139,8 @@
 		color: #000;
 		font-weight: 700;
 		filter: contrast(100%);
-		background: hsla(0, 0%, 100%, 0.966);
+		border: 0.001rem solid #12121233;
+		background: rgba(238, 238, 238, 0.966);
 		padding: 0 0.4em;
 		margin-left: 0.3em;
 	}
@@ -169,13 +170,13 @@
 		user-select: none;
 		flex: 0 1 auto;
 		height: auto;
-		border-bottom: 0.0714rem solid hsla(0, 0%, 66.7%, 0.24);
+		border-bottom: calc(0.000321rem / 2) solid rgb(141 141 142 / 34%);
 		width: 100%;
 		flex-wrap: nowrap;
 		padding: 0.1rem 0.9rem;
 		&:hover,
 		&:active:not(.menu) {
-			background: lighten(#2122254d, 1%);
+			background: lighten(#57575831, 1%);
 			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
 			pointer-events: all;
 			&:active:not(.menu) {
@@ -185,7 +186,7 @@
 		}
 	}
 	.playing {
-		background: lighten(#212225, 5%);
+		background: lighten(#2122254f, 5%);
 		transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
 	}
 	// background-color: transparentize(#aaa, 0.9);

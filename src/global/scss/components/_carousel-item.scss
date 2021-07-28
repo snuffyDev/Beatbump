@@ -24,11 +24,20 @@
 .container.carouselItem {
 	position: relative;
 	padding-bottom: 5ch;
+	padding-left: 1rem;
+	padding-top: 1rem;
+	scroll-snap-align: start;
+
+	&:last-child {
+		padding-right: 1rem;
+	}
 }
 .menu {
 	position: absolute;
-	right: 5%;
-	top: 2.5%;
+	pointer-events: painted;
+
+	right: 0;
+	top: 0;
 	padding-top: 0rem;
 	// padding-right: 0.0125rem;
 	z-index: 1;
@@ -45,10 +54,6 @@
 }
 
 section {
-	padding-left: 1rem;
-	padding-right: 0.5rem;
-	margin-top: 0.5rem;
-	margin-bottom: 0rem;
 	display: block;
 	content: "";
 	// padding-bottom: 1.8em;
@@ -59,7 +64,6 @@ section {
 	/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
 }
 section.item {
-	scroll-snap-align: start;
 	min-height: 16.75rem;
 	height: auto;
 	width: 100%;
@@ -89,7 +93,6 @@ section.item {
 			content: "";
 			top: 0;
 			right: 0;
-
 			bottom: 0;
 			left: 0;
 			background: linear-gradient(rgba(0, 0, 0, 0.502), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));

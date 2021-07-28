@@ -39,10 +39,20 @@ export async function get({ params }) {
 		}
 	)
 
-	let { contents } = await response.json()
-	contents =
-		contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer.content
-			.sectionListRenderer.contents
+	const data = await response.json()
+	let {
+		contents: {
+			singleColumnBrowseResultsRenderer: {
+				tabs: [
+					{
+						tabRenderer: {
+							content: { sectionListRenderer: { contents = [] } = {} } = {}
+						} = {}
+					} = {}
+				] = []
+			} = {}
+		} = {}
+	} = await data
 	const sections = contents.map(({ gridRenderer = {} }) => {
 		const { items = [], header = {} } = gridRenderer
 		const section = items.map(({ musicTwoRowItemRenderer = {} }) => ({

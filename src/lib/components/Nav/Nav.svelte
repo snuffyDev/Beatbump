@@ -17,7 +17,7 @@
 
 <nav class="nav" style={`background-color: var(--${$theme}-top)`}>
 	<div class="logo">
-		<div on:click={() => go()}>
+		<div on:click={() => goto('/trending')}>
 			<img
 				src="/logo-header.png"
 				width="2.5rem"
@@ -89,6 +89,24 @@
 		@media screen and (min-width: 640px) {
 			display: none;
 			visibility: hidden;
+		}
+	}
+	nav {
+		border-bottom: 0.043128em solid #6d6d6d3a;
+		// filter: drop-shadow(0.5rem 1.2rem 1rem #0e0d0d2c);
+		// box-shadow: 0 0.2rem 1rem 0.0125rem #0f0f0f38;
+		&::before {
+			box-shadow: 0 0.4rem 0.2rem -0.0875rem rgb(15 15 15 / 11%);
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			z-index: -1;
+			content: '';
+		}
+		&.light {
+			border-bottom: 0.043128em solid #6d6d6d9d;
 		}
 	}
 	.x-button {

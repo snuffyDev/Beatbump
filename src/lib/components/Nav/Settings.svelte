@@ -74,6 +74,8 @@
 
 	.nav-settings {
 		// padding-left: 2em !important;
+
+		// filter: drop-shadow(0.5rem 1.2rem 1rem #0e0d0d2c);
 		right: 0;
 		top: 4rem;
 		display: flex;

@@ -104,7 +104,7 @@
 		--dark-base: #09090a;
 		--dark-top: #111214;
 		--dark-forms: #131516;
-		--dark-side: #0b0c0c;
+		--dark-side: #13171b33;
 
 		--dim-bottom: rgb(20, 24, 32);
 		--dim-base: rgb(9 9 10);
@@ -118,7 +118,7 @@
 		--light-forms: #aba9c3ff;
 		--light-side: #cac8c9;
 		--rich-black-fogra-29: #0c1217ff;
-		--light-text: #0d0d0fff;
+		--light-text: #131314;
 		--raisin-black: #171824ff;
 	}
 	.input {
@@ -126,12 +126,10 @@
 			background-color: var(--darker-light);
 		}
 	}
-	:global(.light) {
-		* {
-			color: var(--light-text);
-		}
+	:root .light * {
+		color: var(--light-text);
 	}
-	:root.dark {
+	:root .dark * {
 		color: #f3f3f3;
 	}
 	.player {
@@ -155,12 +153,4 @@
 	// :global(.selectCont) {
 	// 	background-color: theme-color('ytm', 'forms');
 	// }
-	:global(nav) {
-		border-bottom: 0.25px rgba(170, 170, 170, 0.116) solid;
-		// background-color: rgb(20 24 32 / 59%);
-	}
-	:global(.body) {
-		scroll-behavior: smooth;
-		text-rendering: optimizeLegibility;
-	}
 </style>

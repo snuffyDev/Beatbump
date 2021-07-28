@@ -10,6 +10,7 @@
 	export let isHidden = false
 	export let type = ''
 	export let items = []
+	export let color = 'white'
 	let showing = false
 	$: menuToggle = showing ? true : false
 	const dispatch = createEventDispatcher()
@@ -45,7 +46,7 @@
 		}}>
 		<svelte:component
 			this={Icon}
-			color={type == 'player' ? 'white' : 'currentColor'}
+			color={type == 'player' || 'white' ? 'white' : 'currentColor'}
 			size="1.5em"
 			name="dots" />
 	</div>
@@ -62,6 +63,7 @@
 	.menuButtons {
 		margin-right: 0.2rem;
 		stroke: rgba(0, 0, 0, 0.692);
+
 		height: 2%;
 		margin: 0pt;
 		z-index: -5;

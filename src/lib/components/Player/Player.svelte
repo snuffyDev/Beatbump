@@ -1,17 +1,23 @@
 <script>
-	import { clickOutside } from '$lib/js/clickOutside'
 	import { goto } from '$app/navigation'
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
-	import { iOS } from '$stores/stores'
-	import { tweened } from 'svelte/motion'
-	import { getSrc } from '$lib/utils'
-	import Queue from './Queue.svelte'
-	import '../../../global/scss/components/_player.scss'
 	import Icon from '$components/Icon/Icon.svelte'
-	import { updateTrack, key, currentTitle, playerLoading } from '$stores/stores'
-	import { cubicOut } from 'svelte/easing'
+	import { clickOutside } from '$lib/js/clickOutside'
 	import list from '$lib/stores/list'
+	import { getSrc } from '$lib/utils'
+	import {
+		currentTitle,
+		iOS,
+		key,
+		playerLoading,
+		updateTrack
+	} from '$stores/stores'
 	import { tick } from 'svelte'
+	import { cubicOut } from 'svelte/easing'
+	import { tweened } from 'svelte/motion'
+	import '../../../global/scss/components/_player.scss'
+	import Queue from './Queue.svelte'
+
 	export let curTheme
 	const player: HTMLAudioElement = new Audio()
 	player.autoplay = true
@@ -34,7 +40,6 @@
 	$: hideEvent = false
 	$: isPlaying = false
 	let seeking = false
-	let once = false
 	let songBar
 
 	let showing
@@ -47,6 +52,8 @@
 
 	player.addEventListener('loadedmetadata', () => {
 		title = $list.mix[0].title
+		isPlaying = true
+		play()
 		DropdownItems = [
 			{
 				text: 'View Artist',
@@ -63,6 +70,8 @@
 		]
 	})
 	const play = () => {
+		navigator.mediaSession.playbackState = 'playing'
+
 		let playTrack = player.play()
 		if (playTrack !== undefined) {
 			playTrack.then(() => metaDataHandler())
@@ -82,8 +91,7 @@
 		// This checks if the user is on an iOS device
 		// due to the length of a song being doubled on iOS,
 		// we have to cut the time in half. Doesn't effect other devices.
-		if (isWebkit && remainingTime < duration / 2 && once == false) {
-			once = true
+		if (isWebkit && remainingTime < duration / 2) {
 			getNext()
 		}
 	})
@@ -145,9 +153,8 @@
 	$: console.log($list.mix)
 
 	const getNext = async () => {
+		key.set(autoId)
 		if (autoId == $list.mix.length - 1) {
-			await tick()
-			// autoId++
 			list.getMore(
 				autoId,
 				$list.mix[autoId]?.itct,
@@ -156,9 +163,6 @@
 				$list.continuation
 			)
 			// autoId++;
-			key.set(autoId)
-
-			once = false
 
 			return
 		} else {
@@ -170,9 +174,7 @@
 
 			console.log('got here')
 			currentTitle.set($list.mix[autoId].title)
-			once = false
 		}
-		once = false
 	}
 	async function ErrorNext() {
 		await tick()
@@ -268,6 +270,7 @@
 		hideEvent = false
 		// console.log(showing)
 	}}
+	bind:theme={curTheme}
 	bind:show={listShow}
 	bind:autoId={$key} />
 
@@ -279,12 +282,12 @@
 		<progress bind:this={songBar} value={$progress} max={duration} />
 	</div>
 	<div class="player" class:light={curTheme == 'light'}>
-		<div class="player-left">
-			<div
-				on:click={() => {
-					if (!hideEvent) showing = !showing
-				}}
-				class="listButton player-btn">
+		<div
+			class="player-left"
+			on:click={() => {
+				if (!hideEvent) showing = !showing
+			}}>
+			<div class="listButton player-btn">
 				<svelte:component this={Icon} color="white" name="radio" size="2em" />
 			</div>
 		</div>
@@ -417,6 +420,8 @@
 	}
 	.f-container {
 		background-color: inherit;
+		position: absolute;
+		box-shadow: 0 0rem 1rem 0rem #00000070;
 	}
 	.light * {
 		color: white !important;
@@ -448,19 +453,20 @@
 			position: relative !important;
 		}
 	}
-
+	.progress-bar {
+		position: relative;
+	}
 	.player-left,
 	.player-right {
-		-webkit-text-size-adjust: 100%;
+		webkit-text-size-adjust: 100%;
 		align-self: center;
 		cursor: pointer;
 		height: auto;
 		max-height: 44pt;
 		max-width: 44pt;
-		margin: 10pt;
+		/* margin: 10pt; */
 		padding: 10pt;
 		width: auto;
-		width: 100%;
 		width: 100%;
 		align-items: center;
 		display: flex;
@@ -475,15 +481,17 @@
 	progress {
 		display: block;
 		width: 100%;
-		height: 0.5315rem;
-		-webkit-appearance: none;
+		height: 0.4315rem;
+		position: absolute;
+		top: -0.1rem;
+		margin: 0;
 		-moz-appearance: none;
 		appearance: none;
 		background: transparent;
 		background-color: #232530;
-		/* z-index: 7; */
 		outline: none;
 		border: transparent;
+		padding: 0;
 	}
 
 	progress::-webkit-progress-bar {
