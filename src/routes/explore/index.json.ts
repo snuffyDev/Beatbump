@@ -33,14 +33,12 @@ export async function get({ query }) {
 				tabs: [
 					{
 						tabRenderer: {
-							content: {
-								sectionListRenderer: { contents }
-							}
-						}
-					}
-				]
-			}
-		}
+							content: { sectionListRenderer: { contents = [] } = {} } = {}
+						} = {}
+					} = {}
+				] = []
+			} = {}
+		} = {}
 	} = await data
 
 	const sections = contents.map(({ gridRenderer = {} }) => {
@@ -61,34 +59,6 @@ export async function get({ query }) {
 			}
 		}))
 		return { section, title: header.gridHeaderRenderer.title.runs[0].text }
-		// const section = [
-		// 	...e.map(({ gridRenderer = [] }) => {
-		// 		let items = []
-		// 		let header = gridRenderer.header?.gridHeaderRenderer.title.runs[0].text
-		// 		items = gridRenderer?.items?.map(
-		// 			(i: { musicNavigationButtonRenderer: any }) => {
-		// 				const { musicNavigationButtonRenderer } = i
-		// 				let text = musicNavigationButtonRenderer.buttonText.runs[0].text
-		// 				let color: number =
-		// 					musicNavigationButtonRenderer.solid.leftStripeColor
-		// 				let colorCode = argbToRGB(color)
-		// 				function argbToRGB(color: number) {
-		// 					return ('00000000' + (color & 0xffffff).toString(16)).slice(-6)
-		// 				}
-
-		// 				return {
-		// 					text: text,
-		// 					colorCode: `#${colorCode}`,
-		// 					clickCommand: musicNavigationButtonRenderer.clickCommand
-		// 				}
-		// 			}
-		// 		)
-		// 		return {
-		// 			header: header,
-		// 			items: items
-		// 		}
-		// 	})
-		// ]
 	})
 	return {
 		status: 200,

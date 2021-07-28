@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition'
-	import { afterUpdate, createEventDispatcher, onMount } from 'svelte'
-	import { cubicInOut } from 'svelte/easing'
 	import { clickOutside } from '$lib/js/clickOutside'
 	import list from '$lib/stores/list'
+	import { afterUpdate, createEventDispatcher, onMount } from 'svelte'
+	import { cubicInOut } from 'svelte/easing'
+	import { fly } from 'svelte/transition'
 	import QueueListItem from './QueueListItem.svelte'
 
 	export let curTheme
@@ -114,9 +114,7 @@
 		opacity: 1;
 		transition: all 250ms ease-in-out;
 		bottom: 4em;
-		&.slide {
-			opacity: 1;
-		}
+
 		.subtitle {
 			/* text-transform: uppercase; */
 			font-size: 1.2rem;

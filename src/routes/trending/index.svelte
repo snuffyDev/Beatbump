@@ -44,9 +44,7 @@
 				<div class="m-alert-info"><em>Coming Soon!</em></div>
 				<box>
 					{#each carouselItems[1].results.slice(1, 15) as item}
-						<div
-							style={`border-left: var(--xs-radius) solid #${item.color}`}
-							class="box">
+						<div style={`border-left: 1ch solid #${item.color}`} class="box">
 							<div class="innerbox">
 								<a class="innerlink" href={`/explore/${item.endpoint.params}`}
 									>{item.text}</a>
@@ -78,7 +76,7 @@
 		letter-spacing: -0.02em;
 
 		h1 {
-			font-size: 1.85em;
+			font-size: 2.125em;
 			@media screen and (min-width: 800px) {
 				font-size: 2.05em;
 			}
@@ -145,9 +143,9 @@
 			left: 0;
 			// z-index: 5;
 			// display: inline-bloc // k;;
-			border-radius: var(--md-radius);
+			border-radius: var(--lg-radius);
 			width: 100%;
-			background: #17151c;
+			background: #9589b314;
 		}
 		&::before {
 			position: absolute;
@@ -160,7 +158,10 @@
 			z-index: 0;
 			border-radius: inherit;
 			height: 100%;
-			background: #17151c;
+			background: #9589b314;
 		}
+	}
+	:root .light .box {
+		background: #8870c427;
 	}
 </style>

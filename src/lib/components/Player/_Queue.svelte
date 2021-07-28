@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition'
-	import { afterUpdate, createEventDispatcher, onMount } from 'svelte'
+	import { afterUpdate, createEventDispatcher, onMount, tick } from 'svelte'
 	import { cubicInOut } from 'svelte/easing'
 	import { clickOutside } from '$lib/js/clickOutside'
 	import list from '$lib/stores/list'
@@ -10,9 +10,9 @@
 	export let autoId
 	export let mixList = []
 	export let show
-
 	$: mixList = $list.mix
 
+	let sliding = false
 	let songList
 	let active = document.getElementById(autoId)
 
@@ -36,20 +36,25 @@
 	)
 
 	function handlePanStart() {
+		sliding = true
 		coords.stiffness = coords.damping = 0.1
 	}
 
 	function handlePanMove(event) {
+		sliding = true
+
 		coords.update(($coords) => ({
 			x: $coords.x + event.detail.dx,
 			y: Math.min(Math.max(-$coords.y, $coords.y + event.detail.dy), 150)
 		}))
 	}
 
-	function handlePanEnd(event) {
+	async function handlePanEnd(event) {
 		coords.stiffness = 0.05
 		coords.damping = 0.6
 		coords.set({ x: 0, y: 0 })
+		await tick()
+		sliding = false
 	}
 	function showList() {
 		dispatch('hide', {
@@ -71,8 +76,11 @@
 		translateY({$coords.y}%)
 	"
 		on:click_outside={() => {
-			show = !show
-			showList()
+			if (sliding == false) {
+				show = !show
+
+				showList()
+			}
 		}}
 		transition:fly={{ y: 0, duration: 125, easing: cubicInOut }}>
 		<div class="list">
@@ -132,7 +140,7 @@
 		/* overflow-y: hidden; */
 		opacity: 1;
 		transition: all 0.125s ease-in-out;
-		top: calc(50% - 13rem);
+		// top: calc(50% - 13rem);
 
 		&.slide {
 			opacity: 1;

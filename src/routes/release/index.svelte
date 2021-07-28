@@ -34,7 +34,7 @@
 	import { onMount } from 'svelte'
 	import Icon from '$components/Icon/Icon.svelte'
 	import ListItem from '$components/ListItem/ListItem.svelte'
-	import { currentTitle, currentTrack, key } from '$stores/stores'
+	import { currentTitle, theme, currentTrack, key } from '$stores/stores'
 	import { parsePageContents } from '$lib/js/releaseUtils'
 	import { isPagePlaying } from '$stores/stores'
 	import list from '$lib/stores/list'
@@ -118,7 +118,10 @@
 							}}
 							><Icon name="play" size="1.5em" />
 							Play Album</button>
-						<button class="radioMix" on:click={() => playRadio()}
+						<button
+							class="radioMix"
+							class:radioMix-light={$theme.includes('light')}
+							on:click={() => playRadio()}
 							><Icon name="play" size="1.5em" />
 							Album Radio</button>
 					</div>
@@ -148,19 +151,36 @@
 		font-family: 'Commissioner' sans-serif;
 		font-weight: 500;
 	}
-	.radioMix {
+	.radioMix:not(.radioMix-light) :not(.light) {
 		background-color: transparent !important;
-		border: #f2f2f2 solid 0.175rem !important;
-		color: #f2f2f2 !important;
-
+		border-color: white !important;
+		color: rgb(255, 255, 255) !important;
+		> svg {
+			color: white !important;
+		}
+		&:hover:not(.light),
+		&:active:not(.light) {
+			background-color: #f2f2f20e !important;
+			border-color: #ffffff !important;
+		}
+		&:active:not(.light) {
+			background-color: #f2f2f2a2 !important;
+			border-color: #c0c0c0 !important;
+			color: #121212 !important;
+		}
+	}
+	.radioMix-light {
+		background-color: lighten(#aba9c3ff, 20%) !important;
+		border-color: #0f0f0f !important;
+		color: #141414 !important;
 		&:hover,
 		&:active {
-			background-color: #f2f2f20e !important;
-			border: #ffffff solid 0.175rem !important;
+			background-color: rgba(242, 242, 242, 0.479) !important;
+			border-color: #3d3d3d !important;
 		}
 		&:active {
-			background-color: #f2f2f2a2 !important;
-			border: #c0c0c0 solid 0.175rem !important;
+			background-color: #f2f2f24d !important;
+			border-color: #0f0f0f !important;
 			color: #121212 !important;
 		}
 	}

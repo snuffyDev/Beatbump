@@ -1,10 +1,11 @@
 <script lang="ts">
-	import list from '$lib/stores/list'
-	import { createEventDispatcher, tick } from 'svelte'
-	import { currentTitle, key } from '$stores/stores'
 	import longpress from '$lib/actions/longpress'
-	import Popout from '../Dropdown/Popout.svelte'
 	import { clickOutside } from '$lib/js/clickOutside'
+	import list from '$lib/stores/list'
+	import { currentTitle, key } from '$stores/stores'
+	import { createEventDispatcher } from 'svelte'
+	import Popout from '../Dropdown/Popout.svelte'
+
 	export let item
 	export let index
 	const dispatch = createEventDispatcher()
@@ -76,63 +77,53 @@
 
 <style lang="scss">
 	.clickable {
-		display: inline-flex;
 		width: 100%;
+		display: inline-flex;
 	}
 	.p-length {
 		margin-left: auto;
 		align-self: center;
-		padding-right: 0.2rem;
 		white-space: nowrap;
+		padding-right: 0.2rem;
 	}
 	.item {
-		user-select: none;
-		margin: 0.5em 0.65rem;
-
-		background-color: hsl(0deg 0% 61% / 9%);
-		padding: var(--md-radius);
-		border-color: rgba(170, 170, 170, 0.014);
-		border-width: 1px;
-		border-radius: var(--md-radius);
-		cursor: pointer;
-		flex-direction: row;
-		// transition: all cubic-bezier(0.39, 0.575, 0.565, 1) 0.23s;
 		display: flex;
-		position: relative;
+		padding: 0.8em;
+		cursor: pointer;
+		user-select: none;
+		border-width: 1px;
 		flex-wrap: nowrap;
-	}
-	.subtitle {
-		/* text-transform: uppercase; */
-
-		font-size: 1.2rem;
-		font-weight: 200;
-		line-height: 1.1;
-		margin: 4rem auto;
-		max-width: 20rem;
-		text-align: center;
-		letter-spacing: 0.016em;
+		margin-top: 0.5rem;
+		border-color: #aaa;
+		position: relative;
+		flex-direction: row;
+		margin-left: 0.75rem;
+		border-radius: 0.8em;
+		margin-right: 0.75rem;
+		margin-bottom: 0.5rem;
+		// transition: all cubic-bezier(0.39, 0.575, 0.565, 1) 0.23s;;
+		background-color: transparentize(rgba(170, 170, 170, 0.801), 0.7);
 	}
 	.pl-thumbnail {
 		width: auto;
 		height: 5rem;
-		border-radius: var(--sm-radius);
-		// opacity: 1;
+		// opacity: 1;;
 		background: #00000017;
+		border-radius: var(--sm-radius);
 		img {
-			aspect-ratio: inherit;
 			width: auto;
 			height: 100%;
-			aspect-ratio: inherit;
+			filter: none;
 			max-width: 100%;
-			-o-object-fit: scale-down;
 			object-fit: contain;
-			background: transparent;
+			aspect-ratio: inherit;
+			aspect-ratio: inherit;
 			border-radius: inherit;
-
+			background: transparent;
+			-o-object-fit: scale-down;
 			background-color: transparent;
 			/* box-shadow: -0.1em 0.1em 0.5em 0 #00000057; */
 			transition: background-color cubic-bezier(0.77, 0, 0.175, 1) 0.1s;
-			filter: none;
 
 			&:active {
 				background-color: rgba(245, 241, 241, 0.199);
@@ -141,20 +132,19 @@
 		}
 	}
 	.active {
-		-webkit-user-select: none;
-		-moz-user-select: none;
-		-ms-user-select: none;
-		user-select: none;
-		margin: 0.5em 0.65rem;
-		background-color: hsl(0deg 0% 64% / 29%) !important;
-		padding: var(--md-radius);
-		border-color: rgba(170, 170, 170, 0.199) !important;
-		border-width: 1px;
-		border-radius: var(--md-radius);
+		display: flex;
+		padding: 0.8em;
 		cursor: pointer;
-		flex-direction: row;
-
+		user-select: none;
 		flex-wrap: nowrap;
+		margin-top: 0.5rem;
+		flex-direction: row;
+		margin-left: 0.75rem;
+		border-radius: 0.8em;
+		margin-right: 0.75rem;
+		margin-bottom: 0.5rem;
+		background-color: hsl(0deg 0% 64% / 29%) !important;
+		transition: all cubic-bezier(0.39, 0.575, 0.565, 1) 0.23s;
 		.pl-thumbnail {
 			background: rgba(126, 126, 126, 0.11);
 			img {
@@ -166,17 +156,17 @@
 	img {
 		width: auto;
 		height: 100%;
-		aspect-ratio: inherit;
 		max-width: 100%;
-		-o-object-fit: scale-down;
-		pointer-events: none;
 		object-fit: contain;
-		background: rgba(12, 12, 12, 0.26); // border: 0.2em solid rgb(17 21 28);
+		pointer-events: none;
 		border-radius: 0.4em;
+		aspect-ratio: inherit;
+		-o-object-fit: scale-down;
+		background: rgba(12, 12, 12, 0.26); // border: 0.2em solid rgb(17 21 28);;
 	}
 	.p-artist {
-		font-size: 1.0125rem;
 		font-weight: 600;
+		font-size: 1.0125rem;
 	}
 	.p-text {
 		/*margin-left: .5em; */
@@ -190,8 +180,8 @@
 		padding-inline: 0.8em;
 	}
 	img::before {
-		display: block;
 		content: '';
+		display: block;
 		padding-top: calc(100% * 2 / 3);
 		/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
 	}
@@ -199,28 +189,25 @@
 		padding: 0em;
 		font-size: 1.0125rem;
 	}
-	@media screen and (min-width: 641px) and (max-width: 800px) {
-		.listContainer {
-			width: 47.5%;
-		}
-	}
 	@media screen and (max-width: 640px) {
 		.p-text {
-			/*margin-left: .5em; */
+			font-size: 1rem;
+			flex-flow: wrap;
+			line-height: 1.2;
 			padding-left: 0.5em;
 			display: inline-flex;
-			font-size: 1rem;
-
-			flex-flow: wrap;
-			justify-content: center;
-			flex-direction: column;
 			padding-inline: 0.8em;
-
-			line-height: 1.2;
+			/*margin-left: .5em; */
+			flex-direction: column;
+			justify-content: center;
 		}
 		.p-title {
 			padding: 0em;
 			font-size: 1.0175rem;
 		}
+	}
+
+	:root .light * {
+		color: white;
 	}
 </style>

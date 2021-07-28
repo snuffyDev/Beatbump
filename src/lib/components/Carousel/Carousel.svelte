@@ -93,26 +93,17 @@
 			font-weight: 600;
 			letter-spacing: -0.05rem;
 			@media screen and (min-width: 800px) {
+<<<<<<< HEAD
 				// font-size: 2.35rem;
+=======
+				font-size: 2.125em;
+>>>>>>> new-scss
 			}
 		}
 	}
 
 	.scroll {
-		background: linear-gradient(
-			180deg,
-			rgb(18 15 24 / 8%) 1%,
-			rgb(20 17 29 / 14%) 10%,
-			rgb(31 26 43 / 18%) 18%,
-			rgb(22 18 30 / 31%) 27%,
-			rgb(33 29 47 / 23%) 37%,
-			rgb(30 26 42 / 28%) 50%,
-			rgb(42 35 64 / 22%) 62%,
-			rgb(33 29 46 / 38%) 70%,
-			rgb(41 33 57 / 34%) 78%,
-			rgb(27 22 39 / 50%) 82%,
-			rgb(49 40 66 / 37%) 100%
-		);
+		background: #453d5d2e;
 		grid-column-gap: 0.5rem;
 		overflow-y: hidden;
 		height: auto;

@@ -32,7 +32,7 @@
 	$: hasList = $list.mix.length > 0
 	$: isThisPage = false
 	let pageTitle = header?.title
-	let description = header?.description
+	let description
 	// setContext(key, header.playlistId);
 	console.log(tracks, continuations, header)
 	console.log(continuations)
@@ -41,9 +41,9 @@
 		pageTitle =
 			pageTitle.length > 64 ? pageTitle.substring(0, 64) + '...' : header.title
 		description =
-			description.length > 240
-				? description.substring(0, 240) + '...'
-				: header.title
+			header.description.length > 240
+				? header.description.substring(0, 240) + '...'
+				: header.description
 		if (header !== undefined) {
 			if ((!hasList && !$isPagePlaying) || !header.playlistId) {
 				isThisPage = false
@@ -91,8 +91,10 @@
 						<div class="info-title">
 							<h4 class="box-title">{pageTitle}</h4>
 							{#if header?.description}
-								<p class="subtitle" class:hidden={width < 640 ? true : false}>
-									{description ? description : ''}
+								<p
+									class="subtitle description"
+									class:hidden={width < 640 ? true : false}>
+									{header.description}
 								</p>
 								<span>
 									<p class="subtitle">

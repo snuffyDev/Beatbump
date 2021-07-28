@@ -1,17 +1,23 @@
 <script>
-	import { clickOutside } from '$lib/js/clickOutside'
 	import { goto } from '$app/navigation'
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
-	import { iOS } from '$stores/stores'
-	import { tweened } from 'svelte/motion'
-	import { getSrc } from '$lib/utils'
-	import Queue from './Queue.svelte'
-	import '../../../global/scss/components/_player.scss'
 	import Icon from '$components/Icon/Icon.svelte'
-	import { updateTrack, key, currentTitle, playerLoading } from '$stores/stores'
-	import { cubicOut } from 'svelte/easing'
+	import { clickOutside } from '$lib/js/clickOutside'
 	import list from '$lib/stores/list'
+	import { getSrc } from '$lib/utils'
+	import {
+		currentTitle,
+		iOS,
+		key,
+		playerLoading,
+		updateTrack
+	} from '$stores/stores'
 	import { tick } from 'svelte'
+	import { cubicOut } from 'svelte/easing'
+	import { tweened } from 'svelte/motion'
+	import '../../../global/scss/components/_player.scss'
+	import Queue from './Queue.svelte'
+
 	export let curTheme
 	const player: HTMLAudioElement = new Audio()
 	player.autoplay = true
@@ -34,7 +40,6 @@
 	$: hideEvent = false
 	$: isPlaying = false
 	let seeking = false
-	let once = false
 	let songBar
 
 	let showing
@@ -65,6 +70,8 @@
 		]
 	})
 	const play = () => {
+		navigator.mediaSession.playbackState = 'playing'
+
 		let playTrack = player.play()
 		if (playTrack !== undefined) {
 			playTrack.then(() => metaDataHandler())
@@ -84,8 +91,7 @@
 		// This checks if the user is on an iOS device
 		// due to the length of a song being doubled on iOS,
 		// we have to cut the time in half. Doesn't effect other devices.
-		if (isWebkit && remainingTime < duration / 2 && once == false) {
-			once = true
+		if (isWebkit && remainingTime < duration / 2) {
 			getNext()
 		}
 	})
@@ -157,8 +163,11 @@
 				$list.continuation
 			)
 			// autoId++;
+<<<<<<< HEAD
 
 			once = false
+=======
+>>>>>>> new-scss
 
 			return
 		} else {
@@ -170,9 +179,7 @@
 
 			console.log('got here')
 			currentTitle.set($list.mix[autoId].title)
-			once = false
 		}
-		once = false
 	}
 	async function ErrorNext() {
 		await tick()
@@ -419,6 +426,10 @@
 	.f-container {
 		background-color: inherit;
 		position: absolute;
+<<<<<<< HEAD
+=======
+		box-shadow: 0 0rem 1rem 0rem #00000070;
+>>>>>>> new-scss
 	}
 	.light * {
 		color: white !important;

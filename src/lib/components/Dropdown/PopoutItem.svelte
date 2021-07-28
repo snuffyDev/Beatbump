@@ -10,7 +10,7 @@
 </script>
 
 <div class="popout-item" on:click>
-	<Icon name={icon} size="1.25em" />
+	<Icon name={icon} color="white" size="1.25em" />
 	<div class="po-text">{text}</div>
 </div>
 
@@ -42,5 +42,9 @@
 			background-color: #6f6f85;
 			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.1s;
 		}
+	}
+
+	:root .light * {
+		color: white;
 	}
 </style>

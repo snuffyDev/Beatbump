@@ -22,12 +22,22 @@ button {
 	* {
 		margin-left: 1.5em;
 	}
+	&:hover {
+		background-color: transparentize(#fff, 0.1) !important;
+		border-color: #caca !important;
+	}
+	&:active {
+		background-color: transparentize(#fff, 0.3) !important;
+		border-color: rgba(255, 255, 255, 0.667) !important;
+	}
 	// font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 	-webkit-font-smoothing: antialiased;
 }
 .subtitle {
 	margin: 0 0 0.25em 0;
-
+	&.description {
+		margin: 0.25em 0 0.5em 0;
+	}
 	@media screen and (max-width: 500px) {
 		// font-size: 1.5rem;
 		margin: 0 0 0em 0;
