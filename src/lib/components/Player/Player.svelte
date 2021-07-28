@@ -49,7 +49,7 @@
 
 	$: isHidden = false
 	let DropdownItems: Array<any>
-
+	let once
 	player.addEventListener('loadedmetadata', () => {
 		title = $list.mix[0].title
 		isPlaying = true
@@ -91,7 +91,7 @@
 		// This checks if the user is on an iOS device
 		// due to the length of a song being doubled on iOS,
 		// we have to cut the time in half. Doesn't effect other devices.
-		if (isWebkit && remainingTime < duration / 2) {
+		if (isWebkit && remainingTime < duration / 2 && once == false) {
 			getNext()
 		}
 	})
@@ -154,6 +154,7 @@
 
 	const getNext = async () => {
 		key.set(autoId)
+		once = true
 		if (autoId == $list.mix.length - 1) {
 			list.getMore(
 				autoId,
@@ -163,11 +164,8 @@
 				$list.continuation
 			)
 			// autoId++;
-<<<<<<< HEAD
 
 			once = false
-=======
->>>>>>> new-scss
 
 			return
 		} else {
@@ -179,7 +177,9 @@
 
 			console.log('got here')
 			currentTitle.set($list.mix[autoId].title)
+			once = false
 		}
+		once = false
 	}
 	async function ErrorNext() {
 		await tick()
@@ -426,10 +426,7 @@
 	.f-container {
 		background-color: inherit;
 		position: absolute;
-<<<<<<< HEAD
-=======
 		box-shadow: 0 0rem 1rem 0rem #00000070;
->>>>>>> new-scss
 	}
 	.light * {
 		color: white !important;

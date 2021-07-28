@@ -16,10 +16,6 @@
 </script>
 
 <nav class="nav" style={`background-color: var(--${$theme}-top)`}>
-<<<<<<< HEAD
-	<div class="logo" on:click={() => goto('/')}>
-		<img src="/logo-header.png" alt="logo" title="Beatbump Home" />
-=======
 	<div class="logo">
 		<div on:click={() => goto('/trending')}>
 			<img
@@ -29,7 +25,6 @@
 				alt="logo"
 				title="Beatbump Home" />
 		</div>
->>>>>>> new-scss
 		<!-- {/if} -->
 	</div>
 
