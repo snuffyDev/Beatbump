@@ -93,11 +93,7 @@
 			font-weight: 600;
 			letter-spacing: -0.05rem;
 			@media screen and (min-width: 800px) {
-<<<<<<< HEAD
-				// font-size: 2.35rem;
-=======
 				font-size: 2.125em;
->>>>>>> new-scss
 			}
 		}
 	}
