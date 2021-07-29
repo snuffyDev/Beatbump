@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { parseItem } from '$lib/parsers'
+import { parseNextItem } from '$lib/_parsers'
 import { getSrc } from '$lib/utils'
 import { writable } from 'svelte/store'
 import { filterAutoPlay, playerLoading } from './stores'
@@ -11,13 +11,21 @@ const filterList = (list) => {
 		((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set())
 	))
 }
-const fetchNext = async (index, params, videoId, playlistId, ctoken) => {
+const fetchNext = async (
+	index,
+	params,
+	videoId,
+	playlistId,
+	ctoken,
+	playlistSetVideoId
+) => {
 	return await fetch(
 		'/api/next.json?playlistId=' +
 			encodeURIComponent(playlistId) +
 			`${videoId ? `&videoId=${videoId}` : ''}` +
 			`${params ? `&params=${params}` : ''}` +
 			`${ctoken ? `&ctoken=${ctoken}` : ''}` +
+			`${playlistSetVideoId ? `&playerConf=${playlistSetVideoId}` : ''}` +
 			'&index=' +
 			encodeURIComponent(index),
 		{
@@ -64,13 +72,25 @@ function split(arr, chunk) {
 }
 export default {
 	subscribe: list.subscribe,
-	async initList(videoId: string, playlistId: string, key?: number) {
+	async initList(
+		videoId: string,
+		playlistId: string,
+		key?: number,
+		playlistSetVideoId?: string
+	) {
 		loading = true
 		key = key ? key : 0
 		playerLoading.set(loading)
 		if (hasList) mix = []
 		hasList = true
-		const response = await fetchNext(key || 0, '', videoId, playlistId, '')
+		const response = await fetchNext(
+			key || 0,
+			'',
+			videoId,
+			playlistId,
+			'',
+			playlistSetVideoId
+		)
 		const data = await response
 		// console.log(data)
 		// console.log(data)
@@ -100,7 +120,7 @@ export default {
 	async addNext(item, key) {
 		if (!item) return
 		const length = await addToQueue(item.videoId)
-		const nextItem = parseItem(item, length)
+		const nextItem = parseNextItem(item, length)
 		mix.splice(key + 1, 0, nextItem)
 		// console.log(mix, nextItem)
 

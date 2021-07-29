@@ -1,6 +1,6 @@
 <script lang="ts">
 	import CarouselItem from './CarouselItem.svelte'
-	export let setTitle = ''
+	export let header = []
 	export let items = []
 	export let type = ''
 	export let isBrowse = false
@@ -15,8 +15,11 @@
 
 <div class="header">
 	<h1>
-		{setTitle}
+		{header.title}
 	</h1>
+	{#if !isBrowse}<a href={`/trending/new/${header.browseId}`}
+			><small>See All</small></a
+		>{/if}
 </div>
 <div class="section">
 	<div class="scroll" id="scrollItem" bind:this={carousel}>
@@ -75,11 +78,11 @@
 		-webkit-overflow-scrolling: touch;
 		position: relative;
 
-		margin-bottom: 1.5rem;
+		margin-bottom: 2rem;
 
 		border-radius: 0.5em;
 		@media screen and (min-width: 960px) {
-			margin-bottom: 2.5rem;
+			margin-bottom: 3rem;
 		}
 		/* width: 100%; */
 		/* max-width: 100%; */
@@ -87,8 +90,14 @@
 	}
 	.header {
 		display: block;
+		font-weight: 600;
+		letter-spacing: -0.05rem;
+		margin-bottom: 0.5rem;
+		padding: 0.4rem 0.4rem 0.2rem;
+
 		h1 {
-			padding: 0.4rem 0.4rem 0.2rem;
+			margin-right: 0.3em;
+			display: inline-flex;
 			margin-bottom: 0.7rem;
 			font-weight: 600;
 			letter-spacing: -0.05rem;

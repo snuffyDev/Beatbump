@@ -7,13 +7,15 @@ figure {
 img,
 picture {
 	margin: 0;
+	border-radius: var(--sm-radius);
+
 	max-width: 100%;
 }
 
 img::before,
 video::before {
 	display: block;
-	content: '';
+	content: "";
 	padding-top: calc(100% * 2 / 3);
 	/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
 }

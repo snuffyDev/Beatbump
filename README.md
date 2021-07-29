@@ -1,7 +1,7 @@
 
 
 
-# <img src="/.repo/images/logo-header.png" width=48 height=48 /> Beatbump 
+# <img src="/.repo/images/logo-header.png" width=48 height=48 /> Beatbump
 
 An Alternative frontend for YouTube Music created using Svelte/SvelteKit.
 
@@ -48,13 +48,16 @@ Make sure the SvelteKit packages are marked 'next' in the `package.json` before 
 
 ### Deploying
 
+
 The default deployment is configured for Cloudflare Workers. For information on how to setup and configure Cloudflare Workers, visit the [official repo](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare-workers) for the adapter.
 
-For deploying to Cloudflare Workers, there's two commands in `package.json` for this: 
+To get caching for responses with Cloudflare Workers, I'm using a custom adapter. As it is most likely unstable, I'd recommend installing the official one. If you *do* want to use the custom one, [here](https://github.com/snuffyDev/adapter-cloudflare-cache) is the repository.
+
+For deploying to Cloudflare Workers, there's two commands in `package.json` for this:
 | command  | description |
 |--        |-- |
-| `deploy` |  Is a typical deployment to Cloudflare Workers.<br> - Run this if you don't have the `.svelte-kit` & `build` folders.|                                          
-| `deploy:clean` |  Will delete the `.svelte-kit` and the `build` folders <br>   - This deletes the old files left over from the dev server for a clean starting point next time you run `dev` 
+| `deploy` |  Is a typical deployment to Cloudflare Workers.<br> - Run this if you don't have the `.svelte-kit` & `build` folders.|
+| `deploy:clean` |  Will delete the `.svelte-kit` and the `build` folders <br>   - This deletes the old files left over from the dev server for a clean starting point next time you run `dev`
 
 
 For other adapters, visit the official [adapters section](https://kit.svelte.dev/docs#adapters) of the SvelteKit documentation.

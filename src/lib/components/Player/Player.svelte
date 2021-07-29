@@ -30,7 +30,7 @@
 
 	// $: list = $currentMix;
 	$: autoId = $key
-	$: console.log($key, autoId)
+	// $: console.log($key, autoId)
 	$: time = player.currentTime
 	$: duration = 1000
 	let remainingTime = 55
@@ -49,7 +49,7 @@
 
 	$: isHidden = false
 	let DropdownItems: Array<any>
-	let once
+	let once = false
 	player.addEventListener('loadedmetadata', () => {
 		title = $list.mix[0].title
 		isPlaying = true

@@ -20,8 +20,8 @@
 		<div on:click={() => goto('/trending')}>
 			<img
 				src="/logo-header.png"
-				width="2.5rem"
-				height="0.5rem"
+				width="1.75rem"
+				height="1.75rem"
 				alt="logo"
 				title="Beatbump Home" />
 		</div>
@@ -29,7 +29,7 @@
 	</div>
 
 	<section class="homeIcon" on:click={() => goto('/')}>
-		<Icon name="home" size="1.75em" />
+		<Icon name="home" size="1.5em" />
 	</section>
 	<section class="items">
 		{#if !hidden}
@@ -61,7 +61,7 @@
 				shown = !shown
 				hidden = !hidden
 			}}>
-			<svelte:component this={Icon} name="search" size="1.75em" />
+			<svelte:component this={Icon} name="search" size="1.5em" />
 		</div>
 		<Settings bind:isSettings />
 		<div
@@ -70,7 +70,7 @@
 			on:click|stopPropagation={() => {
 				isSettings = !isSettings
 			}}>
-			<svelte:component this={Icon} name="settings" size="1.75em" />
+			<svelte:component this={Icon} name="settings" size="1.5em" />
 		</div>
 	</section>
 </nav>
@@ -96,7 +96,7 @@
 		// filter: drop-shadow(0.5rem 1.2rem 1rem #0e0d0d2c);
 		// box-shadow: 0 0.2rem 1rem 0.0125rem #0f0f0f38;
 		&::before {
-			box-shadow: 0 0.4rem 0.2rem -0.0875rem rgb(15 15 15 / 11%);
+			box-shadow: 0 0.4rem 0.2rem -0.0875rem rgba(15, 15, 15, 11%);
 			position: absolute;
 			top: 0;
 			right: 0;
@@ -110,9 +110,10 @@
 		}
 	}
 	.x-button {
-		padding: 1em;
+		padding: 1em 0 1rem 1rem;
 		right: 0;
-		position: absolute;
+		margin-left: auto;
+		position: relative;
 	}
 	.hidden {
 		display: none;

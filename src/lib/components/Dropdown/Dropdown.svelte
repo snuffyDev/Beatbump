@@ -44,11 +44,7 @@
 			isHidden = !isHidden
 			// console.log(isHidden)
 		}}>
-		<svelte:component
-			this={Icon}
-			color={type == 'player' || 'white' ? 'white' : 'currentColor'}
-			size="1.5em"
-			name="dots" />
+		<svelte:component this={Icon} {color} size="1.5em" name="dots" />
 	</div>
 </div>
 

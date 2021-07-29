@@ -15,7 +15,7 @@ nav.nav {
 	@media screen and (min-width: 640px) {
 		grid-template-columns: 1rem auto;
 	}
-	.nav-item {
+	.nav-item:not(:last-child) {
 		margin-right: 0.5rem;
 	}
 
@@ -49,16 +49,19 @@ nav.nav {
 	left: 0;
 	right: 0;
 	width: 100%;
+	padding: 0 2rem;
 	z-index: 15;
 	box-sizing: border-box;
 	align-content: center;
 	justify-content: center;
 	flex-wrap: nowrap;
 	flex-direction: row;
+	max-width: 100%;
 	height: 100%;
 	align-items: center;
 	background: fixed;
 	background-color: inherit;
+
 	&::before {
 		background: #111214;
 		position: absolute;
@@ -70,4 +73,9 @@ nav.nav {
 		content: "";
 		z-index: -1;
 	}
+}
+
+:root .light .nav-search::before {
+	filter: brightness(0.7);
+	background: var(--light-top);
 }

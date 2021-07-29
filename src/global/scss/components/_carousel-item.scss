@@ -23,7 +23,7 @@
 }
 .container.carouselItem {
 	position: relative;
-	padding-bottom: 5ch;
+	padding-bottom: 1.8rem;
 	padding-left: 1rem;
 	padding-top: 1rem;
 	scroll-snap-align: start;
@@ -56,8 +56,6 @@
 section {
 	display: block;
 	content: "";
-	padding-bottom: 1em;
-
 	::before {
 		display: block;
 	}
@@ -116,7 +114,7 @@ section.item {
 			height: auto;
 			aspect-ratio: inherit;
 			position: absolute;
-			border-radius: var(--xs-radius);
+			// border-radius: var(--xs-radius);
 			min-width: 100%;
 			top: 0;
 			right: 0;

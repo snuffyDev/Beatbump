@@ -61,11 +61,9 @@
 				<slot />
 			</Wrapper>
 		</div>
-		{#if hasError}
-			<div class="alert-container">
-				<Alert message={$errorHandler.msg} color="red" />
-			</div>
-		{/if}
+		<div class="alert-container">
+			<Alert message={$errorHandler.msg} color="red" />
+		</div>
 		<footer
 			class="footer-container"
 			style={`background-color: var(--${$theme}-bottom)`}>
@@ -115,11 +113,17 @@
 		--light-base: rgb(243, 235, 235);
 		--light-bottom: #121018;
 		--light-top: #cac8c9;
-		--light-forms: #aba9c3ff;
+		--light-forms: #e3dbf5;
 		--light-side: #cac8c9;
 		--rich-black-fogra-29: #0c1217ff;
 		--light-text: #131314;
 		--raisin-black: #171824ff;
+
+		--midnight-base: #05070a;
+		--midnight-top: #141018d7;
+		--midnight-side: #08070c85;
+		--midnight-bottom: #090d11;
+		--midnight-forms: #100f17;
 	}
 	.input {
 		&.light {

@@ -9,7 +9,7 @@ import sveltePreprocess from 'svelte-preprocess'
 
 const check = process.env.NODE_ENV
 const dev = check === 'development'
-import worker from '@sveltejs/adapter-cloudflare-workers'
+import worker from '@snuffydev/adapter-cloudflare-cache'
 /** @type {import('@sveltejs/kit').Config} */
 export default {
 	// Consult https://github.com/sveltejs/svelte-preprocess

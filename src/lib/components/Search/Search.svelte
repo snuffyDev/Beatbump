@@ -50,17 +50,24 @@
 <form class={type} on:submit|preventDefault={(e) => handleSubmit(e)}>
 	<!-- <label for="search"><em>search</em></label> -->
 	<div class="nav-item">
-		<div class="input" style={`background-color: var(--${$theme}-forms)`}>
-			<div class="searchBtn" on:click={(e) => handleSubmit(e)}>
+		<div
+			class="input"
+			style={`background-color: var(--${$theme}-forms) !important`}>
+			<div
+				class="searchBtn"
+				style={`background-color: var(--${$theme}-forms)`}
+				on:click={(e) => handleSubmit(e)}>
 				<Icon name="search" size="1rem" />
 			</div>
 			{#if type == 'inline'}<input
+					style={`background-color: var(--${$theme}-forms)`}
 					autofocus
 					autocorrect="off"
 					type="search"
 					placeholder="Search"
 					bind:value={songTitle} />
 			{:else}<input
+					style={`background-color: var(--${$theme}-forms) !important`}
 					autocorrect="off"
 					type="search"
 					placeholder="Search"
@@ -119,7 +126,7 @@
 		padding: 1em;
 
 		right: 0;
-		position: fixed;
+		position: relative;
 	}
 	.sidebar {
 		overflow-x: hidden;

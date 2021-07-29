@@ -19,8 +19,9 @@
 	let themes = [
 		{ name: 'dark' },
 		{ name: 'dim' },
-		{ name: 'ytm' },
-		{ name: 'light' }
+		{ name: 'light' },
+		{ name: 'midnight' },
+		{ name: 'ytm' }
 	]
 </script>
 

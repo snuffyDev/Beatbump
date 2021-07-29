@@ -30,12 +30,7 @@
 					window.innerWidth < 500
 						? Math.min(Math.max(-scroll.top / window.innerHeight, 0), 70) * 750
 						: Math.min(Math.max(-scroll.top / window.innerHeight, 0), 70) * 250
-				// console.log(
-				// 	y,
-				// 	-scroll.top * -window.innerHeight,
-				// 	Math.min(Math.max(-scroll.top / window.innerHeight, 0), 70) * 50,
-				// 	50
-				// )
+
 				if (elapsed < 200) {
 					window.requestAnimationFrame(handler)
 				}
@@ -56,7 +51,7 @@
 	<div class="artist-thumbnail">
 		<div
 			bind:this={container}
-			style={`background-image: linear-gradient(0turn, var(--${$theme}-base) ${Math.min(
+			style={`background-image: linear-gradient(1turn, var(--${$theme}-base) ${Math.min(
 				y,
 				72
 			)}%, transparent); transition: cubic-bezier(0.6, -0.28, 0.74, 0.05) all 120ms`}
@@ -144,6 +139,7 @@
 		display: block;
 		position: relative;
 		height: 100%;
+		min-height: 13rem;
 		&::before {
 			// padding-top: 100%;
 			position: absolute;
@@ -160,6 +156,10 @@
 		width: 100%;
 		height: inherit;
 		position: absolute;
+
+		// background-size: cover;
+		// background-position: top;
+		// background-attachment: fixed;
 
 		top: 0;
 	}

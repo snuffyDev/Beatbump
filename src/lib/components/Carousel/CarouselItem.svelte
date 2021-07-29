@@ -23,7 +23,12 @@
 	let menuToggle = showing ? true : false
 	let width
 	let mobile = width < 525
+	let primaryArtist
 	// $: console.log(loading)
+	// if (item.subtitle.length > 3) {
+	// 	// let sub = item.subtitle.reverse()
+	// 	primaryArtist = item.subtitle[2]
+	// }
 	let DropdownItems = [
 		{
 			text: 'View Artist',
@@ -37,7 +42,9 @@
 				await tick()
 
 				goto(
-					`/artist/${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
+					type == 'new'
+						? `/artist/${item.subtitle[2].navigationEndpoint.browseEndpoint.browseId}`
+						: `/artist/${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
 				)
 			}
 		},
@@ -47,7 +54,7 @@
 			action: () => list.addNext(item, $key)
 		}
 	]
-	$: srcImg = item.thumbnails[0].url
+	let srcImg = item.thumbnails[0].url
 	// $: if (width < 525) {
 	// 	hovering = false
 	// }
@@ -129,9 +136,10 @@
 						<img
 							alt="thumbnail"
 							transition:fade|local
-							on:error={() => {
-								srcImg =
-									'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDY0IDY0IiB3aWR0aD0iNjRwdCIgaGVpZ2h0PSI2NHB0Ij48ZGVmcz48Y2xpcFBhdGggaWQ9InByZWZpeF9fYSI+PHBhdGggZD0iTTAgMGg2NHY2NEgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjOTk5IiBkPSJNMCAwaDY0djY0SDB6Ii8+PGcgY2xpcC1wYXRoPSJ1cmwoI3ByZWZpeF9fYikiPjx0ZXh0IHRyYW5zZm9ybT0idHJhbnNsYXRlKDI2LjUgNDguOTMyKSIgZm9udC1mYW1pbHk9IkxhdG8iIGZvbnQtd2VpZ2h0PSI0MDAiIGZvbnQtc2l6ZT0iMzYiIGZpbGw9IiMxNzE4MjQiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyMy41IDEwLjQpIiBkPSJNMCAwaDE3djQzLjJIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+'
+							on:error={(e) => {
+								e.currentTarget.onerror = null
+								e.currentTarget.src = '/assets/error.svg'
+								srcImg = '/logo-header.png'
 							}}
 							class:img16x9={aspectRatio?.includes('16_9')}
 							loading="lazy"
@@ -176,7 +184,7 @@
 		{#if !isBrowse}
 			<div class="menu" class:mobile={width < 550}>
 				{#if hovering || width < 550}
-					<Dropdown bind:isHidden items={DropdownItems} />
+					<Dropdown color="white" bind:isHidden items={DropdownItems} />
 				{/if}
 			</div>
 		{/if}

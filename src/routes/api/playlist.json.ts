@@ -1,7 +1,7 @@
 import type { Artist, Thumbnail } from '$lib/types'
 import type { NextContinuationData } from '$lib/types'
 import type { EndpointOutput } from '@sveltejs/kit'
-import type { PlaylistItem } from '$lib/types/playlist'
+import type { IPlaylistItem } from '$lib/types/playlist'
 import { pb } from '$lib/utils'
 /** Hits the YouTube Music API for a playlist page
  *	Currently is not fully implemented.
@@ -84,7 +84,6 @@ export async function get({ query }): Promise<EndpointOutput> {
 				.nextContinuationData
 			musicDetailHeaderRenderer = [musicDetailHeaderRenderer]
 			const parseHeader = musicDetailHeaderRenderer.map((header) => {
-
 				let { description, subtitle, thumbnail, secondSubtitle, title } = header
 				console.log(description, subtitle, thumbnail, secondSubtitle, title)
 				const subtitles: string = pb(subtitle, 'runs:text', false)
@@ -156,7 +155,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 	}
 }
 
-function parseTrack(contents = [], playlistId): Array<PlaylistItem> {
+function parseTrack(contents = [], playlistId): Array<IPlaylistItem> {
 	const Tracks = contents.map((data) => {
 		const { musicResponsiveListItemRenderer } = data
 		const length = pb(
@@ -177,6 +176,7 @@ function parseTrack(contents = [], playlistId): Array<PlaylistItem> {
 			true
 		)
 		let videoId = undefined
+
 		if (
 			!musicResponsiveListItemRenderer.playlistItemData &&
 			!musicResponsiveListItemRenderer?.navigationEndpoint?.watchEndpoint
@@ -206,7 +206,16 @@ function parseTrack(contents = [], playlistId): Array<PlaylistItem> {
 			length,
 			videoId: videoId ? videoId : undefined,
 			playlistId: playlistId,
+			playlistSetVideoId:
+				musicResponsiveListItemRenderer.playlistItemData.playlistSetVideoId ||
+				musicResponsiveListItemRenderer.overlay
+					.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer
+					.playNavigationEndpoint.watchEndpoint.playlistSetVideoId,
 			thumbnail,
+			playerParams:
+				musicResponsiveListItemRenderer?.flexColumns[0]
+					?.musicResponsiveListItemFlexColumnRenderer.text.runs[0]
+					.navigationEndpoint.watchEndpoint.playerParams || undefined,
 			title,
 			artistInfo
 		}

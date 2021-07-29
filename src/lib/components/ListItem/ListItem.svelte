@@ -11,7 +11,8 @@
 	const dispatch = createEventDispatcher()
 	function dispatchPlaying(playing) {
 		dispatch('pagePlaying', {
-			isPlaying: true
+			isPlaying: true,
+
 		})
 	}
 	let radio = []
@@ -26,15 +27,20 @@
 		key.set(index)
 		if (page == 'playlist') {
 			// if (!$key) {
-			key.set(index)
-			console.log('key: ' + $key)
-			await list.startPlaylist(item.playlistId)
+			key.set(0)
+			console.log('key: ' + $key, item.playlistId)
+			// await list.startPlaylist(item.playlistId)
 			// } else {
 			// 	console.log('key: ' + $key)
 			// 	await getSrc($list.mix[index]?.videoId)
 			// }
 
-			// await list.initList(item.videoId, item.playlistId)
+			await list.initList(
+				item.videoId,
+				item.playlistId,
+				index,
+				item.playlistSetVideoId
+			)
 		} else {
 			key.set(0)
 			await list.initList(item.videoId, item.playlistId, index)

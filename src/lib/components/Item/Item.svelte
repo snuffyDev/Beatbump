@@ -5,7 +5,7 @@
 	import Loading from '$components/Loading/Loading.svelte'
 	import { onMount, tick } from 'svelte'
 
-	import { key, currentTrack } from '$stores/stores'
+	import { key, currentTrack, theme } from '$stores/stores'
 	import Icon from '$components/Icon/Icon.svelte'
 	import { goto } from '$app/navigation'
 	import list from '$lib/stores/list'
@@ -162,7 +162,10 @@
 		</div>
 
 		<div class="menu">
-			<Dropdown bind:isHidden items={DropdownItems} />
+			<Dropdown
+				color={$theme == 'light' ? 'black' : 'white'}
+				bind:isHidden
+				items={DropdownItems} />
 		</div>
 	</div>
 </div>
@@ -209,7 +212,8 @@
 		flex-wrap: nowrap;
 
 		&:active {
-			background: lighten(#212225, 3%);
+			background: lighten(#3c3d4159, 3%);
+			// filter: brightness(0.7);
 			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) background 0.125s;
 		}
 	}

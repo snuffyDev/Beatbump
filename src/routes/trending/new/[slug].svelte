@@ -1,6 +1,6 @@
 <script context="module">
 	export async function load({ page, fetch }) {
-		const response = await fetch(`/explore/${page.params.slug}.json`)
+		const response = await fetch(`/trending/new/${page.params.slug}.json`)
 		const { sections, header } = await response.json()
 		return {
 			props: {
@@ -24,17 +24,21 @@
 		<h1>{header}</h1>
 	</div>
 	{#each sections as section}
-		<h3>{section.title}</h3>
 		<div class="grid">
 			{#each section.section as item}
-				<div
-					class="item"
-					on:click={() => goto('/playlist?list=' + item.browseId)}>
-					<div class="img">
-						<img loading="lazy" src={item.thumbnail} alt="thumbnail" />
+				{#if item.type == 'albums'}
+					<div
+						class="item"
+						on:click={() => goto('/release?id=' + item.browseId)}>
+						<div class="img">
+							<img loading="lazy" src={item.thumbnail} alt="thumbnail" />
+						</div>
+						<div class="item-title">{item.title}</div>
+						<div class="item-subtitle">
+							{#each item.subtitles as { text }}{text}{/each}
+						</div>
 					</div>
-					<div class="item-title">{item.title}</div>
-				</div>
+				{/if}
 			{/each}
 		</div>
 	{/each}
@@ -63,8 +67,6 @@
 		flex-direction: column;
 		// border: #aaaaaa40 solid 1px;
 		justify-content: flex-start;
-
-		cursor: pointer;
 		border-radius: 0.4rem;
 		padding: 0.5rem 0.4rem 0.4rem;
 		position: relative;

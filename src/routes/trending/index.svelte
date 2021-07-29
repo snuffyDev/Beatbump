@@ -4,8 +4,8 @@
 		const response = await data.json()
 		return {
 			props: {
-				carouselItems: await response,
-				test: await response
+				carouselItems: await response
+				// test: await response
 			},
 			maxage: 3600,
 			status: 200
@@ -14,12 +14,12 @@
 </script>
 
 <script lang="ts">
-	export let carouselItems
-	export let test
+	export let carouselItems: ICarousel
+	// export let test
 	import { currentTitle } from '$stores/stores'
 	import Carousel from '$components/Carousel/Carousel.svelte'
-	import type { CarouselItem } from '$lib/types'
-	$: console.log(carouselItems, test)
+	import type { ICarousel } from '$lib/types'
+	$: console.log(carouselItems)
 
 	// const moodsAndGenres =  carouselItems[1].results.slice(0,15)
 </script>
@@ -31,42 +31,38 @@
 	<meta name="og:url" content="https://beatbump.ml/trending" />
 	<meta name="og:title" content="Trending" />
 </svelte:head>
-{#await carouselItems then _}
-	<main>
-		<Carousel
-			setTitle={carouselItems[2].header.title}
-			items={carouselItems[2].results}
-			type="trending" />
+<main>
+	<Carousel
+		header={carouselItems[2].header}
+		items={carouselItems[2].results}
+		type="trending" />
 
-		<div class="breakout">
-			<div class="box-cont">
-				<h1>{carouselItems[1].header.title}</h1>
-				<div class="m-alert-info"><em>Coming Soon!</em></div>
-				<box>
-					{#each carouselItems[1].results.slice(1, 15) as item}
-						<div style={`border-left: 1ch solid #${item.color}`} class="box">
-							<div class="innerbox">
-								<a class="innerlink" href={`/explore/${item.endpoint.params}`}
-									>{item.text}</a>
-							</div>
+	<div class="breakout">
+		<div class="box-cont">
+			<h1>{carouselItems[1].header.title}</h1>
+			<!-- <div class="m-alert-info"><em>Coming Soon!</em></div> -->
+			<box>
+				{#each carouselItems[1].results.slice(1, 15) as item}
+					<div style={`border-left: 1ch solid #${item.color}`} class="box">
+						<div class="innerbox">
+							<a class="innerlink" href={`/explore/${item.endpoint.params}`}
+								>{item.text}</a>
 						</div>
-					{/each}
-				</box>
-				<a class="link" href="/explore">See All</a>
-			</div>
+					</div>
+				{/each}
+			</box>
+			<a class="link" href="/explore">See All</a>
 		</div>
-		<Carousel
-			setTitle={carouselItems[3].header.title}
-			items={carouselItems[3].results}
-			type="trending" />
-		<Carousel
-			setTitle={carouselItems[0].header.title}
-			items={carouselItems[0].results}
-			type="new" />
-	</main>
-{:catch err}
-	{err}
-{/await}
+	</div>
+	<Carousel
+		header={carouselItems[3].header}
+		items={carouselItems[3].results}
+		type="trending" />
+	<Carousel
+		header={carouselItems[0].header}
+		items={carouselItems[0].results}
+		type="new" />
+</main>
 
 <style lang="scss">
 	.header {
@@ -95,6 +91,15 @@
 	.breakout {
 		// border: 2px solid rgba(119, 136, 153, 0.171);
 		border-radius: 0.8rem;
+		-webkit-overflow-scrolling: touch;
+		position: relative;
+
+		margin-bottom: 2rem;
+
+		// border-radius: 0.5em;
+		@media screen and (min-width: 960px) {
+			margin-bottom: 3rem;
+		}
 		// padding: 0.8rem;
 	}
 	.box-cont {
@@ -123,18 +128,20 @@
 		// text-overflow: clip;
 		text-align: start;
 		font-size: 100%;
-		border-radius: var(--md-radius);
 		width: 100%;
+		border-radius: var(--md-radius) 0 0 var(--md-radius);
+
 		align-items: center;
 		// white-space: normal;
-		border-right: none;
+		border-right: none !important;
 		height: 3rem;
 		position: relative;
 		.innerbox {
 			height: 100%;
 			padding: 0 0 0 1rem;
 			align-items: center;
-
+			border-radius: var(--md-radius) 0 0 var(--md-radius);
+			width: 100%;
 			display: flex;
 			position: absolute;
 			top: 0;
@@ -143,23 +150,33 @@
 			left: 0;
 			// z-index: 5;
 			// display: inline-bloc // k;;
-			border-radius: var(--lg-radius);
+
 			width: 100%;
-			background: #9589b314;
+			// background: #9589b314;
 		}
 		&::before {
 			position: absolute;
 			top: 0;
 			right: 0;
+			border-radius: 0 var(--md-radius) var(--md-radius) 0;
+
 			bottom: 0;
 			left: 0;
 			content: '';
 			width: 100%;
+
+			// border-radius: var(--md-radius);
 			z-index: 0;
-			border-radius: inherit;
+			// border-radius: inherit;
 			height: 100%;
 			background: #9589b314;
 		}
+	}
+	.innerlink {
+		display: flex;
+		width: 100%;
+		height: 100%;
+		align-items: center;
 	}
 	:root .light .box {
 		background: #8870c427;

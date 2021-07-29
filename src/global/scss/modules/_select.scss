@@ -1,106 +1,85 @@
 .select {
-	display: grid;
-	grid-template-columns: 1fr 0.5px;
-	align-content: center;
-	font-size: 0.95rem;
-	font-weight: 500;
-	background-color: inherit;
-	grid-template-areas: "select end";
-	border-radius: var(--md-radius);
-	color: inherit;
 	width: 100%;
-	border-radius: 0.25rem;
+	height: auto;
+	display: grid;
+	color: inherit;
 	min-width: 15ch;
 	max-width: 30ch;
-	position: relative;
-	height: auto;
 	min-height: 5ch;
+	font-weight: 600;
 	max-height: 30ch;
+	position: relative;
+	align-content: center;
+	font-family: var(--base-font);
+	-webkit-text-size-adjust: none;
+	border-radius: var(--md-radius);
+	grid-template-columns: 1fr 0.5px;
+	grid-template-areas: "select end";
+	transition: all cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s;
+
 	&:active,
 	&:focus-within {
 		// background: #262e38;
-		background-color: #ffffff27 !important;
-
-		transition: all cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s;
 	}
 	&.inline {
 		max-width: 8rem;
 	}
 	&::after {
-		content: "";
-		place-self: end;
-		grid-area: end !important;
-		align-self: center;
-		position: absolute;
 		right: 0;
-		margin-right: 0.7rem;
-
-		color: inherit;
+		content: "";
 		width: 0.6rem;
 		height: 0.5rem;
+		color: inherit;
+		place-self: end;
+		align-self: center;
+		margin-right: 0.7rem;
+		grid-area: end !important;
+		/* position: absolute; */
+		/* top: calc(100% - 50%); */
 		background-color: currentColor;
-		-webkit-clip-path: polygon(100% 0, 0 0, 50% 100%);
 		clip-path: polygon(100% 0, 0 0, 50% 100%);
+		-webkit-clip-path: polygon(100% 0, 0 0, 50% 100%);
 	}
-	transition: ease-in-out 0.5s all;
 	option {
 		background-color: #0d0e0ee0;
-		transition: ease-in-out 0.5s all;
 	}
 }
 select {
+	-webkit-text-size-adjust: auto;
+
 	option {
-		// background-color: #0d0e0ee0;
-		transition: ease-in-out 0.5s all;
 		background-color: inherit;
-		// margin-inline: 0.2rem;
-		// margin-block-start: 0.125rem;
 	}
-	@media screen and (min-width: 620px) and (max-width: 1440px) {
-		font-size: 14px;
-	}
-	@media screen and (min-width: 1441px) {
-		font-size: 16px;
-	}
-	outline: none;
+
 	&:active,
 	&:focus-within {
 		// background: #262e38;
-		background-color: #ffffff27 !important;
-
-		transition: all cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s;
+		filter: brightness(1.5);
 	}
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
-	min-width: inherit;
-	background-color: inherit;
-	border: 1px rgba(170, 170, 170, 0.233) solid;
-	color: invert(#aaaa);
-	border-radius: inherit;
-	padding: 0.2rem 2rem 0.5rem 0.5rem;
-	color: inherit;
+	-webkit-text-size-adjust: auto;
 	margin: 0;
-	width: auto;
-	display: grid;
-	grid-template-columns: 1fr 0.5px;
-	font-weight: 500;
-	background-color: inherit;
-	grid-template-areas: "select end";
-	border-radius: 0.2125rem;
-	color: inherit;
 	width: 100%;
+	outline: none;
+	color: inherit;
 	min-width: 15ch;
 	max-width: 30ch;
+	height: inherit;
+	cursor: inherit;
+	appearance: none;
+	white-space: pre;
+	grid-area: select;
 	position: relative;
 	min-height: inherit;
-	max-height: 30ch;
-	height: inherit;
+	max-height: inherit;
 	font-family: inherit;
-	font-size: inherit;
-	white-space: pre;
-	cursor: inherit;
-	position: relative;
+	-moz-appearance: none;
 	align-content: center;
-	grid-area: select;
+	-webkit-appearance: none;
+	background-color: inherit;
+	font-size: 100% !important;
+	border-radius: var(--md-radius);
+	font-weight: inherit !important;
+	padding: 0.2rem 2rem 0.5rem 0.5rem;
+	border: 0.0625rem solid hsla(0, 0%, 66.7%, 0.219);
+	transition: all 0.1s cubic-bezier(0.47, 0, 0.745, 0.715);
 }

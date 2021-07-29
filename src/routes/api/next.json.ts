@@ -7,6 +7,7 @@ export async function get({ query }) {
 	const i = query.get('index')
 	const params = query.get('params')
 	const video_id = query.get('videoId')
+	const playerParams = query.get('playerConf') || ''
 	const playlist_id = query.get('playlistId')
 	const ctoken = query.get('ctoken')
 	try {
@@ -37,7 +38,9 @@ export async function get({ query }) {
 					params: `${params}`,
 					tunerSettingValue: 'AUTOMIX_SETTING_NORMAL',
 					videoId: `${video_id}`,
-					playlistId: `${playlist_id}`
+					playlistId: `${playlist_id}`,
+					playlistSetVideoId: `${playerParams ? playerParams : ''}`
+					// playerParams: `${playerParams ? playerParams : ''}`
 				}),
 				headers: {
 					'Content-Type': 'application/json; charset=utf-8',

@@ -41,6 +41,7 @@ export interface IPlaylistItem {
 	thumbnail: Thumbnail[]
 	artist: Artist
 	videoId?: string
+	playerParams?: string
 	playlistId?: string
 }
 

@@ -98,3 +98,11 @@ export interface mixList {
 	thumbnail?: string
 	length: string
 }
+export type CarouselHeader = {
+	browseId: string
+	title: string
+}
+export type ICarousel = {
+	header: CarouselHeader
+	results: CarouselItem[]
+}

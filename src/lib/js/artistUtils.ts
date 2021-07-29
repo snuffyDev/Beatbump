@@ -84,7 +84,7 @@ function parseCarouselItem(items, header) {
 				params: endpoint.params
 			}
 		} else {
-			return title
+			return { title }
 		}
 	})
 	// console.log(head)

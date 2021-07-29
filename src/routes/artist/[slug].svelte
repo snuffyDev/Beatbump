@@ -81,19 +81,11 @@
 			{#key carouselItems}
 				{#each carouselItems as { contents, header }, i}
 					{#if i < 4}
-						<Carousel
-							items={contents}
-							type="artist"
-							isBrowse={false}
-							setTitle={header?.title ? header.title : header}>
+						<Carousel items={contents} type="artist" isBrowse={false} {header}>
 							>
 						</Carousel>
 					{:else}
-						<Carousel
-							items={contents}
-							type="artist"
-							isBrowse={true}
-							setTitle={header.title ? header.title : header}>
+						<Carousel items={contents} type="artist" isBrowse={true} {header}>
 							>
 						</Carousel>
 					{/if}

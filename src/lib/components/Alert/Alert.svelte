@@ -7,16 +7,18 @@
 	import { fly } from 'svelte/transition'
 </script>
 
-<div
-	transition:fly={{ y: 200, duration: 1000 }}
-	on:introend={() => {
-		setTimeout(() => {
-			errorHandler.set({ msg: undefined, action: undefined })
-		}, 1500)
-	}}
-	class="alert m-alert-danger">
-	{message}
-</div>
+{#if $errorHandler.msg}
+	<div
+		transition:fly={{ y: 200, duration: 750 }}
+		on:introend={() => {
+			setTimeout(() => {
+				errorHandler.set({ msg: undefined, action: undefined })
+			}, 2500)
+		}}
+		class="alert m-alert-danger">
+		{message}
+	</div>
+{/if}
 
 <style lang="scss">
 	.m-alert-danger {

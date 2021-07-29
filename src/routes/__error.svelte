@@ -2,13 +2,13 @@
 	import { goto } from '$app/navigation'
 	import { navigating } from '$app/stores'
 
-	let redir = 5
+	let redir = 6
 	let timeout
 	const redirect = () => {
 		if (!$navigating) {
 			redir = redir - 1
 			if (redir <= 0) {
-				goto('/')
+				goto('/trending')
 			} else {
 				timeout = setTimeout(redirect, 1000)
 			}
