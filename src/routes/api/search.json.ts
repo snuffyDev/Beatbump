@@ -9,112 +9,101 @@ interface SearchOutput extends EndpointOutput {
 	didYouMean?: { term: string; endpoint: { query; params } }
 	continuation?: NextContinuationData
 }
-export async function get({ query }): Promise<SearchOutput> {
-	let q = query.get('q') || ''
-	q = decodeURIComponent(q)
+export async function get({ query }) {
+	let q = query.get('q')
 	const filter = query.get('filter') || ''
 	const videoId = query.get('videoId') || ''
 	const itct = query.get('itct') || ''
 	const playlistId = query.get('playlistId') || ''
 	const ctoken = query.get('ctoken') || ''
 	const browseId = query.get('browseId') || ''
-	// console.log(endpoint)
+	console.log(q)
 	const pageType = query.get('pt') || ''
 
-	try {
-		const response = await fetch(
-			`https://music.youtube.com/youtubei/v1/search?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${
-				ctoken !== '' ? '' : `&sp=EgWKAQIIAWoKEAoQAxAEEAUQCQ%3D%3D`
-			}${
-				ctoken !== ''
-					? `&ctoken=${ctoken}&continuation=${ctoken}&itct=${itct}&type='next'`
-					: ''
-			}`,
-			{
-				method: 'POST',
-				body: JSON.stringify({
-					...BaseContext,
-					user: {
-						enableSafetyMode: false
-					},
+	const response = await fetch(
+		`https://music.youtube.com/youtubei/v1/search?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${
+			ctoken !== '' ? '' : `&sp=EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D`
+		}${
+			ctoken !== ''
+				? `&ctoken=${ctoken}&continuation=${ctoken}&itct=${itct}&type='next'`
+				: ''
+		}`,
+		{
+			method: 'POST',
+			body: JSON.stringify({
+				...BaseContext,
+				user: {
+					enableSafetyMode: false
+				},
+				browseEndpointContextMusicConfig: {
 					browseEndpointContextMusicConfig: {
-						browseEndpointContextMusicConfig: {
-							pageType: `${pageType}`
-						}
-					},
-					browseId: `${browseId}`,
+						pageType: `${pageType}`
+					}
+				},
+				browseId: `${browseId}`,
 
-					isAudioOnly: true,
-					query: `${q}`,
+				isAudioOnly: true,
+				query: `${q}`,
 
-					params: `${filter}`,
-					videoId: `${videoId}`,
-					playlistId: `${playlistId}`
-				}),
-				headers: {
-					'Content-Type': 'application/json; charset=utf-8',
-					Origin: 'https://music.youtube.com',
-					'User-Agent':
-						'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
-				}
-			}
-		)
-
-		if (!response.ok) {
-			// NOT res.status >= 200 && res.status < 300
-			return { status: response.status, body: response.statusText }
-		}
-		const data: {
-			continuationContents?
-			contents: {
-				sectionListRenderer: {
-					contents: [
-						{
-							messageRenderer?
-							itemSectionRenderer?: {
-								contents: [
-									{
-										didYouMeanRenderer
-										messageRenderer?: { text: { runs: [{ text: string }] } }
-										musicShelfRenderer?
-										musicShelfContinuation?
-									}
-								]
-							}
-						}
-					]
-				}
-			}
-		} = await response.json()
-
-		if (Object.prototype.hasOwnProperty.call(data, 'continuationContents')) {
-			const { continuationContents } = data
-			const results = parseSearchResult(continuationContents, true, filter)
-
-			// console.log(`contents: `, results;
-			return {
-				status: 200,
-				body: JSON.stringify(results)
-			}
-		} else {
-			const {
-				contents: {
-					sectionListRenderer: { contents: [...rest] = [] } = {}
-				} = {}
-			} = data
-
-			const results = parseSearchResult(rest, false, filter)
-
-			return {
-				status: 200,
-				body: JSON.stringify(results)
+				params: `${filter}`,
+				videoId: `${videoId}`,
+				playlistId: `${playlistId}`
+			}),
+			headers: {
+				'Content-Type': 'application/json; charset=utf-8',
+				Origin: 'https://music.youtube.com',
+				'User-Agent':
+					'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 			}
 		}
-	} catch (error) {
-		// console.log(error)
+	)
+	// return { status: 200, body: await response.json() }
+	if (!response.ok) {
+		// NOT res.status >= 200 && res.status < 300
+		return { status: response.status, body: response.statusText }
+	}
+	const data = await response.json()
+	let {
+		continuationContents,
+		contents: {
+			tabbedSearchResultsRenderer: {
+				tabs: [
+					{
+						tabRenderer: {
+							content: {
+								sectionListRenderer: {
+									contents: [
+										{
+											// didYouMeanRenderer = {},
+											// messageRenderer: {
+											// 	text: { runs: [{ text: string }] = {} } = {}
+											// } = {},
+											musicShelfRenderer
+										} = {}
+									] = [],
+									contents = []
+								} = {}
+							} = {}
+						} = {}
+					} = {}
+				] = []
+			} = {}
+		} = {}
+	} = await data
+	if (Object.prototype.hasOwnProperty.call(data, 'continuationContents')) {
+		const results = parseSearchResult(continuationContents, true, filter)
+
 		return {
-			status: 400,
-			body: error
+			status: 200,
+			body: JSON.stringify(results)
+		}
+	} else {
+
+		const results = parseSearchResult(contents, false, filter)
+
+		return {
+			status: 200,
+			body: JSON.stringify(results)
 		}
 	}
 }
@@ -273,7 +262,7 @@ function parseSearchResult(data, cont, filter?) {
         data = response data
         cont = continuation
 				*/
-
+	console.log(data)
 	let continuation
 
 	let didYouMean
@@ -287,9 +276,9 @@ function parseSearchResult(data, cont, filter?) {
             Message Renderer is for when something goes horribly wrong,
             itemSectionRenderer is for when there's an error
         */
-		if (data[0].messageRenderer) return []
-		if (data[0].itemSectionRenderer) {
-			if (data[0].itemSectionRenderer?.contents[0].messageRenderer)
+		if (data[0]?.messageRenderer) return []
+		if (data[0]?.itemSectionRenderer) {
+			if (data[0]?.itemSectionRenderer?.contents[0].messageRenderer)
 				return { error: 'No Results Found' }
 			didYouMean = correctedQuery(
 				data[0]?.itemSectionRenderer?.contents[0].didYouMeanRenderer
@@ -301,7 +290,7 @@ function parseSearchResult(data, cont, filter?) {
 		}
 	}
 	// Safety net
-	if (ctx.itemSectionRenderer) return []
+	if (ctx?.itemSectionRenderer) return []
 
 	let results: Song[] | PlaylistSearch[] = []
 
