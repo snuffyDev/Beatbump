@@ -13,7 +13,6 @@
 	$: curTheme = $theme
 	$: setTheme = $theme
 	if (browser) {
-
 	}
 	$: setFilter = $filterAutoPlay
 
@@ -33,12 +32,11 @@
 			isSettings = !isSettings
 		}}
 		class="nav-settings"
-		style={`background-color: var(--${curTheme}-top)}`}
 		transition:fade={{ duration: 120, easing: circIn }}>
 		<!-- <label for="search"><em>search</em></label> -->
 		<div class="setting">
 			<label for="select" class="s-text">Theme:</label>
-			<div class="select" style={`background-color: var(--${$theme}-forms)`}>
+			<div class="select">
 				<!-- svelte-ignore a11y-no-onchange -->
 				<select
 					id="select"

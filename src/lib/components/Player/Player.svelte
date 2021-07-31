@@ -14,6 +14,7 @@
 	} from '$stores/stores'
 	import { tick } from 'svelte'
 	import { cubicOut } from 'svelte/easing'
+	import { fade } from 'svelte/transition'
 	import { tweened } from 'svelte/motion'
 	import '../../../global/scss/components/_player.scss'
 	import Queue from './Queue.svelte'
@@ -41,8 +42,11 @@
 	let isPlaying = false
 	let seeking = false
 	let songBar
+	let seekBar
+	let hoverWidth
 
 	let showing
+	let hovering
 	$: loading = $playerLoading
 	$: listShow = showing ? true : false
 	$: mixList = $list.mix
@@ -234,11 +238,19 @@
 	})
 	function trackMouse(event) {
 		if (seeking) seekAudio(event)
-		// if (hovering) hover(event)
+		if (hovering) hoverEvent(event)
 	}
 	function seek(event, bounds) {
 		let x = event.pageX - bounds.left
 
+		return Math.min(Math.max(x / bounds.width, 0), 1)
+	}
+	function hoverEvent(event) {
+		if (!songBar) return
+		hoverWidth = hover(event, songBar.getBoundingClientRect())
+	}
+	function hover(event, bounds) {
+		let x = event.clientX + bounds.left
 		return Math.min(Math.max(x / bounds.width, 0), 1)
 	}
 
@@ -279,11 +291,24 @@
 	bind:show={listShow}
 	bind:autoId={$key} />
 
-<div class="f-container">
+<div class="f-container" transition:fade>
 	<div
 		class="progress-bar"
+		on:mouseleave={() => (hovering = false)}
+		transition:fade
 		on:click={seekAudio}
-		on:mousedown={() => (seeking = true)}>
+		on:mousedown={() => (seeking = true)}
+		on:focus={() => {
+			return
+		}}
+		on:mouseover={() => (hovering = true)}>
+		{#if hovering}
+			<div
+				class="hover"
+				transition:fade={{ duration: 150 }}
+				bind:this={seekBar}
+				style="transform:scaleX({hoverWidth})" />
+		{/if}
 		<progress bind:this={songBar} value={$progress} max={duration} />
 	</div>
 	<div class="player" class:light={curTheme == 'light'}>
@@ -423,6 +448,14 @@
 		to {
 		}
 	}
+	.hover {
+		background-color: #bababa66;
+		height: 0.5rem;
+		position: absolute;
+		z-index: 1;
+		width: 100%;
+		transform-origin: 0% 50%;
+	}
 	.f-container {
 		background-color: inherit;
 		position: absolute;
@@ -461,6 +494,8 @@
 	}
 	.progress-bar {
 		position: relative;
+		height: 0.5rem;
+		width: 100%;
 	}
 	.player-left,
 	.player-right {
@@ -487,18 +522,29 @@
 	progress {
 		display: block;
 		width: 100%;
-		height: 0.4315rem;
+		height: 0.5rem;
 		position: absolute;
-		top: -0.1rem;
+		top: 0;
 		cursor: pointer;
 		margin: 0;
 		-moz-appearance: none;
 		appearance: none;
 		background: transparent;
-		background-color: #232530;
 		outline: none;
 		border: transparent;
 		padding: 0;
+
+		&::before {
+			background-color: #232530;
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			content: '';
+			width: 100%;
+			z-index: -1;
+		}
 	}
 
 	progress::-webkit-progress-bar {

@@ -5,10 +5,7 @@
 	import { theme } from '$lib/stores/stores'
 </script>
 
-<div
-	class="sidebar"
-	style={`background-color: var(--${$theme}-side)`}
-	transition:fly>
+<div class="sidebar" transition:fly>
 	<section class="head">
 		<slot name="head">
 			<Search type="block" /></slot>

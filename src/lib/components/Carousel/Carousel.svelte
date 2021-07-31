@@ -64,14 +64,11 @@
 
 <style lang="scss">
 	a small {
-		color: #dcdcdc;
 		font-size: 0.95rem;
 		font-weight: 700;
-		letter-spacing: 0.01rem;
+		font-variant-caps: all-petite-caps;
+		letter-spacing: 0.02rem;
 		transition: ease-in-out color 75ms;
-		&:hover {
-			color: #929292;
-		}
 	}
 	.section {
 		-webkit-overflow-scrolling: touch;

@@ -51,24 +51,17 @@
 <form class={type} on:submit|preventDefault={(e) => handleSubmit(e)}>
 	<!-- <label for="search"><em>search</em></label> -->
 	<div class="nav-item">
-		<div
-			class="input"
-			style={`background-color: var(--${$theme}-forms) !important`}>
-			<div
-				class="searchBtn"
-				style={`background-color: var(--${$theme}-forms)`}
-				on:click={(e) => handleSubmit(e)}>
+		<div class="input">
+			<div class="searchBtn" on:click={(e) => handleSubmit(e)}>
 				<Icon name="search" size="1rem" />
 			</div>
 			{#if type == 'inline'}<input
-					style={`background-color: var(--${$theme}-forms)`}
 					autofocus
 					autocorrect="off"
 					type="search"
 					placeholder="Search"
 					bind:value={songTitle} />
 			{:else}<input
-					style={`background-color: var(--${$theme}-forms) !important`}
 					autocorrect="off"
 					type="search"
 					placeholder="Search"
@@ -80,20 +73,14 @@
 
 	<!-- <label for="option"><em>search type</em></label> -->
 	<div class="nav-item">
-		<div
-			class="select"
-			style={`background-color: var(--${$theme}-forms)`}
-			class:inline={type == 'inline' ? true : false}>
+		<div class="select" class:inline={type == 'inline' ? true : false}>
 			<select
-				style={`background-color: var(--${$theme}-forms)`}
 				on:blur={() => {
 					searchState.set({ option: filter, text: songTitle })
 				}}
 				bind:value={filter}>
 				{#each options as option (option.params)}
-					<option
-						style={`background-color: var(--${$theme}-forms); color: inherit;`}
-						value={option.params}>{option.label}</option>
+					<option value={option.params}>{option.label}</option>
 				{/each}
 			</select>
 		</div>

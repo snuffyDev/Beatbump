@@ -19,6 +19,12 @@
 			name="apple-mobile-web-app-status-bar-style"
 			content="black-translucent"
 		/>
+		<script>
+			if (!('theme' in localStorage)) {
+				localStorage.setItem('theme', 'dark')
+			}
+			document.querySelector('html').classList.add(localStorage.theme)
+		</script>
 		<meta content="yes" name="apple-touch-fullscreen" />
 		<meta name="apple-mobile-web-app-title" content="Beatbump" />
 		<link rel="apple-touch-startup-image" href="/logo-header.png" />

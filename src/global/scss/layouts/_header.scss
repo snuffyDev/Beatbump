@@ -59,11 +59,12 @@ nav.nav {
 	max-width: 100%;
 	height: 100%;
 	align-items: center;
-	background: fixed;
-	background-color: inherit;
+	// background: ;: fixed;
+	background: inherit;
 
 	&::before {
-		background: #111214;
+		filter: brightness(0.5);
+
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -76,6 +77,6 @@ nav.nav {
 }
 
 :root .light .nav-search::before {
-	filter: brightness(0.7);
+	filter: brightness(0.1);
 	background: var(--light-top);
 }

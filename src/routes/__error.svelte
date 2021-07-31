@@ -1,21 +1,24 @@
 <script>
 	import { goto } from '$app/navigation'
 	import { navigating } from '$app/stores'
+	import { onMount } from 'svelte'
 	let redir = 6
 	let timeout
-	const redirect = () => {
-		if (!$navigating) {
-			redir = redir - 1
-			if (redir <= 0) {
-				goto('/trending')
+	onMount(() => {
+		const redirect = () => {
+			if (!$navigating) {
+				redir = redir - 1
+				if (redir <= 0) {
+					goto('/trending')
+				} else {
+					timeout = setTimeout(redirect, 1000)
+				}
 			} else {
-				timeout = setTimeout(redirect, 1000)
+				clearTimeout(timeout)
 			}
-		} else {
-			clearTimeout(timeout)
 		}
-	}
-	redirect()
+		redirect()
+	})
 </script>
 
 <main>

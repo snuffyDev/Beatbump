@@ -34,7 +34,7 @@ export const getSrc = async (videoId?: string, playlistId?: string) => {
 
 	const res = await fetch(url).then((data) => data.json())
 	const formats = await sort(res)
-	console.log(formats)
+	// console.log(formats)
 
 	const src = formats[0].url !== null ? setTrack(formats) : handleError()
 	// console.log(src)

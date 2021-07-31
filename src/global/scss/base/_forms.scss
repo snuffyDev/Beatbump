@@ -82,6 +82,8 @@ input[type="search"] {
 	&:active,
 	&:focus-within,
 	+ .searchBtn {
+		filter: brightness(1.1);
+
 		// background: #262e38;
 		// background-color: #e0e0e0d2 !important;
 		//  {
@@ -90,7 +92,8 @@ input[type="search"] {
 	}
 	::placeholder {
 		// color: #131313;
-		font-weight: 500;
+		font-weight: 400;
+		opacity: 0.7;
 	}
 }
 .input {
@@ -111,7 +114,9 @@ input[type="search"] {
 	&:focus-within {
 		// background: #262e38;
 		// background-color: #e2e2e2 !important;
-		filter: brightness(1.5);
+		border: 0.25px rgb(114, 114, 114) solid;
+
+		filter: brightness(1.15);
 	}
 }
 input :not([type="range"]) :not([type="checkbox"]) {

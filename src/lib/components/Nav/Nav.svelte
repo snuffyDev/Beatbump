@@ -15,7 +15,7 @@
 	let shown
 </script>
 
-<nav class="nav" style={`background-color: var(--${$theme}-top)`}>
+<nav class="nav">
 	<div class="logo">
 		<div on:click={() => goto('/trending')}>
 			<img

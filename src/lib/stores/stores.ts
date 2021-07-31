@@ -97,16 +97,23 @@ function _theme() {
 		get: (theme) => get(theme),
 		set: (theme) => {
 			if (!browser) return
+			const currentTheme = document.querySelector('html').classList.item(0)
 			set(theme)
+			document.querySelector('html').classList.replace(currentTheme, theme)
+
 			localStorage.setItem('theme', theme)
 		},
 		init: () => {
 			if (!browser) return
 			if (!localStorage.getItem('theme')) {
 				set('dark')
+				document.querySelector('html').classList.add(localStorage.theme)
+
 				localStorage.setItem('theme', 'dark')
 			} else {
-				localStorage.getItem('theme')
+				const theme = localStorage.getItem('theme')
+				document.querySelector('html').classList.add(theme)
+
 				set(localStorage.getItem('theme'))
 			}
 			// if (localStorage.getItem('theme')) return;

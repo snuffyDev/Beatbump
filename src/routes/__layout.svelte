@@ -18,12 +18,14 @@
 	import Alert from '$lib/components/Alert/Alert.svelte'
 	import { browser } from '$app/env'
 	export let key
+	let loaded
 	onMount(() => {
 		iOS.init()
 
 		theme.init()
 		let filter = localStorage.getItem('filterAutoPlay')
 		filter ? filterAutoPlay.init(filter) : filterAutoPlay.init(false)
+		loaded = true
 	})
 	let width
 	let shown
@@ -32,31 +34,26 @@
 </script>
 
 <svelte:window bind:innerWidth={width} />
-<div
-	class="body"
-	class:light={$theme.includes('light') ? true : false}
-	style={`background-color: var(--${$theme}-base)`}>
-	{#if browser}
-		<Nav {width} />
-		<Sidebar />
-		<div
-			class="wrapper"
-			class:no-scroll={$page.path.includes('/search/') ? true : false}
-			bind:this={main}
-			id="wrapper">
-			<Wrapper {key} {main}>
-				<slot />
-			</Wrapper>
-		</div>
-		<div class="alert-container">
-			<Alert message={$errorHandler.msg} color="red" />
-		</div>
-		<footer
-			class="footer-container"
-			style={`background-color: var(--${$theme}-bottom)`}>
+<div class="body">
+	<Nav {width} />
+	<Sidebar />
+	<div
+		class="wrapper"
+		class:no-scroll={$page.path.includes('/search/') ? true : false}
+		bind:this={main}
+		id="wrapper">
+		<Wrapper {key} {main}>
+			<slot />
+		</Wrapper>
+	</div>
+	<div class="alert-container">
+		<Alert message={$errorHandler.msg} color="red" />
+	</div>
+	<footer class="footer-container">
+		{#if browser && loaded}
 			<Player curTheme={$theme} />
-		</footer>
-	{/if}
+		{/if}
+	</footer>
 </div>
 
 <style lang="scss" global>
@@ -82,7 +79,7 @@
 		--ytm-bottom: #121018;
 		--ytm-base: #09090a;
 		--ytm-top: #09090a;
-		--ytm-forms: rgb(21, 20, 29);
+		--ytm-forms: #15141d;
 		--ytm-side: #1210183a;
 
 		--dark-bottom: #111214;
@@ -91,13 +88,13 @@
 		--dark-forms: #131516;
 		--dark-side: #13171b33;
 
-		--dim-bottom: rgb(20, 24, 32);
-		--dim-base: rgb(9 9 10);
-		--dim-top: rgb(20, 24, 32);
+		--dim-bottom: #141820;
+		--dim-base: #09090a;
+		--dim-top: #141820;
 		--dim-forms: #131516;
 		--dim-side: #0b0c0f;
 
-		--light-base: rgb(252, 248, 248);
+		--light-base: #fcf8f8;
 		--light-bottom: #121018;
 		--light-top: #cac8c9;
 		--light-forms: #e3dbf5;
@@ -112,11 +109,126 @@
 		--midnight-bottom: #090d11;
 		--midnight-forms: #100f17;
 	}
-	.input {
+
+	html {
+		color: #f3f3f3;
+		a small {
+			color: #999393;
+			&:hover {
+				color: #a5a5a5;
+			}
+		}
+		&.dark {
+			.footer-container,
+			.player {
+				background: var(--dark-bottom);
+			}
+			.select,
+			.input {
+				background: var(--dark-forms);
+			}
+
+			nav {
+				background: var(--dark-top);
+			}
+			aside,
+			.sidebar {
+				background: var(--dark-side);
+			}
+		}
+		&.dim {
+			.footer-container,
+			.player {
+				background: var(--dim-bottom);
+			}
+			.select,
+			.input {
+				background: var(--dim-forms);
+			}
+			nav {
+				background: var(--dim-top);
+			}
+			aside,
+			.sidebar {
+				background: var(--dim-side);
+			}
+		}
+		&.ytm {
+			.footer-container,
+			.player {
+				background: var(--ytm-bottom);
+			}
+			.select,
+			.input {
+				background: var(--ytm-forms);
+			}
+			nav {
+				background: var(--ytm-top);
+			}
+			aside,
+			.sidebar {
+				background: var(--ytm-side);
+			}
+		}
+
+		&.midnight {
+			.footer-container,
+			.player {
+				background: var(--midnight-bottom);
+			}
+			.select,
+			.input {
+				background: var(--midnight-forms);
+			}
+			nav {
+				background: var(--midnight-top);
+			}
+			aside,
+			.sidebar {
+				background: var(--midnight-side);
+			}
+		}
 		&.light {
-			background-color: var(--darker-light);
+			* {
+				color: var(--light-text);
+			}
+			background-color: var(--light-base);
+			.footer-container,
+			.player {
+				background: var(--light-bottom);
+			}
+			.select,
+			select,
+			.input,
+			option {
+				background: var(--light-forms);
+			}
+			nav {
+				background: var(--light-top);
+			}
+			a small {
+				color: #464646;
+				&:hover {
+					color: #9e9e9e;
+				}
+			}
+			aside,
+			.sidebar {
+				background: var(--light-side);
+			}
 		}
 	}
+	.footer-container {
+		/* position: fixed; */
+		grid-area: f/f/f/f;
+		/* height: 4rem; */
+
+		display: block;
+		z-index: 1;
+		height: 100%;
+		min-height: 100%;
+	}
+
 	:root .light * {
 		color: var(--light-text);
 	}
@@ -126,21 +238,7 @@
 	.player {
 		color: #f3f3f3;
 	}
-	.footer-container {
-		/* position: fixed; */
-		grid-area: f/f/f/f;
-		/* height: 4rem; */
-		display: block;
-		z-index: 1;
-	}
 
-	:global(.input) {
-		// background-color: theme-color('ytm', 'forms');
-		background-color: var(--ytm-forms);
-		&.light {
-			background-color: var(--darker-light);
-		}
-	}
 	// :global(.selectCont) {
 	// 	background-color: theme-color('ytm', 'forms');
 	// }
