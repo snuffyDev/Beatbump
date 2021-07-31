@@ -28,12 +28,10 @@
 			window.requestAnimationFrame(function (e) {
 				y =
 					window.innerWidth < 500
-						? Math.min(Math.max(-scroll.top / window.innerHeight, 0), 70) * 750
-						: Math.min(Math.max(-scroll.top / window.innerHeight, 0), 70) * 250
+						? Math.min(Math.max(-scroll.top / window.innerHeight, 0), 10) * 450
+						: Math.min(Math.max(-scroll.top / window.innerHeight, 0), 10) * 125
 
-				if (elapsed < 200) {
-					window.requestAnimationFrame(handler)
-				}
+				window.requestAnimationFrame(handler)
 
 				window.cancelAnimationFrame(y)
 			})
@@ -53,7 +51,7 @@
 			bind:this={container}
 			style={`background-image: linear-gradient(1turn, var(--${$theme}-base) ${Math.min(
 				y,
-				72
+				52
 			)}%, transparent); transition: cubic-bezier(0.6, -0.28, 0.74, 0.05) all 120ms`}
 			id="gradient"
 			class="gradient" />
@@ -140,6 +138,7 @@
 		position: relative;
 		height: 100%;
 		min-height: 13rem;
+		// max-height: 30%;
 		&::before {
 			// padding-top: 100%;
 			position: absolute;
@@ -167,8 +166,11 @@
 		z-index: -1;
 		top: 0;
 		width: 100%;
-		max-height: 25%;
+		// max-height: 25%;
+		// aspect-ratio: 16/9;
+		object-fit: cover;
 		overflow: hidden;
+		border-radius: 0;
 	}
 	.artist-content {
 		position: relative;

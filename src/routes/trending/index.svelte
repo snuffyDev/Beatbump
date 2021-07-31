@@ -21,15 +21,9 @@
 
 <script lang="ts">
 	export let carouselItems: ICarousel
-	// export let test
 	import { currentTitle } from '$stores/stores'
 	import Carousel from '$components/Carousel/Carousel.svelte'
 	import type { ICarousel } from '$lib/types'
-	import Header from '$lib/components/Layouts/Header.svelte'
-	import type { Load } from '@sveltejs/kit'
-	$: console.log(carouselItems)
-
-	// const moodsAndGenres =  carouselItems[1].results.slice(0,15)
 </script>
 
 <svelte:head>

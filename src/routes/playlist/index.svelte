@@ -10,7 +10,7 @@
 				continuations: await continuations,
 				header: await header
 			},
-			// maxage: 0,
+			maxage: 3600,
 			status: 200
 		}
 	}
@@ -22,7 +22,7 @@
 	import lazy from '$lib/lazy'
 	import list from '$lib/stores/list'
 	import { currentTitle, isPagePlaying } from '$lib/stores/stores'
-	import type { Header, PlaylistItem } from '$lib/types/playlist'
+	import type { Header } from '$lib/types/playlist'
 	import { onMount, setContext } from 'svelte'
 	export let tracks: PlaylistItem[]
 	export let header: Header

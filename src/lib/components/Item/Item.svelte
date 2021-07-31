@@ -81,6 +81,7 @@
 			if (d.text == 'View Artist') return
 		})
 	}
+	// $: console.log(data.type, data)
 	const itemHandler = () => {
 		explicit = data.explicit
 		title = data.title
@@ -94,11 +95,16 @@
 			title = title
 		}
 	}
+
 	const clickHandler = async () => {
+		if (data.type == 'artist') {
+			goto(`/artist/${data.artistInfo.artist}`)
+			return
+		}
 		try {
 			loading = true
 			videoId = data.videoId ? data.videoId : ''
-			playlistId = data.playlistId ? data.playlistId : data.shuffle.playlistId
+			playlistId = data?.playlistId ? data.playlistId : data.shuffle.playlistId
 			if (data.type == 'playlist') {
 				await list.startPlaylist(playlistId)
 			} else {
@@ -125,11 +131,7 @@
 					clickHandler()
 				}
 			}}>
-			<div
-				class="img-container"
-				on:longpress|capture={() => {
-					alert('longpress!')
-				}}>
+			<div class="img-container">
 				{#if loading}
 					<Loading size="3em" />
 				{/if}
@@ -150,7 +152,9 @@
 				{#if explicit}
 					<span class="explicit"> E </span>
 				{/if}
-				<p class="text-artist">
+				<p
+					class="text-artist"
+					class:hidden={data.type == 'artist' ? true : false}>
 					{data.type == 'playlist' ? `${data.metaData}` : `by ${artist}`}
 				</p>
 				<span class="album">
@@ -270,10 +274,10 @@
 	}
 
 	.title {
-		display: block;
+		display: flex;
 		width: 100%;
 		margin-left: 1rem;
-		line-height: 1.3125;
+		line-height: 1.5;
 		align-self: center;
 		flex-direction: column;
 	}

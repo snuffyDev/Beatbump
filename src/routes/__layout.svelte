@@ -119,6 +119,7 @@
 			}
 		}
 		&.dark {
+			background: var(--dark-base);
 			.footer-container,
 			.player {
 				background: var(--dark-bottom);
@@ -137,6 +138,7 @@
 			}
 		}
 		&.dim {
+			background: var(--dim-base);
 			.footer-container,
 			.player {
 				background: var(--dim-bottom);
@@ -154,6 +156,7 @@
 			}
 		}
 		&.ytm {
+			background: var(--ytm-base);
 			.footer-container,
 			.player {
 				background: var(--ytm-bottom);
@@ -172,6 +175,7 @@
 		}
 
 		&.midnight {
+			background: var(--midnight-base);
 			.footer-container,
 			.player {
 				background: var(--midnight-bottom);
@@ -192,7 +196,7 @@
 			* {
 				color: var(--light-text);
 			}
-			background-color: var(--light-base);
+			background: var(--light-base);
 			.footer-container,
 			.player {
 				background: var(--light-bottom);

@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 export async function get({ params, query }) {
 	const { slug } = params
-	const ctx = query.get('params') || ''
+	// const ctx = query.get('params') || ''
 
 	try {
 		const response = await fetch(
@@ -20,19 +20,18 @@ export async function get({ params, query }) {
 							enableSafetyMode: false
 						}
 					},
-					params: `${ctx}`,
+					// params: `${ctx}`,
 					browseId: `${slug}`
 				}),
 				headers: {
 					'Content-Type': 'application/json; charset=utf-8',
-					Origin: 'https://music.youtube.com',
-					Referer: 'https://music.youtube.com/channel/UCKIOM0Wi1qNV8HFLArK-uYQ'
+					Origin: 'https://music.youtube.com'
 				}
 			}
 		)
 
 		const data = await response.json()
-		console.log(data)
+		// console.log(data)
 		let {
 			header: {
 				musicHeaderRenderer: {
@@ -56,7 +55,7 @@ export async function get({ params, query }) {
 		slug.includes('videos') ? (type = 'videos') : (type = 'albums')
 		const sections = contents.map(({ gridRenderer = {} }) => {
 			const { items = [] } = gridRenderer
-			console.log(items)
+			// console.log(items)
 			const section = items.map(({ musicTwoRowItemRenderer = {} }) => ({
 				thumbnail:
 					musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer
@@ -86,10 +85,18 @@ export async function get({ params, query }) {
 			}))
 			return { section }
 		})
-
+		const getTitle = () => {
+			const wordParts: Array<any> = slug.split('_')
+			for (let i = 0; i < wordParts.length; i++) {
+				wordParts[i] = wordParts[i][0].toUpperCase() + wordParts[i].substr(1)
+			}
+			wordParts.join(' ')
+			const final = wordParts.shift()
+			return wordParts.join(' ')
+		}
 		// console.log(sections)
 		return {
-			body: { sections, header: text },
+			body: { title: getTitle(), sections, header: text },
 			status: 200
 		}
 	} catch (error) {

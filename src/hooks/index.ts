@@ -5,10 +5,9 @@ dev
 const directives = {
 	'base-uri': ["'self'"],
 	'child-src': ["'self'"],
-	'connect-src':
-		dev
-			? ["'self'", 'ws://localhost:*', 'ws://*', '*']
-			: ["'self'", 'ws://localhost:*'],
+	'connect-src': dev
+		? ["'self'", 'ws://localhost:*', 'ws://*', '*']
+		: ["'self'", 'ws://localhost:*'],
 	// 'connect-src': ,
 	'img-src': [
 		"'self'",
@@ -46,6 +45,21 @@ const directives = {
 const csp = Object.entries(directives)
 	.map(([key, arr]) => key + ' ' + arr.join(' '))
 	.join('; ')
+export async function serverFetch(request) {
+	if (request.url.startsWith('https://accounts.google.com')) {
+		// clone the original request, but change the URL
+		request = new Request(
+			request.url.replace(
+				'https://accounts.google.com/',
+				'http://localhost:5000/'
+			),
+			request
+		)
+	}
+
+	return fetch(request)
+}
+
 export async function handle({ request, resolve }) {
 	request.locals = request.headers
 

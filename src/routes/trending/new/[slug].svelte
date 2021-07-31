@@ -12,13 +12,13 @@
 						: ''
 				}`
 		)
-		const { sections, header, contents } = await response.json()
+		const { sections, header, title } = await response.json()
 		if (response.ok) {
 			return {
 				props: {
 					sections,
 					header,
-					contents
+					title
 				},
 				status: 200
 			}
@@ -30,14 +30,12 @@
 	import type { sections } from '$lib/types/components/sections'
 	export let sections: sections
 	export let header
-	export let contents
-	import { page } from '$app/stores'
+	export let title: string
 	import { goto } from '$app/navigation'
 	import Header from '$lib/components/Layouts/Header.svelte'
-	$: console.log(sections, header, contents)
 </script>
 
-<Header slug={$page.params.slug} />
+<Header name={title.replace(',', ' ')} />
 
 <main>
 	<div class="header">

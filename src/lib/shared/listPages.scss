@@ -140,6 +140,7 @@ hr {
 }
 .info {
 	/* margin-left: auto; */
+	transition: all cubic-bezier(0.645, 0.045, 0.355, 1) 0.25s;
 	margin-right: auto;
 	padding-left: 1.5rem;
 	@media screen and (max-width: 500px) {
@@ -179,8 +180,7 @@ hr {
 		flex-direction: column;
 	}
 	.info {
-		padding-left: 1rem;
-		padding-right: 1rem;
+		padding: 1rem;
 	}
 	.img {
 		justify-self: center;
@@ -213,6 +213,7 @@ li,
 	max-width: 18.2857rem;
 	max-height: 18.2857rem;
 	min-width: 18.2856rem;
+	transition: all cubic-bezier(0.645, 0.045, 0.355, 1) 0.125s;
 	img {
 		/* max-width: inherit; */
 		/* max-height: inherit; */

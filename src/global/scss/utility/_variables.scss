@@ -17,8 +17,9 @@ $secondary-font-family: "Commissioner", sans-serif;
 	--base-radius: 0.5ch;
 	--xs-radius: calc(var(--base-radius) / 0.95);
 	--sm-radius: calc(var(--base-radius) / 0.8);
-	--md-radius: calc(var(--base-radius) / 0.5);
-	--lg-radius: calc(var(--base-radius));
+	--md-radius: calc(var(--base-radius) / 0.625);
+	--lg-radius: calc(var(--base-radius) / 0.5);
+	--xl-radius: calc(var(--base-radius) / 0.3125);
 }
 // Sizes
 $max-width: 85.375rem;

@@ -10,7 +10,7 @@ interface SearchOutput extends EndpointOutput {
 	didYouMean?: { term: string; endpoint: { query; params } }
 	continuation?: NextContinuationData
 }
-export async function get({ query }):Promise<SearchOutput> {
+export async function get({ query }): Promise<SearchOutput> {
 	// console.time('test')
 	let q = query.get('q')
 	const filter = query.get('filter') || ''
@@ -19,7 +19,7 @@ export async function get({ query }):Promise<SearchOutput> {
 	const playlistId = query.get('playlistId') || ''
 	const ctoken = query.get('ctoken') || ''
 	const browseId = query.get('browseId') || ''
-	console.log(q)
+	// console.log(q)
 	const pageType = query.get('pt') || ''
 
 	const response = await fetch(
@@ -145,41 +145,29 @@ const parsePlaylist = (contents): PlaylistSearch[] => {
 }
 
 const parseSong = (contents, type): Song[] => {
-	return contents.map(({ musicResponsiveListItemRenderer }, i) => {
+	return contents.map(({ musicResponsiveListItemRenderer: ctx = {} }, i) => {
 		// let d = musicResponsiveListItemRenderer
 		let explicit
-		if (
-			Object.prototype.hasOwnProperty.call(
-				musicResponsiveListItemRenderer,
-				'badges'
-			)
-		)
-			explicit = true
+		if (Object.prototype.hasOwnProperty.call(ctx, 'badges')) explicit = true
 		const flexColumns = pb(
-			musicResponsiveListItemRenderer,
+			ctx,
 			'musicResponsiveListItemFlexColumnRenderer',
 			true
 		)
 
-		const thumbnails =
-			musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail
-				.thumbnails
+		const thumbnails = ctx.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails
 		const title =
-			musicResponsiveListItemRenderer.flexColumns[0]
-				.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text
+			ctx.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0]
+				.text
 		// console.log(title)
 
 		let browseId
 		if (
-			musicResponsiveListItemRenderer.menu?.menuRenderer?.items[5]
-				?.menuNavigationItemRenderer?.navigationEndpoint?.browseEndpoint
+			ctx.menu?.menuRenderer?.items[5]?.menuNavigationItemRenderer
+				?.navigationEndpoint?.browseEndpoint
 		) {
-			const menu = pb(
-				musicResponsiveListItemRenderer.menu?.menuRenderer,
-				'items',
-				true
-			)
-			const items = pb(menu, 'menuNavigationItemRenderer')
+			const menu = ctx.menu?.menuRenderer.items
+			const { musicNavigationItemRenderer: items = [] } = menu
 			// console.log(items);
 			if (items.length > 4) {
 				browseId = items[3].navigationEndpoint.browseEndpoint.browseId
@@ -188,25 +176,25 @@ const parseSong = (contents, type): Song[] => {
 			}
 		} else {
 			browseId =
-				musicResponsiveListItemRenderer.flexColumns[1]
-					?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
-					?.navigationEndpoint?.browseEndpoint?.browseId
+				ctx.flexColumns[1].musicResponsiveListItemFlexColumnRenderer?.text
+					?.runs[0]?.navigationEndpoint?.browseEndpoint?.browseId
 		}
 
 		// const { videoId = '', playlistId, params }
 		const videoId =
-			musicResponsiveListItemRenderer.menu?.menuRenderer?.items[0]
-				?.menuNavigationItemRenderer?.navigationEndpoint.watchEndpoint?.videoId
+			ctx.menu?.menuRenderer?.items[0]?.menuNavigationItemRenderer
+				?.navigationEndpoint.watchEndpoint?.videoId
 		const playlistId =
-			musicResponsiveListItemRenderer.menu?.menuRenderer?.items[0]
-				?.menuNavigationItemRenderer?.navigationEndpoint.watchEndpoint
-				?.playlistId
+			ctx.menu?.menuRenderer?.items[0]?.menuNavigationItemRenderer
+				?.navigationEndpoint.watchEndpoint?.playlistId
 		const params =
-			musicResponsiveListItemRenderer.menu?.menuRenderer?.items[0]
-				?.menuNavigationItemRenderer?.navigationEndpoint.watchEndpoint?.params
+			ctx.menu?.menuRenderer?.items[0]?.menuNavigationItemRenderer
+				?.navigationEndpoint.watchEndpoint?.params
 
-		const metaInfo = pb(flexColumns[1], 'runs:text', true)
-		// console.log(metaInfo);
+		const {
+			runs: metaInfo = []
+		} = ctx.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text
+		// console.log(metaInfo)
 		let albumInfo
 		if (type == 'song') {
 			const albumArr: [] = flexColumns[1].text.runs
@@ -224,15 +212,19 @@ const parseSong = (contents, type): Song[] => {
 		}
 		// let album = {};
 		const length = metaInfo[metaInfo.length - 1]
-
-		const artistsArr = metaInfo.reverse()
-		const artists = artistsArr.slice(4)
-		if (artists.length > 1) {
-			for (let i = 0; i < artists.length; i++) {
-				artists.splice(i + 1, 1)
+		let artists = []
+		if (type !== 'artist') {
+			const artistsArr = metaInfo.reverse()
+			artists = artistsArr.slice(4)
+			if (artists.length > 1) {
+				for (let i = 0; i < artists.length; i++) {
+					artists.splice(i + 1, 1)
+				}
 			}
+			artists.reverse()
+		} else {
+			artists = ctx.navigationEndpoint.browseEndpoint.browseId
 		}
-		artists.reverse()
 		const artist: Artist = {
 			browseId: browseId,
 			artist: artists
@@ -262,7 +254,7 @@ function parseSearchResult(data, cont, filter?) {
         data = response data
         cont = continuation
 				*/
-	console.log(data)
+	// console.log(data)
 	let continuation
 
 	let didYouMean
@@ -290,7 +282,9 @@ function parseSearchResult(data, cont, filter?) {
 		}
 	}
 	// Safety net
-	if (ctx?.itemSectionRenderer) {return []}
+	if (ctx?.itemSectionRenderer) {
+		return []
+	}
 
 	let results: Song[] | PlaylistSearch[] = []
 
@@ -313,8 +307,12 @@ function parseSearchResult(data, cont, filter?) {
 			'EgeKAQQoAEABagwQDhAKEAkQAxAEEAU='
 		]
 		const videoParams = 'EgWKAQIQAWoKEAMQBBAKEAUQCQ=='
-
-		if (!paramList.includes(filter) && !videoParams.includes(filter)) {
+		const artistParams = 'EgWKAQIgAWoKEAMQBBAKEAkQBQ=='
+		if (
+			!paramList.includes(filter) &&
+			!artistParams.includes(filter) &&
+			!videoParams.includes(filter)
+		) {
 			const { contents: ctx } = contents[0]
 			continuation = continuationCheck(contents[0])
 
@@ -326,7 +324,16 @@ function parseSearchResult(data, cont, filter?) {
 
 			const { contents: ctx } = contents[0]
 			results = parseSong(ctx, 'video')
+
 			return { results, continuation }
+		} else if (
+			filter == artistParams ||
+			filter == 'EgWKAQIgAWoKEAMQBBAKEAkQBQ%3D%3D'
+		) {
+			continuation = continuationCheck(contents[0])
+
+			const { contents: ctx } = contents[0]
+			results = parseSong(ctx, 'artist')
 		} else {
 			continuation = continuationCheck(contents[0])
 			contents = contents[0]?.contents

@@ -1,12 +1,15 @@
 <script>
 	import { page } from '$app/stores'
+	import list from '$lib/stores/list'
 	import { currentTitle } from '$lib/stores/stores'
 	console.log($page.params)
-	export let slug
-	$: slug = slug
-	$: console.log(slug)
+	export let name
+
+	// $: slug = slug
+	$: console.log(name)
 </script>
 
 <svelte:head>
-	<title>{slug} - Beatbump</title>
+	<title>{name} - Beatbump</title>
+	<meta property="og:title" content={name} />
 </svelte:head>

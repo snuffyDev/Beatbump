@@ -11,7 +11,7 @@
 				if (redir <= 0) {
 					goto('/trending')
 				} else {
-					timeout = setTimeout(redirect, 1000)
+					// timeout = setTimeout(redirect, 1000)
 				}
 			} else {
 				clearTimeout(timeout)

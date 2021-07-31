@@ -48,7 +48,7 @@ export async function get({ query }) {
 			} = {}
 		} = {}
 	} = await response.json()
-
+	// console.log({ [contents]: key }, key)
 	carouselItems.push(
 		...contents.filter((content) => {
 			return content.musicCarouselShelfRenderer

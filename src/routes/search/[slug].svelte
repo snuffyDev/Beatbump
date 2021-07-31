@@ -37,7 +37,7 @@
 	export let error
 	export let filter
 
-	$: console.log(contents, continuation)
+	// $: console.log(contents, continuation)
 	import { currentTitle, search } from '$stores/stores'
 	import { page } from '$app/stores'
 	import { invalidate } from '$app/navigation'

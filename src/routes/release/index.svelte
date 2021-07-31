@@ -43,7 +43,7 @@
 
 	const promise = parsePageContents(data)
 	let { details, items } = promise
-	console.log(promise)
+	// console.log(promise)
 	const playAlbum = () => {
 		list.startPlaylist(details.audioPlaylistId)
 		key.set(0)
@@ -65,9 +65,6 @@
 	} else {
 		isThisPage = false
 	}
-
-	let radio: mixList
-	radio = {}
 </script>
 
 <svelte:head>
