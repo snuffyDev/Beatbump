@@ -1,0 +1,19 @@
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+     - name: Build site
+       run: 'npm run build'
+     - name: Publish
+       uses: cloudflare/wrangler-action@1.2.0
+       with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+       env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
