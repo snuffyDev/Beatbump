@@ -62,8 +62,10 @@ export async function get({ query }): Promise<EndpointOutput> {
 							{
 								tabRenderer: {
 									content: {
+										// eslint-disable-next-line prefer-const
 										sectionListRenderer,
 										sectionListRenderer: {
+											// eslint-disable-next-line prefer-const
 											contents: [{ musicPlaylistShelfRenderer = {} }]
 										}
 									}
@@ -80,10 +82,13 @@ export async function get({ query }): Promise<EndpointOutput> {
 				playlistId = ''
 			} = await sectionListRenderer
 
-			const cont: NextContinuationData = await continuations[0]
-				.nextContinuationData
+			const cont: NextContinuationData = (await continuations[0]
+				?.nextContinuationData)
+				? continuations[0]?.nextContinuationData
+				: ''
 			musicDetailHeaderRenderer = [musicDetailHeaderRenderer]
 			const parseHeader = musicDetailHeaderRenderer.map((header) => {
+				// eslint-disable-next-line prefer-const
 				let { description, subtitle, thumbnail, secondSubtitle, title } = header
 				console.log(description, subtitle, thumbnail, secondSubtitle, title)
 				const subtitles: string = pb(subtitle, 'runs:text', false)
@@ -155,7 +160,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 	}
 }
 
-function parseTrack(contents = [], playlistId): Array<IPlaylistItem> {
+function parseTrack(contents = [], playlistId?): Array<IPlaylistItem> {
 	const Tracks = contents.map((data) => {
 		const { musicResponsiveListItemRenderer } = data
 		const length = pb(

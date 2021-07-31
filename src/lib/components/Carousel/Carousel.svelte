@@ -1,23 +1,30 @@
 <script lang="ts">
 	import CarouselItem from './CarouselItem.svelte'
-	export let header = []
+	export let header: CarouselHeader
 	export let items = []
 	export let type = ''
 	export let isBrowse = false
 	import lazy from '$lib/lazy'
 	import { fade } from 'svelte/transition'
 	import { goto } from '$app/navigation'
+	import type { CarouselHeader } from '$lib/types'
 	let isHidden
 	let section = []
 	let arr = items
 	let carousel
+	let st = ''
 </script>
 
 <div class="header">
 	<h1>
 		{header.title}
 	</h1>
-	{#if !isBrowse}<a href={`/trending/new/${header.browseId}`}
+	{#if !isBrowse && header.browseId}<a
+			href={header.browseId?.includes('VLP')
+				? `/playlist?list=${header?.browseId}`
+				: `/trending/new/${header?.browseId}${
+						header?.params ? `?params=${header?.params}` : ''
+				  }${header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ''}`}
 			><small>See All</small></a
 		>{/if}
 </div>
@@ -56,23 +63,15 @@
 </div>
 
 <style lang="scss">
-	.item {
-		padding-bottom: 2em;
-	}
-	.details {
-		display: flex;
-		align-items: center;
-		margin-top: 3px;
-		display: block;
-		text-overflow: ellipsis;
-		overflow: hidden;
-	}
-
-	.title {
-		cursor: pointer;
-
-		text-overflow: ellipsis, 2px;
-		display: inline-block;
+	a small {
+		color: #dcdcdc;
+		font-size: 0.95rem;
+		font-weight: 700;
+		letter-spacing: 0.01rem;
+		transition: ease-in-out color 75ms;
+		&:hover {
+			color: #929292;
+		}
 	}
 	.section {
 		-webkit-overflow-scrolling: touch;
@@ -131,78 +130,5 @@
 		border-radius: inherit;
 		overflow-anchor: none;
 		-webkit-overflow-scrolling: touch;
-	}
-
-	section {
-		padding-left: 1.5rem;
-		padding-right: 1.5rem;
-		padding-top: 1.5rem;
-		margin-bottom: 0;
-		display: block;
-		cursor: pointer;
-		content: '';
-
-		::before {
-			display: block;
-		}
-		/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
-	}
-	.item {
-		scroll-snap-align: start;
-		min-height: 16.75rem;
-		height: auto;
-		width: 16rem;
-	}
-
-	.img {
-		border-radius: var(--md-radius);
-		height: auto;
-		width: 100%;
-		.container {
-			position: relative; /* If you want text inside of it */
-
-			cursor: pointer;
-			width: 100%;
-			position: relative;
-			padding-top: 100%; /* 1:1 Aspect Ratio */
-			&::before {
-				position: absolute;
-				content: '';
-				top: 0;
-				right: 0;
-
-				bottom: 0;
-				left: 0;
-				background: linear-gradient(rgba(0, 0, 0, 0.473), rgba(0, 0, 0, 0.473));
-
-				transition: opacity cubic-bezier(0.29, -0.3, 0.7, 0.95) 0.15s;
-				opacity: 0.001;
-				z-index: 1;
-			}
-			&:hover::before {
-				// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
-				background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.534));
-				opacity: 0.6;
-				z-index: 1;
-			}
-			img {
-				width: 100%;
-				height: auto;
-
-				position: absolute;
-				top: 0;
-				right: 0;
-				border-radius: var(--sm-radius);
-
-				bottom: 0;
-				left: 0;
-			}
-		}
-	}
-	.cont {
-		display: flex;
-		flex-direction: column;
-		margin-top: 0.8571rem;
-		padding-right: 1em;
 	}
 </style>

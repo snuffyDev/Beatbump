@@ -13,3 +13,5 @@ wrangler.toml
 src/routes/api/backup
 .env
 src/lib/_parsers.ts
+src/lib/components/Player/_Player.svelte
+.gitignore

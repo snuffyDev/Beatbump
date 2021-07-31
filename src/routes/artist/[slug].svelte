@@ -1,4 +1,6 @@
 <script context="module">
+	export const ssr = false
+
 	export async function load({ page, fetch }) {
 		const url =
 			'/api/artist.json?endpoint=browse&browseId=' +
@@ -38,11 +40,12 @@
 	import ListItem from '$components/ListItem/ListItem.svelte'
 	import { isPagePlaying } from '$lib/stores/stores'
 	import list from '$lib/stores/list'
+	import type { CarouselItem, ICarousel } from '$lib/types'
 
 	export let headerContent
 	export let description
 	export let thumbnail
-	export let carouselItems
+	export let carouselItems: ICarousel
 	export let items
 	export let data
 	let width
@@ -58,43 +61,41 @@
 </svelte:head>
 
 <svelte:window bind:innerWidth={width} />
-{#await headerContent then _}
-	<main>
-		<ArtistPageHeader {description} {headerContent} {width} {thumbnail} />
-		<div class="artist-body">
-			{#if items.length > 0}
-				<section>
-					<h4 class="grid-title">Songs</h4>
-					<section class="songs">
-						{#each items as item, index}
-							<ListItem
-								{item}
-								{index}
-								page="artist"
-								on:pagePlaying={() => {
-									isPagePlaying.set($page.path + $page.params)
-								}} />
-						{/each}
-					</section>
+<!-- {#await headerContent then _} -->
+<main>
+	<ArtistPageHeader {description} {headerContent} {width} {thumbnail} />
+	<div class="artist-body">
+		{#if items?.length > 0}
+			<section>
+				<h4 class="grid-title">Songs</h4>
+				<section class="songs">
+					{#each items as item, index}
+						<ListItem
+							{item}
+							{index}
+							page="artist"
+							on:pagePlaying={() => {
+								isPagePlaying.set($page.path + $page.params)
+							}} />
+					{/each}
 				</section>
+			</section>
+		{/if}
+		{#each carouselItems as { contents, header }, i}
+			{#if i == carouselItems.length - 1}
+				<Carousel items={contents} type="artist" isBrowse={true} {header}>
+					>
+				</Carousel>
+			{:else}
+				<Carousel items={contents} type="artist" isBrowse={false} {header}>
+					>
+				</Carousel>
 			{/if}
-			{#key carouselItems}
-				{#each carouselItems as { contents, header }, i}
-					{#if i < 4}
-						<Carousel items={contents} type="artist" isBrowse={false} {header}>
-							>
-						</Carousel>
-					{:else}
-						<Carousel items={contents} type="artist" isBrowse={true} {header}>
-							>
-						</Carousel>
-					{/if}
-				{/each}
-			{/key}
-		</div>
-	</main>
-{/await}
+		{/each}
+	</div>
+</main>
 
+<!-- {/await} -->
 <style lang="scss">
 	.content-wrapper {
 		display: flex;

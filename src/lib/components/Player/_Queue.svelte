@@ -45,7 +45,7 @@
 
 		coords.update(($coords) => ({
 			x: $coords.x + event.detail.dx,
-			y: Math.min(Math.max(-$coords.y, $coords.y + event.detail.dy), 150)
+			y: Math.max(Math.min(-$coords.y, $coords.y + event.detail.dy), 150)
 		}))
 	}
 

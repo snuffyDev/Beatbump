@@ -27,8 +27,9 @@ export const sort = (data) => {
 				}
 			}
 		})
-		// console.log(arr)
+		console.log(arr)
 		if (arr.length !== 0) {
+			console.log('0!!!!')
 			return arr.map((format) => {
 				return {
 					url: format.url

@@ -1,6 +1,6 @@
 import type { CarouselItem } from './types'
 
-export function parseItem(item, length) {
+export function parseItem(item = [], length) {
 	item = [item]
 	const result = item.map((item) => {
 		const title = item.title
@@ -51,7 +51,7 @@ export const MusicTwoRowItemRenderer = (ctx: any): CarouselItem => {
 					?.playlistId
 			: ctx.musicTwoRowItemRenderer?.thumbnailOverlay
 					?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer
-					?.playNavigationEndpoint?.watchPlaylistEndpoint.playlistId,
+					?.playNavigationEndpoint?.watchPlaylistEndpoint?.playlistId,
 		endpoint: {
 			browseId:
 				ctx.musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint
@@ -62,7 +62,7 @@ export const MusicTwoRowItemRenderer = (ctx: any): CarouselItem => {
 					?.browseEndpointContextMusicConfig?.pageType
 		},
 
-		subtitle: ctx.musicTwoRowItemRenderer.subtitle.runs
+		subtitle: ctx?.musicTwoRowItemRenderer?.subtitle?.runs
 	}
 	return Item
 }

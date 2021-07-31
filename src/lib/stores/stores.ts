@@ -77,10 +77,12 @@ function _verifyUserAgent() {
 		update,
 		get: (user) => get(iOS),
 		init: () => {
+			if (!browser) return
 			set(isApple)
 			browser ? localStorage.setItem('iOSClient', isApple) : null
 		},
 		reset: () => {
+			if (!browser) return
 			set(undefined)
 			browser ? localStorage.removeItem('iOSClient') : null
 		}
@@ -94,16 +96,18 @@ function _theme() {
 		update: (theme) => get(theme),
 		get: (theme) => get(theme),
 		set: (theme) => {
+			if (!browser) return
 			set(theme)
 			localStorage.setItem('theme', theme)
 		},
-		init: (theme) => {
+		init: () => {
+			if (!browser) return
 			if (!localStorage.getItem('theme')) {
-				set(theme)
-				localStorage.setItem('theme', theme)
+				set('dark')
+				localStorage.setItem('theme', 'dark')
 			} else {
 				localStorage.getItem('theme')
-				set(theme)
+				set(localStorage.getItem('theme'))
 			}
 			// if (localStorage.getItem('theme')) return;
 		},

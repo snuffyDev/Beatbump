@@ -38,7 +38,7 @@
 	$: volume = 0.5
 	let volumeHover
 	$: hideEvent = false
-	$: isPlaying = false
+	let isPlaying = false
 	let seeking = false
 	let songBar
 
@@ -426,6 +426,7 @@
 	.f-container {
 		background-color: inherit;
 		position: absolute;
+		grid-area: f/f/f/f;
 		box-shadow: 0 0rem 1rem 0rem #00000070;
 	}
 	.light * {
@@ -489,6 +490,7 @@
 		height: 0.4315rem;
 		position: absolute;
 		top: -0.1rem;
+		cursor: pointer;
 		margin: 0;
 		-moz-appearance: none;
 		appearance: none;

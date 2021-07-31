@@ -1,23 +1,43 @@
 <script context="module">
 	export async function load({ page, fetch }) {
-		const response = await fetch(`/trending/new/${page.params.slug}.json`)
-		const { sections, header } = await response.json()
-		return {
-			props: {
-				sections,
-				header
-			},
-			status: 200
+		// const params = page.query.get('params')
+		const response = await fetch(
+			`/trending/new/${page.params.slug}.json` +
+				`${
+					page.query.get('params') ? `?params=${page.query.get('params')}` : ''
+				}` +
+				`${
+					page.query.get('itct')
+						? `&itct=${encodeURIComponent(page.query.get('itct'))}`
+						: ''
+				}`
+		)
+		const { sections, header, contents } = await response.json()
+		if (response.ok) {
+			return {
+				props: {
+					sections,
+					header,
+					contents
+				},
+				status: 200
+			}
 		}
 	}
 </script>
 
 <script lang="ts">
-	export let sections
+	import type { sections } from '$lib/types/components/sections'
+	export let sections: sections
 	export let header
+	export let contents
+	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
-	$: console.log(sections, header)
+	import Header from '$lib/components/Layouts/Header.svelte'
+	$: console.log(sections, header, contents)
 </script>
+
+<Header slug={$page.params.slug} />
 
 <main>
 	<div class="header">

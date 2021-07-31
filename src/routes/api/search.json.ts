@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import BaseContext from '$lib/context'
+
 import type { Artist, NextContinuationData, Song } from '$lib/types'
 import type { PlaylistSearch } from '$lib/types/playlist'
 import { pb } from '$lib/utils'
@@ -9,7 +10,8 @@ interface SearchOutput extends EndpointOutput {
 	didYouMean?: { term: string; endpoint: { query; params } }
 	continuation?: NextContinuationData
 }
-export async function get({ query }) {
+export async function get({ query }):Promise<SearchOutput> {
+	// console.time('test')
 	let q = query.get('q')
 	const filter = query.get('filter') || ''
 	const videoId = query.get('videoId') || ''
@@ -91,19 +93,17 @@ export async function get({ query }) {
 		} = {}
 	} = await data
 	if (Object.prototype.hasOwnProperty.call(data, 'continuationContents')) {
-		const results = parseSearchResult(continuationContents, true, filter)
-
+		// const results =
 		return {
 			status: 200,
-			body: JSON.stringify(results)
+			body: parseSearchResult(continuationContents, true, filter)
 		}
 	} else {
-
-		const results = parseSearchResult(contents, false, filter)
+		// const results = parseSearchResult(contents, false, filter)
 
 		return {
 			status: 200,
-			body: JSON.stringify(results)
+			body: parseSearchResult(contents, false, filter)
 		}
 	}
 }
@@ -290,7 +290,7 @@ function parseSearchResult(data, cont, filter?) {
 		}
 	}
 	// Safety net
-	if (ctx?.itemSectionRenderer) return []
+	if (ctx?.itemSectionRenderer) {return []}
 
 	let results: Song[] | PlaylistSearch[] = []
 
@@ -342,6 +342,7 @@ function parseSearchResult(data, cont, filter?) {
 			continuation: continuation
 		}
 	}
+	// console.timeEnd('test')
 	return { contents: results, continuation: continuation }
 }
 function continuationCheck(contents) {

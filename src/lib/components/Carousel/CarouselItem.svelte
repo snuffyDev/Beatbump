@@ -54,7 +54,11 @@
 			action: () => list.addNext(item, $key)
 		}
 	]
-	let srcImg = item.thumbnails[0].url
+	let srcImg =
+		item.thumbnails[0].width <= 60
+			? item.thumbnails[0].url.replace(/=(w(\d+))-(h(\d+))/g, '=w256-h256')
+			: item.thumbnails[0].url
+	// if (item.thumbnails[0].width <=60 && item.thumbnails[0].height <=60) srcImg=
 	// $: if (width < 525) {
 	// 	hovering = false
 	// }
@@ -72,6 +76,9 @@
 			: false || type == 'trending'}
 		class:item1x1={aspectRatio?.includes('SQUARE') ? true : false}
 		on:mouseover={() => {
+			hovering = true
+		}}
+		on:focus={() => {
 			hovering = true
 		}}
 		on:mouseleave={() => {
@@ -106,15 +113,15 @@
 					if (isBrowse) {
 						goto(`/artist/${item?.endpoint?.browseId}`)
 					} else if (item.videoId !== undefined) {
+						console.log('data')
 						loading = true
 						await list.initList(item.videoId, item.playlistId, index)
 						currentTrack.set({ ...$list.mix[index] })
 						// currentTitle.set(res[0].title);
 						key.set(index)
-						// console.log('data')
 					} else {
 						loading = true
-						await list.startPlaylist(item.playlistId)
+						await list.initArtistList(item.videoId, item.playlistId)
 						key.set(0)
 					}
 				}

@@ -114,6 +114,7 @@ section.item {
 			height: auto;
 			aspect-ratio: inherit;
 			position: absolute;
+			object-fit: contain;
 			// border-radius: var(--xs-radius);
 			min-width: 100%;
 			top: 0;

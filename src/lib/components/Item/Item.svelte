@@ -210,11 +210,13 @@
 		width: 100%;
 		flex-direction: row;
 		flex-wrap: nowrap;
+		background: transparent;
+		transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) background 0.125s;
 
-		&:active {
+		&:active,
+		&:hover {
 			background: lighten(#3c3d4159, 3%);
 			// filter: brightness(0.7);
-			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) background 0.125s;
 		}
 	}
 
@@ -240,7 +242,7 @@
 		font-size: 1.05rem;
 
 		&:hover {
-			text-decoration: underline solid white 0.0714rem;
+			text-decoration: underline solid currentColor 0.0714rem;
 			cursor: pointer;
 		}
 	}
@@ -248,6 +250,7 @@
 		width: auto;
 
 		height: auto;
+		backdrop-filter: contrast(0.9);
 	}
 	img::before {
 		display: block;
@@ -267,10 +270,12 @@
 	}
 
 	.title {
-		display: inline-block;
+		display: block;
 		width: 100%;
 		margin-left: 1rem;
 		line-height: 1.3125;
+		align-self: center;
+		flex-direction: column;
 	}
 	.img-container {
 		position: relative;
@@ -297,10 +302,14 @@
 		}
 	}
 	@media (min-width: 640px) {
-		.container:hover:not(.menu) {
+		.container:active:not(.menu) {
 			pointer-events: bounding-box;
-			background: lighten(#212225, 5%);
-			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) background 0.125s;
+			background: lighten(#575a6359, 5%);
+		}
+
+		:root .light .container:active:not(.menu) {
+			pointer-events: bounding-box;
+			background: darken(#0a0a0c71, 5%);
 		}
 	}
 </style>

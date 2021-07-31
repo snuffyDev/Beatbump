@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { navigating, page } from '$app/stores'
-	import { fade, fly } from 'svelte/transition'
+	import { navigating } from '$app/stores'
+	import { fly } from 'svelte/transition'
 	import { expoInOut } from 'svelte/easing'
 	export let main
 	export let key

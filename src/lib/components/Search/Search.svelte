@@ -1,7 +1,8 @@
 <script>
 	let options = [
 		{ label: 'Songs', params: 'EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D' },
-		{ label: 'Videos', params: 'EgWKAQIQAWoKEAMQBBAKEAUQCQ%3D%3D' },
+		{ label: 'Videos', params: 'EgWKAQIQAWoKEAMQBBAKEAkQBQ%3D%3D' },
+		{ label: 'Artists', params: 'EgWKAQIgAWoKEAMQBBAKEAkQBQ%3D%3D' },
 		{ label: 'All Playlists', params: 'EgWKAQIoAWoKEAMQBBAKEAUQCQ%3D%3D' },
 		{
 			label: 'Featured Playlists',

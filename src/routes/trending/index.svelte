@@ -1,11 +1,17 @@
 <script context="module">
-	export async function load({ page, fetch }) {
-		const data = await fetch('/trending.json?q=browse')
-		const response = await data.json()
+	export async function load({ fetch }) {
+		const response = await fetch('/trending.json?q=browse')
+		const data = await response.json()
+		if (!response.ok) {
+			return {
+				status: response.status,
+				error: new Error(`Error: ${response.statusText}`)
+			}
+		}
+
 		return {
 			props: {
-				carouselItems: await response
-				// test: await response
+				carouselItems: await data
 			},
 			maxage: 3600,
 			status: 200
@@ -19,6 +25,8 @@
 	import { currentTitle } from '$stores/stores'
 	import Carousel from '$components/Carousel/Carousel.svelte'
 	import type { ICarousel } from '$lib/types'
+	import Header from '$lib/components/Layouts/Header.svelte'
+	import type { Load } from '@sveltejs/kit'
 	$: console.log(carouselItems)
 
 	// const moodsAndGenres =  carouselItems[1].results.slice(0,15)
@@ -28,8 +36,10 @@
 	<title>{$currentTitle ? $currentTitle : 'Trending'} - Beatbump</title>
 	<meta name="description" content="The latest trending songs" />
 	<meta name="keywords" content="Trending, music, stream" />
-	<meta name="og:url" content="https://beatbump.ml/trending" />
-	<meta name="og:title" content="Trending" />
+	<meta property="og:url" content="https://beatbump.ml/trending" />
+	<meta property="og:title" content="Trending" />
+
+	<meta property="og:image" content="/logo.png" />
 </svelte:head>
 <main>
 	<Carousel
@@ -169,7 +179,7 @@
 			z-index: 0;
 			// border-radius: inherit;
 			height: 100%;
-			background: #9589b314;
+			background: #9589b321;
 		}
 	}
 	.innerlink {

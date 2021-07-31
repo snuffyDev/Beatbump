@@ -34,6 +34,7 @@
 		})
 	}
 	let isHidden = false
+	$: console.log(item)
 </script>
 
 <li id={index} class:active={$key == index} class="item">

@@ -51,7 +51,7 @@ export interface Thumbnail {
 export interface ArtistInfo {
 	pageType?: string
 	artists?: [] | string
-	artist?: [] | string
+	artist?: string | string[]
 	browseId?: string
 }
 
@@ -99,8 +99,8 @@ export interface mixList {
 	length: string
 }
 export type CarouselHeader = {
-	browseId: string
-	title: string
+	browseId?: string
+	title?: string
 }
 export type ICarousel = {
 	header: CarouselHeader

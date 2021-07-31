@@ -1,7 +1,6 @@
 <script>
 	import { goto } from '$app/navigation'
 	import { navigating } from '$app/stores'
-
 	let redir = 6
 	let timeout
 	const redirect = () => {

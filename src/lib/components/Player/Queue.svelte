@@ -5,8 +5,8 @@
 	import { cubicInOut } from 'svelte/easing'
 	import { fly } from 'svelte/transition'
 	import QueueListItem from './QueueListItem.svelte'
+	import { browser } from '$app/env'
 
-	export let curTheme
 	export let autoId
 	export let mixList = []
 	export let show
@@ -14,7 +14,8 @@
 	$: mixList = $list.mix
 
 	let songList
-	let active = document.getElementById(autoId)
+	let active
+	if (browser) active = document.getElementById(autoId)
 
 	const dispatch = createEventDispatcher()
 	// import slide from '$lib/actions/slide'
@@ -35,7 +36,6 @@
 </script>
 
 {#if show}
-	<!-- content here -->
 	<div
 		class="listContainer"
 		use:clickOutside

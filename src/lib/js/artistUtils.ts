@@ -36,11 +36,10 @@ export const parseArtistPage = (header, items) => {
 		if (i?.musicCarouselShelfRenderer) {
 			carouselItems = [
 				...carouselItems,
-				parseCarouselItem(
-					i?.musicCarouselShelfRenderer.contents,
+				parseCarouselItem(i?.musicCarouselShelfRenderer.contents, [
 					i?.musicCarouselShelfRenderer.header
-						.musicCarouselShelfBasicHeaderRenderer?.title.runs
-				)
+						?.musicCarouselShelfBasicHeaderRenderer
+				])
 			]
 		}
 	})
@@ -60,7 +59,7 @@ function parseSongs(items) {
 	return results
 }
 
-function parseCarouselItem(items, header) {
+function parseCarouselItem(items, header = []) {
 	// console.log(items, header)
 	// console.log(items)
 	const contents = items.map((item) => {
@@ -74,14 +73,15 @@ function parseCarouselItem(items, header) {
 	})
 	// console.log(contents)
 	const head = header.map((i) => {
-		const title = i.text
-		const endpoint = i.navigationEndpoint?.browseEndpoint
+		const title = i?.title?.runs[0].text
+		const endpoint = i?.title?.runs[0].navigationEndpoint
+		const moreButton = i.moreContentButton?.buttonRenderer?.navigationEndpoint
 		if (endpoint) {
 			return {
 				title,
-
-				browseId: endpoint.browseId,
-				params: endpoint.params
+				itct: endpoint?.clickTrackingParams,
+				browseId: endpoint?.browseEndpoint.browseId,
+				params: endpoint?.browseEndpoint.params
 			}
 		} else {
 			return { title }

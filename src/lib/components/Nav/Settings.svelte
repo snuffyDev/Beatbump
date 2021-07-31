@@ -1,5 +1,4 @@
 <script>
-	import Search from '$components/Search/Search.svelte'
 	import { fade } from 'svelte/transition'
 	import Icon from '$components/Icon/Icon.svelte'
 	import { circIn } from 'svelte/easing'
@@ -8,12 +7,14 @@
 	import { filterAutoPlay, theme } from '$stores/stores'
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
+	import { browser } from '$app/env'
 
 	export let isSettings
 	$: curTheme = $theme
-	let setTheme = localStorage.getItem('theme')
-		? localStorage.getItem('theme')
-		: ''
+	$: setTheme = $theme
+	if (browser) {
+
+	}
 	$: setFilter = $filterAutoPlay
 
 	let themes = [

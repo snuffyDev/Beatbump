@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { parseNextItem } from '$lib/_parsers'
 import { getSrc } from '$lib/utils'
-import { writable } from 'svelte/store'
-import { filterAutoPlay, playerLoading } from './stores'
-import { addToQueue } from '../utils'
 import { currentTitle } from '$stores/stores'
+import { writable } from 'svelte/store'
+
+import { addToQueue } from '../utils'
+import { filterAutoPlay, playerLoading } from './stores'
 
 const filterList = (list) => {
 	return (mix = [...list].filter(
@@ -109,12 +110,13 @@ export default {
 		hasList = true
 		const response = await fetch(
 			`/api/artistNext.json?playlistId=${playlistId}&videoId=${videoId}`
-		).then((data) => data.json())
-		// await getSrc(videoId);
+		)
+		const resMix = await response.json()
+		await getSrc(resMix[0].videoId)
 		loading = false
 		playerLoading.set(loading)
-		continuation.push(response.continuation)
-		mix.push(...response)
+		continuation.push(resMix.continuation)
+		mix.push(...resMix)
 		list.set({ continuation, mix })
 	},
 	async addNext(item, key) {
@@ -151,7 +153,7 @@ export default {
 			splitList = Chunked.chunks
 			mix = splitList[0]
 		}
-		console.log(mix)
+		console.log(mix[0])
 		console.log(splitList)
 		loading = false
 		playerLoading.set(loading)

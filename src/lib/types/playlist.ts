@@ -2,21 +2,10 @@ import type {
 	Thumbnail,
 	NextContinuationData,
 	Artist,
-	TitleEndpoint
+	TitleEndpoint,
+	ArtistInfo
 } from '$lib/types'
-// export interface Header {
-// 	description: string
-// 	title: string
-// 	thumbnails: Thumbnail[]
-// 	secondSubtitle?: string[] | string
-// 	playlistId: string
-// 	subtitles?: string
-// }
-// export interface Playlist {
-// 	thumbnails?: Thumbnail[]
-// 	continuation?: NextContinuationData
-// 	contents: PlaylistItem[]
-// }
+
 export interface PlaylistSearch {
 	playlistId: string
 	metaData?: string | string[]
@@ -38,8 +27,9 @@ export interface IPlaylistItem {
 	navigation?: Menu[]
 	length?: string
 	title: string | TitleEndpoint
-	thumbnail: Thumbnail[]
-	artist: Artist
+	thumbnail: Thumbnail[] | Thumbnail
+	artist?: Artist
+	artistInfo?: ArtistInfo
 	videoId?: string
 	playerParams?: string
 	playlistId?: string

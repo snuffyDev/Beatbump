@@ -7,7 +7,6 @@
 </script>
 
 <script>
-	import { browser } from '$app/env'
 	import { onMount } from 'svelte'
 	import { errorHandler, filterAutoPlay, theme } from '$stores/stores'
 	import { iOS } from '$stores/stores'
@@ -17,30 +16,18 @@
 	import Wrapper from '$components/Wrapper/Wrapper.svelte'
 	import { page } from '$app/stores'
 	import Alert from '$lib/components/Alert/Alert.svelte'
+	import { browser } from '$app/env'
 	export let key
 	onMount(() => {
 		iOS.init()
-		const getTheme = () => {
-			// console.log("themeswitch");
-			let ls = localStorage.getItem('theme')
-			ls ? theme.init(ls) : theme.init('dark')
-			let filter = localStorage.getItem('filterAutoPlay')
-			filter ? filterAutoPlay.init(filter) : filterAutoPlay.init(false)
-			// console.log($filterAutoPlay)
-			// if (ls) {
-			// 	theme.init(ls);
-			// } else {
-			// 	theme.init("dark");
-			// }
-		}
-		getTheme()
-		return
+
+		theme.init()
+		let filter = localStorage.getItem('filterAutoPlay')
+		filter ? filterAutoPlay.init(filter) : filterAutoPlay.init(false)
 	})
 	let width
 	let shown
-	$: curTheme = $theme
 	let main
-	$: hasError = $errorHandler.msg !== undefined ? true : false
 	// $: console.log(hasError, errorKey)
 </script>
 
@@ -110,7 +97,7 @@
 		--dim-forms: #131516;
 		--dim-side: #0b0c0f;
 
-		--light-base: rgb(243, 235, 235);
+		--light-base: rgb(252, 248, 248);
 		--light-bottom: #121018;
 		--light-top: #cac8c9;
 		--light-forms: #e3dbf5;
