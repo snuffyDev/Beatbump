@@ -34,7 +34,7 @@
 	import { onMount } from 'svelte'
 	import Icon from '$components/Icon/Icon.svelte'
 	import ListItem from '$components/ListItem/ListItem.svelte'
-	import { currentTitle, theme, currentTrack, key } from '$stores/stores'
+	import { currentTitle, theme, key } from '$stores/stores'
 	import { parsePageContents } from '$lib/js/releaseUtils'
 	import { isPagePlaying } from '$stores/stores'
 	import list from '$lib/stores/list'

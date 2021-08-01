@@ -1,7 +1,9 @@
 import { dev } from '$app/env'
+import type { Handle } from '@sveltejs/kit'
+import type { Hooks } from '@sveltejs/kit/types/internal'
 
 const rootDomain = import.meta.env.VITE_DOMAIN // or your server IP for dev
-dev
+
 const directives = {
 	'base-uri': ["'self'"],
 	'child-src': ["'self'"],
@@ -22,7 +24,13 @@ const directives = {
 	'frame-ancestors': ["'self'"],
 	'frame-src': ["'self'"],
 	'manifest-src': ["'self'"],
-	'media-src': ["'self'", 'data:', 'https://*.googlevideo.com'],
+	'media-src': [
+		"'self'",
+		'data:',
+		'ws://localhost:*',
+		'localhost:*',
+		'https://*.googlevideo.com'
+	],
 	'object-src': ["'none'"],
 	'style-src': ["'self'", "'unsafe-inline'"],
 	'default-src': [

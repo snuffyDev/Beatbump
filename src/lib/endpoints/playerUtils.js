@@ -9,6 +9,9 @@ const parseProxyRedir = (url) => {
 export const sort = (data) => {
 	try {
 		const json = data
+		if (json['playabilityStatus']['status'].includes('ERROR')) {
+			return [{ url: null, error: json.playabilityStatus.status }]
+		}
 		const streamingData = json.streamingData
 		const formatParent = streamingData['formats'].concat(
 			streamingData['adaptiveFormats']

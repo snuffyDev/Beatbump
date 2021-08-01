@@ -22,7 +22,6 @@
 	onMount(() => {
 		iOS.init()
 
-		theme.init()
 		let filter = localStorage.getItem('filterAutoPlay')
 		filter ? filterAutoPlay.init(filter) : filterAutoPlay.init(false)
 		loaded = true
@@ -61,7 +60,6 @@
 
 	@import '../global/stylesheet.scss';
 	//  @import "../global/vars.css";
-
 	.alert-container {
 		display: flex;
 		position: fixed;
@@ -104,12 +102,41 @@
 		--raisin-black: #171824ff;
 
 		--midnight-base: #05070a;
-		--midnight-top: #141018d7;
-		--midnight-side: #08070c85;
+		--midnight-top: #0d0813;
+		--midnight-side: #0c091a0e;
 		--midnight-bottom: #090d11;
 		--midnight-forms: #100f17;
 	}
 
+	.footer-container {
+		width: 100%;
+		position: relative;
+		&::before {
+			background: var(--midnight-bottom);
+			position: fixed;
+			/* top: 0; */
+			z-index: -1;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			content: '';
+			width: 100%;
+			/* grid-area: f/f/f/f; */
+			height: 4.7rem;
+		}
+		&::after {
+			background: #232530;
+			position: absolute;
+			bottom: 4rem;
+			z-index: -1;
+			right: 0;
+			/* bottom: 0; */
+			left: 0;
+			content: '';
+			width: 100%;
+			height: 0.5rem;
+		}
+	}
 	html {
 		color: #f3f3f3;
 		a small {
@@ -226,11 +253,14 @@
 		/* position: fixed; */
 		grid-area: f/f/f/f;
 		/* height: 4rem; */
-
+		position: fixed;
+		bottom: 0;
 		display: block;
 		z-index: 1;
-		height: 100%;
-		min-height: 100%;
+		width: 100%;
+		min-width: 100%;
+		// height: 100%;
+		// min-height: 100%;
 	}
 
 	:root .light * {

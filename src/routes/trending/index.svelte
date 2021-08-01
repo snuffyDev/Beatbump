@@ -24,6 +24,8 @@
 	import { currentTitle } from '$stores/stores'
 	import Carousel from '$components/Carousel/Carousel.svelte'
 	import type { ICarousel } from '$lib/types'
+
+	// $: console.log(carouselItems)
 </script>
 
 <svelte:head>

@@ -50,7 +50,6 @@ export interface Thumbnail {
 
 export interface ArtistInfo {
 	pageType?: string
-	artists?: [] | string
 	artist?: string | string[]
 	browseId?: string
 }

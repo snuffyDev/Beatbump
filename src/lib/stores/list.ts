@@ -7,26 +7,39 @@ import { writable } from 'svelte/store'
 import { addToQueue } from '../utils'
 import { filterAutoPlay, playerLoading } from './stores'
 
-const filterList = (list) => {
-	return (mix = [...list].filter(
-		((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set())
-	))
-}
+let hasList = false
+let mix = []
+let continuation: string
+let clickTrackingParams: string
+
+let splitList: []
+let splitListIndex = 0
+let currentMixId: string
+let loading = false
+
+const list = writable({
+	currentMixId,
+	continuation,
+	clickTrackingParams,
+	mix
+})
 const fetchNext = async (
 	index,
 	params,
 	videoId,
 	playlistId,
 	ctoken,
-	playlistSetVideoId
+	playlistSetVideoId,
+	clickTracking
 ) => {
 	return await fetch(
 		'/api/next.json?playlistId=' +
 			encodeURIComponent(playlistId) +
 			`${videoId ? `&videoId=${videoId}` : ''}` +
 			`${params ? `&params=${params}` : ''}` +
+			`${clickTracking ? `&clickTracking=${clickTracking}` : ''}` +
 			`${ctoken ? `&ctoken=${ctoken}` : ''}` +
-			`${playlistSetVideoId ? `&playerConf=${playlistSetVideoId}` : ''}` +
+			`${playlistSetVideoId ? `&setVideoId=${playlistSetVideoId}` : ''}` +
 			'&index=' +
 			encodeURIComponent(index),
 		{
@@ -43,23 +56,18 @@ let Chunked = {
 }
 
 let filterSetting = false
-filterAutoPlay.subscribe((setting) => {
+
+const unsubscribe = filterAutoPlay.subscribe((setting) => {
 	filterSetting = setting
 })
+unsubscribe()
 
-let loading = false
+const filterList = (list) => {
+	return (mix = [...list].filter(
+		((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set())
+	))
+}
 
-let hasList = false
-let mix = []
-let continuation = []
-let index = 0
-
-let splitList = []
-let splitListIndex = 0
-const list = writable({
-	continuation,
-	mix
-})
 function split(arr, chunk) {
 	const temp = []
 	let i = 0
@@ -77,47 +85,61 @@ export default {
 		videoId: string,
 		playlistId: string,
 		key?: number,
-		playlistSetVideoId?: string
+		playlistSetVideoId?: string,
+		clickTracking?: string
 	) {
 		loading = true
-		key = key ? key : 0
 		playerLoading.set(loading)
+
+		key = key ? key : 0
+
 		if (hasList) mix = []
 		hasList = true
+
 		const response = await fetchNext(
 			key || 0,
 			'',
 			videoId,
 			playlistId,
 			'',
-			playlistSetVideoId
+			playlistSetVideoId ? playlistSetVideoId : '',
+			clickTracking
 		)
 		const data = await response
-		// console.log(data)
-		// console.log(data)
+
 		await getSrc(videoId)
 		currentTitle.set(data.results[key].title)
+
 		loading = false
 		playerLoading.set(loading)
-		continuation.push(data.continuation)
+
+		continuation = data.continuation
+		currentMixId = data.currentMixId
+		clickTrackingParams = data.clickTrackingParams
+
 		mix.push(...data.results)
-		list.set({ continuation, mix })
+		list.set({ currentMixId, clickTrackingParams, continuation, mix })
 	},
 	async initArtistList(videoId, playlistId) {
 		loading = true
 		playerLoading.set(loading)
+
 		if (hasList) mix = []
 		hasList = true
+
 		const response = await fetch(
 			`/api/artistNext.json?playlistId=${playlistId}&videoId=${videoId}`
 		)
+
 		const resMix = await response.json()
 		await getSrc(resMix[0].videoId)
+
 		loading = false
 		playerLoading.set(loading)
-		continuation.push(resMix.continuation)
+
+		continuation = resMix.continuation
 		mix.push(...resMix)
-		list.set({ continuation, mix })
+		list.set({ currentMixId, clickTrackingParams, continuation, mix })
 	},
 	async addNext(item, key) {
 		if (!item) return
@@ -126,18 +148,26 @@ export default {
 		mix.splice(key + 1, 0, nextItem)
 		// console.log(mix, nextItem)
 
-		list.set({ continuation, mix })
+		list.set({ currentMixId, clickTrackingParams, continuation, mix })
 	},
 	async moreLikeThis(item) {
 		if (!item) return
 		loading = true
 		playerLoading.set(loading)
-		const response = await fetchNext(0, '', item.videoId, item.autoMixList, '')
+		const response = await fetchNext(
+			0,
+			'',
+			item.videoId,
+			item.autoMixList,
+			'',
+			'',
+			''
+		)
 		const data = await response
 		console.log(data)
 		mix.push(...data.results)
-		continuation.push(data.continuation)
-		list.set({ continuation, mix })
+		continuation = data.continuation
+		list.set({ currentMixId, clickTrackingParams, continuation, mix })
 		loading = false
 		playerLoading.set(loading)
 	},
@@ -153,17 +183,23 @@ export default {
 			splitList = Chunked.chunks
 			mix = splitList[0]
 		}
-		console.log(mix[0])
-		console.log(splitList)
+		// console.log(mix[0])
+		// console.log(splitList)
 		loading = false
 		playerLoading.set(loading)
 		await getSrc(mix[0].videoId)
-		list.set({ continuation, mix })
+		list.set({ currentMixId, clickTrackingParams, continuation, mix })
 
 		// console.log(data)
 	},
-	async getMore(autoId, itct, videoId, playlistId, ctoken) {
-		// console.log([...splitList].length, [...splitList])
+	async getMore(
+		autoId,
+		itct,
+		videoId,
+		playlistId,
+		ctoken,
+		clickTrackingParams
+	) {
 		let loading = true
 		playerLoading.set(loading)
 		if (splitList && mix.length < Chunked.origLength - 1) {
@@ -174,17 +210,33 @@ export default {
 			await getSrc(mix[autoId++].videoId)
 			loading = false
 			filterSetting ? filterList([...mix]) : (mix = [...mix])
-			list.set({ continuation, mix })
+			list.set({ currentMixId, clickTrackingParams, continuation, mix })
 			playerLoading.set(loading)
 		} else {
-			const data = await fetchNext(autoId, itct, videoId, playlistId, ctoken)
+			/*  Fetch the next batch of songs for autoplay
+				- autoId: current position in mix
+				- itct: params for /api/player.json (typically 'OAHyAQIIAQ%3D%3D')
+				- videoId: current videoId
+				- playlistId: current playlistId
+				- ctoken: continuation token retrieved when mix is first initialized
+				- playlistSetVideoId: set to '' since it is not a Playlist, it only is an autoplay
+				= clickTrackingParams: YouTube sends these for certain requests to prevent people
+				using their API for this purpose  */
+			const data = await fetchNext(
+				autoId,
+				itct,
+				videoId,
+				playlistId,
+				ctoken,
+				'',
+				clickTrackingParams
+			)
 
-			mix.pop()
+			// console.log(data)
 			await getSrc(data.results[0].videoId)
 
-			loading = false
-			playerLoading.set(loading)
-
+			mix = [...mix, ...data.results]
+			filterSetting ? filterList(mix) : mix
 			filterSetting
 				? (mix = [...mix, ...data.results].filter(
 						((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(
@@ -192,7 +244,15 @@ export default {
 						)
 				  ))
 				: (mix = [...mix, ...data.results])
-			list.set({ continuation, mix })
+			// mix = [...mix, ...data.results]
+			continuation = data.continuation
+			currentMixId = data.currentMixId
+			clickTrackingParams = data.clickTrackingParams
+			// mix.push(...mix)
+
+			loading = false
+			playerLoading.set(loading)
+			list.set({ currentMixId, clickTrackingParams, continuation, mix })
 		}
 	}
 }

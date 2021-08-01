@@ -11,8 +11,7 @@
 	const dispatch = createEventDispatcher()
 	function dispatchPlaying(playing) {
 		dispatch('pagePlaying', {
-			isPlaying: true,
-
+			isPlaying: true
 		})
 	}
 	let radio = []
@@ -21,19 +20,13 @@
 
 <div
 	class="item"
-	class:playing={$key == index && isPagePlaying}
+	class:playing={$key == index && $isPagePlaying}
 	on:click={async () => {
 		// @ts-ignore
 		key.set(index)
 		if (page == 'playlist') {
-			// if (!$key) {
 			key.set(0)
 			console.log('key: ' + $key, item.playlistId)
-			// await list.startPlaylist(item.playlistId)
-			// } else {
-			// 	console.log('key: ' + $key)
-			// 	await getSrc($list.mix[index]?.videoId)
-			// }
 
 			await list.initList(
 				item.videoId,
@@ -48,10 +41,10 @@
 		console.log($list.mix)
 		dispatchPlaying(true)
 	}}
-	on:mouseover={() => {
+	on:mouseenter={() => {
 		isHovering = true
 	}}
-	on:mouseout={() => {
+	on:mouseleave={() => {
 		isHovering = false
 	}}>
 	<div class="item-wrapper">

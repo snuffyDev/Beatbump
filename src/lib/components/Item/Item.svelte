@@ -5,13 +5,11 @@
 	import Loading from '$components/Loading/Loading.svelte'
 	import { onMount, tick } from 'svelte'
 
-	import { key, currentTrack, theme } from '$stores/stores'
+	import { key, theme } from '$stores/stores'
 	import Icon from '$components/Icon/Icon.svelte'
 	import { goto } from '$app/navigation'
 	import list from '$lib/stores/list'
-	import type { Item, Song } from '$lib/types'
-	import type { PlaylistSearch } from '$lib/types/playlist'
-	import lazy from '$lib/lazy'
+	import type { Item } from '$lib/types'
 	import longpress from '$lib/actions/longpress'
 
 	let videoId = ''
@@ -39,7 +37,9 @@
 				})
 
 				await tick()
-				goto(`/artist/${data.artistInfo.browseId}`)
+				goto(
+					`/artist/${data['artistInfo']['artist'][0]['navigationEndpoint']['browseEndpoint']['browseId']}`
+				)
 			}
 		},
 		{
@@ -98,7 +98,9 @@
 
 	const clickHandler = async () => {
 		if (data.type == 'artist') {
-			goto(`/artist/${data.artistInfo.artist}`)
+			goto(
+				`/artist/${data.artistInfo.artist[0].navigationEndpoint.browseEndpoint.browseId}`
+			)
 			return
 		}
 		try {
@@ -108,11 +110,9 @@
 			if (data.type == 'playlist') {
 				await list.startPlaylist(playlistId)
 			} else {
-				await list.initList(videoId, playlistId)
+				await list.initList(videoId, playlistId, 0, data.params, '')
 			}
 			key.set(0)
-			console.log($list.mix)
-			currentTrack.set({ ...$list.mix[0] })
 			loading = false
 			return
 		} catch (error) {
@@ -155,7 +155,9 @@
 				<p
 					class="text-artist"
 					class:hidden={data.type == 'artist' ? true : false}>
-					{data.type == 'playlist' ? `${data.metaData}` : `by ${artist}`}
+					{data.type == 'playlist'
+						? `${data.metaData}`
+						: `by ${data.artistInfo.artist[0].text}`}
 				</p>
 				<span class="album">
 					{#if data.album}<Icon name="album" size="1em" /><a
@@ -274,7 +276,7 @@
 	}
 
 	.title {
-		display: flex;
+		display: inline-block;
 		width: 100%;
 		margin-left: 1rem;
 		line-height: 1.5;

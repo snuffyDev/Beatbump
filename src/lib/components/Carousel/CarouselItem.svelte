@@ -1,7 +1,7 @@
 <script lang="ts">
 	import lazy from '$lib/lazy'
 	import Loading from '$components/Loading/Loading.svelte'
-	import { currentTrack, key } from '$stores/stores'
+	import { key } from '$stores/stores'
 	import { fade } from 'svelte/transition'
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 	import { goto } from '$app/navigation'
@@ -23,12 +23,7 @@
 	let menuToggle = showing ? true : false
 	let width
 	let mobile = width < 525
-	let primaryArtist
-	// $: console.log(loading)
-	// if (item.subtitle.length > 3) {
-	// 	// let sub = item.subtitle.reverse()
-	// 	primaryArtist = item.subtitle[2]
-	// }
+
 	let DropdownItems = [
 		{
 			text: 'View Artist',
@@ -58,13 +53,6 @@
 		item.thumbnails[0].width <= 60
 			? item.thumbnails[0].url.replace(/=(w(\d+))-(h(\d+))/g, '=w256-h256')
 			: item.thumbnails[0].url
-	// if (item.thumbnails[0].width <=60 && item.thumbnails[0].height <=60) srcImg=
-	// $: if (width < 525) {
-	// 	hovering = false
-	// }
-	// if (width < 550) {
-	// 	hovering = true
-	// }
 </script>
 
 <svelte:window bind:outerWidth={width} />
@@ -95,7 +83,6 @@
 				loading = true
 				if (type == 'trending') {
 					await list.initList(item.videoId, item.playlistId)
-					currentTrack.set({ ...$list.mix[0] })
 					key.set(0)
 				}
 				if (type == 'new') {
@@ -116,12 +103,11 @@
 						console.log('data')
 						loading = true
 						await list.initList(item.videoId, item.playlistId, index)
-						currentTrack.set({ ...$list.mix[index] })
 						// currentTitle.set(res[0].title);
 						key.set(index)
 					} else {
 						loading = true
-						await list.initArtistList(item.videoId, item.playlistId)
+						list.startPlaylist(item.playlistId)
 						key.set(0)
 					}
 				}
@@ -139,34 +125,19 @@
 					{#if loading}
 						<Loading />
 					{/if}
-					{#if type == 'artist'}
-						<img
-							alt="thumbnail"
-							transition:fade|local
-							on:error={(e) => {
-								e.currentTarget.onerror = null
-								e.currentTarget.src = '/assets/error.svg'
-								srcImg = '/logo-header.png'
-							}}
-							class:img16x9={aspectRatio?.includes('16_9')}
-							loading="lazy"
-							type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-							src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
-							use:lazy={{ src: srcImg }} />
-					{:else}
-						<img
-							on:error={() => {
-								srcImg =
-									'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDY0IDY0IiB3aWR0aD0iNjRwdCIgaGVpZ2h0PSI2NHB0Ij48ZGVmcz48Y2xpcFBhdGggaWQ9InByZWZpeF9fYSI+PHBhdGggZD0iTTAgMGg2NHY2NEgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjOTk5IiBkPSJNMCAwaDY0djY0SDB6Ii8+PGcgY2xpcC1wYXRoPSJ1cmwoI3ByZWZpeF9fYikiPjx0ZXh0IHRyYW5zZm9ybT0idHJhbnNsYXRlKDI2LjUgNDguOTMyKSIgZm9udC1mYW1pbHk9IkxhdG8iIGZvbnQtd2VpZ2h0PSI0MDAiIGZvbnQtc2l6ZT0iMzYiIGZpbGw9IiMxNzE4MjQiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyMy41IDEwLjQpIiBkPSJNMCAwaDE3djQzLjJIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+'
-							}}
-							alt="thumbnail"
-							transition:fade|local
-							class:img16x9={aspectRatio?.includes('16_9')}
-							loading="lazy"
-							type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-							src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
-							use:lazy={{ src: srcImg }} />
-					{/if}
+					<img
+						alt="thumbnail"
+						transition:fade|local
+						on:error={(e) => {
+							e.currentTarget.onerror = null
+							e.currentTarget.src = '/assets/error.svg'
+							srcImg = '/logo-header.png'
+						}}
+						class:img16x9={aspectRatio?.includes('16_9')}
+						loading="lazy"
+						type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+						src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
+						use:lazy={{ src: srcImg }} />
 				</div>
 			</div>
 

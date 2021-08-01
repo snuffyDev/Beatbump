@@ -29,9 +29,8 @@
 
 	$: currentTitle.set(title)
 
-	// $: list = $currentMix;
 	$: autoId = $key
-	// $: console.log($key, autoId)
+	$: console.log($key, autoId)
 	$: time = player.currentTime
 	$: duration = 1000
 	let remainingTime = 55
@@ -55,7 +54,7 @@
 	let DropdownItems: Array<any>
 	let once = false
 	player.addEventListener('loadedmetadata', () => {
-		title = $list.mix[0].title
+		title = $list.mix[autoId].title
 		isPlaying = true
 		play()
 		DropdownItems = [
@@ -107,13 +106,13 @@
 
 	player.addEventListener('play', () => {
 		isPlaying = true
+		key.set(autoId)
+
 		play()
 	})
 
 	player.addEventListener('ended', () => {
 		// console.log('ended')
-
-		key.set(autoId)
 
 		getNext()
 	})
@@ -155,19 +154,19 @@
 		}
 	}
 	$: console.log($list.mix)
-
+	$: console.log($list.currentMixId)
 	const getNext = async () => {
-		key.set(autoId)
 		once = true
 		if (autoId == $list.mix.length - 1) {
 			list.getMore(
 				autoId,
 				$list.mix[autoId]?.itct,
 				$list.mix[autoId]?.videoId,
-				$list.mix[autoId]?.autoMixList,
-				$list.continuation
+				$list.currentMixId,
+				$list.continuation,
+				$list.clickTrackingParams
 			)
-			// autoId++;
+			// autoId++
 
 			once = false
 
@@ -199,7 +198,7 @@
 	async function setNext() {
 		await getSrc(mixList[autoId].videoId)
 		currentTitle.set($list.mix[autoId].title)
-		key.set(autoId)
+		// key.set(autoId)
 	}
 	async function prevBtn() {
 		if (!autoId || autoId < 0) {
@@ -215,8 +214,13 @@
 		if (!gettingNext) {
 			if (autoId == $list.mix.length - 1) {
 				gettingNext = true
+				key.set(autoId)
 				await getNext()
+				autoId++
+				key.set(autoId)
+
 				gettingNext = false
+				return
 			} else {
 				gettingNext = true
 				autoId++
@@ -287,7 +291,6 @@
 		hideEvent = false
 		// console.log(showing)
 	}}
-	bind:theme={curTheme}
 	bind:show={listShow}
 	bind:autoId={$key} />
 
@@ -418,18 +421,19 @@
 		visibility: hidden !important;
 	}
 	.player-spinner {
-		display: inline-flex;
+		// display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		justify-self: center;
-		width: 2em;
-		// background: white;
-		height: 2em;
+		width: 2rem;
+		// // background: white;
+		height: 2rem;
 		border: rgba(255, 255, 255, 0.26) solid 0.25em;
 		border-radius: 50%;
 		border-top-color: rgba(255, 255, 255, 0.904);
 		animation: loading 1s infinite cubic-bezier(0.785, 0.135, 0.15, 0.86);
-		width: 2em;
+		max-width: 100%;
+		max-height: 100%;
 		opacity: 0;
 		// background: white;
 		transition: all ease-in-out 1s;
@@ -437,7 +441,7 @@
 			opacity: 1;
 			transition: all ease-in-out 1s;
 		}
-		height: 2em;
+		// height: 2em;
 	}
 	@keyframes loading {
 		to {

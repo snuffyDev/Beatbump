@@ -20,7 +20,7 @@ export const errorHandler = writable({
 export const search: SearchStore = writable()
 
 export const isPagePlaying = writable('')
-export const key = writable(undefined)
+export const key = writable(0)
 
 export const playerLoading = writable(false)
 export const searchState = writable({
@@ -28,15 +28,6 @@ export const searchState = writable({
 	text: ''
 })
 
-export const currentTrack = writable({
-	continuation: '',
-	id: '',
-	videoId: '',
-	title: '',
-	artist: '',
-	thumbnail: '',
-	length: ''
-})
 export const theme = _theme()
 export const filterAutoPlay = _filterAutoPlay()
 export const currentMix = writable({
