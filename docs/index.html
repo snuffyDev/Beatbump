@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Beatbump</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="description" content="Description" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, minimum-scale=1.0"
+		/>
+		<style>
+			:root {
+				--content-max-width: 65em !important;
+				--base-background-color: #161a24 !important;
+				--sidebar-background: #10141d !important;
+				--blockquote-background: #1e2333 !important;
+				--sidebar-name-color: #c7cfdf !important;
+				--sidebar-name-text-align: left !important;
+				--sidebar-name-font-weight: 600 !important;
+			}
+		</style>
+
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css"
+		/>
+	</head>
+	<body>
+		<div id="app"></div>
+
+		<script>
+			window.$docsify = {
+				loadSidebar: true,
+				name: 'Beatbump',
+				subMaxLevel: 4,
+				autoHeader: true,
+				auto2top: true,
+				markdown: {
+					smartypants: true
+				},
+				repo: 'https://github.com/snuffyDev/Beatbump/',
+				pagination: {
+					previousText: 'Previous',
+					nextText: 'Next',
+					crossChapter: true,
+					crossChapterText: true
+				}
+			}
+		</script>
+		<!-- Docsify v4 -->
+
+		<script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+		<script src="//unpkg.com/docsify-pagination/dist/docsify-pagination.min.js"></script>
+		<script src="//cdn.jsdelivr.net/npm/prismjs@1.24.1/components/prism-typescript.min.js"></script>
+		<script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-js.min.js"></script>
+	</body>
+</html>
