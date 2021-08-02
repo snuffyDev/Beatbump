@@ -1,11 +1,13 @@
 import BaseContext from '$lib/context'
 import { parseArtistPage } from '$lib/js/artistUtils'
+import type { EndpointOutput } from '@sveltejs/kit'
 
-export async function get({ query }) {
-	// if (headers.origin !== "https://beatbump.ml/") { return { status: 400, body: JSON.stringify('CORS error!') } }
-
+export async function get({
+	query
+}: {
+	query: URLSearchParams
+}): Promise<EndpointOutput> {
 	const browseId = query.get('browseId')
-	// console.log(endpoint)
 	try {
 		const response = await fetch(
 			`https://music.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
@@ -28,11 +30,6 @@ export async function get({ query }) {
 				}
 			}
 		)
-
-		// if (!response.ok) {
-		// 	// NOT res.status >= 200 && res.status < 300
-		// 	return { status: response.status, body: response.statusText }
-		// }
 		const data = await response.json()
 		const {
 			header,
@@ -54,16 +51,12 @@ export async function get({ query }) {
 		const thumbnail = []
 		let description = ''
 		let items = []
-		// console.log(contents)
-		let headerContent = []
+		const headerContent = []
 		const parse = async (header, contents) => {
 			const newData = [
 				parseArtistPage(header?.musicImmersiveHeaderRenderer, contents)
 			]
-			// console.log(newData)
-
 			return newData.map((d) => {
-				// console.log(d)
 				carouselItems.push([...d.carouselItems])
 				headerContent.push(d[0])
 				if (d[0]) {
@@ -78,12 +71,10 @@ export async function get({ query }) {
 				}
 				description = d[0].description.split('.')
 
-				// console.log(headerContent, d, description, items)
 				return { headerContent, items }
 			})
 		}
 		const body = await parse(header, contents)
-		// console.log(data)
 		if (carouselItems.length >= 0) {
 			return {
 				status: 200,

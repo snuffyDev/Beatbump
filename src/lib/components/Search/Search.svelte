@@ -51,10 +51,11 @@
 <form class={type} on:submit|preventDefault={(e) => handleSubmit(e)}>
 	<!-- <label for="search"><em>search</em></label> -->
 	<div class="nav-item">
-		<div class="input">
+		<div aria-label="search" class="input">
 			<div class="searchBtn" on:click={(e) => handleSubmit(e)}>
 				<Icon name="search" size="1rem" />
 			</div>
+			<!-- svelte-ignore a11y-autofocus -->
 			{#if type == 'inline'}<input
 					autofocus
 					autocorrect="off"
@@ -73,7 +74,10 @@
 
 	<!-- <label for="option"><em>search type</em></label> -->
 	<div class="nav-item">
-		<div class="select" class:inline={type == 'inline' ? true : false}>
+		<div
+			class="select"
+			aria-label="select"
+			class:inline={type == 'inline' ? true : false}>
 			<select
 				on:blur={() => {
 					searchState.set({ option: filter, text: songTitle })
@@ -90,19 +94,9 @@
 <style lang="scss">
 	.hidden {
 		display: none;
-		visiblity: hidden;
+		visibility: hidden;
 	}
-	button {
-		background: transparent !important;
-		color: inherit !important;
-		padding: 0.1em;
-		border: none !important;
-		visibility: visible;
-		@media screen and (max-width: 365px) {
-			display: none !important;
-			visibility: none !important;
-		}
-	}
+
 	.mobile-search {
 		display: flex;
 		/* flex-direction: row; */

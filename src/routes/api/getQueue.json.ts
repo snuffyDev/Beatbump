@@ -1,7 +1,10 @@
-// import type {PlaylistItem, Menu, Thumbnail} from '$lib/types';
-import type { PlaylistItem, Menu } from '$lib/types/playlist'
-export async function get({ query, headers }) {
-	// if (headers.origin !== "https://beatbump.ml/") { return { status: 400, body: JSON.stringify('CORS error!') } }
+import type { IPlaylistItem } from '$lib/types/playlist'
+import type { EndpointOutput } from '@sveltejs/kit'
+export async function get({
+	query
+}: {
+	query: URLSearchParams
+}): Promise<EndpointOutput> {
 	const playlistId = query.get('playlistId') || ''
 	try {
 		const response = await fetch(
@@ -76,8 +79,7 @@ export async function get({ query, headers }) {
 		const { queueDatas } = await data
 
 		const q = queueDatas.map(
-			({ content: { playlistPanelVideoRenderer } }): PlaylistItem => {
-				const { ctx } = playlistPanelVideoRenderer
+			({ content: { playlistPanelVideoRenderer } }): IPlaylistItem => {
 				const length = playlistPanelVideoRenderer?.lengthText?.runs[0].text
 				const artistInfo = {
 					artist: playlistPanelVideoRenderer?.longBylineText?.runs[0]?.text,
@@ -88,7 +90,7 @@ export async function get({ query, headers }) {
 				const thumbnails =
 					playlistPanelVideoRenderer?.thumbnail?.thumbnails[0]?.url
 				const title = playlistPanelVideoRenderer?.title?.runs[0]?.text
-				const { videoId, playlistId } = {
+				const { videoId = '', playlistId = '' } = {
 					...playlistPanelVideoRenderer?.navigationEndpoint?.watchEndpoint
 				}
 				return {

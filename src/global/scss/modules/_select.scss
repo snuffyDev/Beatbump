@@ -6,7 +6,6 @@
 	min-width: 15ch;
 	max-width: 30ch;
 	min-height: 5ch;
-	font-weight: 600;
 	max-height: 30ch;
 	position: relative;
 	align-content: center;
@@ -83,7 +82,6 @@ select {
 	background-color: inherit;
 	font-size: 100% !important;
 	border-radius: var(--md-radius);
-	font-weight: inherit !important;
 	padding: 0.2rem 2rem 0.5rem 0.5rem;
 	border: none;
 	transition: all 0.1s cubic-bezier(0.47, 0, 0.745, 0.715);

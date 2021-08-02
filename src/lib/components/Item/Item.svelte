@@ -98,9 +98,7 @@
 
 	const clickHandler = async () => {
 		if (data.type == 'artist') {
-			goto(
-				`/artist/${data.artistInfo.artist[0].navigationEndpoint.browseEndpoint.browseId}`
-			)
+			goto(`/artist/${data.artistInfo.artist}`)
 			return
 		}
 		try {
@@ -148,9 +146,13 @@
 				</div>
 			</div>
 			<div class="title">
-				<span class="text-title">{title}</span>
-				{#if explicit}
-					<span class="explicit"> E </span>
+				<span class="text-title"
+					>{title}
+					<span class="explicit" class:hidden={!data.explicit}> E </span></span>
+				{#if data.type == 'artist'}
+					<p class="artist-stats">
+						Artist &CenterDot; {data?.length?.text}
+					</p>
 				{/if}
 				<p
 					class="text-artist"
@@ -184,9 +186,11 @@
 		padding-right: 0.625rem;
 	}
 	.hidden {
-		display: none;
+		display: none !important;
+		visibility: hidden !important;
 	}
-	.album {
+	.album,
+	.artist-stats {
 		font-size: 0.9em;
 		font-weight: 300;
 		align-items: center;
@@ -276,7 +280,7 @@
 	}
 
 	.title {
-		display: inline-block;
+		display: inline-flex;
 		width: 100%;
 		margin-left: 1rem;
 		line-height: 1.5;

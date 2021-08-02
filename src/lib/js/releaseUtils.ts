@@ -2,7 +2,7 @@ export function parsePageContents(data) {
 	let info = {}
 	let temp = []
 	let playlistId
-	console.log(data)
+	// console.log(data)
 	let items = []
 	let {
 		frameworkUpdates: {
@@ -17,7 +17,7 @@ export function parsePageContents(data) {
 		}
 		if (d.payload.hasOwnProperty('musicAlbumRelease')) {
 			Object.assign(info, d.payload.musicAlbumRelease)
-			console.log(info)
+			// console.log(info)
 		}
 	})
 	if (info) playlistId = info.radioAutomixPlaylistId
@@ -40,7 +40,7 @@ export function parsePageContents(data) {
 			explicit: explicit
 		}
 	})
-	console.log(items)
+	// console.log(items)
 
 	return { items, details: { ...info } }
 }

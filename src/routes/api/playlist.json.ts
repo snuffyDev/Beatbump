@@ -3,19 +3,16 @@ import type { NextContinuationData } from '$lib/types'
 import type { EndpointOutput } from '@sveltejs/kit'
 import type { IPlaylistItem } from '$lib/types/playlist'
 import { pb } from '$lib/utils'
-/** Hits the YouTube Music API for a playlist page
- *	Currently is not fully implemented.
- *
- * @export get
- * @param {*} { query }
- * @return {*}  {Promise<EndpointOutput>}
- */
 
-export async function get({ query }): Promise<EndpointOutput> {
+export async function get({
+	query
+}: {
+	query: URLSearchParams
+}): Promise<EndpointOutput> {
 	const browseId = query.get('list') || ''
 	const itct = query.get('itct') || ''
 	const ctoken = query.get('ctoken') || ''
-	// console.log(videoId,playlistId)
+
 	try {
 		const response = await fetch(
 			'https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30' +
@@ -78,8 +75,7 @@ export async function get({ query }): Promise<EndpointOutput> {
 
 			const {
 				contents: [{ musicPlaylistShelfRenderer: { contents = [] } = {} }] = [],
-				continuations = [],
-				playlistId = ''
+				continuations = []
 			} = await sectionListRenderer
 
 			const cont: NextContinuationData = (await continuations[0]

@@ -63,12 +63,8 @@
 </main>
 
 <style lang="scss">
-	h1,
-	h3 {
+	h1 {
 		letter-spacing: -0.02em;
-	}
-	h3 {
-		font-weight: 600;
 	}
 	.header {
 		margin-bottom: 0.8rem;

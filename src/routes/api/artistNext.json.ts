@@ -1,4 +1,10 @@
-export async function get({ query }) {
+import type { EndpointOutput } from '@sveltejs/kit'
+
+export async function get({
+	query
+}: {
+	query: URLSearchParams
+}): Promise<EndpointOutput> {
 	const videoId = query.get('videoId') || ''
 	const playlistId = query.get('playlistId') || ''
 	try {
@@ -125,9 +131,7 @@ export async function get({ query }) {
 				const mixList =
 					item.menu.menuRenderer.items[0].menuNavigationItemRenderer
 						.navigationEndpoint.watchEndpoint.playlistId
-				const browseId =
-					item?.longBylineText?.runs[0]?.navigationEndpoint?.browseEndpoint
-						?.browseId
+
 				const thumbnail = item.thumbnail.thumbnails[0].url
 				const artistInfo = {
 					pageType: 'MUSIC_PAGE_TYPE_ARTIST',
@@ -153,7 +157,7 @@ export async function get({ query }) {
 			//console.log(temp);
 			return response
 		}
-		const trim: [] = trimResponse()
+		const trim = trimResponse()
 
 		return {
 			status: 200,

@@ -1,16 +1,19 @@
 /* eslint-disable no-inner-declarations */
 import { parseContents } from '$lib/endpoints/nextUtils'
+import type { EndpointOutput } from '@sveltejs/kit'
 
 // import NextParser from "/nextUtils";
 
-export async function get({ query }) {
-	const i = query.get('index') || ''
+export async function get({
+	query
+}: {
+	query: URLSearchParams
+}): Promise<EndpointOutput> {
 	const params = query.get('params') || ''
 	const video_id = query.get('videoId') || ''
 	const playlist_id = query.get('playlistId') || ''
 	const ctoken = query.get('ctoken') || ''
 	const clickTracking = query.get('clickParams') || ''
-	const cfg = query.get('cfg') || ''
 	const setVideoId = query.get('setVideoId') || ''
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/next?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
@@ -33,7 +36,6 @@ export async function get({ query }) {
 				continuation: `${ctoken}`,
 				isAudioOnly: true,
 				enablePersistentPlaylistPanel: true,
-				// index: `${i}`,
 				params: `${params}`,
 				tunerSettingValue: 'AUTOMIX_SETTING_NORMAL',
 				videoId: `${video_id}`,

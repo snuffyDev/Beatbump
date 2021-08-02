@@ -1,9 +1,9 @@
 {
 	"compilerOptions": {
 		"moduleResolution": "node",
-		"module": "ES2020",
+		"module": "es2020",
 		"lib": ["es2020"],
-		"target": "ES2020",
+		"target": "ES2019",
 		/**
 			svelte-preprocess cannot figure out whether you have a value or a type, so tell TypeScript
 			to enforce using \`import type\` instead of \`import\` for Types.

@@ -11,6 +11,7 @@
 	export let isHidden = false
 	export let type = ''
 	export let items = []
+	export let color = 'white'
 	let showing = false
 	$: menuToggle = showing ? true : false
 	const dispatch = createEventDispatcher()
@@ -26,6 +27,7 @@
 			transition:slide={{ duration: 125, easing: quartInOut }}>
 			{#each items as item}
 				<PopoutItem
+					{color}
 					on:click={item.action}
 					on:click={() => {
 						isHidden = !isHidden

@@ -5,11 +5,12 @@
 
 	export let text = ''
 	export let icon = ''
+	export let color = 'white'
 
 	getContext('menu')
 </script>
 
-<div class="popout-item" on:click>
+<div class="popout-item" style="color:{color}" on:click>
 	<Icon name={icon} color="white" size="1.25em" />
 	<div class="po-text">{text}</div>
 </div>
@@ -20,6 +21,7 @@
 		margin-left: 0.5em;
 		font-size: 1em;
 		white-space: nowrap;
+		color: inherit;
 	}
 	.popout-item {
 		z-index: 5;
@@ -39,8 +41,13 @@
 		// box-shadow: 0em 0.5em 0.5em 0em #1f1f1f40;
 		&:hover {
 			color: #fcf6f6;
-			background-color: #6f6f85;
+			background-color: #585869;
 			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.1s;
+		}
+		&:active {
+			background-color: #a0a0b1;
+
+			transition: cubic-bezier(0.68, -0.55, 0.265, 1.55) all 0.3s;
 		}
 	}
 

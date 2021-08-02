@@ -21,6 +21,7 @@
 
 <script lang="ts">
 	export let carouselItems: ICarousel
+
 	import { currentTitle } from '$stores/stores'
 	import Carousel from '$components/Carousel/Carousel.svelte'
 	import type { ICarousel } from '$lib/types'
@@ -71,42 +72,16 @@
 </main>
 
 <style lang="scss">
-	.header {
-		padding: 0.4em 0.4em 0.2em;
-		margin-bottom: 0.4em;
-		font-weight: 600;
-		letter-spacing: -0.02em;
-
-		h1 {
-			font-size: 2.125em;
-			@media screen and (min-width: 800px) {
-				font-size: 2.05em;
-			}
-		}
-	}
-	// h1 {
-	// 	cursor: pointer;
-	// 	display: inline;
-	// 	font-weight: 450;
-	// 	// font-size: 1.05rem;
-	// 	font-family: 'Commissioner', sans-serif;
-	// 	margin-bottom: 0.8em;
-	// 	letter-spacing: -0.02em;
-	// }
-
 	.breakout {
-		// border: 2px solid rgba(119, 136, 153, 0.171);
 		border-radius: 0.8rem;
 		-webkit-overflow-scrolling: touch;
 		position: relative;
 
 		margin-bottom: 2rem;
 
-		// border-radius: 0.5em;
 		@media screen and (min-width: 960px) {
 			margin-bottom: 3rem;
 		}
-		// padding: 0.8rem;
 	}
 	.box-cont {
 		justify-content: space-around;
@@ -116,9 +91,7 @@
 	box {
 		display: grid;
 		width: 100%;
-		// overflow-x: scroll;
 		white-space: nowrap;
-		// grid-gap: 1rem;
 
 		grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
 
@@ -131,14 +104,12 @@
 		justify-content: flex-start;
 		flex-direction: row;
 		flex-wrap: nowrap;
-		// text-overflow: clip;
 		text-align: start;
 		font-size: 100%;
 		width: 100%;
 		border-radius: var(--md-radius) 0 0 var(--md-radius);
 
 		align-items: center;
-		// white-space: normal;
 		border-right: none !important;
 		height: 3rem;
 		position: relative;
@@ -154,11 +125,8 @@
 			right: 0;
 			bottom: 0;
 			left: 0;
-			// z-index: 5;
-			// display: inline-bloc // k;;
 
 			width: 100%;
-			// background: #9589b314;
 		}
 		&::before {
 			position: absolute;
@@ -171,9 +139,7 @@
 			content: '';
 			width: 100%;
 
-			// border-radius: var(--md-radius);
 			z-index: 0;
-			// border-radius: inherit;
 			height: 100%;
 			background: #9589b321;
 		}
@@ -183,8 +149,5 @@
 		width: 100%;
 		height: 100%;
 		align-items: center;
-	}
-	:root .light .box {
-		background: #8870c427;
 	}
 </style>

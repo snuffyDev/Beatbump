@@ -21,13 +21,12 @@
 	let loaded
 	onMount(() => {
 		iOS.init()
-
+		theme.init()
 		let filter = localStorage.getItem('filterAutoPlay')
 		filter ? filterAutoPlay.init(filter) : filterAutoPlay.init(false)
 		loaded = true
 	})
 	let width
-	let shown
 	let main
 	// $: console.log(hasError, errorKey)
 </script>
@@ -50,20 +49,16 @@
 	</div>
 	<footer class="footer-container">
 		{#if browser && loaded}
-			<Player curTheme={$theme} />
+			<Player />
 		{/if}
 	</footer>
 </div>
 
 <style lang="scss" global>
-	// @import '../global/01styles/main';
-
 	@import '../global/stylesheet.scss';
-	//  @import "../global/vars.css";
 	.alert-container {
 		display: flex;
 		position: fixed;
-		/* width: 100%; */
 		bottom: 5rem;
 		left: 0;
 		right: 0;
@@ -110,18 +105,18 @@
 
 	.footer-container {
 		width: 100%;
+		max-width: 100%;
+		grid-area: f/f/f/f;
 		position: relative;
 		&::before {
 			background: var(--midnight-bottom);
 			position: fixed;
-			/* top: 0; */
 			z-index: -1;
 			right: 0;
 			bottom: 0;
 			left: 0;
 			content: '';
 			width: 100%;
-			/* grid-area: f/f/f/f; */
 			height: 4.7rem;
 		}
 		&::after {
@@ -130,7 +125,6 @@
 			bottom: 4rem;
 			z-index: -1;
 			right: 0;
-			/* bottom: 0; */
 			left: 0;
 			content: '';
 			width: 100%;
@@ -250,17 +244,13 @@
 		}
 	}
 	.footer-container {
-		/* position: fixed; */
 		grid-area: f/f/f/f;
-		/* height: 4rem; */
 		position: fixed;
 		bottom: 0;
 		display: block;
 		z-index: 1;
 		width: 100%;
 		min-width: 100%;
-		// height: 100%;
-		// min-height: 100%;
 	}
 
 	:root .light * {
@@ -272,8 +262,4 @@
 	.player {
 		color: #f3f3f3;
 	}
-
-	// :global(.selectCont) {
-	// 	background-color: theme-color('ytm', 'forms');
-	// }
 </style>

@@ -78,7 +78,6 @@ input[type="search"] {
 	max-height: 30ch;
 
 	transition: all cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s;
-	font-weight: 500;
 	&:active,
 	&:focus-within,
 	+ .searchBtn {
@@ -148,5 +147,4 @@ input :not([type="range"]) :not([type="checkbox"]) {
 
 :root .light .input input ::placeholder {
 	color: #131313;
-	font-weight: 500;
 }

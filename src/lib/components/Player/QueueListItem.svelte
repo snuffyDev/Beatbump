@@ -27,11 +27,11 @@
 		}
 	]
 	function handleClick(i) {
-		i--
 		currentTitle.set($list.mix[i].title)
 		dispatch('updated', {
 			id: `${i}`
 		})
+		console.log('itemitem')
 	}
 	let isHidden = false
 	// $: console.log(item)
@@ -77,6 +77,9 @@
 </li>
 
 <style lang="scss">
+	* {
+		color: #f3f3f3 !important;
+	}
 	.clickable {
 		width: 100%;
 		display: inline-flex;
@@ -109,7 +112,7 @@
 		width: auto;
 		height: 5rem;
 		// opacity: 1;;
-		background: #00000017;
+		background: #00000027;
 		border-radius: var(--sm-radius);
 		img {
 			width: auto;
@@ -127,8 +130,9 @@
 			transition: background-color cubic-bezier(0.77, 0, 0.175, 1) 0.1s;
 
 			&:active {
-				background-color: rgba(245, 241, 241, 0.199);
+				background-color: rgba(245, 241, 241, 0.295);
 				transition: all cubic-bezier(0.39, 0.575, 0.565, 1) 0.23s;
+				border: rgba(170, 170, 170, 0.801) solid 0.5rem;
 			}
 		}
 	}

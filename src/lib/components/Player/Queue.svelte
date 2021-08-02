@@ -8,12 +8,10 @@
 	import { browser } from '$app/env'
 
 	export let autoId
-	export let mixList = []
-	export let show
-
+	export let show = false
+	export let QueueList = []
 	$: mixList = $list.mix
 
-	let songList
 	let active
 	if (browser) active = document.getElementById(autoId)
 
@@ -28,27 +26,18 @@
 		if (active) active.scrollIntoView(true)
 	})
 
-	function showList() {
-		dispatch('hide', {
-			showing: false
-		})
-	}
+
 </script>
 
-{#if show}
 	<div
 		class="listContainer"
-		use:clickOutside
-		on:click_outside={() => {
-			show = false
-			showList()
-		}}
+
 		transition:fly={{ y: 0, duration: 125, easing: cubicInOut }}>
 		<div class="list">
 			{#if mixList.length > 0}
-				<ul class="list-m" id="list" bind:this={songList}>
+				<ul  class="list-m" id="list">
 					{#each mixList as item, index}
-						<QueueListItem on:updated {item} {index} />
+						<slot {item} {index} />
 					{/each}
 				</ul>
 			{:else}
@@ -59,7 +48,6 @@
 			{/if}
 		</div>
 	</div>
-{/if}
 
 <style lang="scss">
 	.empty > * {
@@ -82,7 +70,6 @@
 		margin: 0;
 		left: 0;
 		border-radius: 0.8em 0.8em 0 0;
-		color: white;
 		// bottom: -10em;
 		display: flex;
 		flex: 1 1 auto;
@@ -96,6 +83,7 @@
 		min-height: 55%;
 		width: 40%;
 		z-index: -1;
+		bottom: 4rem;
 		&::before {
 			position: absolute;
 			content: '';
@@ -113,7 +101,6 @@
 		overflow-y: hidden;
 		opacity: 1;
 		transition: all 250ms ease-in-out;
-		bottom: 4em;
 
 		.subtitle {
 			/* text-transform: uppercase; */

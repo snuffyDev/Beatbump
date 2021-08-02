@@ -3,6 +3,7 @@
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 	import Icon from '$components/Icon/Icon.svelte'
 	import { clickOutside } from '$lib/js/clickOutside'
+	import Controls from './Controls.svelte'
 	import list from '$lib/stores/list'
 	import { getSrc } from '$lib/utils'
 	import {
@@ -10,19 +11,19 @@
 		iOS,
 		key,
 		playerLoading,
+		theme,
 		updateTrack
 	} from '$stores/stores'
 	import { tick } from 'svelte'
 	import { cubicOut } from 'svelte/easing'
 	import { fade } from 'svelte/transition'
 	import { tweened } from 'svelte/motion'
-	import '../../../global/scss/components/_player.scss'
 	import Queue from './Queue.svelte'
+	import QueueListItem from './QueueListItem.svelte'
 
-	export let curTheme
 	const player: HTMLAudioElement = new Audio()
 	player.autoplay = true
-	// console.log($updateTrack)
+
 	$: player.src = $updateTrack
 	$: isWebkit = $iOS
 	let title
@@ -30,14 +31,13 @@
 	$: currentTitle.set(title)
 
 	$: autoId = $key
-	$: console.log($key, autoId)
+	// $: console.log($key, autoId)
 	$: time = player.currentTime
 	$: duration = 1000
 	let remainingTime = 55
 
 	$: volume = 0.5
 	let volumeHover
-	$: hideEvent = false
 	let isPlaying = false
 	let seeking = false
 	let songBar
@@ -45,9 +45,9 @@
 	let hoverWidth
 
 	let showing
+	let hide
 	let hovering
 	$: loading = $playerLoading
-	$: listShow = showing ? true : false
 	$: mixList = $list.mix
 
 	$: isHidden = false
@@ -83,7 +83,6 @@
 		}
 	}
 	const pause = () => player.pause()
-	// $: console.log(volume)
 	$: player.volume = volume
 
 	player.addEventListener('timeupdate', async () => {
@@ -153,13 +152,11 @@
 			navigator.mediaSession.setActionHandler('nexttrack', nextBtn)
 		}
 	}
-	$: console.log($list.mix)
-	$: console.log($list.currentMixId)
+
 	const getNext = async () => {
 		once = true
 		if (autoId == $list.mix.length - 1) {
 			list.getMore(
-				autoId,
 				$list.mix[autoId]?.itct,
 				$list.mix[autoId]?.videoId,
 				$list.currentMixId,
@@ -176,9 +173,8 @@
 			key.set(autoId)
 			const src = await getSrc(mixList[autoId].videoId)
 			src.error ? ErrorNext() : setNext()
-			await tick()
 
-			console.log('got here')
+			// console.log('got here')
 			currentTitle.set($list.mix[autoId].title)
 			once = false
 		}
@@ -187,13 +183,6 @@
 	async function ErrorNext() {
 		await tick()
 		getNext()
-		// autoId--
-		// key.set(autoId)
-		// const src = await getSrc(mixList[autoId].videoId)
-
-		// console.log('got here ErrorNext')
-		// currentTitle.set($list.mix[autoId].title)
-		// once = false
 	}
 	async function setNext() {
 		await getSrc(mixList[autoId].videoId)
@@ -224,7 +213,7 @@
 			} else {
 				gettingNext = true
 				autoId++
-				console.log(mixList[autoId].videoId, $list.mix, $list.mix[autoId])
+				// console.log(mixList[autoId].videoId, $list.mix, $list.mix[autoId])
 				key.set(autoId)
 				const src = await getSrc(mixList[autoId]?.videoId)
 				src.error
@@ -278,33 +267,14 @@
 	on:mouseup={() => (seeking = false)}
 	on:mousemove={trackMouse} />
 
-<Queue
-	on:updated={async (event) => {
-		key.set(event.detail.id)
-		await tick()
-		getNext()
-		// console.log(autoId);
-	}}
-	on:hide={(event) => {
-		hideEvent = true
-		showing = !event.detail.showing
-		hideEvent = false
-		// console.log(showing)
-	}}
-	bind:show={listShow}
-	bind:autoId={$key} />
-
 <div class="f-container" transition:fade>
 	<div
 		class="progress-bar"
-		on:mouseleave={() => (hovering = false)}
 		transition:fade
 		on:click={seekAudio}
 		on:mousedown={() => (seeking = true)}
-		on:focus={() => {
-			return
-		}}
-		on:mouseover={() => (hovering = true)}>
+		on:mouseleave={() => (hovering = false)}
+		on:mouseenter={() => (hovering = true)}>
 		{#if hovering}
 			<div
 				class="hover"
@@ -314,73 +284,50 @@
 		{/if}
 		<progress bind:this={songBar} value={$progress} max={duration} />
 	</div>
-	<div class="player" class:light={curTheme == 'light'}>
+	<div class="player" class:light={$theme == 'light'}>
 		<div
+			style="background:inherit; display:contents;"
 			class="player-left"
-			on:click={() => {
-				if (!hideEvent) showing = !showing
+			use:clickOutside
+			on:click_outside={async () => {
+				hide = true
+				showing = false
+				await tick()
+				hide = false
+			}}
+			on:click|stopPropagation={() => {
+				showing = !showing
 			}}>
+			{#if showing}
+				<Queue bind:autoId={$key} let:item let:index>
+					<row id={index}>
+						<QueueListItem
+							on:updated={async (event) => {
+								key.set(index - 1)
+								await tick()
+								getNext()
+							}}
+							{item}
+							{index} />
+					</row>
+				</Queue>
+			{/if}
 			<div class="listButton player-btn">
-				<svelte:component this={Icon} color="white" name="radio" size="2em" />
+				<Icon color="white" name="radio" size="2em" />
 			</div>
 		</div>
-		<div class="player-controls">
-			<div class="buttons">
-				<div class="player-btn" on:click={prevBtn}>
-					<svelte:component
-						this={Icon}
-						color="white"
-						name="skip-back"
-						size="2em" />
-				</div>
-				<div
-					class="player-btn player-title"
-					on:click={() => {
-						if (!isPlaying) {
-							play()
-						} else {
-							pause()
-						}
-					}}>
-					{#if loading}
-						<div
-							class="player-spinner"
-							class:fade-out={loading ? true : false} />
-					{:else if !isPlaying}
-						<Icon color="white" name="play" size="2em" />
-					{:else if !loading && isPlaying}
-						<Icon color="white" name="pause" size="2em" />
-					{/if}
-				</div>
-				<div class="player-btn" on:click={nextBtn}>
-					<svelte:component
-						this={Icon}
-						color="white"
-						name="skip-forward"
-						size="2em" />
-				</div>
-			</div>
-		</div>
-
+		<Controls bind:isPlaying bind:loading {play} {pause} {nextBtn} {prevBtn} />
 		<div class="player-right">
 			{#if width > 500}
 				<div
 					class="volume"
 					use:clickOutside
-					on:click_outside={() => {
-						volumeHover = false
-					}}>
+					on:click_outside={() => (volumeHover = false)}>
 					<div
 						color="white"
 						class="volume-icon"
-						on:click={() => {
-							volumeHover = !volumeHover
-						}}>
-						<svelte:component
-							this={Icon}
-							color="white"
-							name="volume"
-							size="2em" />
+						on:click={() => (volumeHover = !volumeHover)}>
+						<Icon color="white" name="volume" size="2em" />
 					</div>
 					{#if volumeHover}
 						<div class="volume-wrapper">
@@ -401,9 +348,7 @@
 				<div class="menu-container">
 					<Dropdown
 						bind:isHidden
-						on:click_outside={() => {
-							isHidden = !isHidden
-						}}
+						on:click_outside={() => (isHidden = !isHidden)}
 						type="player"
 						items={DropdownItems} />
 				</div>
@@ -416,42 +361,13 @@
 </div>
 
 <style lang="scss">
+	@import '../../../global/scss/components/_player.scss';
+
 	.hidden {
 		display: none !important;
 		visibility: hidden !important;
 	}
-	.player-spinner {
-		// display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		justify-self: center;
-		width: 2rem;
-		// // background: white;
-		height: 2rem;
-		border: rgba(255, 255, 255, 0.26) solid 0.25em;
-		border-radius: 50%;
-		border-top-color: rgba(255, 255, 255, 0.904);
-		animation: loading 1s infinite cubic-bezier(0.785, 0.135, 0.15, 0.86);
-		max-width: 100%;
-		max-height: 100%;
-		opacity: 0;
-		// background: white;
-		transition: all ease-in-out 1s;
-		&.fade-out {
-			opacity: 1;
-			transition: all ease-in-out 1s;
-		}
-		// height: 2em;
-	}
-	@keyframes loading {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-	@keyframes loaddone {
-		to {
-		}
-	}
+
 	.hover {
 		background-color: #bababa66;
 		height: 0.5rem;
@@ -503,7 +419,6 @@
 	}
 	.player-left,
 	.player-right {
-		webkit-text-size-adjust: 100%;
 		align-self: center;
 		cursor: pointer;
 		height: auto;
