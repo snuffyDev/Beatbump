@@ -7,7 +7,7 @@ An Alternative frontend for YouTube Music created using Svelte/SvelteKit.
 
 **Live Site**: https://beatbump.ml/
 
-**Documentation** _(work in progress)_: https://snuffydev.github.io/docs-beatbump/
+**Documentation** _(work in progress)_: https://snuffydev.github.io/Beatbump/index.html#/
 
 |<img src="/.repo/images/artistpagegif.gif" width="480" height="auto"/> |<img src="/.repo/images/pwa.jpg" width="160" height="auto"/>|<img src="/.repo/images/trending.jpeg" width="480" height="auto"/> |
 |--  |-- |-- |
