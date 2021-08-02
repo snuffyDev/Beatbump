@@ -24,7 +24,6 @@ const list = writable({
 	mix
 })
 const fetchNext = async (
-	index,
 	params,
 	videoId,
 	playlistId,
@@ -39,9 +38,7 @@ const fetchNext = async (
 			`${params ? `&params=${params}` : ''}` +
 			`${clickTracking ? `&clickTracking=${clickTracking}` : ''}` +
 			`${ctoken ? `&ctoken=${ctoken}` : ''}` +
-			`${playlistSetVideoId ? `&setVideoId=${playlistSetVideoId}` : ''}` +
-			'&index=' +
-			encodeURIComponent(index),
+			`${playlistSetVideoId ? `&setVideoId=${playlistSetVideoId}` : ''}`,
 		{
 			headers: { accept: 'application/json' }
 		}
@@ -97,7 +94,6 @@ export default {
 		hasList = true
 
 		const response = await fetchNext(
-			key || 0,
 			'',
 			videoId,
 			playlistId,
@@ -155,7 +151,6 @@ export default {
 		loading = true
 		playerLoading.set(loading)
 		const response = await fetchNext(
-			0,
 			'',
 			item.videoId,
 			item.autoMixList,
@@ -192,14 +187,7 @@ export default {
 
 		// console.log(data)
 	},
-	async getMore(
-		autoId,
-		itct,
-		videoId,
-		playlistId,
-		ctoken,
-		clickTrackingParams
-	) {
+	async getMore(itct, videoId, playlistId, ctoken, clickTrackingParams) {
 		let loading = true
 		playerLoading.set(loading)
 		if (splitList && mix.length < Chunked.origLength - 1) {
@@ -207,7 +195,7 @@ export default {
 			mix.pop()
 
 			mix = [...mix, ...splitList[splitListIndex]]
-			await getSrc(mix[autoId++].videoId)
+			await getSrc(mix[0].videoId)
 			loading = false
 			filterSetting ? filterList([...mix]) : (mix = [...mix])
 			list.set({ currentMixId, clickTrackingParams, continuation, mix })
@@ -223,7 +211,6 @@ export default {
 				= clickTrackingParams: YouTube sends these for certain requests to prevent people
 				using their API for this purpose  */
 			const data = await fetchNext(
-				autoId,
 				itct,
 				videoId,
 				playlistId,
@@ -235,15 +222,15 @@ export default {
 			// console.log(data)
 			await getSrc(data.results[0].videoId)
 
-			mix = [...mix, ...data.results]
-			filterSetting ? filterList(mix) : mix
-			filterSetting
-				? (mix = [...mix, ...data.results].filter(
+			// mix = [...mix, ...data.results]
+			// mix = filterSetting ? filterList(mix) : mix
+			mix = filterSetting
+				? [...mix, ...data.results].filter(
 						((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(
 							new Set()
 						)
-				  ))
-				: (mix = [...mix, ...data.results])
+				  )
+				: [...mix, ...data.results]
 			// mix = [...mix, ...data.results]
 			continuation = data.continuation
 			currentMixId = data.currentMixId
