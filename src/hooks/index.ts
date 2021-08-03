@@ -1,4 +1,5 @@
 import { dev } from '$app/env'
+
 import type { Handle } from '@sveltejs/kit'
 import type { Hooks } from '@sveltejs/kit/types/internal'
 
@@ -55,8 +56,15 @@ const csp = Object.entries(directives)
 	.join('; ')
 
 export async function handle({ request, resolve }) {
+	if (
+		request.path.startsWith('/api') &&
+		request.headers.origin !== rootDomain
+	) {
+		return {
+			status: 403
+		}
+	}
 	request.locals = request.headers
-
 	const response = await resolve(request)
 
 	return {

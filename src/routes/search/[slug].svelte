@@ -90,7 +90,9 @@
 		} catch (error) {
 			hasData = null
 			isLoading = false
-			throw new Error(error + ' Unable to get more!')
+			return {
+				error: new Error(error + ' Unable to get more!')
+			}
 		}
 	}
 	$: items = $search
