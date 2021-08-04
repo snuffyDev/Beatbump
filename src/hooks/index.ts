@@ -1,9 +1,6 @@
 import { dev } from '$app/env'
-
-import type { Handle } from '@sveltejs/kit'
-import type { Hooks } from '@sveltejs/kit/types/internal'
-
 const rootDomain = import.meta.env.VITE_DOMAIN // or your server IP for dev
+const siteURL = import.meta.env.VITE_SITE_URL
 
 const directives = {
 	'base-uri': ["'self'"],
@@ -56,14 +53,6 @@ const csp = Object.entries(directives)
 	.join('; ')
 
 export async function handle({ request, resolve }) {
-	if (
-		request.path.startsWith('/api') &&
-		request.headers.origin !== rootDomain
-	) {
-		return {
-			status: 403
-		}
-	}
 	request.locals = request.headers
 	const response = await resolve(request)
 
