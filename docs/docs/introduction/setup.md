@@ -22,5 +22,6 @@ npm install
 ```
 After the dependencies are installed, you can start the development server with the command ```npm run dev```!
 
----
+### Before deployment
 
+Please continue to the next page before deploying.

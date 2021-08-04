@@ -1,6 +1,6 @@
 # Overview
 
-This section is a brief overview of what the endpoints do and how they work. For an in-depth look at the endpoints, you can find that [here](/api/endpoint/table).
+This section is a brief overview of what the endpoints do and how they work. You must deploy your own instance in order to use the API.
 
 All of the endpoints are accessible through a ```GET``` request.
 

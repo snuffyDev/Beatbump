@@ -26,8 +26,9 @@ An Alternative frontend for YouTube Music created using Svelte/SvelteKit.
 
 This project is in it's infancy, so for stability reasons, this repository is currently not accepting pull requests for now. You can download the repo and modify the code to fit your needs best.
 
-Once there's documentation for how it works, along with a solid base of features, this repo will accept them.
+Once the documentation is finished, this repo will accept them.
 
+You can find the documentation [here](https://snuffydev.github.io/Beatbump/#/).
 ### Getting Started
 
 First, clone or initialize the repository on your machine. To quickly get setup, use [degit](https://github.com/Rich-Harris/degit):
@@ -50,18 +51,6 @@ Make sure the SvelteKit packages are marked 'next' in the `package.json` before 
 
 ### Deploying
 
-
-The default deployment is configured for Cloudflare Workers. For information on how to setup and configure Cloudflare Workers, visit the [official repo](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare-workers) for the adapter.
-
-To get caching for responses with Cloudflare Workers, I'm using a custom adapter. As it is most likely unstable, I'd recommend installing the official one. If you *do* want to use the custom one, [here](https://github.com/snuffyDev/adapter-cloudflare-cache) is the repository.
-
-For deploying to Cloudflare Workers, there's two commands in `package.json` for this:
-| command  | description |
-|--        |-- |
-| `deploy` |  Is a typical deployment to Cloudflare Workers.<br> - Run this if you don't have the `.svelte-kit` & `build` folders.|
-| `deploy:clean` |  Will delete the `.svelte-kit` and the `build` folders <br>   - This deletes the old files left over from the dev server for a clean starting point next time you run `dev`
-
-
-For other adapters, visit the official [adapters section](https://kit.svelte.dev/docs#adapters) of the SvelteKit documentation.
+[See the docs](https://snuffydev.github.io/Beatbump/#/docs/introduction/deploying) for more information.
 
 > **Note:** This app uses SvelteKit endpoints, which will not work with @sveltejs/adapter-static, it's **_not recommended_** to use it, even if you refactor it to use Serverless Functions.
