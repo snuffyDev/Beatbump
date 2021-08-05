@@ -1,14 +1,14 @@
 <script context="module">
-	export async function load({ page, fetch }) {
-		const data = await fetch(
-			'/api/playlist.json?list=' + encodeURIComponent(page.query.get('list'))
-		)
-		const { tracks, header, continuations } = await data.json()
+	import { api } from '$lib/api'
+	export async function load({ page }) {
+		const data = await api('playlist', { list: page.query.get('list') })
+
+		const { tracks, header, continuations } = await data.body
 		return {
 			props: {
-				tracks: await tracks,
-				continuations: await continuations,
-				header: await header
+				tracks: tracks,
+				continuations: continuations,
+				header: header
 			},
 			maxage: 3600,
 			status: 200

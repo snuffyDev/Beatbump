@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { api } from './api'
 import { sort } from './endpoints/playerUtils'
 import { errorHandler, updateTrack } from './stores/stores'
 import { key } from './stores/stores'
@@ -28,17 +29,15 @@ export const addToQueue = async (videoId: any) => {
 
 // Get source URLs
 export const getSrc = async (videoId?: string, playlistId?: string) => {
-	const url = `/api/player.json${videoId ? `?videoId=${videoId}` : ''}${
-		playlistId ? `?list=${playlistId}` : ''
-	}`
-
-	const res = await fetch(url).then((data) => data.json())
-	const formats = await sort(res)
-	// console.log(formats)
+	const res = await api('player', {
+		videoId: videoId ? videoId : '',
+		playlistId: playlistId ? playlistId : ''
+	})
+	const data = await res.body
+	const formats = await sort(data)
 
 	const src = formats[0].url !== null ? setTrack(formats) : handleError()
-	// console.log(src)
-	return await src
+	return src
 }
 function setTrack(formats) {
 	// console.log(formats)
