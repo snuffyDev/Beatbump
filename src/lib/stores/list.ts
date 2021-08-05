@@ -5,7 +5,7 @@ import { currentTitle } from '$stores/stores'
 import { writable } from 'svelte/store'
 
 import { addToQueue } from '../utils'
-import { filterAutoPlay, playerLoading } from './stores'
+import { filterAutoPlay, key, playerLoading } from './stores'
 
 let hasList = false
 let mix = []
@@ -81,15 +81,15 @@ export default {
 	async initList(
 		videoId: string,
 		playlistId: string,
-		key?: number,
+		keyId?: number,
 		playlistSetVideoId?: string,
 		clickTracking?: string
 	) {
 		loading = true
 		playerLoading.set(loading)
-
-		key = key ? key : 0
-
+		console.log(videoId, playlistId, keyId, playlistSetVideoId, clickTracking)
+		keyId = keyId ? keyId : 0
+		key.set(0)
 		if (hasList) mix = []
 		hasList = true
 
@@ -104,7 +104,7 @@ export default {
 		const data = await response
 
 		await getSrc(videoId)
-		currentTitle.set(data.results[key].title)
+		currentTitle.set(data.results[keyId].title)
 
 		loading = false
 		playerLoading.set(loading)
@@ -169,6 +169,7 @@ export default {
 	async startPlaylist(playlistId) {
 		loading = true
 		playerLoading.set(loading)
+		key.set(0)
 		const data = await fetch(
 			`/api/getQueue.json?playlistId=${playlistId}`
 		).then((data) => data.json())

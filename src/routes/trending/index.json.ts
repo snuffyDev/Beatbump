@@ -4,21 +4,21 @@ import {
 	MusicResponsiveListItemRenderer,
 	MusicTwoRowItemRenderer
 } from '$lib/parsers'
-
 import type { CarouselHeader, CarouselItem } from '$lib/types'
-// import { CarouselItem } from '$lib/types';
-export async function get({ query }) {
-	// console.time('timer')
+import type { EndpointParams } from '$lib/types/internals'
+import type { EndpointOutput } from '@sveltejs/kit'
+
+export async function get({ query }: EndpointParams): Promise<EndpointOutput> {
 	const endpoint = query.get('q') || ''
 	const browseId = 'FEmusic_explore'
 	const carouselItems = []
+	// fetch data using Base Context
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/${endpoint}?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
 			method: 'POST',
 			body: JSON.stringify({
 				...BaseContext,
-
 				browseId: `${browseId}`
 			}),
 			headers: {
@@ -31,10 +31,9 @@ export async function get({ query }) {
 	)
 
 	if (!response.ok) {
-		// NOT res.status >= 200 && res.status < 300
 		return { status: response.status, body: response.statusText }
 	}
-	// const data = await response.json();
+
 	const {
 		contents: {
 			singleColumnBrowseResultsRenderer: {

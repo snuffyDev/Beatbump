@@ -15,3 +15,5 @@ src/routes/api/backup
 src/lib/_parsers.ts
 src/lib/components/Player/_Player.svelte
 .gitignore
+src/routes/trending/test/index.json.ts
+src/routes/trending/test/index.svelte

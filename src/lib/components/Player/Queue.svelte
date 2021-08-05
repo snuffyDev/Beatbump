@@ -25,29 +25,26 @@
 		let active = document.getElementById(autoId)
 		if (active) active.scrollIntoView(true)
 	})
-
-
 </script>
 
-	<div
-		class="listContainer"
-
-		transition:fly={{ y: 0, duration: 125, easing: cubicInOut }}>
-		<div class="list">
-			{#if mixList.length > 0}
-				<ul  class="list-m" id="list">
-					{#each mixList as item, index}
-						<slot {item} {index} />
-					{/each}
-				</ul>
-			{:else}
-				<div class="empty">
-					<span class="empty-title">Empty!</span>
-					<span class="subtitle">Choose a song to see your feed</span>
-				</div>
-			{/if}
-		</div>
+<div
+	class="listContainer"
+	transition:fly={{ y: 0, duration: 125, easing: cubicInOut }}>
+	<div class="list">
+		{#if mixList.length > 0}
+			<ul class="list-m" id="list">
+				{#each mixList as item, index}
+					<slot {item} {index} />
+				{/each}
+			</ul>
+		{:else}
+			<div class="empty">
+				<span class="empty-title">Empty!</span>
+				<span class="subtitle">Choose a song to see your feed</span>
+			</div>
+		{/if}
 	</div>
+</div>
 
 <style lang="scss">
 	.empty > * {
@@ -83,7 +80,7 @@
 		min-height: 55%;
 		width: 40%;
 		z-index: -1;
-		bottom: 4rem;
+		bottom: 4.4rem;
 		&::before {
 			position: absolute;
 			content: '';
@@ -137,6 +134,7 @@
 		overflow-y: scroll;
 		height: 100%;
 		scroll-padding-top: 0.8rem;
+		padding-bottom: 0.8rem;
 	}
 
 	.empty-title {

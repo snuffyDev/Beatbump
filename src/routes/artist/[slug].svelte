@@ -1,29 +1,20 @@
 <script context="module">
+	import { api } from '$lib/api'
+
 	export const ssr = false
 
 	export async function load({ page, fetch }) {
-		const url =
-			'/api/artist.json?endpoint=browse&browseId=' +
-			encodeURIComponent(page.params.slug) +
-			'&pt=MUSIC_PAGE_TYPE_ARTIST'
-		const response = await fetch(url)
-		const data = await response.json()
-		let {
-			carouselItems,
-			description,
-			thumbnail,
-			headerContent,
-			items
-		} = await data
+		const response = await api('artist', { browseId: page.params.slug })
+		const data = await response.body
+		let { carousels, description, thumbnail, header, songs } = await data
 
 		return {
 			props: {
-				carouselItems,
+				carousels,
 				description,
 				thumbnail,
-				headerContent,
-				items,
-				data
+				header,
+				songs
 			},
 			status: 200
 		}
@@ -31,45 +22,38 @@
 </script>
 
 <script lang="ts">
-	import { goto } from '$app/navigation'
 	import Carousel from '$components/Carousel/Carousel.svelte'
 	import ArtistPageHeader from '../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte'
 	import { page } from '$app/stores'
 
-	import Icon from '$components/Icon/Icon.svelte'
 	import ListItem from '$components/ListItem/ListItem.svelte'
 	import { isPagePlaying } from '$lib/stores/stores'
-	import list from '$lib/stores/list'
-	import type { CarouselItem, ICarousel } from '$lib/types'
 
-	export let headerContent
+	export let header
 	export let description
 	export let thumbnail
-	export let carouselItems: ICarousel
-	export let items
-	export let data
+	export let carousels
+	export let songs
 	let width
-
-	console.log(data, carouselItems, items, description, thumbnail, headerContent)
 </script>
 
 <svelte:head>
 	<title
-		>{headerContent?.name == undefined
+		>{header?.name == undefined
 			? 'Artist - '
-			: `${headerContent.name} - `}Beatbump</title>
+			: `${header.name} - `}Beatbump</title>
 </svelte:head>
 
 <svelte:window bind:innerWidth={width} />
 <!-- {#await headerContent then _} -->
 <main>
-	<ArtistPageHeader {description} {headerContent} {width} {thumbnail} />
+	<ArtistPageHeader {description} {header} {width} {thumbnail} />
 	<div class="artist-body">
-		{#if items?.length > 0}
+		{#if songs?.length > 0}
 			<section>
 				<h4 class="grid-title">Songs</h4>
 				<section class="songs">
-					{#each items as item, index}
+					{#each songs as item, index}
 						<ListItem
 							{item}
 							{index}
@@ -81,8 +65,8 @@
 				</section>
 			</section>
 		{/if}
-		{#each carouselItems as { contents, header }, i}
-			{#if i == carouselItems.length - 1}
+		{#each carousels as { contents, header }, i}
+			{#if i == carousels.length - 1}
 				<Carousel items={contents} type="artist" isBrowse={true} {header}>
 					>
 				</Carousel>

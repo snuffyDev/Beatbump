@@ -331,16 +331,14 @@
 					</div>
 					{#if volumeHover}
 						<div class="volume-wrapper">
-							<div class="volume-container">
-								<div class="volume-slider">
-									<input
-										class="volume"
-										type="range"
-										bind:value={volume}
-										min="0"
-										max="1"
-										step="any" />
-								</div>
+							<div class="volume-slider">
+								<input
+									class="volume"
+									type="range"
+									bind:value={volume}
+									min="0"
+									max="1"
+									step="any" />
 							</div>
 						</div>
 					{/if}
@@ -368,6 +366,9 @@
 		visibility: hidden !important;
 	}
 
+	.volume {
+		position: relative;
+	}
 	.hover {
 		background-color: #bababa66;
 		height: 0.5rem;
@@ -391,11 +392,13 @@
 	}
 	.volume-wrapper {
 		background: var(--dark-bottom);
-		display: block;
+		display: flex;
 		position: absolute;
-		bottom: 7.9rem;
+		bottom: 6.5rem;
 		transform: rotate(-90deg);
 		padding: 0;
+		height: 1.5rem;
+		align-items: center;
 	}
 	.volume-icon {
 		cursor: pointer;

@@ -20,7 +20,7 @@
 	let viewport
 	let contents
 	let viewport_height = 0
-	let visible
+	let visible: { index: number; start?: number; data: Object }[]
 	let mounted
 
 	let top = 0
@@ -148,18 +148,14 @@
 			</svelte-virtual-list-row>
 		{/each}
 		{#if !hasData}
-			<div
-				style="height:1.5rem;"
-				use:vp
-				on:enterViewport={() => {
-					dispatch('endList')
-				}} />
+			<div use:vp on:enterViewport={() => dispatch('endList')} />
+
 			{#if isLoading}
-				<div class="loading-results" style="padding: 0em 1em 1em 1em;">
+				<div class="loading-results" style="padding: 0em;">
 					<svg
 						role="img"
-						width="39.0714rem"
-						height="5.7143rem"
+						width="53.0714rem"
+						height="8.7143rem"
 						aria-labelledby="loading-aria"
 						viewBox="0 0 575 90"
 						preserveAspectRatio="none"
@@ -182,21 +178,21 @@
 									width="56"
 									height="56"
 									class="s-iYjv5-ishYhK" /><rect
-									x="75"
+									x="68"
 									y="43"
 									rx="0"
 									ry="0"
 									width="177"
 									height="9"
 									class="s-iYjv5-ishYhK" /><rect
-									x="75"
+									x="68"
 									y="64"
 									rx="0"
 									ry="0"
 									width="94"
 									height="9"
 									class="s-iYjv5-ishYhK" /><rect
-									x="75"
+									x="68"
 									y="21"
 									rx="0"
 									ry="0"
@@ -255,8 +251,10 @@
 		padding: 0;
 		margin: 0;
 		/* height: 100%; */
+		height: 100%;
 		display: block;
 		position: relative;
+		bottom: 0;
 		padding-left: 0.8rem;
 		border-bottom: 0.0714rem solid hsla(0, 0%, 66.7%, 0.24);
 	}

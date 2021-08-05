@@ -26,7 +26,7 @@
 	import Carousel from '$components/Carousel/Carousel.svelte'
 	import type { ICarousel } from '$lib/types'
 
-	// $: console.log(carouselItems)
+	$: console.log(carouselItems)
 </script>
 
 <svelte:head>
@@ -46,7 +46,11 @@
 
 	<div class="breakout">
 		<div class="box-cont">
-			<h1>{carouselItems[1].header.title}</h1>
+			<div class="header">
+				<h1>{carouselItems[1].header.title}</h1>
+				<a class="link" href="/explore"><small>See All</small></a>
+			</div>
+
 			<!-- <div class="m-alert-info"><em>Coming Soon!</em></div> -->
 			<box>
 				{#each carouselItems[1].results.slice(1, 15) as item}
@@ -58,7 +62,6 @@
 					</div>
 				{/each}
 			</box>
-			<a class="link" href="/explore">See All</a>
 		</div>
 	</div>
 	<Carousel
@@ -68,10 +71,12 @@
 	<Carousel
 		header={carouselItems[0].header}
 		items={carouselItems[0].results}
-		type="new" />
+		type="trending"
+		isBrowse={true} />
 </main>
 
 <style lang="scss">
+	@import '../../global/scss/components/_carousel';
 	.breakout {
 		border-radius: 0.8rem;
 		-webkit-overflow-scrolling: touch;

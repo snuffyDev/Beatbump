@@ -3,10 +3,8 @@
 	export let header: CarouselHeader
 	export let items = []
 	export let type = ''
-	export let isBrowse = false
-	import lazy from '$lib/lazy'
-	import { fade } from 'svelte/transition'
-	import { goto } from '$app/navigation'
+	export let isBrowse
+
 	import type { CarouselHeader } from '$lib/types'
 	let isHidden
 	let section = []
@@ -19,7 +17,7 @@
 	<h1>
 		{header.title}
 	</h1>
-	{#if !isBrowse && header.browseId}<a
+	{#if header.browseId}<a
 			href={header.browseId?.includes('VLP')
 				? `/playlist?list=${header?.browseId}`
 				: `/trending/new/${header?.browseId}${
@@ -38,6 +36,7 @@
 					type="trending"
 					aspectRatio={item.aspectRatio}
 					{item}
+					{isBrowse}
 					index={i}
 					bind:section />
 			{:else if type == 'artist'}
@@ -63,13 +62,7 @@
 </div>
 
 <style lang="scss">
-	a small {
-		font-size: 0.95rem;
-		font-weight: 700;
-		font-variant-caps: all-petite-caps;
-		letter-spacing: 0.02rem;
-		transition: ease-in-out color 75ms;
-	}
+	@import '../../../global/scss/components/_carousel';
 	.section {
 		-webkit-overflow-scrolling: touch;
 		position: relative;
@@ -83,26 +76,6 @@
 		/* width: 100%; */
 		/* max-width: 100%; */
 		/* overflow: scroll;*/
-	}
-	.header {
-		display: block;
-		font-weight: 600;
-		letter-spacing: -0.05rem;
-		margin-bottom: 0.5rem;
-		padding: 0.4rem 0.4rem 0.2rem;
-
-		h1 {
-			font-weight: 600;
-			letter-spacing: -0.05rem;
-			margin-right: .7rem;
-    display: inline-flex;
-		flex-direction: row;
-		flex-wrap: nowrap;
-
-		@media screen and (min-width: 800px) {
-				font-size: 2.125em;
-			}
-		}
 	}
 
 	.scroll {

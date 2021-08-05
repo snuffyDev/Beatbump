@@ -48,18 +48,14 @@
 
 	$: search.set(contents)
 
-	$: songTitle = $page.params.slug || title
+	let songTitle = $page.params.slug || title
 	const title = songTitle
 	let ctoken = continuation.continuation
 	let itct = continuation.clickTrackingParams
 	// console.log(contents);
 	let isLoading = false
 	let hasData = false
-	onMount(() => {
-		if (contents) {
-		}
-		return
-	})
+
 	async function paginate() {
 		if (isLoading || hasData) return
 		try {
@@ -234,7 +230,7 @@
 	}
 	.searchHeader {
 		padding: 0.5rem 0 0.8rem 0;
-		font-family: 'Commissioner', sans-serif;
+		font-family: 'CommissionerVariable', sans-serif;
 		margin-left: auto;
 		display: flex;
 		// flex-direction: row;

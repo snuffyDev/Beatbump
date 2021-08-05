@@ -48,7 +48,7 @@
 	display: inline;
 	font-weight: 500;
 	font-size: 1.1em;
-	font-family: "Commissioner", sans-serif;
+	font-family: "CommissionerVariable", sans-serif;
 	margin-bottom: 0.25rem;
 	letter-spacing: -0.05em;
 }
@@ -92,15 +92,15 @@ section.item {
 			left: 0;
 			background: linear-gradient(rgba(0, 0, 0, 0.502), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
 
-			transition: background cubic-bezier(0.29, -0.3, 0.7, 0.95) 0.15s,
-				opacity cubic-bezier(0.29, -0.3, 0.7, 0.95) 0.15s;
+			transition: background cubic-bezier(0.455, 0.03, 0.515, 0.955) 0.1s,
+				opacity cubic-bezier(0.455, 0.03, 0.515, 0.955) 0.1s;
 			opacity: 0.1;
 			z-index: 1;
 		}
 		&:hover::before {
 			// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
 			background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
-			opacity: 0.8;
+			opacity: 0.7;
 			z-index: 1;
 		}
 		&:active:hover::before {

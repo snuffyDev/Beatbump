@@ -43,15 +43,14 @@
 
 	const promise = parsePageContents(data)
 	let { details, items } = promise
-	// console.log(promise)
+	console.log(promise)
 	const playAlbum = () => {
 		list.startPlaylist(details.audioPlaylistId)
 		key.set(0)
 		currentTitle.set(items[0].title)
 	}
 	const playRadio = () => {
-		list.initList(items[0].videoId, details.radioAutomixPlaylistId)
-		key.set(0)
+		list.initList(items[0].videoId, details.radioAutomixPlaylistId, 0)
 		currentTitle.set(items[0].title)
 	}
 
@@ -74,9 +73,6 @@
 
 {#await promise then _}
 	<main>
-		<div class="m-alert-danger">
-			<h6>Note: This is a work in progress.</h6>
-		</div>
 		<div class="box">
 			<div class="info-box">
 				<div class="info-wrapper">
@@ -99,7 +95,9 @@
 							<h4>{details.title}</h4>
 							<span>
 								<p>
-									{details.artistDisplayName} &CenterDot;
+									<a href={`/artist/${details.artistChannelId}`}
+										>{details.artistDisplayName}</a>
+									&CenterDot;
 									<small>{details.releaseDate.year}</small>
 									&CenterDot;
 									<small
@@ -145,8 +143,8 @@
 	@import '../../lib/shared/listPages.scss';
 
 	button {
-		font-family: 'Commissioner' sans-serif;
-		font-weight: 500;
+		font-family: 'CommissionerVariable' sans-serif;
+		font-weight: 550 !important;
 	}
 	.radioMix:not(.radioMix-light) :not(.light) {
 		background-color: transparent !important;

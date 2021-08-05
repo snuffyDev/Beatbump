@@ -72,27 +72,27 @@ export async function get({
 											musicQueueRenderer: {
 												content: {
 													playlistPanelRenderer: {
-														contents,
+														contents = [],
 														continuations: [
 															{
 																nextRadioContinuationData: {
-																	clickTrackingParams,
-																	continuation
-																}
-															}
-														]
-													}
-												}
-											}
-										}
-									}
-								}
-							]
-						}
-					}
-				}
-			},
-			currentVideoEndpoint: { watchEndpoint }
+																	clickTrackingParams = '',
+																	continuation = ''
+																} = {}
+															} = {}
+														] = []
+													} = {}
+												} = {}
+											} = {}
+										} = {}
+									} = {}
+								} = {}
+							] = []
+						} = {}
+					} = {}
+				} = {}
+			} = {},
+			currentVideoEndpoint: { watchEndpoint = {} } = {}
 		} = data
 		const parsed = parseContents(
 			contents,

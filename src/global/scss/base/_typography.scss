@@ -8,7 +8,7 @@ h4,
 h5,
 h6 {
 	color: $base-font-color;
-	font-family: "Commissioner", sans-serif;
+	font-family: "CommissionerVariable", sans-serif;
 
 	line-height: 1.5;
 	font-weight: 500;
@@ -57,14 +57,16 @@ a,
 		font-weight: 500;
 	}
 	&:visited {
-		color: darken($link-color, 3%);
+		color: darken($link-color, 5%);
 	}
 	&:active,
 	&:focus,
 	&:hover {
-		color: darken($link-color, 10%);
+		text-decoration: underline 0.001rem solid;
+		text-underline-offset: 0.001rem;
+		color: darken($link-color, 15%);
 		outline: none;
-		text-decoration: none;
+		// text-decoration: none;
 	}
 	&:hover {
 		cursor: pointer;

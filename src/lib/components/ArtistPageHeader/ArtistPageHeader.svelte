@@ -4,41 +4,46 @@
 	import { theme } from '$lib/stores/stores'
 	import list from '$lib/stores/list'
 	import Icon from '../Icon/Icon.svelte'
-	export let headerContent
+	export let header
 	export let thumbnail = []
 	export let description
 	export let width
 	let container: HTMLDivElement
 	let y = 0
-	afterUpdate(() => {
-		container = container
-	})
+	let handler = (event: UIEvent) => {}
+	let wrapper: HTMLElement
 
 	onMount(() => {
 		let start
+		handler = (event) => {
+			if (start === undefined) start = event.timeStamp
+			let scroll
+			if (container) scroll = container.getBoundingClientRect()
 
-		// let gradient = document.getElementById('gradient')
+			const elapsed = event.timeStamp - start
+			if (container) {
+				window.requestAnimationFrame(function (e) {
+					y =
+						window.innerWidth < 500
+							? Math.min(
+									Math.max((-scroll.top / window.innerHeight) * 4, 0),
+									10
+							  ) * 350
+							: Math.min(
+									Math.max((-scroll.top / window.innerHeight) * 4, 0),
+									10
+							  ) * 50
+					window.requestAnimationFrame(handler)
 
-		function handler(event) {
-			if (start === undefined) start = event.timestamp
-			const scroll = container.getBoundingClientRect()
-
-			const elapsed = event.timestamp - start
-
-			window.requestAnimationFrame(function (e) {
-				y =
-					window.innerWidth < 500
-						? Math.min(Math.max(-scroll.top / window.innerHeight, 0), 10) * 450
-						: Math.min(Math.max(-scroll.top / window.innerHeight, 0), 10) * 125
-
-				window.requestAnimationFrame(handler)
-
-				window.cancelAnimationFrame(y)
-			})
+					window.cancelAnimationFrame(y)
+				})
+			}
 		}
-		let wrapper = document.getElementById('wrapper')
+		wrapper = document.getElementById('wrapper')
 		wrapper.addEventListener('scroll', handler, { passive: true })
 		return () => {
+			window.cancelAnimationFrame(y)
+
 			window.removeEventListener('scroll', handler)
 			wrapper.removeEventListener('scroll', handler)
 		}
@@ -80,14 +85,14 @@
 		class="artist-content"
 		style="		box-shadow:0rem 0rem 0.5rem 0.5rem var(--{$theme}-base), 1.5rem 0.5rem 0.8rem 0.5rem inset var(--{$theme}-base);">
 		<div class="content-wrapper">
-			<div class="name">{headerContent?.name}</div>
+			<div class="name">{header?.name}</div>
 			{#if width > 500 && !!description}
 				<div class="description">{description[0]}</div>
 			{/if}
 			<div class="btn-wrpr">
 				<button
 					class="radio-button"
-					on:click={list.startPlaylist(headerContent.mixInfo.playlistId)}
+					on:click={list.startPlaylist(header.mixInfo.playlistId)}
 					><Icon size="1.25em" name="radio" /><span class="btn-text">
 						Play Radio</span
 					></button>
@@ -189,7 +194,7 @@
 				font-weight: 700;
 				font-size: 2.5rem;
 				display: inline-block;
-				font-family: 'Commissioner', sans-serif;
+				font-family: 'CommissionerVariable', sans-serif;
 
 				// white-space: pre;
 				text-shadow: rgba(0, 0, 0, 0.171) 0.2rem -0.12rem 0.5rem;

@@ -91,10 +91,10 @@
 	}
 	.item-wrapper {
 		display: flex;
-		/* align-content: flex-start; */
-		justify-content: center;
-		/* align-items: center; */
 		padding: 0.4rem 0;
+		/* align-items: stretch; */
+		/* flex-wrap: nowrap; */
+		height: 100%;
 	}
 
 	.explicit {
@@ -113,19 +113,22 @@
 		margin-left: 0.3em;
 	}
 	.itemInfo {
-		display: flex;
+		display: inline-flex;
 		flex-direction: column;
 		flex: 1 0;
+		align-self: center;
 		margin-right: 1.8rem;
 		.item-title {
 			font-weight: 400;
 		}
 		.artist {
-			font-weight: 500;
+			font-family: 'CommissionerVariable', sans-serif;
+			font-weight: 450;
 		}
 	}
 	.item {
 		cursor: pointer;
+		height: 5rem;
 	}
 
 	.explicit {

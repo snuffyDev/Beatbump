@@ -70,11 +70,11 @@ export interface SearchResult {
 	thumbnails: [{ url: string }]
 	subtitle?: Subtitle[]
 }
-export interface CarouselItem {
+export type CarouselItem = {
 	artistInfo?: ArtistInfo
 	title: string
 	artist?: string
-	endpoint?: string | { browseId: string; pageType: string }
+	endpoint?: string | ItemEndpoint
 	aspectRatio?: string
 	videoId: string
 	playlistId: string
@@ -83,7 +83,10 @@ export interface CarouselItem {
 	thumbnails: [{ url: string }[]]
 	subtitle?: Subtitle[]
 }
-
+export type ItemEndpoint = {
+	browseId: string
+	pageType: string
+}
 export interface mixList {
 	continuation: string
 	autoMixList?: string
@@ -96,12 +99,4 @@ export interface mixList {
 	artist: string
 	thumbnail?: string
 	length: string
-}
-export type CarouselHeader = {
-	browseId?: string
-	title?: string
-}
-export type ICarousel = {
-	header: CarouselHeader
-	results: CarouselItem[]
 }

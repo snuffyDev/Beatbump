@@ -2,7 +2,7 @@ export function parsePageContents(data) {
 	let info = {}
 	let temp = []
 	let playlistId
-	// console.log(data)
+	console.log(data)
 	let items = []
 	let {
 		frameworkUpdates: {
@@ -10,16 +10,26 @@ export function parsePageContents(data) {
 		}
 	} = data
 	let arr = mutations
-
+	let channelId;
 	arr.forEach((d) => {
 		if (d.payload.hasOwnProperty('musicTrack')) {
 			items.push(d.payload.musicTrack)
 		}
 		if (d.payload.hasOwnProperty('musicAlbumRelease')) {
 			Object.assign(info, d.payload.musicAlbumRelease)
+
 			// console.log(info)
 		}
+		if (d.payload.hasOwnProperty('musicArtist')){
+			let {externalChannelId} = d['payload']['musicArtist']
+			channelId = externalChannelId;
+		}
 	})
+	channelId  = !channelId ?
+	data.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+		?.content?.sectionListRenderer?.contents[1]
+		?.musicCarouselShelfRenderer?.contents[0]?.musicTwoRowItemRenderer
+		?.subtitle?.runs[2]?.navigationEndpoint?.browseEndpoint?.browseId : channelId
 	if (info) playlistId = info.radioAutomixPlaylistId
 	items = items.map((item) => {
 		let explicit = false
@@ -42,5 +52,11 @@ export function parsePageContents(data) {
 	})
 	// console.log(items)
 
-	return { items, details: { ...info } }
+	return {
+		items,
+		details: {
+			...info,
+			artistChannelId: channelId
+		}
+	}
 }

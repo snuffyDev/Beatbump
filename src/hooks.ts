@@ -1,6 +1,7 @@
 import { dev } from '$app/env'
+
+import type { Handle } from '@sveltejs/kit'
 const rootDomain = import.meta.env.VITE_DOMAIN // or your server IP for dev
-const siteURL = import.meta.env.VITE_SITE_URL
 
 const directives = {
 	'base-uri': ["'self'"],
@@ -52,7 +53,7 @@ const csp = Object.entries(directives)
 	.map(([key, arr]) => key + ' ' + arr.join(' '))
 	.join('; ')
 
-export async function handle({ request, resolve }) {
+export const handle: Handle = async ({ request, resolve }) => {
 	request.locals = request.headers
 	const response = await resolve(request)
 

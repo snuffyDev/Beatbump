@@ -91,10 +91,10 @@ main {
 a,
 .link {
 	transition: 120ms ease-in opacity;
-	font-family: "Commissioner", sans-serif, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+	font-family: "CommissionerVariable", sans-serif, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 	$color: white;
 	text-decoration: none;
-	font-weight: 450;
+	font-weight: 100 !important;
 	color: $color;
 	cursor: pointer;
 	opacity: 1;

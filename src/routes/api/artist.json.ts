@@ -1,5 +1,6 @@
 import BaseContext from '$lib/context'
 import { parseArtistPage } from '$lib/js/artistUtils'
+import type { ICarousel } from '$lib/types'
 import type { EndpointOutput } from '@sveltejs/kit'
 
 export async function get({
@@ -47,49 +48,50 @@ export async function get({
 			} = {}
 		} = data
 
-		const carouselItems = []
-		const thumbnail = []
-		let description = ''
-		let items = []
-		const headerContent = []
-		const parse = async (header, contents) => {
-			const newData = [
-				parseArtistPage(header?.musicImmersiveHeaderRenderer, contents)
-			]
-			return newData.map((d) => {
-				carouselItems.push([...d.carouselItems])
-				headerContent.push(d[0])
-				if (d[0]) {
-					d[0].thumbnails?.forEach((h) => {
-						thumbnail.push(h)
-					})
-				}
-				if (d?.songs) {
-					items = [...d.songs]
-				} else {
-					items = undefined
-				}
-				description = d[0].description.split('.')
+		const parsed = parse(header, contents)
 
-				return { headerContent, items }
-			})
-		}
-		const body = await parse(header, contents)
-		if (carouselItems.length >= 0) {
-			return {
-				status: 200,
-				body: {
-					body,
-					carouselItems: carouselItems[0],
-					headerContent: headerContent[0],
-					description,
-					thumbnail,
-					items
-				}
+		return {
+			status: 200,
+			body: {
+				...parsed[0]
 			}
 		}
 	} catch (err) {
 		console.log(err)
 		throw new Error(err)
 	}
+}
+
+function parse(header, contents) {
+	const carouselItems: ICarousel[] | null = []
+	const thumbnail = []
+	let description = ''
+	let items = []
+	const headerContent = []
+	const newData = [
+		parseArtistPage(header?.musicImmersiveHeaderRenderer, contents)
+	]
+	return newData.map((d) => {
+		carouselItems.push(...d.carouselItems)
+		headerContent.push(d[0])
+		if (d[0]) {
+			d[0].thumbnails?.forEach((h) => {
+				thumbnail.push(h)
+			})
+		}
+		if (d?.songs) {
+			items = [...d.songs]
+		} else {
+			items = undefined
+		}
+		description = d[0].description.split('.')
+
+		return {
+			header: headerContent[0],
+			songs: items,
+			thumbnail,
+			carousels: carouselItems,
+			description
+		}
+	})
 }

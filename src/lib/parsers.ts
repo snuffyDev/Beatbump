@@ -51,16 +51,21 @@ export const MusicTwoRowItemRenderer = (ctx: any): CarouselItem => {
 					?.playlistId
 			: ctx.musicTwoRowItemRenderer?.thumbnailOverlay
 					?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer
-					?.playNavigationEndpoint?.watchPlaylistEndpoint?.playlistId,
-		endpoint: {
-			browseId:
-				ctx.musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint
-					?.browseId,
-			pageType:
-				ctx.musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint
-					?.browseEndpointContextSupportedConfigs
-					?.browseEndpointContextMusicConfig?.pageType
-		},
+					?.playNavigationEndpoint?.watchPlaylistEndpoint?.playlistId ||
+			  ctx.musicTwoRowItemRenderer?.overlay?.musicItemThumbnailOverlayRenderer
+					?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
+					?.watchPlaylistEndpoint?.playlistId,
+		endpoint: ctx.musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint
+			? {
+					browseId:
+						ctx.musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint
+							?.browseId || undefined,
+					pageType:
+						ctx.musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint
+							?.browseEndpointContextSupportedConfigs
+							?.browseEndpointContextMusicConfig?.pageType || undefined
+			  }
+			: undefined,
 
 		subtitle: ctx?.musicTwoRowItemRenderer?.subtitle?.runs
 	}
@@ -82,6 +87,7 @@ export const MusicResponsiveListItemRenderer = (ctx: any): CarouselItem => {
 		title:
 			ctx.musicResponsiveListItemRenderer.flexColumns[0]
 				.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text,
+		aspectRatio: ctx.musicResponsiveListItemRenderer.flexColumnDisplayStyle,
 		videoId:
 			ctx.musicResponsiveListItemRenderer.flexColumns[0]
 				.musicResponsiveListItemFlexColumnRenderer.text.runs[0]

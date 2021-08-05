@@ -117,7 +117,7 @@
 			left: 0;
 			content: '';
 			width: 100%;
-			height: 4.7rem;
+			height: 4.5rem;
 		}
 		&::after {
 			background: #232530;
@@ -218,6 +218,18 @@
 				color: var(--light-text);
 			}
 			background: var(--light-base);
+			a small {
+				$color: rgb(71, 71, 71);
+				font-size: 0.95rem;
+				font-weight: 700;
+				font-variant-caps: all-petite-caps;
+				letter-spacing: 0.02rem;
+				transition: ease-in-out color 75ms;
+				color: $color !important;
+				&:hover {
+					color: lighten($color, 30%) !important;
+				}
+			}
 			.footer-container,
 			.player {
 				background: var(--light-bottom);

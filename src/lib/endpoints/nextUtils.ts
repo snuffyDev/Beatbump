@@ -6,7 +6,6 @@ export function parseContents(
 	current
 ) {
 	if (contents) {
-		// console.log('contents:::::::::::::::: ' + contents)
 		let arr = []
 		let currentMix = current.playlistId
 		arr.push(
@@ -80,7 +79,6 @@ export function parseContents(
 					length: playlistPanelVideoRenderer.lengthText.runs[0].text
 				}
 			})
-			// console.log('results:::::::::::::::: ' + results)
 
 			return {
 				currentMixId: currentMix,
