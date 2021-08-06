@@ -23,12 +23,11 @@ To get caching for responses with Cloudflare Workers, a custom adapter is used. 
 For both adapters: The [official adapter](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare-workers) follow the regular Wrangler setup.
 
 For deploying to Cloudflare Workers, there's two commands in `package.json` for this:
-| command  | description |
-|--        |-- |
-| `deploy` |  Is a typical deployment to Cloudflare Workers.<br> - Run this if you don't have the `.svelte-kit` & `build` folders.|
-| `deploy:clean` |  Will delete the `.svelte-kit` and the `build` folders <br>   - This deletes the old files left over from the dev server for a clean starting point next time you run `dev`
 
-
+| command 	| description 	|
+|---	|---	|
+| `deploy` 	| A typical Cloudflare Workers deployment, use this if you do not have the `.svelte-kit` and `build` folders. 	|
+| `deploy:clean` 	| To ensure a clean slate when you launch the dev server at a later date,<br>run this command to both deploy and delete the `.svelte-kit` and `build` folders 	|
 ## Notice For Public Instances
 
 Whenever you are ready to deploy Beatbump, it's important to remember that YouTube uses *region-locking* for a lot of music. If you are just hosting this for yourself, then there should be no issues in terms of content playback.
