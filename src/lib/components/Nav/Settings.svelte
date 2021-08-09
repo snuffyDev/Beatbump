@@ -9,13 +9,11 @@
 	import { page } from '$app/stores'
 	import { browser } from '$app/env'
 
-	export let isSettings
-	$: curTheme = $theme
-	$: setTheme = $theme
-	if (browser) {
+	export let isSettingsOpen
+	$: options = {
+		theme: $theme,
+		filter: $filterAutoPlay
 	}
-	$: setFilter = $filterAutoPlay
-
 	let themes = [
 		{ name: 'dark' },
 		{ name: 'dim' },
@@ -25,11 +23,11 @@
 	]
 </script>
 
-{#if isSettings}
+{#if isSettingsOpen}
 	<div
 		use:clickOutside
 		on:click_outside={() => {
-			isSettings = !isSettings
+			isSettingsOpen = !isSettingsOpen
 		}}
 		class="nav-settings"
 		transition:fade={{ duration: 120, easing: circIn }}>
@@ -40,15 +38,13 @@
 				<!-- svelte-ignore a11y-no-onchange -->
 				<select
 					id="select"
-					bind:value={setTheme}
+					bind:value={options.theme}
 					on:change={() => {
-						theme.set(setTheme)
+						theme.set(options.theme)
 					}}>
 					{#each themes as theme}
-						<option
-							value={theme.name}
-							style={`background-color: var(--${setTheme}-forms); color: inherit;`}
-							selected={setTheme}>{theme.name}</option>
+						<option value={theme.name} selected={options.theme}
+							>{theme.name}</option>
 					{/each}
 				</select>
 			</div>
@@ -57,9 +53,9 @@
 			<label for="checkbox" class="s-text">Dedupe Automix: </label>
 			<input
 				type="checkbox"
-				bind:checked={setFilter}
+				bind:checked={options.filter}
 				on:change={() => {
-					filterAutoPlay.set(setFilter)
+					filterAutoPlay.set(options.filter)
 				}} />
 		</div>
 	</div>
@@ -67,15 +63,11 @@
 
 <style lang="scss">
 	.s-text {
-		padding: 0 0.8rem 0.2rem 0.8rem; /* align-self: start; */
+		padding: 0 0.8rem 0.2rem 0.8rem;
 		font-size: 1.1rem;
-		// margin-right: 4rem;
 	}
 
 	.nav-settings {
-		// padding-left: 2em !important;
-
-		// filter: drop-shadow(0.5rem 1.2rem 1rem #0e0d0d2c);
 		right: 0;
 		top: 4rem;
 		display: flex;

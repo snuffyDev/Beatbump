@@ -100,7 +100,7 @@
 		display: grid;
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(10.85rem, 1fr));
-		grid-gap: 1rem 1.2rem; // grid-gap: 1rem 1.5rem;
+		grid-gap: 1rem 1.2rem;
 		@media screen and (max-width: 575px) {
 			grid-template-columns: repeat(auto-fit, minmax(10.85rem, 1fr));
 		}
@@ -118,6 +118,5 @@
 	main {
 		margin: 0;
 		padding: 0;
-		// overflow-y: scroll;
 	}
 </style>

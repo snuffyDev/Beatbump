@@ -1,27 +1,36 @@
 <script lang="ts">
-	import { errorHandler } from '$lib/stores/stores'
+	import { alertHandler } from '$lib/stores/stores'
 
-	export let color
+	export let color = 'red'
 	export let message
 
 	import { fly } from 'svelte/transition'
 </script>
 
-{#if $errorHandler.msg}
-	<div
-		transition:fly={{ y: 200, duration: 750 }}
-		on:introend={() => {
-			setTimeout(() => {
-				errorHandler.set({ msg: undefined, action: undefined })
-			}, 2500)
-		}}
-		class="alert m-alert-danger">
-		{message}
-	</div>
-{/if}
+<div class="alert-container">
+	{#if $alertHandler.msg}
+		<div
+			transition:fly={{ y: 200, duration: 750 }}
+			on:introend={() => {
+				setTimeout(() => {
+					alertHandler.set({ msg: undefined, action: undefined })
+				}, 2500)
+			}}
+			class="alert m-alert-error">
+			{message}
+		</div>
+	{/if}
+</div>
 
 <style lang="scss">
+	.alert-container {
+		display: flex;
+		position: fixed;
+		bottom: 5rem;
+		left: 0;
+		right: 0;
+		justify-content: center;
+	}
 	.m-alert-danger {
-		max-width: 29.375rem !important;
 	}
 </style>

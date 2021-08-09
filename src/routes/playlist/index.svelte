@@ -26,14 +26,14 @@
 	import { onMount, setContext } from 'svelte'
 	export let tracks: PlaylistItem[]
 	export let header: Header
-	// export let error;
+	
 	export let continuations
 	const key = {}
 	$: hasList = $list.mix.length > 0
 	$: isThisPage = false
 	let pageTitle = header?.title
 	let description
-	// setContext(key, header.playlistId);
+	
 	console.log(tracks, continuations, header)
 	console.log(continuations)
 	$: console.log(isThisPage, $isPagePlaying)
@@ -54,7 +54,7 @@
 			}
 		}
 	})
-	// import { getPlaylist } from '$lib/utils'
+	
 	let width
 </script>
 

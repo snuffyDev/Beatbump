@@ -4,7 +4,6 @@ export function parseItem(item = [], length) {
 	item = [item]
 	const result = item.map((item) => {
 		const title = item.title
-		// console.log(item)
 		if (item?.subtitle) {
 			return {
 				title: title,
@@ -32,7 +31,6 @@ export function parseItem(item = [], length) {
 			length: length
 		}
 	})
-	// console.log(result)
 	return result[0]
 }
 

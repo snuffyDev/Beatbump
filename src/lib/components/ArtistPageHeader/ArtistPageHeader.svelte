@@ -10,7 +10,7 @@
 	export let width
 	let container: HTMLDivElement
 	let y = 0
-	let handler = (event: UIEvent) => {}
+	let handler = (event?: FrameRequestCallback | UIEvent) => {}
 	let wrapper: HTMLElement
 
 	onMount(() => {
@@ -22,25 +22,26 @@
 
 			const elapsed = event.timeStamp - start
 			if (container) {
-				window.requestAnimationFrame(function (e) {
-					y =
-						window.innerWidth < 500
-							? Math.min(
-									Math.max((-scroll.top / window.innerHeight) * 4, 0),
-									10
-							  ) * 350
-							: Math.min(
-									Math.max((-scroll.top / window.innerHeight) * 4, 0),
-									10
-							  ) * 50
-					window.requestAnimationFrame(handler)
-
-					window.cancelAnimationFrame(y)
-				})
+				y =
+					window.innerWidth < 500
+						? Math.min(
+								Math.max((-scroll.top / window.innerHeight) * 4, 0),
+								10
+						  ) * 350
+						: Math.min(
+								Math.max((-scroll.top / window.innerHeight) * 4, 0),
+								10
+						  ) * 50
 			}
 		}
 		wrapper = document.getElementById('wrapper')
-		wrapper.addEventListener('scroll', handler, { passive: true })
+		wrapper.addEventListener(
+			'scroll',
+			() => {
+				window.requestAnimationFrame(handler)
+			},
+			{ passive: true }
+		)
 		return () => {
 			window.cancelAnimationFrame(y)
 
@@ -103,7 +104,6 @@
 
 <!--  -->
 <style lang="scss">
-	// @import "../../../global/vars.css";
 	button {
 		flex-wrap: nowrap;
 		display: inline-flex;
@@ -143,9 +143,8 @@
 		position: relative;
 		height: 100%;
 		min-height: 13rem;
-		// max-height: 30%;
+
 		&::before {
-			// padding-top: 100%;
 			position: absolute;
 			content: '';
 			top: 0;
@@ -161,18 +160,13 @@
 		height: inherit;
 		position: absolute;
 
-		// background-size: cover;
-		// background-position: top;
-		// background-attachment: fixed;
-
 		top: 0;
 	}
 	.header-thumbnail {
 		z-index: -1;
 		top: 0;
 		width: 100%;
-		// max-height: 25%;
-		// aspect-ratio: 16/9;
+
 		object-fit: cover;
 		overflow: hidden;
 		border-radius: 0;
@@ -194,9 +188,8 @@
 				font-weight: 700;
 				font-size: 2.5rem;
 				display: inline-block;
-				font-family: 'CommissionerVariable', sans-serif;
+				font-family: 'Commissioner', sans-serif;
 
-				// white-space: pre;
 				text-shadow: rgba(0, 0, 0, 0.171) 0.2rem -0.12rem 0.5rem;
 
 				letter-spacing: -0.02em;
@@ -210,16 +203,15 @@
 				}
 				@media screen and (min-width: 642px) and (max-width: 839px) {
 					font-size: 2rem;
-					// color: pink;
+
 					padding: 0.8em 0 0.8rem 2rem;
 				}
 				@media screen and (min-width: 840px) and (max-width: 960px) {
 					font-size: 3.5rem;
-					// color: orange;
+
 					inline-size: 100%;
 					overflow-wrap: break-word;
 
-					// font-size: 2.75em;
 					padding: 0 2rem 0.8rem 2rem;
 				}
 				@media screen and (min-width: 961px) {
@@ -240,24 +232,13 @@
 			padding: 0 0 0.8rem 1.8rem;
 		}
 		@media screen and (min-width: 642px) and (max-width: 839px) {
-			// font-size: 2rem;
-			// color: pink;
 			padding: 0 0 0.8rem 2rem;
 		}
 		@media screen and (min-width: 840px) and (max-width: 960px) {
-			// font-size: 3.5rem;
-			// color: orange;
-			// inline-size: 100%;
-			// overflow-wrap: break-word;
-
-			// font-size: 2.75em;
 			padding: 0 2rem 0.8rem 2rem;
 		}
 		@media screen and (min-width: 961px) {
 			padding: 0 2rem 0.8rem 2rem;
-			// font-size: 4.5rem;
-		}
-		button {
 		}
 	}
 </style>

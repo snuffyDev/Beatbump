@@ -37,8 +37,7 @@
 		align-self: center;
 		margin-right: 0.7rem;
 		grid-area: end !important;
-		/* position: absolute; */
-		/* top: calc(100% - 50%); */
+
 		background-color: currentColor;
 		clip-path: polygon(100% 0, 0 0, 50% 100%);
 		-webkit-clip-path: polygon(100% 0, 0 0, 50% 100%);
@@ -65,8 +64,6 @@ select {
 	width: 100%;
 	outline: none;
 	color: inherit;
-	min-width: 15ch;
-	max-width: 30ch;
 	height: inherit;
 	cursor: inherit;
 	appearance: none;

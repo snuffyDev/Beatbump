@@ -12,7 +12,7 @@ type SearchStore = {
 	update: Writable<SearchContents>['update']
 }
 
-export const errorHandler = writable({
+export const alertHandler = writable({
 	msg: undefined,
 	action: undefined
 })

@@ -39,15 +39,14 @@ body {
 	-webkit-text-size-adjust: 100%;
 
 	/* ===== Scrollbar CSS ===== */
-	/* Firefox */
+
 	* {
 		scrollbar-gutter: 10px;
 		scrollbar-width: thin;
 		scrollbar-color: #c7c7c7 #5e5e5e2f;
 	}
 
-	/* Chrome, Edge, and Safari */
-	*::-webkit-scrollbar {
+	::-webkit-scrollbar {
 		width: 0.916667rem;
 		height: 0.916667rem;
 	}
@@ -83,7 +82,7 @@ body {
 		font-size: 14px;
 	}
 	@media screen and (min-width: 1441px) {
-		font-size: 16px;
+		font-size: 110%;
 	}
 }
 
@@ -94,7 +93,6 @@ body {
 		scrollbar-color: #c7c7c7 #5e5e5e2f;
 	}
 
-	/* Chrome, Edge, and Safari */
 	*::-webkit-scrollbar {
 		width: 0.916667rem;
 		height: 0.916667rem;
@@ -122,12 +120,12 @@ body {
 
 body {
 	margin: 0;
-	overflow: hidden;
+	// overflow: hidden;
 	position: fixed;
 	height: 100%;
 	width: 100%;
 }
-.body {
+#app {
 	grid-template-rows: 4rem 1fr 4.5rem;
 	position: fixed;
 	height: 100%;
@@ -142,7 +140,7 @@ body {
 	max-width: 100%;
 }
 @media (min-width: 640px) {
-	.body {
+	#app {
 		grid-template-areas:
 			"n n n n"
 			"s m m m"

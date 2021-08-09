@@ -26,7 +26,7 @@
 	import Carousel from '$components/Carousel/Carousel.svelte'
 	import type { ICarousel } from '$lib/types'
 
-	$: console.log(carouselItems)
+	// $: console.log(carouselItems)
 </script>
 
 <svelte:head>

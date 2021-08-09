@@ -12,7 +12,12 @@
 						: ''
 				}`
 		)
-		const { sections, header, title } = await response.json()
+		const {
+			sections = [],
+			header = '',
+			title = [] | ''
+		} = await response.json()
+		// console.log(sections, header, title)
 		if (response.ok) {
 			return {
 				props: {
@@ -33,9 +38,11 @@
 	export let title: string
 	import { goto } from '$app/navigation'
 	import Header from '$lib/components/Layouts/Header.svelte'
+	import list from '$lib/stores/list'
+	// $: console.log(sections, header, title)
 </script>
 
-<Header name={title.replace(',', ' ')} />
+<Header name={title ? title.replace(',', ' ') : ''} />
 
 <main>
 	<div class="header">
@@ -44,19 +51,24 @@
 	{#each sections as section}
 		<div class="grid">
 			{#each section.section as item}
-				{#if item.type == 'albums'}
-					<div
-						class="item"
-						on:click={() => goto('/release?id=' + item.browseId)}>
-						<div class="img">
-							<img loading="lazy" src={item.thumbnail} alt="thumbnail" />
-						</div>
-						<div class="item-title">{item.title}</div>
-						<div class="item-subtitle">
-							{#each item.subtitles as { text }}{text}{/each}
-						</div>
+				<div
+					class="item"
+					on:click={() => {
+						item.type == 'albums'
+							? goto('/release?id=' + item?.browseId)
+							: list.initList(item.videoId, item.autoMixList)
+					}}>
+					<div class="img">
+						<img loading="lazy" src={item.thumbnail} alt="thumbnail" />
 					</div>
-				{/if}
+					<div class="item-title">{item.title}</div>
+					<div class="item-subtitle">
+						{#each item.subtitles as sub}{#if !sub?.navigationEndpoint}{sub.text}{:else}<a
+									href={`/artist/${sub?.navigationEndpoint?.browseEndpoint?.browseId}`}
+									>{sub.text}</a
+								>{/if}{/each}
+					</div>
+				</div>
 			{/each}
 		</div>
 	{/each}
@@ -85,6 +97,8 @@
 		padding: 0.5rem 0.4rem 0.4rem;
 		position: relative;
 		width: 100%;
+		cursor: pointer;
+
 		.img {
 			width: 100%;
 			margin-bottom: 0.5em;
@@ -93,11 +107,12 @@
 	.item-title {
 		display: inline;
 		padding: 0.3rem 0.1rem;
-		font-family: 'CommissionerVariable';
+		font-family: 'Commissioner';
 		font-weight: 500;
 		font-size: 1.1em;
 		letter-spacing: -0.02em;
-		margin-bottom: 0.5em;
+		margin-bottom: 0.25em;
+		cursor: pointer;
 	}
 
 	@media screen and (min-width: 25rem) and (max-width: 37rem) {

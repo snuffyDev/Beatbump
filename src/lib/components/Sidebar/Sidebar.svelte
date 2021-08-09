@@ -44,7 +44,7 @@
 		overflow-x: hidden;
 		overflow-y: hidden;
 		top: 0;
-		/* bottom: 6rem; */
+
 		padding: 0 0.3125rem 6rem;
 		width: 16rem;
 		max-width: 16rem;
@@ -70,15 +70,15 @@
 	.bottom {
 		position: absolute;
 		bottom: 1rem;
-		// display: flex;
+
 		flex-direction: column;
-		/* margin-left: 2.5rem; */
+
 		line-height: 2;
 		text-align: center;
 		flex-wrap: nowrap;
 		left: 0;
 		right: 0;
-		/* z-index: 200;*/
+
 	}
 	@media (min-width: 640px) {
 		.sidebar {

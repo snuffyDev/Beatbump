@@ -122,7 +122,7 @@
 			font-weight: 400;
 		}
 		.artist {
-			font-family: 'CommissionerVariable', sans-serif;
+			font-family: 'Commissioner', sans-serif;
 			font-weight: 450;
 		}
 	}

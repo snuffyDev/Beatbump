@@ -32,24 +32,21 @@
 	top: 2rem;
 
 	isolation: isolate;
-	/* position: absolute; */
-	/* flex: none; */
-	flex-direction: column;
+
+lex-direction: column;
 }
 .dd-player {
-	/* margin-top: 0; */
 	position: fixed;
 
 	margin-top: -1.75em;
-	/* position: absolute; */
+
 	right: 0;
-	background: #18191b;
+ackground: #18191b;
 	outline: 0.0714rem solid rgba(231, 231, 231, 0.329);
-	/* display: flex; */
-	/* top: 0; */
+
 	// isolation: isolate;
 
-	transform: translateY(-3.25rem);
+ransform: translateY(-3.25rem);
 	flex-direction: column;
 	flex-wrap: nowrap;
 }

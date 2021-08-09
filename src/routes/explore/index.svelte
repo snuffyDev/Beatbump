@@ -51,9 +51,9 @@
 
 <style lang="scss">
 	.breakout {
-		// border: 2px solid rgba(119, 136, 153, 0.171);
+
 		border-radius: 0.8rem;
-		// padding: 0.8rem;
+
 	}
 	.box-cont {
 		justify-content: space-around;
@@ -62,7 +62,7 @@
 	}
 	box {
 		display: grid;
-		// grid-gap: 1rem;
+
 
 		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 

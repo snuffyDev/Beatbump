@@ -73,9 +73,6 @@
 		@media screen and (min-width: 960px) {
 			margin-bottom: 3rem;
 		}
-		/* width: 100%; */
-		/* max-width: 100%; */
-		/* overflow: scroll;*/
 	}
 
 	.scroll {
@@ -83,22 +80,16 @@
 		grid-column-gap: 0.5rem;
 		overflow-y: hidden;
 		height: auto;
-		/* overflow-y: clip; */
+
 		display: grid;
-		// grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-		// grid-auto-rows: 1fr;
+
 		grid-auto-flow: column;
-		/* flex-direction: row; */
+
 		overflow-x: scroll;
 		grid-template-columns: repeat(auto, 1fr);
-
+		padding-top: 1rem;
 		width: auto;
 		scroll-snap-type: x mandatory;
-		// /* flex: 1 1 auto; */
-		// box-shadow: 0 0 10px 3px rgb(0 0 0 / 13%),
-		// 	inset -2px -2px 20px 0 hsl(0deg 0% 57% / 10%),
-		// 	inset 0 0 11px 3px rgb(46 56 56 / 9%);
-
 		border-radius: inherit;
 		overflow-anchor: none;
 		-webkit-overflow-scrolling: touch;

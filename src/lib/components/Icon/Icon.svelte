@@ -3,6 +3,7 @@
 	export let size = '1.5rem'
 	export let focusable = false
 	export let color = 'currentColor'
+	export let width = 0
 	let box = 24
 	let icons = [
 		{
@@ -102,6 +103,7 @@
 			svg: `<polygon points="19 20 9 12 19 4 19 20" />
   <line x1="5" y1="19" x2="5" y2="5" />`
 		},
+		{ name: 'minus', svg: `  <line x1="-100" y1="0" x2="100" y2="0" />` },
 		{
 			name: 'radio',
 			svg: `<circle cx="12" cy="12" r="2" />
@@ -121,7 +123,7 @@
 	xmlns="http://www.w3.org/2000/svg"
 	class={$$props.class}
 	{focusable}
-	width={size}
+	width={width !== 0 ? width : size}
 	height={size}
 	fill="none"
 	stroke-width="2"

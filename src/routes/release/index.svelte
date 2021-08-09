@@ -43,7 +43,7 @@
 
 	const promise = parsePageContents(data)
 	let { details, items } = promise
-	console.log(promise)
+	// console.log(promise)
 	const playAlbum = () => {
 		list.startPlaylist(details.audioPlaylistId)
 		key.set(0)
@@ -143,8 +143,8 @@
 	@import '../../lib/shared/listPages.scss';
 
 	button {
-		font-family: 'CommissionerVariable' sans-serif;
-		font-weight: 550 !important;
+		font-family: 'Commissioner' sans-serif;
+		font-weight: 500 !important;
 	}
 	.radioMix:not(.radioMix-light) :not(.light) {
 		background-color: transparent !important;
@@ -179,5 +179,4 @@
 			color: #121212 !important;
 		}
 	}
-	// @import '../../lib/shared/listPages.scss';
 </style>

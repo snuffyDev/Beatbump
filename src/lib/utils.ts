@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from './api'
 import { sort } from './endpoints/playerUtils'
-import { errorHandler, updateTrack } from './stores/stores'
+import { alertHandler, updateTrack } from './stores/stores'
 import { key } from './stores/stores'
 
-// Shuffle array possitions
+// Shuffle array positions
 export function shuffle(array: any[]) {
 	array.sort(() => Math.random() - 0.5)
 }
@@ -17,8 +17,9 @@ function format(seconds) {
 
 	return `${minutes}:${seconds}`
 }
-// adds song to queue
-export const addToQueue = async (videoId: any) => {
+
+// Fetches a song length for adding to queue
+export const addToQueue = async (videoId: string): Promise<string> => {
 	const url = `/api/player.json${videoId ? `?videoId=${videoId}` : ''}`
 	const data = await fetch(url, { headers: { accept: 'application/json' } })
 		.then((json) => json.json())
@@ -40,15 +41,13 @@ export const getSrc = async (videoId?: string, playlistId?: string) => {
 	return src
 }
 function setTrack(formats) {
-	// console.log(formats)
 	const parsedURL = formats[0].url
 	updateTrack.set(parsedURL)
 	return { body: parsedURL, error: false }
 }
 function handleError() {
 	console.log('error')
-	// console.log(formats)
-	errorHandler.set({
+	alertHandler.set({
 		msg: 'No audio stream found, skipping.',
 		action: 'getNextTrack'
 	})

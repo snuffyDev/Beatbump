@@ -11,7 +11,7 @@ interface SearchOutput extends EndpointOutput {
 	continuation?: NextContinuationData
 }
 export async function get({ query }): Promise<SearchOutput> {
-	// console.time('test')
+
 	let q = query.get('q')
 	const filter = query.get('filter') || ''
 	const videoId = query.get('videoId') || ''
@@ -19,7 +19,7 @@ export async function get({ query }): Promise<SearchOutput> {
 	const playlistId = query.get('playlistId') || ''
 	const ctoken = query.get('ctoken') || ''
 	const browseId = query.get('browseId') || ''
-	// console.log(q)
+
 	const pageType = query.get('pt') || ''
 
 	const response = await fetch(
@@ -59,9 +59,9 @@ export async function get({ query }): Promise<SearchOutput> {
 			}
 		}
 	)
-	// return { status: 200, body: await response.json() }
+
 	if (!response.ok) {
-		// NOT res.status >= 200 && res.status < 300
+
 		return { status: response.status, body: response.statusText }
 	}
 	const data = await response.json()
@@ -76,10 +76,10 @@ export async function get({ query }): Promise<SearchOutput> {
 								sectionListRenderer: {
 									contents: [
 										{
-											// didYouMeanRenderer = {},
-											// messageRenderer: {
-											// 	text: { runs: [{ text: string }] = {} } = {}
-											// } = {},
+
+
+
+
 											musicShelfRenderer
 										} = {}
 									] = [],
@@ -93,13 +93,13 @@ export async function get({ query }): Promise<SearchOutput> {
 		} = {}
 	} = await data
 	if (Object.prototype.hasOwnProperty.call(data, 'continuationContents')) {
-		// const results =
+
 		return {
 			status: 200,
 			body: parseSearchResult(continuationContents, true, filter)
 		}
 	} else {
-		// const results = parseSearchResult(contents, false, filter)
+
 
 		return {
 			status: 200,
@@ -110,7 +110,7 @@ export async function get({ query }): Promise<SearchOutput> {
 // Parse the playlist results for search.
 const parsePlaylist = (contents): PlaylistSearch[] => {
 	return contents.map(({ musicResponsiveListItemRenderer }) => {
-		// const d = musicResponsiveListItemRenderer
+
 		const thumbnails =
 			musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail
 				.thumbnails
@@ -146,7 +146,7 @@ const parsePlaylist = (contents): PlaylistSearch[] => {
 
 const parseSong = (contents, type): Song[] => {
 	return contents.map(({ musicResponsiveListItemRenderer: ctx = {} }, i) => {
-		// let d = musicResponsiveListItemRenderer
+
 		let explicit
 		if (Object.prototype.hasOwnProperty.call(ctx, 'badges')) explicit = true
 		const flexColumns = pb(
@@ -159,7 +159,7 @@ const parseSong = (contents, type): Song[] => {
 		const title =
 			ctx.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0]
 				.text
-		// console.log(title)
+
 
 		let browseId
 		if (
@@ -168,7 +168,7 @@ const parseSong = (contents, type): Song[] => {
 		) {
 			const menu = ctx.menu?.menuRenderer.items
 			const { musicNavigationItemRenderer: items = [] } = menu
-			// console.log(items);
+
 			if (items.length > 4) {
 				browseId = items[3].navigationEndpoint.browseEndpoint.browseId
 			} else {
@@ -180,7 +180,7 @@ const parseSong = (contents, type): Song[] => {
 					?.runs[0]?.navigationEndpoint?.browseEndpoint?.browseId
 		}
 
-		// const { videoId = '', playlistId, params }
+
 		const videoId =
 			ctx.menu?.menuRenderer?.items[0]?.menuNavigationItemRenderer
 				?.navigationEndpoint.watchEndpoint?.videoId
@@ -194,7 +194,7 @@ const parseSong = (contents, type): Song[] => {
 		const {
 			runs: metaInfo = []
 		} = ctx.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text
-		// console.log(metaInfo)
+
 		let albumInfo
 		if (type == 'song') {
 			const albumArr: [] = flexColumns[1].text.runs
@@ -210,7 +210,7 @@ const parseSong = (contents, type): Song[] => {
 		} else {
 			albumInfo = null
 		}
-		// let album = {};
+
 		const length = metaInfo[metaInfo.length - 1]
 		let artists = []
 		if (type !== 'artist') {
@@ -229,7 +229,7 @@ const parseSong = (contents, type): Song[] => {
 			browseId: browseId,
 			artist: artists
 		}
-		// console.log(artists, artists)
+
 		return {
 			album: albumInfo,
 			artistInfo: artist,
@@ -254,14 +254,14 @@ function parseSearchResult(data, cont, filter?) {
         data = response data
         cont = continuation
 				*/
-	// console.log(data)
+
 	let continuation
 
 	let didYouMean
 	let ctx
 
 	if (cont) {
-		// if has continuation, context = data
+
 		ctx = [data]
 	} else {
 		/*  Error Handling
@@ -316,7 +316,7 @@ function parseSearchResult(data, cont, filter?) {
 			const { contents: ctx } = contents[0]
 			continuation = continuationCheck(contents[0])
 
-			// console.log(contents)
+
 			results = parseSong(ctx, 'song')
 			return { results, continuation }
 		} else if (videoParams == filter) {
@@ -349,7 +349,6 @@ function parseSearchResult(data, cont, filter?) {
 			continuation: continuation
 		}
 	}
-	// console.timeEnd('test')
 	return { contents: results, continuation: continuation }
 }
 function continuationCheck(contents) {

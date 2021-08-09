@@ -1,7 +1,7 @@
 import BaseContext from './../../lib/context'
+
 export async function get({ query }) {
 	const browseId = query.get('browseId')
-	// console.log(endpoint)
 
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
@@ -21,10 +21,6 @@ export async function get({ query }) {
 		}
 	)
 
-	// if (!response.ok) {
-	// 	// NOT res.status >= 200 && res.status < 300
-	// 	return { status: response.status, body: response.statusText }
-	// }
 	const data = await response.json()
 
 	const {

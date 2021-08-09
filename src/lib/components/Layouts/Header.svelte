@@ -10,6 +10,7 @@
 </script>
 
 <svelte:head>
-	<title>{name} - Beatbump</title>
+	<title
+		>{$currentTitle !== undefined || '' ? $currentTitle : name} - Beatbump</title>
 	<meta property="og:title" content={name} />
 </svelte:head>

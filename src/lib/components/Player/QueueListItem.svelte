@@ -20,9 +20,6 @@
 					left: 0
 				})
 				list.moreLikeThis(item)
-				// await tick()
-				// list.getMore()
-				// alert('Coming soon!')
 			}
 		}
 	]
@@ -34,7 +31,6 @@
 		console.log('itemitem')
 	}
 	let isHidden = false
-	// $: console.log(item)
 </script>
 
 <li id={index} class:active={$key == index} class="item">
@@ -59,7 +55,6 @@
 	<div
 		class="clickable"
 		on:click|stopPropagation={(event) => {
-			// console.log(`${autoId}`)
 			handleClick(index)
 		}}>
 		<div class="p-text">
@@ -105,13 +100,13 @@
 		border-radius: 0.8em;
 		margin-right: 0.75rem;
 		margin-bottom: 0.5rem;
-		// transition: all cubic-bezier(0.39, 0.575, 0.565, 1) 0.23s;;
+
 		background-color: transparentize(rgba(170, 170, 170, 0.801), 0.7);
 	}
 	.pl-thumbnail {
 		width: auto;
 		height: 5rem;
-		// opacity: 1;;
+
 		background: #00000027;
 		border-radius: var(--sm-radius);
 		img {
@@ -126,7 +121,7 @@
 			background: transparent;
 			-o-object-fit: scale-down;
 			background-color: transparent;
-			/* box-shadow: -0.1em 0.1em 0.5em 0 #00000057; */
+
 			transition: background-color cubic-bezier(0.77, 0, 0.175, 1) 0.1s;
 
 			&:active {
@@ -167,7 +162,7 @@
 		border-radius: 0.4em;
 		aspect-ratio: inherit;
 		-o-object-fit: scale-down;
-		background: rgba(12, 12, 12, 0.26); // border: 0.2em solid rgb(17 21 28);;
+		background: rgba(12, 12, 12, 0.26);
 	}
 	.p-artist {
 		font-weight: 600;
@@ -188,7 +183,6 @@
 		content: '';
 		display: block;
 		padding-top: calc(100% * 2 / 3);
-		/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
 	}
 	.p-title {
 		padding: 0em;

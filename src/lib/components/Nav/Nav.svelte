@@ -11,7 +11,7 @@
 	import { theme } from '$stores/stores'
 	let isHidden = true
 	let hidden = isHidden ? true : false
-	let isSettings
+	let isSettingsOpen
 	let shown
 </script>
 
@@ -61,16 +61,15 @@
 				shown = !shown
 				hidden = !hidden
 			}}>
-			<svelte:component this={Icon} name="search" size="1.5em" />
+			<Icon  name="search" size="1.5em" />
 		</div>
-		<Settings bind:isSettings />
+		<Settings bind:isSettingsOpen />
 		<div
-			class:btn-settings-desktop={width > 640}
 			class="nav-item btn-settings"
 			on:click|stopPropagation={() => {
-				isSettings = !isSettings
+				isSettingsOpen = !isSettingsOpen
 			}}>
-			<svelte:component this={Icon} name="settings" size="1.5em" />
+			<Icon  name="settings" size="1.5em" />
 		</div>
 	</section>
 </nav>
@@ -78,6 +77,8 @@
 <style lang="scss">
 	.btn-settings {
 		cursor: pointer;
+		display:block !important;
+		visibility:visible !important;
 	}
 	.homeIcon {
 		grid-area: m;
@@ -167,6 +168,13 @@
 			margin-right: 0;
 		}
 	}
+	@media screen and (min-width: 640px){
+		.btn-settings {
+			visibility: hidden;
+		display: none;
+		cursor: pointer;
 
+	}
+	}
 	/* your styles go here */
 </style>

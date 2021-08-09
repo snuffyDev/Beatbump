@@ -12,7 +12,11 @@ export async function api(
 	params?: [] | Record<string, string | number>
 ): Promise<APIResponse> {
 	const urlParams = Object.keys(params)
-		.map((k) => k + '=' + params[k])
+		.map((k) => {
+			if (params[k] == undefined) return
+			return k + '=' + params[k]
+		})
+
 		.join('&')
 	const response = await fetch(`/api/${endpoint}.json?${urlParams}`)
 	const data = await response.json()

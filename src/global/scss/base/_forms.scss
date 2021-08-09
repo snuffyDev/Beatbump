@@ -9,6 +9,7 @@ form {
 		height: auto;
 		min-height: 5ch;
 		max-height: 30ch;
+		margin-left: auto;
 	}
 }
 
@@ -133,7 +134,7 @@ input :not([type="range"]) :not([type="checkbox"]) {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	/* padding: 1.566666ch; */
+
 	justify-self: center;
 	// height: 100%;
 	width: 100%;

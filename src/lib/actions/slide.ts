@@ -3,8 +3,8 @@ export default function slide(node) {
 	let y
 
 	function handleMousedown(event) {
-		x = event.clientX
-		y = event.clientY
+		x = event.clientX || event.touches[0].clientX
+		y = event.clientY || event.touches[0].clientY
 
 		node.dispatchEvent(
 			new CustomEvent('panstart', {
@@ -12,17 +12,17 @@ export default function slide(node) {
 			})
 		)
 
-		window.addEventListener('touchstart', handleMousemove, { passive: true })
-		window.addEventListener('touchmove', handleMouseup, { passive: true })
+		window.addEventListener('touchstart', handleMousemove)
+		window.addEventListener('touchmove', handleMouseup)
 		window.addEventListener('mousemove', handleMousemove, { passive: true })
 		window.addEventListener('mouseup', handleMouseup, { passive: true })
 	}
 
 	function handleMousemove(event) {
-		const dx = event.clientX - x
-		const dy = event.clientY - y
-		x = event.clientX
-		y = event.clientY
+		const dx = event.clientX - x || event.changedTouches[0].clientX
+		const dy = event.clientY - y || event.changedTouches[0].clientY
+		x = event.clientX || event.touches[0].clientX
+		y = event.clientY || event.touches[0].clientY
 
 		node.dispatchEvent(
 			new CustomEvent('panmove', {
@@ -32,8 +32,8 @@ export default function slide(node) {
 	}
 
 	function handleMouseup(event) {
-		x = event.clientX
-		y = event.clientY
+		x = event.clientX || event.touches[0].clientX
+		y = event.clientY || event.touches[0].clientY
 
 		node.dispatchEvent(
 			new CustomEvent('panend', {
@@ -47,7 +47,7 @@ export default function slide(node) {
 		window.removeEventListener('mouseup', handleMouseup)
 	}
 
-	node.addEventListener('touchstart', handleMousedown, { passive: true })
+	node.addEventListener('touchstart', handleMousedown)
 	node.addEventListener('mousedown', handleMousedown, { passive: true })
 
 	return {

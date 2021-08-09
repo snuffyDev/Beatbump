@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher, setContext } from 'svelte'
-	import { slide } from 'svelte/transition'
+	import { slide, fade } from 'svelte/transition'
 	import { goto } from '$app/navigation'
 
 	import Icon from '$components/Icon/Icon.svelte'
@@ -18,26 +18,29 @@
 	setContext('menu', { update: isHidden })
 </script>
 
-<div class="menu">
-	{#if isHidden}
-		<div
-			on:mouseleave|stopPropagation={() => {
-				isHidden = false
-			}}
-			transition:slide={{ duration: 125, easing: quartInOut }}>
-			{#each items as item}
-				<PopoutItem
-					{color}
-					on:click={item.action}
-					on:click={() => {
-						isHidden = !isHidden
-					}}
-					text={item.text}
-					icon={item.icon} />
-			{/each}
-		</div>
-	{/if}
-</div>
+{#if isHidden}
+	<div
+		on:mouseleave|stopPropagation={() => {
+			isHidden = false
+		}}
+		use:clickOutside
+		on:click_outside={() => {
+			isHidden = false
+		}}
+		transition:slide={{ duration: 200, easing: quartInOut }}
+		class="menu">
+		{#each items as item}
+			<PopoutItem
+				{color}
+				on:click={item.action}
+				on:click={() => {
+					isHidden = !isHidden
+				}}
+				text={item.text}
+				icon={item.icon} />
+		{/each}
+	</div>
+{/if}
 
 <style lang="scss">
 	.menu {
@@ -46,7 +49,8 @@
 		flex-direction: column;
 		top: 0.3em;
 		left: 6em;
-		border-radius: 0.2em;
-		background: #333333;
+		border-radius: var(--lg-radius);
+
+		background: #414141;
 	}
 </style>

@@ -1,5 +1,7 @@
-export async function get({ query }): Promise<EndpointOutput> {
-	// if (headers.origin !== "https://beatbump.ml/") { return { status: 400, body: JSON.stringify('CORS error!') } }
+export async function get({ query, headers }): Promise<EndpointOutput> {
+	// if (headers.origin !== 'https://beatbump.ml/') {
+	// 	return { status: 403, body: JSON.stringify('CORS error!') }
+	// }
 
 	const browseId = query.get('browseId')
 	// console.log(endpoint)

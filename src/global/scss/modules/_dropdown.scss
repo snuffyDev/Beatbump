@@ -33,21 +33,18 @@
 	top: 2rem;
 
 	isolation: isolate;
-	/* position: absolute; */
-	/* flex: none; */
+
 	flex-direction: column;
 }
 .dd-player {
-	/* margin-top: 0; */
 	position: fixed;
 
 	margin-top: 0em;
-	/* position: absolute; */
+
 	right: 0;
 	background: #18191b;
 	outline: 0.0714rem solid rgba(231, 231, 231, 0.329);
-	/* display: flex; */
-	/* top: 0; */
+
 	// isolation: isolate;
 
 	transform: translateY(-3.25rem);

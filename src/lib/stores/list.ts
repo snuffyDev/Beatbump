@@ -32,9 +32,9 @@ const fetchNext = async (
 	clickTracking
 ) => {
 	return await fetch(
-		'/api/next.json?playlistId=' +
-			encodeURIComponent(playlistId) +
-			`${videoId ? `&videoId=${videoId}` : ''}` +
+		'/api/next.json?videoId=' +
+			encodeURIComponent(videoId) +
+			`${videoId ? `&playlistId=${playlistId}` : ''}` +
 			`${params ? `&params=${params}` : ''}` +
 			`${clickTracking ? `&clickTracking=${clickTracking}` : ''}` +
 			`${ctoken ? `&ctoken=${ctoken}` : ''}` +
@@ -80,7 +80,7 @@ export default {
 	subscribe: list.subscribe,
 	async initList(
 		videoId: string,
-		playlistId: string,
+		playlistId?: string,
 		keyId?: number,
 		playlistSetVideoId?: string,
 		clickTracking?: string
@@ -96,7 +96,7 @@ export default {
 		const response = await fetchNext(
 			'',
 			videoId,
-			playlistId,
+			playlistId ? playlistId : '',
 			'',
 			playlistSetVideoId ? playlistSetVideoId : '',
 			clickTracking

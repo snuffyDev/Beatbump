@@ -4,6 +4,7 @@ import {
 	MusicResponsiveListItemRenderer,
 	MusicTwoRowItemRenderer
 } from '$lib/parsers'
+
 import type { CarouselHeader, CarouselItem } from '$lib/types'
 import type { EndpointParams } from '$lib/types/internals'
 import type { EndpointOutput } from '@sveltejs/kit'
@@ -12,6 +13,8 @@ export async function get({ query }: EndpointParams): Promise<EndpointOutput> {
 	const endpoint = query.get('q') || ''
 	const browseId = 'FEmusic_explore'
 	const carouselItems = []
+	console.time('test')
+
 	// fetch data using Base Context
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/${endpoint}?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
@@ -47,19 +50,19 @@ export async function get({ query }: EndpointParams): Promise<EndpointOutput> {
 			} = {}
 		} = {}
 	} = await response.json()
-	// console.log({ [contents]: key }, key)
 	carouselItems.push(
-		...contents.filter((content) => {
-			return content.musicCarouselShelfRenderer
+		...contents.filter((contents) => {
+			if (contents.musicCarouselShelfRenderer)
+				return contents.musicCarouselShelfRenderer
 		})
 	)
-
+	const responseBody = []
+	const body = carouselItems.forEach(({ musicCarouselShelfRenderer }) => {
+		responseBody.push(parseCarousel({ musicCarouselShelfRenderer }))
+	})
+	if (responseBody.length !== 0) console.timeEnd('test')
 	return {
-		body: carouselItems.map(({ musicCarouselShelfRenderer } = {}) => ({
-			// console.timeEnd('timer')
-			header: parseHeader([musicCarouselShelfRenderer.header])[0],
-			results: parseBody(musicCarouselShelfRenderer.contents)
-		}))
+		body: responseBody
 	}
 }
 
@@ -87,4 +90,12 @@ function parseBody(contents): CarouselItem[] {
 			throw new Error("Unable to parse items, can't find " + `${r}`)
 		})
 	]
+}
+function parseCarousel({ musicCarouselShelfRenderer }) {
+	// console.timeEnd('timer')
+	// console.log(musicCarouselShelfRenderer)
+	return {
+		header: parseHeader([musicCarouselShelfRenderer.header])[0],
+		results: parseBody(musicCarouselShelfRenderer.contents)
+	}
 }

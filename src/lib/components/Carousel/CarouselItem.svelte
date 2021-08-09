@@ -73,11 +73,11 @@
 			loading = false
 		}
 		if (type == 'artist') {
-			item.endpoint.pageType.includes('ARTIST') &&
+			item?.endpoint?.pageType.includes('ARTIST') &&
 				goto(`/artist/${item?.endpoint?.browseId}`)
 			!isBrowse &&
 			item.videoId !== undefined &&
-			!item.endpoint.pageType.includes('ARTIST')
+			!item?.endpoint?.pageType.includes('ARTIST')
 				? await list.initList(item.videoId, item.playlistId, index)
 				: browseHandler()
 			loading = false

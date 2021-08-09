@@ -18,8 +18,8 @@
 
 ::before,
 ::after {
-	text-decoration: inherit; /* 1 */
-	vertical-align: inherit; /* 2 */
+	text-decoration: inherit;
+	vertical-align: inherit;
 }
 
 /**
@@ -33,14 +33,14 @@
   */
 
 html {
-	cursor: default; /* 1 */
-	line-height: 1.5; /* 2 */
-	-moz-tab-size: 4; /* 3 */
-	tab-size: 4; /* 3 */
-	-webkit-tap-highlight-color: transparent /* 4 */;
-	-ms-text-size-adjust: 100%; /* 5 */
-	-webkit-text-size-adjust: 100%; /* 5 */
-	word-break: break-word; /* 6 */
+	cursor: default;
+	line-height: 1.5;
+	-moz-tab-size: 4;
+	tab-size: 4;
+	-webkit-tap-highlight-color: transparent;
+	-ms-text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+	word-break: break-word;
 }
 
 /* Sections
@@ -96,8 +96,8 @@ ul ul {
   */
 
 hr {
-	height: 0; /* 1 */
-	overflow: visible; /* 2 */
+	height: 0;
+	overflow: visible;
 }
 
 /**
@@ -124,8 +124,8 @@ nav ul {
   */
 
 pre {
-	font-family: monospace, monospace; /* 1 */
-	font-size: 1em; /* 2 */
+	font-family: monospace, monospace;
+	font-size: 1em;
 }
 
 /* Text-level semantics
@@ -165,8 +165,8 @@ strong {
 code,
 kbd,
 samp {
-	font-family: monospace, monospace; /* 1 */
-	font-size: 1em; /* 2 */
+	font-family: monospace, monospace;
+	font-size: 1em;
 }
 
 /**
@@ -273,8 +273,8 @@ select {
   */
 
 button {
-	overflow: visible; /* 1 */
-	text-transform: none; /* 2 */
+	overflow: visible;
+	text-transform: none;
 }
 
 /**
@@ -282,9 +282,9 @@ button {
   */
 
 button,
-[type='button'],
-[type='reset'],
-[type='submit'] {
+[type="button"],
+[type="reset"],
+[type="submit"] {
 	-webkit-appearance: button;
 }
 
@@ -294,8 +294,8 @@ button,
   */
 
 fieldset {
-	border: 1px solid #a0a0a0; /* 1 */
-	padding: 0.35em 0.75em 0.625em; /* 2 */
+	border: 1px solid #a0a0a0;
+	padding: 0.35em 0.75em 0.625em;
 }
 
 /**
@@ -312,10 +312,10 @@ input {
   */
 
 legend {
-	color: inherit; /* 2 */
-	display: table; /* 1 */
-	max-width: 100%; /* 1 */
-	white-space: normal; /* 1 */
+	color: inherit;
+	display: table;
+	max-width: 100%;
+	white-space: normal;
 }
 
 /**
@@ -324,8 +324,8 @@ legend {
   */
 
 progress {
-	display: inline-block; /* 1 */
-	vertical-align: baseline; /* 2 */
+	display: inline-block;
+	vertical-align: baseline;
 }
 
 /**
@@ -343,17 +343,17 @@ select {
   */
 
 textarea {
-	margin: 0; /* 1 */
-	overflow: auto; /* 2 */
-	resize: vertical; /* 3 */
+	margin: 0;
+	overflow: auto;
+	resize: vertical;
 }
 
 /**
   * Remove the padding in IE 10-.
   */
 
-[type='checkbox'],
-[type='radio'] {
+[type="checkbox"],
+[type="radio"] {
 	padding: 0;
 }
 
@@ -362,9 +362,9 @@ textarea {
   * 2. Correct the outline style in Safari.
   */
 
-[type='search'] {
-	-webkit-appearance: textfield; /* 1 */
-	outline-offset: -2px; /* 2 */
+[type="search"] {
+	-webkit-appearance: textfield;
+	outline-offset: -2px;
 }
 
 /**
@@ -399,8 +399,8 @@ textarea {
   */
 
 ::-webkit-file-upload-button {
-	-webkit-appearance: button; /* 1 */
-	font: inherit; /* 2 */
+	-webkit-appearance: button;
+	font: inherit;
 }
 
 /**
@@ -510,8 +510,8 @@ select,
 summary,
 textarea,
 [tabindex] {
-	-ms-touch-action: manipulation; /* 1 */
-	touch-action: manipulation; /* 2 */
+	-ms-touch-action: manipulation;
+	touch-action: manipulation;
 }
 
 /**
@@ -529,7 +529,7 @@ textarea,
   * Change the cursor on busy elements in all browsers (opinionated).
   */
 
-[aria-busy='true'] {
+[aria-busy="true"] {
 	cursor: progress;
 }
 
@@ -546,7 +546,7 @@ textarea,
   * inoperable elements in all browsers (opinionated).
   */
 
-[aria-disabled='true'],
+[aria-disabled="true"],
 [disabled] {
 	cursor: not-allowed;
 }
@@ -556,11 +556,11 @@ textarea,
   * in all browsers (opinionated).
   */
 
-[aria-hidden='false'][hidden] {
+[aria-hidden="false"][hidden] {
 	display: initial;
 }
 
-[aria-hidden='false'][hidden]:not(:focus) {
+[aria-hidden="false"][hidden]:not(:focus) {
 	clip: rect(0, 0, 0, 0);
 	position: absolute;
 }

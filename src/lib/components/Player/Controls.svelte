@@ -43,12 +43,12 @@ export let loading
 
 	@import '../../../global/scss/components/_player.scss';
 .player-spinner {
-		// display: inline-flex;
+
 		align-items: center;
 		justify-content: center;
 		justify-self: center;
 		width: 2rem;
-		// // background: white;
+
 		height: 2rem;
 		border: rgba(255, 255, 255, 0.26) solid 0.25em;
 		border-radius: 50%;
@@ -57,13 +57,13 @@ export let loading
 		max-width: 100%;
 		max-height: 100%;
 		opacity: 0;
-		// background: white;
+
 		transition: all ease-in-out 1s;
 		&.fade-out {
 			opacity: 1;
 			transition: all ease-in-out 1s;
 		}
-		// height: 2em;
+
 	}
 	@keyframes loading {
 		to {

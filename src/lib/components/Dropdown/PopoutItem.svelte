@@ -34,9 +34,9 @@
 		margin: 0;
 		border-bottom: 0.0714rem solid #313338;
 		color: #fff9f9;
-		background-color: #1a1a20;
+		// background-color: #1a1a20;
 		position: relative;
-		border-radius: 0.4rem;
+		border-radius: inherit;
 		filter: drop-shadow(0rem 0.25rem 0.2rem rgba(0, 0, 0, 0.342));
 		// box-shadow: 0em 0.5em 0.5em 0em #1f1f1f40;
 		&:hover {
@@ -48,6 +48,10 @@
 			background-color: #a0a0b1;
 
 			transition: cubic-bezier(0.68, -0.55, 0.265, 1.55) all 0.3s;
+		}
+
+		&:last-child {
+			border-bottom: none !important;
 		}
 	}
 

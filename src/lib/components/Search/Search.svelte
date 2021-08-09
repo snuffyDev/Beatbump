@@ -1,4 +1,10 @@
 <script>
+	export let type
+	import { goto } from '$app/navigation'
+	import { searchState } from '$lib/stores/stores'
+	import { createEventDispatcher } from 'svelte'
+	import Icon from '../Icon/Icon.svelte'
+
 	let options = [
 		{ label: 'Songs', params: 'EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D' },
 		{ label: 'Videos', params: 'EgWKAQIQAWoKEAMQBBAKEAkQBQ%3D%3D' },
@@ -13,46 +19,27 @@
 			params: 'EgeKAQQoAEABagwQDhAKEAkQAxAEEAU%3D'
 		}
 	]
-	export let type
-	import { goto } from '$app/navigation'
-	import { search, searchState, theme } from '$lib/stores/stores'
-	import { createEventDispatcher, tick } from 'svelte'
-	import Icon from '../Icon/Icon.svelte'
-	let endpoint = 'search'
 	let filterType
 	let songTitle = ''
 	let filter = filterType ? filterType : options[0].params
 	const dispatch = createEventDispatcher()
-	// searchState.set({ option: undefined, text: undefined });
-	$: console.log($searchState)
-	async function handleSubmit(e) {
-		e.preventDefault()
+
+	async function handleSubmit() {
 		dispatch('submitted', { submitted: true })
 		searchState.set({ option: filter, text: songTitle })
-		// invalidate($page.path)
-		// let URL_BASE = new URL();
 		let url =
 			`/search/` +
 			encodeURIComponent(encodeURIComponent(songTitle)) +
 			`?filter=` +
 			filter
-
-		await tick()
-		window.scrollTo({
-			behavior: 'smooth',
-			top: 0,
-			left: 0
-		})
-
 		goto(url)
 	}
 </script>
 
-<form class={type} on:submit|preventDefault={(e) => handleSubmit(e)}>
-	<!-- <label for="search"><em>search</em></label> -->
+<form class={type} on:submit|preventDefault={handleSubmit}>
 	<div class="nav-item">
 		<div aria-label="search" class="input">
-			<div class="searchBtn" on:click={(e) => handleSubmit(e)}>
+			<div class="searchBtn" on:click={handleSubmit}>
 				<Icon name="search" size="1rem" />
 			</div>
 			<!-- svelte-ignore a11y-autofocus -->
@@ -68,11 +55,8 @@
 					placeholder="Search"
 					bind:value={songTitle} />{/if}
 		</div>
-		<!-- <div class="nav-item inline">
-				</div> -->
 	</div>
 
-	<!-- <label for="option"><em>search type</em></label> -->
 	<div class="nav-item">
 		<div
 			class="select"
@@ -99,8 +83,6 @@
 
 	.mobile-search {
 		display: flex;
-		/* flex-direction: row; */
-		/* flex-wrap: nowrap; */
 		max-height: 4rem;
 		flex-flow: row nowrap !important;
 	}
@@ -115,10 +97,6 @@
 		overflow-y: hidden;
 		top: 0;
 		padding: 0 0.3125rem 6rem;
-		/* width: 17.2rem; */
-		/* max-width: 17.2rem; */
-		/* height: 100%; */
-		/* min-height: 100%; */
 		border-right: 0.0625rem outset hsla(0, 0%, 66.7%, 0.123);
 		box-sizing: border-box;
 		display: none;
@@ -140,10 +118,6 @@
 	form.inline {
 		flex-direction: row;
 		display: flex !important;
-		/* align-items: stretch; */
-		/* justify-content: space-between; */
-		/* width: 100%; */
-		/* place-content: space-evenly; */
 		flex-wrap: nowrap;
 		.nav-item {
 			margin-bottom: 0;

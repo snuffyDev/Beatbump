@@ -31,7 +31,7 @@
 	$: currentTitle.set(title)
 
 	$: autoId = $key
-	// $: console.log($key, autoId)
+
 	$: time = player.currentTime
 	$: duration = 1000
 	let remainingTime = 55
@@ -111,8 +111,6 @@
 	})
 
 	player.addEventListener('ended', () => {
-		// console.log('ended')
-
 		getNext()
 	})
 
@@ -163,7 +161,6 @@
 				$list.continuation,
 				$list.clickTrackingParams
 			)
-			// autoId++
 
 			once = false
 
@@ -174,7 +171,6 @@
 			const src = await getSrc(mixList[autoId].videoId)
 			src.error ? ErrorNext() : setNext()
 
-			// console.log('got here')
 			currentTitle.set($list.mix[autoId].title)
 			once = false
 		}
@@ -187,7 +183,6 @@
 	async function setNext() {
 		await getSrc(mixList[autoId].videoId)
 		currentTitle.set($list.mix[autoId].title)
-		// key.set(autoId)
 	}
 	async function prevBtn() {
 		if (!autoId || autoId < 0) {
@@ -213,7 +208,7 @@
 			} else {
 				gettingNext = true
 				autoId++
-				// console.log(mixList[autoId].videoId, $list.mix, $list.mix[autoId])
+
 				key.set(autoId)
 				const src = await getSrc(mixList[autoId]?.videoId)
 				src.error
@@ -258,8 +253,6 @@
 	}
 
 	let width
-
-	// $: console.log($list.mix)
 </script>
 
 <svelte:window
@@ -287,19 +280,13 @@
 	<div class="player" class:light={$theme == 'light'}>
 		<div
 			style="background:inherit; display:contents;"
-			class="player-left"
-			use:clickOutside
-			on:click_outside={async () => {
-				hide = true
+			on:click_outside={() => {
 				showing = false
-				await tick()
-				hide = false
 			}}
-			on:click|stopPropagation={() => {
-				showing = !showing
-			}}>
+			use:clickOutside
+			class="player-left">
 			{#if showing}
-				<Queue bind:autoId={$key} let:item let:index>
+				<Queue bind:autoId={$key} bind:showing let:item let:index>
 					<row id={index}>
 						<QueueListItem
 							on:updated={async (event) => {
@@ -312,7 +299,16 @@
 					</row>
 				</Queue>
 			{/if}
-			<div class="listButton player-btn">
+			<div
+				on:click={() => {
+					if (showing) {
+						showing = false
+					} else {
+						showing = true
+					}
+					showing = showing ? true : false
+				}}
+				class="listButton player-btn">
 				<Icon color="white" name="radio" size="2em" />
 			</div>
 		</div>
@@ -406,10 +402,9 @@
 
 	.menu-container {
 		right: 5%;
-		/* bottom: 50%; */
+
 		padding: 0;
-		/* top: 50%; */
-		/* overflow: hidden; */
+
 		position: absolute;
 		@media (max-width: 512px) {
 			position: relative !important;
@@ -427,10 +422,9 @@
 		height: auto;
 		max-height: 44pt;
 		max-width: 44pt;
-		/* margin: 10pt; */
+
 		padding: 10pt;
 		width: auto;
-		width: 100%;
 		align-items: center;
 		display: flex;
 		justify-content: center;

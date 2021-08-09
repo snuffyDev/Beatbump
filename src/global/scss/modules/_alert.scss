@@ -1,7 +1,7 @@
 .alert {
 	margin-bottom: 1.125rem;
 }
-.m-alert-danger {
+%m-alert {
 	position: relative;
 	display: block;
 	max-width: $max-width;
@@ -9,19 +9,22 @@
 	border-radius: 0.8rem;
 	width: calc(100% - 2rem);
 	margin: 1em 1em 0 1em;
-	color: #fff;
-	background-color: #b32f2a;
+	background-color: $color-active;
+	color: #f1f1ff;
 }
 
-.m-alert-success {
-	position: relative;
-	display: block;
-	max-width: $max-width;
-	padding: $small-spacing $base-spacing;
-
-	border: $base-border;
-	background-color: transparentize($green, 0.85);
+.m-alert {
+	@extend %m-alert;
+	&.-error {
+		color: #fff;
+		background-color: #b32f2a;
+	}
+	&.-success {
+		color: #dbe6df;
+		background-color: #2ab35f;
+	}
 }
+
 .m-alert-warning {
 	position: relative;
 	display: block;

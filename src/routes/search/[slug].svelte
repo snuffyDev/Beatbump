@@ -230,7 +230,7 @@
 	}
 	.searchHeader {
 		padding: 0.5rem 0 0.8rem 0;
-		font-family: 'CommissionerVariable', sans-serif;
+		font-family: 'Commissioner', sans-serif;
 		margin-left: auto;
 		display: flex;
 		// flex-direction: row;

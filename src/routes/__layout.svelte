@@ -8,7 +8,7 @@
 
 <script>
 	import { onMount } from 'svelte'
-	import { errorHandler, filterAutoPlay, theme } from '$stores/stores'
+	import { alertHandler, filterAutoPlay, theme } from '$stores/stores'
 	import { iOS } from '$stores/stores'
 	import Nav from '$components/Nav/Nav.svelte'
 	import Sidebar from '$components/Sidebar/Sidebar.svelte'
@@ -32,38 +32,27 @@
 </script>
 
 <svelte:window bind:innerWidth={width} />
-<div class="body">
-	<Nav {width} />
-	<Sidebar />
-	<div
-		class="wrapper"
-		class:no-scroll={$page.path.includes('/search/') ? true : false}
-		bind:this={main}
-		id="wrapper">
-		<Wrapper {key} {main}>
-			<slot />
-		</Wrapper>
-	</div>
-	<div class="alert-container">
-		<Alert message={$errorHandler.msg} color="red" />
-	</div>
-	<footer class="footer-container">
-		{#if browser && loaded}
-			<Player />
-		{/if}
-	</footer>
+<Nav {width} />
+<Sidebar />
+<div
+	class="wrapper"
+	class:no-scroll={key.includes('/search/') ? true : false}
+	bind:this={main}
+	id="wrapper">
+	<Wrapper {key} {main}>
+		<slot />
+	</Wrapper>
 </div>
+<Alert message={$alertHandler.msg} color="red" />
+<footer class="footer-container">
+	{#if browser && loaded}
+		<Player />
+	{/if}
+</footer>
 
 <style lang="scss" global>
 	@import '../global/stylesheet.scss';
-	.alert-container {
-		display: flex;
-		position: fixed;
-		bottom: 5rem;
-		left: 0;
-		right: 0;
-		justify-content: center;
-	}
+
 	.no-scroll {
 		overflow: hidden;
 		overflow-y: hidden;
@@ -146,7 +135,8 @@
 				background: var(--dark-bottom);
 			}
 			.select,
-			.input {
+			.input,
+			option {
 				background: var(--dark-forms);
 			}
 
@@ -165,7 +155,8 @@
 				background: var(--dim-bottom);
 			}
 			.select,
-			.input {
+			.input,
+			option {
 				background: var(--dim-forms);
 			}
 			nav {
@@ -183,9 +174,11 @@
 				background: var(--ytm-bottom);
 			}
 			.select,
-			.input {
+			.input,
+			option {
 				background: var(--ytm-forms);
 			}
+
 			nav {
 				background: var(--ytm-top);
 			}
@@ -202,7 +195,8 @@
 				background: var(--midnight-bottom);
 			}
 			.select,
-			.input {
+			.input,
+			option {
 				background: var(--midnight-forms);
 			}
 			nav {
@@ -237,6 +231,7 @@
 			.select,
 			select,
 			.input,
+			option,
 			option {
 				background: var(--light-forms);
 			}

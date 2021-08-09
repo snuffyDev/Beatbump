@@ -27,7 +27,7 @@
 		display: flex;
 		flex-wrap: nowrap;
 		flex-direction: column;
-		// border: #aaaaaa40 solid 1px;
+
 		justify-content: flex-start;
 
 		cursor: pointer;
@@ -43,7 +43,7 @@
 	.item-title {
 		display: inline;
 		padding: 0.3rem 0.1rem;
-		font-family: 'CommissionerVariable';
+		font-family: 'Commissioner';
 		font-weight: 500;
 		font-size: 1.1em;
 		letter-spacing: -0.02em;
