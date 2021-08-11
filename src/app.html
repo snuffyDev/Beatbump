@@ -9,23 +9,24 @@
 			name="viewport"
 			content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0"
 		/>
-		<!-- <meta
-			name="viewport"
-			content="width=device-width, initial-scale=1, maximum-scale=5.0, minimum-scale=1"
-		/> -->
-
-		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<meta
-			name="apple-mobile-web-app-status-bar-style"
-			content="black-translucent"
-		/>
+		<!-- Preload settings -->
 		<script>
 			if (!('theme' in localStorage)) {
 				localStorage.setItem('theme', 'dark')
 			}
 
+			if (/(iPad|iPhone|iPod)/g.test(navigator.userAgent) === true) {
+				localStorage.setItem('iOSClient', true)
+			}
+			localStorage.setItem('iOSClient', false)
 			document.querySelector('html').classList.add(localStorage.theme)
 		</script>
+		<!-- Apple Metatags-->
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta
+			name="apple-mobile-web-app-status-bar-style"
+			content="black-translucent"
+		/>
 		<meta content="yes" name="apple-touch-fullscreen" />
 		<meta name="apple-mobile-web-app-title" content="Beatbump" />
 		<link rel="apple-touch-startup-image" href="/logo-header.png" />
@@ -34,6 +35,7 @@
 		<meta name="apple-mobile-web-app-orientations" content="portrait" />
 
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<!-- SvelteKit tags -->
 		<link rel="manifest" href="/manifest.json" />
 
 		%svelte.head%

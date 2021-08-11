@@ -15,8 +15,6 @@
 <script lang="ts">
 	export let sections
 	export let header
-	import { goto } from '$app/navigation'
-	import lazy from '$lib/lazy'
 	import GridItem from '../_components/GridItem.svelte'
 	$: console.log(sections, header)
 </script>

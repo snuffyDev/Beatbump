@@ -6,7 +6,7 @@
 	export let main
 	export let key
 	$: isNavigating = $navigating
-	$: console.log(isNavigating)
+	// $: console.log(isNavigating)
 	$: if (key) catchUp()
 	async function catchUp() {
 		// console.log(key)
@@ -19,8 +19,8 @@
 
 {#key key}
 	<div
-		in:fly={{ x: -15, duration: 400, delay: 400, easing: quadInOut }}
-		out:fly={{ x: -5, duration: 400, easing: quadInOut }}>
+		in:fly={{ x: -5, duration: 150, delay: 150, easing: quadInOut }}
+		out:fly={{ x: -10, duration: 150, easing: quadInOut }}>
 		<slot />
 	</div>
 {/key}

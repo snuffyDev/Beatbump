@@ -8,7 +8,6 @@
 	import { goto } from '$app/navigation'
 	import { clickOutside } from '$lib/js/clickOutside'
 	export let width
-	import { theme } from '$stores/stores'
 	let isHidden = true
 	let hidden = isHidden ? true : false
 	let isSettingsOpen
@@ -28,10 +27,10 @@
 		<!-- {/if} -->
 	</div>
 
-	<section class="homeIcon" on:click={() => goto('/')}>
+	<div class="homeIcon" on:click={() => goto('/trending')}>
 		<Icon name="home" size="1.5em" />
-	</section>
-	<section class="items">
+	</div>
+	<div class="items">
 		{#if !hidden}
 			<div
 				use:clickOutside
@@ -61,7 +60,7 @@
 				shown = !shown
 				hidden = !hidden
 			}}>
-			<Icon  name="search" size="1.5em" />
+			<Icon name="search" size="1.5em" />
 		</div>
 		<Settings bind:isSettingsOpen />
 		<div
@@ -69,16 +68,16 @@
 			on:click|stopPropagation={() => {
 				isSettingsOpen = !isSettingsOpen
 			}}>
-			<Icon  name="settings" size="1.5em" />
+			<Icon name="settings" size="1.5em" />
 		</div>
-	</section>
+	</div>
 </nav>
 
 <style lang="scss">
 	.btn-settings {
 		cursor: pointer;
-		display:block !important;
-		visibility:visible !important;
+		display: block !important;
+		visibility: visible !important;
 	}
 	.homeIcon {
 		grid-area: m;
@@ -87,6 +86,7 @@
 		justify-content: center;
 		margin-left: auto;
 		margin-right: auto;
+		padding: 9pt;
 		@media screen and (min-width: 640px) {
 			display: none;
 			visibility: hidden;
@@ -168,13 +168,12 @@
 			margin-right: 0;
 		}
 	}
-	@media screen and (min-width: 640px){
+	@media screen and (min-width: 640px) {
 		.btn-settings {
 			visibility: hidden;
-		display: none;
-		cursor: pointer;
-
-	}
+			display: none;
+			cursor: pointer;
+		}
 	}
 	/* your styles go here */
 </style>

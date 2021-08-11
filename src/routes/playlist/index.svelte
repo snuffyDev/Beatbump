@@ -1,14 +1,20 @@
 <script context="module">
 	import { api } from '$lib/api'
-	export async function load({ page }) {
+	export async function load({ page, fetch }) {
 		const data = await api('playlist', { list: page.query.get('list') })
 
 		const { tracks, header, continuations } = await data.body
+		if (!data.ok) {
+			return {
+				error: new Error(data.body),
+				status: data.status
+			}
+		}
 		return {
 			props: {
-				tracks: tracks,
-				continuations: continuations,
-				header: header
+				tracks: await tracks,
+				continuations: await continuations,
+				header: await header
 			},
 			maxage: 3600,
 			status: 200
@@ -24,18 +30,19 @@
 	import { currentTitle, isPagePlaying } from '$lib/stores/stores'
 	import type { Header } from '$lib/types/playlist'
 	import { onMount, setContext } from 'svelte'
+	import Error from '../__error.svelte'
 	export let tracks: PlaylistItem[]
 	export let header: Header
-	
+
 	export let continuations
 	const key = {}
 	$: hasList = $list.mix.length > 0
 	$: isThisPage = false
 	let pageTitle = header?.title
 	let description
-	
-	console.log(tracks, continuations, header)
-	console.log(continuations)
+
+	// console.log(tracks, continuations, header)
+	// console.log(continuations)
 	$: console.log(isThisPage, $isPagePlaying)
 	onMount(() => {
 		pageTitle =
@@ -54,7 +61,7 @@
 			}
 		}
 	})
-	
+
 	let width
 </script>
 

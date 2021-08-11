@@ -5,7 +5,7 @@
 	import { theme } from '$lib/stores/stores'
 </script>
 
-<div class="sidebar" transition:fly>
+<aside class="sidebar" transition:fly>
 	<section class="head">
 		<slot name="head">
 			<Search type="block" /></slot>
@@ -24,7 +24,7 @@
 			</section>
 		</slot>
 	</section>
-</div>
+</aside>
 
 <style lang="scss">
 	hr {
@@ -78,7 +78,6 @@
 		flex-wrap: nowrap;
 		left: 0;
 		right: 0;
-
 	}
 	@media (min-width: 640px) {
 		.sidebar {

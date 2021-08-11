@@ -162,7 +162,7 @@
 						: `by ${data.artistInfo.artist[0].text}`}
 				</p>
 				<span class="album">
-					{#if data.album}<Icon name="album" size="1em" /><a
+					{#if data.album?.browseId}<Icon name="album" size="1em" /><a
 							href="/release?id={data?.album?.browseId}">{data.album.title}</a>
 					{/if}
 				</span>
@@ -244,12 +244,13 @@
 		background: hsla(0, 0%, 100%, 0.966);
 		padding: 0 0.4em;
 		margin-left: 0.3em;
+		outline: #000 solid 0.1px;
 	}
 	.text-artist {
-		font-size: 0.95rem;
+		font-size: 0.95em;
 	}
 	.text-title {
-		font-size: 1.05rem;
+		font-size: 1em;
 
 		&:hover {
 			text-decoration: underline solid currentColor 0.0714rem;
@@ -283,9 +284,10 @@
 		display: inline-flex;
 		width: 100%;
 		margin-left: 1rem;
-		line-height: 1.5;
+		line-height: 1.3;
 		align-self: center;
 		flex-direction: column;
+		font-size: 100%;
 	}
 	.img-container {
 		position: relative;

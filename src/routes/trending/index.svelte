@@ -24,7 +24,6 @@
 
 	import { currentTitle } from '$stores/stores'
 	import Carousel from '$components/Carousel/Carousel.svelte'
-	import type { ICarousel } from '$lib/types'
 
 	// $: console.log(carouselItems)
 </script>
@@ -40,6 +39,7 @@
 </svelte:head>
 <main>
 	<Carousel
+		isBrowse={false}
 		header={carouselItems[2].header}
 		items={carouselItems[2].results}
 		type="trending" />
@@ -67,6 +67,7 @@
 	<Carousel
 		header={carouselItems[3].header}
 		items={carouselItems[3].results}
+		isBrowse={false}
 		type="trending" />
 	<Carousel
 		header={carouselItems[0].header}
@@ -90,13 +91,12 @@
 	}
 	.box-cont {
 		justify-content: space-around;
-
-		padding: 0.8rem;
 	}
 	box {
 		display: grid;
 		width: 100%;
 		white-space: nowrap;
+		padding: 0.8rem;
 
 		grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
 

@@ -22,8 +22,7 @@
 	import QueueListItem from './QueueListItem.svelte'
 
 	const player: HTMLAudioElement = new Audio()
-	player.autoplay = true
-
+	$: player.autoplay = $updateTrack !== undefined ? true : false
 	$: player.src = $updateTrack
 	$: isWebkit = $iOS
 	let title
@@ -37,6 +36,7 @@
 	let remainingTime = 55
 
 	$: volume = 0.5
+	$: player.volume = volume
 	let volumeHover
 	let isPlaying = false
 	let seeking = false
@@ -74,7 +74,8 @@
 	})
 	const play = () => {
 		navigator.mediaSession.playbackState = 'playing'
-
+		isPlaying = true
+		key.set(autoId)
 		let playTrack = player.play()
 		if (playTrack !== undefined) {
 			playTrack.then(() => metaDataHandler())
@@ -83,7 +84,6 @@
 		}
 	}
 	const pause = () => player.pause()
-	$: player.volume = volume
 
 	player.addEventListener('timeupdate', async () => {
 		time = player.currentTime
@@ -103,18 +103,12 @@
 		pause()
 	})
 
-	player.addEventListener('play', () => {
-		isPlaying = true
-		key.set(autoId)
+	player.addEventListener('play', () => play())
 
-		play()
-	})
-
-	player.addEventListener('ended', () => {
-		getNext()
-	})
+	player.addEventListener('ended', () => getNext())
 
 	player.addEventListener('seeked', () => {
+		if (!isPlaying) return
 		play()
 	})
 
@@ -151,16 +145,20 @@
 		}
 	}
 
-	const getNext = async () => {
+	async function getNext() {
 		once = true
 		if (autoId == $list.mix.length - 1) {
-			list.getMore(
-				$list.mix[autoId]?.itct,
-				$list.mix[autoId]?.videoId,
-				$list.currentMixId,
-				$list.continuation,
-				$list.clickTrackingParams
-			)
+			list
+				.getMore(
+					$list.mix[autoId]?.itct,
+					$list.mix[autoId]?.videoId,
+					$list.currentMixId,
+					$list.continuation,
+					$list.clickTrackingParams
+				)
+				.then(({ body }) => {
+					player.src = body
+				})
 
 			once = false
 
@@ -168,29 +166,36 @@
 		} else {
 			autoId++
 			key.set(autoId)
-			const src = await getSrc(mixList[autoId].videoId)
-			src.error ? ErrorNext() : setNext()
+			getTrackURL()
 
 			currentTitle.set($list.mix[autoId].title)
 			once = false
 		}
 		once = false
 	}
-	async function ErrorNext() {
-		await tick()
-		getNext()
+
+	function getTrackURL() {
+		getSrc(mixList[autoId].videoId)
+			.then(({ body }) => {
+				player.src = body
+				currentTitle.set($list.mix[autoId].title)
+			})
+			.catch((err) => {
+				getNext()
+			})
 	}
-	async function setNext() {
-		await getSrc(mixList[autoId].videoId)
+
+	function setNext() {
+		getTrackURL()
 		currentTitle.set($list.mix[autoId].title)
 	}
-	async function prevBtn() {
+	function prevBtn() {
 		if (!autoId || autoId < 0) {
 			console.log('cant do that!')
 		} else {
 			autoId--
 			key.set(autoId)
-			await getSrc($list.mix[autoId].videoId)
+			getTrackURL()
 		}
 	}
 	async function nextBtn() {
@@ -210,13 +215,8 @@
 				autoId++
 
 				key.set(autoId)
-				const src = await getSrc(mixList[autoId]?.videoId)
-				src.error
-					? getNext()
-					: () => {
-							gettingNext = false
-							setNext()
-					  }
+				getTrackURL()
+				gettingNext = false
 			}
 		}
 	}
@@ -243,7 +243,7 @@
 	}
 
 	function seekAudio(event) {
-		if (!songBar && !isPlaying) return
+		if (!songBar && isPlaying === false) return
 
 		player.currentTime = seek(event, songBar.getBoundingClientRect()) * duration
 		player.currentTime =
@@ -418,7 +418,6 @@
 	.player-left,
 	.player-right {
 		align-self: center;
-		cursor: pointer;
 		height: auto;
 		max-height: 44pt;
 		max-width: 44pt;

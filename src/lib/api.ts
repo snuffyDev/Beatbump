@@ -18,6 +18,7 @@ export async function api(
 		})
 
 		.join('&')
+	console.log(urlParams, endpoint, params, `/api/${endpoint}.json?${urlParams}`)
 	const response = await fetch(`/api/${endpoint}.json?${urlParams}`)
 	const data = await response.json()
 

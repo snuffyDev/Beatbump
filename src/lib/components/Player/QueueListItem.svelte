@@ -59,14 +59,14 @@
 		}}>
 		<div class="p-text">
 			<span class="p-title">
-				<span>{item.title}</span>
+				{item.title}
 			</span>
 			<span class="p-artist">
-				<span>{item.artistInfo.artist}</span>
+				{item.artistInfo.artist}
 			</span>
 		</div>
 		<span class="p-length">
-			<span>{item.length}</span>
+			{item.length}
 		</span>
 	</div>
 </li>

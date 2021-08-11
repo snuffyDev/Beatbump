@@ -3,7 +3,7 @@
 	export let size = '1.5rem'
 	export let focusable = false
 	export let color = 'currentColor'
-	export let width = 0
+	export let width: string | number = 0
 	let box = 24
 	let icons = [
 		{
@@ -103,7 +103,7 @@
 			svg: `<polygon points="19 20 9 12 19 4 19 20" />
   <line x1="5" y1="19" x2="5" y2="5" />`
 		},
-		{ name: 'minus', svg: `  <line x1="-100" y1="0" x2="100" y2="0" />` },
+		{ name: 'minus', svg: `  <line x1="-100" y1="50%" x2="100" y2="50%" />` },
 		{
 			name: 'radio',
 			svg: `<circle cx="12" cy="12" r="2" />

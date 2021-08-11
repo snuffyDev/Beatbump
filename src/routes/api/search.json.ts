@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import BaseContext from '$lib/context'
+import { MusicResponsiveListItemRenderer } from '$lib/parsers'
 
 import type { Artist, NextContinuationData, Song } from '$lib/types'
 import type { PlaylistSearch } from '$lib/types/playlist'
@@ -11,7 +12,6 @@ interface SearchOutput extends EndpointOutput {
 	continuation?: NextContinuationData
 }
 export async function get({ query }): Promise<SearchOutput> {
-
 	let q = query.get('q')
 	const filter = query.get('filter') || ''
 	const videoId = query.get('videoId') || ''
@@ -61,7 +61,6 @@ export async function get({ query }): Promise<SearchOutput> {
 	)
 
 	if (!response.ok) {
-
 		return { status: response.status, body: response.statusText }
 	}
 	const data = await response.json()
@@ -74,15 +73,7 @@ export async function get({ query }): Promise<SearchOutput> {
 						tabRenderer: {
 							content: {
 								sectionListRenderer: {
-									contents: [
-										{
-
-
-
-
-											musicShelfRenderer
-										} = {}
-									] = [],
+									contents: [{ musicShelfRenderer } = {}] = [],
 									contents = []
 								} = {}
 							} = {}
@@ -91,16 +82,13 @@ export async function get({ query }): Promise<SearchOutput> {
 				] = []
 			} = {}
 		} = {}
-	} = await data
+	} = data
 	if (Object.prototype.hasOwnProperty.call(data, 'continuationContents')) {
-
 		return {
 			status: 200,
 			body: parseSearchResult(continuationContents, true, filter)
 		}
 	} else {
-
-
 		return {
 			status: 200,
 			body: parseSearchResult(contents, false, filter)
@@ -110,7 +98,6 @@ export async function get({ query }): Promise<SearchOutput> {
 // Parse the playlist results for search.
 const parsePlaylist = (contents): PlaylistSearch[] => {
 	return contents.map(({ musicResponsiveListItemRenderer }) => {
-
 		const thumbnails =
 			musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail
 				.thumbnails
@@ -145,48 +132,11 @@ const parsePlaylist = (contents): PlaylistSearch[] => {
 }
 
 const parseSong = (contents, type): Song[] => {
-	return contents.map(({ musicResponsiveListItemRenderer: ctx = {} }, i) => {
-
+	return contents.map((s, i) => {
 		let explicit
+		const { musicResponsiveListItemRenderer: ctx } = s
 		if (Object.prototype.hasOwnProperty.call(ctx, 'badges')) explicit = true
-		const flexColumns = pb(
-			ctx,
-			'musicResponsiveListItemFlexColumnRenderer',
-			true
-		)
 
-		const thumbnails = ctx.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails
-		const title =
-			ctx.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0]
-				.text
-
-
-		let browseId
-		if (
-			ctx.menu?.menuRenderer?.items[5]?.menuNavigationItemRenderer
-				?.navigationEndpoint?.browseEndpoint
-		) {
-			const menu = ctx.menu?.menuRenderer.items
-			const { musicNavigationItemRenderer: items = [] } = menu
-
-			if (items.length > 4) {
-				browseId = items[3].navigationEndpoint.browseEndpoint.browseId
-			} else {
-				browseId = undefined
-			}
-		} else {
-			browseId =
-				ctx.flexColumns[1].musicResponsiveListItemFlexColumnRenderer?.text
-					?.runs[0]?.navigationEndpoint?.browseEndpoint?.browseId
-		}
-
-
-		const videoId =
-			ctx.menu?.menuRenderer?.items[0]?.menuNavigationItemRenderer
-				?.navigationEndpoint.watchEndpoint?.videoId
-		const playlistId =
-			ctx.menu?.menuRenderer?.items[0]?.menuNavigationItemRenderer
-				?.navigationEndpoint.watchEndpoint?.playlistId
 		const params =
 			ctx.menu?.menuRenderer?.items[0]?.menuNavigationItemRenderer
 				?.navigationEndpoint.watchEndpoint?.params
@@ -197,7 +147,8 @@ const parseSong = (contents, type): Song[] => {
 
 		let albumInfo
 		if (type == 'song') {
-			const albumArr: [] = flexColumns[1].text.runs
+			const albumArr: [] =
+				ctx.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs
 			const album: {
 				text
 				navigationEndpoint: { browseEndpoint: { browseId } }
@@ -225,22 +176,37 @@ const parseSong = (contents, type): Song[] => {
 		} else {
 			artists = ctx.navigationEndpoint.browseEndpoint.browseId
 		}
+		let browseId
+		if (
+			ctx.menu?.menuRenderer?.items[5]?.menuNavigationItemRenderer
+				?.navigationEndpoint?.browseEndpoint
+		) {
+			const menu = ctx.menu?.menuRenderer.items
+			const { musicNavigationItemRenderer: items = [] } = menu
+
+			if (items.length > 4) {
+				browseId = items[3].navigationEndpoint.browseEndpoint.browseId
+			} else {
+				browseId = undefined
+			}
+		} else {
+			browseId =
+				ctx.flexColumns[1].musicResponsiveListItemFlexColumnRenderer?.text
+					?.runs[0]?.navigationEndpoint?.browseEndpoint?.browseId
+		}
 		const artist: Artist = {
 			browseId: browseId,
 			artist: artists
 		}
 
 		return {
+			...MusicResponsiveListItemRenderer(s),
 			album: albumInfo,
 			artistInfo: artist,
-			title: title,
-			videoId: videoId,
+
 			type: type,
 			params: params,
 			length: length,
-			playlistId: playlistId,
-			thumbnails: thumbnails,
-			explicit: explicit,
 			index: i++,
 			hash:
 				Math.random().toString(36).substring(2, 15) +
@@ -261,7 +227,6 @@ function parseSearchResult(data, cont, filter?) {
 	let ctx
 
 	if (cont) {
-
 		ctx = [data]
 	} else {
 		/*  Error Handling
@@ -315,7 +280,6 @@ function parseSearchResult(data, cont, filter?) {
 		) {
 			const { contents: ctx } = contents[0]
 			continuation = continuationCheck(contents[0])
-
 
 			results = parseSong(ctx, 'song')
 			return { results, continuation }

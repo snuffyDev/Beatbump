@@ -3,10 +3,10 @@
 	import list from '$lib/stores/list'
 	import { afterUpdate, createEventDispatcher, onMount, tick } from 'svelte'
 	import { cubicInOut } from 'svelte/easing'
-	import { fly } from 'svelte/transition'
+	import { fly, slide } from 'svelte/transition'
 	import QueueListItem from './QueueListItem.svelte'
 	import { browser } from '$app/env'
-	import slide from '$lib/actions/slide'
+	import drag from '$lib/actions/drag'
 	import Icon from '$lib/components/Icon/Icon.svelte'
 	import { spring } from 'svelte/motion'
 	export let autoId
@@ -26,23 +26,16 @@
 		if (active) active.scrollIntoView(true)
 	})
 
-	// let y = 22.0938
-	let dy = 22.0938
+	let posY = 0
 	let queueList
 	let listHeight = window.innerHeight
-	function handler() {
+	function startHandler() {
 		sliding = true
 	}
-	function mobile(event) {
-		// console.log(event)
-		if (event.touches[0]) {
-			trackMovement({ y: Math.round(event.touches[0].clientY) })
-		}
-	}
 
-	function release(event) {
+	function release() {
 		if (sliding) {
-			if (dy < listHeight / 2) {
+			if (posY < listHeight / 1.5) {
 				open()
 			} else {
 				close()
@@ -50,21 +43,22 @@
 		}
 		sliding = false
 	}
-	function trackMovement({ y }) {
+	function trackMovement({ y, dy }) {
+		// console.log(y, y + dy)
 		if (y <= listHeight && y >= 0) {
-			dy = y
-		} else if (y < listHeight / 2) {
+			posY = y + dy
+		} else if (y < listHeight / 1.5) {
 			open()
 		} else {
 			close()
 		}
-		console.log(y, 'dy: ' + dy, listHeight, listHeight * 0.333)
+		// console.log(y, 'dy: ' + dy)
 	}
 	function open() {
-		dy = 22.0938
+		posY = 0
 	}
 	function close() {
-		dy = 0
+		posY = 0
 		showing = false
 		sliding = false
 	}
@@ -74,17 +68,14 @@
 	})
 </script>
 
-<div
-	bind:this={queueList}
-	class="listContainer"
-	style="transform: translate3d(0, {(dy + listHeight) / 32}vh, 0);"
-	transition:fly={{ y: 0, duration: 125, easing: cubicInOut }}>
+<div class="listContainer" style="transform: translate(0, {posY / 28}vh);">
 	<div
 		class="handle"
-		on:touchstart={handler}
-		on:touchmove|passive={mobile}
-		on:touchend={release}>
-		<Icon name="minus" size="1rem" width="100%" />
+		use:drag
+		on:startDrag={startHandler}
+		on:dragMove={(e) => trackMovement({ y: e.detail.y, dy: e.detail.dy })}
+		on:dragEnd={release}>
+		<Icon name="minus" color="white" size="1rem" width="100%" />
 	</div>
 
 	<div class="list">
@@ -117,22 +108,24 @@
 		position: absolute;
 		top: 0;
 		right: 0;
-		border-bottom: 0.125px solid rgba(170, 170, 170, 0.233);
-		box-shadow: 0 -0.4rem 0.2rem 0 rgba(255, 255, 255, 0.247);
-		background: rgba(170, 170, 170, 0.027);
+		border-bottom: 0.0175rem solid hsla(0, 0%, 66.7%, 0.233);
+		box-shadow: 0 -0.4rem 0.8rem 0.5rem hsl(0deg 0% 100% / 9%);
+		background: hsla(0, 0%, 66.7%, 0.027);
 		z-index: -1;
 		height: 1rem;
+		display: flex;
+		align-items: center;
 	}
 	.empty > * {
 		color: white;
 	}
 	.empty {
-		display: inline-flex;
+		display: flex;
 		flex-direction: column;
-
 		justify-content: center;
 		width: 100%;
 		height: 100%;
+		align-items: center;
 	}
 
 	.listContainer {
@@ -145,7 +138,7 @@
 		border-radius: 0.8em 0.8em 0 0;
 
 		display: flex;
-		top: 0;
+		// top: 0;
 		right: 0;
 		flex: 1 1 auto;
 		visibility: visible;
@@ -153,10 +146,10 @@
 		height: auto;
 		width: auto;
 		background: inherit;
-		max-height: 75%;
+		height: 75%;
 
-		bottom: 5.4rem;
-		transition: transform cubic-bezier(0.23, 1, 0.32, 1) 120ms;
+		bottom: 4.5rem;
+		transition: transform 0.12s cubic-bezier(0.39, 0.58, 0.57, 1);
 		min-height: 23rem;
 		width: 40%;
 		z-index: -1;
@@ -181,7 +174,7 @@
 			font-size: 1.2rem;
 			font-weight: 200;
 			line-height: 1.1;
-			margin: 4rem auto;
+			padding: 4rem 0;
 			max-width: 20rem;
 			text-align: center;
 			letter-spacing: 0.016em;
@@ -209,7 +202,7 @@
 	}
 
 	.empty-title {
-		font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS',
+		font-family: 'Gill Sans', 'Gill Sans MT', 'Calibri', 'Trebuchet MS',
 			sans-serif;
 		text-transform: capitalize;
 		text-align: center;
@@ -217,9 +210,8 @@
 		letter-spacing: -0.02em;
 		font-weight: 500;
 		line-height: 1.1;
-		margin: 4rem auto;
 		max-width: 14rem;
-		margin: 2rem auto;
+		padding: 1rem 0;
 	}
 
 	@media screen and (min-width: 641px) and (max-width: 800px) {
@@ -231,8 +223,6 @@
 		.listContainer {
 			max-width: 100%;
 			width: 100%;
-			height: auto;
-			max-height: 75%;
 		}
 	}
 </style>

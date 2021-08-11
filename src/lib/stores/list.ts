@@ -128,7 +128,6 @@ export default {
 		)
 
 		const resMix = await response.json()
-		await getSrc(resMix[0].videoId)
 
 		loading = false
 		playerLoading.set(loading)
@@ -136,6 +135,7 @@ export default {
 		continuation = resMix.continuation
 		mix.push(...resMix)
 		list.set({ currentMixId, clickTrackingParams, continuation, mix })
+		return await getSrc(resMix[0].videoId)
 	},
 	async addNext(item, key) {
 		if (!item) return
@@ -170,23 +170,23 @@ export default {
 		loading = true
 		playerLoading.set(loading)
 		key.set(0)
+
 		const data = await fetch(
 			`/api/getQueue.json?playlistId=${playlistId}`
 		).then((data) => data.json())
+
 		mix = [...data]
+
 		if (mix.length > 50) {
 			Chunked = { chunks: [...split(mix, 50)], origLength: mix.length }
 			splitList = Chunked.chunks
 			mix = splitList[0]
 		}
-		// console.log(mix[0])
-		// console.log(splitList)
+
 		loading = false
 		playerLoading.set(loading)
-		await getSrc(mix[0].videoId)
 		list.set({ currentMixId, clickTrackingParams, continuation, mix })
-
-		// console.log(data)
+		return await getSrc(mix[0].videoId)
 	},
 	async getMore(itct, videoId, playlistId, ctoken, clickTrackingParams) {
 		let loading = true
@@ -196,11 +196,12 @@ export default {
 			mix.pop()
 
 			mix = [...mix, ...splitList[splitListIndex]]
-			await getSrc(mix[0].videoId)
-			loading = false
+
 			filterSetting ? filterList([...mix]) : (mix = [...mix])
-			list.set({ currentMixId, clickTrackingParams, continuation, mix })
+			loading = false
 			playerLoading.set(loading)
+			list.set({ currentMixId, clickTrackingParams, continuation, mix })
+			return await getSrc(mix[0].videoId)
 		} else {
 			/*  Fetch the next batch of songs for autoplay
 				- autoId: current position in mix
@@ -221,7 +222,6 @@ export default {
 			)
 
 			// console.log(data)
-			await getSrc(data.results[0].videoId)
 
 			// mix = [...mix, ...data.results]
 			// mix = filterSetting ? filterList(mix) : mix
@@ -241,6 +241,7 @@ export default {
 			loading = false
 			playerLoading.set(loading)
 			list.set({ currentMixId, clickTrackingParams, continuation, mix })
+			return await getSrc(data.results[0].videoId)
 		}
 	}
 }

@@ -9,5 +9,6 @@ interface CarouselHeader {
 interface ICarousel {
 	header: CarouselHeader
 	results: CarouselItem[]
+	isBrowse?: boolean
 }
 type Item = Song | PlaylistSearch | CarouselItem

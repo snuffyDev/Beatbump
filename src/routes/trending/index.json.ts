@@ -7,14 +7,12 @@ import {
 
 import type { CarouselHeader, CarouselItem } from '$lib/types'
 import type { EndpointParams } from '$lib/types/internals'
-import type { EndpointOutput } from '@sveltejs/kit'
 
 export async function get({ query }: EndpointParams): Promise<EndpointOutput> {
 	const endpoint = query.get('q') || ''
 	const browseId = 'FEmusic_explore'
 	const carouselItems = []
-	console.time('test')
-
+	// console.time('test')
 	// fetch data using Base Context
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/${endpoint}?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
@@ -56,13 +54,13 @@ export async function get({ query }: EndpointParams): Promise<EndpointOutput> {
 				return contents.musicCarouselShelfRenderer
 		})
 	)
-	const responseBody = []
-	const body = carouselItems.forEach(({ musicCarouselShelfRenderer }) => {
-		responseBody.push(parseCarousel({ musicCarouselShelfRenderer }))
-	})
-	if (responseBody.length !== 0) console.timeEnd('test')
+	// const body = c
+	// if (body.length !== 0)
 	return {
-		body: responseBody
+		body: carouselItems.map(({ musicCarouselShelfRenderer }) => {
+			// console.timeEnd('test')
+			return parseCarousel({ musicCarouselShelfRenderer })
+		})
 	}
 }
 
@@ -76,24 +74,20 @@ function parseHeader(header: any[]): CarouselHeader[] {
 }
 
 function parseBody(contents): CarouselItem[] {
-	return [
-		...contents.map(({ ...r }) => {
-			if (r.musicTwoRowItemRenderer) {
-				return MusicTwoRowItemRenderer(r)
-			}
-			if (r.musicResponsiveListItemRenderer) {
-				return MusicResponsiveListItemRenderer(r)
-			}
-			if (r.musicNavigationButtonRenderer) {
-				return MoodsAndGenresItem(r)
-			}
-			throw new Error("Unable to parse items, can't find " + `${r}`)
-		})
-	]
+	return contents.map(({ ...r }) => {
+		if (r.musicTwoRowItemRenderer) {
+			return MusicTwoRowItemRenderer(r)
+		}
+		if (r.musicResponsiveListItemRenderer) {
+			return MusicResponsiveListItemRenderer(r)
+		}
+		if (r.musicNavigationButtonRenderer) {
+			return MoodsAndGenresItem(r)
+		}
+		throw new Error("Unable to parse items, can't find " + `${r}`)
+	})
 }
 function parseCarousel({ musicCarouselShelfRenderer }) {
-	// console.timeEnd('timer')
-	// console.log(musicCarouselShelfRenderer)
 	return {
 		header: parseHeader([musicCarouselShelfRenderer.header])[0],
 		results: parseBody(musicCarouselShelfRenderer.contents)

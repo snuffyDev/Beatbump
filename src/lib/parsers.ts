@@ -89,13 +89,13 @@ export const MusicResponsiveListItemRenderer = (ctx: any): CarouselItem => {
 		videoId:
 			ctx.musicResponsiveListItemRenderer.flexColumns[0]
 				.musicResponsiveListItemFlexColumnRenderer.text.runs[0]
-				.navigationEndpoint.watchEndpoint.videoId || '',
+				?.navigationEndpoint?.watchEndpoint?.videoId || '',
 		playlistId: ctx.musicResponsiveListItemRenderer.menu.menuRenderer.items[0]
-			.menuNavigationItemRenderer.navigationEndpoint.watchEndpoint.playlistId
+			.menuNavigationItemRenderer?.navigationEndpoint?.watchEndpoint?.playlistId
 			? ctx.musicResponsiveListItemRenderer.menu.menuRenderer.items[0]
 					.menuNavigationItemRenderer.navigationEndpoint.watchEndpoint
 					.playlistId
-			: ctx.navigationEndpoint.watchEndpoint,
+			: ctx?.navigationEndpoint?.watchEndpoint,
 		thumbnails:
 			ctx.musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer
 				.thumbnail.thumbnails

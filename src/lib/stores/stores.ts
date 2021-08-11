@@ -39,7 +39,7 @@ export const currentMix = writable({
 })
 export const iOS = _verifyUserAgent()
 export function updateSource() {
-	const { subscribe, set, update } = writable(undefined)
+	const { subscribe, set, update } = writable('')
 	return {
 		subscribe,
 		set,
@@ -48,7 +48,7 @@ export function updateSource() {
 		add: (src) => {
 			src
 		},
-		reset: () => set(0)
+		reset: () => set('0')
 	}
 }
 

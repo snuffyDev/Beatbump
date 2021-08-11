@@ -179,4 +179,10 @@
 			color: #121212 !important;
 		}
 	}
+
+	@media screen and (max-width: 640px) {
+		small {
+			font-size: 1rem;
+		}
+	}
 </style>

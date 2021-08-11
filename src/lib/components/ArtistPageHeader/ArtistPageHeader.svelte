@@ -12,7 +12,6 @@
 	let y = 0
 	let handler = (event?: FrameRequestCallback | UIEvent) => {}
 	let wrapper: HTMLElement
-
 	onMount(() => {
 		let start
 		handler = (event) => {
@@ -66,9 +65,14 @@
 				{#each thumbnail as img, i}
 					{#if i == 0}
 						<source media="(max-width:{img.width}px)" srcset={img.url} />
+					{:else if i == thumbnail.length - 1}
+						<source
+							media="(min-width:{img.width}px)
+							.width}px)"
+							srcset={img.url} />
 					{:else}
 						<source
-							media="(min-width:{img.width}px) and (max-width: {thumbnail[i]
+							media="(min-width:{img.width}px) and (max-width: {thumbnail[i + 1]
 								.width}px)"
 							srcset={img.url} />
 					{/if}

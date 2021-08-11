@@ -120,10 +120,8 @@ body {
 
 body {
 	margin: 0;
-	// overflow: hidden;
+	overflow: hidden;
 	position: fixed;
-	height: 100%;
-	width: 100%;
 }
 #app {
 	grid-template-rows: 4rem 1fr 4.5rem;

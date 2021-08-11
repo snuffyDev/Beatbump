@@ -5,7 +5,6 @@
 	export let type = ''
 	export let isBrowse
 
-	import type { CarouselHeader } from '$lib/types'
 	let isHidden
 	let section = []
 	let arr = items

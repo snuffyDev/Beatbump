@@ -77,10 +77,6 @@ export async function get({ params, query }) {
 			browseId:
 				musicTwoRowItemRenderer?.navigationEndpoint?.browseEndpoint?.browseId ||
 				null
-			// browseEndpoint:
-			// 	musicTwoRowItemRenderer.menu.menuRenderer.items[0]
-			// 		.menuNavigationItemRenderer.navigationEndpoint.watchPlaylistEndpoint
-			// 		.playlistId || null
 		}))
 		return { section }
 	})

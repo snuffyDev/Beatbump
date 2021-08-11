@@ -137,7 +137,7 @@
 			}}
 			bind:isLoading
 			bind:hasData
-			height=" calc(100% - 8.3rem)"
+			height=" calc(100% - 6rem)"
 			{items}
 			let:item>
 			<Item data={item} />
@@ -251,9 +251,7 @@
 			font-size: calc(var(--base-font-size) * 1.1);
 		}
 		em {
-			padding-top: 0.5rem;
 			font-size: 1.1em;
-			margin-bottom: 0.5rem;
 		}
 	}
 </style>
