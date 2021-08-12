@@ -1,6 +1,6 @@
 import type { CarouselItem } from './types'
 
-export function parseItem(item = [], length) {
+export function parseNextItem(item, length) {
 	item = [item]
 	const result = item.map((item) => {
 		const title = item.title
@@ -27,10 +27,11 @@ export function parseItem(item = [], length) {
 			},
 			videoId: item.videoId,
 			autoMixList: item.playlistId,
-			thumbnail: item?.thumbnail ? item?.thumbnail : item?.thumbnails[0]?.url,
+			thumbnail: item.thumbnails[0].url,
 			length: length
 		}
 	})
+	console.log(result)
 	return result[0]
 }
 

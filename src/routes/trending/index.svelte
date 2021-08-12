@@ -24,6 +24,7 @@
 
 	import { currentTitle } from '$stores/stores'
 	import Carousel from '$components/Carousel/Carousel.svelte'
+	import type { ICarousel } from '$lib/types'
 
 	// $: console.log(carouselItems)
 </script>
@@ -39,7 +40,7 @@
 </svelte:head>
 <main>
 	<Carousel
-		isBrowse={false}
+		isBrowseEndpoint={false}
 		header={carouselItems[2].header}
 		items={carouselItems[2].results}
 		type="trending" />
@@ -50,14 +51,11 @@
 				<h1>{carouselItems[1].header.title}</h1>
 				<a class="link" href="/explore"><small>See All</small></a>
 			</div>
-
-			<!-- <div class="m-alert-info"><em>Coming Soon!</em></div> -->
 			<box>
-				{#each carouselItems[1].results.slice(1, 15) as item}
-					<div style={`border-left: 1ch solid #${item.color}`} class="box">
+				{#each carouselItems[1].results.slice(1, 15) as { color, endpoint: { params }, text }}
+					<div style={`border-left: 1ch solid #${color}`} class="box">
 						<div class="innerbox">
-							<a class="innerlink" href={`/explore/${item.endpoint.params}`}
-								>{item.text}</a>
+							<a class="innerlink" href={`/explore/${params}`}>{text}</a>
 						</div>
 					</div>
 				{/each}
@@ -67,13 +65,13 @@
 	<Carousel
 		header={carouselItems[3].header}
 		items={carouselItems[3].results}
-		isBrowse={false}
+		isBrowseEndpoint={false}
 		type="trending" />
 	<Carousel
 		header={carouselItems[0].header}
 		items={carouselItems[0].results}
 		type="trending"
-		isBrowse={true} />
+		isBrowseEndpoint={true} />
 </main>
 
 <style lang="scss">

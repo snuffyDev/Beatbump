@@ -19,7 +19,9 @@ export async function api(
 
 		.join('&')
 	console.log(urlParams, endpoint, params, `/api/${endpoint}.json?${urlParams}`)
-	const response = await fetch(`/api/${endpoint}.json?${urlParams}`)
+	const response = await fetch(`/api/${endpoint}.json?${urlParams}`, {
+		method: 'GET'
+	})
 	const data = await response.json()
 
 	return {
@@ -27,4 +29,8 @@ export async function api(
 		status: response.status,
 		ok: response.ok
 	}
+}
+
+export function get(endpoint, params) {
+	return api(endpoint, params)
 }

@@ -1,10 +1,5 @@
-import type { EndpointOutput } from '@sveltejs/kit'
-
-export async function get({
-	query
-}: {
-	query: URLSearchParams
-}): Promise<EndpointOutput> {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export async function get({ query }: { query: URLSearchParams }) {
 	const videoId = query.get('videoId') || ''
 	const playlistId = query.get('playlistId') || ''
 	try {
@@ -167,8 +162,7 @@ export async function get({
 		console.log(error)
 		return {
 			status: 500,
-			// Could be a custom message or object i.e. JSON.stringify(err)
-			body: JSON.stringify({ msg: error.message })
+			error: new Error(error)
 		}
 	}
 }

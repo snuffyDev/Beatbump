@@ -1,33 +1,18 @@
 <script lang="ts">
-	import { clickOutside } from '$lib/js/clickOutside'
 	import list from '$lib/stores/list'
-	import { afterUpdate, createEventDispatcher, onMount, tick } from 'svelte'
-	import { cubicInOut } from 'svelte/easing'
-	import { fly, slide } from 'svelte/transition'
-	import QueueListItem from './QueueListItem.svelte'
+	import { afterUpdate, onMount } from 'svelte'
 	import { browser } from '$app/env'
 	import drag from '$lib/actions/drag'
 	import Icon from '$lib/components/Icon/Icon.svelte'
-	import { spring } from 'svelte/motion'
 	export let autoId
 	export let showing = false
-	export let QueueList = []
-	let sliding
+
+	$: if (browser) active = document.getElementById(autoId)
 	$: mixList = $list.mix
 
+	let sliding
 	let active
-	$: if (browser) active = document.getElementById(autoId)
-
-	const dispatch = createEventDispatcher()
-
-	afterUpdate(() => {
-		if (sliding) return
-		active = document.getElementById(autoId)
-		if (active) active.scrollIntoView(true)
-	})
-
 	let posY = 0
-	let queueList
 	let listHeight = window.innerHeight
 	function startHandler() {
 		sliding = true
@@ -63,6 +48,11 @@
 		sliding = false
 	}
 	onMount(() => {
+		active = document.getElementById(autoId)
+		if (active) active.scrollIntoView(true)
+	})
+	afterUpdate(() => {
+		if (sliding) return
 		active = document.getElementById(autoId)
 		if (active) active.scrollIntoView(true)
 	})

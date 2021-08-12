@@ -2,8 +2,8 @@ export async function get({ query, headers }) {
 	// if (headers.origin !== 'https://beatbump.ml/') {
 	// 	return { status: 403, body: JSON.stringify('CORS error!') }
 	// }
-	const videoId = query.get('videoId')
-	const playlistId = query.get('list')
+	const videoId = query.get('videoId') || ''
+	const playlistId = query.get('list') || ''
 	// console.log(videoId,playlistId)
 	try {
 		const response = await fetch(

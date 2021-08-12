@@ -14,7 +14,8 @@
 				description,
 				thumbnail,
 				header,
-				songs
+				songs,
+				id: page.params.slug
 			},
 			status: 200
 		}
@@ -28,13 +29,18 @@
 
 	import ListItem from '$components/ListItem/ListItem.svelte'
 	import { isPagePlaying } from '$lib/stores/stores'
+	import { setContext } from 'svelte'
 
 	export let header
 	export let description
 	export let thumbnail
 	export let carousels
 	export let songs
+	export let id
+	$: id = id
 	let width
+	const ctx = {}
+	setContext(ctx, { pageId: id })
 </script>
 
 <svelte:head>
@@ -57,9 +63,10 @@
 						<ListItem
 							{item}
 							{index}
+							{ctx}
 							page="artist"
 							on:pagePlaying={() => {
-								isPagePlaying.set($page.path + $page.params)
+								isPagePlaying.set(id)
 							}} />
 					{/each}
 				</section>
@@ -67,11 +74,19 @@
 		{/if}
 		{#each carousels as { contents, header }, i}
 			{#if i == carousels.length - 1}
-				<Carousel items={contents} type="artist" isBrowse={true} {header}>
+				<Carousel
+					items={contents}
+					type="artist"
+					isBrowseEndpoint={true}
+					{header}>
 					>
 				</Carousel>
 			{:else}
-				<Carousel items={contents} type="artist" isBrowse={false} {header}>
+				<Carousel
+					items={contents}
+					type="artist"
+					isBrowseEndpoint={false}
+					{header}>
 					>
 				</Carousel>
 			{/if}
@@ -96,15 +111,7 @@
 		padding: 0;
 		width: 100%;
 	}
-	.grid {
-		display: grid;
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(10.85rem, 1fr));
-		grid-gap: 1rem 1.2rem;
-		@media screen and (max-width: 575px) {
-			grid-template-columns: repeat(auto-fit, minmax(10.85rem, 1fr));
-		}
-	}
+
 	.songs {
 		margin-bottom: 1rem;
 	}

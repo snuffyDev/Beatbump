@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { parseNextItem } from '$lib/_parsers'
+import { parseNextItem } from '$lib/parsers'
 import { getSrc } from '$lib/utils'
 import { currentTitle } from '$stores/stores'
 import { writable } from 'svelte/store'
@@ -89,7 +89,7 @@ export default {
 		playerLoading.set(loading)
 		console.log(videoId, playlistId, keyId, playlistSetVideoId, clickTracking)
 		keyId = keyId ? keyId : 0
-		key.set(0)
+		key.set(keyId)
 		if (hasList) mix = []
 		hasList = true
 

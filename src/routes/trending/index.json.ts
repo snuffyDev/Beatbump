@@ -1,14 +1,12 @@
 import BaseContext from '$lib/context'
-import {
-	MoodsAndGenresItem,
-	MusicResponsiveListItemRenderer,
-	MusicTwoRowItemRenderer
-} from '$lib/parsers'
+import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from '$lib/parsers'
 
 import type { CarouselHeader, CarouselItem } from '$lib/types'
 import type { EndpointParams } from '$lib/types/internals'
-
-export async function get({ query }: EndpointParams): Promise<EndpointOutput> {
+/**
+ * @type {import('@sveltejs/kit').RequestHandler}
+ */
+export async function get({ query }: EndpointParams) {
 	const endpoint = query.get('q') || ''
 	const browseId = 'FEmusic_explore'
 	const carouselItems = []
@@ -54,13 +52,19 @@ export async function get({ query }: EndpointParams): Promise<EndpointOutput> {
 				return contents.musicCarouselShelfRenderer
 		})
 	)
-	// const body = c
-	// if (body.length !== 0)
+	const resBody = carouselItems.map(({ musicCarouselShelfRenderer }) => {
+		// console.timeEnd('test')
+		return parseCarousel({ musicCarouselShelfRenderer })
+	})
+	if (resBody) {
+		return {
+			body: resBody,
+			status: 200
+		}
+	}
 	return {
-		body: carouselItems.map(({ musicCarouselShelfRenderer }) => {
-			// console.timeEnd('test')
-			return parseCarousel({ musicCarouselShelfRenderer })
-		})
+		error: new Error(),
+		body: undefined
 	}
 }
 

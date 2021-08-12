@@ -11,15 +11,25 @@ type SearchStore = {
 	set: Writable<SearchContents>['set']
 	update: Writable<SearchContents>['update']
 }
-
-export const alertHandler = writable({
+type Alert = {
+	msg?: string
+	action?: string
+	type?: string
+}
+type AlertStore = {
+	subscribe: Writable<Alert>['subscribe']
+	set: Writable<Alert>['set']
+	update: Writable<Alert>['update']
+}
+export const alertHandler: AlertStore = writable({
 	msg: undefined,
+	type: undefined,
 	action: undefined
 })
 
 export const search: SearchStore = writable()
 
-export const isPagePlaying = writable('')
+export const isPagePlaying = writable()
 export const key = writable(0)
 
 export const playerLoading = writable(false)

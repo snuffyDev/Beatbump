@@ -3,14 +3,19 @@
 		const data = await fetch('/explore.json?browseId=FEmusic_moods_and_genres')
 		const response = await data.json()
 
-		if (data.ok) {
+		if (!data.ok) {
 			return {
-				props: {
-					response
-				},
-				maxage: 3600,
-				status: 200
+				error: new Error(data.statusText),
+
+				status: data.status
 			}
+		}
+		return {
+			props: {
+				response
+			},
+			maxage: 3600,
+			status: 200
 		}
 	}
 </script>
@@ -51,9 +56,7 @@
 
 <style lang="scss">
 	.breakout {
-
 		border-radius: 0.8rem;
-
 	}
 	.box-cont {
 		justify-content: space-around;
@@ -62,7 +65,6 @@
 	}
 	box {
 		display: grid;
-
 
 		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 

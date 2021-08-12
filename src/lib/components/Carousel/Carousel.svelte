@@ -1,9 +1,11 @@
 <script lang="ts">
+	import type { CarouselHeader } from '$lib/types'
+
 	import CarouselItem from './CarouselItem.svelte'
 	export let header: CarouselHeader
 	export let items = []
 	export let type = ''
-	export let isBrowse
+	export let isBrowseEndpoint
 
 	let isHidden
 	let section = []
@@ -35,14 +37,14 @@
 					type="trending"
 					aspectRatio={item.aspectRatio}
 					{item}
-					{isBrowse}
+					{isBrowseEndpoint}
 					index={i}
 					bind:section />
 			{:else if type == 'artist'}
 				<CarouselItem
 					type="artist"
 					aspectRatio={item.aspectRatio}
-					{isBrowse}
+					{isBrowseEndpoint}
 					{item}
 					index={i}
 					bind:section />

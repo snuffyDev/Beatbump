@@ -1,16 +1,16 @@
+/* eslint-disable no-prototype-builtins */
 export function parsePageContents(data) {
+	// eslint-disable-next-line prefer-const
 	let info = {}
-	let temp = []
 	let playlistId
 	console.log(data)
 	let items = []
-	let {
+	const {
 		frameworkUpdates: {
 			entityBatchUpdate: { mutations }
 		}
 	} = data
-	let arr = mutations
-	let channelId;
+	const arr = mutations
 	arr.forEach((d) => {
 		if (d.payload.hasOwnProperty('musicTrack')) {
 			items.push(d.payload.musicTrack)
@@ -20,16 +20,35 @@ export function parsePageContents(data) {
 
 			// console.log(info)
 		}
-		if (d.payload.hasOwnProperty('musicArtist')){
-			let {externalChannelId} = d['payload']['musicArtist']
-			channelId = externalChannelId;
+		if (d.payload.hasOwnProperty('musicArtist')) {
+			const { externalChannelId } = d['payload']['musicArtist']
+			// channelId = externalChannelId
+			// console.log(d['payload']['musicArtist'])
 		}
 	})
-	channelId  = !channelId ?
-	data.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
-		?.content?.sectionListRenderer?.contents[1]
-		?.musicCarouselShelfRenderer?.contents[0]?.musicTwoRowItemRenderer
-		?.subtitle?.runs[2]?.navigationEndpoint?.browseEndpoint?.browseId : channelId
+	const channelId = data.contents?.singleColumnBrowseResultsRenderer?.tabs[0]
+		?.tabRenderer?.content?.sectionListRenderer?.contents[1]
+		?.musicCarouselShelfRenderer?.contents[0]?.musicTwoRowItemRenderer?.subtitle
+		?.runs[2]?.navigationEndpoint?.browseEndpoint?.browseId
+		? data.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+				?.content?.sectionListRenderer?.contents[1]?.musicCarouselShelfRenderer
+				?.contents[0]?.musicTwoRowItemRenderer?.subtitle?.runs[2]
+				?.navigationEndpoint?.browseEndpoint?.browseId
+		: arr[1].payload?.musicArtist?.externalChannelId
+	// console.log(channelId)
+	const releaseInfo = Array.from([info]).map((d) => {
+		return {
+			playlistId: d.audioPlaylistId,
+			subtitles: [d?.releaseDate?.year, '&CenterDot;', d.trackCount],
+			secondSubtitle: [],
+			artist: { name: d.artistDisplayName, channelId },
+			thumbnails: d?.thumbnailDetails?.thumbnails,
+			title: d?.title,
+			autoMixId: d?.radioAutomixPlaylistId
+		}
+	})
+	// console.log(releaseInfo)
+
 	if (info) playlistId = info.radioAutomixPlaylistId
 	items = items.map((item) => {
 		let explicit = false
@@ -54,9 +73,6 @@ export function parsePageContents(data) {
 
 	return {
 		items,
-		details: {
-			...info,
-			artistChannelId: channelId
-		}
+		releaseInfo: releaseInfo[0]
 	}
 }

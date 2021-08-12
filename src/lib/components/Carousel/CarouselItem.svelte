@@ -1,20 +1,20 @@
 <script lang="ts">
 	import lazy from '$lib/lazy'
 	import Loading from '$components/Loading/Loading.svelte'
-	import { key } from '$stores/stores'
+	import { alertHandler, key } from '$stores/stores'
 	import { fade } from 'svelte/transition'
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 	import { goto } from '$app/navigation'
-
 	import type { CarouselItem } from '$lib/types'
 	import list from '$lib/stores/list'
 	import { onMount, tick } from 'svelte'
+	import { browseHandler } from './functions'
 	export let section
 	export let index
 	export let item: CarouselItem
 	export let type = ''
 	export let aspectRatio
-	export let isBrowse = false
+	export let isBrowseEndpoint = false
 	let hovering = false
 	let loading
 	let isHidden
@@ -50,17 +50,39 @@
 			text: 'Add to Queue',
 			icon: 'queue',
 			action: () => list.addNext(item, $key)
+		},
+		{
+			text: 'Share',
+			icon: 'share',
+			action: async () => {
+				const shareData = {
+					title: item.title,
+					text: `Listen to ${item.title} on Beatbump!`,
+					url: `https://beatbump.ml/listen?id=${item.videoId}`
+				}
+				try {
+					await navigator.share(shareData)
+					alertHandler.set({ msg: 'Shared Successfully!', type: 'success' })
+				} catch (error) {
+					alertHandler.set({ msg: 'Error!', type: 'error' })
+				}
+			}
 		}
 	]
-	onMount(() => {
-		if (item.endpoint?.pageType?.includes('ARTIST')) {
-			console.log(item.title)
-		}
-	})
+	onMount(async () => {})
+	type CustomEvent = Event & {
+		currentTarget: EventTarget & HTMLImageElement
+	}
+	const errorHandler = (event: CustomEvent) => {
+		event.currentTarget.onerror = null
+		event.currentTarget.src =
+			'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjYWNhY2FjIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJtYXRyaXgoMS4yOTkgMCAwIDEuMjcgOTUuNjg4IDE4Ni45NzEpIiBmb250LWZhbWlseT0iTGF0byIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMjAiIGZpbGw9IiMyODI4MjgiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLjI5OSAwIDAgMS4yNyA3OCA0Mi4yODYpIiBkPSJNMCAwaDc3djEzNUgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjwvZz48L3N2Zz4='
+	}
 	const clickHandler = async (index) => {
 		loading = true
 		if (type == 'trending') {
-			isBrowse
+			//
+			isBrowseEndpoint
 				? goto(
 						'/release?type=' +
 							encodeURIComponent(item.endpoint.pageType) +
@@ -75,28 +97,13 @@
 		if (type == 'artist') {
 			item?.endpoint?.pageType.includes('ARTIST') &&
 				goto(`/artist/${item?.endpoint?.browseId}`)
-			!isBrowse &&
+			// if has videoId, and endpoint type is artist page, and is not Browse type
+			!isBrowseEndpoint &&
 			item.videoId !== undefined &&
 			!item?.endpoint?.pageType.includes('ARTIST')
 				? await list.initList(item.videoId, item.playlistId, index)
-				: browseHandler()
+				: browseHandler(item.endpoint.pageType, item.endpoint.browseId)
 			loading = false
-		}
-	}
-	function browseHandler() {
-		if (item.endpoint?.pageType?.includes('ARTIST')) {
-			console.log(item)
-
-			goto(`/artist/${item?.endpoint?.browseId}`)
-		} else {
-			item.endpoint.pageType.includes('PLAYLIST')
-				? goto('/playlist?list=' + item.endpoint.browseId)
-				: goto(
-						'/release?type=' +
-							encodeURIComponent(item.endpoint.pageType) +
-							'&id=' +
-							encodeURIComponent(item.endpoint?.browseId)
-				  )
 		}
 	}
 
@@ -139,11 +146,7 @@
 					<img
 						alt="thumbnail"
 						transition:fade|local
-						on:error={(e) => {
-							e.currentTarget.onerror = null
-							e.currentTarget.src = '/assets/error.svg'
-							srcImg = '/logo-header.png'
-						}}
+						on:error={errorHandler}
 						class:img16x9={RATIO_RECT}
 						loading="lazy"
 						type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
@@ -181,7 +184,7 @@
 			</div>
 		</div>
 
-		{#if !isBrowse}
+		{#if !isBrowseEndpoint}
 			<div class="menu" class:mobile={width < 550}>
 				{#if hovering || width < 550}
 					<Dropdown color="white" bind:isHidden items={DropdownItems} />

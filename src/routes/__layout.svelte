@@ -8,23 +8,20 @@
 
 <script>
 	import { onMount } from 'svelte'
-	import { alertHandler, filterAutoPlay, theme } from '$stores/stores'
+	import { filterAutoPlay, theme } from '$stores/stores'
 	import { iOS } from '$stores/stores'
 	import Nav from '$components/Nav/Nav.svelte'
 	import Sidebar from '$components/Sidebar/Sidebar.svelte'
 	import Player from '$components/Player/Player.svelte'
 	import Wrapper from '$components/Wrapper/Wrapper.svelte'
-	import { page } from '$app/stores'
 	import Alert from '$lib/components/Alert/Alert.svelte'
 	import { browser } from '$app/env'
 	export let key
-	let loaded
 	onMount(() => {
 		iOS.init()
 		theme.init()
 		let filter = localStorage.getItem('filterAutoPlay')
 		filter ? filterAutoPlay.init(filter) : filterAutoPlay.init(false)
-		loaded = true
 	})
 	let width
 	let main
@@ -43,9 +40,9 @@
 		<slot />
 	</Wrapper>
 </div>
-<Alert message={$alertHandler.msg} color="red" />
+<Alert />
 <footer class="footer-container">
-	{#if browser && loaded}
+	{#if browser}
 		<Player />
 	{/if}
 </footer>

@@ -80,7 +80,7 @@ export async function get({ query }: { query: URLSearchParams }) {
 		const parseHeader = musicDetailHeaderRenderer.map((header) => {
 			// eslint-disable-next-line prefer-const
 			let { description, subtitle, thumbnail, secondSubtitle, title } = header
-			console.log(description, subtitle, thumbnail, secondSubtitle, title)
+			// console.log(description, subtitle, thumbnail, secondSubtitle, title)
 			const subtitles: string = pb(subtitle, 'runs:text', false)
 			description = description?.runs[0]?.text
 				? description?.runs[0]?.text

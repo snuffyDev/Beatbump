@@ -5,7 +5,7 @@
 	import Loading from '$components/Loading/Loading.svelte'
 	import { onMount, tick } from 'svelte'
 
-	import { key, theme } from '$stores/stores'
+	import { alertHandler, key, theme } from '$stores/stores'
 	import Icon from '$components/Icon/Icon.svelte'
 	import { goto } from '$app/navigation'
 	import list from '$lib/stores/list'
@@ -58,6 +58,24 @@
 			text: 'Add to Queue',
 			icon: 'queue',
 			action: () => list.addNext(data, $key)
+		},
+		{
+			text: 'Share',
+			icon: 'share',
+			action: async () => {
+				const shareData = {
+					title: data.title,
+					text: `Listen to ${data.title} on Beatbump!`,
+					url: `https://beatbump.ml/listen?id=${data.videoId}`
+				}
+				try {
+					const share = await navigator.share(shareData)
+
+					alertHandler.set({ msg: 'Shared Successfully!', type: 'success' })
+				} catch (error) {
+					alertHandler.set({ msg: 'Error!', type: 'error' })
+				}
+			}
 		}
 	]
 	if (data.type == 'playlist') {

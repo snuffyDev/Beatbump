@@ -1,31 +1,30 @@
 <script>
 	import Icon from '$components/Icon/Icon.svelte'
-	import { currentTitle, isPagePlaying, key } from '$stores/stores'
+	import { isPagePlaying, key } from '$stores/stores'
 	import { createEventDispatcher } from 'svelte'
 	import list from '$lib/stores/list'
-	import { getSrc } from '$lib/utils'
 	export let item
 	export let index
 	export let page
-	// $: id = $key >= 1 ? $key : index - 1;
+	export let ctx = {}
+	import { getContext } from 'svelte'
+	const { pageId } = getContext(ctx)
 	const dispatch = createEventDispatcher()
-	function dispatchPlaying(playing) {
+	function dispatchPlaying() {
 		dispatch('pagePlaying', {
 			isPlaying: true
 		})
 	}
-	let radio = []
 	let isHovering = false
 </script>
 
 <div
 	class="item"
-	class:playing={$key == index && $isPagePlaying}
+	class:playing={$isPagePlaying == pageId && index == $key}
 	on:click={async () => {
 		// @ts-ignore
-		key.set(index)
 		if (page == 'playlist') {
-			key.set(0)
+			key.set(index)
 			console.log('key: ' + $key, item.playlistId)
 
 			await list.initList(
@@ -36,10 +35,9 @@
 			)
 		} else {
 			key.set(0)
-			await list.initList(item.videoId, item.playlistId, index)
+			await list.initList(item.videoId, item.playlistId, $key)
 		}
-		console.log($list.mix)
-		dispatchPlaying(true)
+		dispatchPlaying()
 	}}
 	on:mouseenter={() => {
 		isHovering = true

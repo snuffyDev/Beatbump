@@ -1,9 +1,6 @@
 <script lang="ts">
 	import { alertHandler } from '$lib/stores/stores'
 
-	export let color = 'red'
-	export let message
-
 	import { fly } from 'svelte/transition'
 </script>
 
@@ -14,10 +11,10 @@
 			on:introend={() => {
 				setTimeout(() => {
 					alertHandler.set({ msg: undefined, action: undefined })
-				}, 2500)
+				}, 3000)
 			}}
-			class="alert m-alert-error">
-			{message}
+			class={`alert m-alert-${$alertHandler.type}`}>
+			{$alertHandler.msg}
 		</div>
 	{/if}
 </div>
@@ -31,6 +28,7 @@
 		right: 0;
 		justify-content: center;
 	}
+
 	.m-alert-danger {
 	}
 </style>

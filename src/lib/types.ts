@@ -1,5 +1,21 @@
 import type { PlaylistSearch } from './types/playlist'
-export type Item = Song | PlaylistSearch
+export interface CarouselHeader {
+	browseId?: string
+	title?: string
+}
+
+interface MoodsAndGenresItem {
+	color: string
+	endpoint: { params: string }
+	text: string
+}
+export interface ICarousel {
+	header: CarouselHeader
+	results: Array<CarouselItem & MoodsAndGenresItem>
+	isBrowse?: boolean
+}
+export type Item = Song & PlaylistSearch & CarouselItem
+
 export interface Album {
 	browseId: string
 	title: string
@@ -54,10 +70,18 @@ export interface ArtistInfo {
 	browseId?: string
 }
 
-export interface Subtitle {
+export interface Subtitle extends NavigationEndpoint {
 	text: string
 	browseId: string
 	pageType: string
+}
+
+export type NavigationEndpoint = {
+	navigationEndpoint: {
+		browseEndpoint: {
+			browseId: string
+		}
+	}
 }
 
 export interface SearchResult {
@@ -74,13 +98,13 @@ export type CarouselItem = {
 	artistInfo?: ArtistInfo
 	title: string
 	artist?: string
-	endpoint?: string | ItemEndpoint
+	endpoint?: ItemEndpoint & string
 	aspectRatio?: string
 	videoId: string
 	playlistId: string
 	explicit?: boolean
 	params?: string
-	thumbnails: [{ url: string }[]]
+	thumbnails: [{ url: string; width: number }]
 	subtitle?: Subtitle[]
 }
 export type ItemEndpoint = {

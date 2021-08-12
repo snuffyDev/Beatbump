@@ -49,7 +49,8 @@ function handleError() {
 	console.log('error')
 	alertHandler.set({
 		msg: 'No audio stream found, skipping.',
-		action: 'getNextTrack'
+		action: 'getNextTrack',
+		type: 'danger'
 	})
 	return {
 		body: null,

@@ -11,16 +11,28 @@ button {
 	display: inline-flex;
 	font-weight: 500;
 }
+
+.button-group {
+	display: inline-grid;
+	grid-template-columns: 11rem;
+	gap: 0.5rem;
+	align-items: center;
+	max-width: 40%;
+}
 .button--outlined {
 	color: #070707 !important;
 	border-color: #fff !important;
 	background-color: #fff !important;
 	margin-top: 0.5rem;
 	font-weight: 700;
+	// font-size: 1.5rem;
 	display: inline-flex;
+	min-width: 7rem;
 	align-items: center;
-	* {
-		margin-left: 1.5em;
+	.button-text {
+		margin-left: 0.2rem;
+		align-self: center;
+		padding-bottom: 0.1rem;
 	}
 	&:hover {
 		background-color: transparentize(#fff, 0.1) !important;
@@ -138,10 +150,16 @@ hr {
 	flex-wrap: nowrap;
 	flex: 1 1 auto;
 }
+.info-title {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
 .info {
+	width: 100%;
 	/* margin-left: auto; */
 	transition: all cubic-bezier(0.645, 0.045, 0.355, 1) 0.25s;
-	margin-right: auto;
+	// margin-right: auto;
 	padding-left: 1.5rem;
 	@media screen and (max-width: 500px) {
 		// margin-right: 0.5rem;
