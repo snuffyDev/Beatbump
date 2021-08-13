@@ -23,13 +23,10 @@
 		let filter = localStorage.getItem('filterAutoPlay')
 		filter ? filterAutoPlay.init(filter) : filterAutoPlay.init(false)
 	})
-	let width
 	let main
-	// $: console.log(hasError, errorKey)
 </script>
 
-<svelte:window bind:innerWidth={width} />
-<Nav {width} />
+<Nav {key} />
 <Sidebar />
 <div
 	class="wrapper"

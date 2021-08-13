@@ -38,7 +38,9 @@
 	{#each response as section}
 		<div class="breakout">
 			<div class="box-cont">
-				<h3>{section.title}</h3>
+				<div class="header">
+					<h1>{section.title}</h1>
+				</div>
 				<box>
 					{#each section.section as item}
 						<div
@@ -48,7 +50,6 @@
 						</div>
 					{/each}
 				</box>
-				<a class="link" href="/explore">See All</a>
 			</div>
 		</div>
 	{/each}
@@ -58,6 +59,26 @@
 	.breakout {
 		border-radius: 0.8rem;
 	}
+	.header {
+		display: block;
+		font-weight: 600;
+		margin-bottom: 0.5rem;
+		padding: 0.4rem 0.4rem 0.2rem 0;
+
+		h1 {
+			font-weight: 700;
+			letter-spacing: -0.03rem;
+			margin-right: 0.7rem;
+			display: inline-flex;
+			flex-direction: row;
+			flex-wrap: nowrap;
+
+			@media screen and (min-width: 800px) {
+				font-size: 2.125em;
+			}
+		}
+	}
+
 	.box-cont {
 		justify-content: space-around;
 

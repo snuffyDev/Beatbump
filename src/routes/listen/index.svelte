@@ -30,16 +30,19 @@
 	export let id
 	export let playlist
 	export let data
+	let thumbnails = data.videoDetails?.thumbnail?.thumbnails?.reverse()
 	import list from '$lib/stores/list'
 </script>
 
 <svelte:head>
 	<meta property="og:title" content={data.videoDetails.title} />
 	<meta property="og:type" content="music.song" />
-	<meta property="og:site_name" content="Beatbump" />
 	<meta
-		property="og:image"
-		content={data.videoDetails.thumbnail.thumbnails[1].url} />
+		property="og:description"
+		content={`Listen to ${data.videoDetails.title} on Beatbump`} />
+	<meta property="og:site_name" content="Beatbump" />
+	<meta property="og:image" content={thumbnails[0].url} />
+
 	<meta
 		property="og:url"
 		content={`https://beatbump.ml/listen?id=${id}${

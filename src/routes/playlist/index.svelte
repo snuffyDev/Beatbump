@@ -1,7 +1,12 @@
 <script context="module">
 	export async function load({ page, fetch }) {
 		const res = await fetch('/api/playlist.json?list=' + page.query.get('list'))
-		const { tracks, header, continuations } = await res.json()
+		const {
+			tracks,
+			header,
+			continuations,
+			musicDetailHeaderRenderer
+		} = await res.json()
 		if (!res.ok) {
 			return {
 				error: new Error(res.statusText),
@@ -13,6 +18,7 @@
 				tracks: await tracks,
 				continuations: await continuations,
 				header: await header,
+				musicDetailHeaderRenderer,
 				id: page.query.get('list')
 			},
 			maxage: 3600,
@@ -34,6 +40,7 @@
 	export let tracks: Item[]
 	export let header: Header
 	export let id
+	export let musicDetailHeaderRenderer
 	export let continuations
 	let width
 	let pageTitle = header?.title
@@ -41,7 +48,7 @@
 	$: id = id
 	const ctx = {}
 	setContext(ctx, { pageId: id })
-	// console.log(tracks, continuations, header)
+	console.log(tracks, continuations, header, musicDetailHeaderRenderer)
 
 	onMount(() => {
 		pageTitle =

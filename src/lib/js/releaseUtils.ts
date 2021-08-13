@@ -39,7 +39,14 @@ export function parsePageContents(data) {
 	const releaseInfo = Array.from([info]).map((d) => {
 		return {
 			playlistId: d.audioPlaylistId,
-			subtitles: [d?.releaseDate?.year, '&CenterDot;', d.trackCount],
+			subtitles: [
+				{
+					year: d?.releaseDate?.year,
+					tracks: d.trackCount,
+					length: d.durationMs,
+					contentRating: d.contentRating?.explicitType || null
+				}
+			],
 			secondSubtitle: [],
 			artist: { name: d.artistDisplayName, channelId },
 			thumbnails: d?.thumbnailDetails?.thumbnails,

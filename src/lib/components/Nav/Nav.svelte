@@ -7,24 +7,38 @@
 	import { circIn } from 'svelte/easing'
 	import { goto } from '$app/navigation'
 	import { clickOutside } from '$lib/js/clickOutside'
-	export let width
+	import { browser } from '$app/env'
+	export let key
 	let isHidden = true
 	let hidden = isHidden ? true : false
 	let isSettingsOpen
 	let shown
+	let width
+	$: if (browser) width = window.innerWidth
+
+	const navBack = () => {
+		if (!browser) return
+
+		window.history.back()
+	}
 </script>
 
 <nav class="nav">
 	<div class="logo">
-		<div on:click={() => goto('/trending')}>
-			<img
-				src="/logo-header.png"
-				width="1.75rem"
-				height="1.75rem"
-				alt="logo"
-				title="Beatbump Home" />
-		</div>
-		<!-- {/if} -->
+		{#if key !== '/trending'}
+			<div on:click={navBack}>
+				<Icon name="chevron-left" size="1.5em" />
+			</div>
+		{:else}
+			<div on:click={() => goto('/trending', { noscroll })}>
+				<img
+					src="/logo-header.png"
+					width="1.75rem"
+					height="1.75rem"
+					alt="logo"
+					title="Beatbump Home" />
+			</div>
+		{/if}
 	</div>
 
 	<div class="homeIcon" on:click={() => goto('/trending')}>

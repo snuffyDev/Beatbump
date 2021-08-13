@@ -31,7 +31,12 @@
 		</div>
 		<div class="info">
 			<div class="info-title">
-				<h4 class="box-title">{title}</h4>
+				<h4 class="box-title">
+					{title}
+					{#if subtitles[0]?.contentRating}
+						<span class="explicit"> E </span>
+					{/if}
+				</h4>
 				{#if description && type == 'playlist'}
 					<p
 						class="subtitle description"
@@ -49,8 +54,14 @@
 						</em>
 					</span>
 				{:else if type == 'release'}
-					<a href={`/artist/${artist.channelId}`}>{artist.name}</a>
-					{#each subtitles as subtitle} {@html subtitle} {/each} Tracks
+					<p>
+						<a href={`/artist/${artist.channelId}`}>{artist.name}</a>
+						•
+						<small>
+							{subtitles[0].year} • {subtitles[0].tracks}
+							{subtitles[0].tracks > 1 ? 'Tracks' : 'Track'}
+						</small>
+					</p>
 				{/if}
 				<div class="button-group">
 					{#each buttons as { icon, text, action }}
@@ -67,4 +78,11 @@
 
 <style lang="scss">
 	@import '../../shared/listPages.scss';
+	.box-title {
+		display: inline-flex;
+	}
+	p {
+		margin-top: 0;
+		margin-bottom: 0.3rem;
+	}
 </style>

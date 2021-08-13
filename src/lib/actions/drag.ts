@@ -1,7 +1,7 @@
 export default function drag(node) {
 	let x
 	let y
-
+	let loop
 	function handleMousedown(event) {
 		if (event.type == 'touchstart') {
 			x = event.touches[0].clientX
@@ -17,13 +17,18 @@ export default function drag(node) {
 			})
 		)
 
-		window.addEventListener('touchmove', handleMousemove, { passive: true })
+		window.addEventListener('touchmove', handleMousemove)
 		window.addEventListener('touchend', handleMouseup, { passive: true })
-		window.addEventListener('mousemove', handleMousemove, { passive: true })
+		window.addEventListener('mousemove', handleMousemove)
 		window.addEventListener('mouseup', handleMouseup, { passive: true })
 	}
 
 	function handleMousemove(event) {
+		if (loop) return
+		loop = window.requestAnimationFrame(() => mouseMove(event))
+	}
+	function mouseMove(event) {
+		event.preventDefault()
 		let dx, dy
 		if (event.type == 'touchmove') {
 			// console.log(event)
@@ -50,6 +55,7 @@ export default function drag(node) {
 				})
 			)
 		}
+		loop = null
 	}
 
 	function handleMouseup(event) {
@@ -61,6 +67,7 @@ export default function drag(node) {
 			x = event.clientX
 			y = event.clientY
 		}
+		loop = null
 
 		node.dispatchEvent(
 			new CustomEvent('dragEnd', {

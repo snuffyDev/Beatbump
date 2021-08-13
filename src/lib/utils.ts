@@ -59,7 +59,7 @@ function handleError() {
 }
 // parse array object input for child
 
-export const pb = (input: any, query: string, justOne = false) => {
+export const pb = (input: string, query: string, justOne = false) => {
 	const iterate = (x: string | any[], y: string | number) => {
 		let r = []
 

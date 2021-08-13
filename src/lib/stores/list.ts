@@ -116,6 +116,11 @@ export default {
 		mix.push(...data.results)
 		list.set({ currentMixId, clickTrackingParams, continuation, mix })
 	},
+	removeItem(index) {
+		mix.splice(index, 1)
+		mix = [...mix]
+		list.set({ currentMixId, clickTrackingParams, continuation, mix })
+	},
 	async initArtistList(videoId, playlistId) {
 		loading = true
 		playerLoading.set(loading)

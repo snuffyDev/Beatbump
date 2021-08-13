@@ -286,9 +286,18 @@
 			use:clickOutside
 			class="player-left">
 			{#if showing}
-				<Queue bind:autoId={$key} bind:showing let:item let:index>
+				<Queue bind:autoId={$key} let:ctxKey bind:showing let:item let:index>
 					<row id={index}>
 						<QueueListItem
+							{ctxKey}
+							on:removeItem={async () => {
+								showing = true
+								if (index == $key) {
+									key.set(index - 1)
+									await tick()
+									getNext()
+								}
+							}}
 							on:updated={async (event) => {
 								key.set(index - 1)
 								await tick()
@@ -356,7 +365,9 @@
 
 <style lang="scss">
 	@import '../../../global/scss/components/_player.scss';
-
+	row {
+		position: relative;
+	}
 	.hidden {
 		display: none !important;
 		visibility: hidden !important;

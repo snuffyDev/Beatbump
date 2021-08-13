@@ -1,6 +1,6 @@
 <script lang="ts">
 	import list from '$lib/stores/list'
-	import { afterUpdate, onMount } from 'svelte'
+	import { afterUpdate, onMount, setContext } from 'svelte'
 	import { browser } from '$app/env'
 	import drag from '$lib/actions/drag'
 	import Icon from '$lib/components/Icon/Icon.svelte'
@@ -9,11 +9,16 @@
 
 	$: if (browser) active = document.getElementById(autoId)
 	$: mixList = $list.mix
-
+	const ctxKey = {}
 	let sliding
 	let active
+	let listContainer: HTMLElement
+	let listWidth
 	let posY = 0
 	let listHeight = window.innerHeight
+	setContext(ctxKey, {
+		width: listWidth
+	})
 	function startHandler() {
 		sliding = true
 	}
@@ -43,22 +48,25 @@
 		posY = 0
 	}
 	function close() {
-		posY = 0
+		posY = 100
 		showing = false
 		sliding = false
 	}
+	let mounted
+	$: if (active) active.scrollIntoView(true)
+
 	onMount(() => {
 		active = document.getElementById(autoId)
 		if (active) active.scrollIntoView(true)
-	})
-	afterUpdate(() => {
-		if (sliding) return
-		active = document.getElementById(autoId)
-		if (active) active.scrollIntoView(true)
+		listContainer = document.getElementById('listContainer')
+		listWidth = listContainer.clientWidth
 	})
 </script>
 
-<div class="listContainer" style="transform: translate(0, {posY / 28}vh);">
+<div
+	class="listContainer"
+	id="listContainer"
+	style="transform: translate(0, {posY / 28}vh);">
 	<div
 		class="handle"
 		use:drag
@@ -78,9 +86,10 @@
 				}}
 				on:mousedown|stopPropagation={() => {
 					sliding = false
-				}}>
-				{#each mixList as item, index}
-					<slot {item} {index} />
+				}}
+				on:removeItem>
+				{#each mixList as item, index (item.hash)}
+					<slot {item} {ctxKey} {index} />
 				{/each}
 			</ul>
 		{:else}
@@ -174,6 +183,7 @@
 		color: #fff;
 		padding: 0;
 		min-width: 100%;
+		width: 100%;
 	}
 	.list-m {
 		padding: 0;
@@ -187,8 +197,11 @@
 		margin: 0;
 		overflow-y: scroll;
 		height: 100%;
-		scroll-padding-top: 0.8rem;
-		padding-bottom: 2rem;
+		width: 100%;
+		padding-left: 0;
+		padding: 0.225rem 0.6rem;
+		padding-bottom: 0.125rem;
+		overflow-x: hidden;
 	}
 
 	.empty-title {

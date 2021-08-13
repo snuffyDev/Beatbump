@@ -71,7 +71,7 @@ export async function get({ query }: { query: URLSearchParams }) {
 			contents: [{ musicPlaylistShelfRenderer: { contents = [] } = {} }] = [],
 			continuations = []
 		} = await sectionListRenderer
-
+		console.log(musicDetailHeaderRenderer)
 		const cont: NextContinuationData = (await continuations[0]
 			?.nextContinuationData)
 			? continuations[0]?.nextContinuationData
@@ -112,7 +112,8 @@ export async function get({ query }: { query: URLSearchParams }) {
 			body: {
 				continuations: cont,
 				tracks: Tracks,
-				header: parseHeader
+				header: parseHeader,
+				musicDetailHeaderRenderer
 			}
 		}
 	}

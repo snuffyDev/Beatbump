@@ -5,19 +5,19 @@
 	let redir = 6
 	let timeout
 	onMount(() => {
-		// const redirect = () => {
-		// 	if (!$navigating) {
-		// 		redir--
-		// 		if (redir <= 0) {
-		// 			goto('/trending')
-		// 		} else {
-		// 			timeout = setTimeout(redirect, 1000)
-		// 		}
-		// 	} else {
-		// 		clearTimeout(timeout)
-		// 	}
-		// }
-		// redirect()
+		const redirect = () => {
+			if (!$navigating) {
+				redir--
+				if (redir <= 0) {
+					goto('/trending')
+				} else {
+					timeout = setTimeout(redirect, 1000)
+				}
+			} else {
+				clearTimeout(timeout)
+			}
+		}
+		redirect()
 	})
 </script>
 
