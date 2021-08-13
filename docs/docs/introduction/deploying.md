@@ -16,11 +16,29 @@ Vercel and Netlify are deployable through adapters, with little to no configurat
 ## Node
 
 [See the README](https://github.com/sveltejs/kit/tree/master/packages/adapter-node) for details.
+
 ## Cloudflare Workers
 
 To get caching for responses with Cloudflare Workers, a custom adapter is used. For guaranteed stability, use the [official](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare-workers) one. If you *do* want to use the custom one, [here](https://github.com/snuffyDev/adapter-cloudflare-cache) is the repository.
 
 For both adapters: The [official adapter](https://github.com/sveltejs/kit/tree/master/packages/adapter-cloudflare-workers) follow the regular Wrangler setup.
+
+Verify that your ```wrangler.toml``` resembles something like this:
+```toml
+name = "beatbump"
+type = 'webpack'
+account_id = '###'
+route = ''
+zone_id = ''
+usage_model = ''
+workers_dev = true
+target_type = "webpack"
+
+// this part is important!
+[site]
+bucket = "./build"
+entry-point = "./workers-site"
+```
 
 For deploying to Cloudflare Workers, there's two commands in `package.json` for this:
 
