@@ -1,6 +1,6 @@
 # <img src="/.repo/images/logo-header.png" width=48 height=48 /> Beatbump
 
-An Alternative frontend for YouTube Music created using Svelte/SvelteKit.
+An Alternative frontend for YouTube Music created using Svelte/SvelteKit, and powered by Cloudflare Workers.
 
 **Live Site**: https://beatbump.ml/
 
