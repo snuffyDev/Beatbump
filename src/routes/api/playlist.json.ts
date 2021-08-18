@@ -162,7 +162,7 @@ function parseTrack(contents = [], playlistId?): Array<IPlaylistItem> {
 			true
 		)
 		let videoId = undefined
-
+		let playerParams = undefined
 		if (
 			!musicResponsiveListItemRenderer.playlistItemData &&
 			!musicResponsiveListItemRenderer?.navigationEndpoint?.watchEndpoint
@@ -176,6 +176,9 @@ function parseTrack(contents = [], playlistId?): Array<IPlaylistItem> {
 				? titleBody?.navigationEndpoint?.watchEndpoint?.videoId
 				: undefined
 		}
+		playerParams = titleBody?.navigationEndpoint?.watchEndpoint?.playerParams
+			? titleBody?.navigationEndpoint?.watchEndpoint?.playerParams
+			: undefined
 
 		const title = titleBody.text
 		// console.log(artistEndpoint);
@@ -192,6 +195,7 @@ function parseTrack(contents = [], playlistId?): Array<IPlaylistItem> {
 			length,
 			videoId: videoId ? videoId : undefined,
 			playlistId: playlistId,
+
 			playlistSetVideoId:
 				musicResponsiveListItemRenderer.playlistItemData.playlistSetVideoId ||
 				musicResponsiveListItemRenderer.overlay
@@ -201,7 +205,7 @@ function parseTrack(contents = [], playlistId?): Array<IPlaylistItem> {
 			playerParams:
 				musicResponsiveListItemRenderer?.flexColumns[0]
 					?.musicResponsiveListItemFlexColumnRenderer.text.runs[0]
-					.navigationEndpoint.watchEndpoint.playerParams || undefined,
+					.navigationEndpoint.watchEndpoint.playerParams || 'iAQB',
 			title,
 			artistInfo
 		}

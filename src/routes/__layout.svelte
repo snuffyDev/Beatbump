@@ -2,20 +2,20 @@
 	export const load = async ({ page }) => ({
 		props: {
 			key: page.path
-		}
+		},
+		context: { page: page.path }
 	})
 </script>
 
 <script>
-	import { onMount } from 'svelte'
-	import { filterAutoPlay, theme } from '$stores/stores'
-	import { iOS } from '$stores/stores'
+	import { browser } from '$app/env'
 	import Nav from '$components/Nav/Nav.svelte'
-	import Sidebar from '$components/Sidebar/Sidebar.svelte'
 	import Player from '$components/Player/Player.svelte'
 	import Wrapper from '$components/Wrapper/Wrapper.svelte'
 	import Alert from '$lib/components/Alert/Alert.svelte'
-	import { browser } from '$app/env'
+	import { currentTitle, filterAutoPlay, iOS, theme } from '$stores/stores'
+	import { onMount } from 'svelte'
+	import tags from '$lib/stores/ogtags'
 	export let key
 	onMount(() => {
 		iOS.init()
@@ -27,12 +27,13 @@
 </script>
 
 <Nav {key} />
-<Sidebar />
+<!-- <Sidebar /> -->
 <div
 	class="wrapper"
 	class:no-scroll={key.includes('/search/') ? true : false}
 	bind:this={main}
-	id="wrapper">
+	id="wrapper"
+>
 	<Wrapper {key} {main}>
 		<slot />
 	</Wrapper>
@@ -45,7 +46,7 @@
 </footer>
 
 <style lang="scss" global>
-	@import '../global/stylesheet.scss';
+	@import '../global/stylesheet/main.scss';
 
 	.no-scroll {
 		overflow: hidden;
@@ -130,6 +131,7 @@
 			}
 			.select,
 			.input,
+			.suggestions,
 			option {
 				background: var(--dark-forms);
 			}
@@ -150,6 +152,7 @@
 			}
 			.select,
 			.input,
+			.suggestions,
 			option {
 				background: var(--dim-forms);
 			}
@@ -169,6 +172,7 @@
 			}
 			.select,
 			.input,
+			.suggestions,
 			option {
 				background: var(--ytm-forms);
 			}
@@ -190,6 +194,7 @@
 			}
 			.select,
 			.input,
+			.suggestions,
 			option {
 				background: var(--midnight-forms);
 			}
@@ -225,6 +230,7 @@
 			.select,
 			select,
 			.input,
+			.suggestions,
 			option,
 			option {
 				background: var(--light-forms);

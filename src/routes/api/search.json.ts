@@ -13,6 +13,7 @@ interface SearchOutput extends EndpointOutput {
 }
 export async function get({ query }): Promise<SearchOutput> {
 	let q = query.get('q')
+	q = decodeURIComponent(q)
 	const filter = query.get('filter') || ''
 	const videoId = query.get('videoId') || ''
 	const itct = query.get('itct') || ''

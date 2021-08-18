@@ -7,7 +7,8 @@
 	id="vertical-loading-bars"
 	style={` max-width: ${size};
     max-height: ${size}`}
-	transition:fade>
+	transition:fade
+>
 	<span />
 	<span />
 	<span />

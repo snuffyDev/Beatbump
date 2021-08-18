@@ -1,0 +1,33 @@
+a small {
+	$color: rgb(175, 175, 175);
+	font-size: 0.95rem;
+	font-weight: 700;
+	font-variant-caps: all-petite-caps;
+	letter-spacing: 0.05rem;
+	transition: ease-in color 75ms;
+	color: $color;
+	&:hover {
+		color: lighten($color, 30%);
+		text-decoration: underline 0.001rem solid;
+		text-underline-offset: 0.001rem;
+	}
+}
+.header {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 0.5rem;
+	padding: 0.4rem 0.4rem 0.2rem;
+
+	h1 {
+		font-weight: 700;
+		letter-spacing: -0.03rem;
+		margin-right: 0.7rem;
+		display: inline-flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+
+		@media screen and (min-width: 800px) {
+			font-size: 2.125rem;
+		}
+	}
+}

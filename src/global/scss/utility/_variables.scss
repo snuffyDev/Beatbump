@@ -2,17 +2,17 @@
 
 // Typography
 // $base-font-family:'Helvetica', sans-serif;
-$base-font-family: "Commissioner", sans-serif;
+$base-font-family: 'Commissioner', sans-serif;
 
-$secondary-font-family: "Commissioner", sans-serif;
+$secondary-font-family: 'Commissioner', sans-serif;
 :root {
-	--base-spacing: 12px;
-	--base-font-size: 12px;
+	--base-spacing: 1rem;
+	--base-font-size: 75%;
 
 	--sm-spacing: calc(var(--base-spacing) / 2.5);
 	--md-spacing: calc(var(--base-spacing));
-	--lg-spacing: calc(var(--base-spacing) * 1.125);
-	--xl-spacing: calc(var(--base-spacing) * 1.25);
+	--lg-spacing: calc(var(--base-spacing) * 3.5);
+	--xl-spacing: calc(var(--base-spacing) * 5);
 
 	--base-radius: 0.5ch;
 	--xs-radius: calc(var(--base-radius) / 0.95);

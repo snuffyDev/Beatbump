@@ -62,7 +62,8 @@
 
 <svelte:head>
 	<title
-		>{$currentTitle !== undefined ? $currentTitle : 'Playlist'} - Beatbump</title>
+		>{$currentTitle !== undefined ? $currentTitle : 'Playlist'} - Beatbump</title
+	>
 </svelte:head>
 
 <svelte:window bind:innerWidth={width} />
@@ -77,7 +78,7 @@
 			secondSubtitle={header.secondSubtitle}
 			thumbnail={header.thumbnails[0].url.replace(
 				/=(w(\d+))-(h(\d+))/g,
-				'=w256-h256'
+				'=w512-h512'
 			)}
 			title={pageTitle}
 			{description}
@@ -89,7 +90,8 @@
 					icon: 'play',
 					text: 'Play'
 				}
-			]} />
+			]}
+		/>
 
 		{#each tracks as res, i}
 			<ListItem
@@ -99,7 +101,8 @@
 					isPagePlaying.set(id)
 				}}
 				item={res}
-				index={i} />
+				index={i}
+			/>
 		{/each}
 	</main>
 {:catch error}

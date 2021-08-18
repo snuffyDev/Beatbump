@@ -20,7 +20,8 @@
 {#key key}
 	<div
 		in:fly={{ x: -5, duration: 150, delay: 150, easing: quadInOut }}
-		out:fly={{ x: -10, duration: 150, easing: quadInOut }}>
+		out:fly={{ x: -10, duration: 150, easing: quadInOut }}
+	>
 		<slot />
 	</div>
 {/key}

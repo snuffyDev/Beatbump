@@ -1,6 +1,4 @@
 <script context="module">
-	import { get } from '$lib/api'
-
 	export async function load({ page, fetch }) {
 		const id = page.query.get('id')
 		const playlist = page.query.get('list') || undefined
@@ -25,12 +23,11 @@
 </script>
 
 <script>
-	import { goto } from '$app/navigation'
-
 	export let id
 	export let playlist
 	export let data
-	let thumbnails = data.videoDetails?.thumbnail?.thumbnails?.reverse()
+	import { goto } from '$app/navigation'
+	import Icon from '$lib/components/Icon/Icon.svelte'
 	import list from '$lib/stores/list'
 </script>
 
@@ -39,7 +36,8 @@
 	<meta property="og:type" content="music.song" />
 	<meta
 		property="og:description"
-		content={`Listen to ${data.videoDetails.title} on Beatbump`} />
+		content={`Listen to ${data.videoDetails.title} on Beatbump`}
+	/>
 	<meta property="og:site_name" content="Beatbump" />
 	<meta property="og:image" content={thumbnails[0].url} />
 
@@ -47,7 +45,8 @@
 		property="og:url"
 		content={`https://beatbump.ml/listen?id=${id}${
 			playlist ? `&list=${playlist}` : ''
-		}`} />
+		}`}
+	/>
 	<title>{data.videoDetails.title} | Beatbump</title>
 </svelte:head>
 <main>
@@ -57,7 +56,11 @@
 			on:click={() => {
 				list.initList(id, playlist)
 				goto('/trending')
-			}}>OK</button>
+			}}
+			><Icon name="play" size="1.25em" color="black" /><span class="text"
+				>Start Listening</span
+			></button
+		>
 	</div>
 </main>
 
@@ -65,13 +68,25 @@
 	.modal {
 		display: flex;
 		flex-direction: column;
-		background: #191f2b;
+		background: #1c1d26;
 		align-self: center;
-		padding: 1rem;
+		padding: 1rem 1.5rem;
+		border-radius: var(--lg-radius);
 	}
 	.modal-header {
 		font-size: 1.5rem;
+		font-family: 'Commissioner', sans-serif;
+		font-weight: 500;
+		letter-spacing: -0.01em;
 		margin-bottom: 0.8rem;
+	}
+	button {
+		display: inline-flex;
+		justify-items: center;
+		justify-content: center;
+		.text {
+			margin-left: 0.125rem;
+		}
 	}
 	main {
 		display: flex;

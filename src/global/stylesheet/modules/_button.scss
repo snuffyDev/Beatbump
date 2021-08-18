@@ -1,0 +1,51 @@
+// BASE BUTTON STYLES
+// All rules related to the .button module
+
+%button-base {
+	transition: background, 75ms;
+	// display: inline-block;
+	padding: 0.5rem 1rem;
+	color: #0e0e0e !important; // !important is added to colors in order to make button utility immutable.  Otherwise, it's common for `a` styles to override button specificity.
+	background-color: #fffffff2 !important;
+	border: 1px solid #121212 !important;
+	border-radius: var(--base-radius);
+	font-family: 'Commissioner', sans-serif !important;
+	font-size: 1.2em;
+	font-weight: 500 !important;
+	text-transform: none;
+	// text-align: center;
+	// vertical-align: middle;
+	white-space: nowrap;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
+	// &:focus {
+	//     outline: thin dotted #333;
+	//     outline-offset: -2px;
+	// }
+
+	&:hover,
+	&:active,
+	&.active {
+		color: #fff;
+		background-color: darken(#f2f2f2f3, 10%) !important;
+		border-color: #202020 !important;
+		// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
+		outline: 0;
+		text-decoration: none;
+	}
+}
+
+// Button Types
+////////////////////////////////
+
+// Main Button
+.button {
+	@extend %button-base;
+}
+button {
+	@extend %button-base;
+}

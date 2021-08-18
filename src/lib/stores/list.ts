@@ -104,7 +104,7 @@ export default {
 		const data = await response
 
 		await getSrc(videoId)
-		currentTitle.set(data.results[keyId].title)
+		currentTitle.set(data.results[0].title)
 
 		loading = false
 		playerLoading.set(loading)
@@ -120,27 +120,6 @@ export default {
 		mix.splice(index, 1)
 		mix = [...mix]
 		list.set({ currentMixId, clickTrackingParams, continuation, mix })
-	},
-	async initArtistList(videoId, playlistId) {
-		loading = true
-		playerLoading.set(loading)
-
-		if (hasList) mix = []
-		hasList = true
-
-		const response = await fetch(
-			`/api/artistNext.json?playlistId=${playlistId}&videoId=${videoId}`
-		)
-
-		const resMix = await response.json()
-
-		loading = false
-		playerLoading.set(loading)
-
-		continuation = resMix.continuation
-		mix.push(...resMix)
-		list.set({ currentMixId, clickTrackingParams, continuation, mix })
-		return await getSrc(resMix[0].videoId)
 	},
 	async addNext(item, key) {
 		if (!item) return

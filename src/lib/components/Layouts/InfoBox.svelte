@@ -27,7 +27,8 @@
 				use:lazy={{
 					src: thumbnail
 				}}
-				alt="album" />
+				alt="album"
+			/>
 		</div>
 		<div class="info">
 			<div class="info-title">
@@ -40,7 +41,8 @@
 				{#if description && type == 'playlist'}
 					<p
 						class="subtitle description"
-						class:hidden={width < 640 ? true : false}>
+						class:hidden={width < 640 ? true : false}
+					>
 						{description}
 					</p>
 					<span>
@@ -68,7 +70,8 @@
 						<button on:click={action} class="button--outlined"
 							><Icon name={icon} size="1.5rem" /><span class="button-text"
 								>{text}</span
-							></button>
+							></button
+						>
 					{/each}
 				</div>
 			</div>

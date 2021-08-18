@@ -146,7 +146,8 @@
 				if (!loading) {
 					clickHandler()
 				}
-			}}>
+			}}
+		>
 			<div class="img-container">
 				{#if loading}
 					<Loading size="3em" />
@@ -160,13 +161,15 @@
 						loading="lazy"
 						type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 						src={data.thumbnails[0].url}
-						alt="thumbnail" />
+						alt="thumbnail"
+					/>
 				</div>
 			</div>
 			<div class="title">
 				<span class="text-title"
 					>{title}
-					<span class="explicit" class:hidden={!data.explicit}> E </span></span>
+					<span class="explicit" class:hidden={!data.explicit}> E </span></span
+				>
 				{#if data.type == 'artist'}
 					<p class="artist-stats">
 						Artist &CenterDot; {data?.length?.text}
@@ -174,14 +177,16 @@
 				{/if}
 				<p
 					class="text-artist"
-					class:hidden={data.type == 'artist' ? true : false}>
+					class:hidden={data.type == 'artist' ? true : false}
+				>
 					{data.type == 'playlist'
 						? `${data.metaData}`
 						: `by ${data.artistInfo.artist[0].text}`}
 				</p>
 				<span class="album">
 					{#if data.album?.browseId}<Icon name="album" size="1em" /><a
-							href="/release?id={data?.album?.browseId}">{data.album.title}</a>
+							href="/release?id={data?.album?.browseId}">{data.album.title}</a
+						>
 					{/if}
 				</span>
 			</div>
@@ -191,16 +196,14 @@
 			<Dropdown
 				color={$theme == 'light' ? 'black' : 'white'}
 				bind:isHidden
-				items={DropdownItems} />
+				items={DropdownItems}
+			/>
 		</div>
 	</div>
 </div>
 
 <style lang="scss">
 	.menu {
-		position: relative;
-
-		padding-top: 0.125rem;
 		padding-right: 0.625rem;
 	}
 	.hidden {
@@ -229,7 +232,7 @@
 		align-items: center;
 	}
 	p {
-		margin: 0.2em 0;
+		margin: 0.2rem 0;
 	}
 	.container:not(.menu) {
 		display: flex;
@@ -265,7 +268,7 @@
 		outline: #000 solid 0.1px;
 	}
 	.text-artist {
-		font-size: 0.95em;
+		font-size: 0.95rem;
 	}
 	.text-title {
 		font-size: 1em;
@@ -293,6 +296,7 @@
 		align-items: center;
 		flex-wrap: nowrap;
 		padding: 0.4rem 0rem;
+		position: relative;
 		@media screen and (min-width: 640px) {
 			padding: 0.2rem 0rem;
 		}
@@ -333,12 +337,10 @@
 	}
 	@media (min-width: 640px) {
 		.container:active:not(.menu) {
-			pointer-events: bounding-box;
 			background: lighten(#575a6359, 5%);
 		}
 
 		:root .light .container:active:not(.menu) {
-			pointer-events: bounding-box;
 			background: darken(#0a0a0c71, 5%);
 		}
 	}

@@ -8,7 +8,8 @@
 <aside class="sidebar" transition:fly>
 	<section class="head">
 		<slot name="head">
-			<Search type="block" /></slot>
+			<Search type="block" /></slot
+		>
 		<br />
 	</section>
 	<section class="mid">
@@ -20,7 +21,8 @@
 
 			<section class="flex">
 				<a href="https://github.com/snuffyDev/Beatbump" rel="external"
-					><Icon name="github" size="1.5rem" /></a>
+					><Icon name="github" size="1.5rem" /></a
+				>
 			</section>
 		</slot>
 	</section>

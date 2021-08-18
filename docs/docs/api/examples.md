@@ -1,11 +1,13 @@
 # API Examples
 
 ### Search 'All Playlists' for 'Disco' playlists
-Make a ```GET``` request to:
 
-```/api/search.json?q=Disco&filter=EgWKAQIoAWoKEAMQBBAKEAUQCQ%3D%3D```
+Make a `GET` request to:
+
+`/api/search.json?q=Disco&filter=EgWKAQIoAWoKEAMQBBAKEAUQCQ%3D%3D`
 
 Endpoint Response (shortened):
+
 ```js
 contents: [
     {
@@ -29,7 +31,6 @@ contents: [
 
 ### Continue Last Search
 
-The first response should have a ```continuation``` object. Use the ```continuation``` string and the ```clickTrackingParams``` string in the next request. Make sure to keep the ```?q=``` but leave the query blank!
+The first response should have a `continuation` object. Use the `continuation` string and the `clickTrackingParams` string in the next request. Make sure to keep the `?q=` but leave the query blank!
 
-```/api/search.json?q=&filter=EgWKAQIoAWoKEAMQBBAKEAUQCQ==&params=CAsQybcCIhMIhNPpreqS8gIVysI_BB0DjwDm&ctoken=ErAIEgV....```
-
+`/api/search.json?q=&filter=EgWKAQIoAWoKEAMQBBAKEAUQCQ==&params=CAsQybcCIhMIhNPpreqS8gIVysI_BB0DjwDm&ctoken=ErAIEgV....`

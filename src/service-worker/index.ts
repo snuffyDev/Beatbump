@@ -23,23 +23,9 @@ self.addEventListener('activate', (event) => {
 		})
 	)
 })
-async function fetchAndCache(request) {
-	const cache = await caches.open(`offline-${timestamp}`)
 
-	try {
-		const response = await fetch(request)
-		cache.put(request, response.clone())
-		return response
-	} catch (err) {
-		const response = await cache.match(request)
-		if (response) return response
-
-		throw err
-	}
-}
 self.addEventListener('fetch', (event) => {
-	const { request } = event
-
+	const { request }: { request: Request } = event
 	if (!(request.url.indexOf('http') === 0)) return
 	if (
 		request.method !== 'GET' ||

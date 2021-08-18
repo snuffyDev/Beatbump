@@ -8,10 +8,12 @@
 .item1x1 {
 	// padding-top: 100% !important;
 	width: 13rem !important;
+	position: relative;
 }
 .item16x9 {
 	// padding-top: 56.25% !important;
 	width: 20rem !important;
+	position: relative;
 }
 .img1x1 {
 	// padding-top: 100% !important;
@@ -26,17 +28,14 @@
 	padding-bottom: 1.8rem;
 	padding-left: 1rem;
 	scroll-snap-align: start;
-
-	&:last-child {
-		padding-right: 1rem;
-	}
+	padding-right: 1rem;
 }
 .menu {
 	position: absolute;
 	pointer-events: painted;
 
 	right: 0;
-	top: 0;
+	top: 0.25em;
 	padding-top: 0rem;
 	// padding-right: 0.0125rem;
 	z-index: 1;
@@ -47,14 +46,14 @@
 	display: inline;
 	font-weight: 500;
 	font-size: 1.1em;
-	font-family: "Commissioner", sans-serif;
+	font-family: 'Commissioner', sans-serif;
 	margin-bottom: 0.25rem;
 	letter-spacing: -0.05em;
 }
 
 section {
 	display: block;
-	content: "";
+	content: '';
 	::before {
 		display: block;
 	}
@@ -79,16 +78,24 @@ section {
 			cursor: pointer;
 			width: 100%;
 			position: relative;
+			user-select: none;
+			&:focus {
+				border: none;
+			}
 
 			// padding-top: 100%;
 			&::before {
 				position: absolute;
-				content: "";
+				content: '';
 				top: 0;
 				right: 0;
 				bottom: 0;
 				left: 0;
-				background: linear-gradient(rgba(0, 0, 0, 0.502), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
+				background: linear-gradient(
+					rgba(0, 0, 0, 0.502),
+					rgba(0, 0, 0, 0),
+					rgba(0, 0, 0, 0)
+				);
 
 				transition: background cubic-bezier(0.455, 0.03, 0.515, 0.955) 0.1s,
 					opacity cubic-bezier(0.455, 0.03, 0.515, 0.955) 0.1s;
@@ -103,7 +110,11 @@ section {
 			}
 			&:active:hover::before {
 				// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
-				background: linear-gradient(0.5turn, rgba(49, 49, 49, 0.534), rgba(0, 0, 0, 0.11));
+				background: linear-gradient(
+					0.5turn,
+					rgba(49, 49, 49, 0.534),
+					rgba(0, 0, 0, 0.11)
+				);
 				opacity: 1;
 				z-index: 1;
 			}

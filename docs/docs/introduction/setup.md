@@ -15,12 +15,14 @@ npx degit snuffyDev/Beatbump Beatbump
 cd Beatbump
 ```
 
-This will create a new folder called Beatbump with the project's files. Once you're in the ```Beatbump``` directory *(or whatever name you chose)*, install the dependencies:
+This will create a new folder called Beatbump with the project's files. Once you're in the `Beatbump` directory _(or whatever name you chose)_, install the dependencies:
+
 ```bash
 ### You can also use PNPM. Yarn is untested.
 npm install
 ```
-After the dependencies are installed, you can start the development server with the command ```npm run dev```!
+
+After the dependencies are installed, you can start the development server with the command `npm run dev`!
 
 ### Before deployment
 

@@ -1,16 +1,15 @@
 <script lang="ts">
-	import drag from '$lib/actions/drag'
-
 	import longpress from '$lib/actions/longpress'
 	import { clickOutside } from '$lib/js/clickOutside'
 	import list from '$lib/stores/list'
 	import { currentTitle, key } from '$stores/stores'
-	import { createEventDispatcher, getContext, onMount, tick } from 'svelte'
+	import { createEventDispatcher, getContext } from 'svelte'
 	import Popout from '../Dropdown/Popout.svelte'
+
 	export let item
 	export let index
 	export let ctxKey = {}
-	const { width } = getContext(ctxKey)
+	const { width, sliding } = getContext(ctxKey)
 	const dispatch = createEventDispatcher()
 	let pressing = false
 	const DropdownItems = [
@@ -25,108 +24,57 @@
 				})
 				list.moreLikeThis(item)
 			}
+		},
+		{
+			text: 'Remove from queue',
+			icon: 'x',
+			action: async (params) => {
+				list.removeItem(index)
+			}
 		}
 	]
-	let isDragging = false
-	let posX = 0
-	let itemRef: HTMLElement
 
 	function handleClick(i) {
-		if (isDragging) return
-		if (!isDragging) {
-			currentTitle.set($list.mix[i].title)
-			dispatch('updated', {
-				id: `${i}`
-			})
-			console.log('itemitem')
-		}
-	}
-	let isHidden = false
-	function startDrag(e) {
-		isDragging = true
-	}
-	// $: console.log(width, w)
-	let rect
-
-	function dragMovement({ x, dx }) {
-		if (isDragging) {
-			if (x <= rect / 1.25 && x >= 0) {
-				posX = x - dx
-			} else if (x < rect / 1.25) {
-				// console.log('x less w / 2', x, w / 2)
-				open()
-			} else {
-				close(index)
-			}
-			// console.log(posX, x, dx, w / 2)
-		}
-	}
-	// $: console.log($list.mix)
-	function open() {
-		posX = 0
-	}
-	async function close(index) {
-		isDragging = false
-		posX = 1250
-
-		await tick()
-		list.removeItem(index)
-		dispatch('removeItem', {
-			getNext: true
+		currentTitle.set($list.mix[i].title)
+		dispatch('updated', {
+			id: `${i}`
 		})
+		console.log('itemitem')
 	}
-	function release() {
-		if (isDragging) {
-			if (posX < rect / 1.25) {
-				// console.log('release: ', posX, w, width)
-				open()
-			} else {
-				close(index)
-			}
-			isDragging = false
-		}
-	}
-	onMount(() => {
-		let r
-		if (itemRef) r = itemRef.getBoundingClientRect()
-		if (r) rect = r.width
-	})
+	let isShowing = false
 </script>
 
-<div class="li-wrapper" bind:this={itemRef}>
-	<li
-		style="transform: translateX({posX}px);"
-		id={index}
-		class:active={$key == index}
-		class="item">
+<div class="li-wrapper">
+	<li id={index} class:active={$key == index} class="item">
 		<div
 			use:longpress
 			on:longpress={(e) => {
-				if (isDragging) return
 				pressing = true
 
-				isHidden = true
+				isShowing = true
 				// pressing = false
 			}}
+			use:clickOutside
+			on:click_outside={() => {
+				isShowing = false
+			}}
 			class="pl-thumbnail"
-			style="min-width:5rem; max-width:5rem;">
+			style="min-width:5rem; max-width:5rem;"
+		>
 			<img
 				referrerpolicy="origin-when-cross-origin"
 				src={item.thumbnail}
 				loading="lazy"
-				alt="thumbnail" />
-			<Popout items={DropdownItems} type="dd-menu" bind:isHidden />
+				alt="thumbnail"
+			/>
+			<Popout items={DropdownItems} type="dd-menu" bind:isShowing />
 		</div>
 		<div
 			class="clickable"
-			use:drag
-			on:startDrag={startDrag}
-			on:dragMove={(e) => dragMovement({ x: e.detail.x, dx: e.detail.dx })}
-			on:dragEnd={release}
 			on:click|stopPropagation={(event) => {
-				if (isDragging) return
 				handleClick(index)
-			}}>
+			}}
+		>
 			<div class="p-text">
 				<span class="p-title">
 					{item.title}
@@ -170,10 +118,10 @@
 		user-select: none;
 		border-width: 1px;
 		flex-wrap: nowrap;
-		border-color: #aaa;
-		position: absolute;
+		border-color: rgba(36, 36, 36, 0.452);
+		// position: absolute;
 		flex-direction: row;
-		left: 0;
+		left: 0%;
 		right: 0;
 		height: 100%;
 		top: 0;
@@ -183,8 +131,7 @@
 		// margin-right: 0.75rem;
 		// margin-bottom: 0.5rem;
 		width: 100%;
-		transform: translateX(-50%);
-		transform-style: flat;
+
 		background-color: transparentize(rgba(170, 170, 170, 0.801), 0.7);
 		transition: all cubic-bezier(0.39, 0.575, 0.565, 1) 0.15s;
 	}

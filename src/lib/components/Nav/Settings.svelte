@@ -30,7 +30,8 @@
 			isSettingsOpen = !isSettingsOpen
 		}}
 		class="nav-settings"
-		transition:fade={{ duration: 120, easing: circIn }}>
+		transition:fade={{ duration: 120, easing: circIn }}
+	>
 		<!-- <label for="search"><em>search</em></label> -->
 		<div class="setting">
 			<label for="select" class="s-text">Theme:</label>
@@ -41,10 +42,12 @@
 					bind:value={options.theme}
 					on:change={() => {
 						theme.set(options.theme)
-					}}>
+					}}
+				>
 					{#each themes as theme}
 						<option value={theme.name} selected={options.theme}
-							>{theme.name}</option>
+							>{theme.name}</option
+						>
 					{/each}
 				</select>
 			</div>
@@ -56,7 +59,8 @@
 				bind:checked={options.filter}
 				on:change={() => {
 					filterAutoPlay.set(options.filter)
-				}} />
+				}}
+			/>
 		</div>
 	</div>
 {/if}

@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
 	export let name
 	export let size = '1.5rem'
 	export let focusable = false
 	export let color = 'currentColor'
+	export let fill = 'none'
 	export let width: string | number = 0
 	let box = 24
 	let icons = [
@@ -75,6 +76,10 @@
 `
 		},
 		{
+			name: 'heart',
+			svg: `<path xmlns="http://www.w3.org/2000/svg" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>`
+		},
+		{
 			name: 'list',
 			svg: `<line x1="8" y1="6" x2="21" y2="6" />
   <line x1="8" y1="12" x2="21" y2="12" />
@@ -131,12 +136,13 @@
 	{focusable}
 	width={width !== 0 ? width : size}
 	height={size}
-	fill="none"
+	{fill}
 	stroke-width="2"
 	stroke-linecap="round"
 	stroke-linejoin="round"
 	style="stroke: {color} !important;"
-	viewBox="0 0 {box} {box}">{@html displayIcon.svg}</svg>
+	viewBox="0 0 {box} {box}">{@html displayIcon.svg}</svg
+>
 
 <style>
 </style>

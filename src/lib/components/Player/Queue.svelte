@@ -1,9 +1,10 @@
 <script lang="ts">
-	import list from '$lib/stores/list'
-	import { afterUpdate, onMount, setContext } from 'svelte'
 	import { browser } from '$app/env'
 	import drag from '$lib/actions/drag'
 	import Icon from '$lib/components/Icon/Icon.svelte'
+	import list from '$lib/stores/list'
+	import { onMount, setContext } from 'svelte'
+
 	export let autoId
 	export let showing = false
 
@@ -17,7 +18,8 @@
 	let posY = 0
 	let listHeight = window.innerHeight
 	setContext(ctxKey, {
-		width: listWidth
+		width: listWidth,
+		scrolling: sliding
 	})
 	function startHandler() {
 		sliding = true
@@ -66,13 +68,15 @@
 <div
 	class="listContainer"
 	id="listContainer"
-	style="transform: translate(0, {posY / 28}vh);">
+	style="transform: translate(0, {posY / 28}vh);"
+>
 	<div
 		class="handle"
 		use:drag
 		on:startDrag={startHandler}
 		on:dragMove={(e) => trackMovement({ y: e.detail.y, dy: e.detail.dy })}
-		on:dragEnd={release}>
+		on:dragEnd={release}
+	>
 		<Icon name="minus" color="white" size="1rem" width="100%" />
 	</div>
 
@@ -87,8 +91,9 @@
 				on:mousedown|stopPropagation={() => {
 					sliding = false
 				}}
-				on:removeItem>
-				{#each mixList as item, index (item.hash)}
+				on:removeItem
+			>
+				{#each mixList as item, index}
 					<slot {item} {ctxKey} {index} />
 				{/each}
 			</ul>
@@ -113,6 +118,8 @@
 		z-index: -1;
 		height: 1rem;
 		display: flex;
+		cursor: pointer;
+		padding: 0.1rem;
 		align-items: center;
 	}
 	.empty > * {
@@ -151,7 +158,7 @@
 		transition: transform 0.12s cubic-bezier(0.39, 0.58, 0.57, 1);
 		min-height: 23rem;
 		width: 40%;
-		z-index: -1;
+		z-index: 1;
 		&::before {
 			position: absolute;
 			content: '';

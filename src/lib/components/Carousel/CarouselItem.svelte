@@ -1,14 +1,15 @@
 <script lang="ts">
-	import lazy from '$lib/lazy'
-	import Loading from '$components/Loading/Loading.svelte'
-	import { alertHandler, key } from '$stores/stores'
-	import { fade } from 'svelte/transition'
-	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 	import { goto } from '$app/navigation'
-	import type { CarouselItem } from '$lib/types'
+	import Dropdown from '$components/Dropdown/Dropdown.svelte'
+	import Loading from '$components/Loading/Loading.svelte'
+	import lazy from '$lib/lazy'
 	import list from '$lib/stores/list'
-	import { onMount, tick } from 'svelte'
+	import type { CarouselItem } from '$lib/types'
+	import { alertHandler, key } from '$stores/stores'
+	import { tick } from 'svelte'
+	import { fade } from 'svelte/transition'
 	import { browseHandler } from './functions'
+
 	export let section
 	export let index
 	export let item: CarouselItem
@@ -57,19 +58,20 @@
 			action: async () => {
 				const shareData = {
 					title: item.title,
-					text: `Listen to ${item.title} on Beatbump!`,
+					text: `Listen to ${item.title} on Beatbump`,
 					url: `https://beatbump.ml/listen?id=${item.videoId}`
 				}
 				try {
-					await navigator.share(shareData)
+					let isShared
+					isShared = await navigator.share(shareData)
+
 					alertHandler.set({ msg: 'Shared Successfully!', type: 'success' })
 				} catch (error) {
-					alertHandler.set({ msg: 'Error!', type: 'error' })
+					alertHandler.set({ msg: 'Error!' + error, type: 'error' })
 				}
 			}
 		}
 	]
-	onMount(async () => {})
 	type CustomEvent = Event & {
 		currentTarget: EventTarget & HTMLImageElement
 	}
@@ -117,9 +119,7 @@
 <div class="container carouselItem">
 	<section
 		class="item"
-		class:item16x9={RATIO_RECT ? true : false}
-		class:item1x1={RATIO_SQUARE ? true : false}
-		on:mouseover={() => {
+		on:mouseenter={() => {
 			hovering = true
 		}}
 		on:focus={() => {
@@ -131,27 +131,37 @@
 				menuToggle = false
 			}
 		}}
+		class:item16x9={RATIO_RECT ? true : false}
+		class:item1x1={RATIO_SQUARE ? true : false}
 		transition:fade|local
-		bind:this={section[index]}>
-		<div class="clickable" on:click={() => clickHandler(index)}>
+		bind:this={section[index]}
+	>
+		<div
+			class="clickable"
+			style="display:contents;"
+			on:click={() => clickHandler(index)}
+		>
 			<div class="img">
 				<!-- svelte-ignore a11y-missing-attribute -->
 				<div
 					class="container"
 					class:img16x9={RATIO_RECT ? true : false}
-					class:img1x1={RATIO_SQUARE ? true : false}>
+					class:img1x1={RATIO_SQUARE ? true : false}
+				>
 					{#if loading}
 						<Loading />
 					{/if}
 					<img
 						alt="thumbnail"
+						tabindex="-1"
 						transition:fade|local
 						on:error={errorHandler}
 						class:img16x9={RATIO_RECT}
 						loading="lazy"
 						type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 						src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
-						use:lazy={{ src: srcImg }} />
+						use:lazy={{ src: srcImg }}
+					/>
 				</div>
 			</div>
 
@@ -176,7 +186,8 @@
 									}}
 									href={'/artist/' +
 										sub?.navigationEndpoint?.browseEndpoint?.browseId}
-									><span>{sub.text}</span></a>
+									><span>{sub.text}</span></a
+								>
 							{/each}
 						</div>
 					{/if}
@@ -195,9 +206,11 @@
 </div>
 
 <style lang="scss">
-	@import '../../../global/scss/components/_carousel-item.scss';
+	@import '../../../global/stylesheet/components/_carousel-item.scss';
 	.hidden {
 		display: none !important;
 		visibility: hidden !important;
+	}
+	.menu {
 	}
 </style>

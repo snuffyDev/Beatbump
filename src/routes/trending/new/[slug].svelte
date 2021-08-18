@@ -57,7 +57,8 @@
 						item.type == 'albums'
 							? goto('/release?id=' + item?.browseId)
 							: list.initList(item.videoId, item.autoMixList)
-					}}>
+					}}
+				>
 					<div class="img">
 						<img loading="lazy" src={item.thumbnail} alt="thumbnail" />
 					</div>

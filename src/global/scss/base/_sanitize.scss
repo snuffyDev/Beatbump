@@ -282,9 +282,9 @@ button {
   */
 
 button,
-[type="button"],
-[type="reset"],
-[type="submit"] {
+[type='button'],
+[type='reset'],
+[type='submit'] {
 	-webkit-appearance: button;
 }
 
@@ -352,8 +352,8 @@ textarea {
   * Remove the padding in IE 10-.
   */
 
-[type="checkbox"],
-[type="radio"] {
+[type='checkbox'],
+[type='radio'] {
 	padding: 0;
 }
 
@@ -362,7 +362,7 @@ textarea {
   * 2. Correct the outline style in Safari.
   */
 
-[type="search"] {
+[type='search'] {
 	-webkit-appearance: textfield;
 	outline-offset: -2px;
 }
@@ -529,7 +529,7 @@ textarea,
   * Change the cursor on busy elements in all browsers (opinionated).
   */
 
-[aria-busy="true"] {
+[aria-busy='true'] {
 	cursor: progress;
 }
 
@@ -546,7 +546,7 @@ textarea,
   * inoperable elements in all browsers (opinionated).
   */
 
-[aria-disabled="true"],
+[aria-disabled='true'],
 [disabled] {
 	cursor: not-allowed;
 }
@@ -556,11 +556,11 @@ textarea,
   * in all browsers (opinionated).
   */
 
-[aria-hidden="false"][hidden] {
+[aria-hidden='false'][hidden] {
 	display: initial;
 }
 
-[aria-hidden="false"][hidden]:not(:focus) {
+[aria-hidden='false'][hidden]:not(:focus) {
 	clip: rect(0, 0, 0, 0);
 	position: absolute;
 }

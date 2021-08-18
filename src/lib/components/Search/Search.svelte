@@ -1,9 +1,10 @@
-<script>
+<script lang="ts">
 	export let type
 	import { goto } from '$app/navigation'
+	import Icon from '$lib/components/Icon/Icon.svelte'
+	import debounce from '$lib/js/debounce'
 	import { searchState } from '$lib/stores/stores'
 	import { createEventDispatcher } from 'svelte'
-	import Icon from '../Icon/Icon.svelte'
 
 	let options = [
 		{ label: 'Songs', params: 'EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D' },
@@ -20,53 +21,68 @@
 		}
 	]
 	let filterType
-	let songTitle = ''
+	let query = ''
 	let filter = filterType ? filterType : options[0].params
 	const dispatch = createEventDispatcher()
-
+	let results: [] = []
 	async function handleSubmit() {
 		dispatch('submitted', { submitted: true })
-		searchState.set({ option: filter, text: songTitle })
+		searchState.set({ option: filter, text: query })
 		let url =
 			`/search/` +
-			encodeURIComponent(encodeURIComponent(songTitle)) +
+			encodeURIComponent(encodeURIComponent(query)) +
 			`?filter=` +
 			filter
 		goto(url)
 	}
+	const typeahead = debounce(async () => {
+		const response = await fetch(
+			'/api/get_search_suggestions.json?q=' + encodeURIComponent(query)
+		)
+		results = await response.json()
+		console.log(results)
+	}, 250)
 </script>
 
 <form class={type} on:submit|preventDefault={handleSubmit}>
 	<div class="nav-item">
-		<div aria-label="search" class="input">
+		<div class="input">
 			<div class="searchBtn" on:click={handleSubmit}>
 				<Icon name="search" size="1rem" />
 			</div>
 			<!-- svelte-ignore a11y-autofocus -->
-			{#if type == 'inline'}<input
-					autofocus
-					autocorrect="off"
-					type="search"
-					placeholder="Search"
-					bind:value={songTitle} />
-			{:else}<input
-					autocorrect="off"
-					type="search"
-					placeholder="Search"
-					bind:value={songTitle} />{/if}
+			<input
+				autofocus={type == 'inline' ? true : false}
+				autocorrect="off"
+				type="search"
+				placeholder="Search"
+				on:keyup={() => typeahead()}
+				bind:value={query}
+			/>
 		</div>
 	</div>
-
+	{#if results.length > 0}
+		<ul class="suggestions">
+			{#each results as result (result?.id)}
+				<li
+					on:click={() => {
+						query = result.query
+						handleSubmit()
+					}}
+				>
+					{result.query}
+				</li>
+			{/each}
+		</ul>
+	{/if}
 	<div class="nav-item">
-		<div
-			class="select"
-			aria-label="select"
-			class:inline={type == 'inline' ? true : false}>
+		<div class="select" class:inline={type == 'inline' ? true : false}>
 			<select
 				on:blur={() => {
-					searchState.set({ option: filter, text: songTitle })
+					searchState.set({ option: filter, text: query })
 				}}
-				bind:value={filter}>
+				bind:value={filter}
+			>
 				{#each options as option (option.params)}
 					<option value={option.params}>{option.label}</option>
 				{/each}
@@ -76,6 +92,78 @@
 </form>
 
 <style lang="scss">
+	.suggestions {
+		position: absolute;
+		top: 121%;
+		z-index: 10;
+		background: inherit;
+		width: 100%;
+		/* max-height: 44vh; */
+		border-radius: var(--lg-radius);
+		height: auto;
+		display: flex;
+		flex-direction: column;
+		&::after {
+			position: absolute;
+			top: 0;
+			right: 0;
+			border-radius: inherit;
+			bottom: 0;
+			left: 0;
+			content: '';
+			width: 100%;
+			height: 100%;
+			background: rgba(255, 255, 255, 0.007);
+			z-index: 1;
+			pointer-events: none;
+			border: 0.0625rem solid hsla(0, 0%, 66.7%, 0.219);
+		}
+		@media only screen and (max-width: 640px) {
+			left: 0;
+			width: 100%;
+			right: 0;
+		}
+		// padding: 0.4em;
+	}
+	form {
+		background: inherit;
+		&.inline {
+			position: relative;
+		}
+	}
+	ul {
+		padding: 0;
+		margin: 0;
+		list-style: none;
+		background: inherit;
+
+		li {
+			&:first-child {
+				border-radius: var(--lg-radius) var(--lg-radius) 0 0;
+			}
+			&:last-child {
+				border-radius: 0 0 var(--lg-radius) var(--lg-radius);
+			}
+			transition: all cubic-bezier(0.47, 0, 0.745, 0.715) 50ms;
+
+			padding: 0.7em 0.5em;
+			z-index: 1;
+			margin: 0;
+			// border-radius: inherit;
+			cursor: pointer;
+			background: inherit;
+			font-size: 1.08em;
+			// height: 100%;
+			// max-height: 5.125em;
+			border-bottom: 1px solid #1a1a1a;
+			&:hover {
+				background: rgba(255, 255, 255, 0.1);
+			}
+		}
+	}
+	.nav-item {
+		position: relative;
+	}
 	.hidden {
 		display: none;
 		visibility: hidden;
@@ -88,7 +176,7 @@
 	}
 	.x-button {
 		padding: 1em;
-
+		cursor: pointer;
 		right: 0;
 		position: relative;
 	}

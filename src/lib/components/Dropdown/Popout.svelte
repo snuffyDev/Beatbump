@@ -1,43 +1,40 @@
 <script lang="ts">
 	import { createEventDispatcher, setContext } from 'svelte'
-	import { slide, fade } from 'svelte/transition'
-	import { goto } from '$app/navigation'
-
-	import Icon from '$components/Icon/Icon.svelte'
-	import { clickOutside } from '$lib/js/clickOutside'
-	import { quartInOut, quintIn } from 'svelte/easing'
-	import DropdownItem from './DropdownItem.svelte'
+	import { quartInOut } from 'svelte/easing'
+	import { slide } from 'svelte/transition'
 	import PopoutItem from './PopoutItem.svelte'
-	export let isHidden = false
+
+	export let isShowing
 	export let type = ''
 	export let items = []
 	export let color = 'white'
 	let showing = false
 	$: menuToggle = showing ? true : false
 	const dispatch = createEventDispatcher()
-	setContext('menu', { update: isHidden })
+	setContext('menu', { update: isShowing })
 </script>
 
-{#if isHidden}
+{#if isShowing}
 	<div
-		on:mouseleave|stopPropagation={() => {
-			isHidden = false
+		on:mouseleave={() => {
+			isShowing = false
 		}}
-		use:clickOutside
-		on:click_outside={() => {
-			isHidden = false
+		on:focusout={() => {
+			isShowing = false
 		}}
 		transition:slide={{ duration: 200, easing: quartInOut }}
-		class="menu">
+		class="menu"
+	>
 		{#each items as item}
 			<PopoutItem
 				{color}
-				on:click={item.action}
 				on:click={() => {
-					isHidden = !isHidden
+					item.action(item)
+					isShowing = false
 				}}
 				text={item.text}
-				icon={item.icon} />
+				icon={item.icon}
+			/>
 		{/each}
 	</div>
 {/if}
@@ -50,7 +47,7 @@
 		top: 0.3em;
 		left: 6em;
 		border-radius: var(--lg-radius);
-
-		background: #414141;
+		background: #424242;
+		border: 1px #5f5f5f solid;
 	}
 </style>

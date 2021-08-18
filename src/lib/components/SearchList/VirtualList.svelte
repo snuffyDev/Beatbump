@@ -138,10 +138,12 @@
 	bind:this={viewport}
 	bind:offsetHeight={viewport_height}
 	on:scroll={handle_scroll}
-	style="height: {height}; width:100%;">
+	style="height: {height}; width:100%;"
+>
 	<svelte-virtual-list-contents
 		bind:this={contents}
-		style="padding-top: {top}px; padding-bottom: calc({bottom}px + 1rem);">
+		style="padding-top: {top}px; padding-bottom: calc({bottom}px + 1rem);"
+	>
 		{#each visible as row (row.index)}
 			<svelte-virtual-list-row>
 				<slot item={row.data}>Missing template</slot>
@@ -154,91 +156,103 @@
 				<div class="loading-results" style="padding: 0em;">
 					<svg
 						role="img"
-						width="53.0714rem"
-						height="8.7143rem"
+						width="50rem"
+						height="6rem"
 						aria-labelledby="loading-aria"
 						viewBox="0 0 575 90"
 						preserveAspectRatio="none"
-						class="s-iYjv5-ishYhK"
+						class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
 						><rect
-							x="2"
+							x="5"
 							y="0"
 							width="100%"
 							height="100%"
 							clip-path="url(#clip-path)"
-							class="s-iYjv5-ishYhK"
-							style="fill: url(&quot;#fill&quot;);" /><defs
-							class="s-iYjv5-ishYhK"
-							><clipPath id="clip-path" class="s-iYjv5-ishYhK"
+							class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
+							style="fill: url(&quot;#fill&quot;);"
+						/><defs class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
+							><clipPath
+								id="clip-path"
+								class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
 								><rect
 									x="0"
-									y="19"
+									y="10%"
 									rx="0"
 									ry="0"
 									width="56"
-									height="56"
-									class="s-iYjv5-ishYhK" /><rect
-									x="68"
-									y="43"
+									height="70"
+									class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
+								/><rect
+									x="67"
+									y="17"
 									rx="0"
 									ry="0"
-									width="177"
+									width="105"
 									height="9"
-									class="s-iYjv5-ishYhK" /><rect
-									x="68"
-									y="64"
+									class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
+								/><rect
+									x="67"
+									y="60"
 									rx="0"
 									ry="0"
 									width="94"
 									height="9"
-									class="s-iYjv5-ishYhK" /><rect
-									x="68"
-									y="21"
+									class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
+								/><rect
+									x="67"
+									y="38"
 									rx="0"
 									ry="0"
 									width="72"
 									height="9"
-									class="s-iYjv5-ishYhK" /></clipPath
-							><linearGradient id="fill" class="s-iYjv5-ishYhK"
+									class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
+								/></clipPath
+							><linearGradient
+								id="fill"
+								class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
 								><stop
 									offset="0.599964"
 									stop-color="#4f4f4f"
 									stop-opacity="1"
-									class="s-iYjv5-ishYhK"
+									class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
 									><animate
 										attributeName="offset"
 										values="-2; -2; 1"
 										keyTimes="0; 0.25; 1"
 										dur="2s"
 										repeatCount="indefinite"
-										class="s-iYjv5-ishYhK" /></stop
+										class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
+									/></stop
 								><stop
 									offset="1.59996"
 									stop-color="#757575"
 									stop-opacity="1"
-									class="s-iYjv5-ishYhK"
+									class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
 									><animate
 										attributeName="offset"
 										values="-1; -1; 2"
 										keyTimes="0; 0.25; 1"
 										dur="2s"
 										repeatCount="indefinite"
-										class="s-iYjv5-ishYhK" /></stop
+										class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
+									/></stop
 								><stop
 									offset="2.59996"
 									stop-color="#4f4f4f"
 									stop-opacity="1"
-									class="s-iYjv5-ishYhK"
+									class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
 									><animate
 										attributeName="offset"
 										values="0; 0; 3"
 										keyTimes="0; 0.25; 1"
 										dur="2s"
 										repeatCount="indefinite"
-										class="s-iYjv5-ishYhK" /></stop
+										class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
+									/></stop
 								></linearGradient
 							></defs
-						></svg>
+						></svg
+					>
 				</div>
 			{/if}
 		{/if}

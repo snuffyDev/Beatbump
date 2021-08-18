@@ -1,5 +1,9 @@
 import BaseContext from '$lib/context'
-import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from '$lib/parsers'
+import {
+	MoodsAndGenresItem,
+	MusicResponsiveListItemRenderer,
+	MusicTwoRowItemRenderer
+} from '$lib/parsers'
 
 import type { CarouselHeader, CarouselItem } from '$lib/types'
 import type { EndpointParams } from '$lib/types/internals'

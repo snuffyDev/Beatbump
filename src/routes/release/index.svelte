@@ -1,7 +1,9 @@
 <script context="module">
-	export async function load({ query, page, fetch }) {
+	let path
+	export async function load({ context, page, fetch }) {
 		const browseId = page.query.get('id') || ''
 		const pt = page.query.get('type') || ''
+		path = context.page
 		const response = await fetch(
 			`/api/main.json?q=&endpoint=browse${
 				browseId ? `&browseId=${browseId}` : ''
@@ -39,6 +41,7 @@
 	import { browser } from '$app/env'
 	import { setContext } from 'svelte'
 	import { page } from '$app/stores'
+	import tagStore from '$lib/stores/ogtags'
 	export let data
 	export let id
 	$: id = $page.query.get('id')
@@ -56,22 +59,36 @@
 	}
 
 	$: hasList = $list.mix.length > 0
+	let thumbnail = releaseInfo.thumbnails[1].url.replace(
+		/=(w(\d+))-(h(\d+))/g,
+		'=w512-h512'
+	)
+	tagStore.desc(
+		`${releaseInfo.title} by ${releaseInfo.artist.name} on Beatbump`
+	)
+	tagStore.title(releaseInfo.title)
+	tagStore.url(path + `?id=${id}`)
+	tagStore.image(thumbnail)
 	const ctx = {}
 	setContext(ctx, { pageId: id })
 </script>
 
 <svelte:head>
-	<title
-		>{$currentTitle !== '' || undefined ? 'Album' : $currentTitle} - Beatbump</title>
+	{#each Object.entries($tagStore) as [property, content]}
+		{#if content}
+			{#if ['title', 'description', 'image'].includes(property)}
+				<meta name={property} {content} />
+			{:else}
+				<meta {property} {content} />
+			{/if}
+		{/if}
+	{/each}
+	<title>{$currentTitle ? $currentTitle : $tagStore.title} - Beatbump</title>
 </svelte:head>
-
 {#await promise then _}
 	<main>
 		<InfoBox
-			thumbnail={releaseInfo.thumbnails[1].url.replace(
-				/=(w(\d+))-(h(\d+))/g,
-				'=w256-h256'
-			)}
+			{thumbnail}
 			buttons={[
 				{ text: 'Play Album', action: () => playAlbum(), icon: 'play' },
 				{ text: 'Album Radio', action: () => playRadio(), icon: 'play' }
@@ -79,7 +96,8 @@
 			title={releaseInfo.title}
 			artist={releaseInfo.artist}
 			subtitles={releaseInfo.subtitles}
-			type="release" />
+			type="release"
+		/>
 		{#each items as item, index}
 			<ListItem
 				{ctx}
@@ -88,7 +106,8 @@
 					isPagePlaying.set(id)
 				}}
 				{item}
-				{index} />
+				{index}
+			/>
 		{/each}
 	</main>
 {:catch error}

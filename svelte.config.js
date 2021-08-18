@@ -1,7 +1,6 @@
 // /* eslint-disable no-undef */
 
 import node from '@sveltejs/adapter-node'
-
 import autoprefixer from 'autoprefixer'
 import cssnano from 'cssnano'
 import path from 'path'
@@ -12,12 +11,9 @@ const dev = check === 'development'
 import worker from '@snuffydev/adapter-cloudflare-cache'
 /** @type {import('@sveltejs/kit').Config} */
 export default {
-	// Consult https://github.com/sveltejs/svelte-preprocess
-	// for more information about preprocessors
 	preprocess: sveltePreprocess({
 		scss: {
-			includePaths: ['src'],
-			prependData: `@import 'src/global/scss/utility/_mixins.scss';`
+			includePaths: ['src']
 		},
 		defaults: {
 			style: 'postcss',

@@ -1,23 +1,28 @@
 <script context="module">
 	import { api } from '$lib/api'
 
-	export const ssr = false
+	// export const ssr = false
+	export const prerender = true
 
 	export async function load({ page, fetch }) {
-		const response = await api('artist', { browseId: page.params.slug })
-		const data = await response.body
-		let { carousels, description, thumbnail, header, songs } = await data
+		const response = await fetch(
+			'/api/artist.json?browseId=' + page.params.slug
+		)
 
-		return {
-			props: {
-				carousels,
-				description,
-				thumbnail,
-				header,
-				songs,
-				id: page.params.slug
-			},
-			status: 200
+		const data = await response.json()
+		let { carousels, description, thumbnail, header, songs } = await data
+		if (response.ok) {
+			return {
+				props: {
+					carousels,
+					description,
+					thumbnail,
+					header,
+					songs,
+					id: page.params.slug
+				},
+				status: 200
+			}
 		}
 	}
 </script>
@@ -47,17 +52,18 @@
 	<title
 		>{header?.name == undefined
 			? 'Artist - '
-			: `${header.name} - `}Beatbump</title>
+			: `${header.name} - `}Beatbump</title
+	>
 </svelte:head>
 
 <svelte:window bind:innerWidth={width} />
 <!-- {#await headerContent then _} -->
+<ArtistPageHeader {description} {header} {width} {thumbnail} />
 <main>
-	<ArtistPageHeader {description} {header} {width} {thumbnail} />
 	<div class="artist-body">
 		{#if songs?.length > 0}
 			<section>
-				<h4 class="grid-title">Songs</h4>
+				<h1 class="grid-title">Songs</h1>
 				<section class="songs">
 					{#each songs as item, index}
 						<ListItem
@@ -67,7 +73,8 @@
 							page="artist"
 							on:pagePlaying={() => {
 								isPagePlaying.set(id)
-							}} />
+							}}
+						/>
 					{/each}
 				</section>
 			</section>
@@ -78,7 +85,8 @@
 					items={contents}
 					type="artist"
 					isBrowseEndpoint={true}
-					{header}>
+					{header}
+				>
 					>
 				</Carousel>
 			{:else}
@@ -86,7 +94,8 @@
 					items={contents}
 					type="artist"
 					isBrowseEndpoint={false}
-					{header}>
+					{header}
+				>
 					>
 				</Carousel>
 			{/if}
@@ -124,6 +133,5 @@
 	}
 	main {
 		margin: 0;
-		padding: 0;
 	}
 </style>

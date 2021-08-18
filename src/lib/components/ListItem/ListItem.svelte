@@ -31,7 +31,9 @@
 				item.videoId,
 				item.playlistId,
 				index,
-				item.playlistSetVideoId
+				item.playlistSetVideoId ? item.playlistSetVideoId : '',
+				'',
+				item.playerParams
 			)
 		} else {
 			key.set(0)
@@ -44,7 +46,8 @@
 	}}
 	on:mouseleave={() => {
 		isHovering = false
-	}}>
+	}}
+>
 	<div class="item-wrapper">
 		<div class="number">
 			{#if isHovering}
@@ -67,13 +70,15 @@
 			</span>
 			{#if item.artistNames || item.artistInfo?.artist}
 				<span class="artist"
-					>{item.artistNames ? item.artistNames : item.artistInfo.artist}</span>
+					>{item.artistNames ? item.artistNames : item.artistInfo.artist}</span
+				>
 			{:else}
 				<span class="artist">{item.artistInfo.artist}</span>
 			{/if}
 		</span>
 		<span class="length" class:hidden={!item?.length ? true : false}
-			>{item?.length}</span>
+			>{item?.length}</span
+		>
 	</div>
 </div>
 

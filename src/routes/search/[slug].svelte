@@ -1,7 +1,9 @@
 <script context="module">
-	export async function load({ page, fetch }) {
+	let path
+	export async function load({ page, fetch, context }) {
 		const slug = page.params.slug
 		const filter = page.query.get('filter')
+		path = context.page
 		// console.log(filter, page, slug)
 		const url =
 			`/api/search.json?q=` +
@@ -45,17 +47,21 @@
 	import type { NextContinuationData, Song } from '$lib/types'
 	import VirtualList from '$lib/components/SearchList/VirtualList.svelte'
 	import { onMount } from 'svelte'
+	import tagStore from '$lib/stores/ogtags'
 
 	$: search.set(contents)
-
-	let songTitle = $page.params.slug || title
-	const title = songTitle
+	let title
+	let songTitle = title || $page.params.slug
+	title = songTitle
 	let ctoken = continuation.continuation
 	let itct = continuation.clickTrackingParams
 	// console.log(contents);
 	let isLoading = false
 	let hasData = false
-
+	tagStore.desc('Search results for' + songTitle)
+	tagStore.title('Search')
+	tagStore.url(path + `?filter=${filter}`)
+	tagStore.image('/logo.png')
 	async function paginate() {
 		if (isLoading || hasData) return
 		try {
@@ -95,10 +101,16 @@
 </script>
 
 <svelte:head>
-	<title
-		>{$currentTitle === undefined
-			? 'Search - '
-			: `${$currentTitle} - `}Beatbump</title>
+	{#each Object.entries($tagStore) as [property, content]}
+		{#if content}
+			{#if ['title', 'description', 'image'].includes(property)}
+				<meta name={property} {content} />
+			{:else}
+				<meta {property} {content} />
+			{/if}
+		{/if}
+	{/each}
+	<title>{$currentTitle ? $currentTitle : $tagStore.title} - Beatbump</title>
 </svelte:head>
 <!-- {JSON.stringify(results)} -->
 {#if error}
@@ -126,7 +138,8 @@
 								}}
 								href={`/search/${didYouMean.term}?filter=${didYouMean.endpoint.params}`}
 								>{didYouMean.term}?</a
-							></em>
+							></em
+						>
 					</p>
 				{/if}
 			</div>
@@ -139,14 +152,29 @@
 			bind:hasData
 			height=" calc(100% - 6rem)"
 			{items}
-			let:item>
+			let:item
+		>
 			<Item data={item} />
 		</VirtualList>
 	</main>
 {/if}
 
 <style scoped lang="scss">
-	@import '../../global/scss/components/mixins';
+	.parent {
+		width: 100%;
+		align-items: center;
+		justify-items: center;
+		grid-area: m/m/m/m;
+		height: 100%;
+	}
+	@media (min-width: 640px) {
+		.l-container {
+			overflow-x: hidden;
+		}
+		.parent {
+			width: calc(100% - 40px);
+		}
+	}
 
 	.select {
 		color: white;

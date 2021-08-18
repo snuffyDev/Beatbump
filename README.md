@@ -1,6 +1,3 @@
-
-
-
 # <img src="/.repo/images/logo-header.png" width=48 height=48 /> Beatbump
 
 An Alternative frontend for YouTube Music created using Svelte/SvelteKit.
@@ -9,8 +6,8 @@ An Alternative frontend for YouTube Music created using Svelte/SvelteKit.
 
 **Documentation** _(work in progress)_: https://snuffydev.github.io/Beatbump/index.html#/
 
-|<img src="/.repo/images/artistpagegif.gif" width="640" height="auto"/> |<img src="/.repo/images/pwa.jpg" width="320" height="auto"/>|<img src="/.repo/images/trending.jpeg" width="640" height="auto"/> |
-|--  |-- |-- |
+| <img src="/.repo/images/artistpagegif.gif" width="640" height="auto"/> | <img src="/.repo/images/pwa.jpg" width="320" height="auto"/> | <img src="/.repo/images/trending.jpeg" width="640" height="auto"/> |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------ |
 
 ## Features
 
@@ -30,5 +27,5 @@ This project is in it's infancy, so for stability reasons, this repository is cu
 Once the documentation is finished, this repo will accept them.
 
 ## Development and Deploying
-You can find the documentation [here](https://snuffydev.github.io/Beatbump/#/) for setup information.
 
+You can find the documentation [here](https://snuffydev.github.io/Beatbump/#/) for setup information.

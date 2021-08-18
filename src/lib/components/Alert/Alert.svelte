@@ -7,13 +7,14 @@
 <div class="alert-container">
 	{#if $alertHandler.msg}
 		<div
-			transition:fly={{ y: 200, duration: 750 }}
+			transition:fly={{ y: 500, duration: 750 }}
 			on:introend={() => {
 				setTimeout(() => {
 					alertHandler.set({ msg: undefined, action: undefined })
 				}, 3000)
 			}}
-			class={`alert m-alert-${$alertHandler.type}`}>
+			class={`alert m-alert-${$alertHandler.type}`}
+		>
 			{$alertHandler.msg}
 		</div>
 	{/if}
@@ -27,8 +28,5 @@
 		left: 0;
 		right: 0;
 		justify-content: center;
-	}
-
-	.m-alert-danger {
 	}
 </style>

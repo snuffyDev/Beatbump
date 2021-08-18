@@ -1,9 +1,8 @@
-<script>
+<script lang="ts">
 	import { goto } from '$app/navigation'
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 	import Icon from '$components/Icon/Icon.svelte'
 	import { clickOutside } from '$lib/js/clickOutside'
-	import Controls from './Controls.svelte'
 	import list from '$lib/stores/list'
 	import { getSrc } from '$lib/utils'
 	import {
@@ -16,8 +15,9 @@
 	} from '$stores/stores'
 	import { tick } from 'svelte'
 	import { cubicOut } from 'svelte/easing'
-	import { fade } from 'svelte/transition'
 	import { tweened } from 'svelte/motion'
+	import { fade } from 'svelte/transition'
+	import Controls from './Controls.svelte'
 	import Queue from './Queue.svelte'
 	import QueueListItem from './QueueListItem.svelte'
 
@@ -26,8 +26,6 @@
 	$: player.src = $updateTrack
 	$: isWebkit = $iOS
 	let title
-
-	$: currentTitle.set(title)
 
 	$: autoId = $key
 
@@ -53,8 +51,8 @@
 	$: isHidden = false
 	let DropdownItems: Array<any>
 	let once = false
+	$: console.log($list.mix)
 	player.addEventListener('loadedmetadata', () => {
-		title = $list.mix[autoId].title
 		isPlaying = true
 		play()
 		DropdownItems = [
@@ -115,21 +113,21 @@
 	function metaDataHandler() {
 		if ('mediaSession' in navigator && player.src !== undefined) {
 			navigator.mediaSession.metadata = new MediaMetadata({
-				title: $list.mix[autoId].title,
-				artist: $list.mix[autoId].artistInfo.artist || null,
+				title: $list.mix[autoId || 0].title,
+				artist: $list.mix[autoId || 0].artistInfo.artist || null,
 				album:
-					$list.mix[autoId].album?.title ||
-					$list.mix[autoId].album?.text ||
+					$list.mix[autoId || 0].album?.title ||
+					$list.mix[autoId || 0].album?.text ||
 					undefined,
 
 				artwork: [
 					{
-						src: $list.mix[autoId].thumbnails
-							? $list.mix[autoId].thumbnails[0].url.replace(
+						src: $list.mix[autoId || 0].thumbnails
+							? $list.mix[autoId || 0].thumbnails[0].url.replace(
 									/=(w(\d+))-(h(\d+))/g,
 									'=w128-h128'
 							  )
-							: $list.mix[autoId].thumbnail.replace(
+							: $list.mix[autoId || 0].thumbnail.replace(
 									/=(w(\d+))-(h(\d+))/g,
 									'=w128-h128'
 							  ),
@@ -166,23 +164,21 @@
 		} else {
 			autoId++
 			key.set(autoId)
-			getTrackURL()
+			await getTrackURL()
 
 			currentTitle.set($list.mix[autoId].title)
 			once = false
 		}
-		once = false
 	}
 
-	function getTrackURL() {
-		getSrc(mixList[autoId].videoId)
-			.then(({ body }) => {
-				player.src = body
-				currentTitle.set($list.mix[autoId].title)
-			})
-			.catch((err) => {
+	async function getTrackURL() {
+		await getSrc(mixList[autoId].videoId).then(({ body, error }) => {
+			if (error === true) {
 				getNext()
-			})
+			}
+			player.src = body
+			currentTitle.set($list.mix[autoId].title)
+		})
 	}
 
 	function setNext() {
@@ -258,7 +254,8 @@
 <svelte:window
 	bind:outerWidth={width}
 	on:mouseup={() => (seeking = false)}
-	on:mousemove={trackMouse} />
+	on:mousemove={trackMouse}
+/>
 
 <div class="f-container" transition:fade>
 	<div
@@ -267,13 +264,15 @@
 		on:click={seekAudio}
 		on:mousedown={() => (seeking = true)}
 		on:mouseleave={() => (hovering = false)}
-		on:mouseenter={() => (hovering = true)}>
+		on:mouseenter={() => (hovering = true)}
+	>
 		{#if hovering}
 			<div
 				class="hover"
 				transition:fade={{ duration: 150 }}
 				bind:this={seekBar}
-				style="transform:scaleX({hoverWidth})" />
+				style="transform:scaleX({hoverWidth})"
+			/>
 		{/if}
 		<progress bind:this={songBar} value={$progress} max={duration} />
 	</div>
@@ -284,7 +283,8 @@
 				showing = false
 			}}
 			use:clickOutside
-			class="player-left">
+			class="player-left"
+		>
 			{#if showing}
 				<Queue bind:autoId={$key} let:ctxKey bind:showing let:item let:index>
 					<row id={index}>
@@ -304,7 +304,8 @@
 								getNext()
 							}}
 							{item}
-							{index} />
+							{index}
+						/>
 					</row>
 				</Queue>
 			{/if}
@@ -317,7 +318,8 @@
 					}
 					showing = showing ? true : false
 				}}
-				class="listButton player-btn">
+				class="listButton player-btn"
+			>
 				<Icon color="white" name="radio" size="2em" />
 			</div>
 		</div>
@@ -327,11 +329,13 @@
 				<div
 					class="volume"
 					use:clickOutside
-					on:click_outside={() => (volumeHover = false)}>
+					on:click_outside={() => (volumeHover = false)}
+				>
 					<div
 						color="white"
 						class="volume-icon"
-						on:click={() => (volumeHover = !volumeHover)}>
+						on:click={() => (volumeHover = !volumeHover)}
+					>
 						<Icon color="white" name="volume" size="2em" />
 					</div>
 					{#if volumeHover}
@@ -343,7 +347,8 @@
 									bind:value={volume}
 									min="0"
 									max="1"
-									step="any" />
+									step="any"
+								/>
 							</div>
 						</div>
 					{/if}
@@ -353,7 +358,8 @@
 						bind:isHidden
 						on:click_outside={() => (isHidden = !isHidden)}
 						type="player"
-						items={DropdownItems} />
+						items={DropdownItems}
+					/>
 				</div>
 			{/if}
 			<div class:hidden={width > 500} class="menu-container">
@@ -364,7 +370,7 @@
 </div>
 
 <style lang="scss">
-	@import '../../../global/scss/components/_player.scss';
+	@import '../../../global/stylesheet/components/_player.scss';
 	row {
 		position: relative;
 	}
@@ -404,7 +410,12 @@
 		bottom: 6.5rem;
 		transform: rotate(-90deg);
 		padding: 0;
-		height: 1.5rem;
+		height: 1.3rem;
+		align-items: center;
+	}
+	.volume-slider {
+		height: 100%;
+		display: flex;
 		align-items: center;
 	}
 	.volume-icon {

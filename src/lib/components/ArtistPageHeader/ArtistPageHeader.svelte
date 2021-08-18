@@ -1,32 +1,31 @@
 <script lang="ts">
-	import '../../../global/vars.css'
-	import { afterUpdate, onDestroy, onMount } from 'svelte'
-	import { theme } from '$lib/stores/stores'
 	import list from '$lib/stores/list'
-	import Icon from '../Icon/Icon.svelte'
+	import Icon from '$lib/components/Icon/Icon.svelte'
+	import { theme } from '$lib/stores/stores'
+	import { onMount } from 'svelte'
+	import '../../../global/vars.css'
+
 	export let header
 	export let thumbnail = []
 	export let description
 	export let width
 	let container: HTMLDivElement
 	let y = 0
-	let handler = (event?: FrameRequestCallback | UIEvent) => {}
 	let wrapper: HTMLElement
 	onMount(() => {
 		let start
-		handler = (event) => {
-			if (start === undefined) start = event.timeStamp
-			let scroll
-			if (container) scroll = container.getBoundingClientRect()
+		let scroll
 
-			const elapsed = event.timeStamp - start
+		const handler = (e) => {
+			if (container) scroll = container.getBoundingClientRect()
+			// console.log(scroll)
 			if (container) {
 				y =
 					window.innerWidth < 500
 						? Math.min(
 								Math.max((-scroll.top / window.innerHeight) * 4, 0),
 								10
-						  ) * 350
+						  ) * 150
 						: Math.min(
 								Math.max((-scroll.top / window.innerHeight) * 4, 0),
 								10
@@ -34,18 +33,14 @@
 			}
 		}
 		wrapper = document.getElementById('wrapper')
-		wrapper.addEventListener(
-			'scroll',
-			() => {
-				window.requestAnimationFrame(handler)
-			},
-			{ passive: true }
+		wrapper.addEventListener('scroll', () =>
+			window.requestAnimationFrame(handler)
 		)
 		return () => {
 			window.cancelAnimationFrame(y)
-
-			window.removeEventListener('scroll', handler)
-			wrapper.removeEventListener('scroll', handler)
+			wrapper.removeEventListener('scroll', () =>
+				window.cancelAnimationFrame(y)
+			)
 		}
 	})
 </script>
@@ -55,26 +50,42 @@
 		<div
 			bind:this={container}
 			style={`background-image: linear-gradient(1turn, var(--${$theme}-base) ${Math.min(
-				y,
-				52
+				Math.max(10, y),
+				70
 			)}%, transparent); transition: cubic-bezier(0.6, -0.28, 0.74, 0.05) all 120ms`}
 			id="gradient"
-			class="gradient" />
+			class="gradient"
+		/>
 		{#if thumbnail !== undefined}
 			<picture class="header-thumbnail">
 				{#each thumbnail as img, i}
 					{#if i == 0}
-						<source media="(max-width:{img.width}px)" srcset={img.url} />
-					{:else if i == thumbnail.length - 1}
 						<source
-							media="(min-width:{img.width}px)
-							.width}px)"
-							srcset={img.url} />
+							media="(max-width:{img.width}px)"
+							srcset={img.url}
+							type="image/jpeg"
+						/>
+						<source
+							media={`(min-width:${img.width + 1}px) and (max-width:${
+								thumbnail[i + 1].width
+							}px)`}
+							srcset={img.url}
+							type="image/jpeg"
+						/>
+					{:else if i == thumbnail.length - 1}
+						<!-- <source
+							media="(min-width:{thumbnail[i - 1]
+								.width}px) and (max-width:{img.width}px)"
+							srcset={img.url}
+							type="image/jpeg" /> -->
 					{:else}
 						<source
-							media="(min-width:{img.width}px) and (max-width: {thumbnail[i + 1]
-								.width}px)"
-							srcset={img.url} />
+							media={`(min-width:${img.width + 1}px) and (max-width:${
+								thumbnail[i + 1].width
+							}px)`}
+							srcset={thumbnail[i + 1].url}
+							type="image/jpeg"
+						/>
 					{/if}
 				{/each}
 				<img
@@ -82,25 +93,25 @@
 					class="header-thumbnail"
 					loading="eager"
 					src={thumbnail[1]?.url}
-					alt="Artist Thumbnail" />
+					alt="Artist Thumbnail"
+				/>
 			</picture>
 		{/if}
-	</div>
-	<div
-		class="artist-content"
-		style="		box-shadow:0rem 0rem 0.5rem 0.5rem var(--{$theme}-base), 1.5rem 0.5rem 0.8rem 0.5rem inset var(--{$theme}-base);">
-		<div class="content-wrapper">
-			<div class="name">{header?.name}</div>
-			{#if width > 500 && !!description}
-				<div class="description">{description[0]}</div>
-			{/if}
-			<div class="btn-wrpr">
-				<button
-					class="radio-button"
-					on:click={list.startPlaylist(header.mixInfo.playlistId)}
-					><Icon size="1.25em" name="radio" /><span class="btn-text">
-						Play Radio</span
-					></button>
+		<div class="artist-content">
+			<div class="content-wrapper">
+				<div class="name">{header?.name}</div>
+				{#if width > 500 && !!description}
+					<div class="description">{description[0]}</div>
+				{/if}
+				<div class="btn-wrpr">
+					<button
+						class="radio-button"
+						on:click={list.startPlaylist(header.mixInfo.playlistId)}
+						><Icon size="1.25em" name="radio" /><span class="btn-text">
+							Play Radio</span
+						></button
+					>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -140,13 +151,25 @@
 
 	.artist-header {
 		display: block;
-		margin-bottom: 0.5rem;
+		// margin-bottom: 0.5rem;
+		height: 100%;
+		position: relative;
+		max-height: 50vh;
+		@media only screen and (min-width: 640px) {
+			max-height: 75vh;
+		}
 	}
 	.artist-thumbnail {
 		display: block;
 		position: relative;
 		height: 100%;
-		min-height: 13rem;
+		/* min-height: 13rem; */
+		/* max-height: 30rem; */
+		padding-top: 15rem;
+		@media only screen and (min-width: 640px) {
+			padding-top: 18rem;
+		}
+		// box-shadow: 0 0 0.5rem 0.5rem #000;
 
 		&::before {
 			position: absolute;
@@ -169,24 +192,35 @@
 	.header-thumbnail {
 		z-index: -1;
 		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
 		width: 100%;
-
+		height: 100%;
+		max-width: 100%;
+		-o-object-fit: cover;
 		object-fit: cover;
+		/* max-height: 23rem; */
+		position: absolute;
 		overflow: hidden;
 		border-radius: 0;
+		object-position: top;
+		max-height: inherit;
 	}
 	.artist-content {
 		position: relative;
 		z-index: 1;
-		height: 0.25rem;
-		padding-top: 4.5rem;
+
+		padding-left: 4.5rem;
+
 		.content-wrapper {
-			position: absolute;
-			bottom: 0;
-			margin-bottom: 0.5rem;
+			// position: absolute;
+			// bottom: 0;
+			// margin-bottom: 0.5rem;
 			.description {
 				display: block;
-				padding: 0 2rem 2rem 2rem;
+				padding: 0.4em;
+				padding-bottom: 1.2rem;
 			}
 			.name {
 				font-weight: 700;
@@ -197,18 +231,19 @@
 				text-shadow: rgba(0, 0, 0, 0.171) 0.2rem -0.12rem 0.5rem;
 
 				letter-spacing: -0.02em;
-				padding: 0.8em 0 0.8rem 0.5rem;
+				padding-left: 0.4rem;
+				padding-bottom: 1rem;
 
 				@media (min-width: 320px) and (max-width: 499px) {
-					padding: 0.8em 0 0.8rem 0.5rem;
+					// padding: 0.8em 0 0.8rem 0.5rem;
 				}
 				@media (min-width: 500px) and (max-width: 640px) {
-					padding: 0.8em 0 0.8rem 1.8rem;
+					// padding: 0.8em 0 0.8rem 1.8rem;
 				}
 				@media screen and (min-width: 642px) and (max-width: 839px) {
 					font-size: 2rem;
 
-					padding: 0.8em 0 0.8rem 2rem;
+					// padding: 0.8em 0 0.8rem 2rem;
 				}
 				@media screen and (min-width: 840px) and (max-width: 960px) {
 					font-size: 3.5rem;
@@ -216,33 +251,33 @@
 					inline-size: 100%;
 					overflow-wrap: break-word;
 
-					padding: 0 2rem 0.8rem 2rem;
+					// padding: 0 2rem 0.8rem 2rem;
 				}
 				@media screen and (min-width: 961px) {
-					padding: 0 2rem 0.8rem 2rem;
+					// padding: 0 2rem 0.8rem 2rem;
 					font-size: 4.5rem;
 				}
 			}
 		}
 		@media screen and (max-width: 500px) {
-			padding: 0.8rem;
+			padding: 1rem;
 		}
 	}
-	.btn-wrpr {
-		@media (min-width: 320px) and (max-width: 499px) {
-			padding: 0 0 0.8rem 0.5rem;
-		}
-		@media (min-width: 500px) and (max-width: 640px) {
-			padding: 0 0 0.8rem 1.8rem;
-		}
-		@media screen and (min-width: 642px) and (max-width: 839px) {
-			padding: 0 0 0.8rem 2rem;
-		}
-		@media screen and (min-width: 840px) and (max-width: 960px) {
-			padding: 0 2rem 0.8rem 2rem;
-		}
-		@media screen and (min-width: 961px) {
-			padding: 0 2rem 0.8rem 2rem;
-		}
-	}
+	// .btn-wrpr {
+	// 	@media (min-width: 320px) and (max-width: 499px) {
+	// 		padding: 0 0 0.8rem 0.5rem;
+	// 	}
+	// 	@media (min-width: 500px) and (max-width: 640px) {
+	// 		padding: 0 0 0.8rem 1.8rem;
+	// 	}
+	// 	@media screen and (min-width: 642px) and (max-width: 839px) {
+	// 		padding: 0 0 0.8rem 2rem;
+	// 	}
+	// 	@media screen and (min-width: 840px) and (max-width: 960px) {
+	// 		padding: 0 2rem 0.8rem 2rem;
+	// 	}
+	// 	@media screen and (min-width: 961px) {
+	// 		padding: 0 2rem 0.8rem 2rem;
+	// 	}
+	// }
 </style>

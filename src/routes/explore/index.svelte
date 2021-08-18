@@ -31,7 +31,8 @@
 
 <svelte:head>
 	<title
-		>{$currentTitle == undefined || null ? 'Explore' : $currentTitle} - Beatbump</title>
+		>{$currentTitle == undefined || null ? 'Explore' : $currentTitle} - Beatbump</title
+	>
 </svelte:head>
 
 <main>
@@ -45,7 +46,8 @@
 					{#each section.section as item}
 						<div
 							style={`border-left: 0.4286rem solid ${item.color}`}
-							class="box">
+							class="box"
+						>
 							<a href={`/explore/${item.endpoint.params}`}>{item.text}</a>
 						</div>
 					{/each}
