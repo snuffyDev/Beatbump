@@ -6,35 +6,37 @@ h2,
 h3,
 h4,
 h5,
-h6 {
+h6,
+.subheading {
 	color: var(--color-dark);
-	font-family: 'Commissioner', sans-serif;
+	font-family: "Commissioner", sans-serif;
 
 	line-height: 1.5;
 	font-weight: 500;
-	margin: 0 0 var(--sm-spacing);
+	margin: 0 0 1.38rem;
 }
 
 h1 {
-	font-size: 2.25em;
+	font-size: 2.488rem;
 	font-weight: 700;
 	letter-spacing: -0.03rem;
 }
 
 h2 {
-	font-size: 2em;
+	font-size: 2.074rem;
+	font-weight: 700;
 }
 
 h3 {
-	font-size: 1.75em;
+	font-size: 1.728rem;
 }
 
 h4 {
-	font-size: 1.5em;
+	font-size: 1.44rem;
 }
 
 h5 {
-	font-size: 1.25em;
+	font-size: 1.2rem;
 }
 
 h6 {

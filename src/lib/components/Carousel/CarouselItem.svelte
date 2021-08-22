@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation'
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 	import Loading from '$components/Loading/Loading.svelte'
+	import db from '$lib/db'
 	import lazy from '$lib/lazy'
 	import list from '$lib/stores/list'
 	import type { CarouselItem } from '$lib/types'
@@ -51,6 +52,14 @@
 			text: 'Add to Queue',
 			icon: 'queue',
 			action: () => list.addNext(item, $key)
+		},
+		{
+			text: 'Favorite',
+			icon: 'heart',
+			action: () => {
+				console.log(item)
+				db.setNewFavorite(item)
+			}
 		},
 		{
 			text: 'Share',
@@ -116,100 +125,99 @@
 </script>
 
 <svelte:window bind:outerWidth={width} />
-<div class="container carouselItem">
-	<section
-		class="item"
-		on:mouseenter={() => {
-			hovering = true
-		}}
-		on:focus={() => {
-			hovering = true
-		}}
-		on:mouseleave={() => {
-			hovering = false
-			if (width > 550) {
-				menuToggle = false
-			}
-		}}
-		class:item16x9={RATIO_RECT ? true : false}
-		class:item1x1={RATIO_SQUARE ? true : false}
-		transition:fade|local
-		bind:this={section[index]}
+<section
+	class="item"
+	on:mouseenter={() => {
+		hovering = true
+	}}
+	on:focus={() => {
+		hovering = true
+	}}
+	on:mouseleave={() => {
+		hovering = false
+		if (width > 550) {
+			menuToggle = false
+		}
+	}}
+	class:item16x9={RATIO_RECT ? true : false}
+	class:item1x1={RATIO_SQUARE ? true : false}
+	transition:fade|local
+	bind:this={section[index]}
+>
+	<div
+		class="clickable"
+		style="display:block;"
+		on:click={() => clickHandler(index)}
 	>
 		<div
-			class="clickable"
-			style="display:contents;"
-			on:click={() => clickHandler(index)}
+			class="image"
+			class:img16x9={RATIO_RECT ? true : false}
+			class:img1x1={RATIO_SQUARE ? true : false}
+			tabindex="0"
 		>
-			<div class="img">
-				<!-- svelte-ignore a11y-missing-attribute -->
-				<div
-					class="container"
-					class:img16x9={RATIO_RECT ? true : false}
-					class:img1x1={RATIO_SQUARE ? true : false}
-				>
-					{#if loading}
-						<Loading />
-					{/if}
-					<img
-						alt="thumbnail"
-						tabindex="-1"
-						transition:fade|local
-						on:error={errorHandler}
-						class:img16x9={RATIO_RECT}
-						loading="lazy"
-						type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-						src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
-						use:lazy={{ src: srcImg }}
-					/>
-				</div>
-			</div>
-
-			<div class="cont">
-				<div class="text-wrapper">
-					<span class="title">
-						{item.title.length > 48
-							? item.title.substring(0, 48) + '...'
-							: item.title}
-					</span>
-					{#if item.subtitle}
-						<div class="subtitles">
-							{#each item.subtitle as sub}
-								<span class:hidden={sub?.navigationEndpoint}>{sub.text}</span>
-								<a
-									class:hidden={!sub?.navigationEndpoint}
-									on:click|stopPropagation|preventDefault={() => {
-										goto(
-											'/artist/' +
-												sub?.navigationEndpoint?.browseEndpoint?.browseId
-										)
-									}}
-									href={'/artist/' +
-										sub?.navigationEndpoint?.browseEndpoint?.browseId}
-									><span>{sub.text}</span></a
-								>
-							{/each}
-						</div>
+			{#if loading}
+				<Loading />
+			{/if}
+			<img
+				alt="thumbnail"
+				transition:fade|local
+				on:error={errorHandler}
+				class:img16x9={RATIO_RECT}
+				loading="lazy"
+				type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+				src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
+				use:lazy={{ src: srcImg }}
+			/>{#if !isBrowseEndpoint}
+				<div class="menu" class:mobile={width < 550}>
+					{#if hovering || width < 550}
+						<Dropdown color="white" bind:isHidden items={DropdownItems} />
 					{/if}
 				</div>
-			</div>
+			{/if}
 		</div>
 
-		{#if !isBrowseEndpoint}
-			<div class="menu" class:mobile={width < 550}>
-				{#if hovering || width < 550}
-					<Dropdown color="white" bind:isHidden items={DropdownItems} />
+		<div class="cont">
+			<div class="text-wrapper">
+				<span class="title">
+					{item.title.length > 48
+						? item.title.substring(0, 48) + '...'
+						: item.title}
+				</span>
+				{#if item.subtitle}
+					<div class="subtitles">
+						{#each item.subtitle as sub}
+							<span class:hidden={sub?.navigationEndpoint}>{sub.text}</span>
+							<a
+								class:hidden={!sub?.navigationEndpoint}
+								on:click|stopPropagation|preventDefault={() => {
+									goto(
+										'/artist/' +
+											sub?.navigationEndpoint?.browseEndpoint?.browseId
+									)
+								}}
+								href={'/artist/' +
+									sub?.navigationEndpoint?.browseEndpoint?.browseId}
+								><span>{sub.text}</span></a
+							>
+						{/each}
+					</div>
 				{/if}
 			</div>
-		{/if}
-	</section>
-</div>
+		</div>
+	</div>
+</section>
 
 <style lang="scss">
 	@import '../../../global/stylesheet/components/_carousel-item.scss';
 	.hidden {
 		display: none !important;
 		visibility: hidden !important;
+	}
+	.image,
+	img {
+		&:focus {
+			outline: none;
+		}
 	}
 	.menu {
 	}

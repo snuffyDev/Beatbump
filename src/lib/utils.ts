@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { api } from './api'
+import { api } from '$api/_api'
 import { sort } from './endpoints/playerUtils'
 import { alertHandler, updateTrack } from './stores/stores'
 import { key } from './stores/stores'

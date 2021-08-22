@@ -92,6 +92,7 @@
 		max-width: 100%;
 		grid-area: f/f/f/f;
 		position: relative;
+		z-index: 1;
 		&::before {
 			background: var(--midnight-bottom);
 			position: fixed;

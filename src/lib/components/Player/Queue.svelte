@@ -158,7 +158,7 @@
 		transition: transform 0.12s cubic-bezier(0.39, 0.58, 0.57, 1);
 		min-height: 23rem;
 		width: 40%;
-		z-index: 1;
+		z-index: -1;
 		&::before {
 			position: absolute;
 			content: '';

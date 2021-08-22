@@ -27,7 +27,8 @@
 			"$app/*": [".svelte/dev/runtime/app/*", ".svelte/build/runtime/app/*"],
 			"$lib/*": ["src/lib/*"],
 			"$components/*": ["src/lib/components/*"],
-			"$stores/*": ["src/lib/stores/*"]
+			"$stores/*": ["src/lib/stores/*"],
+			"$api/*": ["src/routes/api/*"]
 		}
 	},
 	"include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"]

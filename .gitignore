@@ -17,3 +17,5 @@ src/lib/components/Player/_Player.svelte
 .gitignore
 src/routes/trending/test/index.json.ts
 src/routes/trending/test/index.svelte
+package-lock.json
+package-lock.json

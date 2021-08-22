@@ -7,7 +7,7 @@
 <div class="alert-container">
 	{#if $alertHandler.msg}
 		<div
-			transition:fly={{ y: 500, duration: 750 }}
+			transition:fly={{ y: 150, duration: 750 }}
 			on:introend={() => {
 				setTimeout(() => {
 					alertHandler.set({ msg: undefined, action: undefined })

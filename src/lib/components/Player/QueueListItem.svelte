@@ -195,7 +195,7 @@
 		display: inline-flex;
 		font-size: 1rem;
 		line-height: 1.75;
-		flex-flow: wrap;
+		flex-flow: nowrap;
 		justify-content: center;
 		flex-direction: column;
 		padding-inline: 0.8em;

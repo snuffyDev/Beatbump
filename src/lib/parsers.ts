@@ -78,9 +78,12 @@ export const MusicResponsiveListItemRenderer = (ctx: any): CarouselItem => {
 				.musicResponsiveListItemFlexColumnRenderer.text.runs
 		],
 		artistInfo: {
-			artist:
-				ctx.musicResponsiveListItemRenderer.flexColumns[1]
-					.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text
+			artist: [
+				{
+					...ctx.musicResponsiveListItemRenderer.flexColumns[1]
+						.musicResponsiveListItemFlexColumnRenderer.text.runs[0]
+				}
+			]
 		},
 		explicit: ctx?.badges ? ctx?.badges : false,
 		title:

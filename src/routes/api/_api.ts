@@ -31,6 +31,6 @@ export async function api(
 	}
 }
 
-export function get(endpoint, params) {
+export async function get(endpoint, params) {
 	return api(endpoint, params)
 }

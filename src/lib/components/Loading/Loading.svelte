@@ -26,7 +26,7 @@
 		justify-content: space-evenly;
 
 		top: 0;
-		z-index: 20;
+		z-index: 1;
 		right: 0;
 		/* background: #000; */
 		left: 0;

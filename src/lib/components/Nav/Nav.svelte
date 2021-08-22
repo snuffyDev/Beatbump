@@ -84,6 +84,14 @@
 			</div>
 		{/if}
 		<div
+			class="nav-item btn-favorites"
+			on:click|stopPropagation={() => {
+				goto('/library')
+			}}
+		>
+			<Icon name="folder" size="1.5em" />
+		</div>
+		<div
 			class="nav-item__search"
 			on:click={() => {
 				shown = !shown
@@ -129,7 +137,8 @@
 			}
 		}
 	}
-	.btn-settings {
+	.btn-settings,
+	.btn-favorites {
 		cursor: pointer;
 		display: block !important;
 		visibility: visible !important;
@@ -190,7 +199,7 @@
 		visibility: visible;
 
 		.nav-item {
-			margin-right: 1.75em;
+			margin-right: 2em;
 		}
 		// @media screen and (min-width: 640px) {
 		// 	&__search {
@@ -203,9 +212,10 @@
 			display: initial;
 			visibility: visible;
 
-			margin-right: 1.75rem;
+			margin-right: 2rem;
 			cursor: pointer;
 		}
+
 		&-desktop {
 			place-items: end;
 		}
@@ -219,7 +229,7 @@
 		display: inline-flex;
 		margin-left: auto;
 		.nav-item {
-			margin-right: 1.75em;
+			margin-right: 2em;
 		}
 		:last-child {
 			margin-right: 0;

@@ -9,7 +9,8 @@
 	background-color: #fffffff2 !important;
 	border: 1px solid #121212 !important;
 	border-radius: var(--base-radius);
-	font-family: 'Commissioner', sans-serif !important;
+	font-family: "Commissioner", sans-serif !important;
+	cursor: pointer;
 	font-size: 1.2em;
 	font-weight: 500 !important;
 	text-transform: none;
@@ -36,6 +37,7 @@
 		// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
 		outline: 0;
 		text-decoration: none;
+		cursor: pointer;
 	}
 }
 

@@ -1,5 +1,6 @@
 {
 	"npm-scripts.showStartNotification": false,
 	"px-to-rem.px-per-rem": 14,
-	"svg.preview.background": "custom"
+	"svg.preview.background": "custom",
+	"editor.quickSuggestions": null
 }

@@ -11,6 +11,7 @@
 	import list from '$lib/stores/list'
 	import type { Item } from '$lib/types'
 	import longpress from '$lib/actions/longpress'
+	import db from '$lib/db'
 
 	let videoId = ''
 	let playlistId = ''
@@ -58,6 +59,14 @@
 			text: 'Add to Queue',
 			icon: 'queue',
 			action: () => list.addNext(data, $key)
+		},
+		{
+			text: 'Favorite',
+			icon: 'heart',
+			action: () => {
+				console.log(data)
+				db.setNewFavorite(data)
+			}
 		},
 		{
 			text: 'Share',
@@ -174,15 +183,20 @@
 					<p class="artist-stats">
 						Artist &CenterDot; {data?.length?.text}
 					</p>
+				{:else if data.type == 'playlist'}
+					<p class="text-artist">
+						{data.type == 'playlist' ? `${data.metaData}` : ''}
+					</p>
+				{:else}
+					<p class="text-artist">
+						by
+						<a
+							href={`/artist/` +
+								data.artistInfo?.artist[0]?.navigationEndpoint?.browseEndpoint
+									?.browseId}>{data.artistInfo?.artist[0].text}</a
+						>
+					</p>
 				{/if}
-				<p
-					class="text-artist"
-					class:hidden={data.type == 'artist' ? true : false}
-				>
-					{data.type == 'playlist'
-						? `${data.metaData}`
-						: `by ${data.artistInfo.artist[0].text}`}
-				</p>
 				<span class="album">
 					{#if data.album?.browseId}<Icon name="album" size="1em" /><a
 							href="/release?id={data?.album?.browseId}">{data.album.title}</a

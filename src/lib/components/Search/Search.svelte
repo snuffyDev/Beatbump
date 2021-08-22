@@ -56,7 +56,10 @@
 				autocorrect="off"
 				type="search"
 				placeholder="Search"
-				on:keyup={() => typeahead()}
+				on:keyup={(e) => {
+					if (e.shiftKey && e.ctrlKey) return
+					typeahead()
+				}}
 				bind:value={query}
 			/>
 		</div>

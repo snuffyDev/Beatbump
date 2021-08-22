@@ -1,7 +1,4 @@
 <script context="module">
-	import { api } from '$lib/api'
-
-	// export const ssr = false
 	export const prerender = true
 
 	export async function load({ page, fetch }) {
