@@ -29,3 +29,7 @@ Once the documentation is finished, this repo will accept them.
 ## Development and Deploying
 
 You can find the documentation [here](https://snuffydev.github.io/Beatbump/#/) for setup information.
+
+## Inspirations
+
+- [Invidious](https://github.com/iv-org/invidious) - a privacy focused alternative YouTube front end.
