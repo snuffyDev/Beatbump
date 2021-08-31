@@ -17,7 +17,7 @@
 				clearTimeout(timeout)
 			}
 		}
-		redirect()
+		// redirect()
 	})
 </script>
 

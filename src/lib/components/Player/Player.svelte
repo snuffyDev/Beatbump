@@ -362,7 +362,7 @@
 					/>
 				</div>
 			{/if}
-			<div class:hidden={width > 500} class="menu-container">
+			<div class="menu-container__desktop">
 				<Dropdown bind:isHidden type="player" items={DropdownItems} />
 			</div>
 		</div>
@@ -493,5 +493,12 @@
 	}
 	progress::-webkit-progress-value {
 		background-color: rgba(255, 255, 255, 0.8);
+	}
+
+	@media screen and (min-width: 500px) {
+		.menu-container__desktop {
+			visibility: none !important;
+			display: none !important;
+		}
 	}
 </style>

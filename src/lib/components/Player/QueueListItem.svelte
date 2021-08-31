@@ -213,7 +213,7 @@
 		.p-text {
 			font-size: 1rem;
 			flex-flow: wrap;
-			line-height: 1.2;
+			line-height: 1.5;
 			padding-left: 0.5em;
 			display: inline-flex;
 			padding-inline: 0.8em;

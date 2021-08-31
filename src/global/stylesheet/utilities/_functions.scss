@@ -1,0 +1,62 @@
+$units: (0.75rem, 1rem, 1.25rem, 1rem, 2rem, 3rem) !default;
+$sides: (
+	p: padding,
+	px: (
+		padding-left,
+		padding-right,
+	),
+	py: (
+		padding-top,
+		padding-bottom,
+	),
+	pt: padding-top,
+	pr: padding-right,
+	pb: padding-bottom,
+	pl: padding-left,
+	m: margin,
+	mx: (
+		margin-left,
+		margin-right,
+	),
+	my: (
+		margin-top,
+		margin-bottom,
+	),
+	mt: margin-top,
+	mr: margin-right,
+	mb: margin-bottom,
+	ml: margin-left,
+) !default;
+
+$sizes: (
+	none: (
+		0rem,
+	),
+	xs: (
+		0.25rem,
+	),
+	sm: (
+		0.5rem,
+	),
+	md: (
+		1rem,
+	),
+	lg: (
+		1.25rem,
+	),
+	xl: (
+		1.5rem,
+	),
+) !default;
+
+@at-root {
+	@each $side, $side-list in $sides {
+		@each $unit in $units {
+			.#{$side}-#{index(($units), $unit)} {
+				@each $attr in $side-list {
+					#{$attr}: #{$unit} !important;
+				}
+			}
+		}
+	}
+}

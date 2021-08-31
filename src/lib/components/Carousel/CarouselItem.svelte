@@ -10,7 +10,7 @@
 	import { tick } from 'svelte'
 	import { fade } from 'svelte/transition'
 	import { browseHandler } from './functions'
-
+	import menu from './menu'
 	export let section
 	export let index
 	export let item: CarouselItem
@@ -89,8 +89,9 @@
 		event.currentTarget.src =
 			'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjYWNhY2FjIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJtYXRyaXgoMS4yOTkgMCAwIDEuMjcgOTUuNjg4IDE4Ni45NzEpIiBmb250LWZhbWlseT0iTGF0byIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMjAiIGZpbGw9IiMyODI4MjgiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLjI5OSAwIDAgMS4yNyA3OCA0Mi4yODYpIiBkPSJNMCAwaDc3djEzNUgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjwvZz48L3N2Zz4='
 	}
-	const clickHandler = async (index) => {
+	const clickHandler = async (event: Event, index) => {
 		loading = true
+		if (event) console.log(event)
 		if (type == 'trending') {
 			//
 			isBrowseEndpoint
@@ -147,7 +148,11 @@
 	<div
 		class="clickable"
 		style="display:block;"
-		on:click={() => clickHandler(index)}
+		use:menu
+		on:menutouch={(e) => {
+			console.log(e)
+		}}
+		on:click|stopPropagation={(e) => clickHandler(e, index)}
 	>
 		<div
 			class="image"
@@ -167,13 +172,7 @@
 				type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 				src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
 				use:lazy={{ src: srcImg }}
-			/>{#if !isBrowseEndpoint}
-				<div class="menu" class:mobile={width < 550}>
-					{#if hovering || width < 550}
-						<Dropdown color="white" bind:isHidden items={DropdownItems} />
-					{/if}
-				</div>
-			{/if}
+			/>
 		</div>
 
 		<div class="cont">
@@ -205,6 +204,13 @@
 			</div>
 		</div>
 	</div>
+	{#if !isBrowseEndpoint}
+		<div class="menu">
+			{#if hovering || width < 550}
+				<Dropdown color="white" bind:isHidden items={DropdownItems} />
+			{/if}
+		</div>
+	{/if}
 </section>
 
 <style lang="scss">
@@ -213,8 +219,12 @@
 		display: none !important;
 		visibility: hidden !important;
 	}
+	.item {
+		will-change: contents;
+	}
 	.image,
 	img {
+		will-change: contents;
 		&:focus {
 			outline: none;
 		}

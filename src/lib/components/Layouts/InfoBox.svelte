@@ -61,7 +61,6 @@
 						•
 						<small>
 							{subtitles[0].year} • {subtitles[0].tracks}
-							{subtitles[0].tracks > 1 ? 'Tracks' : 'Track'}
 						</small>
 					</p>
 				{/if}

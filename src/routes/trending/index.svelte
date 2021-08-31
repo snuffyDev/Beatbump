@@ -69,7 +69,7 @@
 		<div class="box-cont">
 			<div class="header">
 				<h1>{carouselItems[1].header.title}</h1>
-				<a class="link" href="/explore"><small>See All</small></a>
+				<a class="link mx-2" href="/explore"><small>See All</small></a>
 			</div>
 			<box>
 				{#each carouselItems[1].results.slice(1, 15) as { color, endpoint: { params }, text }}
@@ -132,17 +132,21 @@
 		text-align: start;
 		font-size: 100%;
 		width: 100%;
-		border-radius: var(--md-radius) 0 0 var(--md-radius);
+		border-radius: var(--md-radius);
 
 		align-items: center;
 		border-right: none !important;
 		height: 3rem;
 		position: relative;
+		background: #9589b321;
+
 		.innerbox {
 			height: 100%;
 			padding: 0 0 0 1rem;
 			align-items: center;
-			border-radius: var(--md-radius) 0 0 var(--md-radius);
+			// border-radius: var(--md-radius) 0 0 var(--md-radius);
+			border-radius: 0 var(--md-radius) var(--md-radius) 0;
+
 			width: 100%;
 			display: flex;
 			position: absolute;
@@ -153,21 +157,19 @@
 
 			width: 100%;
 		}
-		&::before {
-			position: absolute;
-			top: 0;
-			right: 0;
-			border-radius: 0 var(--md-radius) var(--md-radius) 0;
+		// &::before {
+		// 	position: absolute;
+		// 	top: 0;
+		// 	right: 0;
 
-			bottom: 0;
-			left: 0;
-			content: '';
-			width: 100%;
+		// 	bottom: 0;
+		// 	left: 0;
+		// 	content: '';
+		// 	width: 100%;
 
-			z-index: 0;
-			height: 100%;
-			background: #9589b321;
-		}
+		// 	z-index: 0;
+		// 	height: 100%;
+		// }
 	}
 	.innerlink {
 		display: flex;

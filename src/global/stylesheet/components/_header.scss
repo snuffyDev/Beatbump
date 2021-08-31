@@ -1,8 +1,9 @@
 nav.nav {
+	will-change: contents;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	right: 0;
-	grid-template-areas: 'l m r';
+	grid-template-areas: "l m r";
 	height: 4rem;
 	z-index: 5;
 	justify-content: space-between;
@@ -71,7 +72,7 @@ nav.nav {
 		right: 0;
 		bottom: 0;
 		width: 100%;
-		content: '';
+		content: "";
 		z-index: -1;
 	}
 }

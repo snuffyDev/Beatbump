@@ -7,44 +7,43 @@ export async function get({ query }: { query: URLSearchParams }) {
 	const browseId = query.get('list') || ''
 	const itct = query.get('itct') || ''
 	const ctoken = query.get('ctoken') || ''
+	const referrer = query.get('ref') || ''
 
-	const response = await fetch(
-		'https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30' +
-			`${
-				ctoken !== ''
-					? `&ctoken=${ctoken}&continuation=${ctoken}&itct=${itct}&type=next`
-					: ''
-			}`,
-		{
-			method: 'POST',
-			body: JSON.stringify({
-				context: {
-					client: {
-						clientName: 'WEB_REMIX',
-						clientVersion: '0.1'
-					},
-
-					user: {
-						enableSafetyMode: false
-					}
-				},
-				browseId: `${browseId}`,
-				browseEndpointContextMusicConfig: {
-					pageType: 'MUSIC_PAGE_TYPE_PLAYLIST'
-				}
-			}),
-			headers: {
-				'Content-Type': 'application/json; charset=utf-8',
-				Origin: 'https://music.youtube.com'
-			}
-		}
-	)
-
-	if (!response.ok) {
-		return { status: response.status, body: response.statusText }
-	}
+	console.log(browseId, ctoken)
 
 	if (ctoken == '') {
+		const response = await fetch(
+			'https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
+			{
+				method: 'POST',
+				body: JSON.stringify({
+					context: {
+						client: {
+							clientName: 'WEB_REMIX',
+							clientVersion: '0.1'
+						},
+
+						user: {
+							enableSafetyMode: false
+						}
+					},
+					browseId: `${browseId}`,
+					browseEndpointContextMusicConfig: {
+						pageType: 'MUSIC_PAGE_TYPE_PLAYLIST'
+					}
+				}),
+				headers: {
+					'Content-Type': 'application/json; charset=utf-8',
+					Origin: 'https://music.youtube.com',
+					referer:
+						'https://music.youtube.com/playlist?list=' + referrer || browseId
+				}
+			}
+		)
+		if (!response.ok) {
+			return { status: response.status, body: response.statusText }
+		}
+		const data = await response.json()
 		let {
 			header: { musicDetailHeaderRenderer = {} } = {},
 			contents: {
@@ -65,15 +64,14 @@ export async function get({ query }: { query: URLSearchParams }) {
 					] = []
 				} = {}
 			} = {}
-		} = await response.json()
+		} = data
 
 		const {
 			contents: [{ musicPlaylistShelfRenderer: { contents = [] } = {} }] = [],
-			continuations = []
+			continuations
 		} = await sectionListRenderer
 		console.log(musicDetailHeaderRenderer)
-		const cont: NextContinuationData = (await continuations[0]
-			?.nextContinuationData)
+		const cont: NextContinuationData = continuations
 			? continuations[0]?.nextContinuationData
 			: ''
 		musicDetailHeaderRenderer = [musicDetailHeaderRenderer]
@@ -88,6 +86,7 @@ export async function get({ query }: { query: URLSearchParams }) {
 
 			secondSubtitle = pb(secondSubtitle, 'runs:text', false)
 			return {
+				data,
 				description,
 				subtitles,
 				thumbnails:
@@ -110,6 +109,7 @@ export async function get({ query }: { query: URLSearchParams }) {
 		return {
 			status: 200,
 			body: {
+				data,
 				continuations: cont,
 				tracks: Tracks,
 				header: parseHeader,
@@ -118,7 +118,37 @@ export async function get({ query }: { query: URLSearchParams }) {
 		}
 	}
 	if (ctoken !== '') {
-		console.log('contin')
+		const response = await fetch(
+			`https://music.youtube.com/youtubei/v1/browse?ctoken=${ctoken}` +
+				`&continuation=${ctoken}&type=next&itct=${itct}&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
+			{
+				method: 'POST',
+				body: JSON.stringify({
+					context: {
+						client: {
+							clientName: 'WEB_REMIX',
+							clientVersion: '0.1',
+
+							user: {
+								enableSafetyMode: false
+							}
+						}
+					}
+				}),
+				headers: {
+					'Content-Type': 'application/json; charset=utf-8',
+					Origin: 'https://music.youtube.com',
+					referer:
+						'https://music.youtube.com/playlist?list=' + referrer.slice(2) ||
+						browseId
+				}
+			}
+		)
+		if (!response.ok) {
+			return { status: response.status, body: response.statusText }
+		}
+
+		const data = await response.json()
 		const {
 			continuationContents: {
 				musicPlaylistShelfContinuation: {
@@ -126,16 +156,19 @@ export async function get({ query }: { query: URLSearchParams }) {
 					continuations = []
 				} = {}
 			} = {}
-		} = await response.json()
-		const cont: NextContinuationData = await continuations[0]
-			.nextContinuationData
-		const Tracks = parseTrack(contents.contents).filter((e) => {
-			return e != null
-		})
+		} = await data
+		// console.log(data, contents, continuations)
+		const cont: NextContinuationData =
+			continuations[0]?.nextContinuationData.length > 0
+				? continuations[0]?.nextContinuationData
+				: null
+		const Tracks = parseTrack(contents)
+		console.log(referrer.slice(1))
 		return {
 			status: 200,
 			body: {
 				continuations: cont,
+				data,
 				tracks: Tracks
 			}
 		}

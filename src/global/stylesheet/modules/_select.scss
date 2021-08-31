@@ -10,11 +10,11 @@
 	position: relative;
 	align-content: center;
 	font-family: var(--base-font-family);
-
+	will-change: contents;
 	-webkit-text-size-adjust: none;
 	border-radius: var(--md-radius);
 	grid-template-columns: 1fr 0.5px;
-	grid-template-areas: 'select end';
+	grid-template-areas: "select end";
 	border: 0.0625rem solid hsla(0, 0%, 66.7%, 0.219);
 	transition: all cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s;
 
@@ -29,7 +29,7 @@
 	}
 	&::after {
 		right: 0;
-		content: '';
+		content: "";
 		width: 0.6rem;
 		height: 0.5rem;
 		color: inherit;

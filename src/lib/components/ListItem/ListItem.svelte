@@ -16,9 +16,11 @@
 		})
 	}
 	let isHovering = false
+	let parent
 </script>
 
 <div
+	bind:this={parent}
 	class="item"
 	class:playing={$isPagePlaying == pageId && index == $key}
 	on:click={async () => {
@@ -41,41 +43,46 @@
 		}
 		dispatchPlaying()
 	}}
-	on:mouseenter={() => {
-		isHovering = true
-	}}
-	on:mouseleave={() => {
-		isHovering = false
-	}}
 >
-	<div class="item-wrapper">
+	<div
+		class="item-wrapper"
+		on:mouseenter|capture={(e) => {
+			if (parent && parent.contains(e.target)) isHovering = true
+		}}
+		on:mouseleave|capture={(e) => {
+			// isHovering = false
+			if (parent && parent.contains(e.target)) {
+				isHovering = true
+			}
+			isHovering = false
+		}}
+	>
 		<div class="number">
-			{#if isHovering}
-				<span>
-					<svelte:component this={Icon} class="icon" name="play" size="1.5em" />
-				</span>
-				<!-- content here -->
-			{:else}
-				<span>{index + 1}<!-- else content here --></span>
-			{/if}
+			<span class:hidden={!isHovering}>
+				<svelte:component this={Icon} class="icon" name="play" size="1.5em" />
+			</span>
+			<!-- content here -->
+			<span class:hidden={isHovering}
+				>{index + 1}<!-- else content here --></span
+			>
 		</div>
-		<span class="itemInfo">
-			<span class="item-title"
-				>{item.title}
+		<div class="itemInfo">
+			<div class="item-title">
+				{item.title}
 				{#if item.explicit}
 					<span class="explicit">
 						{item.explicit ? 'E' : ''}
 					</span>
 				{/if}
-			</span>
-			{#if item.artistNames || item.artistInfo?.artist}
-				<span class="artist"
-					>{item.artistNames ? item.artistNames : item.artistInfo.artist}</span
-				>
-			{:else}
-				<span class="artist">{item.artistInfo.artist}</span>
-			{/if}
-		</span>
+			</div>
+			<div class="artists">
+				{#if item.subtitle}
+					{#each item?.subtitle as subtitle}
+						<span class="artist">{subtitle.text}</span>
+					{/each}
+				{/if}
+			</div>
+		</div>
 		<span class="length" class:hidden={!item?.length ? true : false}
 			>{item?.length}</span
 		>
@@ -84,6 +91,8 @@
 
 <!-- markup (zero or more items) goes here -->
 <style lang="scss">
+	.artists {
+	}
 	.hidden {
 		display: none;
 		visibility: hidden;
@@ -216,11 +225,5 @@
 		align-self: center;
 
 		justify-self: center;
-		&:hover {
-			opacity: 0;
-			transition: all 75ms ease-in-out;
-			-moz-transition: opacity 75ms ease-in-out;
-			-webkit-transition: opacity 75ms ease-in-out;
-		}
 	}
 </style>

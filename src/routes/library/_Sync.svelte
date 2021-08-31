@@ -3,16 +3,65 @@
 	import Icon from '$lib/components/Icon/Icon.svelte'
 	import { createEventDispatcher, onMount } from 'svelte'
 	import { fade, fly } from 'svelte/transition'
-	// import { createSenderOffer, setRemoteDesc } from './_webRTC'
+	let createSenderOffer = () => {}
+	let setRemoteDesc = (offer: any) => {}
+	onMount(async () => {
+		const importFn = await import('./_webRTC')
+		createSenderOffer = await importFn.createSenderOffer
+		setRemoteDesc = await importFn.setRemoteDesc
+	})
+
 	let id = 'generate id'
 	let peerID = 'recipient id'
 	let peerOffer
 	let copyText = 'copy'
 	let offer
-
+	// type 'offer' = true | 'answer' = false
 	let type = false
 	$: stepCounter = 0
+	let localConn
+	let remoteConn
+	// ! RTC !
+	const config = { iceServers: [{ urls: 'stun:stun.1.google.com:19302' }] }
 
+	let dc
+	const local = async () => {
+		if (!browser) return
+		localConn = new RTCPeerConnection(config)
+		let remoteConn = new RTCPeerConnection(config)
+
+		let sendChannel = localConn.createDataChannel('transfer')
+		sendChannel.onopen = (e) => console.log('open! ' + e)
+
+		localConn.onicecandidate = (e) =>
+			!e.candidate ||
+			remoteConn.addIceCandidate(e.candidate).catch((err) => console.log(err))
+
+		localConn
+			.createOffer()
+			.then(async (offer) => {
+				const desc = await localConn.setLocalDescription(offer)
+				await postID(desc)
+				return desc
+			})
+			.then(() => remoteConn.setRemoteDescription(localConn.localDescription))
+			.then(async () => {
+				const answer = remoteConn.createAnswer()
+				await postID(answer)
+				return answer
+			})
+			.then((answer) => remoteConn.setLocalDescription(answer))
+			.then(() => localConn.setRemoteDescription(remoteConn.localDescription))
+			.catch((err) => console.log(err))
+	}
+
+	const remote = async () => {
+		// remoteConn.ondatachannel = receivedCb()
+		if (!browser) return
+		remoteConn.onicecandidate = (e) =>
+			!e.candidate ||
+			localConn.addIceCandidate(e.candidate).catch(handleAddCandidateError)
+	}
 	const ID = () => {
 		id = Math.random().toString(36).substr(2, 9)
 		return id
@@ -24,12 +73,51 @@
 			stepCounter++
 		}
 	}
+
+	async function postID(offer) {
+		const response = await fetch('/library/post.json', {
+			method: 'POST',
+			body: JSON.stringify({
+				item: {
+					key: id,
+					offer
+				}
+			})
+		})
+		const data = await response.json()
+		console.log(data)
+	}
+	const getID = async () => {
+		const response = await fetch(
+			'/library/get.json?id=' + encodeURIComponent(peerID),
+			{
+				method: 'GET'
+			}
+		)
+		const { data } = await response.json()
+		const offer = await data.offer.sdp
+		peerID = await data.key
+		console.log(offer)
+		if (offer) {
+			connect(offer)
+		}
+	}
+	async function connect(sdp) {
+		const connectIDs = await setRemoteDesc(sdp)
+		console.log(sdp, connectIDs)
+	}
+	function dcInit() {
+		if (!browser) return
+		dc = pc.createDataChannel('chat')
+		dc.onopen = () => console.log('Chat!')
+		dc.onmessage = (e) => console.log(e.data)
+	}
 	const dispatch = createEventDispatcher()
 </script>
 
-<div class="sync-wrapper" transition:fade>
-	<div class="backdrop" />
-	<div class="sync">
+<div class="backdrop" transition:fade />
+<div class="sync-wrapper">
+	<div class="sync" transition:fade>
 		<div
 			class="x-button"
 			on:click={() => {
@@ -82,22 +170,21 @@
 						</div>
 					</div>
 					<label for="radio">
-						<input id="radio" type="checkbox" bind:checked={type} />
+						<input id="radio" type="checkbox" bind:value={type} />
 					</label>
 					{type ? 'offer' : 'answer'}
 					<button
 						on:click={async () => {
 							if (!browser) return
-							// local()
+							local()
 							const id = ID()
-							// offer = await createSenderOffer()
-							// console.log(await id, await offer)
+							offer = await createSenderOffer()
+							console.log(await id, await offer)
 						}}>Generate</button
 					>
 					<button
 						on:click={() => {
-							// postID(offer)
-							alert('Not implemented yet!')
+							postID(offer)
 						}}>Post ID</button
 					>
 				</div>
@@ -125,21 +212,18 @@
 					<input
 						bind:value={peerID}
 						on:submit|preventDefault={async () => {
-							// getID()
-							alert('Coming soon!')
+							getID()
 						}}
 					/>
 					<button
 						on:click={async () => {
-							alert('Coming soon!')
-							// getID()
+							getID()
 						}}>Get Other ID</button
 					>
 					<button
 						on:click={() => {
 							console.log(peerOffer)
-							alert('Coming soon!')
-							// connect(peerOffer)
+							connect(peerOffer)
 						}}>Connect</button
 					>
 				</div>{:else if stepCounter == 3}{/if}
@@ -152,18 +236,10 @@
 
 <style lang="scss">
 	:root {
-		--padding: var(--md-spacing);
+		--padding: 0 var(--md-spacing) 0 var(--md-spacing);
 	}
 	.sync-wrapper {
-		position: fixed;
-		width: 100%;
-		height: 100%;
-		// max-height: 95%;
-		z-index: 1;
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
+		position: relative;
 	}
 	.backdrop {
 		z-index: 1;
@@ -203,7 +279,7 @@
 	}
 	.sync {
 		display: flex;
-		position: absolute;
+		position: fixed;
 		transform: translate(-50%, -50%);
 		top: 50%;
 		left: 50%;
@@ -215,20 +291,17 @@
 		// justify-content: space-between;
 		border: rgba(170, 170, 170, 0.068) 1px solid;
 		box-shadow: 0 0 1rem 0rem rgba(41, 41, 41, 0.116);
-		// height: 75%;
-
+		height: 75%;
 		min-height: 50%;
+		max-height: 100%;
 		border-radius: var(--lg-radius);
 		background: var(--dark-top);
 		@media only screen and (max-width: 640px) {
-			// top: 25%;
-			// top: 0;
-			// left: 0;
+			top: 25%;
+			left: 0;
 			width: 100%;
-			// bottom: 0;
-			// overflow-y: hidden;
-			// height: 100%;
-			// transform: translate(0, 0);
+			height: 45%;
+			transform: translate(0, 0);
 		}
 	}
 	.x-button {
@@ -245,8 +318,6 @@
 	.content {
 		// margin-bottom: 100%;
 		position: relative;
-		// max-height: 100%;
-
 		// width: 95%;
 		// padding: 1.25rem;
 		// border-radius: var(--lg-radius);
@@ -256,29 +327,23 @@
 	}
 	.screen-wrapper {
 		height: 100%;
-		// width: 100%;
+		width: 100%;
 		position: relative;
 	}
 	.next {
-		margin-top: 1rem;
+		margin-top: auto;
 		margin-bottom: 1rem;
-		// padding-top: 100%;
 	}
 	.nextbtn {
 		width: 100%;
 	}
 	.screen {
-		// position: absolute;
-		max-height: 100%;
-		width: 100%;
-		// position: relative;
+		position: absolute;
 		top: 0;
 		right: 0;
 		bottom: 0;
 		left: 0;
-		display: flex;
-		flex-wrap: nowrap;
-		flex-direction: column;
+
 		// height: 100%;
 		// height: 100%;
 	}

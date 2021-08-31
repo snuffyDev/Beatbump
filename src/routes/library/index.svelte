@@ -11,7 +11,7 @@
 	import Sync from './_Sync.svelte'
 	let favorites: any[] | string = []
 	let playlists = []
-	let sync = true
+	let sync = false
 	onMount(async () => {
 		favorites = await db.getFavorites()
 		console.log(favorites)

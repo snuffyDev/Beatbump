@@ -42,6 +42,7 @@
 	$: id = id
 	let width
 	const ctx = {}
+	$: console.log(songs)
 	setContext(ctx, { pageId: id })
 </script>
 

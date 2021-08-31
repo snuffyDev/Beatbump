@@ -5,6 +5,7 @@
 			tracks,
 			header,
 			continuations,
+			data,
 			musicDetailHeaderRenderer
 		} = await res.json()
 		if (!res.ok) {
@@ -16,6 +17,7 @@
 		return {
 			props: {
 				tracks: await tracks,
+				data: await data,
 				continuations: await continuations,
 				header: await header,
 				musicDetailHeaderRenderer,
@@ -29,7 +31,7 @@
 
 <script lang="ts">
 	import ListItem from '$components/ListItem/ListItem.svelte'
-
+	import List from './_List.svelte'
 	import list from '$lib/stores/list'
 	import { currentTitle, isPagePlaying } from '$lib/stores/stores'
 	import type { Header } from '$lib/types/playlist'
@@ -37,18 +39,26 @@
 	import type { Item } from '$lib/types'
 
 	import InfoBox from '$lib/components/Layouts/InfoBox.svelte'
+	import { writable } from 'svelte/store'
 	export let tracks: Item[]
 	export let header: Header
+	export let data
 	export let id
 	export let musicDetailHeaderRenderer
 	export let continuations
+	let ctoken = continuations.continuation
+	let itct = continuations.clickTrackingParams
 	let width
 	let pageTitle = header?.title
 	let description
 	$: id = id
+	let isLoading = false
+	let hasData = false
 	const ctx = {}
+	const trackStore = writable([])
+	trackStore.set(tracks)
 	setContext(ctx, { pageId: id })
-	console.log(tracks, continuations, header, musicDetailHeaderRenderer)
+	console.log(data, tracks, continuations, header, musicDetailHeaderRenderer)
 
 	onMount(() => {
 		pageTitle =
@@ -58,6 +68,33 @@
 				? header.description.substring(0, 240) + '...'
 				: header.description
 	})
+	let test
+	const getContinuation = async () => {
+		if (isLoading || hasData) return
+		isLoading = true
+		const response = await fetch(
+			'/api/playlist.json' +
+				'?ref=' +
+				id +
+				`${ctoken ? `&ctoken=${encodeURIComponent(ctoken)}` : ''}` +
+				'&itct=' +
+				itct
+		)
+		const data = await response.json()
+		const continuationItems = data.tracks
+		if (data.continuations) {
+			ctoken = data.continuations.continuation
+			console.log(data.data)
+			itct = data.continuations.clickTrackingParams
+		}
+		trackStore.update((t) => [...t, ...continuationItems])
+		isLoading = false
+		hasData = data.length === 0
+
+		console.log(data, tracks, continuations, ctoken)
+
+		return !isLoading
+	}
 </script>
 
 <svelte:head>
@@ -93,21 +130,32 @@
 			]}
 		/>
 
-		{#each tracks as res, i}
+		<List
+			items={$trackStore}
+			bind:isLoading
+			on:getMore={async () => await getContinuation()}
+			bind:hasData
+			let:item
+			let:index
+		>
 			<ListItem
 				{ctx}
 				page="playlist"
 				on:pagePlaying={() => {
 					isPagePlaying.set(id)
 				}}
-				item={res}
-				index={i}
+				{item}
+				{index}
 			/>
-		{/each}
+		</List>
 	</main>
 {:catch error}
 	{error}
 {/await}
 
 <style lang="scss">
+	.list {
+		display: block;
+		height: 100%;
+	}
 </style>

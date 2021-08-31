@@ -6,10 +6,11 @@
 	export let text = ''
 	export let icon = ''
 
-	getContext('menu')
+	const { update } = getContext('menu')
+	$: console.log(update)
 </script>
 
-<div class="dd-item" on:click>
+<div class="dd-item" on:click={() => (update = !update)} on:click>
 	<Icon name={icon} size="1.5em" />
 	<div class="dd-text">{text}</div>
 </div>

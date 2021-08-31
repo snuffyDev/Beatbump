@@ -21,7 +21,7 @@
 	margin: 0;
 	border-bottom: 0.0714rem solid #2a2b30;
 	color: #fff9f9;
-
+	will-change: contents;
 	position: relative;
 	&:hover {
 		color: #fcf6f6;

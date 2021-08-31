@@ -40,6 +40,7 @@
 		{header.title}
 	</h1>
 	{#if header.browseId}<a
+			class="mx-2"
 			href={header.browseId?.includes('VLP')
 				? `/playlist?list=${header?.browseId}`
 				: `/trending/new/${header?.browseId}${
@@ -183,21 +184,23 @@
 	}
 	.scroll {
 		background: #453d5d2e;
+
 		grid-column-gap: 0.5rem;
-		overflow-y: hidden;
+		/* overflow-y: hidden; */
+		overflow-x: hidden;
 		height: auto;
-
-		display: grid;
-
-		grid-auto-flow: column;
-
+		display: flex;
+		/* grid-auto-flow: column; */
 		overflow-x: scroll;
-		grid-template-columns: repeat(auto, 1fr);
+		grid-template-rows: 1fr;
 		padding-top: 1rem;
 		width: auto;
+		-ms-scroll-snap-type: x mandatory;
 		scroll-snap-type: x mandatory;
 		border-radius: inherit;
 		overflow-anchor: none;
 		-webkit-overflow-scrolling: touch;
+		flex-direction: row;
+		flex-wrap: nowrap;
 	}
 </style>

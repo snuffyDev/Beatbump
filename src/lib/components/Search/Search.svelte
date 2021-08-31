@@ -36,6 +36,7 @@
 		goto(url)
 	}
 	const typeahead = debounce(async () => {
+		if (query == '' || undefined) return (results = [])
 		const response = await fetch(
 			'/api/get_search_suggestions.json?q=' + encodeURIComponent(query)
 		)
@@ -57,7 +58,7 @@
 				type="search"
 				placeholder="Search"
 				on:keyup={(e) => {
-					if (e.shiftKey && e.ctrlKey) return
+					if (e.shiftKey && e.ctrlKey && e.repeat) return
 					typeahead()
 				}}
 				bind:value={query}
