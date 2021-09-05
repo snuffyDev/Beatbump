@@ -1,27 +1,35 @@
 <script context="module">
-	export const ssr = false
+	export const ssr = true
 </script>
 
 <script lang="ts">
 	import { browser } from '$app/env'
 
 	import Listing from '$lib/components/Item/Listing.svelte'
-	import type { Item } from '$lib/types'
+	// import type { Item } from '$lib/types'
 	import db from '$lib/db'
 
-	import { onMount, setContext } from 'svelte'
+	import { onMount, setContext, getContext } from 'svelte'
+	import type { Writable } from 'svelte/store'
 	import Sync from './_Sync.svelte'
 	$: favorites = []
 	let playlists = []
+
 	$: sync = false
+
 	setContext('library', { isLibrary: true })
-	onMount(async () => {
-		favorites = await db.getFavorites()
-		console.log(favorites)
-	})
+
 	const updateFavorites = async () => {
 		favorites = await db.getFavorites()
+		favorites = [...favorites.slice(0, 5)]
+		return favorites
 	}
+	// let lib: Writable<[]> = getContext('db')
+	onMount(async () => {
+		updateFavorites()
+	})
+
+	// $: if (lib !== undefined) console.log(fv, $fv)
 </script>
 
 {#if sync && browser}
@@ -32,31 +40,33 @@
 		}}
 	/>
 {/if}
-<main>
-	<h1>Your Library</h1>
+<h1>Your Library</h1>
+
+<section>
+	<div class="header">
+		<h2>Your Songs</h2>
+		<a href="/library/songs"><small>See All</small></a>
+	</div>
+	<div class="list">
+		{#each favorites as favorite}
+			<Listing
+				on:update={() => {
+					updateFavorites()
+				}}
+				data={favorite}
+			/>
+		{/each}
+	</div>
 	<button
 		on:click={() => {
 			sync = true
 		}}>Sync to another device</button
 	>
-	<section>
-		<h2>Your Favorites</h2>
-		<div class="list">
-			{#each favorites as favorite}
-				<Listing
-					on:update={() => {
-						updateFavorites()
-					}}
-					data={favorite}
-				/>
-			{/each}
-		</div>
-	</section>
-	<section>
-		<h2>Your Playlists</h2>
-		<em>Coming soon!</em>
-	</section>
-</main>
+</section>
+<section>
+	<h2>Your Playlists</h2>
+	<em>Coming soon!</em>
+</section>
 
 <style lang="scss">
 	section {
@@ -65,5 +75,9 @@
 	}
 	.list {
 		min-height: 15%;
+		margin-bottom: 1rem;
+	}
+	header {
+		display: inline;
 	}
 </style>

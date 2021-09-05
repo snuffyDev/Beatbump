@@ -6,6 +6,8 @@
 	import Peer from 'peerjs?client'
 	import db from '$lib/db'
 	import { alertHandler } from '$lib/stores/stores'
+
+	// }
 	let peer
 	// $: Peer = undefined
 
@@ -142,10 +144,11 @@
 							</div>
 						</div>
 					</div>
-					<label for="radio">
+					<div class="container">
 						I am {type ? 'Sending' : 'Receiving'}:
-					</label>
-					<input id="radio" type="checkbox" bind:value={type} />
+						<input id="radio" type="checkbox" bind:checked={type} />
+						<label for="radio" />
+					</div>
 					<button
 						on:click={async () => {
 							if (!browser) return
@@ -179,6 +182,9 @@
 						class="input"
 						placeholder="other device id"
 						type="text"
+						autocapitalize="off"
+						autocomplete="off"
+						pattern="[A-Za-z0-9_-]+"
 						on:submit|preventDefault={async () => {
 							connect()
 						}}
@@ -198,6 +204,53 @@
 </div>
 
 <style lang="scss">
+	.container {
+		display: flex;
+		margin-bottom: 0.5rem;
+	}
+	input[type='checkbox'] {
+		margin-left: var(--md-spacing);
+		margin-bottom: 1.2rem;
+
+		height: 0;
+		width: 0;
+		visibility: hidden;
+	}
+	input:checked + label::after {
+		left: calc(100% - 0.333333rem);
+		transform: translateX(-100%);
+	}
+	input:checked + label {
+		background-color: #4a7eb2;
+	}
+
+	label:active::after {
+		// width: .03333333rem;
+	}
+	label {
+		background-color: #444857;
+		border-radius: 10rem;
+		position: relative;
+		cursor: pointer;
+		transition: 0.25s;
+		// box-shadow: 0 0 1.2rem #477a8550;
+		display: block;
+		width: 5rem;
+		height: 2.1rem;
+
+		&::after {
+			content: '';
+			width: 1.25rem;
+			height: 1.25rem;
+			background-color: #e8f5f7;
+			position: absolute;
+			border-radius: 5.833333rem;
+			top: 20%;
+			left: 0.3125rem;
+			transition: 0.25s;
+		}
+	}
+
 	.input {
 		background-color: #2929298e !important;
 		margin-bottom: 0.5rem;
@@ -217,10 +270,12 @@
 	}
 	.backdrop {
 		z-index: 1;
-		position: absolute;
+		position: fixed;
+		overflow: hidden;
 		height: 100%;
 		width: 100%;
 		background: #0000009c;
+		overflow: hidden;
 	}
 	code {
 		background: rgba(41, 41, 41, 0.555);
