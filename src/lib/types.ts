@@ -14,7 +14,7 @@ export interface ICarousel {
 	results: Array<CarouselItem & MoodsAndGenresItem>
 	isBrowse?: boolean
 }
-export type Item = Song & PlaylistSearch & CarouselItem
+export type Item = Song & PlaylistSearch & CarouselItem & Record<string, any[]>
 
 export interface Album {
 	browseId: string

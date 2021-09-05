@@ -5,7 +5,6 @@
 	import db from '$lib/db'
 	import lazy from '$lib/lazy'
 	import list from '$lib/stores/list'
-	import type { CarouselItem } from '$lib/types'
 	import { alertHandler, key } from '$stores/stores'
 	import { tick } from 'svelte'
 	import { fade } from 'svelte/transition'
@@ -71,16 +70,23 @@
 					url: `https://beatbump.ml/listen?id=${item.videoId}`
 				}
 				try {
-					let isShared
-					isShared = await navigator.share(shareData)
-
-					alertHandler.set({ msg: 'Shared Successfully!', type: 'success' })
+					if (!navigator.canShare) {
+						await navigator.clipboard.writeText(shareData.url)
+						alertHandler.set({
+							msg: 'Link copied Successfully!',
+							type: 'success'
+						})
+					} else {
+						const share = await navigator.share(shareData)
+						alertHandler.set({ msg: 'Shared Successfully!', type: 'success' })
+					}
 				} catch (error) {
 					alertHandler.set({ msg: 'Error!' + error, type: 'error' })
 				}
 			}
 		}
 	]
+
 	type CustomEvent = Event & {
 		currentTarget: EventTarget & HTMLImageElement
 	}

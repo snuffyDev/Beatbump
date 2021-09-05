@@ -5,6 +5,7 @@ import autoprefixer from 'autoprefixer'
 import cssnano from 'cssnano'
 import path from 'path'
 import sveltePreprocess from 'svelte-preprocess'
+import { isoImport } from 'vite-plugin-iso-import'
 
 const check = process.env.NODE_ENV
 const dev = check === 'development'
@@ -43,6 +44,7 @@ export default {
 					$components: path.resolve('./src/lib/components')
 				}
 			},
+			plugins: [isoImport()],
 			cleanCssOptions: {
 				level: {
 					2: {

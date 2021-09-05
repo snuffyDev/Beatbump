@@ -30,5 +30,6 @@
 	div {
 		display: block;
 		height: 100%;
+		position: relative;
 	}
 </style>

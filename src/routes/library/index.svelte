@@ -5,21 +5,32 @@
 <script lang="ts">
 	import { browser } from '$app/env'
 
-	import Item from '$lib/components/Item/Item.svelte'
+	import Listing from '$lib/components/Item/Listing.svelte'
+	import type { Item } from '$lib/types'
 	import db from '$lib/db'
-	import { onMount } from 'svelte'
+
+	import { onMount, setContext } from 'svelte'
 	import Sync from './_Sync.svelte'
-	let favorites: any[] | string = []
+	$: favorites = []
 	let playlists = []
-	let sync = false
+	$: sync = false
+	setContext('library', { isLibrary: true })
 	onMount(async () => {
 		favorites = await db.getFavorites()
 		console.log(favorites)
 	})
+	const updateFavorites = async () => {
+		favorites = await db.getFavorites()
+	}
 </script>
 
 {#if sync && browser}
-	<Sync on:close={() => (sync = !sync)} />
+	<Sync
+		on:close={() => {
+			updateFavorites()
+			sync = !sync
+		}}
+	/>
 {/if}
 <main>
 	<h1>Your Library</h1>
@@ -32,7 +43,12 @@
 		<h2>Your Favorites</h2>
 		<div class="list">
 			{#each favorites as favorite}
-				<Item data={favorite} />
+				<Listing
+					on:update={() => {
+						updateFavorites()
+					}}
+					data={favorite}
+				/>
 			{/each}
 		</div>
 	</section>

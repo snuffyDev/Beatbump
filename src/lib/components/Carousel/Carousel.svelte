@@ -40,7 +40,7 @@
 		{header.title}
 	</h1>
 	{#if header.browseId}<a
-			class="mx-2"
+			style="white-space:pre;"
 			href={header.browseId?.includes('VLP')
 				? `/playlist?list=${header?.browseId}`
 				: `/trending/new/${header?.browseId}${

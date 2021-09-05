@@ -17,9 +17,19 @@ An Alternative frontend for YouTube Music created using Svelte/SvelteKit, and po
 - Search for songs, playlists, and videos
   - Note: all content is audio-only.
 - View Artist pages for your favorite content
+- Personal Library
+	- Hear a song you like? Save it for later by adding it to your favorites!
+	- Synchronize your library across your devices!
+	-***custom playlists - coming soon***
 - Uses a custom wrapper around the YouTube Music API
 - Multiple themes
 
+## Privacy
+
+All data is stored locally on your device. Data synchronization is done using PeerJS, which uses WebRTC for a peer-to-peer connection between browsers.
+## Libraries used
+
+- [PeerJS](https://www.npmjs.com/package/peerjs) - WebRTC data synchronization
 ## Contributing
 
 This project is in it's infancy, so for stability reasons, this repository is currently not accepting pull requests for now. You can download the repo and modify the code to fit your needs best.

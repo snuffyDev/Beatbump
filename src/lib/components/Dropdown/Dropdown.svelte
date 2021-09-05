@@ -37,6 +37,7 @@
 			{#each items as item}
 				<DropdownItem
 					on:click={item.action}
+					on:click={() => (isHidden = false)}
 					text={item.text}
 					icon={item.icon}
 				/>

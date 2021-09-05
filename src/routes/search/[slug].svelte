@@ -43,7 +43,7 @@
 	import { currentTitle, search } from '$stores/stores'
 	import { page } from '$app/stores'
 	import { invalidate } from '$app/navigation'
-	import Item from '$components/Item/Item.svelte'
+	import Listing from '$components/Item/Listing.svelte'
 	import type { NextContinuationData, Song } from '$lib/types'
 	import VirtualList from '$lib/components/SearchList/VirtualList.svelte'
 	import { onMount } from 'svelte'
@@ -154,7 +154,7 @@
 			{items}
 			let:item
 		>
-			<Item data={item} />
+			<Listing data={item} />
 		</VirtualList>
 	</main>
 {/if}

@@ -30,7 +30,8 @@
 			"$components/*": ["src/lib/components/*"],
 			"$stores/*": ["src/lib/stores/*"],
 			"$api/*": ["src/routes/api/*"]
-		}
+		},
+		"plugins": [{ "name": "vite-plugin-iso-import" }]
 	},
 	"include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"]
 }

@@ -69,7 +69,9 @@
 		<div class="box-cont">
 			<div class="header">
 				<h1>{carouselItems[1].header.title}</h1>
-				<a class="link mx-2" href="/explore"><small>See All</small></a>
+				<a style="white-space:pre" class="link" href="/explore"
+					><small>See All</small></a
+				>
 			</div>
 			<box>
 				{#each carouselItems[1].results.slice(1, 15) as { color, endpoint: { params }, text }}

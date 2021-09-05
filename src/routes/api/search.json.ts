@@ -123,9 +123,6 @@ const parsePlaylist = (contents): PlaylistSearch[] => {
 				musicResponsiveListItemRenderer.menu?.menuRenderer?.items[0]
 					?.menuNavigationItemRenderer?.navigationEndpoint
 					?.watchPlaylistEndpoint?.playlistId,
-			hash:
-				Math.random().toString(36).substring(2, 15) +
-				Math.random().toString(36).substring(2, 15),
 			title: title,
 			type: 'playlist'
 		}
@@ -208,10 +205,7 @@ const parseSong = (contents, type): Song[] => {
 			type: type,
 			params: params,
 			length: length,
-			index: i++,
-			hash:
-				Math.random().toString(36).substring(2, 15) +
-				Math.random().toString(36).substring(2, 15)
+			index: i++
 		}
 	})
 }

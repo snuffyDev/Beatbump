@@ -9,7 +9,7 @@ const directives = {
 	'child-src': ["'self'"],
 	'connect-src': dev
 		? ["'self'", 'ws://localhost:*', 'ws://*', '*']
-		: ["'self'", 'ws://localhost:*'],
+		: ["'self'", 'ws://localhost:*', 'wss://*.peerjs.com', 'ws://*.peerjs.com'],
 	// 'connect-src': ,
 	'img-src': [
 		"'self'",

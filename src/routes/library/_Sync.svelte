@@ -3,68 +3,29 @@
 	import Icon from '$lib/components/Icon/Icon.svelte'
 	import { createEventDispatcher, onMount } from 'svelte'
 	import { fade, fly } from 'svelte/transition'
-	let createSenderOffer = () => {}
-	let setRemoteDesc = (offer: any) => {}
-	onMount(async () => {
-		const importFn = await import('./_webRTC')
-		createSenderOffer = await importFn.createSenderOffer
-		setRemoteDesc = await importFn.setRemoteDesc
-	})
+	import Peer from 'peerjs?client'
+	import db from '$lib/db'
+	import { alertHandler } from '$lib/stores/stores'
+	let peer
+	// $: Peer = undefined
 
 	let id = 'generate id'
-	let peerID = 'recipient id'
+	let peerID = ''
 	let peerOffer
 	let copyText = 'copy'
+	$: completed = false
 	let offer
-	// type 'offer' = true | 'answer' = false
-	let type = false
+	// type 'connect' = true | 'reciever' = false
+	$: type = false
 	$: stepCounter = 0
-	let localConn
-	let remoteConn
-	// ! RTC !
-	const config = { iceServers: [{ urls: 'stun:stun.1.google.com:19302' }] }
 
-	let dc
-	const local = async () => {
-		if (!browser) return
-		localConn = new RTCPeerConnection(config)
-		let remoteConn = new RTCPeerConnection(config)
-
-		let sendChannel = localConn.createDataChannel('transfer')
-		sendChannel.onopen = (e) => console.log('open! ' + e)
-
-		localConn.onicecandidate = (e) =>
-			!e.candidate ||
-			remoteConn.addIceCandidate(e.candidate).catch((err) => console.log(err))
-
-		localConn
-			.createOffer()
-			.then(async (offer) => {
-				const desc = await localConn.setLocalDescription(offer)
-				await postID(desc)
-				return desc
-			})
-			.then(() => remoteConn.setRemoteDescription(localConn.localDescription))
-			.then(async () => {
-				const answer = remoteConn.createAnswer()
-				await postID(answer)
-				return answer
-			})
-			.then((answer) => remoteConn.setLocalDescription(answer))
-			.then(() => localConn.setRemoteDescription(remoteConn.localDescription))
-			.catch((err) => console.log(err))
-	}
-
-	const remote = async () => {
-		// remoteConn.ondatachannel = receivedCb()
-		if (!browser) return
-		remoteConn.onicecandidate = (e) =>
-			!e.candidate ||
-			localConn.addIceCandidate(e.candidate).catch(handleAddCandidateError)
-	}
 	const ID = () => {
-		id = Math.random().toString(36).substr(2, 9)
-		return id
+		if (!Peer && !browser) return
+		id = 'bb-' + Math.random().toString(36).substr(2, 7)
+		peer = new Peer(id)
+		console.log(peer, id)
+
+		return 'bb-' + id
 	}
 	const nextStep = () => {
 		if (stepCounter == 2) {
@@ -74,18 +35,46 @@
 		}
 	}
 
-	async function postID(offer) {
-		const response = await fetch('/library/post.json', {
-			method: 'POST',
-			body: JSON.stringify({
-				item: {
-					key: id,
-					offer
-				}
+	async function connect() {
+		if (!browser) return
+		// !type === connect
+		// type === receiver
+		if (!type) {
+			peer.on('connection', (conn) => {
+				conn.on('data', async (data) => {
+					// Will print 'hi!'
+					await db.setMultiple(JSON.parse(data))
+					alertHandler.set({ msg: 'Data sync completed!', type: 'success' })
+					console.log('received data' + data)
+					setTimeout(() => {
+						completed = true
+						alertHandler.set({
+							msg: 'Data sync complete! Closing connection...',
+							type: 'success'
+						})
+					}, 1250)
+				})
+				conn.on('open', () => {
+					alertHandler.set({ msg: 'Connection established!', type: 'success' })
+					// conn.send('hello!')
+				})
 			})
-		})
-		const data = await response.json()
-		console.log(data)
+			if (completed === true) {
+				peer.destroy()
+				dispatch('close')
+			}
+		} else {
+			const information = await db.getFavorites()
+			const chData = JSON.stringify(information)
+			const conn = peer.connect(peerID)
+			conn.on('open', () => {
+				conn.send(chData)
+			})
+			conn.on('close', () => {
+				peer.destroy()
+				dispatch('close')
+			})
+		}
 	}
 	const getID = async () => {
 		const response = await fetch(
@@ -94,24 +83,8 @@
 				method: 'GET'
 			}
 		)
-		const { data } = await response.json()
-		const offer = await data.offer.sdp
-		peerID = await data.key
-		console.log(offer)
-		if (offer) {
-			connect(offer)
-		}
 	}
-	async function connect(sdp) {
-		const connectIDs = await setRemoteDesc(sdp)
-		console.log(sdp, connectIDs)
-	}
-	function dcInit() {
-		if (!browser) return
-		dc = pc.createDataChannel('chat')
-		dc.onopen = () => console.log('Chat!')
-		dc.onmessage = (e) => console.log(e.data)
-	}
+
 	const dispatch = createEventDispatcher()
 </script>
 
@@ -128,7 +101,7 @@
 		</div>
 		<div class="screen-wrapper" id="sWrapper">
 			{#if stepCounter == 0}
-				<div class="screen" transition:fly>
+				<div class="screen">
 					<div class="content">
 						<h1>Sync your data</h1>
 						<div class="subheading">Follow these steps on both devices</div>
@@ -139,7 +112,7 @@
 					</div>
 				</div>
 			{:else if stepCounter == 1}
-				<div class="screen" transition:fly>
+				<div class="screen">
 					<div class="content">
 						<h1>Generate an ID</h1>
 						<div class="subheading">This ID will help connect your devices</div>
@@ -170,26 +143,18 @@
 						</div>
 					</div>
 					<label for="radio">
-						<input id="radio" type="checkbox" bind:value={type} />
+						I am {type ? 'Sending' : 'Receiving'}:
 					</label>
-					{type ? 'offer' : 'answer'}
+					<input id="radio" type="checkbox" bind:value={type} />
 					<button
 						on:click={async () => {
 							if (!browser) return
-							local()
-							const id = ID()
-							offer = await createSenderOffer()
-							console.log(await id, await offer)
+							ID()
 						}}>Generate</button
-					>
-					<button
-						on:click={() => {
-							postID(offer)
-						}}>Post ID</button
 					>
 				</div>
 			{:else if stepCounter == 2}
-				<div class="screen" transition:fly>
+				<div class="screen">
 					<div class="content">
 						<h1>Get the other ID</h1>
 						<div class="subheading">Let's find the other device</div>
@@ -211,19 +176,17 @@
 					</div>
 					<input
 						bind:value={peerID}
+						class="input"
+						placeholder="other device id"
+						type="text"
 						on:submit|preventDefault={async () => {
-							getID()
+							connect()
 						}}
 					/>
-					<button
-						on:click={async () => {
-							getID()
-						}}>Get Other ID</button
-					>
+
 					<button
 						on:click={() => {
-							console.log(peerOffer)
-							connect(peerOffer)
+							connect()
 						}}>Connect</button
 					>
 				</div>{:else if stepCounter == 3}{/if}
@@ -235,11 +198,22 @@
 </div>
 
 <style lang="scss">
+	.input {
+		background-color: #2929298e !important;
+		margin-bottom: 0.5rem;
+	}
 	:root {
 		--padding: 0 var(--md-spacing) 0 var(--md-spacing);
 	}
 	.sync-wrapper {
-		position: relative;
+		position: absolute;
+		display: grid;
+		align-items: center;
+		justify-items: center;
+		width: 100%;
+		height: 100%;
+		max-height: 100%;
+		grid-template-columns: 1fr;
 	}
 	.backdrop {
 		z-index: 1;
@@ -278,30 +252,32 @@
 		margin-left: 1rem;
 	}
 	.sync {
-		display: flex;
-		position: fixed;
-		transform: translate(-50%, -50%);
-		top: 50%;
-		left: 50%;
-		flex-direction: column;
+		position: relative;
+		top: 0;
+		/* left: 50%; */
+		bottom: 0;
+		min-height: 0;
+		/* transform: translate(-50%,-50%); */
+		flex-direction: row;
+		flex-wrap: wrap;
 		z-index: 5;
 		padding: var(--padding);
-
 		width: 50%;
-		// justify-content: space-between;
-		border: rgba(170, 170, 170, 0.068) 1px solid;
-		box-shadow: 0 0 1rem 0rem rgba(41, 41, 41, 0.116);
-		height: 75%;
-		min-height: 50%;
-		max-height: 100%;
+		flex: 1 1 100%;
+		border: 1px solid #aaa1;
+		transform-origin: top;
+		box-shadow: 0 0 1rem 0 rgb(41 41 41 / 12%);
+		/* max-height: 100%; */
+		/* min-height: 100%; */
 		border-radius: var(--lg-radius);
 		background: var(--dark-top);
 		@media only screen and (max-width: 640px) {
-			top: 25%;
+			top: 0;
 			left: 0;
 			width: 100%;
-			height: 45%;
-			transform: translate(0, 0);
+			// height: 100%;
+			min-height: 0;
+			// transform: translate(0, 10vh);
 		}
 	}
 	.x-button {
@@ -316,14 +292,10 @@
 		font-size: 1.5rem;
 	}
 	.content {
-		// margin-bottom: 100%;
 		position: relative;
-		// width: 95%;
-		// padding: 1.25rem;
-		// border-radius: var(--lg-radius);
-		// background: rgba(170, 170, 170, 0.034);
 		background-clip: content-box;
 		padding-top: 1rem;
+		min-height: 0;
 	}
 	.screen-wrapper {
 		height: 100%;
@@ -331,21 +303,20 @@
 		position: relative;
 	}
 	.next {
-		margin-top: auto;
+		margin-top: 1rem;
 		margin-bottom: 1rem;
 	}
 	.nextbtn {
 		width: 100%;
 	}
 	.screen {
-		position: absolute;
+		/* position: absolute; */
 		top: 0;
 		right: 0;
 		bottom: 0;
 		left: 0;
-
-		// height: 100%;
-		// height: 100%;
+		height: 100%;
+		width: 100%;
 	}
 	p {
 		margin: 0 0 var(--md-spacing) 0;

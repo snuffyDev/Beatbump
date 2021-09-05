@@ -2,8 +2,9 @@
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 
 	export let data: Item
+
 	import Loading from '$components/Loading/Loading.svelte'
-	import { onMount, tick } from 'svelte'
+	import { hasContext, onMount, tick } from 'svelte'
 
 	import { alertHandler, key, theme } from '$stores/stores'
 	import Icon from '$components/Icon/Icon.svelte'
@@ -12,7 +13,10 @@
 	import type { Item } from '$lib/types'
 	import longpress from '$lib/actions/longpress'
 	import db from '$lib/db'
-
+	import { browser } from '$app/env'
+	import { createEventDispatcher } from 'svelte'
+	const dispatch = createEventDispatcher()
+	let isLibrary
 	let videoId = ''
 	let playlistId = ''
 	let songTitle = ''
@@ -26,6 +30,9 @@
 	onMount(() => {
 		itemHandler()
 	})
+	if (hasContext('library')) {
+		isLibrary = true
+	}
 	let DropdownItems = [
 		{
 			text: 'View Artist',
@@ -61,11 +68,16 @@
 			action: () => list.addNext(data, $key)
 		},
 		{
-			text: 'Favorite',
+			text: !isLibrary ? 'Favorite' : 'Remove from Favorites',
 			icon: 'heart',
-			action: () => {
-				console.log(data)
-				db.setNewFavorite(data)
+			action: async () => {
+				// console.log(data)
+				if (!browser) return
+				!isLibrary && (await db.setNewFavorite(data))
+				if (isLibrary) {
+					await db.deleteFavorite(data)
+					dispatch('update')
+				}
 			}
 		},
 		{
@@ -78,9 +90,16 @@
 					url: `https://beatbump.ml/listen?id=${data.videoId}`
 				}
 				try {
-					const share = await navigator.share(shareData)
-
-					alertHandler.set({ msg: 'Shared Successfully!', type: 'success' })
+					if (!navigator.canShare) {
+						await navigator.clipboard.writeText(shareData.url)
+						alertHandler.set({
+							msg: 'Link copied Successfully!',
+							type: 'success'
+						})
+					} else {
+						const share = await navigator.share(shareData)
+						alertHandler.set({ msg: 'Shared Successfully!', type: 'success' })
+					}
 				} catch (error) {
 					alertHandler.set({ msg: 'Error!', type: 'error' })
 				}

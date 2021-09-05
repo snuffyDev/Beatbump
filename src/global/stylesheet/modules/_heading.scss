@@ -1,7 +1,19 @@
 .header {
 	display: flex;
+	/* grid-template-columns: 1fr auto; */
 	font-weight: 600;
 	margin-bottom: 0.5rem;
 	padding: 0.4rem 0.4rem 0.2rem;
-	align-items: center;
+	/* white-space: pre; */
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	align-items: baseline;
+	h1 {
+		margin-right: 1.38rem;
+		margin-bottom: 0;
+	}
+	a {
+		margin: 0 0 1.38rem;
+	}
 }
