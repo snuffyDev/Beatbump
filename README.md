@@ -20,7 +20,7 @@ An Alternative frontend for YouTube Music created using Svelte/SvelteKit, and po
 - Personal Library
 	- Hear a song you like? Save it for later by adding it to your favorites!
 	- Synchronize your library across your devices!
-	-***custom playlists - coming soon***
+	- ***custom playlists - coming soon***
 - Uses a custom wrapper around the YouTube Music API
 - Multiple themes
 
