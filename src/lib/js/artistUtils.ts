@@ -76,15 +76,20 @@ function parseCarouselItem(items, header = []) {
 		const title = i?.title?.runs[0].text
 		const endpoint = i?.title?.runs[0].navigationEndpoint
 		const moreButton = i.moreContentButton?.buttonRenderer?.navigationEndpoint
+		const type = title
 		if (endpoint) {
 			return {
 				title,
-				itct: endpoint?.clickTrackingParams,
+				// moreButton,
+				// endpoint,
+				// i,
+				type: type,
+				itct: moreButton?.clickTrackingParams,
 				browseId: endpoint?.browseEndpoint.browseId,
 				params: endpoint?.browseEndpoint.params
 			}
 		} else {
-			return { title }
+			return { title, type: type }
 		}
 	})
 	// console.log(head)

@@ -13,7 +13,9 @@ module.exports = {
 		{ files: ['*.cjs'], env: { node: true } }
 	],
 	settings: {
-		'svelte3/typescript': () => require('typescript')
+		'svelte3/typescript': () => require('typescript'),
+		'svelte3/ignore-styles': () => true,
+
 	},
 	parserOptions: {
 		sourceType: 'module',
@@ -21,7 +23,7 @@ module.exports = {
 	},
 	env: {
 		browser: true,
-		es2017: true,
+		es2020: true,
 		node: true
 	}
 }

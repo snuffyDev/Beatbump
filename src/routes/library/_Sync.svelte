@@ -1,37 +1,54 @@
-<script lang="ts">
+<script context="module" lang="ts">
 	import { browser } from '$app/env'
+	let _Peer: typeof Peer
+	let RTC_module
+	if (browser) {
+		RTC_module = import('peerjs')
+		RTC_module.then((module) => {
+			_Peer = module.default
+		})
+	}
+</script>
+
+<script lang="ts">
+	import type Peer from 'peerjs'
 	import Icon from '$lib/components/Icon/Icon.svelte'
-	import { createEventDispatcher, onMount } from 'svelte'
-	import { fade, fly } from 'svelte/transition'
-	import Peer from 'peerjs?client'
 	import db from '$lib/db'
 	import { alertHandler } from '$lib/stores/stores'
+	import { createEventDispatcher, onMount } from 'svelte'
+	import { fade } from 'svelte/transition'
 
-	// }
+	type PeerType = 'Sender' | 'Receiver'
+
 	let peer
-	// $: Peer = undefined
 
-	let id = 'generate id'
+	let id = 'unset'
 	let peerID = ''
-	let peerOffer
 	let copyText = 'copy'
-	$: completed = false
-	let offer
-	// type 'connect' = true | 'reciever' = false
-	$: type = false
-	$: stepCounter = 0
+	let completed = false
+	let check: string
+	let peerType: PeerType
+	let stepCounter = 0
+	let RTC
+
+	$: peerType = check == 'sending' ? 'Sender' : 'Receiver'
+	$: type = check == 'sending' ? true : false
+	$: connection = undefined
+
+	const dispatch = createEventDispatcher()
 
 	const ID = () => {
-		if (!Peer && !browser) return
+		if (!RTC && !browser) return
+
 		id = 'bb-' + Math.random().toString(36).substr(2, 7)
-		peer = new Peer(id)
-		console.log(peer, id)
+		peer = new RTC(id)
+		console.log(`Peer ${id} created!`)
 
 		return 'bb-' + id
 	}
 	const nextStep = () => {
-		if (stepCounter == 2) {
-			stepCounter = 0
+		if (stepCounter == 3) {
+			dispatch('close')
 		} else {
 			stepCounter++
 		}
@@ -39,37 +56,42 @@
 
 	async function connect() {
 		if (!browser) return
-		// !type === connect
-		// type === receiver
 		if (!type) {
+			// Receiver Connection
 			peer.on('connection', (conn) => {
 				conn.on('data', async (data) => {
-					// Will print 'hi!'
+					connection = { data, conn }
+					console.log(connection)
+					// When data is received from sender,
+					// write the contents to IndexedDB
 					await db.setMultiple(JSON.parse(data))
+
 					alertHandler.set({ msg: 'Data sync completed!', type: 'success' })
-					console.log('received data' + data)
+
 					setTimeout(() => {
 						completed = true
 						alertHandler.set({
 							msg: 'Data sync complete! Closing connection...',
 							type: 'success'
 						})
+						peer.destroy()
+						dispatch('close')
 					}, 1250)
+					if (completed === true) {
+					}
 				})
 				conn.on('open', () => {
 					alertHandler.set({ msg: 'Connection established!', type: 'success' })
-					// conn.send('hello!')
 				})
 			})
-			if (completed === true) {
-				peer.destroy()
-				dispatch('close')
-			}
 		} else {
+			// Sender Connection
+
 			const information = await db.getFavorites()
 			const chData = JSON.stringify(information)
 			const conn = peer.connect(peerID)
 			conn.on('open', () => {
+				// Immediately transfer to Receiver
 				conn.send(chData)
 			})
 			conn.on('close', () => {
@@ -78,21 +100,20 @@
 			})
 		}
 	}
-	const getID = async () => {
-		const response = await fetch(
-			'/library/get.json?id=' + encodeURIComponent(peerID),
-			{
-				method: 'GET'
-			}
-		)
-	}
-
-	const dispatch = createEventDispatcher()
+	onMount(async () => {
+		if (!_Peer) {
+			const _module = await RTC_module
+			RTC = _module.default
+		} else {
+			RTC = _Peer
+		}
+	})
+	$: console.log(RTC, _Peer)
 </script>
 
-<div class="backdrop" transition:fade />
+<div class="backdrop" transition:fade={{ duration: 150, delay: 150 }} />
 <div class="sync-wrapper">
-	<div class="sync" transition:fade>
+	<div class="sync" transition:fade={{ duration: 300, delay: 300 }}>
 		<div
 			class="x-button"
 			on:click={() => {
@@ -106,60 +127,102 @@
 				<div class="screen">
 					<div class="content">
 						<h1>Sync your data</h1>
-						<div class="subheading">Follow these steps on both devices</div>
+						<div class="subheading">Access your favorites on any device</div>
 						<p>
 							Securely sync your data across your devices! <br /> To begin, open
-							this screen on your other device. After that, hit 'next'
+							this screen on another device. Whenever you are ready, hit 'Next Step'
 						</p>
 					</div>
 				</div>
 			{:else if stepCounter == 1}
 				<div class="screen">
 					<div class="content">
-						<h1>Generate an ID</h1>
-						<div class="subheading">This ID will help connect your devices</div>
-						<p>
-							On both devices, click the generate button to create a temporary
-							ID. Make sure to remember them!
-						</p>
-						<hr />
-						<div class="id">
-							<p>Your ID:</p>
-
-							<div class="id-cont">
-								<code>{id} </code>
-								<p
-									class="copy link"
-									on:click={async () => {
-										if (!browser) return
-										await navigator.clipboard.writeText(id)
-										copyText = 'copied!'
-										setTimeout(() => {
-											copyText = 'copy'
-										}, 1500)
-									}}
-								>
-									{copyText}
-								</p>
-							</div>
+						<h1>First things first...</h1>
+						<div class="subheading">
+							Will this device be <em>sending</em> or <em>receiving</em> data?
 						</div>
+						<!-- <p>Follow these steps on both devices.</p> -->
+						<section class="container row justify">
+							<div class="radio">
+								<label for="sending">
+									<input
+										id="sending"
+										type="checkbox"
+										on:input={() => (check = 'sending')}
+										checked={check == 'sending'}
+									/>
+									<span class="checkbox-tile"
+										><Icon name="send" size="2em" /><span class="label"
+											>Sending</span
+										></span
+									>
+								</label>
+							</div>
+							<div class="radio">
+								<label for="receiving">
+									<input
+										id="receiving"
+										type="checkbox"
+										on:input={() => (check = 'receiving')}
+										checked={check == 'receiving'}
+									/>
+									<span class="checkbox-tile"
+										><Icon name="import" size="2em" /><span class="label"
+											>Receiving</span
+										></span
+									>
+								</label>
+							</div>
+						</section>
 					</div>
-					<div class="container">
-						I am {type ? 'Sending' : 'Receiving'}:
-						<input id="radio" type="checkbox" bind:checked={type} />
-						<label for="radio" />
-					</div>
-					<button
-						on:click={async () => {
-							if (!browser) return
-							ID()
-						}}>Generate</button
-					>
+					<hr />
 				</div>
 			{:else if stepCounter == 2}
 				<div class="screen">
 					<div class="content">
-						<h1>Get the other ID</h1>
+						<h1>Generate Your ID</h1>
+						<div class="subheading">The temporary ID is needed for syncing</div>
+						<hr />
+
+						<section class="container">
+							<div class="id">
+								<p>Your ID:</p>
+
+								<div class="id-cont">
+									<code>{id} </code>
+									<p
+										class="copy link"
+										on:click={async () => {
+											if (!browser) return
+											await navigator.clipboard.writeText(id)
+											copyText = 'copied!'
+											setTimeout(() => {
+												copyText = 'copy'
+											}, 1500)
+										}}
+									>
+										{copyText}
+									</p>
+								</div>
+							</div>
+							<button
+								class="small"
+								on:click={async () => {
+									if (!browser) return
+
+									ID()
+								}}>Create ID</button
+							>
+						</section>
+					</div>
+				</div>
+			{:else if stepCounter == 3}
+				<div class="screen">
+					<div class="content">
+						<h1>
+							Get the {(peerType =
+								check !== 'sending' ? 'Sender' : 'Receiver')}'s ID
+						</h1>
 						<div class="subheading">Let's find the other device</div>
 						<p>
 							After generating an ID for both devices, enter the other's ID in
@@ -172,30 +235,40 @@
 							<div class="id-cont">
 								<code>{id} </code>
 							</div>
+
+							<p>
+								{(peerType = check !== 'sending' ? 'Sender' : 'Receiver')}'s ID:
+							</p>
+
 							<div class="id-cont">
-								<code>{peerID} </code>
+								<code>{peerID ? peerID : 'ID from other device'} </code>
 							</div>
 						</div>
 					</div>
-					<input
-						bind:value={peerID}
-						class="input"
-						placeholder="other device id"
-						type="text"
-						autocapitalize="off"
-						autocomplete="off"
-						pattern="[A-Za-z0-9_-]+"
+					<form
 						on:submit|preventDefault={async () => {
 							connect()
 						}}
-					/>
-
-					<button
-						on:click={() => {
-							connect()
-						}}>Connect</button
+						class="inline"
 					>
-				</div>{:else if stepCounter == 3}{/if}
+						<input
+							bind:value={peerID}
+							class="input"
+							placeholder={`${peerType}'s ID`}
+							type="text"
+							autocapitalize="off"
+							autocomplete="off"
+							autocorrect="off"
+							spellcheck="false"
+							pattern="bb?[a-zA-Z0-9_-]+"
+						/>
+						<button
+							on:click={() => {
+								connect()
+							}}>Connect</button
+						>
+					</form>
+				</div>{/if}
 		</div>
 		<div class="next">
 			<button class="nextbtn" on:click={nextStep}>Next Step</button>
@@ -204,51 +277,103 @@
 </div>
 
 <style lang="scss">
-	.container {
+	.has-icon {
+		width: auto;
+	}
+	.justify {
+		justify-content: space-evenly;
+	}
+	.label {
+		color: #f2f2f2;
+	}
+	.checkbox-tile {
 		display: flex;
-		margin-bottom: 0.5rem;
-	}
-	input[type='checkbox'] {
-		margin-left: var(--md-spacing);
-		margin-bottom: 1.2rem;
-
-		height: 0;
-		width: 0;
-		visibility: hidden;
-	}
-	input:checked + label::after {
-		left: calc(100% - 0.333333rem);
-		transform: translateX(-100%);
-	}
-	input:checked + label {
-		background-color: #4a7eb2;
-	}
-
-	label:active::after {
-		// width: .03333333rem;
-	}
-	label {
-		background-color: #444857;
-		border-radius: 10rem;
-		position: relative;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		width: 7rem;
+		min-height: 7rem;
+		border-radius: 0.5rem;
+		border: 2px solid rgba(181, 191, 217, 0.267);
+		background-color: rgba(117, 117, 117, 0.26);
+		box-shadow: 0 5px 10px rgba(#000, 0.1);
+		transition: 0.15s ease;
 		cursor: pointer;
-		transition: 0.25s;
-		// box-shadow: 0 0 1.2rem #477a8550;
-		display: block;
-		width: 5rem;
-		height: 2.1rem;
+		position: relative;
 
-		&::after {
+		&:before {
 			content: '';
+			position: absolute;
+			display: block;
 			width: 1.25rem;
 			height: 1.25rem;
-			background-color: #e8f5f7;
-			position: absolute;
-			border-radius: 5.833333rem;
-			top: 20%;
-			left: 0.3125rem;
-			transition: 0.25s;
+			border: 2px solid #b5bfd9;
+			background-color: rgba(117, 117, 117, 0.26);
+			border-radius: 50%;
+			top: 0.25rem;
+			left: 0.25rem;
+			opacity: 0;
+			transform: scale(0);
+			transition: 0.25s ease;
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' fill='%23FFFFFF' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'%3E%3C/rect%3E%3Cpolyline points='216 72.005 104 184 48 128.005' fill='none' stroke='%23FFFFFF' stroke-linecap='round' stroke-linejoin='round' stroke-width='32'%3E%3C/polyline%3E%3C/svg%3E");
+			background-size: 12px;
+			background-repeat: no-repeat;
+			background-position: 50% 50%;
 		}
+
+		&:hover {
+			border-color: rgba(34, 97, 255, 0.452);
+			&:before {
+				transform: scale(1);
+				opacity: 1;
+			}
+		}
+	}
+
+	.radio {
+		position: relative;
+	}
+	input[type='checkbox'] {
+		// opacity: 0;
+		// Code to hide the input
+		clip: rect(0 0 0 0);
+		clip-path: inset(100%);
+		height: 1px;
+		overflow: hidden;
+		position: absolute;
+		white-space: nowrap;
+		width: 1px;
+
+		&:checked + .checkbox-tile,
+		&:checked + .checkbox-tile .label {
+			border-color: #2260ff;
+			color: #f2f2f2;
+			text-shadow: 0 0 0.25rem rgba(255, 255, 255, 0.63);
+			&:not(.label) {
+				background-color: rgba(201, 201, 201, 0.274);
+				box-shadow: 0 5px 10px rgba(#000, 0.1);
+			}
+			&:before {
+				transform: scale(1);
+				opacity: 1;
+				background-color: #2260ff;
+				border-color: #2260ff;
+			}
+		}
+	}
+	.inline {
+		display: flex;
+		align-items: flex-start;
+		/* height: auto; */
+		min-height: 5ch;
+		/* max-height: 30ch; */
+		/* margin-left: auto; */
+		flex-direction: row;
+		flex-wrap: nowrap;
+	}
+	.id-container {
+		display: inline-flex;
+		flex-direction: column;
 	}
 
 	.input {
@@ -256,10 +381,10 @@
 		margin-bottom: 0.5rem;
 	}
 	:root {
-		--padding: 0 var(--md-spacing) 0 var(--md-spacing);
+		--padding: 0 var(--xl-spacing) 0 var(--xl-spacing);
 	}
 	.sync-wrapper {
-		position: absolute;
+		position: fixed;
 		display: grid;
 		align-items: center;
 		justify-items: center;
@@ -267,11 +392,11 @@
 		height: 100%;
 		max-height: 100%;
 		grid-template-columns: 1fr;
+		z-index: 5;
 	}
 	.backdrop {
 		z-index: 1;
 		position: fixed;
-		overflow: hidden;
 		height: 100%;
 		width: 100%;
 		background: #0000009c;
@@ -281,8 +406,10 @@
 		background: rgba(41, 41, 41, 0.555);
 		padding: 1rem;
 		border-radius: var(--lg-radius);
-		margin-bottom: 0.8rem;
 		display: inline;
+		font-size: 1.25em;
+		font-weight: 600;
+		letter-spacing: 0.01em;
 		// user-select: text;
 		// cursor: text;
 		cursor: text;
@@ -290,6 +417,7 @@
 	}
 	.id-cont {
 		display: flex;
+		margin-bottom: 0.8rem;
 		align-items: flex-end;
 	}
 	hr {
@@ -299,6 +427,7 @@
 	.id {
 		display: flex;
 		flex-direction: column;
+		margin-bottom: 1.2rem;
 	}
 	.copy {
 		// margin-left: auto;
@@ -307,13 +436,14 @@
 		margin-left: 1rem;
 	}
 	.sync {
-		position: relative;
-		top: 0;
-		/* left: 50%; */
-		bottom: 0;
+		position: fixed;
+		top: 50%;
+		/* bottom: 0; */
+		left: 50%;
 		min-height: 0;
-		/* transform: translate(-50%,-50%); */
+		transform: translate(-50%, -50%);
 		flex-direction: row;
+		transform-origin: top;
 		flex-wrap: wrap;
 		z-index: 5;
 		padding: var(--padding);
@@ -321,14 +451,12 @@
 		flex: 1 1 100%;
 		border: 1px solid #aaa1;
 		transform-origin: top;
-		box-shadow: 0 0 1rem 0 rgb(41 41 41 / 12%);
-		/* max-height: 100%; */
-		/* min-height: 100%; */
+		box-shadow: 0 0 1rem #2929291f;
 		border-radius: var(--lg-radius);
-		background: var(--dark-top);
+		background: #111214;
 		@media only screen and (max-width: 640px) {
-			top: 0;
-			left: 0;
+			// top: 0;
+			// left: 0;
 			width: 100%;
 			// height: 100%;
 			min-height: 0;
@@ -344,7 +472,7 @@
 		z-index: 10;
 	}
 	.subheading {
-		font-size: 1.5rem;
+		font-size: 1.3125em;
 	}
 	.content {
 		position: relative;
@@ -360,9 +488,16 @@
 	.next {
 		margin-top: 1rem;
 		margin-bottom: 1rem;
+		display: flex;
+		flex-wrap: nowrap;
 	}
 	.nextbtn {
 		width: 100%;
+		margin-left: auto;
+		margin-right: auto;
+		@media screen and (min-width: 40em) {
+			width: unset;
+		}
 	}
 	.screen {
 		/* position: absolute; */
@@ -374,7 +509,10 @@
 		width: 100%;
 	}
 	p {
-		margin: 0 0 var(--md-spacing) 0;
+		margin: 0 0 var(--sm-spacing) 0;
 		font-size: 1.125rem;
+	}
+	h1 {
+		margin-top: 0;
 	}
 </style>

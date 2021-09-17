@@ -37,28 +37,30 @@
 	]
 </script>
 
-<h1>Your Songs</h1>
-<section>
-	<div class="filter">
-		<div class="ctx-item">
-			<label for="select">Sort</label>
-			<div class="select">
-				<select id="select" bind:value on:blur={options[value].action}>
-					{#each options as option, i (option.params)}
-						<option value={i}>{option.label}</option>
-					{/each}
-				</select>
+<main>
+	<h1>Your Songs</h1>
+	<section>
+		<div class="filter">
+			<div class="ctx-item">
+				<label for="select">Sort</label>
+				<div class="select">
+					<select id="select" bind:value on:blur={options[value].action}>
+						{#each options as option, i (option.params)}
+							<option value={i}>{option.label}</option>
+						{/each}
+					</select>
+				</div>
 			</div>
 		</div>
-	</div>
-	<section>
-		{#key songs}
-			{#each songs as song}
-				<Listing data={song} />
-			{/each}
-		{/key}
+		<section>
+			{#key songs}
+				{#each songs as song}
+					<Listing data={song} />
+				{/each}
+			{/key}
+		</section>
 	</section>
-</section>
+</main>
 
 <style lang="scss">
 	.filter {

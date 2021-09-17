@@ -23,6 +23,16 @@
 	bind:this={parent}
 	class="item"
 	class:playing={$isPagePlaying == pageId && index == $key}
+	on:mouseenter|capture={(e) => {
+		if (parent && parent.contains(e.target)) isHovering = true
+	}}
+	on:mouseleave|capture={(e) => {
+		// isHovering = false
+		if (parent && parent.contains(e.target)) {
+			isHovering = true
+		}
+		isHovering = false
+	}}
 	on:click={async () => {
 		// @ts-ignore
 		if (page == 'playlist') {
@@ -44,49 +54,38 @@
 		dispatchPlaying()
 	}}
 >
-	<div
-		class="item-wrapper"
-		on:mouseenter|capture={(e) => {
-			if (parent && parent.contains(e.target)) isHovering = true
-		}}
-		on:mouseleave|capture={(e) => {
-			// isHovering = false
-			if (parent && parent.contains(e.target)) {
-				isHovering = true
-			}
-			isHovering = false
-		}}
-	>
-		<div class="number">
-			<span class:hidden={!isHovering}>
-				<svelte:component this={Icon} class="icon" name="play" size="1.5em" />
-			</span>
-			<!-- content here -->
-			<span class:hidden={isHovering}
-				>{index + 1}<!-- else content here --></span
-			>
-		</div>
-		<div class="itemInfo">
-			<div class="item-title">
-				{item.title}
-				{#if item.explicit}
-					<span class="explicit">
-						{item.explicit ? 'E' : ''}
-					</span>
-				{/if}
-			</div>
-			<div class="artists">
-				{#if item.subtitle}
-					{#each item?.subtitle as subtitle}
-						<span class="artist">{subtitle.text}</span>
-					{/each}
-				{/if}
-			</div>
-		</div>
-		<span class="length" class:hidden={!item?.length ? true : false}
-			>{item?.length}</span
-		>
+	<div class="number">
+		<span class:hidden={!isHovering}>
+			<svelte:component this={Icon} class="icon" name="play" size="1.5em" />
+		</span>
+		<!-- content here -->
+		<span class:hidden={isHovering}>{index + 1}<!-- else content here --></span>
 	</div>
+	<div class="itemInfo">
+		<div class="item-title">
+			{item.title}
+			{#if item.explicit}
+				<span class="explicit">
+					{item.explicit ? 'E' : ''}
+				</span>
+			{/if}
+		</div>
+		<div class="artists">
+			{#if item.subtitle}
+				{#each item?.subtitle as subtitle}
+					<span class="artist">{subtitle.text}</span>
+				{/each}
+			{/if}
+			{#if item.artistInfo && page !== 'artist'}
+				<a sveltekit:prefetch href={`/artist/${item.artistInfo.browseId}`}
+					>{item.artistInfo.artist}</a
+				>
+			{/if}
+		</div>
+	</div>
+	<span class="length" class:hidden={!item?.length ? true : false}
+		>{item?.length}</span
+	>
 </div>
 
 <!-- markup (zero or more items) goes here -->
@@ -100,15 +99,10 @@
 	.length {
 		align-self: center;
 		margin-right: 1.5rem;
+		grid-area: r;
 	}
 	.item-wrapper {
-		display: flex;
-		padding: 0.4rem 0;
-		/* align-items: stretch; */
-		/* flex-wrap: nowrap; */
-		height: 100%;
 	}
-
 	.explicit {
 		text-shadow: none;
 		width: 1rem;
@@ -176,8 +170,10 @@
 		/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
 	}
 	.item {
-		display: flex;
-		flex-direction: column;
+		display: grid;
+		height: 100%;
+		grid-template-areas: 'c m r';
+		grid-template-columns: auto 1fr auto;
 		align-content: center;
 		-webkit-user-select: none;
 		-moz-user-select: none;
@@ -187,8 +183,7 @@
 		height: auto;
 		border-bottom: calc(0.000321rem / 2) solid rgb(141 141 142 / 34%);
 		width: 100%;
-		flex-wrap: nowrap;
-		padding: 0.1rem 0.9rem;
+		padding: 0.4rem 0 0.4rem 0.15rem;
 		&:hover,
 		&:active:not(.menu) {
 			background: lighten(#57575831, 1%);
@@ -207,9 +202,11 @@
 	// background-color: transparentize(#aaa, 0.9);
 
 	.itemInfo {
+		grid-area: m;
 		display: flex;
 		flex-direction: column;
 		flex: 1 0;
+		pointer-events: none;
 	}
 
 	.number {
@@ -217,8 +214,9 @@
 		font-size: 1.125rem;
 		font-weight: 600;
 		height: 2rem;
+		grid-area: c;
 		text-align: center;
-		pointer-events: all;
+		pointer-events: none;
 		opacity: 1;
 		margin-left: 0.4rem;
 		margin-right: 1.1rem;

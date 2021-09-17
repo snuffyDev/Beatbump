@@ -5,8 +5,9 @@
 	import db from '$lib/db'
 	import lazy from '$lib/lazy'
 	import list from '$lib/stores/list'
-	import { alertHandler, key } from '$stores/stores'
-	import { tick } from 'svelte'
+	import type { CarouselItem } from '$lib/types'
+	import { alertHandler, currentTitle, key } from '$stores/stores'
+	import { onMount, tick } from 'svelte'
 	import { fade } from 'svelte/transition'
 	import { browseHandler } from './functions'
 	import menu from './menu'
@@ -14,21 +15,25 @@
 	export let index
 	export let item: CarouselItem
 	export let type = ''
+	export let kind = ''
 	export let aspectRatio
 	export let isBrowseEndpoint = false
-	let hovering = false
 	let loading
 	let isHidden
-	let showing = false
-	let menuToggle = showing ? true : false
-	let width
 	let RATIO_SQUARE = item.aspectRatio.includes('SQUARE') ? true : false
 	let RATIO_RECT =
 		item.aspectRatio.includes('TWO_LINE_STACK') ||
 		item.aspectRatio.includes('16_9')
 			? true
 			: false
-	let DropdownItems = [
+
+	const playAlbum = () => {
+		list.startPlaylist(item.playlistId)
+		key.set(0)
+		currentTitle.set(item.title)
+	}
+	let DropdownItems: Array<Record<string, any>>
+	DropdownItems = [
 		{
 			text: 'View Artist',
 			icon: 'artist',
@@ -50,7 +55,16 @@
 		{
 			text: 'Add to Queue',
 			icon: 'queue',
-			action: () => list.addNext(item, $key)
+			action: () => {
+				!kind && list.addNext(item, $key)
+				kind == 'Videos' && list.addNext(item, $key)
+				kind == 'Albums' && playAlbum()
+				kind == 'Featured on' && list.startPlaylist(item.playlistId)
+				alertHandler.set({
+					msg: `${item.title} added to queue!`,
+					type: 'success'
+				})
+			}
 		},
 		{
 			text: 'Favorite',
@@ -129,23 +143,15 @@
 		item.thumbnails[0].width <= 60
 			? item.thumbnails[0].url.replace(/=(w(\d+))-(h(\d+))/g, '=w256-h256')
 			: item.thumbnails[0].url
+	if (kind === 'Singles') {
+		DropdownItems.splice(1, 1)
+		DropdownItems = [...DropdownItems]
+		console.log(DropdownItems)
+	}
 </script>
 
-<svelte:window bind:outerWidth={width} />
 <section
 	class="item"
-	on:mouseenter={() => {
-		hovering = true
-	}}
-	on:focus={() => {
-		hovering = true
-	}}
-	on:mouseleave={() => {
-		hovering = false
-		if (width > 550) {
-			menuToggle = false
-		}
-	}}
 	class:item16x9={RATIO_RECT ? true : false}
 	class:item1x1={RATIO_SQUARE ? true : false}
 	transition:fade|local
@@ -176,7 +182,9 @@
 				class:img16x9={RATIO_RECT}
 				loading="lazy"
 				type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-				src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+"
+				src={RATIO_SQUARE
+					? 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0icHJlZml4X19wcmVmaXhfX2ZlYXRoZXIgcHJlZml4X19wcmVmaXhfX2ZlYXRoZXItbGlzdCI+PHBhdGggb3BhY2l0eT0iLjciIHN0cm9rZT0iI2NjYyIgZmlsbD0iIzMzMyIgZD0iTTAgMGgyNHYyNEgweiIvPjwvc3ZnPg=='
+					: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCI+PGRlZnM+PHBhdGggZD0iTS02LjU0LTUuNjFoNTEydjUxMmgtNTEydi01MTJ6IiBpZD0icHJlZml4X19hIi8+PC9kZWZzPjx1c2UgeGxpbms6aHJlZj0iI3ByZWZpeF9fYSIgb3BhY2l0eT0iLjI1IiBmaWxsPSIjMjIyIi8+PC9zdmc+'}
 				use:lazy={{ src: srcImg }}
 			/>
 		</div>
@@ -187,12 +195,14 @@
 					{item.title.length > 48
 						? item.title.substring(0, 48) + '...'
 						: item.title}
+					<!-- {kind} -->
 				</span>
 				{#if item.subtitle}
 					<div class="subtitles">
 						{#each item.subtitle as sub}
 							<span class:hidden={sub?.navigationEndpoint}>{sub.text}</span>
 							<a
+								sveltekit:prefetch
 								class:hidden={!sub?.navigationEndpoint}
 								on:click|stopPropagation|preventDefault={() => {
 									goto(
@@ -212,15 +222,14 @@
 	</div>
 	{#if !isBrowseEndpoint}
 		<div class="menu">
-			{#if hovering || width < 550}
-				<Dropdown color="white" bind:isHidden items={DropdownItems} />
-			{/if}
+			<Dropdown color="white" bind:isHidden items={DropdownItems} />
 		</div>
 	{/if}
 </section>
 
 <style lang="scss">
 	@import '../../../global/stylesheet/components/_carousel-item.scss';
+
 	.hidden {
 		display: none !important;
 		visibility: hidden !important;
@@ -235,6 +244,19 @@
 			outline: none;
 		}
 	}
+	.item {
+		> :is(*:hover) + * {
+			opacity: 1 !important;
+		}
+	}
 	.menu {
+		opacity: 0;
+		transition: 50ms opacity cubic-bezier(0.55, 0.055, 0.675, 0.19);
+		&:hover {
+			opacity: 1;
+		}
+		@media screen and (max-width: 550px) {
+			opacity: 1;
+		}
 	}
 </style>

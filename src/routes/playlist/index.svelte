@@ -1,25 +1,29 @@
 <script context="module">
+	import { api } from '$lib/api'
+
 	export async function load({ page, fetch }) {
-		const res = await fetch('/api/playlist.json?list=' + page.query.get('list'))
+		const res = await api(fetch, 'playlist', { list: page.query.get('list') })
+
+		// const res = await fetch('/api/playlist.json?list=' + page.query.get('list'))
 		const {
 			tracks,
 			header,
 			continuations,
 			data,
 			musicDetailHeaderRenderer
-		} = await res.json()
+		} = await res.body
 		if (!res.ok) {
 			return {
-				error: new Error(res.statusText),
+				error: new Error(res.body),
 				status: res.status
 			}
 		}
 		return {
 			props: {
-				tracks: await tracks,
-				data: await data,
-				continuations: await continuations,
-				header: await header,
+				tracks: tracks,
+				data: data,
+				continuations: continuations,
+				header: header,
 				musicDetailHeaderRenderer,
 				id: page.query.get('list')
 			},
@@ -68,9 +72,12 @@
 				? header.description.substring(0, 240) + '...'
 				: header.description
 	})
-	let test
 	const getContinuation = async () => {
 		if (isLoading || hasData) return
+		if (!itct || !ctoken) {
+			hasData = true
+			return
+		}
 		isLoading = true
 		const response = await fetch(
 			'/api/playlist.json' +

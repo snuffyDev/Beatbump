@@ -58,7 +58,7 @@
 	// console.log(contents);
 	let isLoading = false
 	let hasData = false
-	tagStore.desc('Search results for' + songTitle)
+	tagStore.desc('Search results for' + decodeURIComponent(songTitle))
 	tagStore.title('Search')
 	tagStore.url(path + `?filter=${filter}`)
 	tagStore.image('/logo.png')
@@ -116,7 +116,7 @@
 {#if error}
 	<section class="searchHeader">
 		<p>
-			{error} for <em>'{songTitle}'</em>
+			{error} for <em>'{decodeURIComponent(songTitle)}'</em>
 		</p>
 	</section>
 {:else}
@@ -125,12 +125,13 @@
 			<div class="text">
 				<p>All Results for...</p>
 				{#key songTitle}
-					<em>'{songTitle}'</em>
+					<em>'{decodeURIComponent(songTitle)}'</em>
 				{/key}
 				{#if didYouMean}
 					<p>
 						Did you mean: <em class="link"
 							><a
+								sveltekit:prefetch
 								on:click={() => {
 									invalidate(
 										`/search/${$page.path}?filter=${$page.query.get('filter')}`
@@ -257,7 +258,7 @@
 		margin-bottom: 0.8rem;
 	}
 	.searchHeader {
-		padding: 0.5rem 0 0.8rem 0;
+		padding: 0.8rem 0 0.8rem 0;
 		font-family: 'Commissioner', sans-serif;
 		margin-left: auto;
 		display: flex;
@@ -267,10 +268,10 @@
 		font-size: 1.125rem;
 		margin: 0;
 		// font-weight: 500;
-		// line-height: 1.5;
 		.text {
 			display: flex;
 			flex-direction: column;
+			line-height: 2.5;
 		}
 		h5 {
 			font-size: 1.95rem;

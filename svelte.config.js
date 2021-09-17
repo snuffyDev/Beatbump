@@ -16,17 +16,14 @@ export default {
 		scss: {
 			includePaths: ['src']
 		},
-		defaults: {
-			style: 'postcss',
-			script: 'typescript'
-		},
+
 		postcss: {
 			plugins: [cssnano({ preset: 'default' }), autoprefixer({})]
 		},
 		typescript: { tsconfigFile: './tsconfig.json' }
 	}),
 	kit: {
-		adapter: dev ? node() : worker(),
+		adapter: dev ? node() : worker({}),
 		target: '#app',
 		files: {
 			assets: 'static',

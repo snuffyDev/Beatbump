@@ -80,7 +80,7 @@
 		padding: 0.5em 0;
 		z-index: 10;
 		border-radius: 0 0 0.5rem 0.5rem;
-		flex-direction: row;
+		flex-direction: column;
 		width: 100%;
 		overflow: hidden;
 		max-width: 44ch;
@@ -90,10 +90,11 @@
 		line-break: normal;
 		word-break: normal;
 		justify-content: space-evenly;
+		align-items: flex-start;
 		@media screen and (max-width: 640px) {
 			max-width: 100%;
-			align-items: center;
-			flex-direction: row;
+			// align-items: center;
+			// flex-direction: row;
 		}
 		border: 0.125px solid #aaaaaa45;
 		border-top: 0;

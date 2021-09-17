@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { api } from '$api/_api'
+import { api } from '$lib/api'
 import { sort } from './endpoints/playerUtils'
 import { alertHandler, updateTrack } from './stores/stores'
 import { key } from './stores/stores'
@@ -30,7 +30,7 @@ export const addToQueue = async (videoId: string): Promise<string> => {
 
 // Get source URLs
 export const getSrc = async (videoId?: string, playlistId?: string) => {
-	const res = await api('player', {
+	const res = await api(fetch, 'player', {
 		videoId: videoId ? videoId : '',
 		playlistId: playlistId ? playlistId : ''
 	})

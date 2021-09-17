@@ -80,14 +80,7 @@
 		letter-spacing: -0.01em;
 		margin-bottom: 0.8rem;
 	}
-	button {
-		display: inline-flex;
-		justify-items: center;
-		justify-content: center;
-		.text {
-			margin-left: 0.125rem;
-		}
-	}
+
 	main {
 		display: flex;
 		height: 100%;

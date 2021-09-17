@@ -4,13 +4,13 @@
 
 <script lang="ts">
 	import { browser } from '$app/env'
+	import Icon from '$lib/components/Icon/Icon.svelte'
 
 	import Listing from '$lib/components/Item/Listing.svelte'
 	// import type { Item } from '$lib/types'
 	import db from '$lib/db'
 
-	import { onMount, setContext, getContext } from 'svelte'
-	import type { Writable } from 'svelte/store'
+	import { onMount, setContext } from 'svelte'
 	import Sync from './_Sync.svelte'
 	$: favorites = []
 	let playlists = []
@@ -36,37 +36,43 @@
 	<Sync
 		on:close={() => {
 			updateFavorites()
-			sync = !sync
+			sync = false
 		}}
 	/>
 {/if}
-<h1>Your Library</h1>
+<main>
+	<header>
+		<h1>Your Library</h1>
+		<button
+			on:click={() => {
+				sync = true
+			}}
+			><Icon name="send" size="1.125em" />
+			<span class="btn-text">Sync Your Data</span></button
+		>
+	</header>
 
-<section>
-	<div class="header">
-		<h2>Your Songs</h2>
-		<a href="/library/songs"><small>See All</small></a>
-	</div>
-	<div class="list">
-		{#each favorites as favorite}
-			<Listing
-				on:update={() => {
-					updateFavorites()
-				}}
-				data={favorite}
-			/>
-		{/each}
-	</div>
-	<button
-		on:click={() => {
-			sync = true
-		}}>Sync to another device</button
-	>
-</section>
-<section>
-	<h2>Your Playlists</h2>
-	<em>Coming soon!</em>
-</section>
+	<section>
+		<div class="header">
+			<h2>Your Songs</h2>
+			<a sveltekit:prefetch href="/library/songs"><small>See All</small></a>
+		</div>
+		<div class="list">
+			{#each favorites as favorite}
+				<Listing
+					on:update={() => {
+						updateFavorites()
+					}}
+					data={favorite}
+				/>
+			{/each}
+		</div>
+	</section>
+	<section>
+		<h2>Your Playlists</h2>
+		<em>Coming soon!</em>
+	</section>
+</main>
 
 <style lang="scss">
 	section {
@@ -76,6 +82,9 @@
 	.list {
 		min-height: 15%;
 		margin-bottom: 1rem;
+	}
+	button {
+		gap: 0.5rem;
 	}
 	header {
 		display: inline;

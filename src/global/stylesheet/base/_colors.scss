@@ -1,0 +1,37 @@
+$ytm: (
+	"bottom": #121018,
+	"base": #09090a,
+	"top": #09090a,
+	"forms": #15141d,
+	"side": #1210183a,
+) !default;
+$dark: (
+	"bottom": #111214,
+	"base": #09090a,
+	"top": #111214,
+	"forms": #131516,
+	"side": #13171b33,
+) !default;
+$dim: (
+	"bottom": #141820,
+	"base": #09090a,
+	"top": #141820,
+	"forms": #131516,
+	"side": #0b0c0f,
+) !default;
+$light: (
+	"base": #fcf8f8,
+	"bottom": #121018,
+	"top": #cac8c9,
+	"forms": #e3dbf5,
+	"side": #cac8c9,
+	"text": #131314,
+) !default;
+$midnight: (
+	"base": #05070a,
+	"top": #0d0813,
+	"side": #0c091a0e,
+	"bottom": #090d11,
+	"forms": #100f17,
+) !default;
+$theme-name: (dark, dim, midnight, light, ytm);

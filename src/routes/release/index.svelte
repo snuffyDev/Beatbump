@@ -4,17 +4,18 @@
 		const browseId = page.query.get('id') || ''
 		const pt = page.query.get('type') || ''
 		path = context.page
-		const response = await fetch(
-			`/api/main.json?q=&endpoint=browse${
-				browseId ? `&browseId=${browseId}` : ''
-			}${pt ? `&pt=${pt}` : ''}`
-		)
-		const data = await response.json()
+		const response = await api(fetch, 'main', {
+			q: '',
+			endpoint: 'browse',
+			browseId,
+			pt: pt ? pt : ''
+		})
+		const data = await response.body
 		if (!response.ok) {
 			return {
 				props: {
-					status: response.statusCode,
-					msg: response.statusText
+					status: response.status,
+					msg: response.body
 				}
 			}
 		}
@@ -42,6 +43,7 @@
 	import { setContext } from 'svelte'
 	import { page } from '$app/stores'
 	import tagStore from '$lib/stores/ogtags'
+	import { api } from '$lib/api'
 	export let data
 	export let id
 	$: id = $page.query.get('id')

@@ -1,13 +1,18 @@
 <script context="module">
-	export const prerender = true
-
 	export async function load({ page, fetch }) {
 		const response = await fetch(
 			'/api/artist.json?browseId=' + page.params.slug
 		)
 
 		const data = await response.json()
-		let { carousels, description, thumbnail, header, songs } = await data
+		let {
+			carousels,
+			description,
+			thumbnail,
+			header,
+			songs,
+			contents
+		} = await data
 		if (response.ok) {
 			return {
 				props: {
@@ -16,6 +21,7 @@
 					thumbnail,
 					header,
 					songs,
+					raw: contents,
 					id: page.params.slug
 				},
 				status: 200
@@ -27,6 +33,7 @@
 <script lang="ts">
 	import Carousel from '$components/Carousel/Carousel.svelte'
 	import ArtistPageHeader from '../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte'
+	import tags from '$lib/stores/ogtags'
 	import { page } from '$app/stores'
 
 	import ListItem from '$components/ListItem/ListItem.svelte'
@@ -37,13 +44,20 @@
 	export let description
 	export let thumbnail
 	export let carousels
-	export let songs
+	export let songs = []
+	export let raw
 	export let id
 	$: id = id
 	let width
 	const ctx = {}
-	$: console.log(songs)
+	$: console.log(header, carousels, raw, songs)
 	setContext(ctx, { pageId: id })
+
+	tags.desc(header?.name)
+	tags.title(header?.name)
+
+	tags.url($page.host + `${$page.path}`)
+	tags.image('/logo.png')
 </script>
 
 <svelte:head>
@@ -52,10 +66,17 @@
 			? 'Artist - '
 			: `${header.name} - `}Beatbump</title
 	>
+	{#each Object.entries($tags) as [property, content]}
+		{#if content}
+			{#if ['title', 'description', 'image'].includes(property)}
+				<meta name={property} {content} />
+			{:else}
+				<meta {property} {content} />
+			{/if}
+		{/if}
+	{/each}
 </svelte:head>
 
-<svelte:window bind:innerWidth={width} />
-<!-- {#await headerContent then _} -->
 <ArtistPageHeader {description} {header} {width} {thumbnail} />
 <main>
 	<div class="artist-body">
@@ -82,6 +103,7 @@
 				<Carousel
 					items={contents}
 					type="artist"
+					kind={header?.type}
 					isBrowseEndpoint={true}
 					{header}
 				>
@@ -91,6 +113,7 @@
 				<Carousel
 					items={contents}
 					type="artist"
+					kind={header?.type}
 					isBrowseEndpoint={false}
 					{header}
 				>

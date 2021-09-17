@@ -1,8 +1,8 @@
 import { dev } from '$app/env'
 
-import type { Handle } from '@sveltejs/kit'
 import type { ServerResponse } from '@sveltejs/kit/types/hooks'
 const rootDomain = import.meta.env.VITE_DOMAIN // or your server IP for dev
+const originURL = import.meta.env.VITE_SITE_URL // or your server IP for dev
 
 const directives = {
 	'base-uri': ["'self'"],
@@ -59,14 +59,14 @@ interface HooksResponse extends ServerResponse {
 export const handle = async ({ request, resolve }): Promise<HooksResponse> => {
 	request.locals = request.headers
 	const response = await resolve(request)
-
+	// console.log(request)
 	return {
 		...response,
 		headers: {
 			...response.headers,
 			'X-Frame-Options': 'SAMEORIGIN',
 			'Referrer-Policy': 'no-referrer',
-			'access-control-allow-origin': dev ? '*' : rootDomain,
+			'Access-Control-Allow-Origin': dev ? '*' : originURL,
 			'Permissions-Policy':
 				'accelerometer=(), autoplay=(), camera=(), document-domain=(), encrypted-media=(), fullscreen=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), sync-xhr=(), usb=(), xr-spatial-tracking=(), geolocation=()',
 			'X-Content-Type-Options': 'nosniff',
@@ -75,4 +75,8 @@ export const handle = async ({ request, resolve }): Promise<HooksResponse> => {
 				'max-age=31536000; includeSubDomains; preload'
 		}
 	}
+}
+
+export function getSession({ locals }) {
+	return locals.user
 }

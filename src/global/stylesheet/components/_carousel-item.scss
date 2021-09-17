@@ -80,12 +80,14 @@ section.item {
 	position: relative;
 	cursor: pointer;
 	user-select: none;
+	border-radius: var(--sm-radius);
 	&:focus {
 		border: none;
 	}
 
 	// padding-top: 100%;
 	&::before {
+		border-radius: inherit;
 		position: absolute;
 		content: "";
 		top: 0;

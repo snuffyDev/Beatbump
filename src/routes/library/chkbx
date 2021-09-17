@@ -1,0 +1,46 @@
+<em>{type ? 'Sending' : 'Receiving'}</em>:</p>
+							<input id="radio" type="checkbox" bind:checked={type} />
+
+							<label for="radio" />
+								input[type='checkbox'] {
+		margin-left: var(--md-spacing);
+		margin-bottom: 1.2rem;
+
+		height: 0;
+		width: 0;
+		visibility: hidden;
+	}
+	input:checked + label::after {
+		left: calc(100% - 0.333333rem);
+		transform: translateX(-100%);
+	}
+	input:checked + label {
+		background-color: #4a7eb2;
+	}
+
+	label:active::after {
+		// width: .03333333rem;
+	}
+	label {
+		background-color: #444857;
+		border-radius: 10rem;
+		position: relative;
+		cursor: pointer;
+		transition: 0.25s;
+		// box-shadow: 0 0 1.2rem #477a8550;
+		display: block;
+		width: 5rem;
+		height: 2.1rem;
+
+		&::after {
+			content: '';
+			width: 1.25rem;
+			height: 1.25rem;
+			background-color: #e8f5f7;
+			position: absolute;
+			border-radius: 5.833333rem;
+			top: 20%;
+			left: 0.3125rem;
+			transition: 0.25s;
+		}
+	}

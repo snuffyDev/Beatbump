@@ -17,6 +17,13 @@ let splitListIndex = 0
 let currentMixId: string
 let loading = false
 
+let Chunked = {
+	chunks: [],
+	origLength: 0
+}
+
+let filterSetting = false
+
 const list = writable({
 	currentMixId,
 	continuation,
@@ -46,13 +53,6 @@ const fetchNext = async (
 		.then((json) => json.json())
 		.catch((err) => console.log(err))
 }
-
-let Chunked = {
-	chunks: [],
-	origLength: 0
-}
-
-let filterSetting = false
 
 const unsubscribe = filterAutoPlay.subscribe((setting) => {
 	filterSetting = setting
@@ -204,11 +204,6 @@ export default {
 				'',
 				clickTrackingParams
 			)
-
-			// console.log(data)
-
-			// mix = [...mix, ...data.results]
-			// mix = filterSetting ? filterList(mix) : mix
 			mix = filterSetting
 				? [...mix, ...data.results].filter(
 						((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(

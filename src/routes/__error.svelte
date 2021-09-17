@@ -22,7 +22,7 @@
 </script>
 
 <main>
-	<a href="/" class="logolink">
+	<a sveltekit:prefetch href="/" class="logolink">
 		<div class="logo"><img src="/logo-header.png" alt="logo" /></div>
 	</a>
 	<h1>Uh-Oh!</h1>

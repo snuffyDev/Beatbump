@@ -3,11 +3,13 @@
 
 	import CarouselItem from './CarouselItem.svelte'
 	import Icon from '$components/Icon/Icon.svelte'
+	import { page } from '$app/stores'
 	// import { tweened } from 'svelte/motion'
 
 	export let header: CarouselHeader
 	export let items = []
 	export let type = ''
+	export let kind = 'normal'
 	export let isBrowseEndpoint
 	// import { quartInOut } from 'svelte/easing'
 	// const tween = tweened(0, {
@@ -33,20 +35,24 @@
 	let group = []
 	// let rectValue: any = 0
 	// $: if (carousel) carousel.scrollLeft += $tween
+	let notArtist = header.browseId?.includes('VLP')
+		? `/playlist?list=${header?.browseId}`
+		: `/trending/new/${header?.browseId}${
+				header?.params ? `?params=${header?.params}` : ''
+		  }${header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ''}`
+	let href =
+		header?.browseId && $page.path.includes('/artist/')
+			? `/artist/releases?browseId=${header?.browseId}&params=${header?.params}&itct=${header?.itct}`
+			: notArtist
 </script>
 
 <div class="header">
 	<h1>
 		{header.title}
 	</h1>
-	{#if header.browseId}<a
+	{#if !$page.path.includes('/artist/') && header.browseId}<a
 			style="white-space:pre;"
-			href={header.browseId?.includes('VLP')
-				? `/playlist?list=${header?.browseId}`
-				: `/trending/new/${header?.browseId}${
-						header?.params ? `?params=${header?.params}` : ''
-				  }${header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ''}`}
-			><small>See All</small></a
+			{href}><small>See All</small></a
 		>{/if}
 </div>
 <div class="section">
@@ -102,6 +108,7 @@
 					{:else if type == 'artist'}
 						<CarouselItem
 							type="artist"
+							{kind}
 							aspectRatio={item.aspectRatio}
 							{isBrowseEndpoint}
 							{item}

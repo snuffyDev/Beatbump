@@ -53,7 +53,8 @@ export async function get({
 		return {
 			status: 200,
 			body: {
-				...parsed[0]
+				...parsed[0],
+				contents
 			}
 		}
 	} catch (err) {
@@ -84,7 +85,7 @@ function parse(header, contents) {
 		} else {
 			items = undefined
 		}
-		description = d[0].description.split('.')
+		description = d[0].description
 
 		return {
 			header: headerContent[0],

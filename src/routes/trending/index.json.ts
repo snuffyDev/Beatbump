@@ -7,10 +7,11 @@ import {
 
 import type { CarouselHeader, CarouselItem } from '$lib/types'
 import type { EndpointParams } from '$lib/types/internals'
-/**
- * @type {import('@sveltejs/kit').RequestHandler}
- */
-export async function get({ query }: EndpointParams) {
+import type { EndpointOutput, RequestHandler } from '@sveltejs/kit'
+
+/** @type {import('@sveltejs/kit').RequestHandler} */
+export async function get({ query }) {
+	// console.log(request, request.headers)
 	const endpoint = query.get('q') || ''
 	const browseId = 'FEmusic_explore'
 	const carouselItems = []

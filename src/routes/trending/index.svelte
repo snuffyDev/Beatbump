@@ -69,15 +69,22 @@
 		<div class="box-cont">
 			<div class="header">
 				<h1>{carouselItems[1].header.title}</h1>
-				<a style="white-space:pre" class="link" href="/explore"
-					><small>See All</small></a
+				<a
+					sveltekit:prefetch
+					style="white-space:pre"
+					class="link"
+					href="/explore"><small>See All</small></a
 				>
 			</div>
 			<box>
 				{#each carouselItems[1].results.slice(1, 15) as { color, endpoint: { params }, text }}
 					<div style={`border-left: 0.5em solid #${color}`} class="box">
 						<div class="innerbox">
-							<a class="innerlink" href={`/explore/${params}`}>{text}</a>
+							<a
+								sveltekit:prefetch
+								class="innerlink"
+								href={`/explore/${params}`}>{text}</a
+							>
 						</div>
 					</div>
 				{/each}

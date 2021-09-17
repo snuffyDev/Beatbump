@@ -10,7 +10,7 @@ form {
 }
 
 label {
-	display: block;
+	// display: block;
 	font-weight: 500;
 	font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 	font-variant-caps: all-small-caps;
@@ -28,7 +28,7 @@ label {
 	margin-bottom: var(--sm-spacing);
 	width: 100%;
 }
-input:not([type="range"]):not([type="checkbox"]) {
+input:not([type="range"]):not([type="checkbox"]):not([type="radio"]) {
 	appearance: none;
 	background: transparent;
 	border: none;

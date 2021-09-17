@@ -142,7 +142,9 @@
 		}
 	}
 
-	const clickHandler = async () => {
+	const clickHandler = async (event: Event & UIEvent) => {
+		if (event.target.nodeName == 'a' || loading) return
+		console.log(event.target)
 		if (data.type == 'artist') {
 			goto(`/artist/${data.artistInfo.artist}`)
 			return
@@ -168,14 +170,7 @@
 
 <div class="container" class:hidden>
 	<div class="innercard">
-		<div
-			class="itemWrapper"
-			on:click|stopPropagation={(e) => {
-				if (!loading) {
-					clickHandler()
-				}
-			}}
-		>
+		<div class="itemWrapper" on:click|stopPropagation={clickHandler}>
 			<div class="img-container">
 				{#if loading}
 					<Loading size="3em" />
@@ -210,6 +205,7 @@
 					<p class="text-artist">
 						by
 						<a
+							sveltekit:prefetch
 							href={`/artist/` +
 								data.artistInfo?.artist[0]?.navigationEndpoint?.browseEndpoint
 									?.browseId}>{data.artistInfo?.artist[0].text}</a
@@ -218,6 +214,7 @@
 				{/if}
 				<span class="album">
 					{#if data.album?.browseId}<Icon name="album" size="1em" /><a
+							sveltekit:prefetch
 							href="/release?id={data?.album?.browseId}">{data.album.title}</a
 						>
 					{/if}

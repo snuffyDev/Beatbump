@@ -247,15 +247,9 @@
 				? (seek(event, songBar.getBoundingClientRect()) * duration) / 2
 				: seek(event, songBar.getBoundingClientRect()) * duration
 	}
-
-	let width
 </script>
 
-<svelte:window
-	bind:outerWidth={width}
-	on:mouseup={() => (seeking = false)}
-	on:mousemove={trackMouse}
-/>
+<svelte:window on:mouseup={() => (seeking = false)} on:mousemove={trackMouse} />
 
 <div class="f-container" transition:fade>
 	<div
@@ -325,46 +319,44 @@
 		</div>
 		<Controls bind:isPlaying bind:loading {play} {pause} {nextBtn} {prevBtn} />
 		<div class="player-right">
-			{#if width > 500}
+			<div
+				class="volume player-btn"
+				use:clickOutside
+				on:click_outside={() => (volumeHover = false)}
+			>
 				<div
-					class="volume"
-					use:clickOutside
-					on:click_outside={() => (volumeHover = false)}
+					color="white"
+					class="volume-icon"
+					on:click={() => (volumeHover = !volumeHover)}
 				>
-					<div
-						color="white"
-						class="volume-icon"
-						on:click={() => (volumeHover = !volumeHover)}
-					>
-						<Icon color="white" name="volume" size="2em" />
-					</div>
-					{#if volumeHover}
-						<div class="volume-wrapper">
-							<div class="volume-slider">
-								<input
-									class="volume"
-									type="range"
-									bind:value={volume}
-									min="0"
-									max="1"
-									step="any"
-								/>
-							</div>
+					<Icon color="white" name="volume" size="2em" />
+				</div>
+				{#if volumeHover}
+					<div class="volume-wrapper">
+						<div class="volume-slider">
+							<input
+								class="volume"
+								type="range"
+								bind:value={volume}
+								min="0"
+								max="1"
+								step="any"
+							/>
 						</div>
-					{/if}
-				</div>
-				<div class="menu-container">
-					<Dropdown
-						bind:isHidden
-						on:click_outside={() => (isHidden = !isHidden)}
-						type="player"
-						items={DropdownItems}
-					/>
-				</div>
-			{/if}
-			<div class="menu-container__desktop">
-				<Dropdown bind:isHidden type="player" items={DropdownItems} />
+					</div>
+				{/if}
 			</div>
+			<div class="menu-container">
+				<Dropdown
+					bind:isHidden
+					on:click_outside={() => (isHidden = !isHidden)}
+					type="player"
+					items={DropdownItems}
+				/>
+			</div>
+			<!-- <div class="menu-container__desktop">
+				<Dropdown bind:isHidden type="player" items={DropdownItems} />
+			</div> -->
 		</div>
 	</div>
 </div>
@@ -381,6 +373,11 @@
 
 	.volume {
 		position: relative;
+		will-change: visibility, display;
+		@media screen and (max-width: 500px) {
+			visibility: hidden;
+			display: none;
+		}
 	}
 	.hover {
 		background-color: #bababa66;
@@ -395,6 +392,7 @@
 		position: absolute;
 		grid-area: f/f/f/f;
 		box-shadow: 0 0rem 1rem 0rem #00000070;
+		height: 100%;
 	}
 	.light * {
 		color: white !important;
@@ -428,7 +426,8 @@
 		padding: 0;
 
 		position: absolute;
-		@media (max-width: 512px) {
+		will-change: position;
+		@media screen and (max-width: 500px) {
 			position: relative !important;
 		}
 	}
@@ -436,6 +435,7 @@
 		position: relative;
 		height: 0.5rem;
 		width: 100%;
+		will-change: visibility;
 	}
 	.player-left,
 	.player-right {
@@ -444,7 +444,7 @@
 		max-height: 44pt;
 		max-width: 44pt;
 
-		padding: 10pt;
+		// padding: 10pt;
 		width: auto;
 		align-items: center;
 		display: flex;
@@ -470,7 +470,7 @@
 		outline: none;
 		border: transparent;
 		padding: 0;
-
+		will-change: contents;
 		&::before {
 			background-color: #232530;
 			position: absolute;
@@ -496,9 +496,10 @@
 	}
 
 	@media screen and (min-width: 500px) {
-		.menu-container__desktop {
-			visibility: none !important;
-			display: none !important;
-		}
+		// .menu-container__desktop {
+		// 	visibility: none !important;
+		// 	display: none !important;
+		// 	will-change: visibility, display;
+		// }
 	}
 </style>

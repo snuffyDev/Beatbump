@@ -48,7 +48,9 @@
 							style={`border-left: 0.4286rem solid ${item.color}`}
 							class="box"
 						>
-							<a href={`/explore/${item.endpoint.params}`}>{item.text}</a>
+							<a sveltekit:prefetch href={`/explore/${item.endpoint.params}`}
+								>{item.text}</a
+							>
 						</div>
 					{/each}
 				</box>

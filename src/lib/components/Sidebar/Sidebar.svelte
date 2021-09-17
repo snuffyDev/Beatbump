@@ -20,8 +20,10 @@
 			><em>Get the code on Github</em>
 
 			<section class="flex">
-				<a href="https://github.com/snuffyDev/Beatbump" rel="external"
-					><Icon name="github" size="1.5rem" /></a
+				<a
+					sveltekit:prefetch
+					href="https://github.com/snuffyDev/Beatbump"
+					rel="external"><Icon name="github" size="1.5rem" /></a
 				>
 			</section>
 		</slot>

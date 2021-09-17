@@ -5,6 +5,4 @@
 	import { writable } from 'svelte/store'
 </script>
 
-<main>
-	<slot />
-</main>
+<slot />
