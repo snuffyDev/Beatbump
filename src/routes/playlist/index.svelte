@@ -4,7 +4,6 @@
 	export async function load({ page, fetch }) {
 		const res = await api(fetch, 'playlist', { list: page.query.get('list') })
 
-		// const res = await fetch('/api/playlist.json?list=' + page.query.get('list'))
 		const {
 			tracks,
 			header,
