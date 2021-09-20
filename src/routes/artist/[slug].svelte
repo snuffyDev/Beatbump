@@ -1,10 +1,14 @@
 <script context="module">
-	export async function load({ page, fetch }) {
-		const response = await fetch(
-			'/api/artist.json?browseId=' + page.params.slug
-		)
+	import { api } from '$lib/api'
 
-		const data = await response.json()
+	export async function load({ page, fetch }) {
+		const id = page.params.slug
+		const response = await api(fetch, {
+			browseId: id,
+			endpoint: 'browse',
+			path: 'artist',
+			type: 'artist'
+		})
 		let {
 			carousels,
 			description,
@@ -12,7 +16,7 @@
 			header,
 			songs,
 			contents
-		} = await data
+		} = await response.body
 		if (response.ok) {
 			return {
 				props: {
@@ -20,7 +24,7 @@
 					description,
 					thumbnail,
 					header,
-					songs,
+					songs: response.body,
 					raw: contents,
 					id: page.params.slug
 				},

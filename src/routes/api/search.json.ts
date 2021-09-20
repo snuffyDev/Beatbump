@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import BaseContext from '$lib/context'
+import BaseContext from '$api/_modules/contexts/context'
 import { MusicResponsiveListItemRenderer } from '$lib/parsers'
 
 import type { Artist, NextContinuationData, Song } from '$lib/types'

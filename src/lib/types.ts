@@ -124,3 +124,16 @@ export interface mixList {
 	thumbnail?: string
 	length: string
 }
+export enum RequestType {
+	artist = 'artist',
+	playlist = 'playlist'
+}
+export type RequestParams = {
+	endpoint: string
+	continuation?: { [key: string]: string; value: string }
+	browseId?: string
+	type?: string
+	videoId?: string
+	playlistId?: string
+	path?: string
+}

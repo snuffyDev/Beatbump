@@ -30,7 +30,8 @@ export const addToQueue = async (videoId: string): Promise<string> => {
 
 // Get source URLs
 export const getSrc = async (videoId?: string, playlistId?: string) => {
-	const res = await api(fetch, 'player', {
+	const res = await api(fetch, {
+		endpoint: 'player',
 		videoId: videoId ? videoId : '',
 		playlistId: playlistId ? playlistId : ''
 	})
@@ -57,6 +58,14 @@ function handleError() {
 		error: true
 	}
 }
+
+export const queryParams = (params) =>
+	Object.keys(params)
+		.map((k) => {
+			if (params[k] == undefined) return
+			return k + '=' + params[k]
+		})
+		.join('&')
 // parse array object input for child
 
 export const pb = (input: string, query: string, justOne = false) => {

@@ -1,4 +1,4 @@
-import BaseContext from './../../lib/context'
+import BaseContext from '../api/_modules/contexttext'
 
 export async function get({ query }) {
 	const browseId = query.get('browseId')

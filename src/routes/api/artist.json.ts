@@ -1,4 +1,4 @@
-import BaseContext from '$lib/context'
+import BaseContext from '$api/_modules/contexts/context'
 import { parseArtistPage } from '$lib/js/artistUtils'
 import type { ICarousel } from '$lib/types'
 import type { EndpointOutput } from '@sveltejs/kit'

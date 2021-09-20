@@ -2,14 +2,30 @@
 	import { api } from '$lib/api'
 
 	export async function load({ page, fetch }) {
-		const res = await api(fetch, 'playlist', { list: page.query.get('list') })
+		const id = page.query.get('list')
+		let body = {
+			path: 'playlist',
+			endpoint: 'browse',
+			type: 'playlist',
+			browseId: id,
+			playlistId: id
+		}
 
+		const res = await api(fetch, { ...body })
+		// const res = await fetch('/api/api.json', {
+		// 	method: 'POST',
+		// 	body: newbody,
+		// 	headers: {
+		// 		'Content-Type': 'application/x-www-form-urlencoded'
+		// 	}
+		// })
+		// const json = await res.json()
 		const {
 			tracks,
 			header,
 			continuations,
-			data,
-			musicDetailHeaderRenderer
+			data
+			// musicDetailHeaderRenderer
 		} = await res.body
 		if (!res.ok) {
 			return {
@@ -23,7 +39,6 @@
 				data: data,
 				continuations: continuations,
 				header: header,
-				musicDetailHeaderRenderer,
 				id: page.query.get('list')
 			},
 			maxage: 3600,
@@ -47,10 +62,9 @@
 	export let header: Header
 	export let data
 	export let id
-	export let musicDetailHeaderRenderer
 	export let continuations
-	let ctoken = continuations.continuation
-	let itct = continuations.clickTrackingParams
+	let ctoken = continuations?.continuation || ''
+	let itct = continuations?.clickTrackingParams || ''
 	let width
 	let pageTitle = header?.title
 	let description
@@ -61,7 +75,7 @@
 	const trackStore = writable([])
 	trackStore.set(tracks)
 	setContext(ctx, { pageId: id })
-	console.log(data, tracks, continuations, header, musicDetailHeaderRenderer)
+	console.log(data, tracks, continuations, header)
 
 	onMount(() => {
 		pageTitle =

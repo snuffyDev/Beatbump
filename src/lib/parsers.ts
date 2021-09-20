@@ -35,9 +35,17 @@ export function parseNextItem(item, length) {
 	return result[0]
 }
 
+type Json =
+	| string
+	| number
+	| boolean
+	| null
+	| Json[]
+	| Record<string, { [key: string]: string; value: string }>
+	| { [key: string]: Json }
 export const MusicTwoRowItemRenderer = (ctx: any): CarouselItem => {
 	const Item: CarouselItem = {
-		title: ctx.musicTwoRowItemRenderer.title.runs[0].text,
+		title: ctx['musicTwoRowItemRenderer']['title']['runs'][0].text,
 		thumbnails:
 			ctx.musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer
 				.thumbnail.thumbnails,

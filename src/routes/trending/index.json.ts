@@ -1,4 +1,5 @@
-import BaseContext from '$lib/context'
+import BaseContext from '$api/_modules/context'
+BaseContext.base
 import {
 	MoodsAndGenresItem,
 	MusicResponsiveListItemRenderer,
@@ -17,14 +18,14 @@ export async function get({ query }) {
 	const carouselItems = []
 	// console.time('test')
 	// fetch data using Base Context
+	console.log
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/${endpoint}?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
 			method: 'POST',
-			body: JSON.stringify({
-				...BaseContext,
-				browseId: `${browseId}`
-			}),
+			body: JSON.stringify(BaseContext.base(browseId)),
+			// browseId: `${browseId}`
+
 			headers: {
 				'Content-Type': 'application/json; charset=utf-8',
 				Origin: 'https://music.youtube.com',
