@@ -28,52 +28,53 @@
 			alt="album"
 		/>
 	</div>
-	<div class="info">
+	<div class="metadata">
 		<div class="info-title">
-			<h4 class="box-title">
-				{title}
+			<div class="box-title">{title}</div>
+		</div>
+		{#if description && type == 'playlist'}
+			<p
+				class="secondary subtitle description"
+				class:hidden={width < 640 ? true : false}
+			>
+				{description}
+			</p>
+			<span class="secondary subtitle-group">
+				<p class="secondary subtitle">
+					{subtitles.join(' ')}
+				</p>
+				<em
+					><small class="subtitle">
+						{secondSubtitle.join(' ')}
+					</small>
+				</em>
+			</span>
+		{:else if type == 'release'}
+			<p>
 				{#if subtitles[0]?.contentRating}
 					<span class="explicit"> E </span>
 				{/if}
-			</h4>
-			{#if description && type == 'playlist'}
-				<p
-					class="subtitle description"
-					class:hidden={width < 640 ? true : false}
+				<a sveltekit:prefetch href={`/artist/${artist.channelId}`}
+					>{artist.name}</a
 				>
-					{description}
-				</p>
-				<span class="subtitle-group">
-					<p class="subtitle">
-						{subtitles.join(' ')}
-					</p>
-					<em
-						><small class="subtitle">
-							{secondSubtitle.join(' ')}
-						</small>
-					</em>
-				</span>
-			{:else if type == 'release'}
-				<p>
-					<a sveltekit:prefetch href={`/artist/${artist.channelId}`}
-						>{artist.name}</a
-					>
-					•
-					<small>
-						{subtitles[0].year} • {subtitles[0].tracks}
-					</small>
-				</p>
-			{/if}
-			<div class="button-group">
-				{#each buttons as { icon, text, action }}
-					<button on:click={action} class="button--outlined"
-						><Icon name={icon} size="1.5rem" /><span class="button-text"
-							>{text}</span
-						></button
-					>
-				{/each}
-			</div>
-		</div>
+				•
+				<small>
+					{subtitles[0].year} • {subtitles[0].tracks}
+				</small>
+			</p>
+		{/if}
+	</div>
+	<div class="button-group">
+		{#each buttons as { icon, text, action }, i}
+			<button
+				on:click={action}
+				class="button"
+				class:outlined={type == 'release' && i == buttons.length - 1}
+				><Icon name={icon} size="1.5rem" /><span class="button-text"
+					>{text}</span
+				></button
+			>
+		{/each}
 	</div>
 </div>
 
@@ -82,6 +83,7 @@
 	.box-title {
 		display: inline-flex;
 	}
+
 	p {
 		margin-top: 0;
 		margin-bottom: 0.3rem;

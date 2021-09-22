@@ -150,10 +150,10 @@ export default {
 		loading = false
 		playerLoading.set(loading)
 	},
-	async startPlaylist(playlistId) {
+	async startPlaylist(playlistId, index) {
 		loading = true
 		playerLoading.set(loading)
-		key.set(0)
+		key.set(index)
 
 		const data = await fetch(
 			`/api/getQueue.json?playlistId=${playlistId}`
@@ -170,7 +170,7 @@ export default {
 		loading = false
 		playerLoading.set(loading)
 		list.set({ currentMixId, clickTrackingParams, continuation, mix })
-		return await getSrc(mix[0].videoId)
+		return await getSrc(mix[index].videoId)
 	},
 	async getMore(itct, videoId, playlistId, ctoken, clickTrackingParams) {
 		let loading = true

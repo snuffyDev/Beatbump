@@ -24,10 +24,6 @@ export default function drag(node) {
 	}
 
 	function handleMousemove(event) {
-		if (loop) return
-		loop = window.requestAnimationFrame(() => mouseMove(event))
-	}
-	function mouseMove(event) {
 		let dx, dy
 		if (event.type == 'touchmove') {
 			// console.log(event)
@@ -54,7 +50,6 @@ export default function drag(node) {
 				})
 			)
 		}
-		loop = null
 	}
 
 	function handleMouseup(event) {
@@ -66,7 +61,6 @@ export default function drag(node) {
 			x = event.clientX
 			y = event.clientY
 		}
-		loop = null
 
 		node.dispatchEvent(
 			new CustomEvent('dragEnd', {

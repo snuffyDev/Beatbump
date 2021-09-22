@@ -283,19 +283,22 @@
 
 	.explicit {
 		text-shadow: none;
-		width: 1rem;
-		height: 1rem;
+		// width: 1rem;
+		// height: 1rem;
 		font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
 			Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
-		font-size: 0.7143rem;
+		font-size: calc(0.7143rem / 1.05);
 		flex: none;
-		color: #000;
+		color: rgb(8, 8, 8);
 		font-weight: 700;
-		filter: contrast(100%);
-		background: hsla(0, 0%, 100%, 0.966);
+		// filter: contrast(100%);
+		background: rgba(247, 247, 247, 0.993);
 		padding: 0 0.4em;
-		margin-left: 0.3em;
-		outline: #000 solid 0.1px;
+		margin-left: 0.25em;
+		display: inline-block;
+		border-radius: 0.2rem;
+		vertical-align: baseline;
+		border: rgba(255, 255, 255, 0.377) solid 0.01px;
 	}
 	.text-artist {
 		font-size: 0.95rem;

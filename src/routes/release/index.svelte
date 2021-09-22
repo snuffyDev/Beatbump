@@ -4,11 +4,11 @@
 		const browseId = page.query.get('id') || ''
 		const pt = page.query.get('type') || ''
 		path = context.page
-		const response = await api(fetch, 'main', {
-			q: '',
+		const response = await api(fetch, {
+			path: 'browse',
 			endpoint: 'browse',
 			browseId,
-			pt: pt ? pt : ''
+			type: 'release'
 		})
 		const data = await response.body
 		if (!response.ok) {
@@ -61,7 +61,7 @@
 	}
 
 	$: hasList = $list.mix.length > 0
-	let thumbnail = releaseInfo.thumbnails[1].url.replace(
+	let thumbnail = releaseInfo?.thumbnails[0]?.url.replace(
 		/=(w(\d+))-(h(\d+))/g,
 		'=w512-h512'
 	)

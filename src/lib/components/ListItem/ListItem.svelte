@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import Icon from '$components/Icon/Icon.svelte'
 	import { isPagePlaying, key } from '$stores/stores'
 	import { createEventDispatcher } from 'svelte'
@@ -38,17 +38,16 @@
 		if (page == 'playlist') {
 			key.set(index)
 			console.log('key: ' + $key, item.playlistId)
+			await list.startPlaylist(item.playlistId, index)
 
-			await list.initList(
-				item.videoId,
-				item.playlistId,
-				index,
-				item.playlistSetVideoId ? item.playlistSetVideoId : '',
-				'',
-				item.playerParams
-			)
+			// await list.initList(
+			// 	item.videoId,
+			// 	item.playlistId,
+			// 	index,
+			// 	item.playlistSetVideoId ? item.playlistSetVideoId : '',
+			// 		)
 		} else {
-			key.set(0)
+			key.set(index)
 			await list.initList(item.videoId, item.playlistId, $key)
 		}
 		dispatchPlaying()
@@ -70,16 +69,11 @@
 				</span>
 			{/if}
 		</div>
-		<div class="artists">
+		<div class="artists secondary">
 			{#if item.subtitle}
 				{#each item?.subtitle as subtitle}
 					<span class="artist">{subtitle.text}</span>
 				{/each}
-			{/if}
-			{#if item.artistInfo && page !== 'artist'}
-				<a sveltekit:prefetch href={`/artist/${item.artistInfo.browseId}`}
-					>{item.artistInfo.artist}</a
-				>
 			{/if}
 		</div>
 	</div>
@@ -103,33 +97,20 @@
 	}
 	.item-wrapper {
 	}
-	.explicit {
-		text-shadow: none;
-		width: 1rem;
-		height: 1rem;
-		font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-			Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
-		font-size: 0.7143rem;
-		flex: none;
-		color: #000;
-		font-weight: 700;
-		filter: contrast(100%);
-		background: hsla(0, 0%, 100%, 0.966);
-		padding: 0 0.4em;
-		margin-left: 0.3em;
-	}
+
 	.itemInfo {
 		display: inline-flex;
 		flex-direction: column;
 		flex: 1 0;
 		align-self: center;
+		line-height: 1.6;
 		margin-right: 1.8rem;
 		.item-title {
-			font-weight: 400;
+			font-weight: 500;
 		}
 		.artist {
 			font-family: 'Commissioner', sans-serif;
-			font-weight: 450;
+			font-weight: 400;
 		}
 	}
 	.item {
@@ -137,22 +118,6 @@
 		height: 5rem;
 	}
 
-	.explicit {
-		text-shadow: none;
-		width: 1rem;
-		height: 1rem;
-		font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-			Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
-		font-size: 0.7143rem;
-		flex: none;
-		color: #000;
-		font-weight: 700;
-		filter: contrast(100%);
-		border: 0.001rem solid #12121233;
-		background: rgba(238, 238, 238, 0.966);
-		padding: 0 0.4em;
-		margin-left: 0.3em;
-	}
 	.text-title {
 		&:hover {
 			text-decoration: underline solid white 0.0714rem;
@@ -184,15 +149,16 @@
 		border-bottom: calc(0.000321rem / 2) solid rgb(141 141 142 / 34%);
 		width: 100%;
 		padding: 0.4rem 0 0.4rem 0.15rem;
-		&:hover,
-		&:active:not(.menu) {
-			background: lighten(#57575831, 1%);
-			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
-			pointer-events: all;
-			&:active:not(.menu) {
-				background: lighten(#212225, 5%);
+		@media (hover: hover) {
+			&:hover {
+				background: lighten(#57575831, 1%);
 				transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
+				pointer-events: all;
 			}
+		}
+		&:active:not(.menu) {
+			background: lighten(#212225, 5%);
+			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
 		}
 	}
 	.playing {

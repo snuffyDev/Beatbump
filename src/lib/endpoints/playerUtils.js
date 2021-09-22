@@ -24,6 +24,7 @@ export const sort = (data) => {
 				if (
 					i.audioChannels === 2 &&
 					i.audioQuality.includes('AUDIO_QUALITY_MEDIUM')
+					// && i.mimeType.includes('webm')
 				) {
 					i.url = parseProxyRedir(i.url)
 					return arr.push(i)

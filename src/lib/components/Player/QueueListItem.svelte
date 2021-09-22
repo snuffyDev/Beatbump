@@ -64,7 +64,6 @@
 			<img
 				referrerpolicy="origin-when-cross-origin"
 				src={item.thumbnail}
-				loading="lazy"
 				alt="thumbnail"
 			/>
 			<Popout items={DropdownItems} type="dd-menu" bind:isShowing />

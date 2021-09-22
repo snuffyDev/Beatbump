@@ -14,8 +14,7 @@
 			description,
 			thumbnail,
 			header,
-			songs,
-			contents
+			songs
 		} = await response.body
 		if (response.ok) {
 			return {
@@ -24,8 +23,8 @@
 					description,
 					thumbnail,
 					header,
-					songs: response.body,
-					raw: contents,
+					// songs: response.body,
+					songs,
 					id: page.params.slug
 				},
 				status: 200
@@ -49,12 +48,12 @@
 	export let thumbnail
 	export let carousels
 	export let songs = []
-	export let raw
+	// export let raw
 	export let id
 	$: id = id
 	let width
 	const ctx = {}
-	$: console.log(header, carousels, raw, songs)
+	$: console.log(header, carousels, songs)
 	setContext(ctx, { pageId: id })
 
 	tags.desc(header?.name)

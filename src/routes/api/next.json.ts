@@ -28,10 +28,10 @@ export async function get({
 
 					user: {
 						enableSafetyMode: false
-					},
-					clickTracking: {
-						clickTrackingParams: `${clickTracking}`
 					}
+					// clickTracking: {
+					// 	clickTrackingParams: `${clickTracking}`
+					// }
 				},
 				continuation: `${ctoken}`,
 				isAudioOnly: true,

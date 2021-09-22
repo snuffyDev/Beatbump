@@ -51,7 +51,7 @@
 		{header.title}
 	</h1>
 	{#if !$page.path.includes('/artist/') && header.browseId}<a
-			style="white-space:pre;"
+			style="white-space:pre; display: inline-block;"
 			{href}><small>See All</small></a
 		>{/if}
 </div>

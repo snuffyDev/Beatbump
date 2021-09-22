@@ -1,4 +1,4 @@
-import type { CarouselItem } from './types'
+import type { CarouselItem, Item } from './types'
 
 export function parseNextItem(item, length) {
 	item = [item]
@@ -79,8 +79,12 @@ export const MusicTwoRowItemRenderer = (ctx: any): CarouselItem => {
 	return Item
 }
 
-export const MusicResponsiveListItemRenderer = (ctx: any): CarouselItem => {
-	const Item: CarouselItem = {
+export const MusicResponsiveListItemRenderer = (
+	ctx: any,
+	playlistSetVideoId?: boolean,
+	playlistId?: string
+): Item => {
+	let Item: Item = {
 		subtitle: [
 			...ctx.musicResponsiveListItemRenderer.flexColumns[1]
 				.musicResponsiveListItemFlexColumnRenderer.text.runs
@@ -93,7 +97,7 @@ export const MusicResponsiveListItemRenderer = (ctx: any): CarouselItem => {
 				}
 			]
 		},
-		explicit: ctx?.badges ? ctx?.badges : false,
+		explicit: ctx?.badges ? true : false,
 		title:
 			ctx.musicResponsiveListItemRenderer.flexColumns[0]
 				.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text,
@@ -102,15 +106,28 @@ export const MusicResponsiveListItemRenderer = (ctx: any): CarouselItem => {
 			ctx.musicResponsiveListItemRenderer.flexColumns[0]
 				.musicResponsiveListItemFlexColumnRenderer.text.runs[0]
 				?.navigationEndpoint?.watchEndpoint?.videoId || '',
-		playlistId: ctx.musicResponsiveListItemRenderer.menu.menuRenderer.items[0]
+		playlistId: ctx.musicResponsiveListItemRenderer?.menu?.menuRenderer.items[0]
 			.menuNavigationItemRenderer?.navigationEndpoint?.watchEndpoint?.playlistId
-			? ctx.musicResponsiveListItemRenderer.menu.menuRenderer.items[0]
+			? ctx.musicResponsiveListItemRenderer?.menu?.menuRenderer.items[0]
 					.menuNavigationItemRenderer.navigationEndpoint.watchEndpoint
 					.playlistId
 			: ctx?.navigationEndpoint?.watchEndpoint,
 		thumbnails:
-			ctx.musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer
-				.thumbnail.thumbnails
+			ctx.musicResponsiveListItemRenderer.thumbnail?.musicThumbnailRenderer
+				?.thumbnail?.thumbnails
+	}
+	if (Item !== undefined && playlistSetVideoId) {
+		Item.playlistSetVideoId =
+			ctx.musicResponsiveListItemRenderer.playlistItemData
+				?.playlistSetVideoId ||
+			ctx.musicResponsiveListItemRenderer?.overlay
+				?.musicItemThumbnailOverlayRenderer.content?.musicPlayButtonRenderer
+				?.playNavigationEndpoint?.watchEndpoint?.playlistSetVideoId
+		Item.playerParams =
+			ctx.musicResponsiveListItemRenderer?.flexColumns[0]
+				?.musicResponsiveListItemFlexColumnRenderer.text?.runs[0]
+				?.navigationEndpoint?.watchEndpoint?.playerParams || 'iAQB'
+		Item.playlistId = playlistId
 	}
 	return Item
 }

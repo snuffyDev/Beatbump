@@ -58,6 +58,7 @@
 
 	import InfoBox from '$lib/components/Layouts/InfoBox.svelte'
 	import { writable } from 'svelte/store'
+	import { browser } from '$app/env'
 	export let tracks: Item[]
 	export let header: Header
 	export let data
@@ -75,16 +76,16 @@
 	const trackStore = writable([])
 	trackStore.set(tracks)
 	setContext(ctx, { pageId: id })
-	console.log(data, tracks, continuations, header)
+	if (browser) {
+		console.log(data, tracks, continuations, header)
+	}
 
-	onMount(() => {
-		pageTitle =
-			pageTitle.length > 64 ? pageTitle.substring(0, 64) + '...' : header.title
-		description =
-			header.description.length > 240
-				? header.description.substring(0, 240) + '...'
-				: header.description
-	})
+	pageTitle =
+		pageTitle.length > 64 ? pageTitle.substring(0, 64) + '...' : header.title
+	description =
+		header.description.length > 240
+			? header.description.substring(0, 240) + '...'
+			: header.description
 	const getContinuation = async () => {
 		if (isLoading || hasData) return
 		if (!itct || !ctoken) {

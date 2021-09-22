@@ -1,4 +1,5 @@
 import { parseArtistPage } from '$lib/js/artistUtils'
+
 import type { ICarousel } from '$lib/types'
 
 export const parseArtist = (data) => {
@@ -21,8 +22,7 @@ export const parseArtist = (data) => {
 	const parsed = parse(header, contents)
 
 	return {
-		...parsed[0],
-		contents
+		...parsed[0]
 	}
 }
 

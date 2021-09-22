@@ -44,7 +44,7 @@
 </footer>
 
 <style lang="scss" global>
-	@import '../global/stylesheet/main.scss';
+	@use '../global/stylesheet/main';
 	.no-scroll {
 		overflow: hidden;
 		overflow-y: hidden;

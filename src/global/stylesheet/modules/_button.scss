@@ -2,7 +2,7 @@
 // All rules related to the .button module
 
 %button-base {
-	transition: background cubic-bezier(0.455, 0.03, 0.515, 0.955) 75ms;
+	transition: background border cubic-bezier(0.455, 0.03, 0.515, 0.955) 75ms;
 	display: inline-flex;
 	padding: 0.6rem 1.2rem;
 	color: #0e0e0e; //  is added to colors in order to make button utility immutable.  Otherwise, it's common for `a` styles to override button specificity.
@@ -12,8 +12,9 @@
 	font-family: "Commissioner", sans-serif;
 	cursor: pointer;
 	font-size: 1.2em;
-	font-weight: 500;
+	font-weight: 600;
 	text-transform: none;
+	margin-bottom: 0.5rem;
 	// text-align: center;
 	// vertical-align: middle;
 	white-space: nowrap;
@@ -28,9 +29,7 @@
 	//     outline-offset: -2px;
 	// }
 
-	&:hover,
-	&:active,
-	&.active {
+	%active {
 		color: rgb(15, 15, 15);
 		background-color: darken(#f2f2f2f3, 10%) !important;
 		border-color: #202020 !important;
@@ -38,6 +37,22 @@
 		outline: 0;
 		text-decoration: none;
 		cursor: pointer;
+	}
+	@media (hover: hover) {
+		&:hover {
+			color: rgb(15, 15, 15);
+			background-color: darken(#f2f2f2f3, 10%) !important;
+			border-color: #202020 !important;
+			// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
+			outline: 0;
+			text-decoration: none;
+			cursor: pointer;
+		}
+	}
+	&:active,
+	&.active {
+		@extend %active;
+		background-color: #f1f1f1 !important;
 	}
 }
 
@@ -57,10 +72,10 @@ button.has-icon {
 }
 
 button.outlined {
-	font-weight: 700;
 	display: inline-flex;
 	min-width: 7rem;
 	align-items: center;
+	font-weight: 700;
 
 	background-color: transparent !important;
 	border: white 0.1rem solid !important;
@@ -70,10 +85,8 @@ button.outlined {
 	/* place-items: center; */
 	display: inline-flex;
 	font-weight: 500;
-	margin-bottom: 0.8rem;
 
-	&:active,
-	&:hover {
+	&:active {
 		border: rgb(158, 158, 158) 0.1rem solid !important;
 		background: rgba(255, 255, 255, 0.027) !important;
 		box-shadow: 0 0 0.1em 0 inset black;
@@ -85,14 +98,18 @@ button.outlined {
 		align-self: center;
 		padding-bottom: 0.1rem;
 	}
-	&:hover {
-		background-color: transparentize(#fff, 0.1) !important;
-		border-color: #caca !important;
+	@media (hover: hover) {
+		&:hover {
+			background-color: rgba(255, 255, 255, 0.034) !important;
+			border-color: #caca !important;
+		}
 	}
 	&:active {
-		background-color: transparentize(#fff, 0.3) !important;
+		background-color: rgba(255, 255, 255, 0.096) !important;
+		// background-color: transparentize(#fff, 0.3) !important;
 		border-color: rgba(255, 255, 255, 0.667) !important;
 	}
+
 	// font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 	-webkit-font-smoothing: antialiased;
 }

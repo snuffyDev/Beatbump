@@ -1,34 +1,43 @@
 import { MusicResponsiveListItemRenderer } from '$lib/parsers'
 
 /* eslint-disable no-prototype-builtins */
-export function parsePageContents(data) {
-	// eslint-disable-next-line prefer-const
-	const {
-		header = {},
-		contents: {
-			singleColumnBrowseResultsRenderer: {
-				tabs: [
-					{
-						tabRenderer: {
-							content: {
-								sectionListRenderer: {
-									contents: [
-										{ musicShelfRenderer: { contents = [] } = {} }
-									] = []
-								} = {}
-							} = {}
-						} = {}
+export function parsePageContents(data: {
+	header: {
+		musicDetailHeaderRenderer: {
+			title
+			subtitle: { runs: [{ text: string }] }
+			menu
+			thumbnail
+			moreButton
+			subtitleBadges
+			secondSubtitle: { runs: [{ text: string }] }
+		}
+	}
+	contents: {
+		singleColumnBrowseResultsRenderer: {
+			tabs: [
+				{
+					tabRenderer: {
+						content: {
+							sectionListRenderer: {
+								contents: [{ musicShelfRenderer: { contents } }]
+							}
+						}
 					}
-				] = []
-			} = {}
-		} = {}
-	} = data
+				}
+			]
+		}
+	}
+}) {
 	let items = []
 	// console.log(contents)
 	let t = {
 		items: 'item'
 	}
-
+	const contents = [
+		...data.contents?.singleColumnBrowseResultsRenderer?.tabs[0].tabRenderer
+			.content.sectionListRenderer.contents[0].musicShelfRenderer.contents
+	]
 	const songs = contents.map(
 		({ musicResponsiveListItemRenderer = {} }, index) => {
 			const {
@@ -36,20 +45,23 @@ export function parsePageContents(data) {
 				navigationEndpoint: {
 					watchEndpoint: { playlistId = '', videoId = '' } = {}
 				} = {}
-			} = musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0]
+			} = musicResponsiveListItemRenderer?.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0]
 			const playlistSetVideoId =
-				musicResponsiveListItemRenderer.playlistItemData.playlistSetVideoId
+				musicResponsiveListItemRenderer?.playlistItemData?.playlistSetVideoId
 			let explicit = false
 			if (musicResponsiveListItemRenderer?.badges) {
 				explicit = true
 			}
-			const length =
-				musicResponsiveListItemRenderer.fixedColumns[0]
-					.musicResponsiveListItemFixedColumnRenderer.text.runs[0].text
+			console.log(contents)
+			const length = musicResponsiveListItemRenderer.fixedColumns
+				? musicResponsiveListItemRenderer?.fixedColumns[0]
+						?.musicResponsiveListItemFixedColumnRenderer?.text?.runs[0]?.text
+				: ''
 			return {
 				title: text,
 				playlistId,
 				videoId,
+				musicResponsiveListItemRenderer,
 				index,
 				length,
 				explicit
@@ -57,16 +69,21 @@ export function parsePageContents(data) {
 		}
 	)
 
-	const releaseInfo = [header].map(({ musicDetailHeaderRenderer = {} }) => ({
+	const releaseInfo = {
 		playlistId:
-			musicDetailHeaderRenderer.menu.menuRenderer.topLevelButtons[0]
-				.buttonRenderer.navigationEndpoint.watchPlaylistEndpoint.playlistId,
+			data.header?.musicDetailHeaderRenderer.menu?.menuRenderer
+				?.topLevelButtons[0].buttonRenderer.navigationEndpoint
+				.watchPlaylistEndpoint.playlistId,
 		subtitles: [
 			{
-				year: musicDetailHeaderRenderer.subtitle.runs[4].text,
-				tracks: musicDetailHeaderRenderer.secondSubtitle.runs[0].text,
-				length: musicDetailHeaderRenderer.secondSubtitle.runs[2].text,
-				contentRating: musicDetailHeaderRenderer.hasOwnProperty(
+				year:
+					data.header?.musicDetailHeaderRenderer?.subtitle?.runs[4]?.text ||
+					null,
+				tracks:
+					data.header?.musicDetailHeaderRenderer?.secondSubtitle?.runs[0].text,
+				length:
+					data.header?.musicDetailHeaderRenderer?.secondSubtitle?.runs[2].text,
+				contentRating: data.header?.musicDetailHeaderRenderer?.hasOwnProperty(
 					'subtitleBadges'
 				)
 					? true
@@ -75,25 +92,25 @@ export function parsePageContents(data) {
 		],
 		secondSubtitle: [],
 		artist: {
-			name: musicDetailHeaderRenderer.subtitle.runs[2].text,
+			name: data.header?.musicDetailHeaderRenderer.subtitle?.runs[2].text,
 			channelId:
-				musicDetailHeaderRenderer.subtitle.runs[2].navigationEndpoint
-					.browseEndpoint.browseId
+				data.header?.musicDetailHeaderRenderer.subtitle?.runs[2]
+					.navigationEndpoint.browseEndpoint.browseId
 		},
 		thumbnails:
-			musicDetailHeaderRenderer.thumbnail.croppedSquareThumbnailRenderer
-				.thumbnail.thumbnails,
-		title: musicDetailHeaderRenderer.title.runs[0].text,
+			data.header?.musicDetailHeaderRenderer?.thumbnail
+				?.croppedSquareThumbnailRenderer?.thumbnail?.thumbnails,
+		title: data.header?.musicDetailHeaderRenderer.title?.runs[0].text,
 		autoMixId:
-			musicDetailHeaderRenderer.menu.menuRenderer.items[1]
-				.menuNavigationItemRenderer.navigationEndpoint.watchPlaylistEndpoint
-				.playlistId
-	}))
+			data.header?.musicDetailHeaderRenderer.menu?.menuRenderer?.items[1]
+				?.menuNavigationItemRenderer?.navigationEndpoint?.watchPlaylistEndpoint
+				?.playlistId || null
+	}
 
-	// console.log(items)
+	console.log(releaseInfo)
 
 	return {
 		items: songs,
-		releaseInfo: releaseInfo[0]
+		releaseInfo: releaseInfo
 	}
 }

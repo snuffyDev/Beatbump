@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import BaseContext from '$api/_modules/contexts/context'
+// import BaseContext from '$api/_modules/contexts/context'
 import { MusicResponsiveListItemRenderer } from '$lib/parsers'
 
 import type { Artist, NextContinuationData, Song } from '$lib/types'
@@ -34,7 +34,30 @@ export async function get({ query }): Promise<SearchOutput> {
 		{
 			method: 'POST',
 			body: JSON.stringify({
-				...BaseContext,
+				context: {
+					client: {
+						clientName: 'WEB_REMIX',
+						clientVersion: '0.1'
+					},
+					capabilities: {},
+					request: {
+						internalExperimentFlags: [
+							{
+								key: 'force_music_enable_outertube_tastebuilder_browse',
+								value: 'true'
+							},
+							{
+								key: 'force_music_enable_outertube_playlist_detail_browse',
+								value: 'true'
+							},
+							{
+								key: 'force_music_enable_outertube_search_suggestions',
+								value: 'true'
+							}
+						],
+						sessionIndex: {}
+					}
+				},
 				user: {
 					enableSafetyMode: false
 				},
@@ -133,7 +156,7 @@ const parseSong = (contents, type): Song[] => {
 	return contents.map((s, i) => {
 		let explicit
 		const { musicResponsiveListItemRenderer: ctx } = s
-		if (Object.prototype.hasOwnProperty.call(ctx, 'badges')) explicit = true
+		if (ctx?.badges) explicit = true
 
 		const params =
 			ctx.menu?.menuRenderer?.items[0]?.menuNavigationItemRenderer
@@ -201,7 +224,7 @@ const parseSong = (contents, type): Song[] => {
 			...MusicResponsiveListItemRenderer(s),
 			album: albumInfo,
 			artistInfo: artist,
-
+			explicit,
 			type: type,
 			params: params,
 			length: length,

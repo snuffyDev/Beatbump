@@ -64,8 +64,9 @@ nav.nav {
 	background: inherit;
 
 	&::before {
-		filter: brightness(0.5);
+		backdrop-filter: brightness(1.1);
 
+		box-shadow: 0 -0.5rem 1em 0.01rem #30303014 inset;
 		position: absolute;
 		top: 0;
 		left: 0;

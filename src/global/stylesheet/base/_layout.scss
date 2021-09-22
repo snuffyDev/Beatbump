@@ -139,7 +139,7 @@ main {
 	overflow: visible;
 	will-change: contents;
 	@media only screen and (min-width: 53.333333rem) {
-		padding: var(--base-spacing) var(--lg-spacing);
+		padding: var(--base-spacing) 1.75rem;
 	}
 }
 

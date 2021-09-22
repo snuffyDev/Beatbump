@@ -169,7 +169,6 @@
 		visibility: hidden;
 		@media screen and (min-width: 53.333333rem) {
 			--lines: 3;
-			font-family: Roboto, Noto Naskh Arabic UI, Arial, sans-serif;
 			font-size: 14px;
 			line-height: var(--line-height);
 			font-weight: 400;
@@ -181,7 +180,7 @@
 			-webkit-box-orient: vertical;
 			overflow: hidden;
 			white-space: normal;
-
+			letter-spacing: -0.0125rem;
 			white-space: normal;
 			max-height: calc(var(--lines) * 14px * var(--line-height));
 			margin-bottom: 0.8rem;

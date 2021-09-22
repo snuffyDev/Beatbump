@@ -24,14 +24,7 @@
 </script>
 
 {#if isSettingsOpen}
-	<div
-		use:clickOutside
-		on:click_outside={() => {
-			isSettingsOpen = !isSettingsOpen
-		}}
-		class="nav-settings"
-		transition:fade={{ duration: 120, easing: circIn }}
-	>
+	<div class="nav-settings" transition:fade={{ duration: 120, easing: circIn }}>
 		<!-- <label for="search"><em>search</em></label> -->
 		<div class="setting">
 			<label for="select" class="s-text">Theme:</label>

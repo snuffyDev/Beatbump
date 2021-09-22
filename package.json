@@ -46,6 +46,7 @@
 		"node": ">= 12.17.0"
 	},
 	"dependencies": {
-		"@fontsource/commissioner": "^4.5.0"
+		"@fontsource/commissioner": "^4.5.0",
+		"cookie": "^0.4.1"
 	}
 }

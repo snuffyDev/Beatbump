@@ -1,5 +1,6 @@
 <script context="module">
-	export async function load({ fetch }) {
+	export async function load({ fetch, session }) {
+		console.log(session)
 		const data = await fetch('/explore.json?browseId=FEmusic_moods_and_genres')
 		const response = await data.json()
 

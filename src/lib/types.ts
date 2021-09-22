@@ -14,7 +14,11 @@ export interface ICarousel {
 	results: Array<CarouselItem & MoodsAndGenresItem>
 	isBrowse?: boolean
 }
-export type Item = Song & PlaylistSearch & CarouselItem & Record<string, any[]>
+export type Item = Song &
+	PlaylistSearch &
+	CarouselItem &
+	MusicResponsiveListItemRenderer &
+	Record<string, any[]>
 
 export interface Album {
 	browseId: string
@@ -107,6 +111,11 @@ export type CarouselItem = {
 	thumbnails: [{ url: string; width: number }]
 	subtitle?: Subtitle[]
 }
+
+interface MusicResponsiveListItemRenderer extends CarouselItem {
+	playlistSetVideoId?: string
+}
+
 export type ItemEndpoint = {
 	browseId: string
 	pageType: string

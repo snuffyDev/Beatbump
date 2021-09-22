@@ -89,7 +89,7 @@ function _verifyUserAgent() {
 		}
 	}
 }
-
+export const authKey = writable('')
 function _theme() {
 	const { subscribe, set, update } = writable('')
 	return {

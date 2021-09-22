@@ -71,7 +71,6 @@
 		]
 	})
 	const play = () => {
-		navigator.mediaSession.playbackState = 'playing'
 		isPlaying = true
 		key.set(autoId)
 		let playTrack = player.play()
@@ -83,7 +82,7 @@
 	}
 	const pause = () => player.pause()
 
-	player.addEventListener('timeupdate', async () => {
+	player.addEventListener('timeupdate', () => {
 		time = player.currentTime
 		duration = player.duration
 		remainingTime = duration - time
@@ -112,34 +111,34 @@
 
 	function metaDataHandler() {
 		if ('mediaSession' in navigator && player.src !== undefined) {
-			navigator.mediaSession.metadata = new MediaMetadata({
-				title: $list.mix[autoId || 0].title,
-				artist: $list.mix[autoId || 0].artistInfo.artist || null,
-				album:
-					$list.mix[autoId || 0].album?.title ||
-					$list.mix[autoId || 0].album?.text ||
-					undefined,
-
-				artwork: [
-					{
-						src: $list.mix[autoId || 0].thumbnails
-							? $list.mix[autoId || 0].thumbnails[0].url.replace(
-									/=(w(\d+))-(h(\d+))/g,
-									'=w128-h128'
-							  )
-							: $list.mix[autoId || 0].thumbnail.replace(
-									/=(w(\d+))-(h(\d+))/g,
-									'=w128-h128'
-							  ),
-						sizes: '128x128',
-						type: 'image/jpeg'
-					}
-				]
-			})
-			navigator.mediaSession.setActionHandler('play', play)
-			navigator.mediaSession.setActionHandler('pause', pause)
-			navigator.mediaSession.setActionHandler('previoustrack', prevBtn)
-			navigator.mediaSession.setActionHandler('nexttrack', nextBtn)
+			// 	navigator.mediaSession.metadata = new MediaMetadata({
+			// 		title: $list.mix[autoId || 0].title,
+			// 		artist: $list.mix[autoId || 0].artistInfo.artist || null,
+			// 		album:
+			// 			$list.mix[autoId || 0].album?.title ||
+			// 			$list.mix[autoId || 0].album?.text ||
+			// 			undefined,
+			// 		artwork: [
+			// 			{
+			// 				src: $list.mix[autoId || 0].thumbnails
+			// 					? $list.mix[autoId || 0].thumbnails[0].url.replace(
+			// 							/=(w(\d+))-(h(\d+))/g,
+			// 							'=w128-h128'
+			// 					  )
+			// 					: $list.mix[autoId || 0].thumbnail.replace(
+			// 							/=(w(\d+))-(h(\d+))/g,
+			// 							'=w128-h128'
+			// 					  ),
+			// 				sizes: '128x128',
+			// 				type: 'image/jpeg'
+			// 			}
+			// 		]
+			// 	})
+			// 	navigator.mediaSession.setActionHandler('play', play)
+			// 	navigator.mediaSession.setActionHandler('pause', pause)
+			// 	navigator.mediaSession.setActionHandler('previoustrack', prevBtn)
+			// 	navigator.mediaSession.setActionHandler('nexttrack', nextBtn)
+			// }
 		}
 	}
 
@@ -272,7 +271,7 @@
 	</div>
 	<div class="player" class:light={$theme == 'light'}>
 		<div
-			style="background:inherit; display:contents;"
+			style="background:inherit;"
 			on:click_outside={() => {
 				showing = false
 			}}
@@ -443,6 +442,7 @@
 		height: auto;
 		max-height: 44pt;
 		max-width: 44pt;
+		place-self: center;
 
 		// padding: 10pt;
 		width: auto;
