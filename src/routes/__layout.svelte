@@ -13,7 +13,7 @@
 	import Player from '$components/Player/Player.svelte'
 	import Wrapper from '$components/Wrapper/Wrapper.svelte'
 	import Alert from '$lib/components/Alert/Alert.svelte'
-	import { filterAutoPlay, iOS, theme } from '$stores/stores'
+	import { alertHandler, filterAutoPlay, iOS, theme } from '$stores/stores'
 	import { onMount } from 'svelte'
 	export let key
 	let main

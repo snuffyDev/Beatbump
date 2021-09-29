@@ -11,11 +11,10 @@ interface Response extends EndpointOutput {
 	body?: string | Record<string, any>
 	error?: Error
 }
-export async function get({ query }): Promise<Response> {
+export async function get({ query, headers }): Promise<Response> {
 	const endpoint = query.get('q') || ''
 	const browseId = 'FEmusic_explore'
 	const carouselItems = []
-
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/${endpoint}?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{

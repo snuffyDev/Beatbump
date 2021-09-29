@@ -152,11 +152,19 @@
 		try {
 			loading = true
 			videoId = data.videoId ? data.videoId : ''
-			playlistId = data?.playlistId ? data.playlistId : data.shuffle.playlistId
+			playlistId = data?.playlistId
+				? data?.playlistId
+				: data.shuffle?.playlistId
 			if (data.type == 'playlist') {
 				await list.startPlaylist(playlistId)
 			} else {
-				await list.initList(videoId, playlistId, 0, data.params, '')
+				await list.initList(
+					videoId,
+					playlistId || data.autoMixList,
+					0,
+					data.params,
+					''
+				)
 			}
 			key.set(0)
 			loading = false
@@ -183,7 +191,7 @@
 						referrerpolicy="origin-when-cross-origin"
 						loading="lazy"
 						type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-						src={data.thumbnails[0].url}
+						src={data.thumbnail || data.thumbnails[0]?.url}
 						alt="thumbnail"
 					/>
 				</div>
@@ -208,7 +216,8 @@
 							sveltekit:prefetch
 							href={`/artist/` +
 								data.artistInfo?.artist[0]?.navigationEndpoint?.browseEndpoint
-									?.browseId}>{data.artistInfo?.artist[0].text}</a
+									?.browseId || data.artistInfo.browseId}
+							>{data.artistInfo?.artist[0].text || data.artistInfo?.artist}</a
 						>
 					</p>
 				{/if}

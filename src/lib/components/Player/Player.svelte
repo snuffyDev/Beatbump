@@ -1,7 +1,10 @@
 <script lang="ts">
+	import { browser } from '$app/env'
+
 	import { goto } from '$app/navigation'
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 	import Icon from '$components/Icon/Icon.svelte'
+	import db from '$lib/db'
 	import { clickOutside } from '$lib/js/clickOutside'
 	import list from '$lib/stores/list'
 	import { getSrc } from '$lib/utils'
@@ -31,7 +34,7 @@
 
 	$: time = player.currentTime
 	$: duration = 1000
-	let remainingTime = 55
+	$: remainingTime = 55
 
 	$: volume = 0.5
 	$: player.volume = volume
@@ -67,6 +70,15 @@
 					})
 					goto(`/artist/${mixList[autoId].artistInfo.browseId}`)
 				}
+			},
+			{
+				text: 'Add to Favorites',
+				icon: 'heart',
+				action: async () => {
+					// console.log(data)
+					if (!browser) return
+					await db.setNewFavorite($list.mix[autoId])
+				}
 			}
 		]
 	})
@@ -81,17 +93,26 @@
 		}
 	}
 	const pause = () => player.pause()
-
+	const setPosition = () => {
+		navigator.mediaSession.setPositionState({
+			duration: isWebkit ? duration / 2 : duration,
+			position: player.currentTime
+		})
+	}
 	player.addEventListener('timeupdate', () => {
 		time = player.currentTime
 		duration = player.duration
 		remainingTime = duration - time
 		$progress = isWebkit == true ? time * 2 : time
-		// This checks if the user is on an iOS device
-		// due to the length of a song being doubled on iOS,
-		// we have to cut the time in half. Doesn't effect other devices.
+
+		/* This checks if the user is on an iOS device
+		 	 due to the length of a song being doubled on iOS,
+			 we have to cut the time in half. Doesn't effect other devices.
+		*/
 		if (isWebkit && remainingTime < duration / 2 && once == false) {
-			getNext()
+			// player.currentTime = 0
+			// getNext();
+			player.currentTime = player.currentTime * 2
 		}
 	})
 
@@ -110,35 +131,43 @@
 	})
 
 	function metaDataHandler() {
-		if ('mediaSession' in navigator && player.src !== undefined) {
-			// 	navigator.mediaSession.metadata = new MediaMetadata({
-			// 		title: $list.mix[autoId || 0].title,
-			// 		artist: $list.mix[autoId || 0].artistInfo.artist || null,
-			// 		album:
-			// 			$list.mix[autoId || 0].album?.title ||
-			// 			$list.mix[autoId || 0].album?.text ||
-			// 			undefined,
-			// 		artwork: [
-			// 			{
-			// 				src: $list.mix[autoId || 0].thumbnails
-			// 					? $list.mix[autoId || 0].thumbnails[0].url.replace(
-			// 							/=(w(\d+))-(h(\d+))/g,
-			// 							'=w128-h128'
-			// 					  )
-			// 					: $list.mix[autoId || 0].thumbnail.replace(
-			// 							/=(w(\d+))-(h(\d+))/g,
-			// 							'=w128-h128'
-			// 					  ),
-			// 				sizes: '128x128',
-			// 				type: 'image/jpeg'
-			// 			}
-			// 		]
-			// 	})
-			// 	navigator.mediaSession.setActionHandler('play', play)
-			// 	navigator.mediaSession.setActionHandler('pause', pause)
-			// 	navigator.mediaSession.setActionHandler('previoustrack', prevBtn)
-			// 	navigator.mediaSession.setActionHandler('nexttrack', nextBtn)
-			// }
+		if ('mediaSession' in navigator) {
+			navigator.mediaSession.metadata = new MediaMetadata({
+				title: $list.mix[autoId || 0].title,
+				artist: $list.mix[autoId || 0].artistInfo.artist || null,
+				album:
+					$list.mix[autoId || 0].album?.title ||
+					$list.mix[autoId || 0].album?.text ||
+					undefined,
+				artwork: [
+					{
+						src: $list.mix[autoId || 0].thumbnails
+							? $list.mix[autoId || 0].thumbnails[0].url.replace(
+									/=(w(\d+))-(h(\d+))/g,
+									'=w128-h128'
+							  )
+							: $list.mix[autoId || 0].thumbnail.replace(
+									/=(w(\d+))-(h(\d+))/g,
+									'=w128-h128'
+							  ),
+						sizes: '128x128',
+						type: 'image/jpeg'
+					}
+				]
+			})
+			navigator.mediaSession.setActionHandler('play', play)
+			navigator.mediaSession.setActionHandler('pause', pause)
+			navigator.mediaSession.setActionHandler('seekto', (session) => {
+				if (session.fastSeek && 'fastSeek' in player) {
+					player.fastSeek(session.seekTime)
+					setPosition()
+					return
+				}
+				player.currentTime = session.seekTime
+				setPosition()
+			})
+			navigator.mediaSession.setActionHandler('previoustrack', prevBtn)
+			navigator.mediaSession.setActionHandler('nexttrack', nextBtn)
 		}
 	}
 
@@ -163,20 +192,21 @@
 		} else {
 			autoId++
 			key.set(autoId)
-			await getTrackURL()
 
+			const src = await getTrackURL()
+			player.src = src
 			currentTitle.set($list.mix[autoId].title)
 			once = false
 		}
 	}
 
 	async function getTrackURL() {
-		await getSrc(mixList[autoId].videoId).then(({ body, error }) => {
+		return await getSrc(mixList[autoId].videoId).then(({ body, error }) => {
 			if (error === true) {
 				getNext()
 			}
-			player.src = body
 			currentTitle.set($list.mix[autoId].title)
+			return body
 		})
 	}
 

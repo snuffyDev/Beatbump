@@ -60,6 +60,8 @@ export const handle = async ({ request, resolve }): Promise<HooksResponse> => {
 	request.locals = request.headers
 	const response = await resolve(request)
 	// console.log(request)
+	// console.log(JSON.stringify(request.headers))
+
 	return {
 		...response,
 		headers: {
@@ -75,8 +77,4 @@ export const handle = async ({ request, resolve }): Promise<HooksResponse> => {
 				'max-age=31536000; includeSubDomains; preload'
 		}
 	}
-}
-
-export function getSession({ locals }) {
-	return locals.user
 }
