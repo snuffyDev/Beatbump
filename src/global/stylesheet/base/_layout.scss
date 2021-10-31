@@ -33,7 +33,7 @@ body {
 	word-wrap: break-word;
 	font-size: var(--base-font-size);
 	-webkit-text-size-adjust: 100%;
-	font-size: 0.75rem;
+	// font-size: 0.75rem;
 
 	/* ===== Scrollbar CSS ===== */
 
@@ -76,10 +76,10 @@ body {
 	-webkit-tap-highlight-color: transparent;
 	// @include mixins.fluid-typography(12, 14, 320, 1440);
 	@media screen and (min-width: 40rem) and (max-width: 61rem) {
-		font-size: 0.875rem;
+		--base-font-size: 0.875rem;
 	}
 	@media screen and (min-width: 61rem) {
-		font-size: 1rem;
+		--base-font-size: 1rem;
 	}
 }
 :root .light {
@@ -139,7 +139,7 @@ main {
 	overflow: visible;
 	will-change: contents;
 	@media only screen and (min-width: 53.333333rem) {
-		padding: var(--base-spacing) var(--lg-spacing);
+		padding: var(--base-spacing) 1.75rem;
 	}
 }
 

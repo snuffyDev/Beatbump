@@ -48,6 +48,9 @@
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
 		grid-gap: 0.5rem;
+
+		// place-items: center;
+		margin: 0 auto;
 	}
 
 	@media screen and (min-width: 25rem) and (max-width: 37rem) {

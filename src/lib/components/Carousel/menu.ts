@@ -5,10 +5,10 @@ export default function menu(node: Node): SvelteActionReturnType {
 			target: EventTarget & HTMLDivElement
 		}
 	) {
-		console.log(e, node)
+		// console.log(e, node)
 		if (!e.target.contains(node)) return
 		if (node && node.contains(e.target)) {
-			node.dispatchEvent(new CustomEvent('menutouch', node))
+			node.dispatchEvent(new CustomEvent('menutouch'))
 			node.addEventListener('touchend', cancelPress, {
 				passive: true,
 				capture: true

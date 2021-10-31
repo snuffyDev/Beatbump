@@ -1,7 +1,7 @@
 <script context="module">
 	let path
 
-	export async function load({ fetch, context }) {
+	export async function load({ fetch, stuff }) {
 		const response = await fetch('/trending.json?q=browse')
 		const data = await response.json()
 		if (!response.ok) {
@@ -10,7 +10,7 @@
 				error: new Error(`Error: ${response.statusText}`)
 			}
 		}
-		path = context.page
+		path = stuff.page
 		return {
 			props: {
 				carouselItems: await data
@@ -33,7 +33,7 @@
 	tagStore.title('Trending')
 	tagStore.url(path)
 	tagStore.image('/logo.png')
-	console.log(carouselItems)
+	// console.log(carouselItems)
 </script>
 
 <svelte:head>
@@ -48,15 +48,6 @@
 	{/each}
 	<title>{$currentTitle ? $currentTitle : $tagStore.title} - Beatbump</title>
 </svelte:head>
-<!-- <svelte:head>
-	<title>{$currentTitle ? $currentTitle : 'Trending'} - Beatbump</title>
-	<meta name="description" content="The latest trending songs" />
-	<meta name="keywords" content="Trending, music, stream" />
-	<meta property="og:url" content="https://beatbump.ml/trending" />
-	<meta property="og:title" content="Trending" />
-
-	<meta property="og:image" content="/logo.png" />
-</svelte:head> -->
 <main>
 	<Carousel
 		isBrowseEndpoint={false}
@@ -69,22 +60,15 @@
 		<div class="box-cont">
 			<div class="header">
 				<h1>{carouselItems[1].header.title}</h1>
-				<a
-					sveltekit:prefetch
-					style="white-space:pre"
-					class="link"
-					href="/explore"><small>See All</small></a
+				<a style="white-space:pre" class="link" href="/explore"
+					><small>See All</small></a
 				>
 			</div>
 			<box>
 				{#each carouselItems[1].results.slice(1, 15) as { color, endpoint: { params }, text }}
 					<div style={`border-left: 0.5em solid #${color}`} class="box">
 						<div class="innerbox">
-							<a
-								sveltekit:prefetch
-								class="innerlink"
-								href={`/explore/${params}`}>{text}</a
-							>
+							<a class="innerlink" href={`/explore/${params}`}>{text}</a>
 						</div>
 					</div>
 				{/each}

@@ -28,7 +28,7 @@
 	-webkit-text-size-adjust: 100%;
 	align-self: center;
 	cursor: pointer;
-	display: inline-block;
+	display: block;
 	height: auto;
 	max-height: 100%;
 	max-width: 44pt;
@@ -89,7 +89,7 @@
 }
 .player-controls {
 	display: flex;
-
+	place-self: center;
 	width: auto;
 }
 
@@ -109,10 +109,10 @@
 .player {
 	z-index: auto;
 	will-change: contents;
-	align-items: unset;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-evenly;
+
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+
 	max-width: 100%;
 	min-width: calc(100% - 40px);
 	width: 100%;

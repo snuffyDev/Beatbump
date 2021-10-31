@@ -1,25 +1,30 @@
+import type { RequestParams } from './types'
+import { queryParams } from './utils'
+
 type Fetch = (input: RequestInfo, init?: RequestInit) => Promise<Response>
 type APIResponse = {
-	body?: string | Record<string, any>
+	body?: {
+		[key: string]: string
+		value: string
+	}
 	status: number
 	ok: boolean
 }
 
 export async function api(
 	fetch: Fetch,
-	endpoint: string,
-	params?: [] | Record<string, string | number>
+	params?: RequestParams
 ): Promise<APIResponse> {
 	// Turn Object's Key-Value pairs into string
-	const urlParams = Object.keys(params)
-		.map((k) => {
-			if (params[k] == undefined) return
-			return k + '=' + params[k]
-		})
-		.join('&')
+	const urlParams = queryParams(params)
 	// Make fetch call
-	const response = await fetch(`/api/${endpoint}.json?${urlParams}`, {
-		method: 'GET'
+	const response = await fetch(`/api/api.json`, {
+		method: 'POST',
+		body: urlParams,
+
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded'
+		}
 	})
 	const data = await response.json()
 	// If request fails, return error.

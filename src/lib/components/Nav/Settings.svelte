@@ -1,13 +1,7 @@
 <script>
 	import { fade } from 'svelte/transition'
-	import Icon from '$components/Icon/Icon.svelte'
 	import { circIn } from 'svelte/easing'
-	import { goto } from '$app/navigation'
-	import { clickOutside } from '$lib/js/clickOutside'
 	import { filterAutoPlay, theme } from '$stores/stores'
-	import { onMount } from 'svelte'
-	import { page } from '$app/stores'
-	import { browser } from '$app/env'
 
 	export let isSettingsOpen
 	$: options = {
@@ -24,14 +18,7 @@
 </script>
 
 {#if isSettingsOpen}
-	<div
-		use:clickOutside
-		on:click_outside={() => {
-			isSettingsOpen = !isSettingsOpen
-		}}
-		class="nav-settings"
-		transition:fade={{ duration: 120, easing: circIn }}
-	>
+	<div class="nav-settings" transition:fade={{ duration: 120, easing: circIn }}>
 		<!-- <label for="search"><em>search</em></label> -->
 		<div class="setting">
 			<label for="select" class="s-text">Theme:</label>

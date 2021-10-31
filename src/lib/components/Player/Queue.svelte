@@ -4,6 +4,8 @@
 	import Icon from '$lib/components/Icon/Icon.svelte'
 	import list from '$lib/stores/list'
 	import { onMount, setContext } from 'svelte'
+	import { quartInOut } from 'svelte/easing'
+	import { fade, fly, slide } from 'svelte/transition'
 
 	export let autoId
 	export let showing = false
@@ -40,11 +42,14 @@
 		if (y <= listHeight && y >= 0) {
 			posY = y + dy
 		} else if (y < listHeight / 1.5) {
-			open()
+			trackOpen()
 		} else {
 			close()
 		}
 		// console.log(y, 'dy: ' + dy)
+	}
+	function trackOpen() {
+		posY = posY
 	}
 	function open() {
 		posY = 0
@@ -68,7 +73,15 @@
 <div
 	class="listContainer"
 	id="listContainer"
-	style="transform: translate(0, {posY / 28}vh);"
+	style="transform: translate(0, calc({posY / 10}%));"
+	in:fly|local={{ y: 350, easing: quartInOut }}
+	out:fly|local={{
+		delay: 125,
+		duration: 450,
+		easing: quartInOut,
+		y: 400,
+		opacity: 0.1
+	}}
 >
 	<div
 		class="handle"
@@ -99,8 +112,8 @@
 			</ul>
 		{:else}
 			<div class="empty">
-				<span class="empty-title">Empty!</span>
-				<span class="subtitle">Choose a song to see your feed</span>
+				<div class="empty-title">Empty!</div>
+				<div class="subtitle">Choose a song to see your feed</div>
 			</div>
 		{/if}
 	</div>
@@ -112,7 +125,10 @@
 		position: absolute;
 		top: 0;
 		right: 0;
+		left: 0;
+		bottom: 0;
 		border-bottom: 0.0175rem solid hsla(0, 0%, 66.7%, 0.233);
+		border-top: 0.0175rem solid rgba(170, 170, 170, 0.034);
 		box-shadow: 0 -0.4rem 0.8rem 0.5rem hsl(0deg 0% 100% / 9%);
 		background: hsla(0, 0%, 66.7%, 0.027);
 		z-index: -1;
@@ -126,12 +142,8 @@
 		color: white;
 	}
 	.empty {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		width: 100%;
-		height: 100%;
-		align-items: center;
+		position: relative;
+		padding-top: 4.5em;
 	}
 
 	.listContainer {
@@ -144,7 +156,7 @@
 		border-radius: 0.8em 0.8em 0 0;
 
 		display: flex;
-		// top: 0;
+		bottom: 4.5rem;
 		right: 0;
 		flex: 1 1 auto;
 		visibility: visible;
@@ -152,10 +164,10 @@
 		height: auto;
 		width: auto;
 		background: inherit;
-		height: 75%;
+		height: 78.75%;
 
-		bottom: 4.5rem;
-		transition: transform 0.12s cubic-bezier(0.39, 0.58, 0.57, 1);
+		// bottom: 4.5rem;
+		transition: transform 25ms cubic-bezier(0.455, 0.03, 0.515, 0.955);
 		min-height: 23rem;
 		width: 40%;
 		z-index: -1;
@@ -174,14 +186,14 @@
 		}
 
 		overflow-y: hidden;
-		opacity: 1;
+		// opacity: 1;
 
 		.subtitle {
 			font-size: 1.2rem;
 			font-weight: 200;
 			line-height: 1.1;
 			padding: 4rem 0;
-			max-width: 20rem;
+			// max-width: 20rem;
 			text-align: center;
 			letter-spacing: 0.016em;
 		}
@@ -189,8 +201,14 @@
 	.list {
 		color: #fff;
 		padding: 0;
+
+		display: flex;
+		flex-direction: column;
 		min-width: 100%;
 		width: 100%;
+		position: relative;
+		max-height: 100%;
+		// margin: auto;
 	}
 	.list-m {
 		padding: 0;
@@ -220,13 +238,13 @@
 		letter-spacing: -0.02em;
 		font-weight: 500;
 		line-height: 1.1;
-		max-width: 14rem;
+		// max-width: 14rem;
 		padding: 1rem 0;
 	}
 
 	@media screen and (min-width: 641px) and (max-width: 800px) {
 		.listContainer {
-			width: 47.5%;
+			width: 50.25%;
 		}
 	}
 	@media screen and (max-width: 640px) {

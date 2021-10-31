@@ -1,4 +1,5 @@
-import type { Artist, Thumbnail } from '$lib/types'
+import { MusicResponsiveListItemRenderer } from '$lib/parsers'
+import type { Artist, Item, Thumbnail } from '$lib/types'
 import type { NextContinuationData } from '$lib/types'
 import type { IPlaylistItem } from '$lib/types/playlist'
 import { pb } from '$lib/utils'
@@ -20,7 +21,8 @@ export async function get({ query }: { query: URLSearchParams }) {
 					context: {
 						client: {
 							clientName: 'WEB_REMIX',
-							clientVersion: '0.1'
+							clientVersion: '1.20211025.00.00',
+							visitorData: 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D'
 						},
 
 						user: {
@@ -34,7 +36,11 @@ export async function get({ query }: { query: URLSearchParams }) {
 				}),
 				headers: {
 					'Content-Type': 'application/json; charset=utf-8',
+
+					'X-Goog-AuthUser': '0',
 					Origin: 'https://music.youtube.com',
+					'x-origin': 'https://music.youtube.com',
+					'X-Goog-Visitor-Id': 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D',
 					referer:
 						'https://music.youtube.com/playlist?list=' + referrer || browseId
 				}
@@ -67,8 +73,11 @@ export async function get({ query }: { query: URLSearchParams }) {
 		} = data
 
 		const {
-			contents: [{ musicPlaylistShelfRenderer: { contents = [] } = {} }] = [],
-			continuations
+			contents: [
+				{
+					musicPlaylistShelfRenderer: { contents = [], continuations = [] } = {}
+				}
+			] = []
 		} = await sectionListRenderer
 		console.log(musicDetailHeaderRenderer)
 		const cont: NextContinuationData = continuations
@@ -127,8 +136,8 @@ export async function get({ query }: { query: URLSearchParams }) {
 					context: {
 						client: {
 							clientName: 'WEB_REMIX',
-							clientVersion: '0.1',
-
+							clientVersion: '1.20211025.00.00',
+							visitorData: 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D',
 							user: {
 								enableSafetyMode: false
 							}
@@ -137,7 +146,12 @@ export async function get({ query }: { query: URLSearchParams }) {
 				}),
 				headers: {
 					'Content-Type': 'application/json; charset=utf-8',
+
+					'X-Goog-AuthUser': '0',
 					Origin: 'https://music.youtube.com',
+					'x-origin': 'https://music.youtube.com',
+
+					'X-Goog-Visitor-Id': 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D',
 					referer:
 						'https://music.youtube.com/playlist?list=' + referrer.slice(2) ||
 						browseId
@@ -158,12 +172,11 @@ export async function get({ query }: { query: URLSearchParams }) {
 			} = {}
 		} = await data
 		// console.log(data, contents, continuations)
-		const cont: NextContinuationData =
-			continuations[0]?.nextContinuationData.length > 0
-				? continuations[0]?.nextContinuationData
-				: null
-		const Tracks = parseTrack(contents)
-		console.log(referrer.slice(1))
+		const cont: NextContinuationData = continuations
+			? continuations[0]?.nextContinuationData
+			: null
+		const Tracks = parseTrack(contents, referrer.slice(2))
+		// console.log(referrer.slice(1))
 		return {
 			status: 200,
 			body: {
@@ -174,74 +187,12 @@ export async function get({ query }: { query: URLSearchParams }) {
 		}
 	}
 }
-
-function parseTrack(contents = [], playlistId?): Array<IPlaylistItem> {
-	const Tracks = contents.map(({ musicResponsiveListItemRenderer } = {}) => {
-		const length = pb(
-			musicResponsiveListItemRenderer,
-			'fixedColumns:0:musicResponsiveListItemFixedColumnRenderer:text:runs:0:text',
-			true
-		)
-		const flexColumns = pb(musicResponsiveListItemRenderer, 'flexColumns', true)
-
-		const artistEndpoint = pb(
-			flexColumns,
-			'musicResponsiveListItemFlexColumnRenderer:1:text:runs:0',
-			true
-		)
-		const titleBody = pb(
-			flexColumns,
-			'musicResponsiveListItemFlexColumnRenderer:0:text:runs:0',
-			true
-		)
-		let videoId = undefined
-		let playerParams = undefined
-		if (
-			!musicResponsiveListItemRenderer.playlistItemData &&
-			!musicResponsiveListItemRenderer?.navigationEndpoint?.watchEndpoint
-				?.videoId
-		)
-			return
-		if (musicResponsiveListItemRenderer?.playlistItemData) {
-			videoId = musicResponsiveListItemRenderer?.playlistItemData.videoId
-		} else {
-			videoId = titleBody?.navigationEndpoint?.watchEndpoint?.videoId
-				? titleBody?.navigationEndpoint?.watchEndpoint?.videoId
-				: undefined
+function parseTrack(contents = [], playlistId?): Array<Item> {
+	const Tracks = contents.map((item) => {
+		if (!item) {
+			return null
 		}
-		playerParams = titleBody?.navigationEndpoint?.watchEndpoint?.playerParams
-			? titleBody?.navigationEndpoint?.watchEndpoint?.playerParams
-			: undefined
-
-		const title = titleBody.text
-		// console.log(artistEndpoint);
-		const artistInfo: Artist = {
-			artist: artistEndpoint.text,
-			browseId: artistEndpoint?.navigationEndpoint?.browseEndpoint?.browseId
-		}
-		const thumbnail: Thumbnail = pb(
-			musicResponsiveListItemRenderer,
-			'thumbnail:musicThumbnailRenderer:thumbnail:thumbnails',
-			true
-		)
-		return {
-			length,
-			videoId: videoId ? videoId : undefined,
-			playlistId: playlistId,
-
-			playlistSetVideoId:
-				musicResponsiveListItemRenderer.playlistItemData.playlistSetVideoId ||
-				musicResponsiveListItemRenderer.overlay
-					.musicItemThumbnailOverlayRenderer.content.musicPlayButtonRenderer
-					.playNavigationEndpoint.watchEndpoint.playlistSetVideoId,
-			thumbnail,
-			playerParams:
-				musicResponsiveListItemRenderer?.flexColumns[0]
-					?.musicResponsiveListItemFlexColumnRenderer.text.runs[0]
-					.navigationEndpoint.watchEndpoint.playerParams || 'iAQB',
-			title,
-			artistInfo
-		}
+		return MusicResponsiveListItemRenderer(item, true, playlistId)
 	})
 	return Tracks
 }

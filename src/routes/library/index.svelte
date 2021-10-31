@@ -13,7 +13,7 @@
 	import { onMount, setContext } from 'svelte'
 	import Sync from './_Sync.svelte'
 	$: favorites = []
-	let playlists = []
+	$: playlists = []
 
 	$: sync = false
 
@@ -26,9 +26,11 @@
 	}
 	// let lib: Writable<[]> = getContext('db')
 	onMount(async () => {
+		playlists = await db.getPlaylists()
+		playlists = [...playlists]
 		updateFavorites()
 	})
-
+	$: console.log(playlists)
 	// $: if (lib !== undefined) console.log(fv, $fv)
 </script>
 
@@ -71,6 +73,21 @@
 	<section>
 		<h2>Your Playlists</h2>
 		<em>Coming soon!</em>
+		{#each playlists as playlist}
+			<div class="container">
+				<img
+					src={playlist.thumbnail}
+					on:load={(e) => {
+						// URL.revokeObjectURL(playlist.thumbnail)
+					}}
+					type=""
+					width="200"
+					height="200"
+				/>
+				<div class="title">{playlist.name}</div>
+				<em class="length">{playlist.length} songs</em>
+			</div>
+		{/each}
 	</section>
 </main>
 

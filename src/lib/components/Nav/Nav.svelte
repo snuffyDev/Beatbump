@@ -13,8 +13,6 @@
 	let hidden = isHidden ? true : false
 	let isSettingsOpen
 	let shown
-	let width
-	$: if (browser) width = window.innerWidth
 
 	const navBack = () => {
 		if (!browser) return
@@ -100,14 +98,22 @@
 		>
 			<Icon name="search" size="1.5em" />
 		</div>
-		<Settings bind:isSettingsOpen />
 		<div
-			class="nav-item btn-settings"
-			on:click|stopPropagation={() => {
-				isSettingsOpen = !isSettingsOpen
+			use:clickOutside
+			on:click_outside={() => {
+				isSettingsOpen = false
 			}}
+			style="display:contents; background:inherit;"
 		>
-			<Icon name="settings" size="1.5em" />
+			<Settings bind:isSettingsOpen />
+			<div
+				class="nav-item btn-settings"
+				on:click|stopPropagation={() => {
+					isSettingsOpen = !isSettingsOpen
+				}}
+			>
+				<Icon name="settings" size="1.5em" />
+			</div>
 		</div>
 	</div>
 </nav>

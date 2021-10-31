@@ -1,18 +1,21 @@
 <script context="module">
-	export async function load({ page, fetch }) {
-		const response = await fetch(
-			'/api/artist.json?browseId=' + page.params.slug
-		)
+	import { api } from '$lib/api'
 
-		const data = await response.json()
+	export async function load({ page, fetch }) {
+		const id = page.params.slug
+		const response = await api(fetch, {
+			browseId: id,
+			endpoint: 'browse',
+			path: 'artist',
+			type: 'artist'
+		})
 		let {
 			carousels,
 			description,
 			thumbnail,
 			header,
-			songs,
-			contents
-		} = await data
+			songs
+		} = await response.body
 		if (response.ok) {
 			return {
 				props: {
@@ -20,8 +23,8 @@
 					description,
 					thumbnail,
 					header,
+					// songs: response.body,
 					songs,
-					raw: contents,
 					id: page.params.slug
 				},
 				status: 200
@@ -45,12 +48,12 @@
 	export let thumbnail
 	export let carousels
 	export let songs = []
-	export let raw
+	// export let raw
 	export let id
 	$: id = id
 	let width
 	const ctx = {}
-	$: console.log(header, carousels, raw, songs)
+	$: console.log(header, carousels, songs)
 	setContext(ctx, { pageId: id })
 
 	tags.desc(header?.name)

@@ -22,11 +22,11 @@ export async function get({ query, headers }) {
 						user: {
 							enableSafetyMode: false
 						},
-						playlistId: `${playlistId}`,
 
 						captionParams: {},
 						params: 'igMDCNgE'
-					}
+					},
+					playlistId: `${playlistId}`
 				}),
 				headers: {
 					'Content-Type': 'application/json; charset=utf-8',

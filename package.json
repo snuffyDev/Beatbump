@@ -3,9 +3,9 @@
 	"version": "0.1.5",
 	"scripts": {
 		"dev": "svelte-kit dev --port 5000 --host",
-		"cache:delete": "rmdir /S /Q build && rmdir /S /Q .svelte-kit",
-		"deploy:clean": "npm run cache:delete && npm run build && wrangler publish",
 		"deploy": "npm run build && wrangler publish",
+		"deploy:clean": "npm run cache:delete && npm run build && wrangler publish",
+		"cache:delete": "rmdir /S /Q build && rmdir /S /Q .svelte-kit",
 		"build": "svelte-kit build",
 		"preview": "svelte-kit preview --host",
 		"format": "prettier --write .",
@@ -46,6 +46,7 @@
 		"node": ">= 12.17.0"
 	},
 	"dependencies": {
-		"@fontsource/commissioner": "^4.5.0"
+		"@fontsource/commissioner": "^4.5.0",
+		"cookie": "^0.4.1"
 	}
 }

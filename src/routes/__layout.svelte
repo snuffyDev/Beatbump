@@ -1,9 +1,10 @@
-<script context="module">
-	export const load = async ({ page }) => ({
+<script context="module" lang="ts">
+	import type { Load } from '@sveltejs/kit'
+	export const load: Load = async ({ page }) => ({
 		props: {
 			key: page.path
 		},
-		context: { page: page.path }
+		stuff: { page: page.path }
 	})
 </script>
 
@@ -13,7 +14,7 @@
 	import Player from '$components/Player/Player.svelte'
 	import Wrapper from '$components/Wrapper/Wrapper.svelte'
 	import Alert from '$lib/components/Alert/Alert.svelte'
-	import { filterAutoPlay, iOS, theme } from '$stores/stores'
+	import { alertHandler, filterAutoPlay, iOS, theme } from '$stores/stores'
 	import { onMount } from 'svelte'
 	export let key
 	let main
@@ -44,7 +45,7 @@
 </footer>
 
 <style lang="scss" global>
-	@import '../global/stylesheet/main.scss';
+	@use '../global/stylesheet/main';
 	.no-scroll {
 		overflow: hidden;
 		overflow-y: hidden;

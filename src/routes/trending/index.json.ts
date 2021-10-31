@@ -1,4 +1,4 @@
-import BaseContext from '$lib/context'
+import BaseContext from '$api/_modules/context'
 import {
 	MoodsAndGenresItem,
 	MusicResponsiveListItemRenderer,
@@ -6,25 +6,21 @@ import {
 } from '$lib/parsers'
 
 import type { CarouselHeader, CarouselItem } from '$lib/types'
-import type { EndpointParams } from '$lib/types/internals'
-import type { EndpointOutput, RequestHandler } from '@sveltejs/kit'
-
-/** @type {import('@sveltejs/kit').RequestHandler} */
-export async function get({ query }) {
-	// console.log(request, request.headers)
+import type { EndpointOutput } from '@sveltejs/kit'
+interface Response extends EndpointOutput {
+	body?: string | Record<string, any>
+	error?: Error
+}
+export async function get({ query, headers }): Promise<Response> {
 	const endpoint = query.get('q') || ''
 	const browseId = 'FEmusic_explore'
 	const carouselItems = []
-	// console.time('test')
-	// fetch data using Base Context
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/${endpoint}?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
 			method: 'POST',
-			body: JSON.stringify({
-				...BaseContext,
-				browseId: `${browseId}`
-			}),
+			body: JSON.stringify(BaseContext.base(browseId)),
+
 			headers: {
 				'Content-Type': 'application/json; charset=utf-8',
 				Origin: 'https://music.youtube.com',
@@ -58,7 +54,6 @@ export async function get({ query }) {
 		})
 	)
 	const resBody = carouselItems.map(({ musicCarouselShelfRenderer }) => {
-		// console.timeEnd('test')
 		return parseCarousel({ musicCarouselShelfRenderer })
 	})
 	if (resBody) {
@@ -68,8 +63,7 @@ export async function get({ query }) {
 		}
 	}
 	return {
-		error: new Error(),
-		body: undefined
+		error: new Error()
 	}
 }
 

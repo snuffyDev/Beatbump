@@ -1,9 +1,9 @@
 <script context="module">
 	let path
-	export async function load({ page, fetch, context }) {
+	export async function load({ page, fetch, stuff }) {
 		const slug = page.params.slug
 		const filter = page.query.get('filter')
-		path = context.page
+		path = stuff.page
 		// console.log(filter, page, slug)
 		const url =
 			`/api/search.json?q=` +
@@ -12,19 +12,16 @@
 			encodeURIComponent(filter)
 		const response = await fetch(url)
 		const data = await response.json()
-		const {
-			contents = {},
-			continuation = {},
-			didYouMean,
-			error = {}
-		} = await data
+		const { contents = {}, continuation = {}, didYouMean, error } = await data
+
 		if (response.ok) {
 			return {
 				props: {
 					filter: filter,
 					contents: contents,
 					continuation: continuation,
-					didYouMean: didYouMean
+					didYouMean: didYouMean,
+					error
 				},
 				status: 200
 			}
@@ -49,7 +46,7 @@
 	import { onMount } from 'svelte'
 	import tagStore from '$lib/stores/ogtags'
 
-	$: search.set(contents)
+	$: !error && search.set(contents)
 	let title
 	let songTitle = title || $page.params.slug
 	title = songTitle
@@ -97,7 +94,8 @@
 			}
 		}
 	}
-	$: items = $search
+	let items
+	$: !error && (items = $search)
 </script>
 
 <svelte:head>
@@ -113,14 +111,14 @@
 	<title>{$currentTitle ? $currentTitle : $tagStore.title} - Beatbump</title>
 </svelte:head>
 <!-- {JSON.stringify(results)} -->
-{#if error}
-	<section class="searchHeader">
-		<p>
-			{error} for <em>'{decodeURIComponent(songTitle)}'</em>
-		</p>
-	</section>
-{:else}
-	<main class="parent">
+<main class="parent">
+	{#if error}
+		<section class="searchHeader">
+			<p>
+				{error} for <em>'{decodeURIComponent(songTitle)}'</em>
+			</p>
+		</section>
+	{:else}
 		<section class="searchHeader">
 			<div class="text">
 				<p>All Results for...</p>
@@ -157,8 +155,8 @@
 		>
 			<Listing data={item} />
 		</VirtualList>
-	</main>
-{/if}
+	{/if}
+</main>
 
 <style scoped lang="scss">
 	.parent {

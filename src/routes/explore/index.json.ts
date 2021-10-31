@@ -1,4 +1,4 @@
-import BaseContext from './../../lib/context'
+import BaseContext from '../api/_modules/context'
 
 export async function get({ query }) {
 	const browseId = query.get('browseId')
@@ -8,9 +8,9 @@ export async function get({ query }) {
 		{
 			method: 'POST',
 			body: JSON.stringify({
-				...BaseContext,
+				...BaseContext.base(browseId)
 
-				browseId: `${browseId}`
+				// browseId: `${browseId}`
 			}),
 			headers: {
 				'Content-Type': 'application/json; charset=utf-8',

@@ -39,7 +39,7 @@
 		dispatch('updated', {
 			id: `${i}`
 		})
-		console.log('itemitem')
+		// console.log('itemitem')
 	}
 	let isShowing = false
 </script>
@@ -64,7 +64,6 @@
 			<img
 				referrerpolicy="origin-when-cross-origin"
 				src={item.thumbnail}
-				loading="lazy"
 				alt="thumbnail"
 			/>
 			<Popout items={DropdownItems} type="dd-menu" bind:isShowing />

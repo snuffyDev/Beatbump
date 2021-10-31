@@ -3,7 +3,8 @@ import type {
 	NextContinuationData,
 	Artist,
 	TitleEndpoint,
-	ArtistInfo
+	ArtistInfo,
+	Item
 } from '$lib/types'
 
 export interface PlaylistSearch {
@@ -47,5 +48,5 @@ export type Header = {
 export type PlaylistData = {
 	continuations: NextContinuationData
 	header: Header
-	contents: IPlaylistItem[]
+	tracks: Item[]
 }

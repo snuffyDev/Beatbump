@@ -1,7 +1,10 @@
 <script lang="ts">
+	import { browser } from '$app/env'
+
 	import { goto } from '$app/navigation'
 	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 	import Icon from '$components/Icon/Icon.svelte'
+	import db from '$lib/db'
 	import { clickOutside } from '$lib/js/clickOutside'
 	import list from '$lib/stores/list'
 	import { getSrc } from '$lib/utils'
@@ -22,7 +25,9 @@
 	import QueueListItem from './QueueListItem.svelte'
 
 	const player: HTMLAudioElement = new Audio()
-	$: player.autoplay = $updateTrack !== undefined ? true : false
+	player.autoplay = $updateTrack !== undefined ? true : false
+	// player.autoplay = true
+
 	$: player.src = $updateTrack
 	$: isWebkit = $iOS
 	let title
@@ -31,7 +36,7 @@
 
 	$: time = player.currentTime
 	$: duration = 1000
-	let remainingTime = 55
+	$: remainingTime = 55
 
 	$: volume = 0.5
 	$: player.volume = volume
@@ -54,7 +59,7 @@
 	$: console.log($list.mix)
 	player.addEventListener('loadedmetadata', () => {
 		isPlaying = true
-		play()
+
 		DropdownItems = [
 			{
 				text: 'View Artist',
@@ -67,35 +72,49 @@
 					})
 					goto(`/artist/${mixList[autoId].artistInfo.browseId}`)
 				}
+			},
+			{
+				text: 'Add to Favorites',
+				icon: 'heart',
+				action: async () => {
+					// console.log(data)
+					if (!browser) return
+					await db.setNewFavorite($list.mix[autoId])
+				}
 			}
 		]
 	})
 	const play = () => {
 		navigator.mediaSession.playbackState = 'playing'
+
 		isPlaying = true
 		key.set(autoId)
-		let playTrack = player.play()
-		if (playTrack !== undefined) {
-			playTrack.then(() => metaDataHandler())
-		} else {
-			metaDataHandler()
-		}
+
+		metaDataHandler()
 	}
 	const pause = () => player.pause()
-
+	const setPosition = () => {
+		navigator.mediaSession.setPositionState({
+			duration: isWebkit ? duration / 2 : duration,
+			position: player.currentTime
+		})
+	}
 	player.addEventListener('timeupdate', async () => {
 		time = player.currentTime
 		duration = player.duration
 		remainingTime = duration - time
 		$progress = isWebkit == true ? time * 2 : time
-		// This checks if the user is on an iOS device
-		// due to the length of a song being doubled on iOS,
-		// we have to cut the time in half. Doesn't effect other devices.
+
+		/* This checks if the user is on an iOS device
+		 	 due to the length of a song being doubled on iOS,
+			 we have to cut the time in half. Doesn't effect other devices.
+		*/
 		if (isWebkit && remainingTime < duration / 2 && once == false) {
-			getNext()
+			player.muted = true
+			await getNext()
+			player.muted = false
 		}
 	})
-
 	player.addEventListener('pause', () => {
 		isPlaying = false
 		pause()
@@ -111,7 +130,7 @@
 	})
 
 	function metaDataHandler() {
-		if ('mediaSession' in navigator && player.src !== undefined) {
+		if ('mediaSession' in navigator) {
 			navigator.mediaSession.metadata = new MediaMetadata({
 				title: $list.mix[autoId || 0].title,
 				artist: $list.mix[autoId || 0].artistInfo.artist || null,
@@ -119,7 +138,6 @@
 					$list.mix[autoId || 0].album?.title ||
 					$list.mix[autoId || 0].album?.text ||
 					undefined,
-
 				artwork: [
 					{
 						src: $list.mix[autoId || 0].thumbnails
@@ -138,6 +156,15 @@
 			})
 			navigator.mediaSession.setActionHandler('play', play)
 			navigator.mediaSession.setActionHandler('pause', pause)
+			navigator.mediaSession.setActionHandler('seekto', (session) => {
+				if (session.fastSeek && 'fastSeek' in player) {
+					player.fastSeek(session.seekTime)
+					setPosition()
+					return
+				}
+				player.currentTime = session.seekTime
+				setPosition()
+			})
 			navigator.mediaSession.setActionHandler('previoustrack', prevBtn)
 			navigator.mediaSession.setActionHandler('nexttrack', nextBtn)
 		}
@@ -154,31 +181,49 @@
 					$list.continuation,
 					$list.clickTrackingParams
 				)
-				.then(({ body }) => {
-					player.src = body
-				})
-
+				.then(({ body }) => {})
+			autoId++
+			key.set(autoId)
 			once = false
 
 			return
 		} else {
-			autoId++
-			key.set(autoId)
-			await getTrackURL()
+			try {
+				autoId++
+				key.set(autoId)
 
-			currentTitle.set($list.mix[autoId].title)
-			once = false
+				await getTrackURL()
+				// player.muted = true
+				// player.src = src
+				// player.load()
+				// const play = player.play()
+				// play
+
+				// 	.then(() => {
+				// 		player.play()
+				// 		metaDataHandler()
+				// 	})
+				// 	.catch((err) => console.error('GetNext Error! ' + err))
+				// player.muted = false
+				// player.src = src
+				currentTitle.set($list.mix[autoId].title)
+				once = false
+			} catch (error) {
+				console.error('Error!', error)
+			}
 		}
 	}
 
 	async function getTrackURL() {
-		await getSrc(mixList[autoId].videoId).then(({ body, error }) => {
-			if (error === true) {
-				getNext()
-			}
-			player.src = body
-			currentTitle.set($list.mix[autoId].title)
-		})
+		return await getSrc(mixList[autoId].videoId)
+			.then(({ body, error }) => {
+				if (error === true) {
+					getNext()
+				}
+				currentTitle.set($list.mix[autoId].title)
+				return body
+			})
+			.catch((err) => console.error('URL Error! ' + err))
 	}
 
 	function setNext() {
@@ -272,7 +317,7 @@
 	</div>
 	<div class="player" class:light={$theme == 'light'}>
 		<div
-			style="background:inherit; display:contents;"
+			style="background:inherit;"
 			on:click_outside={() => {
 				showing = false
 			}}
@@ -443,6 +488,7 @@
 		height: auto;
 		max-height: 44pt;
 		max-width: 44pt;
+		place-self: center;
 
 		// padding: 10pt;
 		width: auto;

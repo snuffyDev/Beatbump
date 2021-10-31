@@ -322,7 +322,7 @@
 		}
 
 		&:hover {
-			border-color: rgba(34, 97, 255, 0.452);
+			border-color: #3b9b9b;
 			&:before {
 				transform: scale(1);
 				opacity: 1;
@@ -346,7 +346,7 @@
 
 		&:checked + .checkbox-tile,
 		&:checked + .checkbox-tile .label {
-			border-color: #2260ff;
+			border-color: #3b9b9b;
 			color: #f2f2f2;
 			text-shadow: 0 0 0.25rem rgba(255, 255, 255, 0.63);
 			&:not(.label) {
@@ -356,7 +356,7 @@
 			&:before {
 				transform: scale(1);
 				opacity: 1;
-				background-color: #2260ff;
+				background-color: #3b9b9b;
 				border-color: #2260ff;
 			}
 		}

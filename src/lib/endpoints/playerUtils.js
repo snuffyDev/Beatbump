@@ -19,18 +19,20 @@ export const sort = (data) => {
 		let arr = []
 		let getNext
 		// console.log(formatParent, streamingData)
+
 		formatParent.map((i) => {
-			if (i.mimeType.includes('audio')) {
-				if (
-					i.audioChannels === 2 &&
-					i.audioQuality.includes('AUDIO_QUALITY_MEDIUM')
-				) {
-					i.url = parseProxyRedir(i.url)
-					return arr.push(i)
-				}
+
+			if (i.mimeType.includes('audio') &&
+				i.audioChannels === 2 &&
+				i.audioQuality.includes('AUDIO_QUALITY_MEDIUM')
+				&& i.mimeType.includes('mp4')
+			) {
+				i.url = parseProxyRedir(i.url)
+				return arr.push(i)
 			}
+
 		})
-		console.log(arr)
+		// console.log(arr)
 		if (arr.length !== 0) {
 			// console.log('0!!!!')
 			return arr.map((format) => {

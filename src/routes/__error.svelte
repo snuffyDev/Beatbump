@@ -1,4 +1,6 @@
 <script>
+	import { dev } from '$app/env'
+
 	import { goto } from '$app/navigation'
 	import { navigating } from '$app/stores'
 	import { onMount } from 'svelte'
@@ -17,7 +19,7 @@
 				clearTimeout(timeout)
 			}
 		}
-		// redirect()
+		if (!dev) redirect()
 	})
 </script>
 

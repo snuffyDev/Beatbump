@@ -1,5 +1,6 @@
 import { browser } from '$app/env'
 import type { SearchContents } from '$lib/types'
+import { readable } from 'svelte/store'
 import type { Writable } from 'svelte/store'
 import { get, writable } from 'svelte/store'
 export const updateTrack = updateSource()
@@ -31,7 +32,7 @@ export const search: SearchStore = writable()
 
 export const isPagePlaying = writable()
 export const key = writable(0)
-
+export const currentId = writable('')
 export const playerLoading = writable(false)
 export const searchState = writable({
 	option: '',
@@ -89,7 +90,7 @@ function _verifyUserAgent() {
 		}
 	}
 }
-
+export const authKey = writable('')
 function _theme() {
 	const { subscribe, set, update } = writable('')
 	return {

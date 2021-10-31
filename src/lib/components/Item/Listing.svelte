@@ -15,8 +15,9 @@
 	import db from '$lib/db'
 	import { browser } from '$app/env'
 	import { createEventDispatcher } from 'svelte'
+
 	const dispatch = createEventDispatcher()
-	let isLibrary
+	let isLibrary = hasContext('library') ? true : false
 	let videoId = ''
 	let playlistId = ''
 	let songTitle = ''
@@ -30,8 +31,13 @@
 	onMount(() => {
 		itemHandler()
 	})
-	if (hasContext('library')) {
-		isLibrary = true
+	type CustomEvent = Event & {
+		currentTarget: EventTarget & HTMLImageElement
+	}
+	const errorHandler = (event: CustomEvent) => {
+		event.currentTarget.onerror = null
+		event.currentTarget.src =
+			'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjYWNhY2FjIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJtYXRyaXgoMS4yOTkgMCAwIDEuMjcgOTUuNjg4IDE4Ni45NzEpIiBmb250LWZhbWlseT0iTGF0byIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMjAiIGZpbGw9IiMyODI4MjgiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLjI5OSAwIDAgMS4yNyA3OCA0Mi4yODYpIiBkPSJNMCAwaDc3djEzNUgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjwvZz48L3N2Zz4='
 	}
 	let DropdownItems = [
 		{
@@ -121,6 +127,20 @@
 		})
 		DropdownItems.shift()
 		DropdownItems.pop()
+		DropdownItems.push({
+			text: 'Add to Playlist',
+			icon: 'heart',
+			action: async () => {
+				const _data = await fetch(
+					`/api/getQueue.json?playlistId=${data.playlistId}`
+				).then((data) => data.json())
+
+				await db.addToPlaylist({
+					name: data.title,
+					items: [..._data]
+				})
+			}
+		})
 	}
 	if (data.type == 'video') {
 		DropdownItems = DropdownItems.filter((d) => {
@@ -144,7 +164,7 @@
 
 	const clickHandler = async (event: Event & UIEvent) => {
 		if (event.target.nodeName == 'a' || loading) return
-		console.log(event.target)
+		// console.log(event.target)
 		if (data.type == 'artist') {
 			goto(`/artist/${data.artistInfo.artist}`)
 			return
@@ -152,11 +172,19 @@
 		try {
 			loading = true
 			videoId = data.videoId ? data.videoId : ''
-			playlistId = data?.playlistId ? data.playlistId : data.shuffle.playlistId
+			playlistId = data?.playlistId
+				? data?.playlistId
+				: data.shuffle?.playlistId
 			if (data.type == 'playlist') {
 				await list.startPlaylist(playlistId)
 			} else {
-				await list.initList(videoId, playlistId, 0, data.params, '')
+				await list.initList(
+					videoId,
+					playlistId || data.autoMixList,
+					0,
+					data.params,
+					''
+				)
 			}
 			key.set(0)
 			loading = false
@@ -168,7 +196,7 @@
 	}
 </script>
 
-<div class="container" class:hidden>
+<div class="container">
 	<div class="innercard">
 		<div class="itemWrapper" on:click|stopPropagation={clickHandler}>
 			<div class="img-container">
@@ -182,8 +210,9 @@
 						id="img"
 						referrerpolicy="origin-when-cross-origin"
 						loading="lazy"
+						on:error={errorHandler}
 						type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-						src={data.thumbnails[0].url}
+						src={data.thumbnail || data.thumbnails[0]?.url}
 						alt="thumbnail"
 					/>
 				</div>
@@ -208,7 +237,8 @@
 							sveltekit:prefetch
 							href={`/artist/` +
 								data.artistInfo?.artist[0]?.navigationEndpoint?.browseEndpoint
-									?.browseId}>{data.artistInfo?.artist[0].text}</a
+									?.browseId || data.artistInfo.browseId}
+							>{data.artistInfo?.artist[0].text || data.artistInfo?.artist}</a
 						>
 					</p>
 				{/if}
@@ -283,19 +313,22 @@
 
 	.explicit {
 		text-shadow: none;
-		width: 1rem;
-		height: 1rem;
+		// width: 1rem;
+		// height: 1rem;
 		font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
 			Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
-		font-size: 0.7143rem;
+		font-size: calc(0.7143rem / 1.05);
 		flex: none;
-		color: #000;
+		color: rgb(8, 8, 8);
 		font-weight: 700;
-		filter: contrast(100%);
-		background: hsla(0, 0%, 100%, 0.966);
+		// filter: contrast(100%);
+		background: rgba(247, 247, 247, 0.993);
 		padding: 0 0.4em;
-		margin-left: 0.3em;
-		outline: #000 solid 0.1px;
+		margin-left: 0.25em;
+		display: inline-block;
+		border-radius: 0.2rem;
+		vertical-align: baseline;
+		border: rgba(255, 255, 255, 0.377) solid 0.01px;
 	}
 	.text-artist {
 		font-size: 0.95rem;

@@ -2,14 +2,30 @@
 	import { api } from '$lib/api'
 
 	export async function load({ page, fetch }) {
-		const res = await api(fetch, 'playlist', { list: page.query.get('list') })
+		const id = page.query.get('list')
+		let body = {
+			path: 'playlist',
+			endpoint: 'browse',
+			type: 'playlist',
+			browseId: id,
+			playlistId: id
+		}
 
+		const res = await api(fetch, { ...body })
+		// const res = await fetch('/api/api.json', {
+		// 	method: 'POST',
+		// 	body: newbody,
+		// 	headers: {
+		// 		'Content-Type': 'application/x-www-form-urlencoded'
+		// 	}
+		// })
+		// const json = await res.json()
 		const {
 			tracks,
 			header,
 			continuations,
-			data,
-			musicDetailHeaderRenderer
+			data
+			// musicDetailHeaderRenderer
 		} = await res.body
 		if (!res.ok) {
 			return {
@@ -23,7 +39,6 @@
 				data: data,
 				continuations: continuations,
 				header: header,
-				musicDetailHeaderRenderer,
 				id: page.query.get('list')
 			},
 			maxage: 3600,
@@ -43,14 +58,14 @@
 
 	import InfoBox from '$lib/components/Layouts/InfoBox.svelte'
 	import { writable } from 'svelte/store'
+	import { browser } from '$app/env'
 	export let tracks: Item[]
 	export let header: Header
 	export let data
 	export let id
-	export let musicDetailHeaderRenderer
 	export let continuations
-	let ctoken = continuations.continuation
-	let itct = continuations.clickTrackingParams
+	let ctoken = continuations?.continuation || ''
+	let itct = continuations?.clickTrackingParams || ''
 	let width
 	let pageTitle = header?.title
 	let description
@@ -61,46 +76,67 @@
 	const trackStore = writable([])
 	trackStore.set(tracks)
 	setContext(ctx, { pageId: id })
-	console.log(data, tracks, continuations, header, musicDetailHeaderRenderer)
+	if (browser) {
+		console.log(data, tracks, continuations, header)
+	}
 
-	onMount(() => {
-		pageTitle =
-			pageTitle.length > 64 ? pageTitle.substring(0, 64) + '...' : header.title
-		description =
-			header.description.length > 240
-				? header.description.substring(0, 240) + '...'
-				: header.description
-	})
+	pageTitle =
+		pageTitle.length > 64 ? pageTitle.substring(0, 64) + '...' : header.title
+	description =
+		header.description.length > 240
+			? header.description.substring(0, 240) + '...'
+			: header.description
 	const getContinuation = async () => {
 		if (isLoading || hasData) return
 		if (!itct || !ctoken) {
 			hasData = true
+
 			return
 		}
-		isLoading = true
-		const response = await fetch(
-			'/api/playlist.json' +
-				'?ref=' +
-				id +
-				`${ctoken ? `&ctoken=${encodeURIComponent(ctoken)}` : ''}` +
-				'&itct=' +
-				itct
-		)
-		const data = await response.json()
-		const continuationItems = data.tracks
-		if (data.continuations) {
-			ctoken = data.continuations.continuation
-			console.log(data.data)
-			itct = data.continuations.clickTrackingParams
+		try {
+			isLoading = true
+			const response = await fetch(
+				'/api/playlist.json' +
+					'?ref=' +
+					id +
+					`${ctoken ? `&ctoken=${encodeURIComponent(ctoken)}` : ''}` +
+					'&itct=' +
+					itct
+			)
+			const data = await response.json()
+			const continuationItems = data.tracks
+			if (data.continuations) {
+				ctoken = data.continuations.continuation
+				// console.log(data.data)
+				itct = data.continuations.clickTrackingParams
+				trackStore.update((t) => [...t, ...continuationItems])
+				isLoading = false
+				hasData = data.length === 0
+				return hasData
+			} else {
+				ctoken = null
+				itct = undefined
+
+				hasData = null
+				isLoading = false
+				trackStore.update((t) =>
+					[...t, ...continuationItems].filter((item) => {
+						if (item !== null || item !== undefined) {
+							return item
+						}
+					})
+				)
+			}
+
+			console.log(data, items, continuations, ctoken)
+
+			return !isLoading
+		} catch (error) {
+			hasData = null
+			isLoading = false
 		}
-		trackStore.update((t) => [...t, ...continuationItems])
-		isLoading = false
-		hasData = data.length === 0
-
-		console.log(data, tracks, continuations, ctoken)
-
-		return !isLoading
 	}
+	$: items = $trackStore
 </script>
 
 <svelte:head>
@@ -137,7 +173,7 @@
 		/>
 
 		<List
-			items={$trackStore}
+			{items}
 			bind:isLoading
 			on:getMore={async () => await getContinuation()}
 			bind:hasData

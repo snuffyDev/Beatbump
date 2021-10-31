@@ -49,17 +49,20 @@
 	pointer-events: all;
 }
 .dd-player {
-	position: fixed;
+	position: absolute;
+	bottom: 0;
 
-	margin-top: 0em;
-
+	isolation: isolate;
 	right: 0;
-	background: #18191b;
-	outline: 0.0714rem solid rgba(231, 231, 231, 0.329);
+	border-radius: var(--lg-radius);
+	z-index: 5;
 
+	background: #333333;
+	border: 1px #5f5f5f solid;
+	pointer-events: all;
 	// isolation: isolate;
 
-	transform: translateY(-3.25rem);
+	transform: translateY(-2.25rem);
 	flex-direction: column;
 	flex-wrap: nowrap;
 	.dd-item * {
