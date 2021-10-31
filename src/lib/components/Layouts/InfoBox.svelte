@@ -13,13 +13,13 @@
 	export let artist = undefined
 	export let type = 'playlist'
 	let width
-	$: if (browser) width = window.innerWidth
 </script>
+
+<svelte:window bind:innerWidth={width} />
 
 <div class="box">
 	<div class="img">
 		<img
-			loading="lazy"
 			type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 			src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0icHJlZml4X19wcmVmaXhfX2ZlYXRoZXIgcHJlZml4X19wcmVmaXhfX2ZlYXRoZXItbGlzdCI+PHBhdGggb3BhY2l0eT0iLjciIHN0cm9rZT0iI2NjYyIgZmlsbD0iIzMzMyIgZD0iTTAgMGgyNHYyNEgweiIvPjwvc3ZnPg=="
 			use:lazy={{

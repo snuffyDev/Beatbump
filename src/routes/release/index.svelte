@@ -1,9 +1,10 @@
-<script context="module">
+<script context="module" lang="ts">
+	import type { Load } from '@sveltejs/kit'
 	let path
-	export async function load({ context, page, fetch }) {
+	export const load: Load = async ({ stuff, page, fetch }) => {
 		const browseId = page.query.get('id') || ''
 		const pt = page.query.get('type') || ''
-		path = context.page
+		path = stuff.page
 		const response = await api(fetch, {
 			path: 'browse',
 			endpoint: 'browse',

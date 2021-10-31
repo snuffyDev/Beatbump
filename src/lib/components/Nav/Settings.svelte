@@ -1,13 +1,7 @@
 <script>
 	import { fade } from 'svelte/transition'
-	import Icon from '$components/Icon/Icon.svelte'
 	import { circIn } from 'svelte/easing'
-	import { goto } from '$app/navigation'
-	import { clickOutside } from '$lib/js/clickOutside'
 	import { filterAutoPlay, theme } from '$stores/stores'
-	import { onMount } from 'svelte'
-	import { page } from '$app/stores'
-	import { browser } from '$app/env'
 
 	export let isSettingsOpen
 	$: options = {

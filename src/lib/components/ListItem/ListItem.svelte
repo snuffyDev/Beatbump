@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from '$components/Icon/Icon.svelte'
-	import { isPagePlaying, key } from '$stores/stores'
+	import { currentId, isPagePlaying, key } from '$stores/stores'
 	import { createEventDispatcher } from 'svelte'
 	import list from '$lib/stores/list'
 	export let item
@@ -22,7 +22,7 @@
 <div
 	bind:this={parent}
 	class="item"
-	class:playing={$isPagePlaying == pageId && index == $key}
+	class:playing={$isPagePlaying == pageId && item.videoId == $currentId}
 	on:mouseenter|capture={(e) => {
 		if (parent && parent.contains(e.target)) isHovering = true
 	}}
@@ -44,8 +44,8 @@
 			// 	item.videoId,
 			// 	item.playlistId,
 			// 	index,
-			// 	item.playlistSetVideoId ? item.playlistSetVideoId : '',
-			// 		)
+			// 	item.playlistSetVideoId ? item.playlistSetVideoId : ''
+			// )
 		} else {
 			key.set(index)
 			await list.initList(item.videoId, item.playlistId, $key)
@@ -62,7 +62,7 @@
 	</div>
 	<div class="itemInfo">
 		<div class="item-title">
-			{item.title}
+			{item?.title}
 			{#if item.explicit}
 				<span class="explicit">
 					{item.explicit ? 'E' : ''}

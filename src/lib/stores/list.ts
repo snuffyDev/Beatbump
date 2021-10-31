@@ -12,7 +12,7 @@ let mix = []
 let continuation: string
 let clickTrackingParams: string
 
-let splitList: []
+let splitList: any[]
 let splitListIndex = 0
 let currentMixId: string
 let loading = false
@@ -150,7 +150,7 @@ export default {
 		loading = false
 		playerLoading.set(loading)
 	},
-	async startPlaylist(playlistId, index) {
+	async startPlaylist(playlistId, index = 0) {
 		loading = true
 		playerLoading.set(loading)
 		key.set(index)
@@ -170,6 +170,7 @@ export default {
 		loading = false
 		playerLoading.set(loading)
 		list.set({ currentMixId, clickTrackingParams, continuation, mix })
+		console.log(mix, mix[index])
 		return await getSrc(mix[index].videoId)
 	},
 	async getMore(itct, videoId, playlistId, ctoken, clickTrackingParams) {
@@ -177,15 +178,14 @@ export default {
 		playerLoading.set(loading)
 		if (splitList && mix.length < Chunked.origLength - 1) {
 			splitListIndex++
-			mix.pop()
 
+			const src = await getSrc(mix[mix.length].videoId)
 			mix = [...mix, ...splitList[splitListIndex]]
-
 			filterSetting ? filterList([...mix]) : (mix = [...mix])
 			loading = false
 			playerLoading.set(loading)
 			list.set({ currentMixId, clickTrackingParams, continuation, mix })
-			return await getSrc(mix[0].videoId)
+			return await src
 		} else {
 			/*  Fetch the next batch of songs for autoplay
 				- autoId: current position in mix

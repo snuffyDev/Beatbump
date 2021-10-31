@@ -4,7 +4,7 @@ function lazy(node, data) {
 	if (IntersectionObserver) {
 		const observer = new IntersectionObserver(onIntersect, {
 			rootMargin: '250px 250px',
-			threshold: 0.05
+			threshold: 0.01
 		})
 		function onIntersect(entries) {
 			entries.forEach((entry) => {

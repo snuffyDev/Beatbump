@@ -39,7 +39,7 @@
 		dispatch('updated', {
 			id: `${i}`
 		})
-		console.log('itemitem')
+		// console.log('itemitem')
 	}
 	let isShowing = false
 </script>

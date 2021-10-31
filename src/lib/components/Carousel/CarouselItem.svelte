@@ -161,9 +161,7 @@
 		class="clickable"
 		style="display:block;"
 		use:menu
-		on:menutouch={(e) => {
-			console.log(e)
-		}}
+		on:menutouch={(e) => {}}
 		on:click|stopPropagation={(e) => clickHandler(e, index)}
 	>
 		<div
@@ -180,7 +178,6 @@
 				transition:fade|local
 				on:error={errorHandler}
 				class:img16x9={RATIO_RECT}
-				loading="lazy"
 				type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 				src={RATIO_SQUARE
 					? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mMMXgwAAU8A+CaOv30AAAAASUVORK5CYII='

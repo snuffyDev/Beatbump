@@ -24,9 +24,14 @@ An Alternative frontend for YouTube Music created using Svelte/SvelteKit, and po
 - Uses a custom wrapper around the YouTube Music API
 - Multiple themes
 
+## Important Notice for iOS 15 Users
+
+AutoPlay is broken on iOS 15, [see this guide](https://github.com/snuffyDev/Beatbump/wiki/Fixing-Background-Autoplay-on-iOS-15) for a fix.
+
 ## Privacy
 
 All data is stored locally on your device. Data synchronization is done using PeerJS, which uses WebRTC for a peer-to-peer connection between browsers.
+
 ## Libraries used
 
 - [PeerJS](https://www.npmjs.com/package/peerjs) - WebRTC data synchronization

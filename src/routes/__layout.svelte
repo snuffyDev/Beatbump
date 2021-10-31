@@ -1,9 +1,10 @@
-<script context="module">
-	export const load = async ({ page }) => ({
+<script context="module" lang="ts">
+	import type { Load } from '@sveltejs/kit'
+	export const load: Load = async ({ page }) => ({
 		props: {
 			key: page.path
 		},
-		context: { page: page.path }
+		stuff: { page: page.path }
 	})
 </script>
 

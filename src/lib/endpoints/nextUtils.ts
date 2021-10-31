@@ -6,6 +6,7 @@ export function parseContents(
 	current
 ) {
 	if (contents) {
+		// console.log(contents, current)
 		let arr = []
 		let currentMix = current.playlistId
 		arr.push(
@@ -26,6 +27,9 @@ export function parseContents(
 					playlistPanelVideoRenderer.menu.menuRenderer.items[0]
 						.menuNavigationItemRenderer?.navigationEndpoint?.watchEndpoint
 						.playlistId
+				const playlistSetVideoId = playlistPanelVideoRenderer?.playlistSetVideoId
+					? playlistPanelVideoRenderer.playlistSetVideoId
+					: ''
 				let menu = pb(playlistPanelVideoRenderer, 'menu:menuRenderer', false)
 				if (!Array.isArray(menu)) {
 					menu = [menu]
@@ -70,6 +74,7 @@ export function parseContents(
 						artist: artist,
 						browseId: browseId
 					},
+					playlistSetVideoId,
 					videoId: metaPath.videoId,
 					hash:
 						Math.random().toString(36).substring(2, 15) +

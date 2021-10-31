@@ -30,11 +30,11 @@ export const parsePlaylist = async (data): Promise<PlaylistData> => {
 										{
 											musicPlaylistShelfRenderer: {
 												contents = [],
-												playlistId = ''
+												playlistId = '',
+												continuations = []
 											} = {}
 										}
-									] = [],
-									continuations = []
+									] = []
 								} = {}
 							} = {}
 						} = {}

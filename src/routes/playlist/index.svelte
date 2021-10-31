@@ -90,32 +90,53 @@
 		if (isLoading || hasData) return
 		if (!itct || !ctoken) {
 			hasData = true
+
 			return
 		}
-		isLoading = true
-		const response = await fetch(
-			'/api/playlist.json' +
-				'?ref=' +
-				id +
-				`${ctoken ? `&ctoken=${encodeURIComponent(ctoken)}` : ''}` +
-				'&itct=' +
-				itct
-		)
-		const data = await response.json()
-		const continuationItems = data.tracks
-		if (data.continuations) {
-			ctoken = data.continuations.continuation
-			console.log(data.data)
-			itct = data.continuations.clickTrackingParams
+		try {
+			isLoading = true
+			const response = await fetch(
+				'/api/playlist.json' +
+					'?ref=' +
+					id +
+					`${ctoken ? `&ctoken=${encodeURIComponent(ctoken)}` : ''}` +
+					'&itct=' +
+					itct
+			)
+			const data = await response.json()
+			const continuationItems = data.tracks
+			if (data.continuations) {
+				ctoken = data.continuations.continuation
+				// console.log(data.data)
+				itct = data.continuations.clickTrackingParams
+				trackStore.update((t) => [...t, ...continuationItems])
+				isLoading = false
+				hasData = data.length === 0
+				return hasData
+			} else {
+				ctoken = null
+				itct = undefined
+
+				hasData = null
+				isLoading = false
+				trackStore.update((t) =>
+					[...t, ...continuationItems].filter((item) => {
+						if (item !== null || item !== undefined) {
+							return item
+						}
+					})
+				)
+			}
+
+			console.log(data, items, continuations, ctoken)
+
+			return !isLoading
+		} catch (error) {
+			hasData = null
+			isLoading = false
 		}
-		trackStore.update((t) => [...t, ...continuationItems])
-		isLoading = false
-		hasData = data.length === 0
-
-		console.log(data, tracks, continuations, ctoken)
-
-		return !isLoading
 	}
+	$: items = $trackStore
 </script>
 
 <svelte:head>
@@ -152,7 +173,7 @@
 		/>
 
 		<List
-			items={$trackStore}
+			{items}
 			bind:isLoading
 			on:getMore={async () => await getContinuation()}
 			bind:hasData

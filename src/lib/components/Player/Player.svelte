@@ -25,7 +25,9 @@
 	import QueueListItem from './QueueListItem.svelte'
 
 	const player: HTMLAudioElement = new Audio()
-	$: player.autoplay = $updateTrack !== undefined ? true : false
+	player.autoplay = $updateTrack !== undefined ? true : false
+	// player.autoplay = true
+
 	$: player.src = $updateTrack
 	$: isWebkit = $iOS
 	let title
@@ -57,7 +59,7 @@
 	$: console.log($list.mix)
 	player.addEventListener('loadedmetadata', () => {
 		isPlaying = true
-		play()
+
 		DropdownItems = [
 			{
 				text: 'View Artist',
@@ -83,14 +85,12 @@
 		]
 	})
 	const play = () => {
+		navigator.mediaSession.playbackState = 'playing'
+
 		isPlaying = true
 		key.set(autoId)
-		let playTrack = player.play()
-		if (playTrack !== undefined) {
-			playTrack.then(() => metaDataHandler())
-		} else {
-			metaDataHandler()
-		}
+
+		metaDataHandler()
 	}
 	const pause = () => player.pause()
 	const setPosition = () => {
@@ -99,7 +99,7 @@
 			position: player.currentTime
 		})
 	}
-	player.addEventListener('timeupdate', () => {
+	player.addEventListener('timeupdate', async () => {
 		time = player.currentTime
 		duration = player.duration
 		remainingTime = duration - time
@@ -110,12 +110,11 @@
 			 we have to cut the time in half. Doesn't effect other devices.
 		*/
 		if (isWebkit && remainingTime < duration / 2 && once == false) {
-			// player.currentTime = 0
-			// getNext();
-			player.currentTime = player.currentTime * 2
+			player.muted = true
+			await getNext()
+			player.muted = false
 		}
 	})
-
 	player.addEventListener('pause', () => {
 		isPlaying = false
 		pause()
@@ -182,32 +181,49 @@
 					$list.continuation,
 					$list.clickTrackingParams
 				)
-				.then(({ body }) => {
-					player.src = body
-				})
-
+				.then(({ body }) => {})
+			autoId++
+			key.set(autoId)
 			once = false
 
 			return
 		} else {
-			autoId++
-			key.set(autoId)
+			try {
+				autoId++
+				key.set(autoId)
 
-			const src = await getTrackURL()
-			player.src = src
-			currentTitle.set($list.mix[autoId].title)
-			once = false
+				await getTrackURL()
+				// player.muted = true
+				// player.src = src
+				// player.load()
+				// const play = player.play()
+				// play
+
+				// 	.then(() => {
+				// 		player.play()
+				// 		metaDataHandler()
+				// 	})
+				// 	.catch((err) => console.error('GetNext Error! ' + err))
+				// player.muted = false
+				// player.src = src
+				currentTitle.set($list.mix[autoId].title)
+				once = false
+			} catch (error) {
+				console.error('Error!', error)
+			}
 		}
 	}
 
 	async function getTrackURL() {
-		return await getSrc(mixList[autoId].videoId).then(({ body, error }) => {
-			if (error === true) {
-				getNext()
-			}
-			currentTitle.set($list.mix[autoId].title)
-			return body
-		})
+		return await getSrc(mixList[autoId].videoId)
+			.then(({ body, error }) => {
+				if (error === true) {
+					getNext()
+				}
+				currentTitle.set($list.mix[autoId].title)
+				return body
+			})
+			.catch((err) => console.error('URL Error! ' + err))
 	}
 
 	function setNext() {

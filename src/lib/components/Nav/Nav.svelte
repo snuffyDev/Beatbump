@@ -13,8 +13,6 @@
 	let hidden = isHidden ? true : false
 	let isSettingsOpen
 	let shown
-	let width
-	$: if (browser) width = window.innerWidth
 
 	const navBack = () => {
 		if (!browser) return

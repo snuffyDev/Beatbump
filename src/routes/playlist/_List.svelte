@@ -10,7 +10,7 @@
 </script>
 
 <div class="list">
-	{#each items as item, i}
+	{#each items as item, i (item)}
 		<slot {item} index={i} />
 	{/each}
 	{#if !hasData}

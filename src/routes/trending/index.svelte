@@ -1,7 +1,7 @@
 <script context="module">
 	let path
 
-	export async function load({ fetch, context }) {
+	export async function load({ fetch, stuff }) {
 		const response = await fetch('/trending.json?q=browse')
 		const data = await response.json()
 		if (!response.ok) {
@@ -10,7 +10,7 @@
 				error: new Error(`Error: ${response.statusText}`)
 			}
 		}
-		path = context.page
+		path = stuff.page
 		return {
 			props: {
 				carouselItems: await data

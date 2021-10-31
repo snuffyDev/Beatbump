@@ -18,7 +18,7 @@ export type Item = Song &
 	PlaylistSearch &
 	CarouselItem &
 	MusicResponsiveListItemRenderer &
-	Record<string, any[]>
+	Record<string, any>
 
 export interface Album {
 	browseId: string
