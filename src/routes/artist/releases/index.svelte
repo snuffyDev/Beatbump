@@ -8,10 +8,11 @@
 				browseId
 			)}&params=${params}&itct=${itct}`
 		)
-		const data = await response.json()
+		const { header, contents } = await response.json()
 		return {
 			props: {
-				data: await data
+				header: await header,
+				contents: await contents
 			},
 			status: 200
 		}
@@ -19,10 +20,25 @@
 </script>
 
 <script lang="ts">
-	export let data
+	import GridItem from './_GridItem.svelte'
 
-	$: console.log(data)
+	export let header
+	export let contents = []
+
+	$: console.log(header, contents)
 </script>
 
-<h1>Test</h1>
-{data}
+<h1>{header?.artist}</h1>
+<h2>{header?.type}</h2>
+<div class="grid">
+	{#each contents as item}
+		<GridItem {item} />
+	{/each}
+</div>
+
+<style lang="scss">
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+	}
+</style>

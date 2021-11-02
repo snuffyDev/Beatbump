@@ -137,9 +137,18 @@ export enum RequestType {
 	artist = 'artist',
 	playlist = 'playlist'
 }
+export type JSON =
+	| string
+	| number
+	| boolean
+	| null
+	| JSON[]
+	| Record<string, { [key: string]: string; value: string }>
+	| { [key: string]: JSON }
+
 export type RequestParams = {
 	endpoint: string
-	continuation?: { [key: string]: string; value: string }
+	continuation?: JSON
 	browseId?: string
 	type?: string
 	videoId?: string

@@ -1,7 +1,3 @@
-<script context="module">
-	export const ssr = true
-</script>
-
 <script lang="ts">
 	import { browser } from '$app/env'
 	import Icon from '$lib/components/Icon/Icon.svelte'
@@ -15,9 +11,11 @@
 	$: favorites = []
 	$: playlists = []
 
-	$: sync = false
-
+	let sync
 	setContext('library', { isLibrary: true })
+	type customEvent = Event & {
+		currentTarget: EventTarget & HTMLImageElement & HTMLElement
+	}
 
 	const updateFavorites = async () => {
 		favorites = await db.getFavorites()
@@ -73,17 +71,9 @@
 	<section>
 		<h2>Your Playlists</h2>
 		<em>Coming soon!</em>
-		{#each playlists as playlist}
+		{#each playlists as playlist, i}
 			<div class="container">
-				<img
-					src={playlist.thumbnail}
-					on:load={(e) => {
-						// URL.revokeObjectURL(playlist.thumbnail)
-					}}
-					type=""
-					width="200"
-					height="200"
-				/>
+				<img src={playlist.thumbnail} width="200" height="200" />
 				<div class="title">{playlist.name}</div>
 				<em class="length">{playlist.length} songs</em>
 			</div>

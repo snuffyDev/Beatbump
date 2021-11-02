@@ -1,10 +1,13 @@
-import { null_to_empty } from 'svelte/internal'
-
 const Base = {
 	context: {
 		client: {
 			clientName: 'WEB_REMIX',
-			clientVersion: '0.1'
+			clientVersion: '1.20211025.00.00',
+			visitorData: 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D',
+
+			user: {
+				enableSafetyMode: false
+			}
 		},
 		capabilities: {},
 		request: {
@@ -23,9 +26,6 @@ const Base = {
 				}
 			],
 			sessionIndex: {}
-		},
-		user: {
-			enableSafetyMode: false
 		},
 		utcOffsetMinutes: -new Date().getTimezoneOffset()
 	}

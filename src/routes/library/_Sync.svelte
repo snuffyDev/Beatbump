@@ -15,12 +15,12 @@
 	import Icon from '$lib/components/Icon/Icon.svelte'
 	import db from '$lib/db'
 	import { alertHandler } from '$lib/stores/stores'
-	import { createEventDispatcher, onMount } from 'svelte'
+	import { createEventDispatcher, onMount, tick } from 'svelte'
 	import { fade } from 'svelte/transition'
 
 	type PeerType = 'Sender' | 'Receiver'
 
-	let peer
+	let peer: Peer
 
 	let id = 'unset'
 	let peerID = ''
@@ -43,7 +43,32 @@
 		id = 'bb-' + Math.random().toString(36).substr(2, 7)
 		peer = new RTC(id)
 		console.log(`Peer ${id} created!`)
+		if (!type) {
+			peer.on('connection', (conn) => {
+				conn.on('data', async (data) => {
+					connection = { data, conn }
+					console.log(connection)
+					// When data is received from sender,
+					// write the contents to IndexedDB
+					await db.setMultiple(JSON.parse(data))
 
+					alertHandler.set({ msg: 'Data sync completed!', type: 'success' })
+					setTimeout(() => {
+						completed = true
+					}, 1250)
+					await tick()
+					conn.close()
+					peer.destroy()
+
+					dispatch('close')
+					if (completed === true) {
+					}
+				})
+				conn.on('open', () => {
+					alertHandler.set({ msg: 'Connection established!', type: 'success' })
+				})
+			})
+		}
 		return 'bb-' + id
 	}
 	const nextStep = () => {
@@ -58,32 +83,6 @@
 		if (!browser) return
 		if (!type) {
 			// Receiver Connection
-			peer.on('connection', (conn) => {
-				conn.on('data', async (data) => {
-					connection = { data, conn }
-					console.log(connection)
-					// When data is received from sender,
-					// write the contents to IndexedDB
-					await db.setMultiple(JSON.parse(data))
-
-					alertHandler.set({ msg: 'Data sync completed!', type: 'success' })
-
-					setTimeout(() => {
-						completed = true
-						alertHandler.set({
-							msg: 'Data sync complete! Closing connection...',
-							type: 'success'
-						})
-						peer.destroy()
-						dispatch('close')
-					}, 1250)
-					if (completed === true) {
-					}
-				})
-				conn.on('open', () => {
-					alertHandler.set({ msg: 'Connection established!', type: 'success' })
-				})
-			})
 		} else {
 			// Sender Connection
 
@@ -91,9 +90,11 @@
 			const chData = JSON.stringify(information)
 			const conn = peer.connect(peerID)
 			conn.on('open', () => {
-				// Immediately transfer to Receiver
+				// Transfer to Receiver
 				conn.send(chData)
 			})
+			conn.on('data', (data) => {})
+
 			conn.on('close', () => {
 				peer.destroy()
 				dispatch('close')
@@ -108,7 +109,7 @@
 			RTC = _Peer
 		}
 	})
-	$: console.log(RTC, _Peer)
+	// $: console.log(RTC, _Peer)
 </script>
 
 <div class="backdrop" transition:fade={{ duration: 150, delay: 150 }} />
@@ -133,6 +134,9 @@
 							this screen on another device. Whenever you are ready, hit 'Next Step'
 						</p>
 					</div>
+				</div>
+				<div class="next">
+					<button class="nextbtn" on:click={nextStep}>Next Step</button>
 				</div>
 			{:else if stepCounter == 1}
 				<div class="screen">
@@ -177,6 +181,15 @@
 					</div>
 					<hr />
 				</div>
+				<div class="next">
+					<button
+						class="nextbtn"
+						disabled={check == undefined}
+						on:click={() => {
+							if (check !== undefined) nextStep
+						}}>Next Step</button
+					>
+				</div>
 			{:else if stepCounter == 2}
 				<div class="screen">
 					<div class="content">
@@ -216,62 +229,81 @@
 						</section>
 					</div>
 				</div>
+				<div class="next">
+					<button
+						class="nextbtn"
+						disabled={id == 'unset'}
+						on:click={() => {
+							if (id !== 'unset') nextStep
+						}}>Next Step</button
+					>
+				</div>
 			{:else if stepCounter == 3}
 				<div class="screen">
-					<div class="content">
-						<h1>
-							Get the {(peerType =
-								check !== 'sending' ? 'Sender' : 'Receiver')}'s ID
-						</h1>
-						<div class="subheading">Let's find the other device</div>
-						<p>
-							After generating an ID for both devices, enter the other's ID in
-							the field below.
-						</p>
-						<hr />
-						<div class="id">
-							<p>Your ID:</p>
-
-							<div class="id-cont">
-								<code>{id} </code>
-							</div>
-
+					{#if check == 'sending'}
+						<div class="content">
+							<h1>
+								Get the {(peerType =
+									check !== 'sending' ? 'Sender' : 'Receiver')}'s ID
+							</h1>
+							<div class="subheading">Let's find the other device</div>
 							<p>
-								{(peerType = check !== 'sending' ? 'Sender' : 'Receiver')}'s ID:
+								After generating an ID for both devices, enter the other's ID in
+								the field below.
 							</p>
+							<hr />
+							<div class="id">
+								<p>Your ID:</p>
 
-							<div class="id-cont">
-								<code>{peerID ? peerID : 'ID from other device'} </code>
+								<div class="id-cont">
+									<code>{id} </code>
+								</div>
+
+								<p>
+									{(peerType = check !== 'sending' ? 'Sender' : 'Receiver')}'s
+									ID:
+								</p>
+
+								<div class="id-cont">
+									<code>{peerID ? peerID : 'ID from other device'} </code>
+								</div>
 							</div>
 						</div>
-					</div>
-					<form
-						on:submit|preventDefault={async () => {
-							connect()
-						}}
-						class="inline"
-					>
-						<input
-							bind:value={peerID}
-							class="input"
-							placeholder={`${peerType}'s ID`}
-							type="text"
-							autocapitalize="off"
-							autocomplete="off"
-							autocorrect="off"
-							spellcheck="false"
-							pattern="bb?[a-zA-Z0-9_-]+"
-						/>
-						<button
-							on:click={() => {
+						<form
+							on:submit|preventDefault={async () => {
 								connect()
-							}}>Connect</button
+							}}
+							class="inline"
 						>
-					</form>
-				</div>{/if}
-		</div>
-		<div class="next">
-			<button class="nextbtn" on:click={nextStep}>Next Step</button>
+							<input
+								bind:value={peerID}
+								class="input"
+								placeholder={`${peerType}'s ID`}
+								type="text"
+								autocapitalize="off"
+								autocomplete="off"
+								autocorrect="off"
+								spellcheck="false"
+								pattern="bb?[a-zA-Z0-9_-]+"
+							/>
+							<button
+								on:click={() => {
+									connect()
+								}}>Connect</button
+							>
+						</form>
+					{:else}
+						<div class="content">
+							<h1>Ready to Receive Data</h1>
+							<div class="subheading">Waiting for sender to connect.</div>
+							<p>
+								Once data transfer is completed, this popup window will close
+								automatically
+							</p>
+						</div>
+					{/if}
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>

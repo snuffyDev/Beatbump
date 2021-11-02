@@ -13,6 +13,8 @@
 	let showing = false
 	$: menuToggle = showing ? true : false
 	const dispatch = createEventDispatcher()
+	const hideEvent = () => dispatch('close')
+	const openEvent = () => dispatch('open')
 	setContext('menu', { update: isHidden })
 </script>
 
@@ -28,7 +30,7 @@
 >
 	{#if isHidden}
 		<div
-			on:mouseleave={() => {
+			on:mouseleave|stopPropagation={() => {
 				isHidden = false
 			}}
 			transition:slide={{ duration: 125, easing: quartInOut }}
@@ -45,7 +47,7 @@
 		</div>
 	{/if}
 	<div
-		class="menuButtons"
+		class="dd-button"
 		on:click|stopPropagation={() => {
 			isHidden = !isHidden
 			// console.log(isHidden)
@@ -57,20 +59,13 @@
 
 <style lang="scss">
 	.menu {
-		position: relative;
-		display: flex;
-		flex-direction: column;
+		display: contents;
 	}
-	.menuButtons {
-		margin-right: 0.2rem;
+	.dd-button {
 		stroke: rgba(0, 0, 0, 0.692);
-
-		height: 2%;
 		margin: 0pt;
-		position: relative;
-		flex-direction: column;
-		display: flex;
-
+		position: unset;
+		// z-index: 5;
 		margin-left: auto;
 		/* place-items: flex-end; */
 		cursor: pointer;

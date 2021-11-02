@@ -12,14 +12,7 @@
 		}
 
 		const res = await api(fetch, { ...body })
-		// const res = await fetch('/api/api.json', {
-		// 	method: 'POST',
-		// 	body: newbody,
-		// 	headers: {
-		// 		'Content-Type': 'application/x-www-form-urlencoded'
-		// 	}
-		// })
-		// const json = await res.json()
+
 		const {
 			tracks,
 			header,
@@ -95,6 +88,7 @@
 		}
 		try {
 			isLoading = true
+
 			const response = await fetch(
 				'/api/playlist.json' +
 					'?ref=' +

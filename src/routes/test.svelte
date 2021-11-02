@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { queryParams } from '$lib/utils'
 	import db from '$lib/db'
+	import MobilePopper from '$lib/components/Popper'
+	import Popper from '$lib/components/Popper/Popper.svelte'
 
 	let text
 	const dbTest = async () => {
@@ -554,10 +556,32 @@
 			console.log(text)
 		}
 	}
+	let DropdownItems = [
+		{
+			text: 'View Artist',
+			icon: 'artist',
+			action: () => {
+				window.scrollTo({
+					behavior: 'smooth',
+					top: 0,
+					left: 0
+				})
+			}
+		},
+		{
+			text: 'Add to Favorites',
+			icon: 'heart',
+			action: async () => {
+				// console.log(data)
+			}
+		}
+	]
 </script>
 
 {text}
 <button on:click|preventDefault={dbTest}>Click me</button>
+<!-- <MobilePopper {DropdownItems} /> -->
+<Popper bind:items={DropdownItems} />
 
 <style lang="scss">
 </style>

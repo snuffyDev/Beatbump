@@ -75,9 +75,7 @@
 			}}
 		>
 			<div class="p-text">
-				<span class="p-title">
-					{item.title}
-				</span>
+				<span class="p-title">{item?.title}</span>
 				<span class="p-artist">
 					{item.artistInfo.artist}
 				</span>
@@ -192,10 +190,12 @@
 		/*margin-left: .5em; */
 		padding-left: 0.5em;
 		display: inline-flex;
+
+		overflow: hidden;
 		font-size: 1rem;
 		line-height: 1.75;
 		flex-flow: nowrap;
-		justify-content: center;
+		// justify-content: center;
 		flex-direction: column;
 		padding-inline: 0.8em;
 	}
@@ -207,11 +207,12 @@
 	.p-title {
 		padding: 0em;
 		font-size: 1.0125rem;
+		white-space: pre-wrap;
 	}
 	@media screen and (max-width: 640px) {
 		.p-text {
 			font-size: 1rem;
-			flex-flow: wrap;
+			// flex-flow: wrap;
 			line-height: 1.5;
 			padding-left: 0.5em;
 			display: inline-flex;

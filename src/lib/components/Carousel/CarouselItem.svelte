@@ -9,6 +9,7 @@
 	import { alertHandler, currentTitle, key } from '$stores/stores'
 	import { onMount, tick } from 'svelte'
 	import { fade } from 'svelte/transition'
+	import Popper from '../Popper/Popper.svelte'
 	import { browseHandler } from './functions'
 	import menu from './menu'
 	export let section
@@ -219,7 +220,8 @@
 	</div>
 	{#if !isBrowseEndpoint}
 		<div class="menu">
-			<Dropdown color="white" bind:isHidden items={DropdownItems} />
+			<!-- <Dropdown color="white" bind:isHidden items={DropdownItems} /> -->
+			<Dropdown bind:isHidden items={DropdownItems} />
 		</div>
 	{/if}
 </section>

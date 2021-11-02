@@ -15,6 +15,7 @@
 	import db from '$lib/db'
 	import { browser } from '$app/env'
 	import { createEventDispatcher } from 'svelte'
+	import Popper from '../Popper/Popper.svelte'
 
 	const dispatch = createEventDispatcher()
 	let isLibrary = hasContext('library') ? true : false
@@ -253,11 +254,12 @@
 		</div>
 
 		<div class="menu">
-			<Dropdown
+			<!-- <Dropdown
 				color={$theme == 'light' ? 'black' : 'white'}
 				bind:isHidden
 				items={DropdownItems}
-			/>
+			/> -->
+			<Popper bind:isHidden items={DropdownItems} />
 		</div>
 	</div>
 </div>
@@ -303,7 +305,7 @@
 		flex-wrap: nowrap;
 		background: transparent;
 		transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) background 0.125s;
-
+		max-width: unset !important;
 		&:active,
 		&:hover {
 			background: lighten(#3c3d4159, 3%);

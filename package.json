@@ -1,6 +1,6 @@
 {
 	"name": "beatbump",
-	"version": "0.1.5",
+	"version": "2.2.0",
 	"scripts": {
 		"dev": "svelte-kit dev --port 5000 --host",
 		"deploy": "npm run build && wrangler publish",

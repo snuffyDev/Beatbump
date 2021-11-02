@@ -72,7 +72,7 @@ export const handle = async ({ request, resolve }): Promise<HooksResponse> => {
 			'Access-Control-Allow-Origin': dev ? '*' : originURL,
 			'Permissions-Policy': `accelerometer=(), autoplay="*", camera=(), document-domain=(), encrypted-media=(), fullscreen=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), sync-xhr=(), usb=(), xr-spatial-tracking=(), geolocation=()`,
 			'X-Content-Type-Options': 'nosniff',
-			'Content-Security-Policy': !dev ? csp : '',
+			'Content-Security-Policy': csp,
 			'Strict-Transport-Security':
 				'max-age=31536000; includeSubDomains; preload'
 		}

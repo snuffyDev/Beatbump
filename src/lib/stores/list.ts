@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { parseNextItem } from '$lib/parsers'
+import type { Item, Song } from '$lib/types'
 import { getSrc } from '$lib/utils'
 import { currentTitle } from '$stores/stores'
+import { alertHandler } from '$stores/stores'
 import { writable } from 'svelte/store'
 
 import { addToQueue } from '../utils'
 import { filterAutoPlay, key, playerLoading } from './stores'
 
 let hasList = false
-let mix = []
+let mix: Item[] = []
 let continuation: string
 let clickTrackingParams: string
 
@@ -16,11 +18,11 @@ let splitList: any[]
 let splitListIndex = 0
 let currentMixId: string
 let loading = false
-
-let Chunked = {
-	chunks: [],
-	origLength: 0
+type ChunkedPlaylist = {
+	chunks?: any[][]
+	origLength?: number
 }
+let Chunked: ChunkedPlaylist = {}
 
 let filterSetting = false
 
@@ -150,28 +152,49 @@ export default {
 		loading = false
 		playerLoading.set(loading)
 	},
-	async startPlaylist(playlistId, index = 0) {
+	async startPlaylist(playlistId: string, index = 0) {
 		loading = true
 		playerLoading.set(loading)
 		key.set(index)
+		try {
+			const data = await fetch(
+				`/api/getQueue.json?playlistId=${playlistId}`
+			).then((data) => data.json())
+			mix = [...data]
 
-		const data = await fetch(
-			`/api/getQueue.json?playlistId=${playlistId}`
-		).then((data) => data.json())
+			if (mix.length > 50) {
+				Chunked = {
+					chunks: [...split(mix, 50)],
+					origLength: mix.length
+				}
 
-		mix = [...data]
+				splitList = Chunked.chunks
 
-		if (mix.length > 50) {
-			Chunked = { chunks: [...split(mix, 50)], origLength: mix.length }
-			splitList = Chunked.chunks
-			mix = splitList[0]
+				if (index < splitList[0].length) {
+					mix = splitList[0]
+				} else {
+					let temp = []
+					splitList.forEach((chunk, i) => {
+						if (index > chunk.length) {
+							temp = [...temp, splitList[i]]
+						}
+						if (index < chunk.length - 1 && index > splitList[i--].length) {
+							mix = [...temp, ...splitList[i]]
+						}
+					})
+				}
+			}
+			loading = false
+			playerLoading.set(loading)
+
+			list.set({ currentMixId, clickTrackingParams, continuation, mix })
+			return await getSrc(mix[index].videoId)
+		} catch (error) {
+			console.error(`Error starting playlist!\nOriginal Error:\n${error}`)
+			loading = false
+			playerLoading.set(loading)
+			alertHandler.set({ msg: 'Error starting playback', type: 'error' })
 		}
-
-		loading = false
-		playerLoading.set(loading)
-		list.set({ currentMixId, clickTrackingParams, continuation, mix })
-		console.log(mix, mix[index])
-		return await getSrc(mix[index].videoId)
 	},
 	async getMore(itct, videoId, playlistId, ctoken, clickTrackingParams) {
 		let loading = true

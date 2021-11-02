@@ -9,13 +9,16 @@ html {
 *::after {
 	box-sizing: inherit;
 }
-
+html {
+	font-size: 12px;
+}
 html,
 body {
 	line-height: 1.5;
 	position: fixed;
 	width: 100%;
 	height: 100%;
+	// overflow: hidden;
 	top: 0;
 	right: 0;
 	bottom: 0;
@@ -31,9 +34,8 @@ body {
 		"Helvetica Neue", sans-serif;
 	color: rgb(255, 255, 255);
 	word-wrap: break-word;
-	font-size: var(--base-font-size);
 	-webkit-text-size-adjust: 100%;
-	// font-size: 0.75rem;
+	--base-font-size: 12px;
 
 	/* ===== Scrollbar CSS ===== */
 
@@ -75,11 +77,14 @@ body {
 	user-select: none;
 	-webkit-tap-highlight-color: transparent;
 	// @include mixins.fluid-typography(12, 14, 320, 1440);
-	@media screen and (min-width: 40rem) and (max-width: 61rem) {
-		--base-font-size: 0.875rem;
+	@media screen and (min-width: 40em) and (max-width: 65em) {
+		--base-font-size: 14px;
 	}
-	@media screen and (min-width: 61rem) {
-		--base-font-size: 1rem;
+	@media screen and (min-width: 65em) and (max-width: 80em) {
+		--base-font-size: 16px;
+	}
+	@media screen and (min-width: 81em) {
+		--base-font-size: 100%;
 	}
 }
 :root .light {
@@ -119,6 +124,9 @@ body {
 	overflow: hidden;
 	position: fixed;
 }
+html {
+	font-size: var(--base-font-size);
+}
 #app {
 	grid-template-rows: 4rem 1fr 4.5rem;
 	position: fixed;
@@ -137,9 +145,8 @@ main {
 	padding: 1rem;
 	position: relative;
 	overflow: visible;
-	will-change: contents;
 	@media only screen and (min-width: 53.333333rem) {
-		padding: var(--base-spacing) 1.75rem;
+		padding: 1.25rem 1.8rem;
 	}
 }
 
@@ -147,10 +154,14 @@ main {
 	overflow: hidden;
 	overflow-y: scroll;
 	-webkit-overflow-scrolling: touch;
-	will-change: contents, scroll-position;
 	display: block;
 	touch-action: pan-y;
 	grid-area: m/m/m/m;
+}
+
+.no-scroll {
+	overflow: hidden !important;
+	overflow-y: hidden !important;
 }
 
 .container {

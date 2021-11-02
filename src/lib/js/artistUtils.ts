@@ -84,9 +84,9 @@ function parseCarouselItem(items, header = []) {
 				// endpoint,
 				// i,
 				type: type,
-				itct: moreButton?.clickTrackingParams,
-				browseId: endpoint?.browseEndpoint.browseId,
-				params: endpoint?.browseEndpoint.params
+				itct: i?.moreContentButton?.buttonRenderer?.trackingParams,
+				browseId: moreButton?.browseEndpoint?.browseId,
+				params: moreButton?.browseEndpoint?.params
 			}
 		} else {
 			return { title, type: type }

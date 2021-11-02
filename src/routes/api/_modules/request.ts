@@ -14,9 +14,16 @@ export const sendRequest = async (
 		'Content-Type': 'application/json',
 		'X-Goog-AuthUser': '0',
 		Origin: 'https://music.youtube.com',
+		'x-origin': 'https://music.youtube.com',
+
 		'X-Goog-Visitor-Id': 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D'
 	})
-
+	if (params.type == 'playlist' && params.continuation && params.playlistId) {
+		headers.append(
+			'referer',
+			'https://music.youtube.com/playlist?list=' + params.playlistId.slice(2)
+		)
+	}
 	if (params.endpoint == 'player') {
 		headers.delete('User-Agent')
 		headers.delete('X-Goog-Visitor-Id')

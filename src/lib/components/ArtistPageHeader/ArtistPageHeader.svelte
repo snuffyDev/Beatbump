@@ -17,7 +17,15 @@
 	let wrapper: HTMLElement
 	let isExpanded
 	let scroll
-
+	$: opacity = 0
+	type CustomEvent = Event & {
+		currentTarget: EventTarget & HTMLImageElement & HTMLPictureElement
+		target: EventTarget & HTMLImageElement & HTMLPictureElement
+	}
+	const imageLoadHandler = (event: CustomEvent) => {
+		opacity = 1
+		// 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjYWNhY2FjIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJtYXRyaXgoMS4yOTkgMCAwIDEuMjcgOTUuNjg4IDE4Ni45NzEpIiBmb250LWZhbWlseT0iTGF0byIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMjAiIGZpbGw9IiMyODI4MjgiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLjI5OSAwIDAgMS4yNyA3OCA0Mi4yODYpIiBkPSJNMCAwaDc3djEzNUgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjwvZz48L3N2Zz4='
+	}
 	const handler = (e) => {
 		if (!browser) return
 		if (container) scroll = container.getBoundingClientRect()
@@ -74,7 +82,7 @@
 			class="gradient"
 		/>
 		{#if thumbnail !== undefined}
-			<picture class="header-thumbnail">
+			<picture class="header-thumbnail" style="opacity:{opacity};">
 				{#each thumbnail as img, i}
 					{#if i == 0}
 						<source
@@ -106,9 +114,10 @@
 					{/if}
 				{/each}
 				<img
-					referrerpolicy="origin-when-cross-origin"
 					class="header-thumbnail"
 					loading="eager"
+					on:load={imageLoadHandler}
+					style="opacity:{opacity};"
 					src={thumbnail[1]?.url}
 					alt="Artist Thumbnail"
 				/>
@@ -318,7 +327,8 @@
 		-o-object-fit: cover;
 		object-fit: cover;
 		position: absolute;
-		transition: all 5000ms cubic-bezier(0.455, 0.03, 0.515, 0.955);
+		transition: opacity 0.75s linear;
+		// transition: all 5000ms cubic-bezier(0.455, 0.03, 0.515, 0.955);
 		overflow: hidden;
 		/* transform: scale(1.1); */
 		border-radius: 0;

@@ -20,6 +20,7 @@
 	import { cubicOut } from 'svelte/easing'
 	import { tweened } from 'svelte/motion'
 	import { fade } from 'svelte/transition'
+	import Popper from '../Popper/Popper.svelte'
 	import Controls from './Controls.svelte'
 	import Queue from './Queue.svelte'
 	import QueueListItem from './QueueListItem.svelte'
@@ -392,12 +393,7 @@
 				{/if}
 			</div>
 			<div class="menu-container">
-				<Dropdown
-					bind:isHidden
-					on:click_outside={() => (isHidden = !isHidden)}
-					type="player"
-					items={DropdownItems}
-				/>
+				<Popper bind:isHidden type="player" items={DropdownItems} />
 			</div>
 			<!-- <div class="menu-container__desktop">
 				<Dropdown bind:isHidden type="player" items={DropdownItems} />

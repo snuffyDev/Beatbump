@@ -35,13 +35,14 @@
 	let group = []
 	// let rectValue: any = 0
 	// $: if (carousel) carousel.scrollLeft += $tween
+	const isArtistPage = $page.path.includes('/artist/')
 	let notArtist = header.browseId?.includes('VLP')
 		? `/playlist?list=${header?.browseId}`
 		: `/trending/new/${header?.browseId}${
 				header?.params ? `?params=${header?.params}` : ''
 		  }${header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ''}`
 	let href =
-		header?.browseId && $page.path.includes('/artist/')
+		header?.browseId && isArtistPage
 			? `/artist/releases?browseId=${header?.browseId}&params=${header?.params}&itct=${header?.itct}`
 			: notArtist
 </script>
@@ -50,10 +51,19 @@
 	<h1>
 		{header.title}
 	</h1>
-	{#if !$page.path.includes('/artist/') && header.browseId}<a
+	{#if !isArtistPage && header.browseId}<a
 			style="white-space:pre; display: inline-block;"
 			{href}><small>See All</small></a
-		>{/if}
+		>{:else if isArtistPage && header.browseId && !header.title.includes('Videos')}
+		<a style="white-space:pre; display: inline-block;" {href}
+			><small>See All</small></a
+		>
+	{:else if isArtistPage && header.title.includes('Videos')}
+		<a
+			style="white-space:pre; display: inline-block;"
+			href={`/playlist?list=${header?.browseId}`}><small>See All</small></a
+		>
+	{/if}
 </div>
 <div class="section">
 	<div
@@ -147,6 +157,7 @@
 		z-index: 1;
 		bottom: 0;
 		pointer-events: all;
+		cursor: pointer;
 
 		background: rgba(233, 233, 233, 0.384);
 		// border: rgba(0, 0, 0, 0.171) 0.01px solid;
@@ -163,6 +174,10 @@
 		&:hover {
 			background: rgb(233, 233, 233);
 			color: #111111e0;
+		}
+		&:active {
+			background: rgb(223, 223, 223);
+			box-shadow: 0 0 0.12em 0.1em #11111141, 0 0 0.1em 0.125em #7a7a7a85 inset;
 		}
 		@media screen and (max-width: 640px) {
 			display: none !important;
@@ -194,7 +209,7 @@
 
 		grid-column-gap: 0.5rem;
 		/* overflow-y: hidden; */
-		overflow-x: hidden;
+		// overflow-x: hidden;
 		height: auto;
 		display: flex;
 		/* grid-auto-flow: column; */

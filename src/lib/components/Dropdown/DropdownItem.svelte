@@ -7,7 +7,7 @@
 	export let icon = ''
 
 	let { update } = getContext('menu')
-	$: console.log(update)
+	// $: console.log(update)
 </script>
 
 <div class="dd-item" on:click>

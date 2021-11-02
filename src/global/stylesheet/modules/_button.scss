@@ -24,11 +24,12 @@
 	-ms-user-select: none;
 	user-select: none;
 	max-height: 3rem;
+
 	// &:focus {
 	//     outline: thin dotted #333;
 	//     outline-offset: -2px;
 	// }
-
+	transition: background-color linear 75ms, color linear 75ms;
 	%active {
 		color: rgb(15, 15, 15);
 		background-color: darken(#f2f2f2f3, 10%) !important;
@@ -53,6 +54,14 @@
 	&.active {
 		@extend %active;
 		background-color: #f1f1f1 !important;
+	}
+	&:disabled {
+		background-color: rgb(44, 44, 44);
+		color: #777777 !important;
+		cursor: not-allowed;
+		&:hover {
+			background-color: rgb(44, 44, 44) !important;
+		}
 	}
 }
 

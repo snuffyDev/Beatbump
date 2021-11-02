@@ -19,34 +19,34 @@ $themes: (
 		"base": #09090a,
 		"top": #09090a,
 		"forms": #15141d,
-		"side": #1210183a,
+		"side": #0e0c13,
 	),
 	dark: (
 		"bottom": #111214,
 		"base": #09090a,
 		"top": #111214,
 		"forms": #131516,
-		"side": #13171b33,
+		"side": #15191d,
 	),
 	dim: (
 		"bottom": #141820,
 		"base": #09090a,
 		"top": #141820,
 		"forms": #131516,
-		"side": #0b0c0f,
+		"side": #0f1116,
 	),
 	light: (
 		"base": #fcf8f8,
 		"bottom": #121018,
 		"top": #cac8c9,
 		"forms": #e3dbf5,
-		"side": #cac8c9,
+		"side": #131313,
 		"text": #131314,
 	),
 	midnight: (
 		"base": #05070a,
 		"top": #0d0813,
-		"side": #0c091a0e,
+		"side": #15131f,
 		"bottom": #090d11,
 		"forms": #100f17,
 	),
@@ -55,6 +55,7 @@ $theme-name: (dark, dim, midnight, light, ytm);
 $section-names: (base, top, side, bottom, forms);
 
 :root {
+	--mobile-popper-bg: unset;
 	@each $section in $section-names {
 		@each $theme in $theme-name {
 			--#{$theme}-#{$section}: #{map-get($themes, $theme, $section)};
@@ -66,6 +67,7 @@ html {
 
 	@each $theme in $theme-name {
 		&.#{$theme} {
+			--mobile-popper-bg: #{map-get($themes, $theme, "side")};
 			background: map-get($themes, $theme, "base");
 			@if $theme == light {
 				* {

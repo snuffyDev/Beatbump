@@ -1,5 +1,14 @@
 import type { CarouselItem, Item } from './types'
 
+type JSON =
+	| string
+	| number
+	| boolean
+	| null
+	| JSON[]
+	| Record<string, { [key: string]: string; value: string }>
+	| { [key: string]: JSON }
+
 export function parseNextItem(item, length) {
 	item = [item]
 	const result = item.map((item) => {
@@ -35,14 +44,6 @@ export function parseNextItem(item, length) {
 	return result[0]
 }
 
-type Json =
-	| string
-	| number
-	| boolean
-	| null
-	| Json[]
-	| Record<string, { [key: string]: string; value: string }>
-	| { [key: string]: Json }
 export const MusicTwoRowItemRenderer = (ctx: any): CarouselItem => {
 	const Item: CarouselItem = {
 		title: ctx['musicTwoRowItemRenderer']['title']['runs'][0].text,
