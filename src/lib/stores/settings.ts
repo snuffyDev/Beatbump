@@ -7,16 +7,21 @@ type Settings = {
 	dedupe?: boolean
 	preferWebM?: boolean
 }
+let list: Settings = {
+	theme: 'dark',
+	dedupe: true,
+	preferWebM: false
+}
 export const settings = _settings()
-
 function _settings() {
-	if (!browser) return
-
-	const { subscribe, set } = writable<Settings>({
-		theme: localStorage.getItem('theme'),
-		dedupe: JSON.parse(localStorage.getItem('filterAutoPlay')) || true,
-		preferWebM: JSON.parse(localStorage.getItem('preferWebM'))
-	})
+	if (browser) {
+		list = {
+			theme: localStorage.getItem('theme'),
+			dedupe: JSON.parse(localStorage.getItem('filterAutoPlay')) || true,
+			preferWebM: JSON.parse(localStorage.getItem('preferWebM'))
+		}
+	}
+	const { subscribe, set } = writable<Settings>(list)
 	const values = () => ({})
 
 	return {
@@ -25,15 +30,6 @@ function _settings() {
 			const { theme, dedupe, preferWebM } = settings
 
 			set({ theme: themeSet(theme), dedupe, preferWebM })
-		},
-		setTheme: (theme: theme) => {
-			set({ ...values(), theme: themeSet(theme) })
-		},
-		setPreferWebM: (option: boolean) => {
-			localStorage.setItem('preferWebM', option)
-		},
-		setDedupe: (option: boolean) => {
-			localStorage.setItem('filterAutoPlay', option)
 		}
 	}
 }

@@ -25,6 +25,11 @@
 		iOS.init()
 		const filter = localStorage.getItem('filterAutoPlay')
 		filter ? filter : localStorage.setItem('filterAutoPlay', 'true')
+		settings.set({
+			theme: localStorage.getItem('theme'),
+			dedupe: JSON.parse(localStorage.getItem('filterAutoPlay')) || true,
+			preferWebM: JSON.parse(localStorage.getItem('preferWebM'))
+		})
 	})
 </script>
 

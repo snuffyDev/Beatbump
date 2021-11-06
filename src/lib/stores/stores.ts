@@ -41,7 +41,10 @@ export const searchState = writable({
 })
 
 export const theme = derived(settings, ($settings) => $settings.theme)
-export const filterAutoPlay = derived(settings, ($settings) => $settings.dedupe)
+export const filterAutoPlay = derived(
+	settings,
+	($settings) => $settings?.dedupe
+)
 export const currentMix = writable({
 	videoId: '',
 	playlistId: '',

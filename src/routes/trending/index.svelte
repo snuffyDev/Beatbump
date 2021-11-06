@@ -33,7 +33,7 @@
 	tagStore.title('Trending')
 	tagStore.url(path)
 	tagStore.image('/logo.png')
-	$: console.log(carouselItems)
+	// $: console.log(carouselItems)
 </script>
 
 <svelte:head>
