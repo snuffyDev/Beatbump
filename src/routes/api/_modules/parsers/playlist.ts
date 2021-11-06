@@ -121,7 +121,7 @@ export const parsePlaylist = async (
 		// console.log(referrer.slice(1))
 		return {
 			continuations: cont,
-			data,
+
 			tracks: Tracks
 		}
 	}

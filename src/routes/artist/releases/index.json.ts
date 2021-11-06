@@ -24,9 +24,11 @@ export const get = async ({ query }) => {
 				'x-youtube-page-label': 'youtube.music.web.client_20210901_00_RC00',
 				'x-youtube-time-zone': 'America/New_York',
 				origin: 'https://music.youtube.com',
-				'x-youtube-utc-offset': '-240'
+				'x-youtube-utc-offset': '-240',
+				referrer: 'https://music.youtube.com/channel/' + browseId,
+				referer: 'https://music.youtube.com/channel/' + browseId
 			},
-			referrer: 'https://music.youtube.com/channel/' + browseId,
+
 			body: JSON.stringify({
 				context: {
 					client: {
@@ -66,8 +68,7 @@ export const get = async ({ query }) => {
 				browseId: browseId,
 				params: params
 			}),
-			method: 'POST',
-			mode: 'cors'
+			method: 'POST'
 			// credentials: 'include'
 		}
 	)

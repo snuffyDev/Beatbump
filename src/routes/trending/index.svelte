@@ -33,7 +33,7 @@
 	tagStore.title('Trending')
 	tagStore.url(path)
 	tagStore.image('/logo.png')
-	// console.log(carouselItems)
+	$: console.log(carouselItems)
 </script>
 
 <svelte:head>
@@ -60,9 +60,7 @@
 		<div class="box-cont">
 			<div class="header">
 				<h1>{carouselItems[1].header.title}</h1>
-				<a style="white-space:pre" class="link" href="/explore"
-					><small>See All</small></a
-				>
+				<a class="link" href="/explore"><small>See All</small></a>
 			</div>
 			<box>
 				{#each carouselItems[1].results.slice(1, 15) as { color, endpoint: { params }, text }}
@@ -131,7 +129,8 @@
 		border-right: none !important;
 		height: 3rem;
 		position: relative;
-		background: #9589b321;
+		background: #7875862c;
+		box-shadow: 0 0 0.5rem 0 rgba(0, 0, 0, 0.192);
 
 		.innerbox {
 			height: 100%;
@@ -169,5 +168,6 @@
 		width: 100%;
 		height: 100%;
 		align-items: center;
+		text-shadow: 0 0 0.25rem rgba(0, 0, 0, 0.089);
 	}
 </style>

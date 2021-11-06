@@ -3,9 +3,6 @@
 	import Icon from '$lib/components/Icon/Icon.svelte'
 	import { theme } from '$lib/stores/stores'
 	import { onMount } from 'svelte'
-	import '../../../global/vars.css'
-	import { clickOutside } from '$lib/js/clickOutside'
-	import { fade } from 'svelte/transition'
 	import { browser } from '$app/env'
 
 	export let header
@@ -17,7 +14,8 @@
 	let wrapper: HTMLElement
 	let isExpanded
 	let scroll
-	$: opacity = 0
+	let opacity = 0
+	let img: HTMLImageElement
 	type CustomEvent = Event & {
 		currentTarget: EventTarget & HTMLImageElement & HTMLPictureElement
 		target: EventTarget & HTMLImageElement & HTMLPictureElement
@@ -42,13 +40,23 @@
 	$: isExpanded && handler()
 	onMount(() => {
 		let start
+		if (img) {
+			img.decode().then(() => {
+				opacity = 1
+			})
 
+			img.addEventListener('load', () => {})
+			// console.log(img)
+		}
 		wrapper = document.getElementById('wrapper')
 		wrapper.addEventListener('scroll', () =>
 			window.requestAnimationFrame(handler)
 		)
 		return () => {
 			window.cancelAnimationFrame(y)
+			img.removeEventListener('load', () => {
+				opacity = 1
+			})
 			wrapper.removeEventListener('scroll', () =>
 				window.cancelAnimationFrame(y)
 			)
@@ -81,48 +89,47 @@
 			id="gradient"
 			class="gradient"
 		/>
-		{#if thumbnail !== undefined}
-			<picture class="header-thumbnail" style="opacity:{opacity};">
-				{#each thumbnail as img, i}
-					{#if i == 0}
-						<source
-							media="(max-width:{img.width}px)"
-							srcset={img.url}
-							type="image/jpeg"
-						/>
-						<source
-							media={`(min-width:${img.width + 1}px) and (max-width:${
-								thumbnail[i + 1].width
-							}px)`}
-							srcset={img.url}
-							type="image/jpeg"
-						/>
-					{:else if i == thumbnail.length - 1}
-						<!-- <source
+		<picture class="header-thumbnail">
+			{#each thumbnail as img, i (img)}
+				{#if i == 0}
+					<source
+						media="(max-width:{img.width}px)"
+						srcset={img.url}
+						type="image/jpeg"
+					/>
+					<source
+						media={`(min-width:${img.width + 1}px) and (max-width:${
+							thumbnail[i + 1].width
+						}px)`}
+						srcset={img.url}
+						type="image/jpeg"
+					/>
+				{:else if i == thumbnail.length - 1}
+					<!-- <source
 							media="(min-width:{thumbnail[i - 1]
 								.width}px) and (max-width:{img.width}px)"
 							srcset={img.url}
 							type="image/jpeg" /> -->
-					{:else}
-						<source
-							media={`(min-width:${img.width + 1}px) and (max-width:${
-								thumbnail[i + 1].width
-							}px)`}
-							srcset={thumbnail[i + 1].url}
-							type="image/jpeg"
-						/>
-					{/if}
-				{/each}
-				<img
-					class="header-thumbnail"
-					loading="eager"
-					on:load={imageLoadHandler}
-					style="opacity:{opacity};"
-					src={thumbnail[1]?.url}
-					alt="Artist Thumbnail"
-				/>
-			</picture>
-		{/if}
+				{:else}
+					<source
+						media={`(min-width:${img.width + 1}px) and (max-width:${
+							thumbnail[i + 1].width
+						}px)`}
+						srcset={thumbnail[i + 1].url}
+						type="image/jpeg"
+					/>
+				{/if}
+			{/each}
+			<img
+				bind:this={img}
+				class="header-thumbnail"
+				style="opacity:{opacity};"
+				loading="eager"
+				src={thumbnail[1]?.url}
+				id="artist_img"
+				alt="Artist Thumbnail"
+			/>
+		</picture>
 		<div class="artist-content">
 			<div class="content-wrapper">
 				<div class="name">{header?.name}</div>

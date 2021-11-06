@@ -54,7 +54,7 @@ export default function drag(node) {
 
 	function handleMouseup(event) {
 		if (event.type == 'touchend') {
-			// console.log(event)
+			// console.log(JSON.stringify(event))
 			x = event.changedTouches[0].clientX
 			y = event.changedTouches[0].clientY
 		} else {

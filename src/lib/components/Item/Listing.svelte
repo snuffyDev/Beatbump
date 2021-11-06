@@ -1,6 +1,4 @@
 <script lang="ts">
-	import Dropdown from '$components/Dropdown/Dropdown.svelte'
-
 	export let data: Item
 
 	import Loading from '$components/Loading/Loading.svelte'
@@ -15,7 +13,7 @@
 	import db from '$lib/db'
 	import { browser } from '$app/env'
 	import { createEventDispatcher } from 'svelte'
-	import Popper from '../Popper/Popper.svelte'
+	import { PopperButton } from '../Popper'
 
 	const dispatch = createEventDispatcher()
 	let isLibrary = hasContext('library') ? true : false
@@ -130,15 +128,16 @@
 		DropdownItems.pop()
 		DropdownItems.push({
 			text: 'Add to Playlist',
-			icon: 'heart',
+			icon: 'playlist-add',
 			action: async () => {
 				const _data = await fetch(
 					`/api/getQueue.json?playlistId=${data.playlistId}`
 				).then((data) => data.json())
-
+				let thumb = data.thumbnails?.reverse()
 				await db.addToPlaylist({
 					name: data.title,
-					items: [..._data]
+					items: [..._data],
+					thumbnail: thumb[0].url ?? data.thumbnail
 				})
 			}
 		})
@@ -209,11 +208,7 @@
 					<img
 						use:longpress
 						id="img"
-						referrerpolicy="origin-when-cross-origin"
-						loading="lazy"
-						on:error={errorHandler}
-						type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-						src={data.thumbnail || data.thumbnails[0]?.url}
+						src={data.thumbnails[0]?.url ?? data.thumbnail}
 						alt="thumbnail"
 					/>
 				</div>
@@ -259,7 +254,16 @@
 				bind:isHidden
 				items={DropdownItems}
 			/> -->
-			<Popper bind:isHidden items={DropdownItems} />
+			<PopperButton
+				metadata={{
+					thumbnail: data.thumbnails[0]?.url ?? data.thumbnail,
+					title: title,
+					length: data.type !== artist ? data?.length?.text : ''
+				}}
+				type="search"
+				bind:isHidden
+				items={DropdownItems}
+			/>
 		</div>
 	</div>
 </div>

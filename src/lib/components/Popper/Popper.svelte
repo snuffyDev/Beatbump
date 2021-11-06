@@ -1,21 +1,21 @@
 <script lang="ts">
 	import Dropdown from '../Dropdown/Dropdown.svelte'
-
 	import MobilePopper from './MobilePopper.svelte'
-	export let items = []
-	export let type = ''
-	export let isHidden
+
+	const poppers = [
+		{
+			name: 'mobile',
+			component: MobilePopper
+		},
+		{ name: 'desktop', component: Dropdown }
+	]
 	let width
-	$: mobile = width < 640 ? true : false
-	$: component = mobile ? MobilePopper : Dropdown
+	$: popper = width < 640 ? poppers[0] : poppers[1]
 </script>
 
 <svelte:window bind:innerWidth={width} />
-{#if mobile}
-	<svelte:component this={MobilePopper} {type} bind:items bind:isHidden />
-{:else}
-	<svelte:component this={Dropdown} {type} bind:items bind:isHidden />
-{/if}
 
-<style src="./index.scss" lang="scss">
+<svelte:component this={popper.component} />
+
+<style lang="scss">
 </style>

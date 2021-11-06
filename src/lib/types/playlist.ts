@@ -47,6 +47,6 @@ export type Header = {
 
 export type PlaylistData = {
 	continuations: NextContinuationData
-	header: Header
+	header?: Header
 	tracks: Item[]
 }

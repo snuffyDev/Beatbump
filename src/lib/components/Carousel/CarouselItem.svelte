@@ -1,17 +1,14 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
-	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 	import Loading from '$components/Loading/Loading.svelte'
 	import db from '$lib/db'
 	import lazy from '$lib/lazy'
 	import list from '$lib/stores/list'
 	import type { CarouselItem } from '$lib/types'
 	import { alertHandler, currentTitle, key } from '$stores/stores'
-	import { onMount, tick } from 'svelte'
-	import { fade } from 'svelte/transition'
-	import Popper from '../Popper/Popper.svelte'
+	import { tick } from 'svelte'
+	import { PopperButton } from '../Popper'
 	import { browseHandler } from './functions'
-	import menu from './menu'
 	export let section
 	export let index
 	export let item: CarouselItem
@@ -139,7 +136,7 @@
 			loading = false
 		}
 	}
-
+	// $:console.log(item.thumbnails)
 	let srcImg =
 		item.thumbnails[0].width <= 60
 			? item.thumbnails[0].url.replace(/=(w(\d+))-(h(\d+))/g, '=w256-h256')
@@ -147,15 +144,77 @@
 	if (kind === 'Singles') {
 		DropdownItems.splice(1, 1)
 		DropdownItems = [...DropdownItems]
-		console.log(DropdownItems)
+		// console.log(DropdownItems)
 	}
+
+	let active
 </script>
 
-<section
+<article class="item" on:click|stopPropagation={(e) => clickHandler(e, index)}>
+	<section
+		class="item-thumbnail"
+		on:mouseover={() => (active = true)}
+		on:focus
+		on:mouseout={() => (active = false)}
+	>
+		<div
+			class="image"
+			class:active
+			class:img16x9={RATIO_RECT ? true : false}
+			class:img1x1={RATIO_SQUARE ? true : false}
+			tabindex="0"
+		>
+			{#if loading}
+				<Loading />
+			{/if}
+			<img
+				alt="thumbnail"
+				on:error={errorHandler}
+				loading="lazy"
+				class:img16x9={RATIO_RECT}
+				class:img1x1={RATIO_SQUARE}
+				width={item.thumbnails[0].width}
+				height={item.thumbnails[0].height}
+				src={item.thumbnails[0]?.placeholder}
+				use:lazy={{ src: srcImg }}
+			/>
+		</div>
+		<div class="item-menu" class:hidden={isBrowseEndpoint}>
+			<PopperButton bind:isHidden items={DropdownItems} />
+		</div>
+	</section>
+	<section class="item-title">
+		<h1 class="link">
+			{item.title.length > 48
+				? item.title.substring(0, 48) + '...'
+				: item.title}
+		</h1>
+		{#if item.subtitle}
+			<span class="subtitles secondary">
+				{#each item.subtitle as sub}
+					<span class:hidden={sub?.navigationEndpoint}>{sub.text}</span>
+					<a
+						sveltekit:prefetch
+						class:hidden={!sub?.navigationEndpoint}
+						on:click|stopPropagation|preventDefault={() => {
+							goto(
+								'/artist/' + sub?.navigationEndpoint?.browseEndpoint?.browseId
+							)
+						}}
+						href={'/artist/' +
+							sub?.navigationEndpoint?.browseEndpoint?.browseId}
+						><span>{sub.text}</span></a
+					>
+				{/each}
+			</span>
+		{/if}
+	</section>
+</article>
+
+<!-- <section
 	class="item"
 	class:item16x9={RATIO_RECT ? true : false}
 	class:item1x1={RATIO_SQUARE ? true : false}
-	transition:fade|local
 	bind:this={section[index]}
 >
 	<div
@@ -176,13 +235,13 @@
 			{/if}
 			<img
 				alt="thumbnail"
-				transition:fade|local
 				on:error={errorHandler}
+				loading="lazy"
 				class:img16x9={RATIO_RECT}
-				type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-				src={RATIO_SQUARE
-					? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mMMXgwAAU8A+CaOv30AAAAASUVORK5CYII='
-					: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAJCAQAAACRI2S5AAAAEklEQVR42mMMXsyAFzCOKgADAIveCLCeLfJzAAAAAElFTkSuQmCC'}
+				class:img1x1={RATIO_SQUARE}
+				width={item.thumbnails[0].width}
+				height={item.thumbnails[0].height}
+				src={item.thumbnails[0]?.placeholder}
 				use:lazy={{ src: srcImg }}
 			/>
 		</div>
@@ -193,7 +252,7 @@
 					{item.title.length > 48
 						? item.title.substring(0, 48) + '...'
 						: item.title}
-					<!-- {kind} -->
+					<!-- {kind}
 				</span>
 				{#if item.subtitle}
 					<div class="secondary subtitles">
@@ -220,35 +279,151 @@
 	</div>
 	{#if !isBrowseEndpoint}
 		<div class="menu">
-			<!-- <Dropdown color="white" bind:isHidden items={DropdownItems} /> -->
-			<Dropdown bind:isHidden items={DropdownItems} />
+			<!-- <Dropdown color="white" bind:isHidden items={DropdownItems} /> -
+			<PopperButton bind:isHidden items={DropdownItems} />
 		</div>
 	{/if}
-</section>
-
+</section> -->
 <style lang="scss">
-	@import '../../../global/stylesheet/components/_carousel-item.scss';
-
-	.hidden {
-		display: none !important;
-		visibility: hidden !important;
+	.item-title {
+		display: inline-flex;
+		flex-direction: column;
+		gap: 0.4rem;
 	}
-	.item {
-		will-change: contents;
+	.item1x1 {
+		// padding-top: 100% !important;
+		width: 100%;
+		max-width: 20rem !important;
+		position: relative;
 	}
-	.image,
-	img {
-		will-change: contents;
-		&:focus {
-			outline: none;
+	.item16x9 {
+		// padding-top: 56.25% !important;
+		min-width: 20rem !important;
+		position: relative;
+	}
+	.img1x1 {
+		// padding-top: 100% !important;
+		min-width: 13rem !important;
+		max-width: 20rem;
+		aspect-ratio: 1/1 !important;
+	}
+	.img16x9 {
+		// padding-top: 56.25% !important;
+		min-width: 20rem !important;
+		max-width: 23rem;
+		aspect-ratio: 16/9 !important;
+	}
+	// @import '../../../global/stylesheet/components/_carousel-item.scss';
+	.subtitles {
+		display: inline-flex;
+		flex-wrap: wrap;
+		cursor: pointer;
+		> * {
+			margin-right: 0.125rem;
 		}
 	}
+	h1 {
+		font-size: 1.1rem;
+		font-weight: 500;
+		margin-bottom: 0;
+		display: inline;
+	}
+	article {
+		// display: block;
+		// padding-bottom: 1.8rem;
+		// padding-left: 1rem;
+		scroll-snap-align: start;
+		// padding-right: 1rem;
+		&::before {
+			position: absolute;
+			display: block;
+			content: '';
+			padding-top: calc(100% * 2 / 3);
+		}
+	}
+	.image {
+		width: 100%;
+		// height: 100%;
+		height: auto;
+
+		position: relative;
+		cursor: pointer;
+		user-select: none;
+		border-radius: var(--sm-radius);
+		&:focus {
+			border: none;
+		}
+
+		&::before {
+			border-radius: inherit;
+			position: absolute;
+			content: '';
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			background: linear-gradient(
+				rgba(0, 0, 0, 0.502),
+				rgba(0, 0, 0, 0),
+				rgba(0, 0, 0, 0)
+			);
+			pointer-events: none;
+			will-change: contents;
+			transition: background cubic-bezier(0.455, 0.03, 0.515, 0.955) 0.1s,
+				opacity cubic-bezier(0.455, 0.03, 0.515, 0.955) 0.1s;
+			opacity: 0.1;
+			// z-index: 1;
+		}
+
+		&:active:hover::before {
+			// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
+			background: linear-gradient(rgba(0, 0, 0, 0.651), rgba(0, 0, 0, 0.11));
+			opacity: 1;
+			z-index: 1;
+		}
+		// padding-top: 100%;
+
+		img {
+			width: inherit;
+			height: inherit;
+			aspect-ratio: inherit;
+			user-select: none;
+			// position: absolute;
+			object-fit: cover;
+			// border-radius: var(--xs-radius);
+			min-width: 100%;
+			// min-height: 100%;
+		}
+	}
+	.active {
+		&::before {
+			// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
+			background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
+			opacity: 0.7;
+			z-index: 1;
+		}
+	}
+
 	.item {
-		> :is(*:hover) + * {
+		display: flex;
+		flex-direction: column;
+		gap: 0.8rem;
+		isolation: isolate;
+
+		// cursor: pointer;
+	}
+	.image:hover {
+		+ .item-menu {
 			opacity: 1 !important;
 		}
 	}
-	.menu {
+
+	.item-menu {
+		position: absolute;
+		right: 0;
+		top: 0;
+		z-index: 5;
+		margin: 0.25rem;
 		opacity: 0;
 		transition: 50ms opacity cubic-bezier(0.55, 0.055, 0.675, 0.19);
 		&:hover {
@@ -256,6 +431,20 @@
 		}
 		@media screen and (max-width: 550px) {
 			opacity: 1;
+		}
+	}
+	.item-thumbnail {
+		position: relative;
+		cursor: pointer;
+	}
+	.hidden {
+		display: none !important;
+		visibility: hidden !important;
+	}
+	.image,
+	img {
+		&:focus {
+			outline: none;
 		}
 	}
 </style>

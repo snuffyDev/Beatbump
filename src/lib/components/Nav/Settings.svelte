@@ -1,13 +1,11 @@
 <script>
 	import { fade } from 'svelte/transition'
 	import { circIn } from 'svelte/easing'
-	import { filterAutoPlay, theme } from '$stores/stores'
+	import { filterAutoPlay, iOS, theme } from '$stores/stores'
+	import { settings } from '$lib/stores/settings'
+	import { queryParams } from '$lib/utils'
 
 	export let isSettingsOpen
-	$: options = {
-		theme: $theme,
-		filter: $filterAutoPlay
-	}
 	let themes = [
 		{ name: 'dark' },
 		{ name: 'dim' },
@@ -20,19 +18,20 @@
 {#if isSettingsOpen}
 	<div class="nav-settings" transition:fade={{ duration: 120, easing: circIn }}>
 		<!-- <label for="search"><em>search</em></label> -->
+
 		<div class="setting">
 			<label for="select" class="s-text">Theme:</label>
 			<div class="select">
 				<!-- svelte-ignore a11y-no-onchange -->
 				<select
 					id="select"
-					bind:value={options.theme}
+					bind:value={$settings.theme}
 					on:change={() => {
-						theme.set(options.theme)
+						localStorage.setItem('theme', $settings.theme)
 					}}
 				>
 					{#each themes as theme}
-						<option value={theme.name} selected={options.theme}
+						<option value={theme.name} selected={$settings.theme}
 							>{theme.name}</option
 						>
 					{/each}
@@ -43,12 +42,34 @@
 			<label for="checkbox" class="s-text">Dedupe Automix: </label>
 			<input
 				type="checkbox"
-				bind:checked={options.filter}
+				bind:checked={$settings.dedupe}
 				on:change={() => {
-					filterAutoPlay.set(options.filter)
+					// settings.setDedupe(!filter)
+					localStorage.setItem(
+						'filterAutoPlay',
+						JSON.stringify($settings.dedupe)
+					)
 				}}
 			/>
 		</div>
+		{#if !$iOS}
+			<div class="setting">
+				<label for="checkbox" class="s-text">Prefer WEBM Audio: </label>
+				<input
+					type="checkbox"
+					bind:checked={$settings.preferWebM}
+					on:change={async () => {
+						// settings.setPreferWebM(!preferWebM)
+						localStorage.setItem(
+							'preferWebM',
+							JSON.stringify($settings.preferWebM)
+						)
+
+
+					}}
+				/>
+			</div>
+		{/if}
 	</div>
 {/if}
 

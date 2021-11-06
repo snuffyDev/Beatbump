@@ -1,4 +1,8 @@
 import type { CarouselItem, Item } from './types'
+import type {
+	IMusicResponsiveListItemRenderer,
+	IMusicTwoRowItemRenderer
+} from './types/internals'
 
 type JSON =
 	| string
@@ -44,12 +48,33 @@ export function parseNextItem(item, length) {
 	return result[0]
 }
 
-export const MusicTwoRowItemRenderer = (ctx: any): CarouselItem => {
+export const MusicTwoRowItemRenderer = (ctx): CarouselItem => {
+	let {
+		musicTwoRowItemRenderer: {
+			thumbnailRenderer: {
+				musicThumbnailRenderer: { thumbnail: { thumbnails = [] } = {} } = {}
+			} = {}
+		} = {}
+	} = ctx
+
+	thumbnails = thumbnails.map((d) => {
+		const url: string = d?.url?.replace('-rj', '-rw')
+		let placeholder = url
+		placeholder = placeholder?.replace(
+			/(=w(\d+)-h(\d+))/gm,
+
+			'=w10-h10-fSoften=50,50,05'
+		)
+		return {
+			...d,
+			url: url,
+			placeholder
+		}
+	})
+
 	const Item: CarouselItem = {
 		title: ctx['musicTwoRowItemRenderer']['title']['runs'][0].text,
-		thumbnails:
-			ctx.musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer
-				.thumbnail.thumbnails,
+		thumbnails,
 		aspectRatio: ctx.musicTwoRowItemRenderer.aspectRatio,
 		videoId:
 			ctx.musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint?.videoId,
@@ -81,10 +106,26 @@ export const MusicTwoRowItemRenderer = (ctx: any): CarouselItem => {
 }
 
 export const MusicResponsiveListItemRenderer = (
-	ctx: any,
+	ctx,
 	playlistSetVideoId?: boolean,
 	playlistId?: string
 ): Item => {
+	let {
+		thumbnail: {
+			musicThumbnailRenderer: { thumbnail: { thumbnails = [] } = {} } = {}
+		} = {}
+	} = ctx?.musicResponsiveListItemRenderer
+	thumbnails = thumbnails.map((d) => {
+		let url: string = d?.url
+		let placeholder = url
+		placeholder = placeholder?.replace('sddefault', 'default')
+		return {
+			...d,
+			url: url,
+			placeholder
+		}
+	})
+
 	let Item: Item = {
 		subtitle: [
 			...ctx.musicResponsiveListItemRenderer.flexColumns[1]
@@ -113,9 +154,7 @@ export const MusicResponsiveListItemRenderer = (
 					.menuNavigationItemRenderer.navigationEndpoint.watchEndpoint
 					.playlistId
 			: ctx?.navigationEndpoint?.watchEndpoint,
-		thumbnails:
-			ctx.musicResponsiveListItemRenderer.thumbnail?.musicThumbnailRenderer
-				?.thumbnail?.thumbnails
+		thumbnails
 	}
 	if (Item !== undefined && playlistSetVideoId) {
 		Item.playlistSetVideoId =

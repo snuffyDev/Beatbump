@@ -1,8 +1,8 @@
 // CORE
-@use './utilities/utilities';
-@use './base/theme';
-@use './base/base';
+@use "./utilities/utilities";
+@use "./base/theme";
+@use "./base/base";
 @use "./modules/modules";
-
+@use "./layout";
 // Extras
-@use './components/header';
+@use "./components/header";

@@ -6,7 +6,7 @@ const parseProxyRedir = (url) => {
 	return url
 }
 
-export const sort = (data) => {
+export const sort = (data, WebM = false) => {
 	try {
 		const json = data
 		if (json['playabilityStatus']['status'].includes('ERROR')) {
@@ -22,12 +22,21 @@ export const sort = (data) => {
 
 		formatParent.map((i) => {
 
-			if (i.mimeType.includes('audio') &&
+			if (WebM && i.mimeType.includes('audio') &&
 				i.audioChannels === 2 &&
 				i.audioQuality.includes('AUDIO_QUALITY_MEDIUM')
-				&& i.mimeType.includes('mp4')
+				&& (i.mimeType.includes('mp4') || i.mimeType.includes('webm'))
 			) {
 				i.url = parseProxyRedir(i.url)
+				i.mimeType = i.mimeType.includes('mp4') ? 'mp4' : 'webm'
+				return arr.push(i)
+			} else if (!WebM && i.mimeType.includes('audio') &&
+				i.audioChannels === 2 &&
+				i.audioQuality.includes('AUDIO_QUALITY_MEDIUM')
+				&& i.mimeType.includes('mp4')) {
+
+				i.url = parseProxyRedir(i.url)
+				i.mimeType = 'mp4';
 				return arr.push(i)
 			}
 
@@ -37,12 +46,13 @@ export const sort = (data) => {
 			// console.log('0!!!!')
 			return arr.map((format) => {
 				return {
-					url: format.url
+					url: format.url,
+					mimeType: format.mimeType
 				}
 			})
 		}
 
-		return [{ url: null }]
+		return [{ url: null, mimeType: null }]
 		// return null
 	} catch (e) {
 		console.log('Fetch error', e)

@@ -18,11 +18,12 @@ export const parseArtist = (data) => {
 			} = {}
 		} = {}
 	} = data
-
+	console.log(header)
 	const parsed = parse(header, contents)
 
 	return {
-		...parsed[0]
+		...parsed[0],
+		headerRaw: header
 	}
 }
 
@@ -32,9 +33,7 @@ function parse(header: { musicImmersiveHeaderRenderer: any }, contents: any) {
 	let description = ''
 	let items = []
 	const headerContent = []
-	const newData = [
-		parseArtistPage(header?.musicImmersiveHeaderRenderer, contents)
-	]
+	const newData = [parseArtistPage(header, contents)]
 	return newData.map((d) => {
 		carouselItems.push(...d.carouselItems)
 		headerContent.push(d[0])

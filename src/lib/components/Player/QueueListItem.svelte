@@ -94,6 +94,8 @@
 	.clickable {
 		width: 100%;
 		display: inline-flex;
+
+		align-items: center;
 	}
 	.p-length {
 		margin-left: auto;

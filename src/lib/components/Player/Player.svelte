@@ -2,7 +2,6 @@
 	import { browser } from '$app/env'
 
 	import { goto } from '$app/navigation'
-	import Dropdown from '$components/Dropdown/Dropdown.svelte'
 	import Icon from '$components/Icon/Icon.svelte'
 	import db from '$lib/db'
 	import { clickOutside } from '$lib/js/clickOutside'
@@ -20,14 +19,13 @@
 	import { cubicOut } from 'svelte/easing'
 	import { tweened } from 'svelte/motion'
 	import { fade } from 'svelte/transition'
-	import Popper from '../Popper/Popper.svelte'
+	import { PopperButton } from '../Popper'
 	import Controls from './Controls.svelte'
 	import Queue from './Queue.svelte'
 	import QueueListItem from './QueueListItem.svelte'
 
 	const player: HTMLAudioElement = new Audio()
-	player.autoplay = $updateTrack !== undefined ? true : false
-	// player.autoplay = true
+	$: player.autoplay = $updateTrack !== undefined ? true : false
 
 	$: player.src = $updateTrack
 	$: isWebkit = $iOS
@@ -58,6 +56,29 @@
 	let DropdownItems: Array<any>
 	let once = false
 	$: console.log($list.mix)
+
+	/*
+  	Player Controls
+	 */
+	const play = () => {
+		navigator.mediaSession.playbackState = 'playing'
+
+		isPlaying = true
+		key.set(autoId)
+
+		metaDataHandler()
+	}
+	const pause = () => player.pause()
+	const setPosition = () => {
+		navigator.mediaSession.setPositionState({
+			duration: isWebkit ? duration / 2 : duration,
+			position: player.currentTime
+		})
+	}
+	/*
+		Player Event Listeners
+	 */
+
 	player.addEventListener('loadedmetadata', () => {
 		isPlaying = true
 
@@ -85,21 +106,7 @@
 			}
 		]
 	})
-	const play = () => {
-		navigator.mediaSession.playbackState = 'playing'
 
-		isPlaying = true
-		key.set(autoId)
-
-		metaDataHandler()
-	}
-	const pause = () => player.pause()
-	const setPosition = () => {
-		navigator.mediaSession.setPositionState({
-			duration: isWebkit ? duration / 2 : duration,
-			position: player.currentTime
-		})
-	}
 	player.addEventListener('timeupdate', async () => {
 		time = player.currentTime
 		duration = player.duration
@@ -111,9 +118,8 @@
 			 we have to cut the time in half. Doesn't effect other devices.
 		*/
 		if (isWebkit && remainingTime < duration / 2 && once == false) {
-			player.muted = true
-			await getNext()
-			player.muted = false
+			// await getNext()
+			player.currentTime = player.currentTime * 2
 		}
 	})
 	player.addEventListener('pause', () => {
@@ -130,6 +136,9 @@
 		play()
 	})
 
+	/*
+		Metadata Handler
+	*/
 	function metaDataHandler() {
 		if ('mediaSession' in navigator) {
 			navigator.mediaSession.metadata = new MediaMetadata({
@@ -155,7 +164,7 @@
 					}
 				]
 			})
-			navigator.mediaSession.setActionHandler('play', play)
+			navigator.mediaSession.setActionHandler('play', player.play)
 			navigator.mediaSession.setActionHandler('pause', pause)
 			navigator.mediaSession.setActionHandler('seekto', (session) => {
 				if (session.fastSeek && 'fastSeek' in player) {
@@ -170,7 +179,9 @@
 			navigator.mediaSession.setActionHandler('nexttrack', nextBtn)
 		}
 	}
-
+	/*
+		Player Track Management
+	*/
 	async function getNext() {
 		once = true
 		if (autoId == $list.mix.length - 1) {
@@ -193,20 +204,8 @@
 				autoId++
 				key.set(autoId)
 
-				await getTrackURL()
-				// player.muted = true
-				// player.src = src
-				// player.load()
-				// const play = player.play()
-				// play
+				getTrackURL()
 
-				// 	.then(() => {
-				// 		player.play()
-				// 		metaDataHandler()
-				// 	})
-				// 	.catch((err) => console.error('GetNext Error! ' + err))
-				// player.muted = false
-				// player.src = src
 				currentTitle.set($list.mix[autoId].title)
 				once = false
 			} catch (error) {
@@ -215,8 +214,8 @@
 		}
 	}
 
-	async function getTrackURL() {
-		return await getSrc(mixList[autoId].videoId)
+	function getTrackURL() {
+		return getSrc(mixList[autoId].videoId)
 			.then(({ body, error }) => {
 				if (error === true) {
 					getNext()
@@ -262,6 +261,10 @@
 			}
 		}
 	}
+
+	/*
+		UI Functions
+	*/
 	const progress = tweened(0, {
 		duration: duration,
 		easing: cubicOut
@@ -363,7 +366,17 @@
 				<Icon color="white" name="radio" size="2em" />
 			</div>
 		</div>
-		<Controls bind:isPlaying bind:loading {play} {pause} {nextBtn} {prevBtn} />
+		<Controls
+			bind:isPlaying
+			bind:loading
+			on:play={() => {
+				play()
+				player.play()
+			}}
+			{pause}
+			{nextBtn}
+			{prevBtn}
+		/>
 		<div class="player-right">
 			<div
 				class="volume player-btn"
@@ -393,7 +406,7 @@
 				{/if}
 			</div>
 			<div class="menu-container">
-				<Popper bind:isHidden type="player" items={DropdownItems} />
+				<PopperButton type="player" items={DropdownItems} />
 			</div>
 			<!-- <div class="menu-container__desktop">
 				<Dropdown bind:isHidden type="player" items={DropdownItems} />
@@ -430,7 +443,7 @@
 	}
 	.f-container {
 		background-color: inherit;
-		position: absolute;
+		// position: absolute;
 		grid-area: f/f/f/f;
 		box-shadow: 0 0rem 1rem 0rem #00000070;
 		height: 100%;
@@ -493,9 +506,10 @@
 		justify-content: center;
 	}
 	.f-container {
-		position: absolute;
+		// position: absolute;
 		bottom: 0;
 		width: 100%;
+		// z-index: -1;
 	}
 
 	progress {

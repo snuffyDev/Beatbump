@@ -7,7 +7,7 @@
 	export let key
 	$: isNavigating = $navigating
 	// $: console.log(isNavigating)
-	$: if (key) catchUp()
+	$: if (key || isNavigating !== null) catchUp()
 	async function catchUp() {
 		// console.log(key)
 		await tick()

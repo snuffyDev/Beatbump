@@ -4,9 +4,12 @@
 	export let prevBtn
 	export let nextBtn
 	export let isPlaying
-	export let play
 	export let pause
 	export let loading
+	import { createEventDispatcher } from 'svelte'
+	const dispatch = createEventDispatcher()
+
+	const playEvent = () => dispatch('play')
 </script>
 
 <div class="player-controls">
@@ -16,9 +19,10 @@
 		</div>
 		<div
 			class="player-btn player-title"
-			on:click={() => {
+			on:click={(e) => {
+				console.log(e)
 				if (!isPlaying) {
-					play()
+					playEvent()
 				} else {
 					pause()
 				}

@@ -65,6 +65,20 @@
 		height_map.length = items.length
 	}
 
+	function scroller(node: HTMLElement) {
+		function handleScroll(e: UIEvent & { target: EventTarget & HTMLElement }) {
+			// console.log(e)
+			if (node.contains(e.target)) {
+				handle_scroll()
+			}
+		}
+		node.addEventListener('scroll', handleScroll, { passive: true })
+		return {
+			destroy: () => {
+				node.removeEventListener('scroll', handleScroll, true)
+			}
+		}
+	}
 	async function handle_scroll() {
 		const { scrollTop } = viewport
 
@@ -137,7 +151,7 @@
 <svelte-virtual-list-viewport
 	bind:this={viewport}
 	bind:offsetHeight={viewport_height}
-	on:scroll={handle_scroll}
+	use:scroller
 	style="height: {height}; width:100%;"
 >
 	<svelte-virtual-list-contents
@@ -261,11 +275,10 @@
 
 <style>
 	.loading-results {
-		width: 100%;
 		padding: 0;
 		margin: 0;
 		/* height: 100%; */
-		height: 100%;
+
 		display: block;
 		position: relative;
 		bottom: 0;
@@ -282,6 +295,7 @@
 		/* bottom: 8rem; */
 		-webkit-overflow-scrolling: touch;
 		display: block;
+		overscroll-behavior: contain;
 	}
 
 	svelte-virtual-list-contents,

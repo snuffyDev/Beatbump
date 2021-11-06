@@ -27,9 +27,7 @@
 			<div class="logo-back" on:click={() => goto('/trending')}>
 				<img
 					style="margin-left:1.5rem;"
-					src="/logo-header.png"
-					width="1.75rem"
-					height="1.75rem"
+					src="/logo.svg"
 					alt="logo"
 					title="Beatbump Home"
 				/>
@@ -38,15 +36,12 @@
 				<Icon name="chevron-left" size="1.5em" />
 			</div>
 		{:else}
-			<div on:click={() => goto('/trending')}>
-				<img
-					src="/logo-header.png"
-					width="1.75rem"
-					height="1.75rem"
-					alt="logo"
-					title="Beatbump Home"
-				/>
-			</div>
+			<img
+				on:click={() => goto('/trending')}
+				src="/logo.svg"
+				alt="logo"
+				title="Beatbump Home"
+			/>
 		{/if}
 	</div>
 

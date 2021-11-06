@@ -14,12 +14,14 @@
 			description,
 			thumbnail,
 			header,
-			songs
+			songs,
+			headerRaw
 		} = await response.body
 		if (response.ok) {
 			return {
 				props: {
 					carousels,
+					headerRaw,
 					description,
 					thumbnail,
 					header,
@@ -44,6 +46,7 @@
 	import { setContext } from 'svelte'
 
 	export let header
+	export let headerRaw
 	export let description
 	export let thumbnail
 	export let carousels
@@ -53,7 +56,7 @@
 	$: id = id
 	let width
 	const ctx = {}
-	$: console.log(header, carousels, songs)
+	$: console.log(headerRaw, carousels, songs)
 	setContext(ctx, { pageId: id })
 
 	tags.desc(header?.name)

@@ -1,0 +1,51 @@
+.no-scroll {
+	overflow: hidden;
+	overflow-y: hidden;
+}
+
+$sections: (
+	bottom: (
+		footer-container,
+		player,
+	),
+	top: (
+		nav,
+	),
+	forms: (
+		select,
+		input,
+		option,
+		suggestions,
+	),
+);
+$themes: (dark, dim, midnight, light, ytm);
+
+.footer-container {
+	width: 100%;
+	max-width: 100%;
+	grid-area: f/f/f/f;
+	position: relative;
+	z-index: 1;
+	isolation: isolate;
+	height: 100%;
+}
+
+.footer-container {
+	grid-area: f/f/f/f;
+	// position: fixed;
+	bottom: 0;
+	display: block;
+	// z-index: 1;
+	width: 100%;
+	min-width: 100%;
+}
+
+:root .light * {
+	color: var(--light-text);
+}
+:root .dark * {
+	color: #f3f3f3;
+}
+.player {
+	color: #f3f3f3;
+}

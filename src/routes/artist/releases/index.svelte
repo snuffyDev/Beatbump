@@ -8,6 +8,9 @@
 				browseId
 			)}&params=${params}&itct=${itct}`
 		)
+		if (!response.ok) {
+			return { props: { status: await response.json() }, status: 200 }
+		}
 		const { header, contents } = await response.json()
 		return {
 			props: {
@@ -24,17 +27,21 @@
 
 	export let header
 	export let contents = []
-
+	export let status
 	$: console.log(header, contents)
 </script>
 
-<h1>{header?.artist}</h1>
-<h2>{header?.type}</h2>
-<div class="grid">
-	{#each contents as item}
-		<GridItem {item} />
-	{/each}
-</div>
+{#if status}
+	{status}
+{:else}
+	<h1>{header?.artist}</h1>
+	<h2>{header?.type}</h2>
+	<div class="grid">
+		{#each contents as item}
+			<GridItem {item} />
+		{/each}
+	</div>
+{/if}
 
 <style lang="scss">
 	.grid {

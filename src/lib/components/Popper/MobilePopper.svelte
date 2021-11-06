@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { browser } from '$app/env'
+
 	import drag from '$lib/actions/drag'
 	import list from '$lib/stores/list'
 	import { key } from '$lib/stores/stores'
@@ -6,23 +8,26 @@
 	import { createEventDispatcher, onMount } from 'svelte'
 	import { fade, fly } from 'svelte/transition'
 	import Icon from '../Icon/Icon.svelte'
+	import { PopperStore } from './popperStore'
 
-	export let isHidden = false
-	export let items = []
-	export let type = ''
+	$: items = $PopperStore.items
+	$: type = $PopperStore.type
+	// $: isHidden = $PopperStore.
 	const hideEvent = () => dispatch('close')
 	const openEvent = () => dispatch('open')
 	let listHeight
 	let sliding
 	let posY = 0
 	let showing
+	let throwY
 	function startHandler() {
 		sliding = true
 	}
 
-	function release() {
+	function release(e) {
+		// console.log(e)
 		if (sliding) {
-			if (posY < listHeight / 1.5) {
+			if (posY < listHeight / 2) {
 				open()
 			} else {
 				close()
@@ -32,6 +37,7 @@
 	}
 	function trackMovement({ y, dy }) {
 		// console.log(y, y + dy)
+		throwY = dy
 		if (y <= listHeight && y >= 0) {
 			posY = y + dy
 		} else if (y > listHeight) {
@@ -48,38 +54,53 @@
 		posY = 0
 	}
 	function close() {
-		posY = 100
-		isHidden = false
+		// posY = 100
+		// isHidden = false
+		posY = 0
+		PopperStore.reset()
+		allowScroll()
 		sliding = false
 	}
+	function noScroll() {
+		if (!browser) return
+		// document.querySelector('#wrapper').classList.add('no-scroll')
+	}
+	function allowScroll() {
+		if (!browser) return
+		PopperStore.set({ items: [], isOpen: false, type })
+		// document.querySelector('#wrapper').classList.remove('no-scroll')
+	}
+	$: items && noScroll()
 	// $: console.log($list.mix[$key])
-	// onMount(() => {
-	// 	document.querySelector('#wrapper').classList.add('no-scroll')
-	// 	return () =>
-	// 		document.querySelector('#wrapper').classList.remove('no-scroll')
-	// })
+
 	const dispatch = createEventDispatcher()
+	let popperHeight
 </script>
 
 <svelte:window bind:innerHeight={listHeight} />
-{#if items.length !== 0 && isHidden}
+{#if items.length !== 0}
 	<div
 		class="backdrop"
-		on:click={() => (isHidden = false)}
+		on:click={allowScroll}
 		transition:fade={{ duration: 125 }}
 	/>
 	<div
 		in:fly={{ duration: 125, delay: 125, y: 5 }}
 		out:fly={{ duration: 250, delay: 125, y: 5 }}
 		class="drag"
-		style="transform: translateY({posY / 5}px); height:  auto; bottom:0; "
+		bind:clientHeight={popperHeight}
+		style="transform: translateY({posY /
+			3.25}px); height:{popperHeight}px; top:{listHeight -
+			popperHeight}px;{sliding ? `transition:none;` : ''}"
 	>
 		<div class="popper">
 			<div
 				class="handle"
 				use:drag
 				on:startDrag={startHandler}
-				on:dragMove={(e) => trackMovement({ y: e.detail.y, dy: e.detail.dy })}
+				on:dragMove={(e) => {
+					trackMovement({ y: e.detail.y, dy: e.detail.dy })
+				}}
 				on:dragEnd={release}
 			>
 				<Icon name="minus" color="#f2f2f2" width="100%" />
@@ -103,14 +124,23 @@
 					</div>
 				</section>
 			{/if}
+			{#if type == 'search'}
+				<section class="m-metadata">
+					<div class="image">
+						<img src={$PopperStore.metadata.thumbnail} alt="" />
+					</div>
+					<div class="metatext">
+						<span>{$PopperStore.metadata.title}</span>
+
+						<span class="length">
+							<span class="subheading">{$PopperStore.metadata.length}</span>
+						</span>
+					</div>
+				</section>
+			{/if}
 			<ul>
 				{#each items as item}
-					<li
-						on:click={item.action}
-						on:click={() => {
-							isHidden = false
-						}}
-					>
+					<li on:click={item.action} on:click={allowScroll}>
 						<Icon name={item.icon} color="#f2f2f2" size="1.5em" />
 						<span class="text">{item.text}</span>
 					</li>
@@ -119,15 +149,6 @@
 		</div>
 	</div>
 {/if}
-<div
-	class="dd-button"
-	on:click|stopPropagation={() => {
-		isHidden = !isHidden
-		// console.log(isHidden)
-	}}
->
-	<svelte:component this={Icon} color="#f2f2f2" size="1.5rem" name="dots" />
-</div>
 
 <style src="./index.scss" lang="scss">
 </style>

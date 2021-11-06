@@ -2,7 +2,8 @@ import { browser } from '$app/env'
 import type { SearchContents } from '$lib/types'
 import { readable } from 'svelte/store'
 import type { Writable } from 'svelte/store'
-import { get, writable } from 'svelte/store'
+import { get, writable, derived } from 'svelte/store'
+import { settings } from './settings'
 export const updateTrack = updateSource()
 export const ctxKey = {}
 export const currentTitle = writable(undefined)
@@ -39,8 +40,8 @@ export const searchState = writable({
 	text: ''
 })
 
-export const theme = _theme()
-export const filterAutoPlay = _filterAutoPlay()
+export const theme = derived(settings, ($settings) => $settings.theme)
+export const filterAutoPlay = derived(settings, ($settings) => $settings.dedupe)
 export const currentMix = writable({
 	videoId: '',
 	playlistId: '',

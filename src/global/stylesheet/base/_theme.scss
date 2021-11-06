@@ -73,7 +73,14 @@ html {
 				* {
 					color: #131314;
 				}
-
+				a,
+				.link {
+					$link-color: #131314;
+					color: $link-color !important;
+					&:hover {
+						color: lighten($link-color, 30%) !important;
+					}
+				}
 				a small {
 					$color: rgb(71, 71, 71);
 					font-size: 0.95rem;

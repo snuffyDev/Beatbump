@@ -25,7 +25,9 @@
 
 <main>
 	<a sveltekit:prefetch href="/" class="logolink">
-		<div class="logo"><img src="/logo-header.png" alt="logo" /></div>
+		<div class="logo">
+			<img src="/logo.svg" width="128" height="128" alt="logo" />
+		</div>
 	</a>
 	<h1>Uh-Oh!</h1>
 	<h5>Looks like you hit a dead end!</h5>

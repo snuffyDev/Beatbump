@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { browser } from '$app/env'
 import { api } from '$lib/api'
 import { sort } from './endpoints/playerUtils'
 import { alertHandler, currentId, updateTrack } from './stores/stores'
@@ -30,20 +31,28 @@ export const addToQueue = async (videoId: string): Promise<string> => {
 
 // Get source URLs
 export const getSrc = async (videoId?: string, playlistId?: string) => {
+	const webM = browser && localStorage.getItem('preferWebM') ? true : false
 	const res = await api(fetch, {
 		endpoint: 'player',
 		videoId: videoId ? videoId : '',
 		playlistId: playlistId ? playlistId : ''
 	})
 	const data = await res.body
-	const formats = await sort(data)
+	const formats = await sort(data, webM)
 	currentId.set(videoId)
-	const src = formats[0].url !== null ? setTrack(formats) : handleError()
+	console.log(formats)
+	const src = formats[0].url !== null ? setTrack(formats, webM) : handleError()
 	return src
 }
-function setTrack(formats) {
+function setTrack(formats = [], webM) {
+	if (webM) {
+		const item = formats.find((v) => v.mimeType === 'webm')
+		const parsedURL = item !== undefined ? item.url : formats[0].url
+		updateTrack.update(() => parsedURL)
+		return { body: parsedURL, error: false }
+	}
 	const parsedURL = formats[0].url
-	updateTrack.set(parsedURL)
+	updateTrack.update(() => parsedURL)
 	return { body: parsedURL, error: false }
 }
 function handleError() {

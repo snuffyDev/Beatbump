@@ -147,11 +147,10 @@ export type JSON =
 	| { [key: string]: JSON }
 
 export type RequestParams = {
-	endpoint: string
+	endpoint?: string
+	browseId?: string;
 	continuation?: JSON
-	browseId?: string
 	type?: string
 	videoId?: string
 	playlistId?: string
-	path?: string
 }

@@ -5,24 +5,34 @@ import {
 
 export const parseArtistPage = (header, items) => {
 	// console.log(items)
-	header = [header]
+	if (header?.musicImmersiveHeaderRenderer) {
+		header = [header.musicImmersiveHeaderRenderer]
+	} else if (header?.musicVisualHeaderRenderer) {
+		header = [header.musicVisualHeaderRenderer]
+	}
 	const parsedHeader = header.map((h) => {
 		const name = h?.title.runs[0].text
 		let description
+		let foregroundThumbnails
 		const thumbnail = h?.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails
 		const mixInfo =
-			h?.startRadioButton.buttonRenderer.navigationEndpoint
-				.watchPlaylistEndpoint
+			h?.startRadioButton?.buttonRenderer?.navigationEndpoint
+				?.watchPlaylistEndpoint ?? null
 		if (h?.description) {
 			description = h?.description.runs[0].text
 		} else {
 			description = ''
 		}
+		if (h?.foregroundThumbnail) {
+			foregroundThumbnails =
+				h?.foregroundThumbnail?.musicThumbnailRenderer?.thumbnail.thumbnails
+		}
 		return {
 			name: name,
 			thumbnails: thumbnail,
 			mixInfo: mixInfo,
-			description: description
+			description: description,
+			foregroundThumbnails
 		}
 	})
 	let songs

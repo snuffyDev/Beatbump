@@ -26,15 +26,17 @@ const Parsers = async (
 		hasContinuation?: boolean
 	}
 ) => {
+	console.log(endpoint, { data, hasContinuation })
+
 	const Endpoints = {
-		next: await parseNextTrack(data, hasContinuation),
+		next: () => parseNextTrack(data, hasContinuation),
 		player: () => data,
 		release: await data,
-		playlist: await parsePlaylist(data),
-		artist: await parseArtist(data)
+		playlist: () => parsePlaylist(data),
+		artist: () => parseArtist(data)
 	}
 
-	return await Endpoints[`${endpoint}`]
+	return await Endpoints[`${endpoint}`]()
 }
 
 export const post = async ({ body }: { body: ReadOnlyFormData }) => {
@@ -59,8 +61,8 @@ export const post = async ({ body }: { body: ReadOnlyFormData }) => {
 	const browseId = (body.get('browseId') as string) || ''
 	const continuation = body.get('continuation') || null
 	const ctx = Context.base(browseId, type)
-	// console.log('all: ' + body.keys())
 	if (path == 'playlist' && browseId && continuation) {
+		console.log('uh oh!')
 		const request = await sendRequest(ctx, {
 			endpoint,
 			type: 'playlist',

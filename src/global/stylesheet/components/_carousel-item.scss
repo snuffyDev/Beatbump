@@ -1,11 +1,3 @@
-.subtitles {
-	display: inline-flex;
-	flex-wrap: wrap;
-	span,
-	a {
-		margin-right: 0.125em;
-	}
-}
 .text-wrapper {
 	display: inline-flex;
 	flex-direction: column;
@@ -28,11 +20,11 @@
 }
 .img16x9 {
 	// padding-top: 56.25% !important;
+	min-width: 20rem !important;
 	aspect-ratio: 16/9 !important;
 }
 .container.carouselItem {
 	position: relative;
-	will-change: contents;
 }
 .menu {
 	position: absolute;
@@ -55,7 +47,7 @@
 	letter-spacing: -0.05em;
 }
 
-section {
+article {
 	// display: block;
 	padding-bottom: 1.8rem;
 	padding-left: 1rem;
@@ -77,6 +69,8 @@ section.item {
 .image {
 	width: 100%;
 	// height: 100%;
+	height: auto;
+
 	position: relative;
 	cursor: pointer;
 	user-select: none;
@@ -110,7 +104,7 @@ section.item {
 	}
 	&:active:hover::before {
 		// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
-		background: linear-gradient(0.5turn, rgba(32, 32, 32, 0.534), rgba(0, 0, 0, 0.11));
+		background: linear-gradient(rgba(0, 0, 0, 0.651), rgba(0, 0, 0, 0.11));
 		opacity: 1;
 		z-index: 1;
 	}
@@ -118,10 +112,12 @@ section.item {
 		width: inherit;
 		height: inherit;
 		aspect-ratio: inherit;
+		user-select: none;
 		// position: absolute;
-		object-fit: contain;
+		object-fit: cover;
 		// border-radius: var(--xs-radius);
 		min-width: 100%;
+		// min-height: 100%;
 	}
 }
 

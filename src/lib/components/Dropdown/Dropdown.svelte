@@ -4,57 +4,62 @@
 	import { createEventDispatcher, setContext } from 'svelte'
 	import { quartInOut } from 'svelte/easing'
 	import { slide } from 'svelte/transition'
+	import { PopperStore } from '../Popper'
 	import DropdownItem from './DropdownItem.svelte'
 
-	export let isHidden = false
-	export let type = ''
-	export let items = []
 	export let color = 'white'
-	let showing = false
-	$: menuToggle = showing ? true : false
+
+	$: items = $PopperStore.items
+	$: type = $PopperStore.type
+
+	$: isHidden = $PopperStore.items.length !== 0
 	const dispatch = createEventDispatcher()
+
 	const hideEvent = () => dispatch('close')
 	const openEvent = () => dispatch('open')
 	setContext('menu', { update: isHidden })
+	function onClose() {
+		PopperStore.set({ items: [], isOpen: false, type })
+	}
+	let width
+	let viewport_height
+	let popperHeight
+	$: posY =
+		popperHeight &&
+		($PopperStore.y - popperHeight <= 0
+			? $PopperStore.y
+			: $PopperStore.bottom + popperHeight >= viewport_height
+			? $PopperStore.y - popperHeight
+			: $PopperStore.y)
+	$: console.log(items)
 </script>
 
+<svelte:window bind:innerHeight={viewport_height} />
 <div
 	class="menu"
-	on:focusout={() => {
-		isHidden = false
-	}}
+	on:focusout={onClose}
 	use:clickOutside
-	on:click_outside={() => {
-		isHidden = false
-	}}
+	on:click_outside={onClose}
 >
 	{#if isHidden}
 		<div
-			on:mouseleave|stopPropagation={() => {
-				isHidden = false
-			}}
+			bind:clientWidth={width}
+			bind:clientHeight={popperHeight}
+			style="transform: translate({$PopperStore.x - width}px, {posY}px)"
+			on:mouseleave|stopPropagation={onClose}
 			transition:slide={{ duration: 125, easing: quartInOut }}
 			class={type == 'player' ? 'dd-player' : 'dd-menu'}
 		>
 			{#each items as item}
 				<DropdownItem
 					on:click={item.action}
-					on:click={() => (isHidden = false)}
+					on:click={onClose}
 					text={item.text}
 					icon={item.icon}
 				/>
 			{/each}
 		</div>
 	{/if}
-	<div
-		class="dd-button"
-		on:click|stopPropagation={() => {
-			isHidden = !isHidden
-			// console.log(isHidden)
-		}}
-	>
-		<svelte:component this={Icon} {color} size="1.5em" name="dots" />
-	</div>
 </div>
 
 <style lang="scss">

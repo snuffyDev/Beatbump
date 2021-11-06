@@ -5,20 +5,19 @@ import autoprefixer from 'autoprefixer'
 import cssnano from 'cssnano'
 import path from 'path'
 import sveltePreprocess from 'svelte-preprocess'
-import { isoImport } from 'vite-plugin-iso-import'
-
 const check = process.env.NODE_ENV
 const dev = check === 'development'
 import worker from '@snuffydev/adapter-cloudflare-cache'
+
 /** @type {import('@sveltejs/kit').Config} */
-export default {
+const config = {
 	preprocess: sveltePreprocess({
 		scss: {
-			includePaths: ['src']
+			includePaths: ['src'],
 		},
 
 		postcss: {
-			plugins: [cssnano({ preset: 'default' }), autoprefixer({})]
+			plugins: [cssnano({ preset: 'cssnano-preset-default' }), autoprefixer({})]
 		},
 		typescript: { tsconfigFile: './tsconfig.json' }
 	}),
@@ -41,15 +40,16 @@ export default {
 					$components: path.resolve('./src/lib/components')
 				}
 			},
-			plugins: [isoImport()],
 			cleanCssOptions: {
 				level: {
 					2: {
 						all: true,
-						removeDuplicateRules: true
+						removeDuplicateRules: true,
+
 					}
 				}
 			}
 		}
 	}
 }
+export default config

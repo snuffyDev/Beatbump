@@ -99,11 +99,7 @@
 	</div>
 	<div class="scroll" id="scrollItem" bind:this={carousel}>
 		{#each arr as item, index}
-			<div
-				class="c-group"
-				bind:this={group[index]}
-				style="display:inline-flex;"
-			>
+			<div class="c-group" bind:this={group[index]}>
 				{#each item as item, i}
 					{#if type == 'trending'}
 						<!-- {JSON.stringify(item[1], title, thumbnail, subtitle)} -->
@@ -144,11 +140,18 @@
 <style lang="scss">
 	@import '../../../global/stylesheet/components/_carousel';
 	.c-group {
-		&:last-child {
-			.container.carouselItem:last-child {
-				padding-right: 1rem;
-			}
-		}
+		display: inline-flex;
+		width: 100%;
+		padding-bottom: 1.8rem;
+		padding-left: 1rem;
+		scroll-snap-align: start;
+		padding-right: 1rem;
+		gap: 2rem;
+		// &:last-child {
+		// 	.container.carouselItem:last-child {
+		// 		padding-right: 1rem;
+		// 	}
+		// }
 	}
 	.left,
 	.right {

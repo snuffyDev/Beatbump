@@ -24,9 +24,11 @@
 	}
 	// let lib: Writable<[]> = getContext('db')
 	onMount(async () => {
-		playlists = await db.getPlaylists()
-		playlists = [...playlists]
-		updateFavorites()
+		const hasPlaylists = await db.getPlaylists()
+		const hasFavorites = await db.getFavorites()
+		favorites = hasFavorites.length !== 0 && [...hasFavorites]
+		playlists = hasPlaylists.length !== 0 && [...hasPlaylists]
+		// updateFavorites()
 	})
 	$: console.log(playlists)
 	// $: if (lib !== undefined) console.log(fv, $fv)
@@ -58,26 +60,30 @@
 			<a sveltekit:prefetch href="/library/songs"><small>See All</small></a>
 		</div>
 		<div class="list">
-			{#each favorites as favorite}
-				<Listing
-					on:update={() => {
-						updateFavorites()
-					}}
-					data={favorite}
-				/>
-			{/each}
+			{#if favorites.length !== 0}
+				{#each favorites as favorite}
+					<Listing
+						on:update={() => {
+							updateFavorites()
+						}}
+						data={favorite}
+					/>
+				{/each}
+			{/if}
 		</div>
 	</section>
 	<section>
 		<h2>Your Playlists</h2>
 		<em>Coming soon!</em>
-		{#each playlists as playlist, i}
-			<div class="container">
-				<img src={playlist.thumbnail} width="200" height="200" />
-				<div class="title">{playlist.name}</div>
-				<em class="length">{playlist.length} songs</em>
-			</div>
-		{/each}
+		{#if playlists.length !== 0}
+			{#each playlists as playlist, i}
+				<div class="container">
+					<img src={playlist.thumbnail} width="200" height="200" />
+					<div class="title">{playlist.name}</div>
+					<em class="length">{playlist.length} songs</em>
+				</div>
+			{/each}
+		{/if}
 	</section>
 </main>
 

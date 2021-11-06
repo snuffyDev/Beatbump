@@ -42,6 +42,6 @@
 		"src/**/*.ts",
 		"src/**/*.svelte",
 		"src/routes/library/_peer.cjs"
-	],
+, "global.d.ts"	],
 	"exclude": [".svelte/*", ".svelte-kit/*", "build/*"]
 }

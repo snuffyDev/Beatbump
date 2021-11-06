@@ -108,6 +108,16 @@
   <line x1="21" y1="21" x2="16.65" y2="16.65" />`
 		},
 		{
+			name: 'playlist-add',
+			svg: ` <g>
+    <line stroke="currentColor" id="svg_1" y2="6" x2="21" y1="6" x1="3"/>
+    <line stroke="currentColor" id="svg_2" y2="12" x2="21" y1="12" x1="3"/>
+    <line stroke="currentColor" id="svg_3" y2="18" x2="19.57594" y1="18" x1="3"/>
+  </g>
+  <path d="M -18.57 -22.149 H -16.529 V -18.067 H -12.448 V -16.027 H -16.529 V -11.946 H -18.57 V -16.027 H -22.651 V -18.067 H -18.57 Z" style="stroke-width: 1px;fill: currentColor;paint-order: fill;" transform="matrix(-1, 0, 0, -1, 0, 0)"/>
+`
+		},
+		{
 			name: 'x',
 			svg: `
   <line x1="18" y1="6" x2="6" y2="18" />

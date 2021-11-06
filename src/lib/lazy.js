@@ -10,6 +10,7 @@ function lazy(node, data) {
 			entries.forEach((entry) => {
 				if (entry.isIntersecting && once) {
 					node.setAttribute('src', data.src)
+					observer.unobserve(node)
 				}
 			})
 		}

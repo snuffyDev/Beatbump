@@ -39,8 +39,8 @@
 	position: absolute;
 	display: flex;
 	flex-direction: column;
-	top: 2em;
-	right: 0.5em;
+	top: 0;
+	left: 0;
 	border-radius: var(--lg-radius);
 	z-index: 5;
 
@@ -49,11 +49,11 @@
 	pointer-events: all;
 }
 .dd-player {
-	position: absolute;
-	bottom: 0;
+	position: fixed;
+	top: 0;
 
 	isolation: isolate;
-	right: 0;
+	left: 0;
 	border-radius: var(--lg-radius);
 	z-index: 5;
 

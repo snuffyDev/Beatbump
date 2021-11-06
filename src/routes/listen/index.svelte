@@ -8,12 +8,17 @@
 			'/api/player.json?videoId=' + id + '&playlistId='
 		)
 		const data = await metadata.json()
+		const {
+			videoDetails: { title = '', thumbnail: { thumbnails = [] } = {} } = {}
+		} = data
+
 		if (!id) {
 			return { redirect: '/trending', status: 301 }
 		}
 		return {
 			props: {
-				data,
+				title,
+				thumbnails: thumbnails.reverse(),
 				id,
 				playlist
 			},
@@ -25,19 +30,18 @@
 <script>
 	export let id
 	export let playlist
-	export let data
+	export let thumbnails
+	export let title
 	import { goto } from '$app/navigation'
 	import Icon from '$lib/components/Icon/Icon.svelte'
 	import list from '$lib/stores/list'
+	// $: console.log(data)
 </script>
 
 <svelte:head>
-	<meta property="og:title" content={data.videoDetails.title} />
+	<meta property="og:title" content={title} />
 	<meta property="og:type" content="music.song" />
-	<meta
-		property="og:description"
-		content={`Listen to ${data.videoDetails.title} on Beatbump`}
-	/>
+	<meta property="og:description" content={`Listen to ${title} on Beatbump`} />
 	<meta property="og:site_name" content="Beatbump" />
 	<meta property="og:image" content={thumbnails[0].url} />
 
@@ -47,24 +51,29 @@
 			playlist ? `&list=${playlist}` : ''
 		}`}
 	/>
-	<title>{data.videoDetails.title} | Beatbump</title>
+	<title>{title} | Beatbump</title>
 </svelte:head>
 <main>
 	<div class="modal">
-		<div class="modal-header">Listen to {data.videoDetails.title}?</div>
-		<button
-			on:click={() => {
-				list.initList(id, playlist)
-				goto('/trending')
-			}}
-			><Icon name="play" size="1.25em" color="black" /><span class="text"
-				>Start Listening</span
-			></button
-		>
+		<div class="modal-header">Listen to {title}?</div>
+		<div class="container">
+			<button
+				on:click={() => {
+					list.initList(id, playlist)
+					goto('/trending')
+				}}
+				><Icon name="play" size="1.25em" color="black" /><span class="text"
+					>Start Listening</span
+				></button
+			>
+		</div>
 	</div>
 </main>
 
 <style lang="scss">
+	.container {
+		place-items: center;
+	}
 	.modal {
 		display: flex;
 		flex-direction: column;
