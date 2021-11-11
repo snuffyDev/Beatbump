@@ -1,16 +1,25 @@
 <script>
-	import { page } from '$app/stores'
-	import list from '$lib/stores/list'
+	import tagStore from '$lib/stores/ogtags'
 	import { currentTitle } from '$lib/stores/stores'
-	console.log($page.params)
-	export let name
 
+	export let title
+	export let desc = ''
+	export let url
+	export let image = '/logo.png'
 	// $: slug = slug
-	$: console.log(name)
+	// $: console.log(name)
+	tagStore.init(title, url, desc, image)
 </script>
 
 <svelte:head>
-	<title>{$currentTitle ? $currentTitle : name} - Beatbump</title>
-
-	<meta property="og:title" content={name} />
+	{#each Object.entries($tagStore) as [property, content]}
+		{#if content}
+			{#if ['title', 'description', 'image'].includes(property)}
+				<meta name={property} {content} />
+			{:else}
+				<meta {property} {content} />
+			{/if}
+		{/if}
+	{/each}
+	<title>{$currentTitle ? $currentTitle : $tagStore.title} - Beatbump</title>
 </svelte:head>

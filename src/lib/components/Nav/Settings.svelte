@@ -64,8 +64,6 @@
 							'preferWebM',
 							JSON.stringify($settings.preferWebM)
 						)
-
-
 					}}
 				/>
 			</div>

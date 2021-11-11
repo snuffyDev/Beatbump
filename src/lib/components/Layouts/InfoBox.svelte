@@ -11,26 +11,31 @@
 	export let secondSubtitle = []
 	export let buttons = []
 	export let artist = undefined
+	export let editable = false
 	export let type = 'playlist'
 	let width
+	let modifiedTitle
 </script>
 
 <svelte:window bind:innerWidth={width} />
 
 <div class="box">
 	<div class="img">
-		<img
-			type="image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
-			src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0icHJlZml4X19wcmVmaXhfX2ZlYXRoZXIgcHJlZml4X19wcmVmaXhfX2ZlYXRoZXItbGlzdCI+PHBhdGggb3BhY2l0eT0iLjciIHN0cm9rZT0iI2NjYyIgZmlsbD0iIzMzMyIgZD0iTTAgMGgyNHYyNEgweiIvPjwvc3ZnPg=="
-			use:lazy={{
-				src: thumbnail
-			}}
-			alt="album"
-		/>
+		<img src={thumbnail} alt="album" />
 	</div>
 	<div class="metadata">
 		<div class="info-title">
-			<div class="box-title">{title}</div>
+			{#if editable}
+				<div
+					class="box-title editable"
+					contenteditable="true"
+					bind:textContent={modifiedTitle}
+				>
+					{title}
+				</div>
+			{:else}
+				<div class="box-title">{title}</div>
+			{/if}
 		</div>
 		{#if description && type == 'playlist'}
 			<p
@@ -83,7 +88,6 @@
 	.box-title {
 		display: inline-flex;
 	}
-
 	p {
 		margin-top: 0;
 		margin-bottom: 0.3rem;

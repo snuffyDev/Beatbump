@@ -4,7 +4,12 @@
 	import Loading from '$components/Loading/Loading.svelte'
 	import { hasContext, onMount, tick } from 'svelte'
 
-	import { alertHandler, key, theme } from '$stores/stores'
+	import {
+		alertHandler,
+		key,
+		showAddToPlaylistPopper,
+		theme
+	} from '$stores/stores'
 	import Icon from '$components/Icon/Icon.svelte'
 	import { goto } from '$app/navigation'
 	import list from '$lib/stores/list'
@@ -126,6 +131,9 @@
 		})
 		DropdownItems.shift()
 		DropdownItems.pop()
+		DropdownItems = [
+			...DropdownItems.filter((item) => !item.text.includes('Favorite'))
+		]
 		DropdownItems.push({
 			text: 'Add to Playlist',
 			icon: 'playlist-add',
@@ -134,11 +142,7 @@
 					`/api/getQueue.json?playlistId=${data.playlistId}`
 				).then((data) => data.json())
 				let thumb = data.thumbnails?.reverse()
-				await db.addToPlaylist({
-					name: data.title,
-					items: [..._data],
-					thumbnail: thumb[0].url ?? data.thumbnail
-				})
+				showAddToPlaylistPopper.set({ state: true, item: data })
 			}
 		})
 	}

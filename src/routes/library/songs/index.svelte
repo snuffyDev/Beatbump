@@ -1,15 +1,19 @@
 <script lang="ts">
+	import Icon from '$lib/components/Icon/Icon.svelte'
+
 	import Listing from '$lib/components/Item/Listing.svelte'
 
 	import db from '$lib/db'
 
-	import { onMount } from 'svelte'
+	import { onMount, setContext } from 'svelte'
 	let value
 	let songs = []
+	setContext({}, 'library')
 	onMount(async () => {
 		songs = await db.getFavorites()
 	})
 	$: console.log(value, songs)
+
 	let options = [
 		{
 			label: 'Unsorted',
@@ -41,6 +45,11 @@
 	<h1>Your Songs</h1>
 	<section>
 		<div class="filter">
+			<!-- <div class="ctx-item">
+				<button on:click={() => {}}
+					><Icon name="play" size="1.25em" /> Play All</button
+				>
+			</div> -->
 			<div class="ctx-item">
 				<label for="select">Sort</label>
 				<div class="select">
@@ -55,7 +64,7 @@
 		<section>
 			{#key songs}
 				{#each songs as song}
-					<Listing data={song} />
+					<Listing isLibrary={true} data={song} />
 				{/each}
 			{/key}
 		</section>

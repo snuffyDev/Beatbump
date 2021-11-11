@@ -2,7 +2,7 @@
 	display: block;
 	font-weight: 600;
 	margin-bottom: 1.5rem;
-	padding: 0.4rem 0.4rem 0.2rem;
+	padding: 0.4rem 0.4rem 0.2rem 0;
 	/* flex-direction: row; */
 	justify-content: flex-start;
 	align-items: baseline;
@@ -12,7 +12,7 @@
 	h2 {
 		margin-right: 0.728rem;
 		margin-bottom: 0;
-		white-space: pre;
+		// white-space: pre;
 		display: inline-block;
 	}
 	a {

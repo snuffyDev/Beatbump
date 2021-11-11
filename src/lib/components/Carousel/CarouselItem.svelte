@@ -4,8 +4,13 @@
 	import db from '$lib/db'
 	import lazy from '$lib/lazy'
 	import list from '$lib/stores/list'
-	import type { CarouselItem } from '$lib/types'
-	import { alertHandler, currentTitle, key } from '$stores/stores'
+	import type { CarouselItem, Item } from '$lib/types'
+	import {
+		alertHandler,
+		currentTitle,
+		key,
+		showAddToPlaylistPopper
+	} from '$stores/stores'
 	import { tick } from 'svelte'
 	import { PopperButton } from '../Popper'
 	import { browseHandler } from './functions'
@@ -62,6 +67,23 @@
 					msg: `${item.title} added to queue!`,
 					type: 'success'
 				})
+			}
+		},
+		{
+			text: 'Add to Playlist',
+			icon: 'playlist-add',
+			action: async () => {
+				if (item.endpoint?.pageType.includes('PLAYLIST')) {
+					console.log('PLAYLIST')
+					const response = await fetch(
+						'/api/getQueue.json?playlistId=' + item.playlistId
+					)
+					const data = await response.json()
+					const items: Item[] = data
+					showAddToPlaylistPopper.set({ state: true, item: [...items] })
+				} else {
+					showAddToPlaylistPopper.set({ state: true, item: item })
+				}
 			}
 		},
 		{
@@ -146,6 +168,7 @@
 		DropdownItems = [...DropdownItems]
 		// console.log(DropdownItems)
 	}
+	let node: HTMLElement
 
 	let active
 </script>
@@ -156,6 +179,7 @@
 		on:mouseover={() => (active = true)}
 		on:focus
 		on:mouseout={() => (active = false)}
+		on:blur
 	>
 		<div
 			class="image"
@@ -176,7 +200,7 @@
 				width={item.thumbnails[0].width}
 				height={item.thumbnails[0].height}
 				src={item.thumbnails[0]?.placeholder}
-				use:lazy={{ src: srcImg }}
+				use:lazy={{ src: srcImg, placeholder: item.thumbnails[0]?.placeholder }}
 			/>
 		</div>
 		<div class="item-menu" class:hidden={isBrowseEndpoint}>
@@ -332,9 +356,11 @@
 		// display: block;
 		// padding-bottom: 1.8rem;
 		// padding-left: 1rem;
+		padding: 0 1rem;
+
 		scroll-snap-align: start;
 		// padding-right: 1rem;
-		&::before {
+		::before {
 			position: absolute;
 			display: block;
 			content: '';
@@ -377,7 +403,7 @@
 
 		&:active:hover::before {
 			// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
-			background: linear-gradient(rgba(0, 0, 0, 0.651), rgba(0, 0, 0, 0.11));
+			background: linear-gradient(rgba(0, 0, 0, 0.589), rgba(0, 0, 0, 0.11));
 			opacity: 1;
 			z-index: 1;
 		}

@@ -1,3 +1,5 @@
+import { MusicTwoRowItemRenderer } from '$lib/parsers'
+
 type destructure = {
 	contents: {
 		singleColumnBrowseResultsRenderer: {
@@ -60,19 +62,7 @@ export async function get({ params }) {
 	} = await data
 	const sections = contents.map(({ gridRenderer = {} }) => {
 		const { items = [], header = {} } = gridRenderer
-		const section = items.map(({ musicTwoRowItemRenderer = {} }) => ({
-			thumbnail:
-				musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer
-					.thumbnail.thumbnails[0].url,
-			title: musicTwoRowItemRenderer.title.runs[0].text,
-			subtitles: musicTwoRowItemRenderer.subtitle.runs,
-			browseId:
-				musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseId,
-			shuffle:
-				musicTwoRowItemRenderer.menu.menuRenderer.items[0]
-					.menuNavigationItemRenderer.navigationEndpoint.watchPlaylistEndpoint
-					.playlistId
-		}))
+		const section = items.map((ctx) => MusicTwoRowItemRenderer(ctx))
 		return { section, title: header.gridHeaderRenderer.title.runs[0].text }
 	})
 	return {

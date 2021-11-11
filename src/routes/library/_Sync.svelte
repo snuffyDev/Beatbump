@@ -186,7 +186,7 @@
 						class="nextbtn"
 						disabled={check == undefined}
 						on:click={() => {
-							if (check !== undefined) nextStep
+							if (check !== undefined) nextStep()
 						}}>Next Step</button
 					>
 				</div>
@@ -234,7 +234,7 @@
 						class="nextbtn"
 						disabled={id == 'unset'}
 						on:click={() => {
-							if (id !== 'unset') nextStep
+							if (id !== 'unset') nextStep()
 						}}>Next Step</button
 					>
 				</div>

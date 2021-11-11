@@ -44,6 +44,9 @@
 
 <style lang="scss">
 	@import '../../../global/stylesheet/components/_player.scss';
+	.player-btn {
+		padding: 8pt;
+	}
 	.player-spinner {
 		align-items: center;
 		justify-content: center;

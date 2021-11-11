@@ -1,8 +1,10 @@
 <script>
 	import { browser } from '$app/env'
 	import { goto } from '$app/navigation'
+	import { page } from '$app/stores'
 	import Icon from '$components/Icon/Icon.svelte'
 	import Search from '$components/Search/Search.svelte'
+	import { tooltip } from '$lib/actions/tooltip'
 	import { clickOutside } from '$lib/js/clickOutside'
 	import { circIn } from 'svelte/easing'
 	import { fade } from 'svelte/transition'
@@ -23,8 +25,8 @@
 
 <nav class="nav">
 	<div class="logo">
-		{#if key !== '/trending'}
-			<div class="logo-back" on:click={() => goto('/trending')}>
+		{#if key !== '/home'}
+			<div class="logo-back" on:click={() => goto('/home')}>
 				<img
 					style="margin-left:1.5rem;"
 					src="/logo.svg"
@@ -37,7 +39,7 @@
 			</div>
 		{:else}
 			<img
-				on:click={() => goto('/trending')}
+				on:click={() => goto('/home')}
 				src="/logo.svg"
 				alt="logo"
 				title="Beatbump Home"
@@ -45,9 +47,54 @@
 		{/if}
 	</div>
 
-	<div class="homeIcon" on:click={() => goto('/trending')}>
-		<Icon name="home" size="1.5em" />
+	<div class="middle">
+		<div
+			class="nav-item  homeIcon"
+			use:tooltip
+			data-tooltip="Home"
+			on:click={() => goto('/home')}
+			class:active={$page.path.includes('home')}
+		>
+			<!-- <div class="nav-text">Home</div> -->
+			<Icon
+				name="home"
+				color={$page.path.includes('home') ? '#fff' : '#BCBCBE'}
+				size="1.5em"
+			/>
+		</div>
+
+		<div
+			class="nav-item trending"
+			use:tooltip
+			data-tooltip="Trending"
+			class:active={$page.path.includes('trending')}
+			on:click={() => goto('/trending')}
+		>
+			<!-- <div class="nav-text">Trending</div> -->
+			<Icon
+				name="trending"
+				color={$page.path.includes('trending') ? '#fff' : '#BCBCBE'}
+				size="1.5em"
+			/>
+		</div>
+		<div
+			use:tooltip
+			data-tooltip="Library"
+			class="nav-item btn-favorites"
+			class:active={$page.path.includes('library')}
+			on:click|stopPropagation={() => {
+				goto('/library')
+			}}
+		>
+			<!-- <div class="nav-text">Library</div> -->
+			<Icon
+				name="folder"
+				color={$page.path.includes('library') ? '#fff' : '#BCBCBE'}
+				size="1.5em"
+			/>
+		</div>
 	</div>
+
 	<div class="items">
 		{#if !hidden}
 			<div
@@ -76,14 +123,7 @@
 				</div>
 			</div>
 		{/if}
-		<div
-			class="nav-item btn-favorites"
-			on:click|stopPropagation={() => {
-				goto('/library')
-			}}
-		>
-			<Icon name="folder" size="1.5em" />
-		</div>
+
 		<div
 			class="nav-item__search"
 			on:click={() => {
@@ -114,6 +154,26 @@
 </nav>
 
 <style lang="scss">
+	.active::before {
+		position: absolute;
+		top: 50%;
+		/* right: 0; */
+		/* bottom: 0; */
+		left: 50%;
+		// content: '';
+		border-radius: 9999rem;
+		width: 100%;
+		height: 100%;
+		z-index: -1;
+		color: #fff;
+		background: radial-gradient(
+			circle at center,
+			hsl(0deg 0% 85% / 25%),
+			hsl(0deg 0% 0% / 0%)
+		);
+		padding: 1.5rem;
+		transform: translate(-50%, -50%);
+	}
 	-back {
 		visibility: visible !important;
 		display: block !important;
@@ -144,18 +204,30 @@
 		display: block !important;
 		visibility: visible !important;
 	}
-	.homeIcon {
+	.middle {
 		grid-area: m;
-		visibility: visible;
-		justify-self: center;
-		justify-content: center;
-		margin-left: auto;
-		margin-right: auto;
-		padding: 9pt;
-		@media screen and (min-width: 640px) {
-			display: none;
-			visibility: hidden;
+		display: inline-flex;
+		align-items: center;
+		justify-content: space-between;
+		.nav-item {
+			position: relative !important;
+			cursor: pointer;
 		}
+	}
+	// .nav-text {
+	// 	display: none;
+	// 	visibility: hidden;
+	// 	@media screen and (min-width: 640px) {
+	// 		display: inline;
+	// 		visibility: visible;
+	// 	}
+	// }
+	.homeIcon {
+		visibility: visible;
+		// @media screen and (min-width: 640px) {
+		// 	display: none;
+		// 	visibility: hidden;
+		// }
 	}
 	nav {
 		border-bottom: 0.043128em solid #6d6d6d3a;
@@ -198,7 +270,7 @@
 		margin-bottom: 0;
 		display: initial;
 		visibility: visible;
-
+		position: relative;
 		.nav-item {
 			margin-right: 2em;
 		}

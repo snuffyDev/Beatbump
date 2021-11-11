@@ -1,4 +1,5 @@
 import { browser } from '$app/env'
+
 import type { SearchContents } from '$lib/types'
 import { readable } from 'svelte/store'
 import type { Writable } from 'svelte/store'
@@ -7,7 +8,7 @@ import { settings } from './settings'
 export const updateTrack = updateSource()
 export const ctxKey = {}
 export const currentTitle = writable(undefined)
-
+import type { Item } from '$lib/types'
 type SearchStore = {
 	subscribe: Writable<SearchContents>['subscribe']
 	set: Writable<SearchContents>['set']
@@ -39,7 +40,10 @@ export const searchState = writable({
 	option: '',
 	text: ''
 })
-
+export const showAddToPlaylistPopper = writable<{
+	state: boolean
+	item?: Item | Item[] | undefined
+}>({ state: false })
 export const theme = derived(settings, ($settings) => $settings.theme)
 export const filterAutoPlay = derived(
 	settings,

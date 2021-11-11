@@ -28,26 +28,17 @@
 	import Carousel from '$components/Carousel/Carousel.svelte'
 	import type { ICarousel } from '$lib/types'
 	import tagStore from '$lib/stores/ogtags'
+	import Header from '$lib/components/Layouts/Header.svelte'
 	// $: console.log(carouselItems)
-	tagStore.desc('The latest trending songs')
-	tagStore.title('Trending')
-	tagStore.url(path)
-	tagStore.image('/logo.png')
+
 	// $: console.log(carouselItems)
 </script>
 
-<svelte:head>
-	{#each Object.entries($tagStore) as [property, content]}
-		{#if content}
-			{#if ['title', 'description', 'image'].includes(property)}
-				<meta name={property} {content} />
-			{:else}
-				<meta {property} {content} />
-			{/if}
-		{/if}
-	{/each}
-	<title>{$currentTitle ? $currentTitle : $tagStore.title} - Beatbump</title>
-</svelte:head>
+<Header
+	title="Trending"
+	url={path}
+	desc="The latest trending songs and releases"
+/>
 <main>
 	<Carousel
 		isBrowseEndpoint={false}

@@ -19,7 +19,14 @@
 	const openEvent = () => dispatch('open')
 	setContext('menu', { update: isHidden })
 	function onClose() {
-		PopperStore.set({ items: [], isOpen: false, type })
+		PopperStore.set({
+			items: [],
+			isOpen: false,
+			type,
+			x: undefined,
+			y: undefined,
+			bottom: undefined
+		})
 	}
 	let width
 	let viewport_height
@@ -31,7 +38,7 @@
 			: $PopperStore.bottom + popperHeight >= viewport_height
 			? $PopperStore.y - popperHeight
 			: $PopperStore.y)
-	$: console.log(items)
+	// $: console.log(items)
 </script>
 
 <svelte:window bind:innerHeight={viewport_height} />

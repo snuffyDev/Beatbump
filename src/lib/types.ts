@@ -39,9 +39,9 @@ export interface Song {
 	playlistId?: string
 	params?: string
 	autoMixList?: string
-	thumbnails: [{ url: string }]
+	thumbnails: Array<Thumbnail>
 	length?: string
-	explicit?: string
+	explicit?: boolean
 	hash?: string
 }
 
@@ -66,6 +66,8 @@ export interface Artist {
 }
 export interface Thumbnail {
 	url: string
+	width: number
+	height: number
 }
 
 export interface ArtistInfo {
@@ -95,7 +97,7 @@ export interface SearchResult {
 	videoId: string
 	playlistId: string
 	params?: string
-	thumbnails: [{ url: string }]
+	thumbnails: Array<Thumbnail>
 	subtitle?: Subtitle[]
 }
 export type CarouselItem = {
@@ -108,7 +110,7 @@ export type CarouselItem = {
 	playlistId: string
 	explicit?: boolean
 	params?: string
-	thumbnails: [{ url: string; width: number }]
+	thumbnails: Array<Thumbnail>
 	subtitle?: Subtitle[]
 }
 
@@ -148,7 +150,7 @@ export type JSON =
 
 export type RequestParams = {
 	endpoint?: string
-	browseId?: string;
+	browseId?: string
 	continuation?: JSON
 	type?: string
 	videoId?: string

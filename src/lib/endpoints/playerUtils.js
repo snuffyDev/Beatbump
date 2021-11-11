@@ -21,25 +21,27 @@ export const sort = (data, WebM = false) => {
 		// console.log(formatParent, streamingData)
 
 		formatParent.map((i) => {
-
-			if (WebM && i.mimeType.includes('audio') &&
+			if (
+				WebM === true &&
+				i.mimeType.includes('audio') &&
 				i.audioChannels === 2 &&
-				i.audioQuality.includes('AUDIO_QUALITY_MEDIUM')
-				&& (i.mimeType.includes('mp4') || i.mimeType.includes('webm'))
+				i.audioQuality.includes('AUDIO_QUALITY_MEDIUM') &&
+				(i.mimeType.includes('mp4') || i.mimeType.includes('webm'))
 			) {
 				i.url = parseProxyRedir(i.url)
 				i.mimeType = i.mimeType.includes('mp4') ? 'mp4' : 'webm'
 				return arr.push(i)
-			} else if (!WebM && i.mimeType.includes('audio') &&
+			} else if (
+				WebM === false &&
+				i.mimeType.includes('audio') &&
 				i.audioChannels === 2 &&
-				i.audioQuality.includes('AUDIO_QUALITY_MEDIUM')
-				&& i.mimeType.includes('mp4')) {
-
+				i.audioQuality.includes('AUDIO_QUALITY_MEDIUM') &&
+				i.mimeType.includes('mp4')
+			) {
 				i.url = parseProxyRedir(i.url)
-				i.mimeType = 'mp4';
+				i.mimeType = 'mp4'
 				return arr.push(i)
 			}
-
 		})
 		// console.log(arr)
 		if (arr.length !== 0) {

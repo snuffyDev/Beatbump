@@ -4,7 +4,12 @@ import { writable } from 'svelte/store'
 import { alertHandler } from './stores/stores'
 
 import type { Item } from './types'
-type IDBPlaylist = { name: string; thumbnail?: any; items: Item[] }
+type IDBPlaylist = {
+	name: string
+	description?: string
+	thumbnail?: any
+	items: Item | Item[]
+}
 const notify = (msg: string, type: string) => {
 	alertHandler.set({
 		msg: msg,
@@ -16,15 +21,23 @@ let DB_VER = 1
 
 const accessDB = () => {
 	if (!browser) return
-	return new Promise((resolve, reject) => {
-		if (db !== undefined) {
-			resolve(undefined)
-			return
+	return new Promise(function (resolve, reject) {
+		if (db != undefined) {
+			return resolve()
 		}
 		const request = indexedDB.open('beatbump', 1)
 
-		request.addEventListener('upgradeneeded', (event) => {
-			db = request.result
+		function error(error) {
+			reject(error.target.error.message)
+			console.error(error.target.error.message)
+		}
+		request.onupgradeneeded = function (
+			event: IDBVersionChangeEvent & {
+				target: EventTarget & { result: IDBDatabase }
+			}
+		) {
+			db = event.target.result
+			db.onerror = error
 			if (!db.objectStoreNames.contains('favorites')) {
 				db.createObjectStore('favorites', {
 					keyPath: 'videoId' || 'playlistId'
@@ -35,52 +48,108 @@ const accessDB = () => {
 					keyPath: 'name'
 				})
 			}
-		})
-		request.addEventListener('success', (e) => {
-			db = request.result
-			db.addEventListener('close', (e) => {
+		}
+		request.onerror = error
+		request.onsuccess = function (
+			e: IDBVersionChangeEvent & {
+				target: EventTarget & { result: IDBDatabase }
+			}
+		) {
+			db = e.target.result
+			db.onerror = error
+			db.addEventListener('close', function (e) {
 				db = undefined
 			})
-			resolve(undefined)
-		})
+			resolve(db)
+		}
 	})
 }
 
 export default {
-	createPlaylist({ name, items, thumbnail }: IDBPlaylist) {},
-	async addToPlaylist({ name, items, thumbnail }: IDBPlaylist) {
-		await accessDB()
-		const _proxied = await fetch(
-			'/api/proxy.json?url=' + encodeURIComponent(thumbnail)
-		)
-		const _buffer = await _proxied.json()
-		const { image: _img } = _buffer
-		thumbnail = _img
-		try {
-			let tx = db.transaction(['playlists'], 'readwrite')
-			tx.objectStore('playlists').put({
-				name,
-				items: items,
-				length: items.length,
-				thumbnail
+	createNewPlaylist({ name, description, items, thumbnail }: IDBPlaylist) {
+		return new Promise(function (resolve, reject) {
+			accessDB().then(function () {
+				try {
+					let tx = db.transaction('playlists', 'readwrite')
+					tx.objectStore('playlists').put({
+						name,
+						description,
+						items: Array.isArray(items) ? [...items] : items,
+						length: items.length,
+						thumbnail
+					}).onsuccess = resolve
+					tx.addEventListener('complete', function () {
+						resolve({ name, description, items, thumbnail })
+						notify('Created Playlist!', 'success')
+					})
+					tx.addEventListener('error', function (e) {
+						notify('Error: ' + e, 'error')
+						reject()
+					})
+				} catch (err) {
+					notify('Error: ' + err, 'error')
+					reject()
+					// throw new Error(err)
+				}
 			})
-			tx.addEventListener('complete', () => {
-				notify('Created Playlist!', 'success')
-			})
-			tx.addEventListener('error', function (e) {
-				throw new Error(e)
-			})
-		} catch (err) {
-			throw new Error(err)
-		}
+		})
 	},
+	addToPlaylist(name, { playlist, item }) {
+		return new Promise(function (resolve, reject) {
+			accessDB().then(function () {
+				try {
+					let tx = db.transaction('playlists', 'readwrite')
+					tx.objectStore('playlists').openCursor().onsuccess = function (
+						e: Event & { target: EventTarget & { result: IDBCursorWithValue } }
+					) {
+						const cursor = e.target.result
+						if (cursor) {
+							const playlistItem = cursor.value
+							if (Array.isArray(item)) {
+								const request = cursor.update({
+									...playlistItem,
+									items: [...playlistItem?.items, ...item],
+									length: [...playlistItem?.items, ...item].length
+								})
 
+								request.onsuccess = function (e) {
+									resolve(request)
+								}
+							} else {
+								const request = cursor.update({
+									...playlistItem,
+									items: [...playlistItem?.items, item],
+									length: [...playlistItem?.items, item].length
+								})
+								request.onsuccess = function (e) {
+									resolve(request)
+								}
+							}
+							// console.log(e.target.result, list)
+						}
+
+						// list
+						notify('Added to Playlist!', 'success')
+						// return resolve()
+					}
+					tx.addEventListener('complete', () => {
+						notify('Added to Playlist!', 'success')
+					})
+					tx.addEventListener('error', function (e) {
+						throw new Error(e)
+					})
+				} catch (err) {
+					throw new Error(err)
+				}
+			})
+		})
+	},
 	async setNewFavorite(item: Item) {
 		await accessDB()
 		if (!item) return new Error('No item was provided!')
 
 		try {
-			const tx = db.transaction('favorites', 'readwrite')
+			const tx = db.transaction(['favorites'], 'readwrite')
 
 			tx.objectStore('favorites').put(item)
 			tx.addEventListener('complete', () => {
@@ -125,59 +194,100 @@ export default {
 	},
 	async deletePlaylist(name: string) {
 		if (!name) return 'No playlist name was provided!'
-		await accessDB()
-		try {
-			db.transaction(['playlist'], 'readwrite')
-				.objectStore('playlist')
-				.delete(name)
-			notify('Playlist Deleted!', 'success')
-		} catch (e) {
-			console.error(e)
-		}
-	},
-	async getFavorites(): Promise<Item[]> {
-		let favorites: Item[] | null = []
-		await accessDB()
-		return new Promise((resolve, reject) => {
-			const transaction = db
-				.transaction(['favorites'], 'readonly')
-				.objectStore('favorites')
-				.getAll()
-			transaction.onsuccess = function (e) {
-				favorites = transaction.result
-				// console.log(e, favorites, transaction.result)
-				resolve([...favorites])
-			}
-			transaction.onerror = function (e) {
-				reject('rejected')
-			}
-			if (favorites.length !== 0) {
-				resolve([...favorites])
-			}
+		return new Promise(function (resolve, reject) {
+			accessDB().then(function () {
+				try {
+					db.transaction(['playlist'], 'readwrite')
+						.objectStore('playlist')
+						.delete(name)
+					notify('Playlist Deleted!', 'success')
+				} catch (e) {
+					console.error(e)
+				}
+			})
 		})
 	},
-	async getPlaylists(): Promise<IDBPlaylist[]> {
+	getFavorites(): Promise<Item[]> {
+		let lists: Item[] | null = []
+		return new Promise(function (resolve, reject) {
+			accessDB().then(function () {
+				try {
+					const transaction = db
+						.transaction('favorites', 'readonly')
+						.objectStore('favorites')
+
+					transaction.getAll().onsuccess = function (
+						e: Event & { target: EventTarget & { result: IDBCursorWithValue } }
+					) {
+						if (e.target.result) {
+							const result = e.target.result
+							if (Array.isArray(result)) {
+								lists = result
+								// console.log(lists, e.target.result.value)
+								// e.target.result.continue()
+								resolve([...lists])
+							}
+						}
+					}
+				} catch (e) {
+					// console.error(e)
+					notify('Error! ' + e, 'error')
+					reject([])
+				}
+			})
+		})
+	},
+	getPlaylist(name) {
+		return new Promise(function (resolve, reject) {
+			accessDB().then(function () {
+				try {
+					const transaction = db
+						.transaction('playlists', 'readonly')
+						.objectStore('playlists')
+
+					transaction.openCursor(name).onsuccess = function (
+						e: Event & { target: EventTarget & { result: IDBCursorWithValue } }
+					) {
+						if (e.target.result) {
+							const playlist = e.target.result.value
+							console.log(playlist, e.target.result)
+							resolve(playlist)
+						}
+					}
+				} catch (e) {
+					// console.error(e)
+					notify('Error! ' + e, 'error')
+					reject([])
+				}
+			})
+		})
+	},
+	getPlaylists(): Promise<IDBPlaylist[]> {
 		let lists: IDBPlaylist[] | null = []
-		await accessDB()
-		return new Promise((resolve, reject) => {
-			try {
-				const transaction = db
-					.transaction('playlists', 'readwrite')
-					.objectStore('playlists')
-					.getAll()
-				transaction.addEventListener('success', function (e) {
-					lists = transaction.result
-					console.log(lists, transaction.result)
-					resolve([...lists])
-				})
-				transaction.addEventListener('error', function (e) {
-					console.error(e)
-				})
-			} catch (e) {
-				console.error(e)
-				notify('Error! ' + e, 'error')
-				reject(e)
-			}
+		return new Promise(function (resolve, reject) {
+			accessDB().then(function () {
+				try {
+					const transaction = db
+						.transaction('playlists', 'readonly')
+						.objectStore('playlists')
+
+					transaction.getAll().onsuccess = function (
+						e: Event & { target: EventTarget & { result: IDBRequest } }
+					) {
+						if (e.target.result) {
+							const result = e.target.result
+							if (Array.isArray(result)) {
+								lists = result
+								resolve([...lists])
+							}
+						}
+					}
+					// resolve([...lists])
+				} catch (e) {
+					notify('Error! ' + e, 'error')
+					reject([])
+				}
+			})
 		})
 	}
 }

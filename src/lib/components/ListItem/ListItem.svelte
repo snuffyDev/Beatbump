@@ -46,6 +46,9 @@
 			// 	index,
 			// 	item.playlistSetVideoId ? item.playlistSetVideoId : ''
 			// )
+		} else if (page == 'library') {
+			key.set(index)
+			dispatch('initLocalList', index)
 		} else {
 			key.set(index)
 			await list.initList(item.videoId, item.playlistId, $key)

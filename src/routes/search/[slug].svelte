@@ -45,6 +45,7 @@
 	import VirtualList from '$lib/components/SearchList/VirtualList.svelte'
 	import { onMount } from 'svelte'
 	import tagStore from '$lib/stores/ogtags'
+	import Header from '$lib/components/Layouts/Header.svelte'
 
 	$: !error && search.set(contents)
 	let title
@@ -55,10 +56,7 @@
 	// console.log(contents);
 	let isLoading = false
 	let hasData = false
-	tagStore.desc('Search results for' + decodeURIComponent(songTitle))
-	tagStore.title('Search')
-	tagStore.url(path + `?filter=${filter}`)
-	tagStore.image('/logo.png')
+
 	async function paginate() {
 		if (isLoading || hasData) return
 		try {
@@ -98,19 +96,12 @@
 	$: !error && (items = $search)
 </script>
 
-<svelte:head>
-	{#each Object.entries($tagStore) as [property, content]}
-		{#if content}
-			{#if ['title', 'description', 'image'].includes(property)}
-				<meta name={property} {content} />
-			{:else}
-				<meta {property} {content} />
-			{/if}
-		{/if}
-	{/each}
-	<title>{$currentTitle ? $currentTitle : $tagStore.title} - Beatbump</title>
-</svelte:head>
 <!-- {JSON.stringify(results)} -->
+<Header
+	title="Search"
+	desc={`Search results for ${decodeURIComponent(songTitle)}`}
+	url={path + `?filter=${filter}`}
+/>
 <main class="parent">
 	{#if error}
 		<section class="searchHeader">
@@ -161,8 +152,8 @@
 <style scoped lang="scss">
 	.parent {
 		width: 100%;
-		align-items: center;
-		justify-items: center;
+		// align-items: center;
+		// justify-items: center;
 		grid-area: m/m/m/m;
 		height: 100%;
 	}

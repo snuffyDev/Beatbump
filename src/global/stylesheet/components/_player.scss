@@ -26,14 +26,14 @@
 }
 .player-btn {
 	-webkit-text-size-adjust: 100%;
-	align-self: center;
+	// align-self: center;
 	cursor: pointer;
-	display: block;
+	display: inline-flex;
 	height: auto;
-	max-height: 100%;
+	max-height: 44pt;
 	max-width: 44pt;
 	margin: 0 2pt;
-	padding: 8pt;
+	padding: 4pt;
 	position: relative;
 	width: auto;
 	isolation: isolate;
@@ -53,6 +53,8 @@
 		transition: opacity, background linear 200ms;
 
 		background-position: center;
+		padding: 8pt;
+
 		// transition: background 0.8s;
 	}
 	@media (hover: hover) {

@@ -14,11 +14,18 @@
 	import Player from '$components/Player/Player.svelte'
 	import Wrapper from '$components/Wrapper/Wrapper.svelte'
 	import Alert from '$lib/components/Alert/Alert.svelte'
-	import { alertHandler, filterAutoPlay, iOS, theme } from '$stores/stores'
+	import {
+		alertHandler,
+		filterAutoPlay,
+		iOS,
+		showAddToPlaylistPopper,
+		theme
+	} from '$stores/stores'
 	import { onMount } from 'svelte'
 	import { Popper } from '$lib/components/Popper'
 	import '../global/stylesheet/main.scss'
 	import { settings } from '$lib/stores/settings'
+	import PlaylistPopper from '$lib/components/PlaylistPopper'
 	export let key
 	let main
 	onMount(() => {
@@ -45,6 +52,11 @@
 	</Wrapper>
 </div>
 <Popper />
+<PlaylistPopper
+	on:close={() => {
+		showAddToPlaylistPopper.set({ state: false, item: {} })
+	}}
+/>
 <Alert />
 <footer class="footer-container">
 	{#if browser}

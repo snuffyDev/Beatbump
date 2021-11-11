@@ -4,6 +4,7 @@
 	flex-direction: column;
 	flex-shrink: 0;
 	height: 100%;
+	gap: 0.8rem;
 	color: #fff !important;
 	padding: 1.5rem 0.8rem;
 	// z-index: 10000;
@@ -28,13 +29,13 @@
 	grid-area: cm;
 }
 .m-metadata {
-	display: inline-flex;
+	display: flex;
 	grid-template-columns: auto 1fr;
 	max-height: 8rem;
 	/* height: 100%; */
 	flex: 1 0 auto;
 	width: 100%;
-	margin-bottom: 1.125rem;
+	// margin-bottom: 1.125rem;
 	min-height: 3rem;
 	background-color: hsl(0deg 0% 20% / 35%);
 	padding: 0.5rem;
@@ -44,21 +45,22 @@
 	gap: 0.8rem;
 }
 .image {
-	width: 100%;
+	// width: 100%;
 	position: relative;
 	// display: inline-flex;
 	// flex-wrap: nowrap;
-	min-height: auto;
+	min-height: 0;
 	height: auto;
-	max-width: 40%;
+	// max-width: 40%;
 	img {
 		aspect-ratio: 1/1 auto;
 		// min-width: 5rem;
 		width: auto;
 		max-width: 100%;
+		height: 100%;
 		border-radius: var(--md-radius);
-		-o-object-fit: scale-down;
-		object-fit: scale-down;
+		-o-object-fit: contain;
+		object-fit: contain;
 		position: inherit;
 		vertical-align: text-top;
 	}
@@ -84,15 +86,7 @@ svg,
 * {
 	color: #f2f2f2 !important;
 }
-.backdrop {
-	position: fixed;
-	z-index: 50;
-	inset: 0;
-	overflow: hidden;
-	background-color: #00000063;
-	width: 100%;
-	height: 100%;
-}
+
 .drag {
 	position: absolute;
 	z-index: 500;

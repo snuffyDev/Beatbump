@@ -6,7 +6,7 @@
 	import db from '$lib/db'
 	import { clickOutside } from '$lib/js/clickOutside'
 	import list from '$lib/stores/list'
-	import { getSrc } from '$lib/utils'
+	import { getSrc, shuffle } from '$lib/utils'
 	import {
 		currentTitle,
 		iOS,
@@ -78,7 +78,12 @@
 	/*
 		Player Event Listeners
 	 */
-
+	player.addEventListener('load', () => {
+		navigator.mediaSession.setPositionState({
+			duration: isWebkit ? player.duration / 2 : player.duration,
+			position: player.currentTime
+		})
+	})
 	player.addEventListener('loadedmetadata', () => {
 		isPlaying = true
 
@@ -102,6 +107,16 @@
 					// console.log(data)
 					if (!browser) return
 					await db.setNewFavorite($list.mix[autoId])
+				}
+			},
+			{
+				text: 'Shuffle',
+				icon: 'shuffle',
+				action: () => {
+					// console.log(data)
+					const _list = $list.mix
+					$list.mix = [...shuffle(_list, autoId)]
+					console.log($list.mix)
 				}
 			}
 		]
@@ -164,7 +179,9 @@
 					}
 				]
 			})
-			navigator.mediaSession.setActionHandler('play', player.play)
+			navigator.mediaSession.setActionHandler('play', (session) => {
+				player.play()
+			})
 			navigator.mediaSession.setActionHandler('pause', pause)
 			navigator.mediaSession.setActionHandler('seekto', (session) => {
 				if (session.fastSeek && 'fastSeek' in player) {
@@ -308,6 +325,14 @@
 		on:mousedown={() => (seeking = true)}
 		on:mouseleave={() => (hovering = false)}
 		on:mouseenter={() => (hovering = true)}
+		on:touchstart={() => {
+			seeking = true
+			hovering = true
+		}}
+		on:touchend={() => {
+			hovering = false
+			seeking = false
+		}}
 	>
 		{#if hovering}
 			<div
@@ -406,7 +431,7 @@
 				{/if}
 			</div>
 			<div class="menu-container">
-				<PopperButton type="player" items={DropdownItems} />
+				<PopperButton type="player" size="2em" items={DropdownItems} />
 			</div>
 			<!-- <div class="menu-container__desktop">
 				<Dropdown bind:isHidden type="player" items={DropdownItems} />

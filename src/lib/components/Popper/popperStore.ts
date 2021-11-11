@@ -12,7 +12,7 @@ type PopperStore = {
 	}
 	x?: number
 	y?: number
-	bottom?:number,
+	bottom?: number
 }
 export const PopperStore = _popperStore()
 function _popperStore() {

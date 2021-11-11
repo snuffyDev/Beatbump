@@ -66,7 +66,7 @@ export const post = async ({ body }: { body: ReadOnlyFormData }) => {
 		const request = await sendRequest(ctx, {
 			endpoint,
 			type: 'playlist',
-			// ref: browseId,
+			ref: browseId,
 			playlistId,
 			continuation
 		})

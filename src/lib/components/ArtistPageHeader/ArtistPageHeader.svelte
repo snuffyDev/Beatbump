@@ -31,10 +31,10 @@
 		if (container) {
 			y =
 				window.innerWidth < 500
-					? Math.min(Math.max((-scroll.top / window.innerHeight) * 4, 0), 10) *
+					? Math.min(Math.max((-scroll.top / window.innerHeight) * 2, 0), 10) *
 					  150
-					: Math.min(Math.max((-scroll.top / window.innerHeight) * 4, 0), 10) *
-					  50
+					: Math.min(Math.max((-scroll.top / window.innerHeight) * 2, 0), 10) *
+					  100
 		}
 	}
 	$: isExpanded && handler()

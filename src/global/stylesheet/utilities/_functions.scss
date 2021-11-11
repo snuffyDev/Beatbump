@@ -3,11 +3,11 @@ $sides: (
 	p: padding,
 	px: (
 		padding-left,
-		padding-right,
+		padding-right
 	),
 	py: (
 		padding-top,
-		padding-bottom,
+		padding-bottom
 	),
 	pt: padding-top,
 	pr: padding-right,
@@ -16,37 +16,37 @@ $sides: (
 	m: margin,
 	mx: (
 		margin-left,
-		margin-right,
+		margin-right
 	),
 	my: (
 		margin-top,
-		margin-bottom,
+		margin-bottom
 	),
 	mt: margin-top,
 	mr: margin-right,
 	mb: margin-bottom,
-	ml: margin-left,
+	ml: margin-left
 ) !default;
 
 $sizes: (
 	none: (
-		0rem,
+		0rem
 	),
 	xs: (
-		0.25rem,
+		0.25rem
 	),
 	sm: (
-		0.5rem,
+		0.5rem
 	),
 	md: (
-		1rem,
+		1rem
 	),
 	lg: (
-		1.25rem,
+		1.25rem
 	),
 	xl: (
-		1.5rem,
-	),
+		1.5rem
+	)
 ) !default;
 
 @at-root {

@@ -1,16 +1,21 @@
 /* eslint-disable no-inner-declarations */
 function lazy(node, data) {
+
 	let once = true
 	if (IntersectionObserver) {
 		const observer = new IntersectionObserver(onIntersect, {
-			rootMargin: '250px 250px',
-			threshold: 0.01
+			root: node.parentElement,
+			rootMargin: '10px',
+			threshold: 0.1
 		})
 		function onIntersect(entries) {
 			entries.forEach((entry) => {
+				if (entry.intersectionRatio > 0.5 && once) {
+					node.setAttribute('src', data.src)
+				}
 				if (entry.isIntersecting && once) {
 					node.setAttribute('src', data.src)
-					observer.unobserve(node)
+					// observer.unobserve(node)
 				}
 			})
 		}

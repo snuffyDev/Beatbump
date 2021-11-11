@@ -1,0 +1,43 @@
+@use "./mixins";
+@include mixins.keyframe(hover) {
+	from {
+		outline: transparent 0.1px solid;
+		background-color: transparent;
+	}
+	to {
+		outline: var(--color-gray-4) 0.1px solid;
+		background-color: var(--transparent-gray-3);
+	}
+}
+@include mixins.keyframe(fade) {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+@include mixins.keyframe(slide-out-top) {
+	to {
+		transform: translate(100%, 50%);
+		opacity: 0;
+	}
+
+	from {
+		transform: translate(100%, -100%);
+		opacity: 1;
+		// transform: translate(0, 0);
+	}
+}
+@mixin anim($name: "slide-up") {
+	@include mixins.keyframe($name) {
+		0% {
+			opacity: 0;
+		}
+
+		100% {
+			opacity: 1;
+		}
+	}
+}

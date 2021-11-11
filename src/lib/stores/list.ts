@@ -80,6 +80,7 @@ function split(arr, chunk) {
 }
 export default {
 	subscribe: list.subscribe,
+	set: list.set,
 	async initList(
 		videoId: string,
 		playlistId?: string,
@@ -115,7 +116,7 @@ export default {
 		currentMixId = data.currentMixId
 		clickTrackingParams = data.clickTrackingParams
 
-		mix.push(...data.results)
+		mix = [...data.results]
 		list.set({ currentMixId, clickTrackingParams, continuation, mix })
 	},
 	removeItem(index) {
@@ -155,13 +156,15 @@ export default {
 	async startPlaylist(playlistId: string, index = 0) {
 		loading = true
 		playerLoading.set(loading)
+		if (hasList) mix = []
+		hasList = true
 		key.set(index)
 		try {
 			const data = await fetch(
 				`/api/getQueue.json?playlistId=${playlistId}`
 			).then((data) => data.json())
 			mix = [...data]
-
+			mix = [...mix.filter((item) => item.title)]
 			if (mix.length > 50) {
 				Chunked = {
 					chunks: [...split(mix, 50)],

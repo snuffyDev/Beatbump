@@ -62,7 +62,7 @@ export default {
 		if (type) {
 			return {
 				context: { ...Base.context },
-				browseId: browseId ?? null_to_empty,
+				browseId: browseId ?? null,
 				browseEndpointContextSupportedConfigs: {
 					browseEndpointContextMusicConfig: {
 						pageType: 'MUSIC_PAGE_TYPE_' + type.toUpperCase()

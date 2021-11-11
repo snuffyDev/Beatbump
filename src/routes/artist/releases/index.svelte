@@ -23,7 +23,7 @@
 </script>
 
 <script lang="ts">
-	import GridItem from './_GridItem.svelte'
+	import { GridItem, Grid } from '$lib/components/Grid'
 
 	export let header
 	export let contents = []
@@ -31,17 +31,15 @@
 	$: console.log(header, contents)
 </script>
 
-{#if status}
-	{status}
-{:else}
-	<h1>{header?.artist}</h1>
-	<h2>{header?.type}</h2>
-	<div class="grid">
-		{#each contents as item}
-			<GridItem {item} />
-		{/each}
-	</div>
-{/if}
+<main>
+	{#if status}
+		{status}
+	{:else}
+		<h1>{header?.artist}</h1>
+
+		<Grid heading={header?.type} items={contents} />
+	{/if}
+</main>
 
 <style lang="scss">
 	.grid {

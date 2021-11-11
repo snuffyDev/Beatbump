@@ -39,10 +39,15 @@
 	import { goto } from '$app/navigation'
 	import Header from '$lib/components/Layouts/Header.svelte'
 	import list from '$lib/stores/list'
+	import { page } from '$app/stores'
 	// $: console.log(sections, header, title)
 </script>
 
-<Header name={title ? title.replace(',', ' ') : ''} />
+<Header
+	title={title ? title.replace(',', ' ') : ''}
+	url={$page.path}
+	desc="The latest in music"
+/>
 
 <main>
 	<div class="header">

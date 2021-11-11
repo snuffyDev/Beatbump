@@ -63,7 +63,7 @@
 		>
 			<img
 				referrerpolicy="origin-when-cross-origin"
-				src={item.thumbnail}
+				src={item.thumbnail ?? item.thumbnails[0].url}
 				alt="thumbnail"
 			/>
 			<Popout items={DropdownItems} type="dd-menu" bind:isShowing />
@@ -77,11 +77,11 @@
 			<div class="p-text">
 				<span class="p-title">{item?.title}</span>
 				<span class="p-artist">
-					{item.artistInfo.artist}
+					{item.artistInfo?.artist[0]?.text ?? item.artistInfo.artist}
 				</span>
 			</div>
 			<span class="p-length">
-				{item.length}
+				{item.length ?? ''}
 			</span>
 		</div>
 	</li>

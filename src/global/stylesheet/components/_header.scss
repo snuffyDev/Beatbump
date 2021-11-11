@@ -13,9 +13,9 @@ nav.nav {
 	align-content: center;
 	padding: 1rem;
 	grid-area: n/n/n/n;
-	@media screen and (min-width: 640px) {
-		grid-template-columns: auto 1fr;
-	}
+	// @media screen and (min-width: 640px) {
+	// 	grid-template-columns: auto 1fr;
+	// }
 	.nav-item:not(:last-child) {
 		margin-right: 0.5rem;
 	}

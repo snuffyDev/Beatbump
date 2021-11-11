@@ -51,6 +51,7 @@ select {
 
 	option {
 		background-color: inherit;
+		border-radius: var(--md-radius);
 	}
 
 	&:active,

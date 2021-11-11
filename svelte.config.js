@@ -13,7 +13,7 @@ import worker from '@snuffydev/adapter-cloudflare-cache'
 const config = {
 	preprocess: sveltePreprocess({
 		scss: {
-			includePaths: ['src'],
+			includePaths: ['src']
 		},
 
 		postcss: {
@@ -40,12 +40,12 @@ const config = {
 					$components: path.resolve('./src/lib/components')
 				}
 			},
+			server: { cors: { origin: 'https://music.youtube.com' } },
 			cleanCssOptions: {
 				level: {
 					2: {
 						all: true,
-						removeDuplicateRules: true,
-
+						removeDuplicateRules: true
 					}
 				}
 			}

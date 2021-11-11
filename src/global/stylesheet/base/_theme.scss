@@ -68,6 +68,8 @@ html {
 	@each $theme in $theme-name {
 		&.#{$theme} {
 			--mobile-popper-bg: #{map-get($themes, $theme, "side")};
+			--form-bg: #{map-get($themes, $theme, "forms")};
+			--top-bg: #{map-get($themes, $theme, "top")};
 			background: map-get($themes, $theme, "base");
 			@if $theme == light {
 				* {

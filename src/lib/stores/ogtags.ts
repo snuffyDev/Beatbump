@@ -33,6 +33,7 @@ type Store = {
 	url: (url: string) => void
 	desc: (desc: string) => void
 	image: (image: string) => void
+	init: (title?: string, url?: string, desc?: string, image?: string) => void
 }
 
 const metatags = (): Store => {
@@ -49,13 +50,20 @@ const metatags = (): Store => {
 		}))
 	const image = (image) =>
 		update((i) => ({ ...i, image: image, 'og:image': image }))
+	const init = (_title, _url, _desc, _image = '/logo.png') => {
+		_title && title(_title)
+		_url && url(_url)
+		_desc && desc(_desc)
+		_image && image(_image)
+	}
 	return {
 		subscribe,
 		set,
 		title,
 		url,
 		desc,
-		image
+		image,
+		init
 	}
 }
 

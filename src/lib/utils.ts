@@ -6,8 +6,14 @@ import { alertHandler, currentId, updateTrack } from './stores/stores'
 import { key } from './stores/stores'
 
 // Shuffle array positions
-export function shuffle(array: any[]) {
-	array.sort(() => Math.random() - 0.5)
+export function shuffle(array: any[], index) {
+	array = [
+		...array.slice(0, index),
+		array[index],
+		...array.slice(index + 1).sort(() => Math.random() - 0.5)
+	]
+	// array.sort(() => Math.random() - 0.5)
+	return array
 }
 function format(seconds) {
 	if (isNaN(seconds)) return '...'
@@ -31,7 +37,10 @@ export const addToQueue = async (videoId: string): Promise<string> => {
 
 // Get source URLs
 export const getSrc = async (videoId?: string, playlistId?: string) => {
-	const webM = browser && localStorage.getItem('preferWebM') ? true : false
+	const webM =
+		browser && JSON.parse(localStorage.getItem('preferWebM')) === true
+			? true
+			: false
 	const res = await api(fetch, {
 		endpoint: 'player',
 		videoId: videoId ? videoId : '',

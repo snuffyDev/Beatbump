@@ -44,7 +44,7 @@
 	import ListItem from '$components/ListItem/ListItem.svelte'
 	import { isPagePlaying } from '$lib/stores/stores'
 	import { setContext } from 'svelte'
-
+	import Header from '$lib/components/Layouts/Header.svelte'
 	export let header
 	export let headerRaw
 	export let description
@@ -56,33 +56,16 @@
 	$: id = id
 	let width
 	const ctx = {}
-	$: console.log(headerRaw, carousels, songs)
+	$: console.log(headerRaw, carousels, songs, $page.path)
 	setContext(ctx, { pageId: id })
-
-	tags.desc(header?.name)
-	tags.title(header?.name)
-
-	tags.url($page.host + `${$page.path}`)
-	tags.image('/logo.png')
 </script>
 
-<svelte:head>
-	<title
-		>{header?.name == undefined
-			? 'Artist - '
-			: `${header.name} - `}Beatbump</title
-	>
-	{#each Object.entries($tags) as [property, content]}
-		{#if content}
-			{#if ['title', 'description', 'image'].includes(property)}
-				<meta name={property} {content} />
-			{:else}
-				<meta {property} {content} />
-			{/if}
-		{/if}
-	{/each}
-</svelte:head>
-
+<Header
+	title={header?.name == undefined ? 'Artist' : header?.name}
+	desc={header?.name}
+	url={$page.path}
+	image={thumbnail && thumbnail[0].url}
+/>
 <ArtistPageHeader {description} {header} {width} {thumbnail} />
 <main>
 	<div class="artist-body">
@@ -152,8 +135,8 @@
 		margin-bottom: 1rem;
 	}
 	.artist-body {
-		padding: 0 2rem;
-		padding-bottom: 2rem;
+		padding: 2rem 2rem 0 2rem;
+		// padding-bottom: 2rem;
 		@media screen and (max-width: 500px) {
 			padding: 0 1rem;
 		}

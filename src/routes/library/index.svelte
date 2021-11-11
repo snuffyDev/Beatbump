@@ -1,17 +1,25 @@
+<script context="module" lang="ts">
+	export const ssr = false
+</script>
+
 <script lang="ts">
 	import { browser } from '$app/env'
 	import Icon from '$lib/components/Icon/Icon.svelte'
 
 	import Listing from '$lib/components/Item/Listing.svelte'
+	import CreatePlaylist from '$lib/components/PlaylistPopper/CreatePlaylist.svelte'
 	// import type { Item } from '$lib/types'
 	import db from '$lib/db'
 
 	import { onMount, setContext } from 'svelte'
+	import Grid from './_components/Grid/Grid.svelte'
+	import Popup from './_components/Popup.svelte'
 	import Sync from './_Sync.svelte'
 	$: favorites = []
 	$: playlists = []
 
-	let sync
+	let showSyncModal
+	let showPlaylistModal
 	setContext('library', { isLibrary: true })
 	type customEvent = Event & {
 		currentTarget: EventTarget & HTMLImageElement & HTMLElement
@@ -26,19 +34,19 @@
 	onMount(async () => {
 		const hasPlaylists = await db.getPlaylists()
 		const hasFavorites = await db.getFavorites()
-		favorites = hasFavorites.length !== 0 && [...hasFavorites]
+		favorites = hasFavorites.length !== 0 && [...hasFavorites.slice(0, 5)]
 		playlists = hasPlaylists.length !== 0 && [...hasPlaylists]
 		// updateFavorites()
 	})
-	$: console.log(playlists)
+	$: console.log(playlists, favorites)
 	// $: if (lib !== undefined) console.log(fv, $fv)
 </script>
 
-{#if sync && browser}
+{#if showSyncModal && browser}
 	<Sync
 		on:close={() => {
 			updateFavorites()
-			sync = false
+			showSyncModal = false
 		}}
 	/>
 {/if}
@@ -47,7 +55,7 @@
 		<h1>Your Library</h1>
 		<button
 			on:click={() => {
-				sync = true
+				showSyncModal = true
 			}}
 			><Icon name="send" size="1.125em" />
 			<span class="btn-text">Sync Your Data</span></button
@@ -60,7 +68,7 @@
 			<a sveltekit:prefetch href="/library/songs"><small>See All</small></a>
 		</div>
 		<div class="list">
-			{#if favorites.length !== 0}
+			{#if favorites.length > 0}
 				{#each favorites as favorite}
 					<Listing
 						on:update={() => {
@@ -69,21 +77,51 @@
 						data={favorite}
 					/>
 				{/each}
+			{:else}
+				<div class="container">
+					<h3>
+						<Icon
+							style="vertical-align: text-bottom; margin-right: 0.125em;"
+							name="frown"
+							size="2rem"
+						/> Looks like you don't have any songs in your favorites...
+					</h3>
+					<span class="subheading"
+						><em>Add some songs to keep track of what you love!</em></span
+					>
+				</div>
 			{/if}
 		</div>
 	</section>
+	{#if showPlaylistModal}
+		<div
+			class="backdrop"
+			on:click={() => {
+				showPlaylistModal = false
+			}}
+		/>
+		<CreatePlaylist
+			on:submit={async (e) => {
+				await db.createNewPlaylist({
+					name: e.detail.name,
+					description: e.detail.description,
+					items: [],
+					thumbnail: e.detail.thumbnail
+				})
+			}}
+			on:close={() => {
+				showPlaylistModal = false
+			}}
+		/>
+	{/if}
 	<section>
-		<h2>Your Playlists</h2>
-		<em>Coming soon!</em>
-		{#if playlists.length !== 0}
-			{#each playlists as playlist, i}
-				<div class="container">
-					<img src={playlist.thumbnail} width="200" height="200" />
-					<div class="title">{playlist.name}</div>
-					<em class="length">{playlist.length} songs</em>
-				</div>
-			{/each}
-		{/if}
+		<Grid
+			heading="Your Playlists"
+			items={playlists}
+			on:new_playlist={() => {
+				showPlaylistModal = true
+			}}
+		/>
 	</section>
 </main>
 
@@ -101,5 +139,20 @@
 	}
 	header {
 		display: inline;
+	}
+	// .playlist-container {
+	// 	gap: 0.8rem;
+	// }
+	.image {
+		min-width: 100%;
+		max-width: 12rem;
+		width: 100%;
+		height: 100%;
+		img {
+			height: inherit;
+			width: inherit;
+			max-width: inherit;
+			max-height: inherit;
+		}
 	}
 </style>

@@ -1,83 +1,58 @@
 {
-    "background_color": "#0E1117",
-    "theme_color": "#1D242E",
-    "name": "Beatbump",
-    "short_name": "Beatbump",
-    "display": "standalone",
-    "description": "Unlock your music.",
-    "start_url": "/",
-    "icons": [
-        {
-            "src": "assets/android/android-launchericon-512-512.png",
-            "sizes": "512x512"
-        },
-        {
-            "src": "assets/android/android-launchericon-192-192.png",
-            "sizes": "192x192"
-        },
-        {
-            "src": "assets/android/android-launchericon-144-144.png",
-            "sizes": "144x144"
-        },
-        {
-            "src": "assets/android/android-launchericon-96-96.png",
-            "sizes": "96x96"
-        },
-        {
-            "src": "assets/android/android-launchericon-72-72.png",
-            "sizes": "72x72"
-        },
-        {
-            "src": "assets/android/android-launchericon-48-48.png",
-            "sizes": "48x48"
-        },
-        {
-            "src": "assets/chrome/chrome-extensionmanagementpage-48-48.png",
-            "sizes": "48x48"
-        },
-        {
-            "src": "assets/chrome/chrome-favicon-16-16.png",
-            "sizes": "16x16"
-        },
-        {
-            "src": "assets/chrome/chrome-installprocess-128-128.png",
-            "sizes": "128x128"
-        },
-        {
-            "src": "assets/firefox/firefox-marketplace-512-512.png",
-            "sizes": "512x512"
-        },
-        {
-            "src": "assets/firefox/firefox-marketplace-128-128.png",
-            "sizes": "128x128"
-        },
-        {
-            "src": "assets/firefox/firefox-general-256-256.png",
-            "sizes": "256x256"
-        },
-        {
-            "src": "assets/firefox/firefox-general-128-128.png",
-            "sizes": "128x128"
-        },
-        {
-            "src": "assets/firefox/firefox-general-90-90.png",
-            "sizes": "90x90"
-        },
-        {
-            "src": "assets/firefox/firefox-general-64-64.png",
-            "sizes": "64x64"
-        },
-        {
-            "src": "assets/firefox/firefox-general-48-48.png",
-            "sizes": "48x48"
-        },
-        {
-            "src": "assets/firefox/firefox-general-32-32.png",
-            "sizes": "32x32"
-        },
-        {
-            "src": "assets/firefox/firefox-general-16-16.png",
-            "sizes": "16x16"
-        }
-    ]
+	"background_color": "#0E1117",
+	"theme_color": "#391e59",
+	"name": "Beatbump",
+	"short_name": "Beatbump",
+	"display": "standalone",
+	"description": "Unlock your music.",
+	"start_url": "/",
+	"shortcuts": [
+		{
+			"name": "Home",
+			"url": "/home"
+		},
+		{
+			"name": "Trending",
+			"url": "/trending",
+			"description": "See the hottest tracks and releases."
+		},
+		{
+			"name": "Library",
+			"url": "/library"
+		}
+	],
+	"icons": [
+		{
+			"src": "assets/android/android-launchericon-512-512.png",
+			"sizes": "512x512"
+		},
+		{
+			"src": "assets/android/android-launchericon-192-192.png",
+			"sizes": "192x192"
+		},
+		{
+			"src": "assets/android/android-launchericon-144-144.png",
+			"sizes": "144x144"
+		},
+		{
+			"src": "assets/android/android-launchericon-96-96.png",
+			"sizes": "96x96"
+		},
+		{
+			"src": "assets/android/android-launchericon-72-72.png",
+			"sizes": "72x72"
+		},
+		{
+			"src": "assets/android/android-launchericon-48-48.png",
+			"sizes": "48x48"
+		},
+		{
+			"src": "assets/chrome/chrome-favicon-16-16.png",
+			"sizes": "16x16"
+		},
+		{
+			"src": "assets/chrome/chrome-installprocess-128-128.png",
+			"sizes": "128x128"
+		}
+	]
 }

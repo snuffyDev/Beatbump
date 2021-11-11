@@ -4,6 +4,7 @@
 	import CarouselItem from './CarouselItem.svelte'
 	import Icon from '$components/Icon/Icon.svelte'
 	import { page } from '$app/stores'
+	import { onMount } from 'svelte'
 	// import { tweened } from 'svelte/motion'
 
 	export let header: CarouselHeader
@@ -17,7 +18,24 @@
 	// })
 	let isHidden
 	let section = []
-	let arr = splitArray(items, 5)
+	let arr = []
+	let moreOnLeft, moreOnRight
+	if (items.length > 3) {
+		arr = [...splitArray(items, 5)]
+	} else {
+		arr = [[...items]]
+	}
+	function scrollHandler(
+		e: Event & {
+			target: HTMLElement
+		}
+	) {
+		moreOnLeft = e.target.scrollLeft < 5 ? false : true
+		moreOnRight =
+			e.target.scrollLeft < e.target.scrollWidth - e.target.clientWidth
+				? true
+				: false
+	}
 	function splitArray(flatArray, numCols) {
 		const newArray = []
 		for (let c = 0; c < numCols; c++) {
@@ -31,8 +49,18 @@
 	}
 	let idx = 0
 	// $: console.log(group.length, group)
-	let carousel
+	let carousel: HTMLElement
+
 	let group = []
+	onMount(() => {
+		if (carousel !== undefined) {
+			moreOnLeft = carousel.scrollLeft < 5 ? false : true
+			moreOnRight =
+				carousel.scrollLeft < carousel.scrollWidth - carousel.clientWidth
+					? true
+					: false
+		}
+	})
 	// let rectValue: any = 0
 	// $: if (carousel) carousel.scrollLeft += $tween
 	const isArtistPage = $page.path.includes('/artist/')
@@ -45,6 +73,8 @@
 		header?.browseId && isArtistPage
 			? `/artist/releases?browseId=${header?.browseId}&params=${header?.params}&itct=${header?.itct}`
 			: notArtist
+
+	// $: console.log(moreOnLeft, moreOnRight)
 </script>
 
 <div class="header">
@@ -66,38 +96,47 @@
 	{/if}
 </div>
 <div class="section">
-	<div
-		class="left"
-		on:click={() => {
-			if (!arr || idx == 0) return
-			idx--
-			let child = group[idx].children
-			let rect = child[0].getBoundingClientRect()
+	{#if moreOnLeft}
+		<div
+			class="left"
+			on:click={() => {
+				if (!arr || idx == 0) return
+				idx--
+				let child = group[idx].children
+				let rect = child[0].getBoundingClientRect()
 
-			carousel.scrollLeft += rect.left
-			// console.log(rect.left)
-			// tween.set(rect.left)
-			// carousel.scrollLeft += $tween
-		}}
-	>
-		<Icon name="chevron-left" size="1.5em" />
-	</div>
-	<div
-		class="right"
-		on:click={() => {
-			if (!arr || idx == group.length - 1) return
-			idx++
-			let child = group[idx].children
-			let rect = child[0].getBoundingClientRect()
-			// console.log(rect.left)
+				carousel.scrollLeft += rect.left
+				// console.log(rect.left)
+				// tween.set(rect.left)
+				// carousel.scrollLeft += $tween
+			}}
+		>
+			<Icon name="chevron-left" size="1.5em" />
+		</div>
+	{/if}
+	{#if moreOnRight}
+		<div
+			class="right"
+			on:click={() => {
+				if (!arr || idx == group.length - 1) return
+				idx++
+				let child = group[idx].children
+				let rect = child[0].getBoundingClientRect()
+				// console.log(rect.left)
 
-			// tween.set(rect.left)
-			carousel.scrollLeft += rect.left
-		}}
+				// tween.set(rect.left)
+				carousel.scrollLeft += rect.left
+			}}
+		>
+			<Icon name="chevron-right" size="1.5em" />
+		</div>
+	{/if}
+	<div
+		class="scroll"
+		id="scrollItem"
+		on:scroll={scrollHandler}
+		bind:this={carousel}
 	>
-		<Icon name="chevron-right" size="1.5em" />
-	</div>
-	<div class="scroll" id="scrollItem" bind:this={carousel}>
 		{#each arr as item, index}
 			<div class="c-group" bind:this={group[index]}>
 				{#each item as item, i}
@@ -141,12 +180,18 @@
 	@import '../../../global/stylesheet/components/_carousel';
 	.c-group {
 		display: inline-flex;
-		width: 100%;
 		padding-bottom: 1.8rem;
-		padding-left: 1rem;
+		// padding-left: 0.5rem;
 		scroll-snap-align: start;
-		padding-right: 1rem;
-		gap: 2rem;
+		// padding-right: 0.5rem;
+
+		// gap: 1.5rem;
+		&:last-child {
+			padding-right: 0.5rem;
+		}
+		&:first-child {
+			padding-left: 0.5rem;
+		}
 		// &:last-child {
 		// 	.container.carouselItem:last-child {
 		// 		padding-right: 1rem;
@@ -162,7 +207,7 @@
 		pointer-events: all;
 		cursor: pointer;
 
-		background: rgba(233, 233, 233, 0.384);
+		background: hsl(0deg 0% 91% / 79%);
 		// border: rgba(0, 0, 0, 0.171) 0.01px solid;
 		transition: ease-in-out 75ms background;
 		height: 3rem;
@@ -220,6 +265,7 @@
 		grid-template-rows: 1fr;
 		padding-top: 1rem;
 		width: auto;
+		// gap: 1.25rem;
 		-ms-scroll-snap-type: x mandatory;
 		scroll-snap-type: x mandatory;
 		border-radius: inherit;
@@ -227,5 +273,32 @@
 		-webkit-overflow-scrolling: touch;
 		flex-direction: row;
 		flex-wrap: nowrap;
+		scrollbar-gutter: 0.833333rem;
+		scrollbar-width: thin;
+		scrollbar-color: #c7c7c7 #5e5e5e2f;
+
+		&::-webkit-scrollbar {
+			width: 0;
+			height: 0;
+		}
+
+		&::-webkit-scrollbar-track {
+			background: #5e5e5e2f;
+			border-radius: 0.625rem;
+			height: 0;
+			width: 0%;
+			background-clip: content-box;
+			border-radius: 0.833333rem;
+			border: transparent solid 0.0983333rem;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background-color: #424242c4;
+			border-radius: 0;
+			width: 0;
+			scrollbar-width: 0;
+			border: 0 solid #b8b8b800;
+			background-clip: content-box;
+		}
 	}
 </style>
