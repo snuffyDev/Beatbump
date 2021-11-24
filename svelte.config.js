@@ -9,7 +9,6 @@ import sveltePreprocess from 'svelte-preprocess'
 const check = process.env.NODE_ENV
 const dev = check === 'development'
 import worker from '@snuffydev/adapter-cloudflare-cache'
-import adapter from '@sveltejs/adapter-cloudflare';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -27,7 +26,7 @@ const config = {
 	}),
 
 	kit: {
-		adapter: dev ? node() : adapter({}),
+		adapter: dev ? node() : worker({}),
 		target: '#app',
 		files: {
 			assets: 'static',
