@@ -46,7 +46,7 @@
 		flex-direction: column;
 		top: 0.3em;
 		left: 6em;
-		border-radius: var(--lg-radius);
+		border-radius: $lg-radius;
 		background: #424242;
 		border: 1px #5f5f5f solid;
 	}

@@ -3,6 +3,11 @@ import type {
 	IMusicResponsiveListItemRenderer,
 	IMusicTwoRowItemRenderer
 } from './types/internals'
+import type {
+	ICarouselTwoRowItem,
+	ITwoRowItemRenderer
+} from './types/musicCarouselTwoRowItem'
+import type { IListItemRenderer } from './types/musicListItemRenderer'
 
 type JSON =
 	| string
@@ -44,11 +49,13 @@ export function parseNextItem(item, length) {
 			length: length
 		}
 	})
-	console.log(result)
+	// console.log(result)
 	return result[0]
 }
 
-export const MusicTwoRowItemRenderer = (ctx): CarouselItem => {
+export const MusicTwoRowItemRenderer = (ctx: {
+	musicTwoRowItemRenderer
+}): ICarouselTwoRowItem => {
 	let {
 		musicTwoRowItemRenderer: {
 			thumbnailRenderer: {
@@ -63,7 +70,7 @@ export const MusicTwoRowItemRenderer = (ctx): CarouselItem => {
 		placeholder = placeholder?.replace(
 			/(=w(\d+)-h(\d+))/gm,
 
-			'=w10-h10-fSoften=50,50,05'
+			'=w1-h1-p-fSoften=50,50,05'
 		)
 		return {
 			...d,
@@ -72,13 +79,13 @@ export const MusicTwoRowItemRenderer = (ctx): CarouselItem => {
 		}
 	})
 
-	const Item: CarouselItem = {
+	const Item: ICarouselTwoRowItem = {
 		title: ctx['musicTwoRowItemRenderer']['title']['runs'][0].text,
 		thumbnails,
 		aspectRatio: ctx.musicTwoRowItemRenderer.aspectRatio,
 		videoId:
 			ctx.musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint?.videoId,
-		playlistId: ctx.musicTwoRowItemRenderer.navigationEndpoint.watchEndpoint
+		playlistId: ctx.musicTwoRowItemRenderer?.navigationEndpoint?.watchEndpoint
 			?.playlistId
 			? ctx.musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint
 					?.playlistId
@@ -88,6 +95,12 @@ export const MusicTwoRowItemRenderer = (ctx): CarouselItem => {
 			  ctx.musicTwoRowItemRenderer?.overlay?.musicItemThumbnailOverlayRenderer
 					?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
 					?.watchPlaylistEndpoint?.playlistId,
+		musicVideoType:
+			ctx.musicTwoRowItemRenderer?.navigationEndpoint?.watchEndpoint
+				?.watchEndpointMusicSupportedConfigs?.watchEndpointMusicConfig
+				?.musicVideoType,
+		playerParams:
+			ctx.musicTwoRowItemRenderer?.navigationEndpoint?.watchEndpoint?.params,
 		endpoint: ctx.musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint
 			? {
 					browseId:
@@ -102,14 +115,15 @@ export const MusicTwoRowItemRenderer = (ctx): CarouselItem => {
 
 		subtitle: ctx?.musicTwoRowItemRenderer?.subtitle?.runs
 	}
+
 	return Item
 }
 
 export const MusicResponsiveListItemRenderer = (
-	ctx,
+	ctx: { musicResponsiveListItemRenderer },
 	playlistSetVideoId?: boolean,
 	playlistId?: string
-): Item => {
+): IListItemRenderer => {
 	let {
 		thumbnail: {
 			musicThumbnailRenderer: { thumbnail: { thumbnails = [] } = {} } = {}
@@ -126,7 +140,7 @@ export const MusicResponsiveListItemRenderer = (
 		}
 	})
 
-	let Item: Item = {
+	let Item: IListItemRenderer = {
 		subtitle: [
 			...ctx.musicResponsiveListItemRenderer.flexColumns[1]
 				.musicResponsiveListItemFlexColumnRenderer.text.runs
@@ -139,35 +153,68 @@ export const MusicResponsiveListItemRenderer = (
 				}
 			]
 		},
-		explicit: ctx?.badges ? true : false,
+		explicit: ctx?.musicResponsiveListItemRenderer.badges ? true : false,
 		title:
 			ctx.musicResponsiveListItemRenderer.flexColumns[0]
 				.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text,
 		aspectRatio: ctx.musicResponsiveListItemRenderer.flexColumnDisplayStyle,
+		playerParams:
+			ctx.musicResponsiveListItemRenderer.flexColumns[0]
+				.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
+				?.navigationEndpoint?.watchEndpoint?.playerParams,
+		musicVideoType:
+			ctx.musicResponsiveListItemRenderer.flexColumns[0]
+				.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
+				?.navigationEndpoint?.watchEndpoint?.watchEndpointMusicConfig
+				?.musicVideoType,
 		videoId:
 			ctx.musicResponsiveListItemRenderer.flexColumns[0]
-				.musicResponsiveListItemFlexColumnRenderer.text.runs[0]
+				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
 				?.navigationEndpoint?.watchEndpoint?.videoId || '',
 		playlistId: ctx.musicResponsiveListItemRenderer?.menu?.menuRenderer.items[0]
 			.menuNavigationItemRenderer?.navigationEndpoint?.watchEndpoint?.playlistId
 			? ctx.musicResponsiveListItemRenderer?.menu?.menuRenderer.items[0]
-					.menuNavigationItemRenderer.navigationEndpoint.watchEndpoint
-					.playlistId
-			: ctx?.navigationEndpoint?.watchEndpoint,
-		thumbnails
+					?.menuNavigationItemRenderer.navigationEndpoint?.watchEndpoint
+					?.playlistId
+			: ctx?.musicResponsiveListItemRenderer.navigationEndpoint?.watchEndpoint,
+		thumbnails,
+		length:
+			ctx?.musicResponsiveListItemRenderer?.fixedColumns &&
+			ctx?.musicResponsiveListItemRenderer?.fixedColumns[0]
+				?.musicResponsiveListItemFixedColumnRenderer?.text?.runs.length
+				? ctx?.musicResponsiveListItemRenderer?.fixedColumns[0]
+						?.musicResponsiveListItemFixedColumnRenderer?.text?.runs[0]?.text
+				: undefined
 	}
 	if (Item !== undefined && playlistSetVideoId) {
-		Item.playlistSetVideoId =
-			ctx.musicResponsiveListItemRenderer.playlistItemData
-				?.playlistSetVideoId ||
-			ctx.musicResponsiveListItemRenderer?.overlay
-				?.musicItemThumbnailOverlayRenderer.content?.musicPlayButtonRenderer
-				?.playNavigationEndpoint?.watchEndpoint?.playlistSetVideoId
-		Item.playerParams =
+		Item = {
+			...Item,
+			playlistSetVideoId:
+				ctx.musicResponsiveListItemRenderer.playlistItemData
+					?.playlistSetVideoId ||
+				ctx.musicResponsiveListItemRenderer?.overlay
+					?.musicItemThumbnailOverlayRenderer.content?.musicPlayButtonRenderer
+					?.playNavigationEndpoint?.watchEndpoint?.playlistSetVideoId
+		}
+		Item.playlistId = playlistId
+	}
+	Item = {
+		...Item,
+		musicVideoType:
+			ctx.musicResponsiveListItemRenderer?.flexColumns[0]
+				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
+				?.navigationEndpoint?.watchEndpoint?.watchEndpointMusicSupportedConfigs
+				?.watchEndpointMusicConfig?.musicVideoType
+	}
+	Item = {
+		...Item,
+		playerParams:
 			ctx.musicResponsiveListItemRenderer?.flexColumns[0]
 				?.musicResponsiveListItemFlexColumnRenderer.text?.runs[0]
-				?.navigationEndpoint?.watchEndpoint?.playerParams || 'iAQB'
-		Item.playlistId = playlistId
+				?.navigationEndpoint?.watchEndpoint?.playerParams ||
+			ctx.musicResponsiveListItemRenderer?.flexColumns[0]
+				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
+				?.navigationEndpoint?.watchEndpoint?.params
 	}
 	return Item
 }

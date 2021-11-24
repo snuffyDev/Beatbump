@@ -6,12 +6,9 @@ import {
 } from '$lib/parsers'
 
 import type { CarouselHeader, CarouselItem } from '$lib/types'
-import type { EndpointOutput } from '@sveltejs/kit'
-interface Response extends EndpointOutput {
-	body?: string | Record<string, any>
-	error?: Error
-}
-export async function get({ query, headers }): Promise<Response> {
+import type { EndpointOutput, RequestHandler } from '@sveltejs/kit'
+
+export const get: RequestHandler<Record<string, any>> = async ({ query }) => {
 	const endpoint = query.get('q') || ''
 	const browseId = 'FEmusic_explore'
 	const carouselItems = []
@@ -58,7 +55,7 @@ export async function get({ query, headers }): Promise<Response> {
 	})
 	if (resBody) {
 		return {
-			body: resBody,
+			body: JSON.stringify(resBody),
 			status: 200
 		}
 	}

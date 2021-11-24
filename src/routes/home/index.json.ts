@@ -20,6 +20,19 @@ export async function get({ query, headers }): Promise<Response> {
 	ctoken = decode(ctoken)
 	const browseId = 'FEmusic_home'
 	const carouselItems = []
+
+	const pushItems = (contents = []) => {
+		carouselItems.push(
+			...contents.filter((contents) => {
+				if (contents?.musicCarouselShelfRenderer) {
+					return contents.musicCarouselShelfRenderer
+				}
+				if (contents?.musicImmersiveCarouselShelfRenderer) {
+					return contents.musicImmersiveCarouselShelfRenderer
+				}
+			})
+		)
+	}
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/browse${
 			itct !== ''
@@ -114,26 +127,12 @@ export async function get({ query, headers }): Promise<Response> {
 		} = data
 
 		let continuations = nextContinuationData
-		carouselItems.push(
-			...contents.filter((contents) => {
-				if (contents?.musicCarouselShelfRenderer) {
-					return contents.musicCarouselShelfRenderer
-				}
-				if (contents?.musicImmersiveCarouselShelfRenderer) {
-					return contents.musicImmersiveCarouselShelfRenderer
-				}
-			})
-		)
+		pushItems(contents)
 
 		const resBody = carouselItems.map((carousel) => {
 			return parseCarousel(carousel)
 		})
 		if (resBody) {
-			console.log(
-				carouselItems[0],
-				carouselItems[0]?.musicImmersiveCarouselShelfRenderer?.backgroundImage
-					?.simpleVideoThumbnailRenderer?.thumbnail?.thumbnails
-			)
 			return {
 				body: {
 					carousels: resBody,
@@ -141,8 +140,9 @@ export async function get({ query, headers }): Promise<Response> {
 						carouselItems[0]?.musicImmersiveCarouselShelfRenderer
 							?.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail
 							?.thumbnails,
-					continuations,
-					data
+					continuations
+
+					// data
 				},
 				status: 200
 			}
@@ -160,18 +160,9 @@ export async function get({ query, headers }): Promise<Response> {
 				} = {}
 			} = {}
 		} = data
-		carouselItems.push(
-			...contents.filter((contents) => {
-				if (contents?.musicCarouselShelfRenderer) {
-					return contents.musicCarouselShelfRenderer
-				}
-				if (contents?.musicImmersiveCarouselShelfRenderer) {
-					return contents.musicImmersiveCarouselShelfRenderer
-				}
-			})
-		)
-		let continuations = nextContinuationData
 
+		let continuations = nextContinuationData
+		pushItems(contents)
 		const resBody = carouselItems.map((carousel) => {
 			return parseCarousel(carousel)
 		})
@@ -180,8 +171,7 @@ export async function get({ query, headers }): Promise<Response> {
 				body: {
 					carousels: resBody,
 
-					continuations,
-					data
+					continuations
 				},
 				status: 200
 			}
@@ -190,9 +180,26 @@ export async function get({ query, headers }): Promise<Response> {
 }
 
 function parseHeader(header: any[]): CarouselHeader[] {
-	return header.map(({ musicCarouselShelfBasicHeaderRenderer } = {}) => ({
-		title: musicCarouselShelfBasicHeaderRenderer['title']['runs'][0].text
-	}))
+	return header.map(({ musicCarouselShelfBasicHeaderRenderer } = {}) => {
+		let subheading, browseId
+		if (musicCarouselShelfBasicHeaderRenderer?.strapline?.runs[0]?.text) {
+			subheading =
+				musicCarouselShelfBasicHeaderRenderer['strapline']['runs'][0].text
+		}
+		if (
+			musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer
+				?.navigationEndpoint?.browseEndpoint?.browseId
+		) {
+			browseId =
+				musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer
+					?.navigationEndpoint?.browseEndpoint?.browseId
+		}
+		return {
+			title: musicCarouselShelfBasicHeaderRenderer['title']['runs'][0].text,
+			subheading,
+			browseId
+		}
+	})
 }
 
 function parseBody(contents): CarouselItem[] {
@@ -209,6 +216,7 @@ function parseBody(contents): CarouselItem[] {
 		throw new Error("Unable to parse items, can't find " + `${r}`)
 	})
 }
+
 function parseCarousel(carousel: {
 	musicImmersiveCarouselShelfRenderer?: Record<string, any>
 	musicCarouselShelfRenderer?: Record<string, any>

@@ -26,7 +26,7 @@ const Parsers = async (
 		hasContinuation?: boolean
 	}
 ) => {
-	console.log(endpoint, { data, hasContinuation })
+	// console.log(endpoint, { data, hasContinuation })
 
 	const Endpoints = {
 		next: () => parseNextTrack(data, hasContinuation),

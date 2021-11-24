@@ -1,23 +1,33 @@
 import { browser } from '$app/env'
 import { writable } from 'svelte/store'
 
-import { alertHandler } from './stores/stores'
-
 import type { Item } from './types'
+import { notify } from './utils'
 type IDBPlaylist = {
-	name: string
+	name?: string
 	description?: string
 	thumbnail?: any
-	items: Item | Item[]
+	items?: Item | Item[]
+	id?: string
 }
-const notify = (msg: string, type: string) => {
-	alertHandler.set({
-		msg: msg,
-		type: type
-	})
+type IDBRequestTarget = Event & {
+	target: EventTarget & { result: IDBRequest & IDBCursorWithValue }
 }
+const mod = {
+	charset: 'useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict',
+	generate: (size = 16) => {
+		let id = ''
+		let i = size
+		while (i--) {
+			id += mod.charset[(Math.random() * mod.charset.length) | 0]
+		}
+		return id
+	}
+}
+
 let db: IDBDatabase
 let DB_VER = 1
+let items: Array<any> = []
 
 const accessDB = () => {
 	if (!browser) return
@@ -25,19 +35,44 @@ const accessDB = () => {
 		if (db != undefined) {
 			return resolve()
 		}
-		const request = indexedDB.open('beatbump', 1)
+		const request = indexedDB.open('beatbump', 2)
 
 		function error(error) {
 			reject(error.target.error.message)
-			console.error(error.target.error.message)
+			console.error(error, error.target.error.message)
 		}
 		request.onupgradeneeded = function (
 			event: IDBVersionChangeEvent & {
-				target: EventTarget & { result: IDBDatabase }
+				target: EventTarget & {
+					result: IDBDatabase
+					transaction: IDBTransaction
+				}
 			}
 		) {
 			db = event.target.result
 			db.onerror = error
+			if (
+				db.objectStoreNames.contains('playlists') &&
+				event.target?.transaction.objectStore('playlists').keyPath !== 'id'
+			) {
+				const getOldPlaylists = event.target?.transaction
+					.objectStore('playlists')
+					.getAll()
+				getOldPlaylists.onsuccess = function (e: IDBRequestTarget) {
+					const results = e.target.result
+					if (Array.isArray(results)) {
+						items = [...results]
+						console.log(e, results)
+
+						event.target.result.deleteObjectStore('playlists')
+					}
+
+					event.target.result.createObjectStore('playlists', {
+						keyPath: 'id'
+					})
+				}
+			}
+
 			if (!db.objectStoreNames.contains('favorites')) {
 				db.createObjectStore('favorites', {
 					keyPath: 'videoId' || 'playlistId'
@@ -45,10 +80,11 @@ const accessDB = () => {
 			}
 			if (!db.objectStoreNames.contains('playlists')) {
 				db.createObjectStore('playlists', {
-					keyPath: 'name'
+					keyPath: 'id'
 				})
 			}
 		}
+
 		request.onerror = error
 		request.onsuccess = function (
 			e: IDBVersionChangeEvent & {
@@ -56,6 +92,7 @@ const accessDB = () => {
 			}
 		) {
 			db = e.target.result
+
 			db.onerror = error
 			db.addEventListener('close', function (e) {
 				db = undefined
@@ -74,9 +111,10 @@ export default {
 					tx.objectStore('playlists').put({
 						name,
 						description,
-						items: Array.isArray(items) ? [...items] : items,
+						items: Array.isArray(items) ? [...items] : [items],
 						length: items.length,
-						thumbnail
+						thumbnail,
+						id: mod.generate(32)
 					}).onsuccess = resolve
 					tx.addEventListener('complete', function () {
 						resolve({ name, description, items, thumbnail })
@@ -84,56 +122,47 @@ export default {
 					})
 					tx.addEventListener('error', function (e) {
 						notify('Error: ' + e, 'error')
-						reject()
+						reject(e)
 					})
 				} catch (err) {
 					notify('Error: ' + err, 'error')
-					reject()
+					reject(err)
 					// throw new Error(err)
 				}
 			})
 		})
 	},
-	addToPlaylist(name, { playlist, item }) {
+	updatePlaylist({ id, thumbnail, description, name }: IDBPlaylist) {
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
 				try {
 					let tx = db.transaction('playlists', 'readwrite')
-					tx.objectStore('playlists').openCursor().onsuccess = function (
-						e: Event & { target: EventTarget & { result: IDBCursorWithValue } }
+					tx.objectStore('playlists').openCursor(id).onsuccess = function (
+						e: IDBRequestTarget
 					) {
 						const cursor = e.target.result
 						if (cursor) {
 							const playlistItem = cursor.value
-							if (Array.isArray(item)) {
-								const request = cursor.update({
-									...playlistItem,
-									items: [...playlistItem?.items, ...item],
-									length: [...playlistItem?.items, ...item].length
-								})
+							const request = cursor.update({
+								...playlistItem,
+								name: name ?? playlistItem.name,
+								thumbnail: thumbnail ?? playlistItem?.thumbnail,
+								description: description ?? playlistItem.description
+							})
 
-								request.onsuccess = function (e) {
-									resolve(request)
-								}
-							} else {
-								const request = cursor.update({
-									...playlistItem,
-									items: [...playlistItem?.items, item],
-									length: [...playlistItem?.items, item].length
-								})
-								request.onsuccess = function (e) {
-									resolve(request)
-								}
+							request.onsuccess = function (e: IDBRequestTarget) {
+								resolve(e.target)
 							}
+
 							// console.log(e.target.result, list)
 						}
 
 						// list
-						notify('Added to Playlist!', 'success')
+						notify('Updated Playlist!', 'success')
 						// return resolve()
 					}
 					tx.addEventListener('complete', () => {
-						notify('Added to Playlist!', 'success')
+						notify('Updated Playlist!', 'success')
 					})
 					tx.addEventListener('error', function (e) {
 						throw new Error(e)
@@ -192,6 +221,13 @@ export default {
 			console.error(e)
 		}
 	},
+	async deleteAllPlaylists() {
+		return new Promise(function (resolve, reject) {
+			accessDB().then(function () {
+				notify('Playlists Deleted!', 'success')
+			})
+		})
+	},
 	async deletePlaylist(name: string) {
 		if (!name) return 'No playlist name was provided!'
 		return new Promise(function (resolve, reject) {
@@ -216,9 +252,7 @@ export default {
 						.transaction('favorites', 'readonly')
 						.objectStore('favorites')
 
-					transaction.getAll().onsuccess = function (
-						e: Event & { target: EventTarget & { result: IDBCursorWithValue } }
-					) {
+					transaction.getAll().onsuccess = function (e: IDBRequestTarget) {
 						if (e.target.result) {
 							const result = e.target.result
 							if (Array.isArray(result)) {
@@ -237,7 +271,7 @@ export default {
 			})
 		})
 	},
-	getPlaylist(name) {
+	getPlaylist(id) {
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
 				try {
@@ -245,10 +279,13 @@ export default {
 						.transaction('playlists', 'readonly')
 						.objectStore('playlists')
 
-					transaction.openCursor(name).onsuccess = function (
+					console.log(id)
+					transaction.openCursor(id).onsuccess = function (
 						e: Event & { target: EventTarget & { result: IDBCursorWithValue } }
 					) {
+						console.log(e)
 						if (e.target.result) {
+							console.log(e.target.result)
 							const playlist = e.target.result.value
 							console.log(playlist, e.target.result)
 							resolve(playlist)
@@ -266,19 +303,33 @@ export default {
 		let lists: IDBPlaylist[] | null = []
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
-				try {
-					const transaction = db
-						.transaction('playlists', 'readonly')
-						.objectStore('playlists')
+				let transaction: IDBObjectStore
 
-					transaction.getAll().onsuccess = function (
-						e: Event & { target: EventTarget & { result: IDBRequest } }
-					) {
+				try {
+					transaction = db
+						.transaction('playlists', 'readwrite')
+						.objectStore('playlists')
+					if (items.length > 0) {
+						items.forEach((item) => {
+							transaction.put(item)
+						})
+					}
+					transaction.getAll().onsuccess = function (e: IDBRequestTarget) {
 						if (e.target.result) {
 							const result = e.target.result
 							if (Array.isArray(result)) {
 								lists = result
+								lists.forEach((item, i, array) => {
+									let id
+									if (!item?.id) {
+										id = mod.generate(32)
+										array[i].id = id
+										transaction.put({ ...array[i] })
+									}
+								})
 								resolve([...lists])
+							} else {
+								reject([])
 							}
 						}
 					}

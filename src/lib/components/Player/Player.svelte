@@ -21,10 +21,17 @@
 	import { fade } from 'svelte/transition'
 	import { PopperButton } from '../Popper'
 	import Controls from './Controls.svelte'
+	import keyboardHandler from './keyboardHandler'
 	import Queue from './Queue.svelte'
 	import QueueListItem from './QueueListItem.svelte'
-
-	const player: HTMLAudioElement = new Audio()
+	class NodeAudio {
+		constructor(...args) {
+			this.addEventListener('play', this.play)
+		}
+		addEventListener(arg0: string, play: () => any) {}
+		play() {}
+	}
+	const player: HTMLAudioElement | any = browser ? new Audio() : new NodeAudio()
 	$: player.autoplay = $updateTrack !== undefined ? true : false
 
 	$: player.src = $updateTrack
@@ -47,44 +54,53 @@
 	let hoverWidth
 
 	let showing
-	let hide
 	let hovering
-	$: loading = $playerLoading
 	$: mixList = $list.mix
 
-	$: isHidden = false
 	let DropdownItems: Array<any>
 	let once = false
-	$: console.log($list.mix)
+	$: console.log($list.mix, autoId, $key, $updateTrack)
 
 	/*
   	Player Controls
 	 */
 	const play = () => {
-		navigator.mediaSession.playbackState = 'playing'
-
+		if ('mediaSession' in navigator) {
+			navigator.mediaSession.playbackState = 'playing'
+		}
 		isPlaying = true
 		key.set(autoId)
 
 		metaDataHandler()
 	}
-	const pause = () => player.pause()
+	const pause = () => {
+		if ('mediaSession' in navigator) {
+			navigator.mediaSession.playbackState = 'paused'
+		}
+		isPlaying = false
+		player.pause()
+	}
 	const setPosition = () => {
-		navigator.mediaSession.setPositionState({
-			duration: isWebkit ? duration / 2 : duration,
-			position: player.currentTime
-		})
+		if ('mediaSession' in navigator) {
+			navigator.mediaSession.setPositionState({
+				duration: isWebkit ? player.duration / 2 : player.duration,
+				position: player.currentTime
+			})
+		}
 	}
 	/*
 		Player Event Listeners
 	 */
 	player.addEventListener('load', () => {
-		navigator.mediaSession.setPositionState({
-			duration: isWebkit ? player.duration / 2 : player.duration,
-			position: player.currentTime
-		})
+		if ('mediaSession' in navigator) {
+			navigator.mediaSession.setPositionState({
+				duration: isWebkit ? player.duration / 2 : player.duration,
+				position: player.currentTime
+			})
+		}
 	})
 	player.addEventListener('loadedmetadata', () => {
+		setPosition()
 		isPlaying = true
 
 		DropdownItems = [
@@ -132,7 +148,7 @@
 		 	 due to the length of a song being doubled on iOS,
 			 we have to cut the time in half. Doesn't effect other devices.
 		*/
-		if (isWebkit && remainingTime < duration / 2 && once == false) {
+		if (isWebkit && remainingTime <= duration / 2 && once == false) {
 			// await getNext()
 			player.currentTime = player.currentTime * 2
 		}
@@ -155,10 +171,12 @@
 		Metadata Handler
 	*/
 	function metaDataHandler() {
+		// <!-- if (!player.src) return -->
+
 		if ('mediaSession' in navigator) {
 			navigator.mediaSession.metadata = new MediaMetadata({
-				title: $list.mix[autoId || 0].title,
-				artist: $list.mix[autoId || 0].artistInfo.artist || null,
+				title: $list.mix[autoId || 0]?.title,
+				artist: $list.mix[autoId || 0]?.artistInfo?.artist || null,
 				album:
 					$list.mix[autoId || 0].album?.title ||
 					$list.mix[autoId || 0].album?.text ||
@@ -180,7 +198,16 @@
 				]
 			})
 			navigator.mediaSession.setActionHandler('play', (session) => {
-				player.play()
+				const _play = player.play()
+				if (_play !== undefined) {
+					_play
+						.then(() => {
+							play()
+						})
+						.catch((error) => {
+							console.error(error)
+						})
+				}
 			})
 			navigator.mediaSession.setActionHandler('pause', pause)
 			navigator.mediaSession.setActionHandler('seekto', (session) => {
@@ -201,16 +228,16 @@
 	*/
 	async function getNext() {
 		once = true
+
 		if (autoId == $list.mix.length - 1) {
-			list
-				.getMore(
-					$list.mix[autoId]?.itct,
-					$list.mix[autoId]?.videoId,
-					$list.currentMixId,
-					$list.continuation,
-					$list.clickTrackingParams
-				)
-				.then(({ body }) => {})
+			if (!$list.continuation && !$list.clickTrackingParams) return
+			list.getMore(
+				$list.mix[autoId]?.itct,
+				$list.mix[autoId]?.videoId,
+				$list.currentMixId,
+				$list.continuation,
+				$list.clickTrackingParams
+			)
 			autoId++
 			key.set(autoId)
 			once = false
@@ -260,12 +287,14 @@
 		let gettingNext = false
 		if (!gettingNext) {
 			if (autoId == $list.mix.length - 1) {
+				if (!$list.continuation && !$list.clickTrackingParams) return
+
 				gettingNext = true
 				key.set(autoId)
 				await getNext()
 				autoId++
 				key.set(autoId)
-
+				play()
 				gettingNext = false
 				return
 			} else {
@@ -274,6 +303,7 @@
 
 				key.set(autoId)
 				getTrackURL()
+				play()
 				gettingNext = false
 			}
 		}
@@ -313,130 +343,163 @@
 				? (seek(event, songBar.getBoundingClientRect()) * duration) / 2
 				: seek(event, songBar.getBoundingClientRect()) * duration
 	}
+
+	const shortcut = {
+		Space: () => {
+			if (!isPlaying) {
+				const _play = player.play()
+				if (_play !== undefined) {
+					_play
+						.then(() => {
+							play()
+						})
+						.catch((error) => {
+							console.error(error)
+						})
+				} else {
+					player.play()
+				}
+			} else {
+				pause()
+			}
+		}
+	}
 </script>
 
-<svelte:window on:mouseup={() => (seeking = false)} on:mousemove={trackMouse} />
+<svelte:window
+	on:pointerup={() => (seeking = false)}
+	on:pointermove={trackMouse}
+/>
 
-<div class="f-container" transition:fade>
-	<div
-		class="progress-bar"
-		transition:fade
-		on:click={seekAudio}
-		on:mousedown={() => (seeking = true)}
-		on:mouseleave={() => (hovering = false)}
-		on:mouseenter={() => (hovering = true)}
-		on:touchstart={() => {
-			seeking = true
-			hovering = true
-		}}
-		on:touchend={() => {
-			hovering = false
-			seeking = false
-		}}
-	>
-		{#if hovering}
-			<div
-				class="hover"
-				transition:fade={{ duration: 150 }}
-				bind:this={seekBar}
-				style="transform:scaleX({hoverWidth})"
-			/>
-		{/if}
-		<progress bind:this={songBar} value={$progress} max={duration} />
-	</div>
-	<div class="player" class:light={$theme == 'light'}>
+<div
+	class="progress-bar"
+	transition:fade
+	on:click={seekAudio}
+	on:pointerdown={() => {
+		seeking = false
+		hovering = false
+	}}
+	on:pointerup={() => {
+		seeking = false
+		hovering = false
+	}}
+	on:pointerleave={(event) => {
+		hovering = false
+	}}
+	on:pointerenter={(e) => {
+		hovering = true
+	}}
+>
+	{#if hovering}
 		<div
-			style="background:inherit;"
-			on:click_outside={() => {
-				showing = false
-			}}
-			use:clickOutside
-			class="player-left"
-		>
-			{#if showing}
-				<Queue bind:autoId={$key} let:ctxKey bind:showing let:item let:index>
-					<row id={index}>
-						<QueueListItem
-							{ctxKey}
-							on:removeItem={async () => {
-								showing = true
-								if (index == $key) {
-									key.set(index - 1)
-									await tick()
-									getNext()
-								}
-							}}
-							on:updated={async (event) => {
+			class="hover"
+			transition:fade={{ duration: 150 }}
+			style="transform:scaleX({hoverWidth})"
+		/>
+	{/if}
+	<progress bind:this={songBar} value={$progress} max={duration} />
+</div>
+<div
+	class="player"
+	use:keyboardHandler={{ shortcut }}
+	class:light={$theme == 'light'}
+>
+	<div
+		style="background:inherit;"
+		on:click_outside={() => {
+			showing = false
+		}}
+		use:clickOutside
+		class="player-left"
+	>
+		{#if showing}
+			<Queue bind:autoId={$key} let:ctxKey bind:showing let:item let:index>
+				<row id={index}>
+					<QueueListItem
+						{ctxKey}
+						on:removeItem={async () => {
+							showing = true
+							if (index == $key) {
 								key.set(index - 1)
 								await tick()
 								getNext()
-							}}
-							{item}
-							{index}
-						/>
-					</row>
-				</Queue>
-			{/if}
-			<div
-				on:click={() => {
-					if (showing) {
-						showing = false
-					} else {
-						showing = true
-					}
-					showing = showing ? true : false
-				}}
-				class="listButton player-btn"
-			>
-				<Icon color="white" name="radio" size="2em" />
-			</div>
-		</div>
-		<Controls
-			bind:isPlaying
-			bind:loading
-			on:play={() => {
-				play()
-				player.play()
+							}
+						}}
+						on:updated={async (event) => {
+							key.set(index - 1)
+							await tick()
+							getNext()
+						}}
+						{item}
+						{index}
+					/>
+				</row>
+			</Queue>
+		{/if}
+		<div
+			on:click={() => {
+				if (showing) {
+					showing = false
+				} else {
+					showing = true
+				}
+				showing = showing ? true : false
 			}}
-			{pause}
-			{nextBtn}
-			{prevBtn}
-		/>
-		<div class="player-right">
-			<div
-				class="volume player-btn"
-				use:clickOutside
-				on:click_outside={() => (volumeHover = false)}
-			>
-				<div
-					color="white"
-					class="volume-icon"
-					on:click={() => (volumeHover = !volumeHover)}
-				>
-					<Icon color="white" name="volume" size="2em" />
-				</div>
-				{#if volumeHover}
-					<div class="volume-wrapper">
-						<div class="volume-slider">
-							<input
-								class="volume"
-								type="range"
-								bind:value={volume}
-								min="0"
-								max="1"
-								step="any"
-							/>
-						</div>
-					</div>
-				{/if}
-			</div>
-			<div class="menu-container">
-				<PopperButton type="player" size="2em" items={DropdownItems} />
-			</div>
-			<!-- <div class="menu-container__desktop">
-				<Dropdown bind:isHidden type="player" items={DropdownItems} />
-			</div> -->
+			class="listButton player-btn"
+		>
+			<Icon color="white" name="radio" size="2rem" />
 		</div>
+	</div>
+	<Controls
+		bind:isPlaying
+		bind:loading={$playerLoading}
+		on:play={() => {
+			play()
+			player.play()
+		}}
+		{pause}
+		{nextBtn}
+		{prevBtn}
+	/>
+	<div class="player-right">
+		<div
+			class="volume player-btn"
+			use:clickOutside
+			on:click_outside={() => (volumeHover = false)}
+		>
+			<div
+				color="white"
+				class="volume-icon"
+				on:click={() => (volumeHover = !volumeHover)}
+			>
+				<Icon color="white" name="volume" size="2rem" />
+			</div>
+			{#if volumeHover}
+				<div class="volume-wrapper">
+					<div class="volume-slider">
+						<input
+							class="volume"
+							type="range"
+							bind:value={volume}
+							min="0"
+							max="1"
+							step="any"
+						/>
+					</div>
+				</div>
+			{/if}
+		</div>
+		<!-- <div class="menu-container__desktop">
+			<Dropdown bind:isHidden type="player" items={DropdownItems} />
+		</div> -->
+	</div>
+	<div class="menu-container">
+		<PopperButton
+			tabindex="-1"
+			type="player"
+			size="2rem"
+			items={DropdownItems}
+		/>
 	</div>
 </div>
 
@@ -466,13 +529,7 @@
 		width: 100%;
 		transform-origin: 0% 50%;
 	}
-	.f-container {
-		background-color: inherit;
-		// position: absolute;
-		grid-area: f/f/f/f;
-		box-shadow: 0 0rem 1rem 0rem #00000070;
-		height: 100%;
-	}
+
 	.light * {
 		color: white !important;
 	}
@@ -500,14 +557,16 @@
 	}
 
 	.menu-container {
-		right: 5%;
-
 		padding: 0;
-
-		position: absolute;
+		position: relative;
 		will-change: position;
+		margin-right: 5%;
+		grid-area: r;
+		place-self: flex-end;
+		align-self: center;
 		@media screen and (max-width: 500px) {
 			position: relative !important;
+			place-self: center;
 		}
 	}
 	.progress-bar {
@@ -520,23 +579,18 @@
 	.player-right {
 		align-self: center;
 		height: auto;
-		max-height: 44pt;
-		max-width: 44pt;
-		place-self: center;
 
-		// padding: 10pt;
-		width: auto;
-		align-items: center;
+		place-self: center;
 		display: flex;
+		align-items: center;
 		justify-content: center;
 	}
-	.f-container {
-		// position: absolute;
-		bottom: 0;
-		width: 100%;
-		// z-index: -1;
+	.player-left {
+		grid-area: l;
 	}
-
+	.player-right {
+		grid-area: r;
+	}
 	progress {
 		display: block;
 		width: 100%;

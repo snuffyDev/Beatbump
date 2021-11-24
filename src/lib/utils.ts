@@ -5,6 +5,18 @@ import { sort } from './endpoints/playerUtils'
 import { alertHandler, currentId, updateTrack } from './stores/stores'
 import { key } from './stores/stores'
 
+// notifications
+export const notify = (
+	msg: string,
+	type: 'success' | 'error',
+	action?: string
+): void => {
+	alertHandler.set({
+		msg: msg,
+		type: type,
+		action
+	})
+}
 // Shuffle array positions
 export function shuffle(array: any[], index) {
 	array = [
@@ -36,23 +48,33 @@ export const addToQueue = async (videoId: string): Promise<string> => {
 }
 
 // Get source URLs
-export const getSrc = async (videoId?: string, playlistId?: string) => {
+export const getSrc = async (
+	videoId?: string,
+	playlistId?: string,
+	params?: string
+): Promise<{ body: any; error?: boolean }> => {
 	const webM =
 		browser && JSON.parse(localStorage.getItem('preferWebM')) === true
 			? true
 			: false
-	const res = await api(fetch, {
-		endpoint: 'player',
-		videoId: videoId ? videoId : '',
-		playlistId: playlistId ? playlistId : ''
-	})
-	const data = await res.body
+	// const res = await api(fetch, {
+	// 	endpoint: 'player',
+	// 	videoId: videoId ? videoId : '',
+	// 	playlistId: playlistId ? playlistId : ''
+	// })
+	const res = await fetch(
+		`/api/player.json?videoId=${videoId}${
+			playlistId ? `&playlistId=${playlistId}` : ''
+		}${params ? `&playerParams=${params}` : ''}`
+	)
+	const data = await res.json()
 	const formats = await sort(data, webM)
 	currentId.set(videoId)
 	console.log(formats)
 	const src = formats[0].url !== null ? setTrack(formats, webM) : handleError()
 	return src
 }
+
 function setTrack(formats = [], webM) {
 	if (webM) {
 		const item = formats.find((v) => v.mimeType === 'webm')
@@ -66,11 +88,8 @@ function setTrack(formats = [], webM) {
 }
 function handleError() {
 	console.log('error')
-	alertHandler.set({
-		msg: 'No audio stream found, skipping.',
-		action: 'getNextTrack',
-		type: 'danger'
-	})
+
+	notify('An error occurred while initiating playback, skipping...', 'error', 'getNextTrack')
 	return {
 		body: null,
 		error: true

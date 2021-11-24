@@ -1,10 +1,9 @@
-<script context="module">
+<script context="module" lang="ts">
 	import { api } from '$lib/api'
 
 	export async function load({ page, fetch }) {
-		const id = page.params.slug
 		const response = await api(fetch, {
-			browseId: id,
+			browseId: page.params.slug,
 			endpoint: 'browse',
 			path: 'artist',
 			type: 'artist'
@@ -14,14 +13,13 @@
 			description,
 			thumbnail,
 			header,
-			songs,
-			headerRaw
+			songs
 		} = await response.body
 		if (response.ok) {
 			return {
 				props: {
 					carousels,
-					headerRaw,
+					// headerRaw,
 					description,
 					thumbnail,
 					header,
@@ -36,7 +34,7 @@
 </script>
 
 <script lang="ts">
-	import Carousel from '$components/Carousel/Carousel.svelte'
+	import Carousel from '$lib/components/Carousel/Carousel.svelte'
 	import ArtistPageHeader from '../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte'
 	import tags from '$lib/stores/ogtags'
 	import { page } from '$app/stores'
@@ -46,17 +44,17 @@
 	import { setContext } from 'svelte'
 	import Header from '$lib/components/Layouts/Header.svelte'
 	export let header
-	export let headerRaw
+	// export let headerRaw
 	export let description
 	export let thumbnail
 	export let carousels
 	export let songs = []
 	// export let raw
 	export let id
-	$: id = id
+	// $: id = id
 	let width
 	const ctx = {}
-	$: console.log(headerRaw, carousels, songs, $page.path)
+	$: console.log(carousels, songs, $page.path)
 	setContext(ctx, { pageId: id })
 </script>
 
@@ -64,7 +62,7 @@
 	title={header?.name == undefined ? 'Artist' : header?.name}
 	desc={header?.name}
 	url={$page.path}
-	image={thumbnail && thumbnail[0].url}
+	image={thumbnail && thumbnail[0]?.url}
 />
 <ArtistPageHeader {description} {header} {width} {thumbnail} />
 <main>
@@ -124,7 +122,7 @@
 	}
 
 	.item-title {
-		font-size: 1rem;
+		font-size: $size-1;
 		cursor: pointer;
 		margin: 0;
 		padding: 0;
@@ -135,13 +133,10 @@
 		margin-bottom: 1rem;
 	}
 	.artist-body {
-		padding: 2rem 2rem 0 2rem;
+		padding: 2rem 0 2rem;
 		// padding-bottom: 2rem;
 		@media screen and (max-width: 500px) {
-			padding: 0 1rem;
+			// padding: 0 1rem;
 		}
-	}
-	main {
-		margin: 0;
 	}
 </style>

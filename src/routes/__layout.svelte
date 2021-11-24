@@ -1,11 +1,13 @@
 <script context="module" lang="ts">
 	import type { Load } from '@sveltejs/kit'
-	export const load: Load = async ({ page }) => ({
-		props: {
-			key: page.path
-		},
-		stuff: { page: page.path }
-	})
+	export const load: Load = async ({ page }) => {
+		return {
+			props: {
+				key: page.path
+			},
+			stuff: { page: page.path }
+		}
+	}
 </script>
 
 <script lang="ts">
@@ -14,13 +16,7 @@
 	import Player from '$components/Player/Player.svelte'
 	import Wrapper from '$components/Wrapper/Wrapper.svelte'
 	import Alert from '$lib/components/Alert/Alert.svelte'
-	import {
-		alertHandler,
-		filterAutoPlay,
-		iOS,
-		showAddToPlaylistPopper,
-		theme
-	} from '$stores/stores'
+	import { iOS, showAddToPlaylistPopper } from '$stores/stores'
 	import { onMount } from 'svelte'
 	import { Popper } from '$lib/components/Popper'
 	import '../global/stylesheet/main.scss'
@@ -59,9 +55,7 @@
 />
 <Alert />
 <footer class="footer-container">
-	{#if browser}
-		<Player />
-	{/if}
+	<Player />
 </footer>
 
 <style lang="scss" global>
@@ -69,4 +63,8 @@
 	@import '@fontsource/commissioner/500.css';
 	@import '@fontsource/commissioner/600.css';
 	@import '@fontsource/commissioner/700.css';
+	.wrapper {
+		overflow-y: scroll; /* has to be scroll, not auto */
+		-webkit-overflow-scrolling: touch;
+	}
 </style>

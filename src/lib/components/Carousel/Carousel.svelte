@@ -25,16 +25,15 @@
 	} else {
 		arr = [[...items]]
 	}
-	function scrollHandler(
-		e: Event & {
-			target: HTMLElement
-		}
-	) {
-		moreOnLeft = e.target.scrollLeft < 5 ? false : true
+	let frame
+	function scrollHandler(timestamp) {
+		if (!carousel) return
+		moreOnLeft = carousel.scrollLeft < 15 ? false : true
 		moreOnRight =
-			e.target.scrollLeft < e.target.scrollWidth - e.target.clientWidth
+			carousel.scrollLeft < carousel.scrollWidth - carousel.clientWidth - 15
 				? true
 				: false
+		frame = requestAnimationFrame(scrollHandler)
 	}
 	function splitArray(flatArray, numCols) {
 		const newArray = []
@@ -49,16 +48,26 @@
 	}
 	let idx = 0
 	// $: console.log(group.length, group)
-	let carousel: HTMLElement
+	let carousel: HTMLDivElement
 
 	let group = []
 	onMount(() => {
 		if (carousel !== undefined) {
-			moreOnLeft = carousel.scrollLeft < 5 ? false : true
+			moreOnLeft = carousel.scrollLeft < 15 ? false : true
 			moreOnRight =
 				carousel.scrollLeft < carousel.scrollWidth - carousel.clientWidth
 					? true
 					: false
+
+			carousel.addEventListener('scroll', () =>
+				window.requestAnimationFrame(scrollHandler)
+			)
+		}
+
+		return () => {
+			carousel.removeEventListener('scroll', () =>
+				window.cancelAnimationFrame(frame)
+			)
 		}
 	})
 	// let rectValue: any = 0
@@ -78,6 +87,9 @@
 </script>
 
 <div class="header">
+	{#if header?.subheading}
+		<p class="subheading">{header?.subheading}</p>
+	{/if}
 	<h1>
 		{header.title}
 	</h1>
@@ -96,41 +108,41 @@
 	{/if}
 </div>
 <div class="section">
-	{#if moreOnLeft}
-		<div
-			class="left"
-			on:click={() => {
-				if (!arr || idx == 0) return
-				idx--
-				let child = group[idx].children
-				let rect = child[0].getBoundingClientRect()
+	<div
+		class="left"
+		class:hidden={!moreOnLeft}
+		on:click={() => {
+			if (!arr || idx == 0) return
+			idx--
+			let child = group[idx].children
+			let rect = child[0].getBoundingClientRect()
 
-				carousel.scrollLeft += rect.left
-				// console.log(rect.left)
-				// tween.set(rect.left)
-				// carousel.scrollLeft += $tween
-			}}
-		>
-			<Icon name="chevron-left" size="1.5em" />
-		</div>
-	{/if}
-	{#if moreOnRight}
-		<div
-			class="right"
-			on:click={() => {
-				if (!arr || idx == group.length - 1) return
-				idx++
-				let child = group[idx].children
-				let rect = child[0].getBoundingClientRect()
-				// console.log(rect.left)
+			carousel.scrollLeft += rect.left
+			// console.log(rect.left)
+			// tween.set(rect.left)
+			// carousel.scrollLeft += $tween
+		}}
+	>
+		<Icon name="chevron-left" size="1.5em" />
+	</div>
 
-				// tween.set(rect.left)
-				carousel.scrollLeft += rect.left
-			}}
-		>
-			<Icon name="chevron-right" size="1.5em" />
-		</div>
-	{/if}
+	<div
+		class="right"
+		class:hidden={!moreOnRight}
+		on:click={() => {
+			if (!arr || idx == group.length - 1) return
+			idx++
+			let child = group[idx].children
+			let rect = child[0].getBoundingClientRect()
+			// console.log(rect.left)
+
+			// tween.set(rect.left)
+			carousel.scrollLeft += rect.left
+		}}
+	>
+		<Icon name="chevron-right" size="1.5em" />
+	</div>
+
 	<div
 		class="scroll"
 		id="scrollItem"
@@ -150,9 +162,9 @@
 							index={i}
 							bind:section
 						/>
-					{:else if type == 'artist'}
+					{:else if type == 'artist' || type == 'home'}
 						<CarouselItem
-							type="artist"
+							{type}
 							{kind}
 							aspectRatio={item.aspectRatio}
 							{isBrowseEndpoint}
@@ -178,6 +190,11 @@
 
 <style lang="scss">
 	@import '../../../global/stylesheet/components/_carousel';
+	.subheading {
+		margin-bottom: 0;
+		color: rgb(175, 175, 175);
+		font-weight: 500;
+	}
 	.c-group {
 		display: inline-flex;
 		padding-bottom: 1.8rem;
@@ -207,24 +224,25 @@
 		pointer-events: all;
 		cursor: pointer;
 
-		background: hsl(0deg 0% 91% / 79%);
+		background-color: hsl(0deg 0% 91% / 79%);
 		// border: rgba(0, 0, 0, 0.171) 0.01px solid;
-		transition: ease-in-out 75ms background;
+		transition: linear 75ms background-color;
 		height: 3rem;
 		box-shadow: 0 0 0.12em 0.1em #11111141;
 		color: #111111b0;
 		border-radius: 50%;
+		opacity: 1;
 		padding: 0;
 		width: 3rem;
 		display: inline-flex !important;
 		align-items: center;
 		justify-content: center;
 		&:hover {
-			background: rgb(233, 233, 233);
+			background-color: rgb(233, 233, 233);
 			color: #111111e0;
 		}
 		&:active {
-			background: rgb(223, 223, 223);
+			background-color: rgb(223, 223, 223);
 			box-shadow: 0 0 0.12em 0.1em #11111141, 0 0 0.1em 0.125em #7a7a7a85 inset;
 		}
 		@media screen and (max-width: 640px) {
@@ -244,18 +262,19 @@
 
 		margin-bottom: 2rem;
 
-		border-radius: 0.5em;
+		border-radius: var(--sm-radius);
 		@media screen and (min-width: 960px) {
 			margin-bottom: 3rem;
 		}
 	}
 	.hidden {
-		display: none !important;
+		opacity: 0;
+		visibility: hidden;
 	}
 	.scroll {
 		background: #453d5d2e;
 
-		grid-column-gap: 0.5rem;
+		// grid-column-gap: 0.5rem;
 		/* overflow-y: hidden; */
 		// overflow-x: hidden;
 		height: auto;

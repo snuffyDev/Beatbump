@@ -2,14 +2,12 @@
 	let path
 	export async function load({ page, fetch, stuff }) {
 		const slug = page.params.slug
-		const filter = page.query.get('filter')
+		const filter = page.query.get('filter') || ''
 		path = stuff.page
 		// console.log(filter, page, slug)
-		const url =
-			`/api/search.json?q=` +
-			encodeURIComponent(slug) +
-			`&filter=` +
-			encodeURIComponent(filter)
+		const url = `/api/search.json?q=${encodeURIComponent(slug)}${
+			filter !== '' ? `&filter=${encodeURIComponent(filter)}` : ''
+		}`
 		const response = await fetch(url)
 		const data = await response.json()
 		const { contents = {}, continuation = {}, didYouMean, error } = await data
@@ -254,7 +252,7 @@
 		// flex-direction: row;
 
 		// white-space: pre;
-		font-size: 1.125rem;
+		font-size: 1.25rem;
 		margin: 0;
 		// font-weight: 500;
 		.text {
@@ -263,10 +261,10 @@
 			line-height: 2.5;
 		}
 		h5 {
-			font-size: 1.95rem;
+			font-size: $size-3;
 		}
 		p {
-			font-size: calc(var(--base-font-size) * 1.1);
+			font-size: $size-1;
 		}
 		em {
 			font-size: 1.1em;

@@ -32,7 +32,7 @@
 		padding: 0.8rem;
 		gap: 0.8rem;
 		backdrop-filter: brightness(1.5);
-		border-radius: var(--lg-radius);
+		border-radius: $lg-radius;
 		border: rgba(163, 163, 163, 0.212) solid 1px;
 
 		// backdrop-filter: brightness(2);

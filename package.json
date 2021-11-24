@@ -14,6 +14,7 @@
 	"devDependencies": {
 		"@babel/core": "^7.14.0",
 		"@snuffydev/adapter-cloudflare-cache": "^1.0.16",
+		"@sveltejs/adapter-cloudflare": "^1.0.0-next.2",
 		"@sveltejs/adapter-cloudflare-workers": "next",
 		"@sveltejs/adapter-node": "next",
 		"@sveltejs/kit": "next",
@@ -39,15 +40,13 @@
 		"svelte-preprocess": "^4.7.4",
 		"tslib": "^2.3.0",
 		"typescript": "^4.3.5",
-		"vite": "^2.1.0",
-		"vite-plugin-iso-import": "^0.1.1"
+		"vite": "^2.1.0"
 	},
 	"type": "module",
 	"engines": {
 		"node": ">= 12.17.0"
 	},
 	"dependencies": {
-		"@fontsource/commissioner": "^4.5.0",
-		"cookie": "^0.4.1"
+		"@fontsource/commissioner": "^4.5.0"
 	}
 }

@@ -35,14 +35,13 @@ export interface IPlaylistItem {
 	playerParams?: string
 	playlistId?: string
 }
-
 export type Header = {
-	description: string
-	subtitles: []
-	thumbnails: []
-	playlistId: string
-	secondSubtitle: []
-	title: string
+	description?: string
+	subtitles?: []
+	thumbnails?: Array<Thumbnail>
+	playlistId?: string
+	secondSubtitle?: []
+	title?: string
 }
 
 export type PlaylistData = {

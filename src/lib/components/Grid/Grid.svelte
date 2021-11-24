@@ -11,7 +11,7 @@
 	</div>
 	<div class="grid">
 		{#each items as item, i (item)}
-			<GridItem {item} />
+			<slot name="item" {item} {i} />
 		{/each}
 	</div>
 </div>

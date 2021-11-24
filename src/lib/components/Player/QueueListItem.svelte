@@ -139,7 +139,7 @@
 		height: 5rem;
 
 		background: #00000027;
-		border-radius: var(--sm-radius);
+		border-radius: $sm-radius;
 		img {
 			width: auto;
 			height: 100%;
@@ -194,7 +194,7 @@
 		display: inline-flex;
 
 		overflow: hidden;
-		font-size: 1rem;
+		font-size: $size-1;
 		line-height: 1.75;
 		flex-flow: nowrap;
 		// justify-content: center;
@@ -213,7 +213,7 @@
 	}
 	@media screen and (max-width: 640px) {
 		.p-text {
-			font-size: 1rem;
+			font-size: $size-1;
 			// flex-flow: wrap;
 			line-height: 1.5;
 			padding-left: 0.5em;

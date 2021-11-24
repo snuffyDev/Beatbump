@@ -6,17 +6,17 @@
 $sections: (
 	bottom: (
 		footer-container,
-		player
+		player,
 	),
 	top: (
-		nav
+		nav,
 	),
 	forms: (
 		select,
 		input,
 		option,
-		suggestions
-	)
+		suggestions,
+	),
 );
 $themes: (dark, dim, midnight, light, ytm);
 
@@ -33,6 +33,7 @@ $themes: (dark, dim, midnight, light, ytm);
 .footer-container {
 	grid-area: f/f/f/f;
 	// position: fixed;
+	min-height: 100%;
 	bottom: 0;
 	display: block;
 	// z-index: 1;

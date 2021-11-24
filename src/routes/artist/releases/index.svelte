@@ -37,7 +37,9 @@
 	{:else}
 		<h1>{header?.artist}</h1>
 
-		<Grid heading={header?.type} items={contents} />
+		<Grid heading={header?.type} let:item items={[...contents]}>
+			<GridItem slot="item" {item} />
+		</Grid>
 	{/if}
 </main>
 

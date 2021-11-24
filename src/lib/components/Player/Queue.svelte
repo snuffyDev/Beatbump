@@ -17,7 +17,7 @@
 	let active
 	let listContainer: HTMLElement
 	let listWidth
-	let posY = 0
+	$: posY = 0
 	let listHeight = window.innerHeight
 	setContext(ctxKey, {
 		width: listWidth,
@@ -30,18 +30,17 @@
 	function release() {
 		if (sliding) {
 			if (posY < listHeight / 1.5) {
-				open()
-			} else {
+				console.log(posY, listHeight)
 				close()
 			}
 		}
 		sliding = false
 	}
-	function trackMovement({ y, dy }) {
-		// console.log(y, y + dy)
+	function trackMovement({ y }) {
+		// console.log(y, listHeight)
 		if (y <= listHeight && y >= 0) {
-			posY = y + dy
-		} else if (y < listHeight / 1.5) {
+			posY = y
+		} else if (y < listHeight * 0.7) {
 			trackOpen()
 		} else {
 			close()
@@ -55,9 +54,10 @@
 		posY = 0
 	}
 	function close() {
-		posY = 100
+		posY = posY
 		showing = false
 		sliding = false
+		posY = 0
 	}
 	let mounted
 	$: if (active) active.scrollIntoView(true)
@@ -68,12 +68,18 @@
 		listContainer = document.getElementById('listContainer')
 		listWidth = listContainer.clientWidth
 	})
+	let queueHeight
+	$: transition = sliding
+		? ''
+		: 'transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22)'
+	$: height = listHeight - queueHeight + 0.1
 </script>
 
 <div
 	class="listContainer"
 	id="listContainer"
-	style="transform: translate(0, calc({posY / 10}%));"
+	bind:clientHeight={queueHeight}
+	style="transform: translate(0, calc({posY}px)); top: calc({height}px - 4.5rem); transition: {transition}; "
 	in:fly|local={{ y: 350, easing: quartInOut }}
 	out:fly|local={{
 		delay: 125,
@@ -86,11 +92,11 @@
 	<div
 		class="handle"
 		use:drag
-		on:startDrag={startHandler}
-		on:dragMove={(e) => trackMovement({ y: e.detail.y, dy: e.detail.dy })}
-		on:dragEnd={release}
+		on:dragstart={startHandler}
+		on:dragmove={(e) => trackMovement({ y: e.detail.y })}
+		on:dragend={release}
 	>
-		<Icon name="minus" color="white" size="1rem" width="100%" />
+		<hr />
 	</div>
 
 	<div class="list">
@@ -112,14 +118,19 @@
 			</ul>
 		{:else}
 			<div class="empty">
-				<div class="empty-title">Empty!</div>
-				<div class="subtitle">Choose a song to see your feed</div>
+				<span class="empty-title">Empty!</span>
+				<span class="subtitle">Choose a song to see your feed</span>
 			</div>
 		{/if}
 	</div>
 </div>
 
 <style lang="scss">
+	hr {
+		width: clamp(25%, 35%, 80%);
+		color: hsl(0deg 0% 80%);
+		border-style: solid;
+	}
 	.handle {
 		width: 100%;
 		position: absolute;
@@ -132,10 +143,10 @@
 		box-shadow: 0 -0.4rem 0.8rem 0.5rem hsl(0deg 0% 100% / 9%);
 		background: hsla(0, 0%, 66.7%, 0.027);
 		z-index: -1;
-		height: 1rem;
+		height: 1.5rem;
 		display: flex;
 		cursor: pointer;
-		padding: 0.1rem;
+		padding: 0.12rem;
 		align-items: center;
 	}
 	.empty > * {
@@ -144,6 +155,8 @@
 	.empty {
 		position: relative;
 		padding-top: 4.5em;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.listContainer {
@@ -156,18 +169,17 @@
 		border-radius: 0.8em 0.8em 0 0;
 
 		display: flex;
-		bottom: 4.5rem;
-		right: 0;
+		// bottom: 4.5rem;
+		// right: 0;
 		flex: 1 1 auto;
 		visibility: visible;
-		padding-top: 1rem;
+		padding-top: 2rem;
 		height: auto;
 		width: auto;
 		background: inherit;
 		height: 78.75%;
 
 		// bottom: 4.5rem;
-		transition: transform 25ms cubic-bezier(0.455, 0.03, 0.515, 0.955);
 		min-height: 23rem;
 		width: 40%;
 		z-index: -1;

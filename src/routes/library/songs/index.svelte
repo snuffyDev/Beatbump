@@ -75,12 +75,12 @@
 	.filter {
 		display: inline-flex;
 		flex-direction: row;
-		margin-bottom: var(--md-spacing);
+		margin-bottom: $md-spacing;
 	}
 	.ctx-item {
 		display: flex;
 		label {
-			margin-right: var(--md-spacing);
+			margin-right: $md-spacing;
 			white-space: pre;
 		}
 	}

@@ -1,7 +1,7 @@
-<script context="module">
+<script context="module" lang="ts">
 	import { api } from '$lib/api'
-
-	export async function load({ page, fetch }) {
+	import type { Load } from '@sveltejs/kit'
+	export const load: Load = async ({ page, fetch }) => {
 		const id = page.query.get('list')
 		let body = {
 			path: 'playlist',
@@ -14,10 +14,10 @@
 		const res = await api(fetch, { ...body })
 
 		const {
-			tracks,
-			header,
-			continuations,
-			data
+			tracks = [],
+			header = {},
+			continuations = {},
+			data = {}
 			// musicDetailHeaderRenderer
 		} = await res.body
 		if (!res.ok) {
@@ -32,7 +32,8 @@
 				data: data,
 				continuations: continuations,
 				header: header,
-				id: page.query.get('list')
+				id: page.query.get('list'),
+				key: page.path
 			},
 			maxage: 3600,
 			status: 200
@@ -45,18 +46,28 @@
 	import List from './_List.svelte'
 	import list from '$lib/stores/list'
 	import { currentTitle, isPagePlaying } from '$lib/stores/stores'
-	import type { Header } from '$lib/types/playlist'
 	import { onMount, setContext } from 'svelte'
 	import type { Item } from '$lib/types'
 
 	import InfoBox from '$lib/components/Layouts/InfoBox.svelte'
 	import { writable } from 'svelte/store'
 	import { browser } from '$app/env'
+	import Header from '$lib/components/Layouts/Header.svelte'
+	import type { Header as HeaderType } from '$lib/types/playlist'
+
 	export let tracks: Item[]
-	export let header: Header
+	export let header: HeaderType = {
+		thumbnails: [],
+		description: '',
+		playlistId: '',
+		secondSubtitle: [],
+		subtitles: [],
+		title: ''
+	}
 	export let data
-	export let id
+	export let id: string
 	export let continuations
+	export let key
 	let ctoken = continuations?.continuation || ''
 	let itct = continuations?.clickTrackingParams || ''
 	let width
@@ -70,8 +81,15 @@
 	trackStore.set(tracks)
 	setContext(ctx, { pageId: id })
 	if (browser) {
-		console.log(data, tracks, continuations, header)
 	}
+	$: console.log(
+		data,
+		tracks,
+		continuations,
+		header,
+		header.thumbnails[1],
+		header.thumbnails[1].url
+	)
 
 	pageTitle =
 		pageTitle.length > 64 ? pageTitle.substring(0, 64) + '...' : header.title
@@ -122,7 +140,7 @@
 				)
 			}
 
-			console.log(data, items, continuations, ctoken)
+			// console.log(data, items, continuations, ctoken)
 
 			return !isLoading
 		} catch (error) {
@@ -131,6 +149,7 @@
 		}
 	}
 	$: items = $trackStore
+	let a = []
 </script>
 
 <svelte:head>
@@ -140,6 +159,13 @@
 </svelte:head>
 
 <svelte:window bind:innerWidth={width} />
+<Header
+	title={header?.title}
+	url={`${key}?list=${id}`}
+	desc={description}
+	image={header?.thumbnails[header.thumbnails?.length - 1]?.url}
+/>
+
 {#await tracks}
 	<!-- promise is pending -->
 	Loading
@@ -149,7 +175,7 @@
 		<InfoBox
 			subtitles={header.subtitles}
 			secondSubtitle={header.secondSubtitle}
-			thumbnail={header.thumbnails[0].url.replace(
+			thumbnail={header.thumbnails[header.thumbnails?.length - 1].url.replace(
 				/=(w(\d+))-(h(\d+))/g,
 				'=w512-h512'
 			)}
@@ -176,6 +202,7 @@
 		>
 			<ListItem
 				{ctx}
+				parentPlaylistId={id.slice(2)}
 				page="playlist"
 				on:pagePlaying={() => {
 					isPagePlaying.set(id)

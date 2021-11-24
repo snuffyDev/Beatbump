@@ -14,9 +14,9 @@
 
 <script lang="ts">
 	import { Grid } from '$lib/components/Grid'
+	import GridItem from '$lib/components/Grid/GridItem.svelte'
 	export let sections
 	export let header
-	import GridItem from '../_components/GridItem.svelte'
 	$: console.log(sections, header)
 </script>
 
@@ -26,7 +26,9 @@
 	</div>
 	{#each [...sections] as section}
 		<!-- <h2>{section.title}</h2> -->
-		<Grid heading={section.title} items={section.section} />
+		<Grid heading={section.title} items={section.section} let:item>
+			<GridItem slot="item" {item} />
+		</Grid>
 	{/each}
 </main>
 

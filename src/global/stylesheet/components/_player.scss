@@ -109,15 +109,19 @@
 	flex-direction: row;
 }
 .player {
-	// z-index: auto;
 	will-change: contents;
-
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
-
+	grid-template-areas: "l m r r";
 	max-width: 100%;
 	min-width: calc(100% - 40px);
 	width: 100%;
+	grid-area: f/f/f/f;
+	min-height: 100%;
+	align-content: start;
+	@media screen and (max-width: 600px) {
+		grid-template-areas: "l m r";
+	}
 }
 input[type="range"].volume {
 	width: auto;

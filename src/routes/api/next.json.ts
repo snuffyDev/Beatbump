@@ -1,5 +1,6 @@
 /* eslint-disable no-inner-declarations */
 import { parseContents } from '$lib/endpoints/nextUtils'
+
 import type { EndpointOutput } from '@sveltejs/kit'
 
 // import NextParser from "/nextUtils";
@@ -9,12 +10,40 @@ export async function get({
 }: {
 	query: URLSearchParams
 }): Promise<EndpointOutput> {
-	const params = query.get('params') || ''
-	const video_id = query.get('videoId') || ''
-	const playlist_id = query.get('playlistId') || ''
-	const ctoken = query.get('ctoken') || ''
+	const params = query.get('params') || undefined
+	const itct = query.get('itct') || ''
+	const videoId = query.get('videoId') || ''
+	const playlistId = query.get('playlistId') || ''
+	const ctoken = query.get('ctoken') || undefined
 	const clickTracking = query.get('clickParams') || ''
 	const setVideoId = query.get('setVideoId') || ''
+	const type = query.get('configType') || ''
+	console.dir({
+		context: {
+			client: {
+				clientName: 'WEB_REMIX',
+				clientVersion: '0.1',
+				user: {
+					enableSafetyMode: false
+				}
+			},
+			clickTracking: {
+				clickTrackingParams: `${clickTracking}`
+			}
+		},
+		continuation: `${ctoken}`,
+		isAudioOnly: true,
+		enablePersistentPlaylistPanel: true,
+		params: `${params !== '' ? encodeURIComponent(params) : itct}`,
+		tunerSettingValue: 'AUTOMIX_SETTING_NORMAL',
+		videoId,
+		playlistSetVideoId: `${setVideoId}`,
+		playlistId,
+		watchEndpointMusicConfig: {
+			hasPersistentPlaylistPanel: true,
+			musicVideoType: type ? type : 'MUSIC_VIDEO_TYPE_ATV'
+		}
+	})
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/next?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
@@ -25,10 +54,10 @@ export async function get({
 						clientName: 'WEB_REMIX',
 						clientVersion: '0.1'
 					},
-
 					user: {
 						enableSafetyMode: false
 					}
+
 					// clickTracking: {
 					// 	clickTrackingParams: `${clickTracking}`
 					// }
@@ -36,14 +65,14 @@ export async function get({
 				continuation: `${ctoken}`,
 				isAudioOnly: true,
 				enablePersistentPlaylistPanel: true,
-				params: `${params}`,
+				params: `${params ? encodeURIComponent(params) : itct}`,
 				tunerSettingValue: 'AUTOMIX_SETTING_NORMAL',
-				videoId: `${video_id}`,
+				videoId: `${videoId}`,
 				playlistSetVideoId: `${setVideoId}`,
-				playlistId: `${playlist_id}`,
+				playlistId: `${playlistId}`,
 				watchEndpointMusicConfig: {
 					hasPersistentPlaylistPanel: true,
-					musicVideoType: 'MUSIC_VIDEO_TYPE_ATV'
+					musicVideoType: type ? type : 'MUSIC_VIDEO_TYPE_ATV'
 				}
 			}),
 			headers: {
@@ -59,7 +88,7 @@ export async function get({
 	const data = await response.json()
 	/* For when you are NOT listening to a song.
 	 ********************************************/
-	if (!params) {
+	if (!ctoken) {
 		const {
 			contents: {
 				singleColumnMusicWatchNextResultsRenderer: {

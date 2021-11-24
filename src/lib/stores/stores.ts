@@ -1,14 +1,12 @@
 import { browser } from '$app/env'
-
-import type { SearchContents } from '$lib/types'
-import { readable } from 'svelte/store'
+import type { Item, SearchContents } from '$lib/types'
 import type { Writable } from 'svelte/store'
-import { get, writable, derived } from 'svelte/store'
+import { derived, get, writable } from 'svelte/store'
 import { settings } from './settings'
+
 export const updateTrack = updateSource()
 export const ctxKey = {}
 export const currentTitle = writable(undefined)
-import type { Item } from '$lib/types'
 type SearchStore = {
 	subscribe: Writable<SearchContents>['subscribe']
 	set: Writable<SearchContents>['set']
@@ -33,7 +31,7 @@ export const alertHandler: AlertStore = writable({
 export const search: SearchStore = writable()
 
 export const isPagePlaying = writable()
-export const key = writable(0)
+export const key = writable<number>(0)
 export const currentId = writable('')
 export const playerLoading = writable(false)
 export const searchState = writable({

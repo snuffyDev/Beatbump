@@ -14,11 +14,7 @@
 	</div>
 	<div class="grid">
 		{#each items as item, i (item)}
-			<GridItem
-				{item}
-				on:click={() =>
-					goto('/library/playlists/' + encodeURIComponent(item.name))}
-			/>
+			<GridItem {item} on:click={() => goto('/library/playlists/' + item.id)} />
 		{/each}
 		<GridItem
 			item={{

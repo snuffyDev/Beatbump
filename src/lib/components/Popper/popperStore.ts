@@ -2,8 +2,8 @@ import { writable } from 'svelte/store'
 
 type PopperStore = {
 	items: any[]
-	isOpen: boolean
-	type: 'player' | string
+	isOpen?: boolean
+	type?: 'player' | string
 	metadata?: {
 		thumbnail: string
 		// artist: string
@@ -13,6 +13,7 @@ type PopperStore = {
 	x?: number
 	y?: number
 	bottom?: number
+	direction?: 'normal' | 'right'
 }
 export const PopperStore = _popperStore()
 function _popperStore() {
@@ -24,6 +25,14 @@ function _popperStore() {
 	return {
 		subscribe,
 		set: (options: PopperStore) => set(options),
-		reset: () => set({ items: [], isOpen: false, type: '' })
+		reset: () =>
+			set({
+				items: [],
+				isOpen: false,
+				type: undefined,
+				x: undefined,
+				y: undefined,
+				bottom: undefined
+			})
 	}
 }

@@ -1,10 +1,9 @@
-export async function get({ query, headers }) {
-	// if (headers.origin !== 'https://beatbump.ml/') {
-	// 	return { status: 403, body: JSON.stringify('CORS error!') }
-	// }
+import type { RequestHandler } from '@sveltejs/kit'
+
+export const get: RequestHandler<Record<string, any>> = async ({ query }) => {
 	const videoId = query.get('videoId') || ''
 	const playlistId = query.get('list') || ''
-	// console.log(videoId,playlistId)
+	const playerParams = query.get('playerParams') || ''
 	try {
 		const response = await fetch(
 			'https://music.youtube.com/youtubei/v1/player?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
@@ -14,7 +13,6 @@ export async function get({ query, headers }) {
 					videoId: `${videoId}`,
 					context: {
 						client: {
-							// originalUrl: `https://music.youtube.com/watch?v=${videoId}&list=${playlistId}`,
 							hl: 'en',
 							clientName: 'ANDROID',
 							clientVersion: '16.02'
@@ -22,10 +20,9 @@ export async function get({ query, headers }) {
 						user: {
 							enableSafetyMode: false
 						},
-
-						captionParams: {},
-						params: 'igMDCNgE'
+						captionParams: {}
 					},
+					params: playerParams ? playerParams : '',
 					playlistId: `${playlistId}`
 				}),
 				headers: {
@@ -36,22 +33,19 @@ export async function get({ query, headers }) {
 		)
 
 		if (!response.ok) {
-			// NOT res.status >= 200 && res.status < 300
 			return { status: response.status, body: response.statusText }
 		}
 		const data = await response.json()
 
 		return {
 			status: 200,
-			body: JSON.stringify(data)
+			body: data
 		}
 	} catch (error) {
-		// output to netlify function log
-		console.log(error)
+		console.error(error)
 		return {
 			status: 500,
-			// Could be a custom message or object i.e. JSON.stringify(err)
-			body: JSON.stringify({ msg: error.message })
+			body: error.message
 		}
 	}
 }

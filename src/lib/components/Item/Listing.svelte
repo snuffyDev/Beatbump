@@ -18,7 +18,8 @@
 	import db from '$lib/db'
 	import { browser } from '$app/env'
 	import { createEventDispatcher } from 'svelte'
-	import { PopperButton } from '../Popper'
+	import { PopperButton, PopperStore } from '../Popper'
+	import { notify } from '$lib/utils'
 
 	const dispatch = createEventDispatcher()
 	let isLibrary = hasContext('library') ? true : false
@@ -26,7 +27,7 @@
 	let playlistId = ''
 	let songTitle = ''
 	$: title = songTitle = '...'
-	let isHidden: Boolean = false
+	let isHidden: boolean = false
 	let explicit
 	let clicked
 	let artist
@@ -102,16 +103,13 @@
 				try {
 					if (!navigator.canShare) {
 						await navigator.clipboard.writeText(shareData.url)
-						alertHandler.set({
-							msg: 'Link copied Successfully!',
-							type: 'success'
-						})
+						notify('Link copied successfully', 'success')
 					} else {
 						const share = await navigator.share(shareData)
-						alertHandler.set({ msg: 'Shared Successfully!', type: 'success' })
+						notify('Shared successfully', 'success')
 					}
 				} catch (error) {
-					alertHandler.set({ msg: 'Error!', type: 'error' })
+					notify('Error: ' + error, 'error')
 				}
 			}
 		}
@@ -151,7 +149,6 @@
 			if (d.text == 'View Artist') return
 		})
 	}
-	// $: console.log(data.type, data)
 	const itemHandler = () => {
 		explicit = data.explicit
 		title = data.title
@@ -165,9 +162,13 @@
 			title = title
 		}
 	}
-
-	const clickHandler = async (event: Event & UIEvent) => {
-		if (event.target.nodeName == 'a' || loading) return
+	const clickHandler = async (event) => {
+		if (
+			(event.target instanceof HTMLElement &&
+				(event.target.nodeName == 'A' || event.target.nodeName == 'P')) ||
+			loading
+		)
+			return
 		// console.log(event.target)
 		if (data.type == 'artist') {
 			goto(`/artist/${data.artistInfo.artist}`)
@@ -182,13 +183,13 @@
 			if (data.type == 'playlist') {
 				await list.startPlaylist(playlistId)
 			} else {
-				await list.initList(
-					videoId,
-					playlistId || data.autoMixList,
-					0,
-					data.params,
-					''
-				)
+				await list.initList({
+					videoId: videoId,
+					playlistId: playlistId || data.autoMixList,
+					keyId: 0,
+					clickTracking: data.params,
+					config: { playerParams: data.playerParams, type: data.musicVideoType }
+				})
 			}
 			key.set(0)
 			loading = false
@@ -200,7 +201,19 @@
 	}
 </script>
 
-<div class="container">
+<div
+	class="container"
+	on:contextmenu={(e) => {
+		window.dispatchEvent(new CustomEvent('contextmenu', { detail: 'listing' }))
+
+		PopperStore.set({
+			items: [...DropdownItems],
+			x: e.pageX,
+			y: e.pageY,
+			direction: 'right'
+		})
+	}}
+>
 	<div class="innercard">
 		<div class="itemWrapper" on:click|stopPropagation={clickHandler}>
 			<div class="img-container">
@@ -212,7 +225,7 @@
 					<img
 						use:longpress
 						id="img"
-						src={data.thumbnails[0]?.url ?? data.thumbnail}
+						src={data.thumbnails ? data.thumbnails[0]?.url : data.thumbnail}
 						alt="thumbnail"
 					/>
 				</div>
@@ -235,9 +248,12 @@
 						by
 						<a
 							sveltekit:prefetch
-							href={`/artist/` +
-								data.artistInfo?.artist[0]?.navigationEndpoint?.browseEndpoint
-									?.browseId || data.artistInfo.browseId}
+							href={`/artist/${
+								Array.isArray(data.artistInfo?.artist)
+									? data.artistInfo?.artist[0]?.navigationEndpoint
+											?.browseEndpoint?.browseId
+									: data.artistInfo?.browseId
+							}`}
 							>{data.artistInfo?.artist[0].text || data.artistInfo?.artist}</a
 						>
 					</p>
@@ -253,16 +269,18 @@
 		</div>
 
 		<div class="menu">
-			<!-- <Dropdown
-				color={$theme == 'light' ? 'black' : 'white'}
-				bind:isHidden
-				items={DropdownItems}
-			/> -->
 			<PopperButton
 				metadata={{
-					thumbnail: data.thumbnails[0]?.url ?? data.thumbnail,
+					artist:
+						data.type !== 'playlist' && Array.isArray(data?.artistInfo?.artist)
+							? [...data?.artistInfo?.artist]
+							: data?.artistInfo?.artist ?? undefined,
+					thumbnail: data.thumbnails ? data.thumbnails[0]?.url : data.thumbnail,
 					title: title,
-					length: data.type !== artist ? data?.length?.text : ''
+					length:
+						data.type !== 'artist' && data.type !== 'playlist'
+							? data?.length?.text
+							: ''
 				}}
 				type="search"
 				bind:isHidden
@@ -274,7 +292,7 @@
 
 <style lang="scss">
 	.menu {
-		padding-right: 0.625rem;
+		padding-right: 0.6rem;
 	}
 	.hidden {
 		display: none !important;
@@ -296,7 +314,7 @@
 		display: flex;
 		width: 100%;
 		margin: 0;
-		padding: 0.3rem;
+		padding: 0.3rem 0.3rem 0.3rem 0.6rem;
 		flex-direction: row;
 		flex-wrap: nowrap;
 		align-items: center;
@@ -393,7 +411,7 @@
 		max-width: 5rem;
 		min-width: 5rem;
 		height: 5rem;
-		border-radius: var(--xs-radius);
+		border-radius: $xs-radius;
 
 		.thumbnail {
 			width: 100%;
@@ -401,7 +419,7 @@
 			background: rgba(13, 13, 15, 0.192);
 			border-radius: inherit;
 			img {
-				border-radius: var(--xs-radius);
+				border-radius: $xs-radius;
 				width: 100%;
 				height: 100%;
 				object-fit: contain;

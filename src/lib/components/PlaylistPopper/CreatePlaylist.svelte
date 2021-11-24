@@ -1,11 +1,16 @@
 <script lang="ts">
 	import { browser } from '$app/env'
 
-	import { alertHandler } from '$lib/stores/stores'
+	import { showAddToPlaylistPopper } from '$lib/stores/stores'
 
 	import { createEventDispatcher, onDestroy } from 'svelte'
 	import { fade, fly } from 'svelte/transition'
-	let thumbnail
+	export let defaults: {
+		name?: string
+		thumbnail?: any
+		description?: string
+	} = {}
+	let thumbnail = defaults?.thumbnail ?? undefined
 	const crop = () => {
 		if (!browser && !thumbnail) return
 		const sourceImage = new Image()
@@ -53,19 +58,21 @@
 			reader.readAsDataURL(files)
 		}
 	}
-	let titleValue
-	let descriptionValue
+	let titleValue = defaults?.name ?? undefined
+	let descriptionValue = defaults?.description ?? undefined
 	onDestroy(() => {})
 	const dispatch = createEventDispatcher()
 </script>
 
-<div
-	class="backdrop"
-	transition:fade={{ duration: 125 }}
-	on:click={() => {
-		dispatch('close')
-	}}
-/>
+{#if $showAddToPlaylistPopper?.state !== true}
+	<div
+		class="backdrop"
+		transition:fade={{ duration: 125 }}
+		on:click={() => {
+			dispatch('close')
+		}}
+	/>
+{/if}
 <section class="playlist-modal" transition:fly={{ duration: 250, delay: 125 }}>
 	<div class="image">
 		{#if thumbnail}
@@ -116,11 +123,11 @@
 						description: descriptionValue,
 						thumbnail
 					})
-				}}>Create</button
+				}}>Done</button
 			>
 			<button
 				on:click|preventDefault={() => {
-					dispatch('cancel')
+					dispatch('close')
 				}}>Cancel</button
 			>
 		</div>
@@ -171,8 +178,13 @@
 		font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
 			Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
 			sans-serif;
+		border-radius: $sm-radius;
+
 		&:hover::after {
-			background: #525252b2;
+			background: rgba(236, 220, 236, 0.32);
+		}
+		&:hover:active::after {
+			background: rgba(194, 178, 194, 0.32);
 		}
 	}
 	.file-button::before {
@@ -180,7 +192,7 @@
 		display: inline-block;
 		background: var(--form-bg);
 		border: 0.0625rem solid hsla(0, 0%, 66.7%, 0.219);
-		border-radius: var(--md-radius);
+		border-radius: $sm-radius;
 		box-shadow: inset 0.1125em -0.1125em 1em 0.5em hsla(0, 0%, 96.9%, 0.014),
 			0 0 0.25em 0.02em hsla(0, 0%, 66.7%, 0) !important;
 
@@ -207,13 +219,14 @@
 		bottom: 0;
 		// left:0;
 		content: 'Select';
-		color: rgb(238, 238, 238);
-		background: #353535b2;
+		color: hsl(0deg 10% 96%);
+		background: hsla(299deg, 16%, 77%, 32%);
 		display: block;
 		font-weight: 500;
-		// padding: ;
 		padding: 0.4rem 0.7rem;
-		transition: background linear 125ms;
+		transition: background 125ms linear;
+		border-top-right-radius: inherit;
+		border-bottom-right-radius: inherit;
 	}
 	[type='file']:hover::before {
 		border-color: black;
@@ -237,7 +250,7 @@
 		width: fit-content;
 		max-width: 100%;
 		max-height: 100%;
-		border-radius: var(--lg-radius);
+		border-radius: $lg-radius;
 		border-color: rgba(129, 129, 129, 0.411);
 		border-width: 0.025rem;
 		border-style: solid;
@@ -246,5 +259,10 @@
 	}
 	.image {
 		align-self: center;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+
+		align-items: center;
 	}
 </style>

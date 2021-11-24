@@ -1,9 +1,12 @@
+/* eslint-disable prefer-const */
+
 import { MusicResponsiveListItemRenderer } from '$lib/parsers'
 import type { Artist, Item, NextContinuationData, Thumbnail } from '$lib/types'
+import type { IListItemRenderer } from '$lib/types/musicListItemRenderer'
 import type { IPlaylistItem, PlaylistData } from '$lib/types/playlist'
 import { pb } from '$lib/utils'
 
-function parseTrack(contents = [], playlistId?): Array<Item> {
+function parseTrack(contents = [], playlistId?): Array<IListItemRenderer> {
 	const Tracks = contents.map((item) => {
 		if (!item) {
 			return null
@@ -14,7 +17,39 @@ function parseTrack(contents = [], playlistId?): Array<Item> {
 }
 
 export const parsePlaylist = async (
-	data,
+	data: {
+		header: {
+			musicDetailHeaderRenderer: {
+				description: { runs: [{ text: string }] }
+				thumbnail: {}
+			}
+		}
+		contents: {
+			singleColumnBrowseResultsRenderer: {
+				tabs: [
+					{
+						tabRenderer: {
+							content: {
+								// eslint-disable-next-line prefer-const
+								sectionListRenderer: {
+									// eslint-disable-next-line prefer-const
+									contents: [
+										{
+											musicPlaylistShelfRenderer: {
+												contents: Array<IListItemRenderer>
+												playlistId: string
+												continuations: NextContinuationData
+											}
+										}
+									]
+								}
+							}
+						}
+					}
+				]
+			}
+		}
+	},
 	next?: boolean
 ): Promise<PlaylistData> => {
 	if (!next) {
@@ -26,10 +61,8 @@ export const parsePlaylist = async (
 						{
 							tabRenderer: {
 								content: {
-									// eslint-disable-next-line prefer-const
 									sectionListRenderer,
 									sectionListRenderer: {
-										// eslint-disable-next-line prefer-const
 										contents: [
 											{
 												musicPlaylistShelfRenderer: {
@@ -61,16 +94,6 @@ export const parsePlaylist = async (
 				secondSubtitle = {},
 				title = {}
 			}) => {
-				// eslint-disable-next-line prefer-const
-				//
-				// let {
-				// 	description = {},
-				// 	subtitle = {},
-				// 	thumbnail = {},
-				// 	secondSubtitle = {},
-				// 	title = {}
-				// } = musicDetailHeaderRenderer
-				// console.log(description, subtitle, thumbnail, secondSubtitle, title)
 				const subtitles = pb(subtitle, 'runs:text', false)
 				const desc = pb(description, 'runs:0:text', false)
 				const _title = pb(title, 'runs:0:text', false)

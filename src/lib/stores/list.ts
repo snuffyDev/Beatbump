@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { parseNextItem } from '$lib/parsers'
 import type { Item, Song } from '$lib/types'
-import { getSrc } from '$lib/utils'
+import { getSrc, notify } from '$lib/utils'
 import { currentTitle } from '$stores/stores'
 import { alertHandler } from '$stores/stores'
 import { writable } from 'svelte/store'
@@ -32,19 +32,32 @@ const list = writable({
 	clickTrackingParams,
 	mix
 })
-const fetchNext = async (
+const fetchNext = async ({
 	params,
 	videoId,
+	itct,
 	playlistId,
 	ctoken,
 	playlistSetVideoId,
-	clickTracking
-) => {
+	clickTracking,
+	configType
+}: {
+	itct?: string
+	params?: string
+	videoId?: string
+	playlistId?: string
+	ctoken?: string
+	playlistSetVideoId?: string
+	clickTracking?: string
+	configType?: string
+}) => {
 	return await fetch(
 		'/api/next.json?videoId=' +
 			encodeURIComponent(videoId) +
+			`${configType ? `&configType=${configType}` : ''}` +
 			`${videoId ? `&playlistId=${playlistId}` : ''}` +
-			`${params ? `&params=${params}` : ''}` +
+			`${itct ? `&itct=${itct}` : ''}` +
+			`${params ? `&params=${encodeURIComponent(params)}` : ''}` +
 			`${clickTracking ? `&clickTracking=${clickTracking}` : ''}` +
 			`${ctoken ? `&ctoken=${ctoken}` : ''}` +
 			`${playlistSetVideoId ? `&setVideoId=${playlistSetVideoId}` : ''}`,
@@ -53,7 +66,7 @@ const fetchNext = async (
 		}
 	)
 		.then((json) => json.json())
-		.catch((err) => console.log(err))
+		.catch((err) => console.error(err))
 }
 
 const unsubscribe = filterAutoPlay.subscribe((setting) => {
@@ -81,35 +94,51 @@ function split(arr, chunk) {
 export default {
 	subscribe: list.subscribe,
 	set: list.set,
-	async initList(
-		videoId: string,
-		playlistId?: string,
-		keyId?: number,
-		playlistSetVideoId?: string,
+	async initList({
+		videoId,
+		playlistId,
+		keyId,
+		playlistSetVideoId,
+		clickTracking,
+		config: { playerParams = '', type = '' } = {}
+	}: {
+		videoId?: string
+		playlistId?: string
+		keyId?: number
+		playlistSetVideoId?: string
 		clickTracking?: string
-	) {
-		loading = true
-		playerLoading.set(loading)
-		console.log(videoId, playlistId, keyId, playlistSetVideoId, clickTracking)
+		config?: { playerParams?: string; type?: string }
+	}) {
+		try {
+
+			loading = true
+			playerLoading.set(loading)
+
 		keyId = keyId ? keyId : 0
 		key.set(keyId)
-		if (hasList) mix = []
+		if (hasList) {
+			mix = []
+			splitList = []
+			Chunked = {}
+		}
 		hasList = true
 
-		const response = await fetchNext(
-			'',
+		const response = await fetchNext({
+			params: playerParams ? playerParams : '',
 			videoId,
-			playlistId ? playlistId : '',
-			'',
-			playlistSetVideoId ? playlistSetVideoId : '',
-			clickTracking
-		)
+			playlistId: playlistId ? playlistId : '',
+
+			playlistSetVideoId: playlistSetVideoId ? playlistSetVideoId : '',
+			clickTracking,
+			configType: type
+		})
 		const data = await response
 
-		await getSrc(videoId)
+		await getSrc(videoId, playlistId, playerParams)
 		currentTitle.set(data.results[0].title)
 
-		loading = false
+		loading
+		 = false
 		playerLoading.set(loading)
 
 		continuation = data.continuation
@@ -118,6 +147,12 @@ export default {
 
 		mix = [...data.results]
 		list.set({ currentMixId, clickTrackingParams, continuation, mix })
+	}catch(err){
+		loading = false;
+		playerLoading.set(loading);
+		console.error(err);
+
+	}
 	},
 	removeItem(index) {
 		mix.splice(index, 1)
@@ -137,16 +172,12 @@ export default {
 		if (!item) return
 		loading = true
 		playerLoading.set(loading)
-		const response = await fetchNext(
-			'',
-			item.videoId,
-			item.autoMixList,
-			'',
-			'',
-			''
-		)
+		const response = await fetchNext({
+			videoId: item.videoId,
+			playlistId: item.autoMixList
+		})
 		const data = await response
-		console.log(data)
+		// console.log(data)
 		mix.push(...data.results)
 		continuation = data.continuation
 		list.set({ currentMixId, clickTrackingParams, continuation, mix })
@@ -196,16 +227,17 @@ export default {
 			console.error(`Error starting playlist!\nOriginal Error:\n${error}`)
 			loading = false
 			playerLoading.set(loading)
-			alertHandler.set({ msg: 'Error starting playback', type: 'error' })
+			notify('Error starting playback', 'error')
 		}
 	},
 	async getMore(itct, videoId, playlistId, ctoken, clickTrackingParams) {
 		let loading = true
 		playerLoading.set(loading)
+
 		if (splitList && mix.length < Chunked.origLength - 1) {
 			splitListIndex++
 
-			const src = await getSrc(mix[mix.length].videoId)
+			const src = await getSrc(mix[mix.length - 1].videoId)
 			mix = [...mix, ...splitList[splitListIndex]]
 			filterSetting ? filterList([...mix]) : (mix = [...mix])
 			loading = false
@@ -222,14 +254,13 @@ export default {
 				- playlistSetVideoId: set to '' since it is not a Playlist, it only is an autoplay
 				= clickTrackingParams: YouTube sends these for certain requests to prevent people
 				using their API for this purpose  */
-			const data = await fetchNext(
-				itct,
+			const data = await fetchNext({
+				params: itct,
 				videoId,
 				playlistId,
 				ctoken,
-				'',
-				clickTrackingParams
-			)
+				clickTracking: clickTrackingParams
+			})
 			mix = filterSetting
 				? [...mix, ...data.results].filter(
 						((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(

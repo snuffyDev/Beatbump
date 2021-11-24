@@ -127,7 +127,7 @@
 		display: inline-block;
 		background: var(--form-bg);
 		border: 0.0625rem solid hsla(0, 0%, 66.7%, 0.219);
-		border-radius: var(--md-radius);
+		border-radius: $md-radius;
 		box-shadow: inset 0.1125em -0.1125em 1em 0.5em hsla(0, 0%, 96.9%, 0.014),
 			0 0 0.25em 0.02em hsla(0, 0%, 66.7%, 0) !important;
 
@@ -184,7 +184,7 @@
 		width: fit-content;
 		max-width: 100%;
 		max-height: 100%;
-		border-radius: var(--lg-radius);
+		border-radius: $lg-radius;
 		border-color: rgba(129, 129, 129, 0.411);
 		border-width: 0.025rem;
 		border-style: solid;

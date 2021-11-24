@@ -1,12 +1,13 @@
 <script lang="ts">
+	import { createEventDispatcher } from 'svelte'
+	import { updateTrack } from '$lib/stores/stores'
 	import Icon from '../Icon/Icon.svelte'
-
+	// export let canPlay
 	export let prevBtn
 	export let nextBtn
 	export let isPlaying
 	export let pause
 	export let loading
-	import { createEventDispatcher } from 'svelte'
 	const dispatch = createEventDispatcher()
 
 	const playEvent = () => dispatch('play')
@@ -20,8 +21,9 @@
 		<div
 			class="player-btn player-title"
 			on:click={(e) => {
-				console.log(e)
+				if (!$updateTrack) return
 				if (!isPlaying) {
+					// console.log(e)
 					playEvent()
 				} else {
 					pause()

@@ -5,6 +5,7 @@
 	import lazy from '$lib/lazy'
 	import list from '$lib/stores/list'
 	import type { CarouselItem, Item } from '$lib/types'
+	import { notify } from '$lib/utils'
 	import {
 		alertHandler,
 		currentTitle,
@@ -12,7 +13,7 @@
 		showAddToPlaylistPopper
 	} from '$stores/stores'
 	import { tick } from 'svelte'
-	import { PopperButton } from '../Popper'
+	import { PopperButton, PopperStore } from '../Popper'
 	import { browseHandler } from './functions'
 	export let section
 	export let index
@@ -35,7 +36,7 @@
 		key.set(0)
 		currentTitle.set(item.title)
 	}
-	let DropdownItems: Array<Record<string, any>>
+	let DropdownItems: Array<{ text: string; icon: string; action: () => void }>
 	DropdownItems = [
 		{
 			text: 'View Artist',
@@ -63,10 +64,8 @@
 				kind == 'Videos' && list.addNext(item, $key)
 				kind == 'Albums' && playAlbum()
 				kind == 'Featured on' && list.startPlaylist(item.playlistId)
-				alertHandler.set({
-					msg: `${item.title} added to queue!`,
-					type: 'success'
-				})
+
+				notify(`${item.title} added to queue!`, 'success')
 			}
 		},
 		{
@@ -98,24 +97,46 @@
 			text: 'Share',
 			icon: 'share',
 			action: async () => {
-				const shareData = {
+				let shareData = {
 					title: item.title,
 					text: `Listen to ${item.title} on Beatbump`,
 					url: `https://beatbump.ml/listen?id=${item.videoId}`
 				}
+				console.log(item.endpoint)
+
+				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_PLAYLIST')) {
+					shareData = {
+						title: item.title,
+						text: `Listen to ${item.title} on Beatbump`,
+						url: `https://beatbump.ml/playlist?list=${item.endpoint?.browseId}`
+					}
+				}
+				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_ALBUM')) {
+					shareData = {
+						title: item.title,
+						text: `Listen to ${item.title} on Beatbump`,
+						url: `https://beatbump.ml/release?id=${item.endpoint?.browseId}`
+					}
+					console.log(shareData)
+				}
+				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_ARTIST')) {
+					shareData = {
+						title: item.title,
+						text: `${item.title} on Beatbump`,
+						url: `https://beatbump.ml/artist/${item.endpoint?.browseId}`
+					}
+					console.log(shareData)
+				}
 				try {
 					if (!navigator.canShare) {
 						await navigator.clipboard.writeText(shareData.url)
-						alertHandler.set({
-							msg: 'Link copied Successfully!',
-							type: 'success'
-						})
+						notify('Link copied successfully', 'success')
 					} else {
 						const share = await navigator.share(shareData)
-						alertHandler.set({ msg: 'Shared Successfully!', type: 'success' })
+						notify('Shared successfully', 'success')
 					}
 				} catch (error) {
-					alertHandler.set({ msg: 'Error!' + error, type: 'error' })
+					notify('Error: ' + error, 'error')
 				}
 			}
 		}
@@ -141,9 +162,27 @@
 							'&id=' +
 							encodeURIComponent(item.endpoint?.browseId)
 				  )
-				: await list.initList(item.videoId, item.playlistId)
+				: await list.initList({
+						videoId: item.videoId,
+						playlistId: item.playlistId,
+						config: { type: item?.musicVideoType }
+				  })
 
 			key.set(0)
+			loading = false
+		}
+		if (type == 'home') {
+			item?.endpoint?.pageType.includes('ARTIST') &&
+				goto(`/artist/${item?.endpoint?.browseId}`)
+			// if has videoId, and endpoint type is artist page, and is not Browse type
+			!isBrowseEndpoint &&
+			item.videoId !== undefined &&
+			!item?.endpoint?.pageType.includes('ARTIST')
+				? await list.initList({
+						videoId: item.videoId,
+						playlistId: item.playlistId
+				  })
+				: browseHandler(item.endpoint.pageType, item.endpoint.browseId)
 			loading = false
 		}
 		if (type == 'artist') {
@@ -153,7 +192,11 @@
 			!isBrowseEndpoint &&
 			item.videoId !== undefined &&
 			!item?.endpoint?.pageType.includes('ARTIST')
-				? await list.initList(item.videoId, item.playlistId, index)
+				? await list.initList({
+						videoId: item.videoId,
+						playlistId: item.playlistId,
+						keyId: index
+				  })
 				: browseHandler(item.endpoint.pageType, item.endpoint.browseId)
 			loading = false
 		}
@@ -166,19 +209,65 @@
 	if (kind === 'Singles') {
 		DropdownItems.splice(1, 1)
 		DropdownItems = [...DropdownItems]
+
 		// console.log(DropdownItems)
+	}
+	if (item?.endpoint?.pageType) {
+		DropdownItems = [
+			...DropdownItems.filter((item) => {
+				if (!item.text.match(/Favorite|Add to Queue|View Artist/gm)) {
+					return item
+				}
+			})
+		]
+	}
+
+	if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_ARTIST')) {
+		DropdownItems = [
+			...DropdownItems.filter((item) => {
+				if (
+					!item.text.match(
+						/Favorite|Add to Queue|View Artist|Add to Playlist/gm
+					)
+				) {
+					return item
+				}
+			})
+		]
 	}
 	let node: HTMLElement
 
 	let active
+	let windowWidth
 </script>
 
-<article class="item" on:click|stopPropagation={(e) => clickHandler(e, index)}>
+<svelte:window bind:innerWidth={windowWidth} />
+<article
+	class:item16x9={RATIO_RECT ? true : false}
+	class:item1x1={RATIO_SQUARE ? true : false}
+	class="item"
+	on:contextmenu={(e) => {
+		e.preventDefault()
+		window.dispatchEvent(
+			new CustomEvent('contextmenu', { detail: 'carouselItem' })
+		)
+
+		PopperStore.set({
+			items: [...DropdownItems],
+			x: e.pageX,
+			y: e.pageY,
+			direction: 'right'
+		})
+	}}
+	on:click|stopPropagation={(e) => clickHandler(e, index)}
+>
 	<section
 		class="item-thumbnail"
 		on:mouseover={() => (active = true)}
 		on:focus
 		on:mouseout={() => (active = false)}
+		class:img16x9={RATIO_RECT ? true : false}
+		class:img1x1={RATIO_SQUARE ? true : false}
 		on:blur
 	>
 		<div
@@ -203,7 +292,7 @@
 				use:lazy={{ src: srcImg, placeholder: item.thumbnails[0]?.placeholder }}
 			/>
 		</div>
-		<div class="item-menu" class:hidden={isBrowseEndpoint}>
+		<div class="item-menu">
 			<PopperButton bind:isHidden items={DropdownItems} />
 		</div>
 	</section>
@@ -216,103 +305,32 @@
 		{#if item.subtitle}
 			<span class="subtitles secondary">
 				{#each item.subtitle as sub}
-					<span class:hidden={sub?.navigationEndpoint}>{sub.text}</span>
-					<a
-						sveltekit:prefetch
-						class:hidden={!sub?.navigationEndpoint}
-						on:click|stopPropagation|preventDefault={() => {
-							goto(
-								'/artist/' + sub?.navigationEndpoint?.browseEndpoint?.browseId
-							)
-						}}
-						href={'/artist/' +
-							sub?.navigationEndpoint?.browseEndpoint?.browseId}
-						><span>{sub.text}</span></a
-					>
+					{#if !sub?.navigationEndpoint}
+						<span>{sub.text}</span>
+					{:else}
+						<a
+							sveltekit:prefetch
+							on:click|stopPropagation|preventDefault={() => {
+								goto(
+									'/artist/' + sub?.navigationEndpoint?.browseEndpoint?.browseId
+								)
+							}}
+							href={'/artist/' +
+								sub?.navigationEndpoint?.browseEndpoint?.browseId}
+							><span>{sub.text}</span></a
+						>
+					{/if}
 				{/each}
 			</span>
 		{/if}
 	</section>
 </article>
 
-<!-- <section
-	class="item"
-	class:item16x9={RATIO_RECT ? true : false}
-	class:item1x1={RATIO_SQUARE ? true : false}
-	bind:this={section[index]}
->
-	<div
-		class="clickable"
-		style="display:block;"
-		use:menu
-		on:menutouch={(e) => {}}
-		on:click|stopPropagation={(e) => clickHandler(e, index)}
-	>
-		<div
-			class="image"
-			class:img16x9={RATIO_RECT ? true : false}
-			class:img1x1={RATIO_SQUARE ? true : false}
-			tabindex="0"
-		>
-			{#if loading}
-				<Loading />
-			{/if}
-			<img
-				alt="thumbnail"
-				on:error={errorHandler}
-				loading="lazy"
-				class:img16x9={RATIO_RECT}
-				class:img1x1={RATIO_SQUARE}
-				width={item.thumbnails[0].width}
-				height={item.thumbnails[0].height}
-				src={item.thumbnails[0]?.placeholder}
-				use:lazy={{ src: srcImg }}
-			/>
-		</div>
-
-		<div class="cont">
-			<div class="text-wrapper">
-				<span class="title">
-					{item.title.length > 48
-						? item.title.substring(0, 48) + '...'
-						: item.title}
-					<!-- {kind}
-				</span>
-				{#if item.subtitle}
-					<div class="secondary subtitles">
-						{#each item.subtitle as sub}
-							<span class:hidden={sub?.navigationEndpoint}>{sub.text}</span>
-							<a
-								sveltekit:prefetch
-								class:hidden={!sub?.navigationEndpoint}
-								on:click|stopPropagation|preventDefault={() => {
-									goto(
-										'/artist/' +
-											sub?.navigationEndpoint?.browseEndpoint?.browseId
-									)
-								}}
-								href={'/artist/' +
-									sub?.navigationEndpoint?.browseEndpoint?.browseId}
-								><span>{sub.text}</span></a
-							>
-						{/each}
-					</div>
-				{/if}
-			</div>
-		</div>
-	</div>
-	{#if !isBrowseEndpoint}
-		<div class="menu">
-			<!-- <Dropdown color="white" bind:isHidden items={DropdownItems} /> -
-			<PopperButton bind:isHidden items={DropdownItems} />
-		</div>
-	{/if}
-</section> -->
 <style lang="scss">
 	.item-title {
 		display: inline-flex;
 		flex-direction: column;
-		gap: 0.4rem;
+		gap: 0.25rem;
 	}
 	.item1x1 {
 		// padding-top: 100% !important;
@@ -321,33 +339,33 @@
 		position: relative;
 	}
 	.item16x9 {
-		// padding-top: 56.25% !important;
-		min-width: 20rem !important;
-		position: relative;
+		width: 100%;
 	}
 	.img1x1 {
 		// padding-top: 100% !important;
-		min-width: 13rem !important;
-		max-width: 20rem;
+		min-width: 14rem !important;
+
 		aspect-ratio: 1/1 !important;
+		width: clamp(12rem, 12rem, 22rem) !important;
 	}
 	.img16x9 {
 		// padding-top: 56.25% !important;
-		min-width: 20rem !important;
-		max-width: 23rem;
+		min-width: 100%;
+		width: 25rem;
 		aspect-ratio: 16/9 !important;
+		// width: clamp(13rem, 22rem, 22rem) !important;
 	}
-	// @import '../../../global/stylesheet/components/_carousel-item.scss';
 	.subtitles {
-		display: inline-flex;
-		flex-wrap: wrap;
+		display: block;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		white-space: normal;
 		cursor: pointer;
-		> * {
-			margin-right: 0.125rem;
-		}
 	}
 	h1 {
-		font-size: 1.1rem;
+		font-size: 1.125rem;
 		font-weight: 500;
 		margin-bottom: 0;
 		display: inline;
@@ -360,7 +378,7 @@
 
 		scroll-snap-align: start;
 		// padding-right: 1rem;
-		::before {
+		&::before {
 			position: absolute;
 			display: block;
 			content: '';
@@ -375,7 +393,9 @@
 		position: relative;
 		cursor: pointer;
 		user-select: none;
-		border-radius: var(--sm-radius);
+		border-radius: $sm-radius;
+		contain: strict;
+
 		&:focus {
 			border: none;
 		}
@@ -394,11 +414,16 @@
 				rgba(0, 0, 0, 0)
 			);
 			pointer-events: none;
-			will-change: contents;
+			will-change: opacity, background;
 			transition: background cubic-bezier(0.455, 0.03, 0.515, 0.955) 0.1s,
 				opacity cubic-bezier(0.455, 0.03, 0.515, 0.955) 0.1s;
 			opacity: 0.1;
 			// z-index: 1;
+		}
+		@media screen and (max-width: 640px) {
+			&::before {
+				opacity: 1;
+			}
 		}
 
 		&:active:hover::before {
@@ -449,9 +474,12 @@
 		right: 0;
 		top: 0;
 		z-index: 5;
+		isolation: isolate;
 		margin: 0.25rem;
 		opacity: 0;
 		transition: 50ms opacity cubic-bezier(0.55, 0.055, 0.675, 0.19);
+		&:focus-visible,
+		&:focus-within,
 		&:hover {
 			opacity: 1;
 		}

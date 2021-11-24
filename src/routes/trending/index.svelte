@@ -31,7 +31,7 @@
 	import Header from '$lib/components/Layouts/Header.svelte'
 	// $: console.log(carouselItems)
 
-	// $: console.log(carouselItems)
+	$: console.log(carouselItems)
 </script>
 
 <Header
@@ -114,7 +114,7 @@
 		text-align: start;
 		font-size: 100%;
 		width: 100%;
-		border-radius: var(--md-radius);
+		border-radius: $md-radius;
 
 		align-items: center;
 		border-right: none !important;
@@ -128,7 +128,7 @@
 			padding: 0 0 0 1rem;
 			align-items: center;
 			// border-radius: var(--md-radius) 0 0 var(--md-radius);
-			border-radius: 0 var(--md-radius) var(--md-radius) 0;
+			border-radius: 0 $md-radius $md-radius 0;
 
 			width: 100%;
 			display: flex;

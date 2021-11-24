@@ -14,7 +14,8 @@ export const parseArtistPage = (header, items) => {
 		const name = h?.title.runs[0].text
 		let description
 		let foregroundThumbnails
-		const thumbnail = h?.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails
+		const thumbnail =
+			h?.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails
 		const mixInfo =
 			h?.startRadioButton?.buttonRenderer?.navigationEndpoint
 				?.watchPlaylistEndpoint ?? null
@@ -25,7 +26,7 @@ export const parseArtistPage = (header, items) => {
 		}
 		if (h?.foregroundThumbnail) {
 			foregroundThumbnails =
-				h?.foregroundThumbnail?.musicThumbnailRenderer?.thumbnail.thumbnails
+				h?.foregroundThumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails
 		}
 		return {
 			name: name,

@@ -15,7 +15,6 @@
 	let hidden = isHidden ? true : false
 	let isSettingsOpen
 	let shown
-
 	const navBack = () => {
 		if (!browser) return
 
@@ -25,7 +24,7 @@
 
 <nav class="nav">
 	<div class="logo">
-		{#if key !== '/home'}
+		{#if !key.includes('home')}
 			<div class="logo-back" on:click={() => goto('/home')}>
 				<img
 					style="margin-left:1.5rem;"
@@ -53,12 +52,12 @@
 			use:tooltip
 			data-tooltip="Home"
 			on:click={() => goto('/home')}
-			class:active={$page.path.includes('home')}
+			class:active={key.includes('home')}
 		>
 			<!-- <div class="nav-text">Home</div> -->
 			<Icon
 				name="home"
-				color={$page.path.includes('home') ? '#fff' : '#BCBCBE'}
+				color={key.includes('home') ? '#fff' : '#BCBCBE'}
 				size="1.5em"
 			/>
 		</div>
@@ -67,13 +66,13 @@
 			class="nav-item trending"
 			use:tooltip
 			data-tooltip="Trending"
-			class:active={$page.path.includes('trending')}
+			class:active={key.includes('trending')}
 			on:click={() => goto('/trending')}
 		>
 			<!-- <div class="nav-text">Trending</div> -->
 			<Icon
 				name="trending"
-				color={$page.path.includes('trending') ? '#fff' : '#BCBCBE'}
+				color={key.includes('trending') ? '#fff' : '#BCBCBE'}
 				size="1.5em"
 			/>
 		</div>
@@ -81,7 +80,7 @@
 			use:tooltip
 			data-tooltip="Library"
 			class="nav-item btn-favorites"
-			class:active={$page.path.includes('library')}
+			class:active={key.includes('library')}
 			on:click|stopPropagation={() => {
 				goto('/library')
 			}}
@@ -109,7 +108,7 @@
 
 				<Search
 					type="inline"
-					on:submitted={(event) => {
+					on:submitted={() => {
 						hidden = !hidden
 					}}
 				/>
@@ -212,27 +211,16 @@
 		.nav-item {
 			position: relative !important;
 			cursor: pointer;
+			padding: 1rem;
 		}
 	}
-	// .nav-text {
-	// 	display: none;
-	// 	visibility: hidden;
-	// 	@media screen and (min-width: 640px) {
-	// 		display: inline;
-	// 		visibility: visible;
-	// 	}
-	// }
+
 	.homeIcon {
 		visibility: visible;
-		// @media screen and (min-width: 640px) {
-		// 	display: none;
-		// 	visibility: hidden;
-		// }
 	}
 	nav {
 		border-bottom: 0.043128em solid #6d6d6d3a;
-		// filter: drop-shadow(0.5rem 1.2rem 1rem #0e0d0d2c);
-		// box-shadow: 0 0.2rem 1rem 0.0125rem #0f0f0f38;
+
 		&::before {
 			box-shadow: 0 0.4rem 0.2rem -0.0875rem rgba(15, 15, 15, 11%);
 			position: absolute;
@@ -261,10 +249,6 @@
 	.shown {
 		visibility: visible !important;
 	}
-	// .desktop {
-	// 	visibility: hidden;
-	// 	display: none;
-	// }
 
 	.nav-item {
 		margin-bottom: 0;
@@ -274,12 +258,6 @@
 		.nav-item {
 			margin-right: 2em;
 		}
-		// @media screen and (min-width: 640px) {
-		// 	&__search {
-		// 		display: none !important;
-		// 		visibility: hidden !important;
-		// 	}
-		// }
 
 		&__search {
 			display: initial;
@@ -309,11 +287,6 @@
 		}
 	}
 	@media screen and (min-width: 640px) {
-		// .btn-settings {
-		// 	visibility: hidden;
-		// 	display: none;
-		// 	cursor: pointer;
-		// }
 	}
 	/* your styles go here */
 </style>

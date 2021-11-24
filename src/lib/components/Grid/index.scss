@@ -1,9 +1,9 @@
-@use "../../../global/stylesheet/base/typography" as type;
+// @use "../../../global/stylesheet/base/typography" as type;
 .grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
 	grid-gap: 0.5rem;
-
+	align-items: center;
 	// place-items: center;
 	margin: 0 auto;
 }

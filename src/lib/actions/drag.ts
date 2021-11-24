@@ -1,18 +1,22 @@
-export default function drag(node) {
-	let x
+export default function drag(node: HTMLElement) {
+	let x, lastY
 	let y
 	let loop
+	let startY
+	let initTop, initHeight
 	function handleMousedown(event) {
-		if (event.type == 'touchstart') {
-			x = event.touches[0].clientX
-			y = event.touches[0].clientY
-		}
-		x = event.clientX
-		y = event.clientY
-		// console.log(x, y)
+		const { top, height } = node.getBoundingClientRect()
 
+		initTop = top
+		initHeight = height
+		if (event.type == 'touchstart') {
+			x = event.touches[0].pageX
+			y = event.touches[0].pageY
+		}
+		x = event.pageX
+		y = event.pageY
 		node.dispatchEvent(
-			new CustomEvent('startDrag', {
+			new CustomEvent('dragstart', {
 				detail: { x, y }
 			})
 		)
@@ -26,44 +30,53 @@ export default function drag(node) {
 	function handleMousemove(event) {
 		let dx, dy
 		if (event.type == 'touchmove') {
-			// console.log(event)
-			dx = event.touches[0].clientX - x
-			dy = event.touches[0].clientY - y
 			// console.log(x, y, dx, dy)
-			x = event.touches[0].clientX
-			y = event.touches[0].clientY
+			x = event.touches[0].pageX
+			y = event.touches[0].pageY
 			node.dispatchEvent(
-				new CustomEvent('dragMove', {
-					detail: { x, y, dx, dy }
+				new CustomEvent('dragmove', {
+					detail: {
+						x,
+						y: initHeight + event.touches[0].pageY - initTop,
+						my: event.clientY
+					}
 				})
 			)
+			lastY = event.touches[0].pageY / 100
 		} else {
-			dx = event.clientX - x
-			dy = event.clientY - y
-			x = event.clientX
-			y = event.clientY
+			dx = event.pageX - x
+			dy = event.pageY - y
+			x = event.pageX
+			y = event.pageY
 
 			// console.log(x, y, dx, dy)
 			node.dispatchEvent(
-				new CustomEvent('dragMove', {
-					detail: { x, y, dx, dy }
+				new CustomEvent('dragmove', {
+					detail: {
+						x,
+						y: initHeight + event.pageY - initTop,
+						my: event.clientY,
+						dx,
+						dy
+					}
 				})
 			)
 		}
 	}
 
 	function handleMouseup(event) {
+		lastY = 0
 		if (event.type == 'touchend') {
 			// console.log(JSON.stringify(event))
-			x = event.changedTouches[0].clientX
-			y = event.changedTouches[0].clientY
+			x = event.changedTouches[0].pageX
+			y = event.changedTouches[0].pageY
 		} else {
-			x = event.clientX
-			y = event.clientY
+			x = event.pageX
+			y = event.pageY
 		}
 
 		node.dispatchEvent(
-			new CustomEvent('dragEnd', {
+			new CustomEvent('dragend', {
 				detail: { x, y }
 			})
 		)
@@ -79,8 +92,8 @@ export default function drag(node) {
 
 	return {
 		destroy() {
-			node.removeEventListener('mousedown', handleMousedown)
-			node.removeEventListener('touchstart', handleMousedown)
+			node.removeEventListener('mousedown', handleMousedown, true)
+			node.removeEventListener('touchstart', handleMousedown, true)
 		}
 	}
 }

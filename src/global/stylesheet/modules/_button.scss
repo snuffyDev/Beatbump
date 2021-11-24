@@ -1,18 +1,25 @@
 // BASE BUTTON STYLES
 // All rules related to the .button module
-
+%active {
+	color: rgb(15, 15, 15);
+	background: linear-gradient(to bottom, darken(#d4d4d4, 10%), #fff) !important;
+	border-color: #202020 !important;
+	// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
+	outline: 0;
+	text-decoration: none;
+	cursor: pointer;
+}
 %button-base {
-	transition: background border cubic-bezier(0.455, 0.03, 0.515, 0.955) 75ms;
 	display: inline-flex;
 	padding: 0.6rem 1.2rem;
 	color: #0e0e0e; //  is added to colors in order to make button utility immutable.  Otherwise, it's common for `a` styles to override button specificity.
-	background-color: #fffffff2;
+	background: linear-gradient(to bottom, #ffffff, #ffffff);
 	border: 1px solid #121212;
 	border-radius: var(--base-radius);
 	font-family: "Commissioner", sans-serif;
 	cursor: pointer;
-	font-size: 1.2em;
-	font-weight: 600;
+	font-size: 1.125rem;
+	font-weight: 500;
 	text-transform: none;
 	// margin-bottom: 0.5rem;
 	// text-align: center;
@@ -29,20 +36,12 @@
 	//     outline: thin dotted #333;
 	//     outline-offset: -2px;
 	// }
-	transition: background-color linear 75ms, color linear 75ms;
-	%active {
-		color: rgb(15, 15, 15);
-		background-color: darken(#f2f2f2f3, 10%) !important;
-		border-color: #202020 !important;
-		// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
-		outline: 0;
-		text-decoration: none;
-		cursor: pointer;
-	}
+	transition: background linear 75ms, color linear 75ms;
+	text-transform: uppercase;
 	@media (hover: hover) {
 		&:hover {
 			color: rgb(15, 15, 15);
-			background-color: darken(#f2f2f2f3, 10%) !important;
+			background: linear-gradient(to bottom, darken(#ffffff, 10%), #ffffff) !important;
 			border-color: #202020 !important;
 			// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
 			outline: 0;
@@ -53,14 +52,17 @@
 	&:active,
 	&.active {
 		@extend %active;
-		background-color: #f1f1f1 !important;
+		// background: #f1f1f1 !important;
+		background: linear-gradient(to bottom, darken(#f7f7f7, 15%), #fff) !important;
 	}
-	&:disabled {
-		background-color: rgb(44, 44, 44);
-		color: #777777 !important;
+	&:disabled,
+	.disabled {
+		background: rgb(44, 44, 44) !important;
+		color: #979797 !important;
 		cursor: not-allowed;
+		border-color: #444;
 		&:hover {
-			background-color: rgb(44, 44, 44) !important;
+			background: rgb(44, 44, 44) !important !important;
 		}
 	}
 }
@@ -82,16 +84,11 @@ button.has-icon {
 
 button.outlined {
 	display: inline-flex;
-	min-width: 7rem;
 	align-items: center;
-	font-weight: 700;
 
-	background-color: transparent !important;
+	background: #0000 !important;
 	border: white 0.1rem solid !important;
 	color: white !important;
-	// align-items: center;
-	/* flex-wrap: nowrap; */
-	/* place-items: center; */
 	display: inline-flex;
 	font-weight: 500;
 
@@ -109,12 +106,12 @@ button.outlined {
 	}
 	@media (hover: hover) {
 		&:hover {
-			background-color: rgba(255, 255, 255, 0.034) !important;
-			border-color: #caca !important;
+			background: rgba(255, 255, 255, 0.034) !important;
+			border-color: rgba(194, 170, 194, 0.667) !important;
 		}
 	}
 	&:active {
-		background-color: rgba(255, 255, 255, 0.096) !important;
+		background: rgba(255, 255, 255, 0.096) !important;
 		// background-color: transparentize(#fff, 0.3) !important;
 		border-color: rgba(255, 255, 255, 0.667) !important;
 	}

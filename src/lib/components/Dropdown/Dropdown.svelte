@@ -1,9 +1,9 @@
 <script lang="ts">
 	import Icon from '$components/Icon/Icon.svelte'
 	import { clickOutside } from '$lib/js/clickOutside'
-	import { createEventDispatcher, setContext } from 'svelte'
-	import { quartInOut } from 'svelte/easing'
+	import { quartOut } from 'svelte/easing'
 	import { slide } from 'svelte/transition'
+
 	import { PopperStore } from '../Popper'
 	import DropdownItem from './DropdownItem.svelte'
 
@@ -13,11 +13,7 @@
 	$: type = $PopperStore.type
 
 	$: isHidden = $PopperStore.items.length !== 0
-	const dispatch = createEventDispatcher()
 
-	const hideEvent = () => dispatch('close')
-	const openEvent = () => dispatch('open')
-	setContext('menu', { update: isHidden })
 	function onClose() {
 		PopperStore.set({
 			items: [],
@@ -30,44 +26,62 @@
 	}
 	let width
 	let viewport_height
+	let viewport_width
 	let popperHeight
+	let popper: HTMLElement = undefined
+	$: rect = popper && popper.getBoundingClientRect()
 	$: posY =
-		popperHeight &&
-		($PopperStore.y - popperHeight <= 0
+		$PopperStore.y - popperHeight <= 0
 			? $PopperStore.y
 			: $PopperStore.bottom + popperHeight >= viewport_height
 			? $PopperStore.y - popperHeight
-			: $PopperStore.y)
-	// $: console.log(items)
+			: $PopperStore.y
+
+	$: posX =
+		$PopperStore.direction === 'right'
+			? popper && rect?.left <= 0
+				? $PopperStore.x + rect?.width
+				: rect?.right >= viewport_width
+				? viewport_width + -width * 1.75
+				: $PopperStore.x
+			: $PopperStore.x - width
+	$: isHidden &&
+		popper &&
+		(() => {
+			console.log('hasfocus')
+			popper.focus()
+		})()
+	// $: console.log(items, posY)
 </script>
 
-<svelte:window bind:innerHeight={viewport_height} />
-<div
-	class="menu"
-	on:focusout={onClose}
-	use:clickOutside
-	on:click_outside={onClose}
->
-	{#if isHidden}
-		<div
-			bind:clientWidth={width}
-			bind:clientHeight={popperHeight}
-			style="transform: translate({$PopperStore.x - width}px, {posY}px)"
-			on:mouseleave|stopPropagation={onClose}
-			transition:slide={{ duration: 125, easing: quartInOut }}
-			class={type == 'player' ? 'dd-player' : 'dd-menu'}
-		>
-			{#each items as item}
-				<DropdownItem
-					on:click={item.action}
-					on:click={onClose}
-					text={item.text}
-					icon={item.icon}
-				/>
-			{/each}
-		</div>
-	{/if}
-</div>
+<svelte:window
+	bind:innerHeight={viewport_height}
+	bind:innerWidth={viewport_width}
+/>
+
+{#if isHidden}
+	<!-- on:focusout={onClose} -->
+	<div
+		use:clickOutside
+		on:click_outside={onClose}
+		bind:clientWidth={width}
+		bind:clientHeight={popperHeight}
+		style="transform: translate({posX}px, {posY}px)"
+		on:mouseleave|stopPropagation={onClose}
+		bind:this={popper}
+		transition:slide={{ duration: 125, easing: quartOut }}
+		class={type == 'player' ? 'dd-player' : 'dd-menu'}
+	>
+		{#each items as item}
+			<DropdownItem
+				on:click={item.action}
+				on:click={onClose}
+				text={item.text}
+				icon={item.icon}
+			/>
+		{/each}
+	</div>
+{/if}
 
 <style lang="scss">
 	.menu {

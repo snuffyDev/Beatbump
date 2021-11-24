@@ -1,4 +1,5 @@
 @use "./mixins";
+@use "./variables" as v;
 html {
 	box-sizing: border-box;
 	scroll-behavior: smooth;
@@ -12,6 +13,13 @@ html {
 html {
 	font-size: 12px;
 }
+
+:focus-visible:not(input):not(.input):not(select):not(.select) {
+	outline: 0.16666rem rgb(113, 175, 255) solid !important;
+}
+// :focus:not(:focus-visible) {
+// 	outline: none;
+// }
 html,
 body {
 	line-height: 1.5;
@@ -35,7 +43,7 @@ body {
 	color: rgb(255, 255, 255);
 	word-wrap: break-word;
 	-webkit-text-size-adjust: 100%;
-	--base-font-size: 12px;
+	--base-font-size: 0.75rem;
 
 	/* ===== Scrollbar CSS ===== */
 
@@ -77,15 +85,14 @@ body {
 	user-select: none;
 	-webkit-tap-highlight-color: transparent;
 	-webkit-font-smoothing: antialiased;
-	// @include mixins.fluid-typography(12, 14, 320, 1440);
-	@media screen and (min-width: 40em) and (max-width: 65em) {
-		--base-font-size: 14px;
+	@media screen and (min-width: 40rem) and (max-width: 85.375rem) {
+		--base-font-size: 0.875rem;
 	}
-	@media screen and (min-width: 65em) and (max-width: 80em) {
-		--base-font-size: 16px;
+	@media screen and (min-width: 83.375rem) and (max-width: 134rem) {
+		--base-font-size: 1rem;
 	}
-	@media screen and (min-width: 81em) {
-		--base-font-size: 100%;
+	@media screen and (min-width: 134.75rem) {
+		--base-font-size: 1.125rem;
 	}
 }
 .tooltip {
@@ -113,7 +120,7 @@ body {
 	border: 1px solid #323232;
 	box-shadow: 1px 1px 1px #323232;
 	background: #121212;
-	font-size: 1rem;
+	font-size: v.$size-1;
 	border-radius: 4px;
 	color: #f1f1f1;
 	padding: 0.3rem;
@@ -193,16 +200,11 @@ html {
 }
 main {
 	margin: 0 auto;
-	padding: 1rem;
 	position: relative;
 	overflow: visible;
 	// display: flex;
 	// flex-direction: column;
-	padding-bottom: 0.8rem;
-	@media only screen and (min-width: 53.333333rem) {
-		padding: 0 2rem 0 2rem;
-		padding-bottom: 0.8rem;
-	}
+	@include v.padding;
 }
 .backdrop {
 	position: fixed;

@@ -7,8 +7,9 @@ figure {
 img,
 picture {
 	margin: 0;
-	border-radius: var(--md-radius);
-
+	border-radius: var(--xs-radius);
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: crisp-edges;
 	max-width: 100%;
 
 	-webkit-user-drag: none;
@@ -21,6 +22,6 @@ picture {
 img::before,
 video::before {
 	display: block;
-	content: '';
+	content: "";
 	padding-top: calc(100% * 2 / 3);
 }

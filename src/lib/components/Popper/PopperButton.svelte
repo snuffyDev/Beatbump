@@ -2,37 +2,45 @@
 	import Dropdown from '../Dropdown/Dropdown.svelte'
 	import Icon from '../Icon/Icon.svelte'
 
-	import MobilePopper from './MobilePopper.svelte'
 	import { PopperStore } from './popperStore'
 	export let items = []
 	export let type = ''
 	export let metadata = {}
 	export let isHidden = false
 	export let size = '1.5rem'
+	export let tabindex = 0
 	function Popper(node: HTMLElement) {
 		let x, y, bottom
 		let isOpen
 		let timer
 		let initY
-		function handleClick(event: MouseEvent) {
+		function handleClick(
+			event: MouseEvent & { target: HTMLElement & EventTarget }
+		) {
+			// if (!node.contains(event.target)) {
+			// 	PopperStore.reset()
+			// 	isOpen = false
+			// }
+			console.log(event)
 			event.stopPropagation()
 
-			// console.log(isOpen)
-			// console.log($PopperStore)
-			if ($PopperStore.isOpen) {
-				PopperStore.reset()
-
-				return
-			}
 			const rect = node.getBoundingClientRect()
 			x = rect.left
 			y = rect.top
 			initY = rect.top
 			bottom = rect.bottom
-			PopperStore.set({ items, isOpen: true, type, x, y, metadata, bottom })
+			isOpen = true
+			PopperStore.set({
+				items,
+				direction: 'normal',
+				isOpen: true,
+				type,
+				x,
+				y,
+				metadata,
+				bottom
+			})
 			return
-			isOpen = false
-			PopperStore.reset()
 		}
 		function handleResize(event: UIEvent) {
 			const log = requestAnimationFrame(() => {
@@ -40,7 +48,16 @@
 				x = rect.left
 				y = rect.top
 				bottom = rect.bottom
-				PopperStore.set({ items, isOpen: true, type, x, y, metadata, bottom })
+				PopperStore.set({
+					items,
+					isOpen: true,
+					direction: 'normal',
+					type,
+					x,
+					y,
+					metadata,
+					bottom
+				})
 				return
 				isOpen = false
 			})
@@ -50,6 +67,7 @@
 			PopperStore.reset()
 		}
 		function handleScroll(event: UIEvent) {
+			if (!isOpen) return
 			const rect = node.getBoundingClientRect()
 			y = rect.top
 			if (y > initY + 50 || y < initY - 50) {
@@ -59,7 +77,18 @@
 			// console.log(x, y, bottom)
 			// PopperStore.reset()
 		}
-		node.addEventListener('click', handleClick)
+		node.addEventListener('click', handleClick, {
+			passive: true,
+			capture: true
+		})
+		node.addEventListener(
+			'keydown',
+			(e) => {
+				if (e.code !== 'Space') return
+				node.click()
+			},
+			{ capture: true }
+		)
 		window.addEventListener('resize', handleResize)
 		window.addEventListener('scroll', handleScroll, {
 			capture: true,
@@ -75,7 +104,7 @@
 	}
 </script>
 
-<div class="dd-button" use:Popper>
+<div class="dd-button" use:Popper {tabindex}>
 	<svelte:component this={Icon} color="#f2f2f2" {size} name="dots" />
 </div>
 

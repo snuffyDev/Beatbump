@@ -1,16 +1,13 @@
 <script lang="ts">
-	import { getContext } from 'svelte'
-
 	import Icon from '../Icon/Icon.svelte'
 
 	export let text = ''
 	export let icon = ''
 
-	let { update } = getContext('menu')
 	// $: console.log(update)
 </script>
 
-<div class="dd-item" on:click>
+<div class="dd-item" tabindex="0" on:click>
 	<Icon name={icon} size="1.5em" />
 	<div class="dd-text">{text}</div>
 </div>
@@ -22,7 +19,7 @@
 			border-top-left-radius: inherit;
 			border-top-right-radius: inherit;
 		}
-		&:last-child {
+		&:last-of-type {
 			border-bottom-left-radius: inherit;
 			border-bottom-right-radius: inherit;
 		}

@@ -21,6 +21,7 @@
 		}
 		if (!dev) redirect()
 	})
+	$: $navigating && timeout && clearTimeout(timeout)
 </script>
 
 <main>

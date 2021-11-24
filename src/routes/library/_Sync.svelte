@@ -413,7 +413,7 @@
 		margin-bottom: 0.5rem;
 	}
 	:root {
-		--padding: 0 var(--xl-spacing) 0 var(--xl-spacing);
+		--padding: 0 $xl-spacing 0 $xl-spacing;
 	}
 	.sync-wrapper {
 		position: fixed;
@@ -437,7 +437,7 @@
 	code {
 		background: rgba(41, 41, 41, 0.555);
 		padding: 1rem;
-		border-radius: var(--lg-radius);
+		border-radius: $lg-radius;
 		display: inline;
 		font-size: 1.25em;
 		font-weight: 600;
@@ -454,7 +454,7 @@
 	}
 	hr {
 		border-color: rgba(170, 170, 170, 0.199);
-		border-radius: var(--lg-radius);
+		border-radius: $lg-radius;
 	}
 	.id {
 		display: flex;
@@ -484,7 +484,7 @@
 		border: 1px solid #aaa1;
 		transform-origin: top;
 		box-shadow: 0 0 1rem #2929291f;
-		border-radius: var(--lg-radius);
+		border-radius: $lg-radius;
 		background: #111214;
 		@media only screen and (max-width: 640px) {
 			// top: 0;
@@ -541,7 +541,7 @@
 		width: 100%;
 	}
 	p {
-		margin: 0 0 var(--sm-spacing) 0;
+		margin: 0 0 $sm-spacing 0;
 		font-size: 1.125rem;
 	}
 	h1 {

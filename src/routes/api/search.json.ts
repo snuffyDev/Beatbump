@@ -56,10 +56,10 @@ export async function get({ query }): Promise<SearchOutput> {
 							}
 						],
 						sessionIndex: {}
+					},
+					user: {
+						enableSafetyMode: false
 					}
-				},
-				user: {
-					enableSafetyMode: false
 				},
 				browseEndpointContextMusicConfig: {
 					browseEndpointContextMusicConfig: {
@@ -71,7 +71,7 @@ export async function get({ query }): Promise<SearchOutput> {
 				isAudioOnly: true,
 				query: `${q}`,
 
-				params: `${filter}`,
+				params: filter !== '' ? `${filter}` : '',
 				videoId: `${videoId}`,
 				playlistId: `${playlistId}`
 			}),

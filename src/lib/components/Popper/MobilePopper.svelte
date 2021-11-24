@@ -4,30 +4,25 @@
 	import drag from '$lib/actions/drag'
 	import list from '$lib/stores/list'
 	import { key } from '$lib/stores/stores'
-
-	import { createEventDispatcher, onMount } from 'svelte'
 	import { fade, fly } from 'svelte/transition'
 	import Icon from '../Icon/Icon.svelte'
 	import { PopperStore } from './popperStore'
 
 	$: items = $PopperStore.items
 	$: type = $PopperStore.type
-	// $: isHidden = $PopperStore.
-	const hideEvent = () => dispatch('close')
-	const openEvent = () => dispatch('open')
+
 	let listHeight
 	let sliding
 	let posY = 0
-	let showing
-	let throwY
-	function startHandler() {
+
+	function startHandler({ detail }) {
 		sliding = true
 	}
 
 	function release(e) {
 		// console.log(e)
 		if (sliding) {
-			if (posY < listHeight / 2) {
+			if (posY < height * 0.7) {
 				open()
 			} else {
 				close()
@@ -35,17 +30,12 @@
 		}
 		sliding = false
 	}
-	function trackMovement({ y, dy }) {
-		// console.log(y, y + dy)
-		throwY = dy
+	function trackMovement({ y }) {
 		if (y <= listHeight && y >= 0) {
-			posY = y + dy
+			posY = y
 		} else if (y > listHeight) {
 			trackOpen()
-		} else {
-			close()
 		}
-		// console.log(y, 'dy: ' + dy)
 	}
 	function trackOpen() {
 		posY = posY
@@ -54,8 +44,6 @@
 		posY = 0
 	}
 	function close() {
-		// posY = 100
-		// isHidden = false
 		posY = 0
 		PopperStore.reset()
 		allowScroll()
@@ -63,18 +51,15 @@
 	}
 	function noScroll() {
 		if (!browser) return
-		// document.querySelector('#wrapper').classList.add('no-scroll')
 	}
 	function allowScroll() {
 		if (!browser) return
 		PopperStore.set({ items: [], isOpen: false, type })
-		// document.querySelector('#wrapper').classList.remove('no-scroll')
 	}
 	$: items && noScroll()
-	// $: console.log($list.mix[$key])
 
-	const dispatch = createEventDispatcher()
 	let popperHeight
+	$: height = listHeight - popperHeight + 0.1
 </script>
 
 <svelte:window bind:innerHeight={listHeight} />
@@ -89,21 +74,19 @@
 		out:fly={{ duration: 250, delay: 125, y: 5 }}
 		class="drag"
 		bind:clientHeight={popperHeight}
-		style="transform: translateY({posY /
-			3.25}px); height:{popperHeight}px; top:{listHeight -
-			popperHeight}px;{sliding ? `transition:none;` : ''}"
+		style="transform: translateY({posY}px); top:{height}px; {sliding
+			? ''
+			: 'transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22)'}; bottom:0;"
 	>
 		<div class="popper">
 			<div
 				class="handle"
 				use:drag
-				on:startDrag={startHandler}
-				on:dragMove={(e) => {
-					trackMovement({ y: e.detail.y, dy: e.detail.dy })
-				}}
-				on:dragEnd={release}
+				on:dragstart={startHandler}
+				on:dragmove={(e) => trackMovement({ y: e.detail.y })}
+				on:dragend={release}
 			>
-				<Icon name="minus" color="#f2f2f2" width="100%" />
+				<hr />
 			</div>
 			{#if type == 'player'}
 				<section class="m-metadata">
@@ -130,10 +113,14 @@
 						<img src={$PopperStore.metadata.thumbnail} alt="" />
 					</div>
 					<div class="metatext">
-						<span>{$PopperStore.metadata.title}</span>
+						<span class="title">{$PopperStore.metadata.title}</span>
 
+						{#each $PopperStore.metadata.artist as artist}
+							<span class="artist"> {artist.text ?? ''}</span>
+						{/each}
+						<span />
 						<span class="length">
-							<span class="subheading">{$PopperStore.metadata.length}</span>
+							{$PopperStore.metadata?.length ?? ''}
 						</span>
 					</div>
 				</section>

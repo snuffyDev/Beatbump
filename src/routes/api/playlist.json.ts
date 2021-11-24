@@ -1,4 +1,5 @@
 import { MusicResponsiveListItemRenderer } from '$lib/parsers'
+
 import type { Artist, Item, Thumbnail } from '$lib/types'
 import type { NextContinuationData } from '$lib/types'
 import type { IPlaylistItem } from '$lib/types/playlist'
@@ -137,10 +138,10 @@ export async function get({ query }: { query: URLSearchParams }) {
 						client: {
 							clientName: 'WEB_REMIX',
 							clientVersion: '1.20211025.00.00',
-							visitorData: 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D',
-							user: {
-								enableSafetyMode: false
-							}
+							visitorData: 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D'
+						},
+						user: {
+							enableSafetyMode: false
 						}
 					}
 				}),

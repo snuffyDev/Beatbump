@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-	export const ssr = false
+	// export const ssr = false
 </script>
 
 <script lang="ts">
@@ -15,8 +15,8 @@
 	import Grid from './_components/Grid/Grid.svelte'
 	import Popup from './_components/Popup.svelte'
 	import Sync from './_Sync.svelte'
-	$: favorites = []
-	$: playlists = []
+	let favorites
+	let playlists
 
 	let showSyncModal
 	let showPlaylistModal
@@ -32,10 +32,14 @@
 	}
 	// let lib: Writable<[]> = getContext('db')
 	onMount(async () => {
-		const hasPlaylists = await db.getPlaylists()
-		const hasFavorites = await db.getFavorites()
-		favorites = hasFavorites.length !== 0 && [...hasFavorites.slice(0, 5)]
-		playlists = hasPlaylists.length !== 0 && [...hasPlaylists]
+		try {
+			const hasPlaylists = await db.getPlaylists()
+			const hasFavorites = await db.getFavorites()
+			favorites = hasFavorites.length !== 0 && [...hasFavorites.slice(0, 5)]
+			playlists = hasPlaylists.length !== 0 && [...hasPlaylists]
+		} catch (err) {
+			console.error(err)
+		}
 		// updateFavorites()
 	})
 	$: console.log(playlists, favorites)
@@ -65,10 +69,12 @@
 	<section>
 		<div class="header">
 			<h2>Your Songs</h2>
-			<a sveltekit:prefetch href="/library/songs"><small>See All</small></a>
+			<a sveltekit:prefetch href="/library/songs"
+				>{#if favorites?.length > 0}<small>See All</small>{/if}</a
+			>
 		</div>
 		<div class="list">
-			{#if favorites.length > 0}
+			{#if favorites?.length > 0}
 				{#each favorites as favorite}
 					<Listing
 						on:update={() => {
@@ -76,20 +82,20 @@
 						}}
 						data={favorite}
 					/>
+				{:else}
+					<div class="container">
+						<h3>
+							<Icon
+								style="vertical-align: text-bottom; margin-right: 0.125em;"
+								name="frown"
+								size="2rem"
+							/> Looks like you don't have any songs in your favorites...
+						</h3>
+						<span class="subheading"
+							><em>Add some songs to keep track of what you love!</em></span
+						>
+					</div>
 				{/each}
-			{:else}
-				<div class="container">
-					<h3>
-						<Icon
-							style="vertical-align: text-bottom; margin-right: 0.125em;"
-							name="frown"
-							size="2rem"
-						/> Looks like you don't have any songs in your favorites...
-					</h3>
-					<span class="subheading"
-						><em>Add some songs to keep track of what you love!</em></span
-					>
-				</div>
 			{/if}
 		</div>
 	</section>
@@ -115,13 +121,22 @@
 		/>
 	{/if}
 	<section>
-		<Grid
-			heading="Your Playlists"
-			items={playlists}
-			on:new_playlist={() => {
-				showPlaylistModal = true
-			}}
-		/>
+		<!-- <button
+			on:click={() => {
+				db.deleteAllPlaylists()
+			}}>Delete all playlists</button
+		> -->
+		{#await playlists then favorites}
+			<Grid
+				heading="Your Playlists"
+				items={playlists}
+				on:new_playlist={() => {
+					showPlaylistModal = true
+				}}
+			/>
+		{:catch err}
+			{err}
+		{/await}
 	</section>
 </main>
 

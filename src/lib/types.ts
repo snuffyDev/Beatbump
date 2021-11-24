@@ -43,6 +43,9 @@ export interface Song {
 	length?: string
 	explicit?: boolean
 	hash?: string
+	playlistSetVideoId?: string
+	playerParams?: string
+	musicVideoType?: string
 }
 
 export interface Continuation {
@@ -112,10 +115,15 @@ export type CarouselItem = {
 	params?: string
 	thumbnails: Array<Thumbnail>
 	subtitle?: Subtitle[]
+	playlistSetVideoId?: string
+	playerParams?: string
+	musicVideoType?: string
 }
 
 interface MusicResponsiveListItemRenderer extends CarouselItem {
 	playlistSetVideoId?: string
+	playerParams?: string
+	musicVideoType?: string
 }
 
 export type ItemEndpoint = {
@@ -154,5 +162,6 @@ export type RequestParams = {
 	continuation?: JSON
 	type?: string
 	videoId?: string
+	path?: string
 	playlistId?: string
 }

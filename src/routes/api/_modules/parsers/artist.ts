@@ -18,12 +18,12 @@ export const parseArtist = (data) => {
 			} = {}
 		} = {}
 	} = data
-	console.log(header)
+	// console.log(header)
 	const parsed = parse(header, contents)
 
 	return {
-		...parsed[0],
-		headerRaw: header
+		...parsed[0]
+		// headerRaw: header
 	}
 }
 

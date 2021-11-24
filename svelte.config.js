@@ -5,6 +5,7 @@ import autoprefixer from 'autoprefixer'
 import cssnano from 'cssnano'
 import path from 'path'
 import sveltePreprocess from 'svelte-preprocess'
+
 const check = process.env.NODE_ENV
 const dev = check === 'development'
 import worker from '@snuffydev/adapter-cloudflare-cache'
@@ -12,8 +13,10 @@ import worker from '@snuffydev/adapter-cloudflare-cache'
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	preprocess: sveltePreprocess({
+		sass: false,
 		scss: {
-			includePaths: ['src']
+
+			includePaths: ['src'], prependData: '@import "src/global/stylesheet/base/_variables.scss";', renderSync: true
 		},
 
 		postcss: {
@@ -21,6 +24,7 @@ const config = {
 		},
 		typescript: { tsconfigFile: './tsconfig.json' }
 	}),
+
 	kit: {
 		adapter: dev ? node() : worker({}),
 		target: '#app',
@@ -40,15 +44,15 @@ const config = {
 					$components: path.resolve('./src/lib/components')
 				}
 			},
-			server: { cors: { origin: 'https://music.youtube.com' } },
-			cleanCssOptions: {
-				level: {
-					2: {
-						all: true,
-						removeDuplicateRules: true
-					}
+			plugins: [(() => ({
+				configureServer({ middlewares, }) {
+					middlewares.use((_req, res, next) => {
+						res.setHeader("Origin", "https://music.youtube.com");
+						next();
+					});
 				}
-			}
+			}))()],
+
 		}
 	}
 }

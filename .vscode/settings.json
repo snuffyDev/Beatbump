@@ -2,5 +2,6 @@
 	"svg.preview.background": "custom",
 	"editor.quickSuggestions": null,
 	"typescript.enablePromptUseWorkspaceTsdk": true,
-	"eslint.probe": ["javascript", "typescript", "html", "markdown", "svelte"]
+	"eslint.probe": ["javascript", "typescript", "html", "markdown", "svelte"],
+	"liveServer.settings.port": 5655
 }

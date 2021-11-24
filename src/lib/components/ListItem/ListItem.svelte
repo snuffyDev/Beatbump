@@ -3,11 +3,13 @@
 	import { currentId, isPagePlaying, key } from '$stores/stores'
 	import { createEventDispatcher } from 'svelte'
 	import list from '$lib/stores/list'
-	export let item
+	export let item: Item
 	export let index
 	export let page
+	export let parentPlaylistId = ''
 	export let ctx = {}
 	import { getContext } from 'svelte'
+	import type { Item } from '$lib/types'
 	const { pageId } = getContext(ctx)
 	const dispatch = createEventDispatcher()
 	function dispatchPlaying() {
@@ -39,26 +41,31 @@
 			key.set(index)
 			console.log('key: ' + $key, item.playlistId)
 			await list.startPlaylist(item.playlistId, index)
-
-			// await list.initList(
-			// 	item.videoId,
-			// 	item.playlistId,
-			// 	index,
-			// 	item.playlistSetVideoId ? item.playlistSetVideoId : ''
-			// )
+			// await list.initList({
+			// 	videoId: item.videoId,
+			// 	playlistId: parentPlaylistId,
+			// 	keyId: $key,
+			// 	config: { playerParams: item?.playerParams, type: item.musicVideoType }
+			// })
 		} else if (page == 'library') {
 			key.set(index)
 			dispatch('initLocalList', index)
 		} else {
 			key.set(index)
-			await list.initList(item.videoId, item.playlistId, $key)
+			console.log(item, item.videoId)
+			await list.initList({
+				videoId: item.videoId,
+				playlistId: item.playlistId,
+				keyId: $key,
+				config: { playerParams: item?.playerParams, type: item?.musicVideoType }
+			})
 		}
 		dispatchPlaying()
 	}}
 >
 	<div class="number">
 		<span class:hidden={!isHovering}>
-			<svelte:component this={Icon} class="icon" name="play" size="1.5em" />
+			<svelte:component this={Icon} name="play" size="1.5em" />
 		</span>
 		<!-- content here -->
 		<span class:hidden={isHovering}>{index + 1}<!-- else content here --></span>

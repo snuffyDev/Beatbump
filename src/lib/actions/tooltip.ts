@@ -2,7 +2,8 @@ export function tooltip(element: HTMLElement) {
 	let div: HTMLDivElement
 	let title
 
-	function mouseOver(event: MouseEvent) {
+	function mouseOver(event: PointerEvent) {
+		// event.preventDefault()
 		if (element.contains(div)) element.removeChild(div)
 		const rect = element.getBoundingClientRect()
 		// NOTE: remove the `title` attribute, to prevent showing the default browser tooltip
@@ -41,27 +42,35 @@ export function tooltip(element: HTMLElement) {
 			// div.style.setProperty('tt-pos-x', `${window.innerWidth / div.clientWidth}px`);
 			div.style.cssText = `--tt-pos-y: ${y}px; --tt-pos-x: ${x}px; --tt-w: ${w}px;`
 		}
+		element.addEventListener('pointerup', mouseLeave)
+		element.addEventListener('pointerleave', mouseLeave)
 	}
 	function mouseMove(event) {
 		// div.style.left = `${event.clientX + 5}px`;
 		// div.style.top = `${event.clientY + 5}px`;
 	}
 	function mouseLeave() {
-		element.removeChild(div)
-		// NOTE: restore the `title` attribute
+		setTimeout(() => {
+			if (element.contains(div)) {
+				element.removeChild(div)
+			}
+			element.removeEventListener('pointerdown', mouseLeave)
+			element.removeEventListener('pointerleave', mouseLeave)
+			element.removeEventListener('pointerup', mouseLeave)
+		}, 250)
 	}
 
-	element.addEventListener('mouseenter', mouseOver)
-	element.addEventListener('mousemove', mouseMove)
-	element.addEventListener('mouseleave', mouseLeave)
+	element.addEventListener('pointerdown', mouseOver)
+	element.addEventListener('pointerover', mouseOver)
+	// element.addEventListener('pointerup', mouseMove)
 
 	return {
 		destroy() {
 			if (element.contains(div)) element.removeChild(div)
 
-			element.removeEventListener('mouseenter', mouseOver)
-			element.removeEventListener('mouseleave', mouseLeave)
-			element.removeEventListener('mousemove', mouseMove)
+			element.removeEventListener('pointerover', mouseOver)
+			element.removeEventListener('pointerdown', mouseOver)
+			// element.removeEventListener('mousemove', mouseMove)
 		}
 	}
 }

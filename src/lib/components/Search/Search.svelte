@@ -27,12 +27,9 @@
 	let results: [] = []
 	async function handleSubmit() {
 		dispatch('submitted', { submitted: true })
-		searchState.set({ option: filter, text: query })
-		let url =
-			`/search/` +
-			encodeURIComponent(encodeURIComponent(query)) +
-			`?filter=` +
-			filter
+		let url = `/search/${encodeURIComponent(encodeURIComponent(query))}${
+			filter !== undefined ? `?filter=${filter}` : ''
+		}`
 		goto(url)
 	}
 	const typeahead = debounce(async () => {
@@ -103,7 +100,7 @@
 		background: inherit;
 		width: 100%;
 		/* max-height: 44vh; */
-		border-radius: var(--lg-radius);
+		border-radius: $lg-radius;
 		height: auto;
 		display: flex;
 		flex-direction: column;
@@ -143,10 +140,10 @@
 
 		li {
 			&:first-child {
-				border-radius: var(--lg-radius) var(--lg-radius) 0 0;
+				border-radius: $lg-radius $lg-radius 0 0;
 			}
 			&:last-child {
-				border-radius: 0 0 var(--lg-radius) var(--lg-radius);
+				border-radius: 0 0 $lg-radius $lg-radius;
 			}
 			transition: all cubic-bezier(0.47, 0, 0.745, 0.715) 50ms;
 
@@ -167,6 +164,7 @@
 	}
 	.nav-item {
 		position: relative;
+		margin-right: 0.25rem;
 	}
 	.hidden {
 		display: none;

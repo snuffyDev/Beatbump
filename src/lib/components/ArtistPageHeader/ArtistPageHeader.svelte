@@ -32,9 +32,9 @@
 			y =
 				window.innerWidth < 500
 					? Math.min(Math.max((-scroll.top / window.innerHeight) * 2, 0), 10) *
-					  150
+					  175
 					: Math.min(Math.max((-scroll.top / window.innerHeight) * 2, 0), 10) *
-					  100
+					  125
 		}
 	}
 	$: isExpanded && handler()
@@ -64,18 +64,6 @@
 	})
 </script>
 
-<!--
-{#if showModal}
-	<div class="modal-wrapper" transition:fade={{ duration: 150 }}>
-		<div
-			class="modal"
-			use:clickOutside
-			on:click_outside={() => (showModal = false)}
-		>
-			<h1 class="modal-name">{header?.name}</h1>
-		</div>
-	</div>
-{/if} -->
 <div class="artist-header">
 	<div class="artist-thumbnail">
 		<div
@@ -185,7 +173,7 @@
 		visibility: hidden;
 		@media screen and (min-width: 53.333333rem) {
 			--lines: 3;
-			font-size: 14px;
+			font-size: 1rem;
 			line-height: var(--line-height);
 			font-weight: 400;
 			color: #fff;
@@ -274,10 +262,13 @@
 		height: 100%;
 		/* min-height: 13rem; */
 		/* max-height: 30rem; */
-		padding-top: 15rem;
+		padding-top: 16vh;
 		overflow: hidden;
-		@media only screen and (min-width: 640px) {
+		@media only screen and (min-width: 1080px) and (max-width: 1600px) {
 			padding-top: 18rem;
+		}
+		@media only screen and (min-width: 1601px) {
+			padding-top: 38rem;
 		}
 		// box-shadow: 0 0 0.5rem 0.5rem #000;
 
@@ -347,13 +338,16 @@
 		position: relative;
 		z-index: 1;
 
-		padding-left: 3.5rem;
-		width: 80%;
+		// padding-left: 3.5rem;
+		@include padding;
+		margin: 0 auto;
+
 		.content-wrapper {
 			display: inline-flex;
 			flex-wrap: wrap;
 			flex-direction: column;
 			align-items: flex-start;
+			width: 80%;
 
 			.name {
 				font-weight: 700;
@@ -393,6 +387,16 @@
 		}
 		@media screen and (max-width: 500px) {
 			padding-left: 2rem;
+		}
+		max-width: $content-width-mobile;
+		@media only screen and (min-width: 1080px) and (max-width: 1366px) {
+			max-width: $content-width-md;
+		}
+		@media only screen and (min-width: 1367px) and (max-width: 1600px) {
+			max-width: $content-width-lg;
+		}
+		@media only screen and (min-width: 1601px) {
+			max-width: $content-width-xl;
 		}
 	}
 	// .btn-wrpr {

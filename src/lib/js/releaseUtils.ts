@@ -1,11 +1,16 @@
 import { MusicResponsiveListItemRenderer } from '$lib/parsers'
-
-/* eslint-disable no-prototype-builtins */
-export function parsePageContents(data: {
+type Data = {
 	header: {
 		musicDetailHeaderRenderer: {
 			title
-			subtitle: { runs: [{ text: string }] }
+			subtitle: {
+				runs: [
+					{
+						text: string
+						navigationEndpoint: { browseEndpoint: { browseId: string } }
+					}
+				]
+			}
 			menu
 			thumbnail
 			moreButton
@@ -28,7 +33,9 @@ export function parsePageContents(data: {
 			]
 		}
 	}
-}) {
+}
+/* eslint-disable no-prototype-builtins */
+export function parsePageContents(data: Data) {
 	let items = []
 	// console.log(contents)
 	let t = {
@@ -69,44 +76,52 @@ export function parsePageContents(data: {
 		}
 	)
 
-	const releaseInfo = {
-		playlistId:
-			data.header?.musicDetailHeaderRenderer.menu?.menuRenderer
-				?.topLevelButtons[0].buttonRenderer.navigationEndpoint
-				.watchPlaylistEndpoint.playlistId,
-		subtitles: [
-			{
-				year:
-					data.header?.musicDetailHeaderRenderer?.subtitle?.runs[4]?.text ||
-					null,
-				tracks:
-					data.header?.musicDetailHeaderRenderer?.secondSubtitle?.runs[0].text,
-				length:
-					data.header?.musicDetailHeaderRenderer?.secondSubtitle?.runs[2].text,
-				contentRating: data.header?.musicDetailHeaderRenderer?.hasOwnProperty(
-					'subtitleBadges'
-				)
-					? true
-					: false
-			}
-		],
-		secondSubtitle: [],
-		artist: {
-			name: data.header?.musicDetailHeaderRenderer.subtitle?.runs[2].text,
-			channelId:
-				data.header?.musicDetailHeaderRenderer.subtitle?.runs[2]
-					.navigationEndpoint.browseEndpoint.browseId
-		},
-		thumbnails:
-			data.header?.musicDetailHeaderRenderer?.thumbnail
-				?.croppedSquareThumbnailRenderer?.thumbnail?.thumbnails,
-		title: data.header?.musicDetailHeaderRenderer.title?.runs[0].text,
-		autoMixId:
-			data.header?.musicDetailHeaderRenderer.menu?.menuRenderer?.items[1]
-				?.menuNavigationItemRenderer?.navigationEndpoint?.watchPlaylistEndpoint
-				?.playlistId || null
+	const releaseInfoParser = () => {
+		const year = data.header?.musicDetailHeaderRenderer.subtitle?.runs.pop()
+		const length = data.header?.musicDetailHeaderRenderer.subtitle?.runs.shift()
+		const artists = [
+			...data.header?.musicDetailHeaderRenderer.subtitle?.runs
+				.filter((item) => !item.text.includes('•'))
+				.map((item) => ({
+					name: item.text,
+					channelId: item?.navigationEndpoint?.browseEndpoint?.browseId || ''
+				}))
+		]
+		return {
+			playlistId:
+				data.header?.musicDetailHeaderRenderer.menu?.menuRenderer
+					?.topLevelButtons[0].buttonRenderer.navigationEndpoint
+					.watchPlaylistEndpoint.playlistId,
+			subtitles: [
+				{
+					year: year.text,
+					tracks:
+						data.header?.musicDetailHeaderRenderer?.secondSubtitle?.runs[0]
+							.text,
+					length:
+						data.header?.musicDetailHeaderRenderer?.secondSubtitle?.runs[2]
+							?.text,
+					type: length.text,
+					contentRating: data.header?.musicDetailHeaderRenderer?.hasOwnProperty(
+						'subtitleBadges'
+					)
+						? true
+						: false
+				}
+			],
+			secondSubtitle: [],
+			artist: artists,
+			thumbnails:
+				data.header?.musicDetailHeaderRenderer?.thumbnail
+					?.croppedSquareThumbnailRenderer?.thumbnail?.thumbnails,
+			title: data.header?.musicDetailHeaderRenderer.title?.runs[0].text,
+			autoMixId:
+				data.header?.musicDetailHeaderRenderer.menu?.menuRenderer?.items[1]
+					?.menuNavigationItemRenderer?.navigationEndpoint
+					?.watchPlaylistEndpoint?.playlistId || null
+		}
 	}
-
+	const releaseInfo = releaseInfoParser()
 	console.log(releaseInfo)
 
 	return {

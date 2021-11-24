@@ -50,14 +50,18 @@
 	$: id = $page.query.get('id')
 	const promise = parsePageContents(data)
 	let { items, releaseInfo } = promise
-	$: if (browser) console.log(promise, releaseInfo)
+	$: if (browser) console.log(data, promise, releaseInfo)
 	const playAlbum = () => {
 		list.startPlaylist(releaseInfo.playlistId)
 		key.set(0)
 		currentTitle.set(items[0].title)
 	}
 	const playRadio = () => {
-		list.initList(items[0].videoId, releaseInfo.autoMixId, 0)
+		list.initList({
+			videoId: items[0].videoId,
+			playlistId: releaseInfo?.autoMixId,
+			keyId: 0
+		})
 		currentTitle.set(items[0].title)
 	}
 
