@@ -80,7 +80,7 @@
 		},
 		{
 			text: !isLibrary ? 'Favorite' : 'Remove from Favorites',
-			icon: 'heart',
+			icon: !isLibrary ? 'heart' : 'x',
 			action: async () => {
 				// console.log(data)
 				if (!browser) return
@@ -161,6 +161,9 @@
 		} else {
 			title = title
 		}
+	}
+	if (data?.album?.browseId === undefined) {
+		DropdownItems = DropdownItems.filter((d) => d.text !== 'Go to album')
 	}
 	const clickHandler = async (event) => {
 		if (

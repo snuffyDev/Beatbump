@@ -48,7 +48,7 @@
 	$: isHidden &&
 		popper &&
 		(() => {
-			console.log('hasfocus')
+			// console.log('hasfocus')
 			popper.focus()
 		})()
 	// $: console.log(items, posY)

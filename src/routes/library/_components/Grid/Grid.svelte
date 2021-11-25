@@ -11,11 +11,17 @@
 <div class="grid-container">
 	<div class="header">
 		<span class="h2">{heading}</span>
+		<slot name="buttons" />
 	</div>
 	<div class="grid">
-		{#each items as item, i (item)}
-			<GridItem {item} on:click={() => goto('/library/playlists/' + item.id)} />
-		{/each}
+		{#if items.length > 0}
+			{#each items as item, i (item)}
+				<GridItem
+					{item}
+					on:click={() => goto('/library/playlists/' + item.id)}
+				/>
+			{/each}
+		{/if}
 		<GridItem
 			item={{
 				thumbnail:

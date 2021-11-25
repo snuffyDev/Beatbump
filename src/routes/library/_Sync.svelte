@@ -110,9 +110,23 @@
 		}
 	})
 	// $: console.log(RTC, _Peer)
+	function keyDownListener(event: KeyboardEvent) {
+		if (event.key == 'Esc' || event.key == 'Escape') {
+			event.preventDefault()
+			dispatch('close')
+		}
+		if (event.defaultPrevented) {
+			return // Do nothing if the event was already processed
+		}
+	}
 </script>
 
-<div class="backdrop" transition:fade={{ duration: 150, delay: 150 }} />
+<svelte:window on:keydown={keyDownListener} />
+<div
+	class="backdrop"
+	on:click={() => dispatch('close')}
+	transition:fade={{ duration: 150, delay: 150 }}
+/>
 <div class="sync-wrapper">
 	<div class="sync" transition:fade={{ duration: 300, delay: 300 }}>
 		<div
@@ -265,33 +279,32 @@
 								</p>
 
 								<div class="id-cont">
-									<code>{peerID ? peerID : 'ID from other device'} </code>
+									<input
+										on:submit|preventDefault={async () => {
+											connect()
+										}}
+										bind:value={peerID}
+										class="input"
+										placeholder={`${peerType}'s ID`}
+										type="text"
+										autocapitalize="off"
+										autocomplete="off"
+										autocorrect="off"
+										spellcheck="false"
+										pattern="bb?[a-zA-Z0-9_-]+"
+									/>
 								</div>
 							</div>
 						</div>
-						<form
-							on:submit|preventDefault={async () => {
-								connect()
-							}}
-							class="inline"
-						>
-							<input
-								bind:value={peerID}
-								class="input"
-								placeholder={`${peerType}'s ID`}
-								type="text"
-								autocapitalize="off"
-								autocomplete="off"
-								autocorrect="off"
-								spellcheck="false"
-								pattern="bb?[a-zA-Z0-9_-]+"
-							/>
+						<div class="next">
 							<button
+								class="nextBtn"
+								disabled={peerID.length < 1}
 								on:click={() => {
 									connect()
 								}}>Connect</button
 							>
-						</form>
+						</div>
 					{:else}
 						<div class="content">
 							<h1>Ready to Receive Data</h1>
@@ -416,12 +429,10 @@
 		--padding: 0 $xl-spacing 0 $xl-spacing;
 	}
 	.sync-wrapper {
-		position: fixed;
 		display: grid;
 		align-items: center;
 		justify-items: center;
-		width: 100%;
-		height: 100%;
+
 		max-height: 100%;
 		grid-template-columns: 1fr;
 		z-index: 5;
@@ -439,8 +450,8 @@
 		padding: 1rem;
 		border-radius: $lg-radius;
 		display: inline;
-		font-size: 1.25em;
-		font-weight: 600;
+		font-size: 1.125em;
+		font-weight: 400;
 		letter-spacing: 0.01em;
 		// user-select: text;
 		// cursor: text;
@@ -508,8 +519,8 @@
 	}
 	.content {
 		position: relative;
-		background-clip: content-box;
-		padding-top: 1rem;
+		// background-clip: content-box;
+		padding: 1rem;
 		min-height: 0;
 	}
 	.screen-wrapper {
@@ -522,6 +533,7 @@
 		margin-bottom: 1rem;
 		display: flex;
 		flex-wrap: nowrap;
+		justify-content: center;
 	}
 	.nextbtn {
 		width: 100%;

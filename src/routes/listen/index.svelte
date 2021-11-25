@@ -13,6 +13,13 @@
 				playlist ? `&playlistId=${playlist}` : ''
 			}`
 		)
+		const list = await fetch(
+			`/api/next.json?videoId=${id ? id : ''}${
+				playlist ? `&playlistId=${playlist}` : ''
+			}`
+		)
+		const listData = await list.json()
+
 		const data = await metadata.json()
 		const {
 			videoDetails: {
@@ -27,7 +34,8 @@
 				title,
 				thumbnails,
 				videoId,
-				playlist
+				playlist,
+				related: listData
 			},
 			status: 200
 		}
@@ -39,9 +47,12 @@
 	export let playlist
 	export let thumbnails = []
 	export let title
+	export let related
 	import { goto } from '$app/navigation'
 	import Icon from '$lib/components/Icon/Icon.svelte'
+	import Listing from '$lib/components/Item/Listing.svelte'
 	import list from '$lib/stores/list'
+	$: console.log(related)
 	// $: console.log(videoId, playlist, thumbnails, title)
 </script>
 
@@ -61,70 +72,97 @@
 	<title>{title} | Beatbump</title>
 </svelte:head>
 <main>
-	<div class="modal">
-		<div class="modal-header">
-			<div class="image-container">
-				<img
-					src={thumbnails[thumbnails.length - 1]?.url}
-					width={thumbnails[thumbnails.length - 1]?.width}
-					height={thumbnails[thumbnails.length - 1]?.height}
-					alt={`Thumbnail for ${title}`}
-				/>
-			</div>
-			<span class="h2">Listen to {title}?</span>
+	<header>
+		<div class="image-container">
+			<img
+				src={thumbnails[thumbnails.length - 1]?.url}
+				width={thumbnails[thumbnails.length - 1]?.width}
+				height={thumbnails[thumbnails.length - 1]?.height}
+				alt={`Thumbnail for ${title}`}
+			/>
 		</div>
-		<div class="container">
+		<div class="body">
+			<span class="title h4">{title}</span>
 			<button
 				on:click={() => {
-					list.initList({ videoId, playlistId: playlist })
-					goto('/trending')
+					list.initList({
+						videoId,
+						playlistId: playlist ?? related?.currentMixId
+					})
 				}}
 				><Icon name="play" size="1.25em" color="black" /><span class="text"
 					>Start Listening</span
 				></button
 			>
 		</div>
+	</header>
+	<section class="related">
+		<span class="h2">Related Tracks</span>
+		<div class="results">
+			{#each related?.results as result}
+				<Listing data={result} />
+			{/each}
+		</div>
+	</section>
+	<div class="modal">
+		<div class="modal-header" />
+		<div class="container" />
 	</div>
 </main>
 
 <style lang="scss">
+	.related {
+		display: flex;
+		flex-direction: column;
+		gap: 0.8rem;
+	}
+
+	.body {
+		grid-area: body;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		align-self: center;
+		gap: 1.25rem;
+	}
+	button {
+		grid-area: button;
+	}
+	header {
+		display: grid;
+		grid-template-areas:
+			'img body'
+			'img .';
+		grid-template-columns: 0.5fr 1fr;
+
+		grid-template-rows: 1fr 1fr;
+		gap: 1rem;
+		margin-bottom: 0.8rem;
+
+		background-color: hsl(209deg 20% 27% / 19%);
+		border-color: #1b1b1b;
+		border-radius: 0.8em;
+		border-width: 1px;
+		margin: 1em;
+		padding: 0.8em;
+		transition: all 0.23s cubic-bezier(0.39, 0.575, 0.565, 1);
+	}
 	.container {
 		place-items: center;
 	}
-	.modal {
-		display: flex;
-		flex-direction: column;
 
-		background: #121018;
-		align-self: center;
-		padding: 1rem 1.5rem;
-		border-radius: $lg-radius;
-	}
-	.modal-header {
-		font-size: 1.5rem;
-		font-family: 'Commissioner', sans-serif;
-		font-weight: 500;
-		letter-spacing: -0.01em;
-		// margin-bottom: 0.8rem;
-		display: inline-flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.8rem;
-	}
 	.image-container {
 		max-width: 100%;
 		height: auto;
-		max-height: 12rem;
+		max-height: 20rem;
+		grid-area: img;
 	}
 	img {
 		width: inherit;
 		max-width: inherit;
 		max-height: inherit;
+		width: 100%;
+		height: auto;
 		object-fit: cover;
-	}
-	main {
-		display: flex;
-		height: 100%;
-		justify-content: center;
 	}
 </style>

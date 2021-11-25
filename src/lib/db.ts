@@ -224,7 +224,13 @@ export default {
 	async deleteAllPlaylists() {
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
-				notify('Playlists Deleted!', 'success')
+				const tx = (db
+					.transaction(['playlists'], 'readwrite')
+					.objectStore('playlists')
+					.clear().onsuccess = function (e) {
+					notify('Playlists Deleted!', 'success')
+					resolve('deleted')
+				})
 			})
 		})
 	},
@@ -233,8 +239,8 @@ export default {
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
 				try {
-					db.transaction(['playlist'], 'readwrite')
-						.objectStore('playlist')
+					db.transaction(['playlists'], 'readwrite')
+						.objectStore('playlists')
 						.delete(name)
 					notify('Playlist Deleted!', 'success')
 				} catch (e) {

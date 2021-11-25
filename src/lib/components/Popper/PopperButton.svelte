@@ -21,7 +21,7 @@
 			// 	PopperStore.reset()
 			// 	isOpen = false
 			// }
-			console.log(event)
+			// console.log(event)
 			event.stopPropagation()
 
 			const rect = node.getBoundingClientRect()

@@ -40,12 +40,14 @@ export function parseNextItem(item, length) {
 			title: title,
 			artistInfo: {
 				pageType: 'MUSIC_PAGE_TYPE_ARTIST',
-				artist: item.artistInfo.artist[0],
+				artist: Array.isArray(item.artistInfo)
+					? item.artistInfo.artist[0]
+					: item.artistInfo.artist,
 				browseId: item.artistInfo.browseId
 			},
 			videoId: item.videoId,
 			autoMixList: item.playlistId,
-			thumbnail: item.thumbnails[0].url,
+			thumbnail: item.thumbnails ? item.thumbnails[0].url : item.thumbnail,
 			length: length
 		}
 	})

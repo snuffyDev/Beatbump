@@ -110,49 +110,46 @@ export default {
 		config?: { playerParams?: string; type?: string }
 	}) {
 		try {
-
 			loading = true
 			playerLoading.set(loading)
 
-		keyId = keyId ? keyId : 0
-		key.set(keyId)
-		if (hasList) {
-			mix = []
-			splitList = []
-			Chunked = {}
+			keyId = keyId ? keyId : 0
+			key.set(keyId)
+			if (hasList) {
+				mix = []
+				splitList = []
+				Chunked = {}
+			}
+			hasList = true
+
+			const response = await fetchNext({
+				params: playerParams ? playerParams : '',
+				videoId,
+				playlistId: playlistId ? playlistId : '',
+
+				playlistSetVideoId: playlistSetVideoId ? playlistSetVideoId : '',
+				clickTracking,
+				configType: type
+			})
+			const data = await response
+
+			await getSrc(videoId, playlistId, playerParams)
+			currentTitle.set(data.results[0].title)
+
+			loading = false
+			playerLoading.set(loading)
+
+			continuation = data.continuation
+			currentMixId = data.currentMixId
+			clickTrackingParams = data.clickTrackingParams
+
+			mix = [...data.results]
+			list.set({ currentMixId, clickTrackingParams, continuation, mix })
+		} catch (err) {
+			loading = false
+			playerLoading.set(loading)
+			console.error(err)
 		}
-		hasList = true
-
-		const response = await fetchNext({
-			params: playerParams ? playerParams : '',
-			videoId,
-			playlistId: playlistId ? playlistId : '',
-
-			playlistSetVideoId: playlistSetVideoId ? playlistSetVideoId : '',
-			clickTracking,
-			configType: type
-		})
-		const data = await response
-
-		await getSrc(videoId, playlistId, playerParams)
-		currentTitle.set(data.results[0].title)
-
-		loading
-		 = false
-		playerLoading.set(loading)
-
-		continuation = data.continuation
-		currentMixId = data.currentMixId
-		clickTrackingParams = data.clickTrackingParams
-
-		mix = [...data.results]
-		list.set({ currentMixId, clickTrackingParams, continuation, mix })
-	}catch(err){
-		loading = false;
-		playerLoading.set(loading);
-		console.error(err);
-
-	}
 	},
 	removeItem(index) {
 		mix.splice(index, 1)
@@ -165,7 +162,7 @@ export default {
 		const nextItem = parseNextItem(item, length)
 		mix.splice(key + 1, 0, nextItem)
 		// console.log(mix, nextItem)
-
+		notify('Added to queue!', 'success')
 		list.set({ currentMixId, clickTrackingParams, continuation, mix })
 	},
 	async moreLikeThis(item) {

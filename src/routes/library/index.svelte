@@ -61,7 +61,7 @@
 			on:click={() => {
 				showSyncModal = true
 			}}
-			><Icon name="send" size="1.125em" />
+			><Icon name="send" size="1.1em" />
 			<span class="btn-text">Sync Your Data</span></button
 		>
 	</header>
@@ -121,11 +121,6 @@
 		/>
 	{/if}
 	<section>
-		<!-- <button
-			on:click={() => {
-				db.deleteAllPlaylists()
-			}}>Delete all playlists</button
-		> -->
 		{#await playlists then favorites}
 			<Grid
 				heading="Your Playlists"
@@ -133,7 +128,18 @@
 				on:new_playlist={() => {
 					showPlaylistModal = true
 				}}
-			/>
+			>
+				<button
+					slot="buttons"
+					class="outlined"
+					on:click={() => {
+						db.deleteAllPlaylists()
+					}}
+					><Icon name="tool" size="1.1em" /><span class="btn-text"
+						>Manage Playlists</span
+					></button
+				></Grid
+			>
 		{:catch err}
 			{err}
 		{/await}
@@ -150,7 +156,7 @@
 		margin-bottom: 1rem;
 	}
 	button {
-		gap: 0.5rem;
+		gap: 0.25rem;
 	}
 	header {
 		display: inline;

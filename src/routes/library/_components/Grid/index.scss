@@ -17,6 +17,10 @@
 	font-size: 2.074rem;
 	font-weight: 700;
 }
+.header {
+	display: flex;
+	flex-direction: column;
+}
 
 // @media screen and (min-width: 25rem) and (max-width: 37rem) {
 // 	.grid {

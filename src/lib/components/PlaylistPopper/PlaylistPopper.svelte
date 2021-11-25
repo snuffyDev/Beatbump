@@ -66,27 +66,11 @@
 					showCreatePlaylist = true
 				}}
 			/>
-			<!-- {#if showConfirmation && showConfirmation?.index !== undefined}
-				<div class="confirmation">
-					<em>{playlists[showConfirmation?.index].name}</em>
-					<button on:click|preventDefault>Add</button>
-				</div>
-			{/if} -->
 		</div>
 	</Modal>
 {/if}
 
 <style lang="scss">
-	// .confirmation {
-	// 	position: sticky;
-	// 	bottom: 0;
-	// 	background-color: #585869;
-	// 	width: 100%;
-	// 	height: 100%;
-	// 	margin: 0;
-	// 	padding: 0.2rem 0.8rem;
-	// 	// backdrop-filter: brightness(5);
-	// }
 	.list {
 		overflow-y: auto;
 		position: relative;

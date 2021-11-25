@@ -1,9 +1,15 @@
+@use "../base/variables" as v;
+
 // BASE BUTTON STYLES
 // All rules related to the .button module
+$background: #ffffff;
+$color: #0d0d0d;
+$focus-background: #8f8f8f;
+$focus-color: #1c1c1c;
 %active {
-	color: rgb(15, 15, 15);
-	background: linear-gradient(to bottom, darken(#d4d4d4, 10%), #fff) !important;
-	border-color: #202020 !important;
+	color: $focus-color;
+	background: $focus-background !important;
+	border-color: $focus-color !important;
 	// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
 	outline: 0;
 	text-decoration: none;
@@ -13,13 +19,14 @@
 	display: inline-flex;
 	padding: 0.6rem 1.2rem;
 	color: #0e0e0e; //  is added to colors in order to make button utility immutable.  Otherwise, it's common for `a` styles to override button specificity.
-	background: linear-gradient(to bottom, #ffffff, #ffffff);
+	background: $background;
+
 	border: 1px solid #121212;
-	border-radius: var(--base-radius);
+	border-radius: v.$base-radius;
 	font-family: "Commissioner", sans-serif;
 	cursor: pointer;
 	font-size: 1.125rem;
-	font-weight: 500;
+	font-weight: 600;
 	text-transform: none;
 	// margin-bottom: 0.5rem;
 	// text-align: center;
@@ -41,7 +48,7 @@
 	@media (hover: hover) {
 		&:hover {
 			color: rgb(15, 15, 15);
-			background: linear-gradient(to bottom, darken(#ffffff, 10%), #ffffff) !important;
+			background: lighten($focus-background, 30%) !important;
 			border-color: #202020 !important;
 			// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
 			outline: 0;
@@ -53,7 +60,7 @@
 	&.active {
 		@extend %active;
 		// background: #f1f1f1 !important;
-		background: linear-gradient(to bottom, darken(#f7f7f7, 15%), #fff) !important;
+		background: $focus-background !important;
 	}
 	&:disabled,
 	.disabled {
