@@ -13,10 +13,33 @@ export const sort = (data, WebM = false) => {
 			return [{ url: null, error: json.playabilityStatus.status }]
 		}
 		const streamingData = json.streamingData
+		let arr = []
+		if (streamingData['dashManifestUrl']) {
+			streamingData['formats'].map((format) => {
+				if (
+
+					format.audioChannels === 2 &&
+					format.audioQuality.includes('AUDIO_QUALITY_MEDIUM') &&
+					format.mimeType.includes('mp4')
+				) {
+					arr.push(format)
+				}
+			})
+			if (arr.length !== 0) {
+				// console.log('0!!!!')
+				return arr.map((format) => {
+					return {
+						url: format.url,
+						mimeType: format.mimeType
+					}
+				})
+			}
+
+			return [{ url: null, mimeType: null }]
+		}
 		const formatParent = streamingData['formats'].concat(
 			streamingData['adaptiveFormats']
 		)
-		let arr = []
 		let getNext
 		// console.log(formatParent, streamingData)
 

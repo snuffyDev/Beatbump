@@ -130,12 +130,10 @@
 	}
 	header {
 		display: grid;
-		grid-template-areas:
-			'img body'
-			'img .';
+		grid-template-areas: 'img body';
 		grid-template-columns: 0.5fr 1fr;
+		grid-template-rows: 1fr;
 
-		grid-template-rows: 1fr 1fr;
 		gap: 1rem;
 		margin-bottom: 0.8rem;
 
@@ -146,6 +144,12 @@
 		margin: 1em;
 		padding: 0.8em;
 		transition: all 0.23s cubic-bezier(0.39, 0.575, 0.565, 1);
+		@media screen and (min-width: 640px) {
+			grid-template-areas:
+				'img body'
+				'img .';
+			grid-template-rows: 1fr 1fr;
+		}
 	}
 	.container {
 		place-items: center;
