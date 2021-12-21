@@ -70,7 +70,6 @@
 				width={headerThumbnail[0].width}
 				height={headerThumbnail[0].height}
 				class="immer-img"
-				loading="eager"
 				alt="large background header"
 			/>
 		</picture>

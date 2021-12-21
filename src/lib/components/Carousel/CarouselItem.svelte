@@ -202,7 +202,7 @@
 	}
 
 	// $:console.log(item.thumbnails)
-	let srcImg = item.thumbnails[item.thumbnails.length - 1].url
+	let srcImg = item.thumbnails[0].url
 
 	if (kind === 'Singles') {
 		DropdownItems.splice(1, 1)
@@ -294,9 +294,9 @@
 				class:img16x9={RATIO_RECT}
 				class:img1x1={RATIO_SQUARE}
 				decoding="async"
-				width={item.thumbnails[item.thumbnails.length - 1].width}
-				height={item.thumbnails[item.thumbnails.length - 1].height}
-				src={item.thumbnails[item.thumbnails.length - 1]?.placeholder}
+				width={item.thumbnails[0].width}
+				height={item.thumbnails[0].height}
+				src={item.thumbnails[0]?.placeholder}
 				use:lazy={{
 					src: srcImg
 				}}
