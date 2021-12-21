@@ -1,15 +1,21 @@
 import { dev } from '$app/env'
 
 import type { ServerResponse } from '@sveltejs/kit/types/hooks'
-const rootDomain = import.meta.env.VITE_DOMAIN // or your server IP for dev
-const originURL = import.meta.env.VITE_SITE_URL // or your server IP for dev
+const rootDomain = '*' // or your server IP for dev
+const originURL = '*' // or your server IP for dev
 
 const directives = {
 	'base-uri': ["'self'"],
 	'child-src': ["'self'"],
 	'connect-src': dev
-		? ["'self'", 'ws://localhost:*', 'ws://*', '*']
-		: ["'self'", 'ws://localhost:*', 'wss://*.peerjs.com', 'ws://*.peerjs.com'],
+		? ["'self'", 'ws://localhost:*', 'ws://*', 'blob://*', '*']
+		: [
+				"'self'",
+				'ws://localhost:*',
+				'https://*.googlevideo.com',
+				'wss://*.peerjs.com',
+				'ws://*.peerjs.com'
+		  ],
 	// 'connect-src': ,
 	'img-src': [
 		"'self'",
@@ -28,6 +34,8 @@ const directives = {
 	'media-src': [
 		"'self'",
 		'data:',
+		'blob://*',
+		'blob:*',
 		'ws://localhost:*',
 		'localhost:*',
 		'https://*.googlevideo.com'
@@ -45,6 +53,8 @@ const directives = {
 	'script-src': [
 		"'self'",
 		"'unsafe-inline'",
+		'localhost:*',
+
 		"'report-sample'",
 		'https://static.cloudflareinsights.com'
 	],
