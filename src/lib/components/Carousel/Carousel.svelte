@@ -5,36 +5,23 @@
 	import Icon from '$components/Icon/Icon.svelte'
 	import { page } from '$app/stores'
 	import { onMount } from 'svelte'
-	// import { tweened } from 'svelte/motion'
+	import observer from './observer'
 
 	export let header: CarouselHeader
 	export let items = []
 	export let type = ''
 	export let kind = 'normal'
 	export let isBrowseEndpoint
-	// import { quartInOut } from 'svelte/easing'
-	// const tween = tweened(0, {
-	// 	easing: quartInOut
-	// })
 	let isHidden
 	let section = []
 	let arr = []
 	let moreOnLeft, moreOnRight
 	if (items.length > 3) {
-		arr = [...splitArray(items, 5)]
+		arr = [...splitArray(items, 4)]
 	} else {
 		arr = [[...items]]
 	}
-	let frame
-	function scrollHandler(timestamp) {
-		if (!carousel) return
-		moreOnLeft = carousel.scrollLeft < 15 ? false : true
-		moreOnRight =
-			carousel.scrollLeft < carousel.scrollWidth - carousel.clientWidth - 15
-				? true
-				: false
-		frame = requestAnimationFrame(scrollHandler)
-	}
+
 	function splitArray(flatArray, numCols) {
 		const newArray = []
 		for (let c = 0; c < numCols; c++) {
@@ -47,34 +34,48 @@
 		return newArray
 	}
 	let idx = 0
-	// $: console.log(group.length, group)
 	let carousel: HTMLDivElement
 
 	let group = []
 	onMount(() => {
-		if (carousel !== undefined) {
+		let frame
+
+		function scrollHandler() {
+			if (!carousel) return
 			moreOnLeft = carousel.scrollLeft < 15 ? false : true
 			moreOnRight =
-				carousel.scrollLeft < carousel.scrollWidth - carousel.clientWidth
+				carousel.scrollLeft < carousel.scrollWidth - carousel.clientWidth - 15
 					? true
 					: false
-
-			carousel.addEventListener('scroll', () =>
-				window.requestAnimationFrame(scrollHandler)
-			)
+			cancelAnimationFrame(frame)
 		}
+		frame = requestAnimationFrame(scrollHandler)
+
+		carousel !== undefined &&
+			carousel.addEventListener(
+				'scroll',
+				() => {
+					frame = requestAnimationFrame(scrollHandler)
+				},
+				{ passive: true }
+			)
 
 		return () => {
-			carousel.removeEventListener('scroll', () =>
-				window.cancelAnimationFrame(frame)
+			cancelAnimationFrame(frame)
+			carousel.removeEventListener(
+				'scroll',
+				() => {
+					frame = requestAnimationFrame(scrollHandler)
+				},
+				true
 			)
 		}
+		// let rectValue: any = 0
 	})
-	// let rectValue: any = 0
 	// $: if (carousel) carousel.scrollLeft += $tween
 	const isArtistPage = $page.path.includes('/artist/')
 	let notArtist = header.browseId?.includes('VLP')
-		? `/playlist?list=${header?.browseId}`
+		? `/playlist/${header?.browseId}`
 		: `/trending/new/${header?.browseId}${
 				header?.params ? `?params=${header?.params}` : ''
 		  }${header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ''}`
@@ -103,7 +104,7 @@
 	{:else if isArtistPage && header.title.includes('Videos')}
 		<a
 			style="white-space:pre; display: inline-block;"
-			href={`/playlist?list=${header?.browseId}`}><small>See All</small></a
+			href={`/playlist/${header?.browseId}`}><small>See All</small></a
 		>
 	{/if}
 </div>
@@ -118,9 +119,6 @@
 			let rect = child[0].getBoundingClientRect()
 
 			carousel.scrollLeft += rect.left
-			// console.log(rect.left)
-			// tween.set(rect.left)
-			// carousel.scrollLeft += $tween
 		}}
 	>
 		<Icon name="chevron-left" size="1.5em" />
@@ -134,21 +132,13 @@
 			idx++
 			let child = group[idx].children
 			let rect = child[0].getBoundingClientRect()
-			// console.log(rect.left)
-
-			// tween.set(rect.left)
 			carousel.scrollLeft += rect.left
 		}}
 	>
 		<Icon name="chevron-right" size="1.5em" />
 	</div>
 
-	<div
-		class="scroll"
-		id="scrollItem"
-		on:scroll={scrollHandler}
-		bind:this={carousel}
-	>
+	<div class="scroll" id="scrollItem" bind:this={carousel}>
 		{#each arr as item, index}
 			<div class="c-group" bind:this={group[index]}>
 				{#each item as item, i}
@@ -196,24 +186,25 @@
 		font-weight: 500;
 	}
 	.c-group {
-		display: inline-flex;
-		padding-bottom: 1.8rem;
-		// padding-left: 0.5rem;
+		display: flex;
 		scroll-snap-align: start;
-		// padding-right: 0.5rem;
+		align-items: flex-start;
+		// visibility: hidden;
+		position: relative;
+		&::before {
+			display: block;
+			content: '';
+			position: absolute;
 
-		// gap: 1.5rem;
+			padding-top: calc(100% * 2 / 3);
+		}
 		&:last-child {
 			padding-right: 0.5rem;
 		}
 		&:first-child {
-			padding-left: 0.5rem;
+			// padding-left: 0.5rem;
+			visibility: visible;
 		}
-		// &:last-child {
-		// 	.container.carouselItem:last-child {
-		// 		padding-right: 1rem;
-		// 	}
-		// }
 	}
 	.left,
 	.right {
@@ -272,37 +263,29 @@
 		visibility: hidden;
 	}
 	.scroll {
-		background: #453d5d2e;
-
-		// grid-column-gap: 0.5rem;
-		/* overflow-y: hidden; */
-		// overflow-x: hidden;
+		background: hsla(255, 21%, 30%, 0.2);
+		contain: layout paint style;
 		height: auto;
-		display: flex;
-		/* grid-auto-flow: column; */
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: 1fr;
 		overflow-x: scroll;
-		grid-template-rows: 1fr;
-		padding-top: 1rem;
+		overflow-y: visible;
 		width: auto;
-		// gap: 1.25rem;
 		-ms-scroll-snap-type: x mandatory;
 		scroll-snap-type: x mandatory;
 		border-radius: inherit;
 		overflow-anchor: none;
 		-webkit-overflow-scrolling: touch;
-		flex-direction: row;
-		flex-wrap: nowrap;
 		scrollbar-gutter: 0.833333rem;
 		scrollbar-width: thin;
-		scrollbar-color: #c7c7c7 #5e5e5e2f;
-
+		touch-action: pan-x pan-y;
 		&::-webkit-scrollbar {
 			width: 0;
 			height: 0;
 		}
 
 		&::-webkit-scrollbar-track {
-			background: #5e5e5e2f;
 			border-radius: 0.625rem;
 			height: 0;
 			width: 0%;

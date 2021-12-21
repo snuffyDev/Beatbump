@@ -36,6 +36,7 @@
 				videoId,
 				playlist,
 				related: listData
+				// data: listData
 			},
 			status: 200
 		}
@@ -48,11 +49,12 @@
 	export let thumbnails = []
 	export let title
 	export let related
+	// export let data
 	import { goto } from '$app/navigation'
 	import Icon from '$lib/components/Icon/Icon.svelte'
 	import Listing from '$lib/components/Item/Listing.svelte'
 	import list from '$lib/stores/list'
-	$: console.log(related)
+	// $: console.log(related)
 	// $: console.log(videoId, playlist, thumbnails, title)
 </script>
 

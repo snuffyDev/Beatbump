@@ -18,32 +18,7 @@ export async function get({
 	const clickTracking = query.get('clickParams') || ''
 	const setVideoId = query.get('setVideoId') || ''
 	const type = query.get('configType') || ''
-	console.dir({
-		context: {
-			client: {
-				clientName: 'WEB_REMIX',
-				clientVersion: '0.1',
-				user: {
-					enableSafetyMode: false
-				}
-			},
-			clickTracking: {
-				clickTrackingParams: `${clickTracking}`
-			}
-		},
-		continuation: `${ctoken}`,
-		isAudioOnly: true,
-		enablePersistentPlaylistPanel: true,
-		params: `${params !== '' ? encodeURIComponent(params) : itct}`,
-		tunerSettingValue: 'AUTOMIX_SETTING_NORMAL',
-		videoId,
-		playlistSetVideoId: `${setVideoId}`,
-		playlistId,
-		watchEndpointMusicConfig: {
-			hasPersistentPlaylistPanel: true,
-			musicVideoType: type ? type : 'MUSIC_VIDEO_TYPE_ATV'
-		}
-	})
+
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/next?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{

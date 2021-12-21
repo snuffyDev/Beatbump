@@ -1,6 +1,8 @@
 // /* eslint-disable no-undef */
 
 import node from '@sveltejs/adapter-node'
+import adapter from '@sveltejs/adapter-cloudflare'
+import worker from '@snuffydev/adapter-cloudflare-cache'
 import autoprefixer from 'autoprefixer'
 import cssnano from 'cssnano'
 import path from 'path'
@@ -8,8 +10,6 @@ import sveltePreprocess from 'svelte-preprocess'
 
 const check = process.env.NODE_ENV
 const dev = check === 'development'
-import worker from '@snuffydev/adapter-cloudflare-cache'
-
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	preprocess: sveltePreprocess({
@@ -26,7 +26,7 @@ const config = {
 	}),
 
 	kit: {
-		adapter: dev ? node() : worker({}),
+		adapter: dev ? node() : adapter({}),
 		target: '#app',
 		files: {
 			assets: 'static',
@@ -54,6 +54,15 @@ const config = {
 			}))()],
 
 		}
+	},
+	onwarn(warning, defaultHandler) {
+		// don't warn on <marquee> elements, cos they're cool
+		if (warning.code === "css-unused-selector")
+			return;
+
+		// handle all other warnings normally
+		defaultHandler(warning);
 	}
+
 }
 export default config

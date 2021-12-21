@@ -28,7 +28,7 @@
 	export let header
 	export let contents = []
 	export let status
-	$: console.log(header, contents)
+	// $: console.log(header, contents)
 </script>
 
 <main>

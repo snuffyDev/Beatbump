@@ -4,7 +4,7 @@
 // All rules related to the .button module
 $background: #ffffff;
 $color: #0d0d0d;
-$focus-background: #8f8f8f;
+$focus-background: #cccccc;
 $focus-color: #1c1c1c;
 %active {
 	color: $focus-color;
@@ -17,16 +17,17 @@ $focus-color: #1c1c1c;
 }
 %button-base {
 	display: inline-flex;
-	padding: 0.6rem 1.2rem;
-	color: #0e0e0e; //  is added to colors in order to make button utility immutable.  Otherwise, it's common for `a` styles to override button specificity.
+	padding: 0.8rem 1.2rem;
+	color: #0e0e0e !important; //  is added to colors in order to make button utility immutable.  Otherwise, it's common for `a` styles to override button specificity.
 	background: $background;
 
-	border: 1px solid #121212;
+	border: 0.15rem solid hsl(0deg 0% 7%);
 	border-radius: v.$base-radius;
 	font-family: "Commissioner", sans-serif;
 	cursor: pointer;
-	font-size: 1.125rem;
-	font-weight: 600;
+	font-size: unset;
+	gap: 0.25rem;
+	font-weight: 500;
 	text-transform: none;
 	// margin-bottom: 0.5rem;
 	// text-align: center;
@@ -37,8 +38,17 @@ $focus-color: #1c1c1c;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
-	max-height: 3rem;
+	padding: 0.7em 0.57em;
+	// height: 100%;
+	// width: 100%;
+	/* align-items: center; */
+	transition: background linear 75ms, color linear 75ms;
+	text-transform: uppercase;
+	font-weight: 600;
+	font-size: unset;
+	justify-content: center;
 	align-items: center;
+	vertical-align: middle;
 	// &:focus {
 	//     outline: thin dotted #333;
 	//     outline-offset: -2px;
@@ -47,7 +57,7 @@ $focus-color: #1c1c1c;
 	text-transform: uppercase;
 	@media (hover: hover) {
 		&:hover {
-			color: rgb(15, 15, 15);
+			color: rgb(15, 15, 15) !important;
 			background: lighten($focus-background, 30%) !important;
 			border-color: #202020 !important;
 			// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
@@ -60,6 +70,8 @@ $focus-color: #1c1c1c;
 	&.active {
 		@extend %active;
 		// background: #f1f1f1 !important;
+		color: $focus-color !important 	;
+		border-color: $focus-color !important;
 		background: $focus-background !important;
 	}
 	&:disabled,
@@ -69,7 +81,7 @@ $focus-color: #1c1c1c;
 		cursor: not-allowed;
 		border-color: #444;
 		&:hover {
-			background: rgb(44, 44, 44) !important !important;
+			background: rgb(44, 44, 44) !important;
 		}
 	}
 }
@@ -80,6 +92,7 @@ button.small {
 	@extend %button-base;
 	max-width: fit-content;
 }
+
 button.has-icon {
 	display: inline-flex;
 	justify-items: center;
@@ -115,6 +128,7 @@ button.outlined {
 		&:hover {
 			background: rgba(255, 255, 255, 0.034) !important;
 			border-color: rgba(194, 170, 194, 0.667) !important;
+			color: rgb(236, 236, 236) !important;
 		}
 	}
 	&:active {
@@ -130,6 +144,33 @@ button.outlined {
 .button {
 	@extend %button-base;
 }
-button {
+button:not(.icon-btn) {
 	@extend %button-base;
+}
+button.icon-btn {
+	display: inline-flex;
+	flex-wrap: nowrap;
+	position: relative;
+	cursor: pointer;
+	padding: 8pt;
+	place-content: center;
+	max-width: 44pt;
+	border: none;
+	background-color: hsl(0deg 0% 0% / 0%);
+	color: var(--color-dark);
+}
+
+button.danger {
+	border-color: #eb2019 !important;
+	color: darken(#ff4949, 3%) !important;
+	background: #5c191718 !important;
+	&:hover {
+		color: lighten(#ff4949, 3%) !important;
+		border-color: #eb2019b2 !important;
+	}
+	&:active {
+		color: lighten(#ff4949, 10%) !important;
+		border-color: #eb20195b !important;
+		background: #5c191785 !important;
+	}
 }

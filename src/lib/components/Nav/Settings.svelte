@@ -9,14 +9,17 @@
 	let themes = [
 		{ name: 'dark' },
 		{ name: 'dim' },
-		{ name: 'light' },
 		{ name: 'midnight' },
 		{ name: 'ytm' }
 	]
 </script>
 
 {#if isSettingsOpen}
-	<div class="nav-settings" transition:fade={{ duration: 120, easing: circIn }}>
+	<div
+		class="nav-settings"
+		role="settings"
+		transition:fade={{ duration: 120, easing: circIn }}
+	>
 		<!-- <label for="search"><em>search</em></label> -->
 
 		<div class="setting">

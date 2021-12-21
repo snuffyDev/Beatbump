@@ -46,34 +46,10 @@ export function parsePageContents(data: Data) {
 			.content.sectionListRenderer.contents[0].musicShelfRenderer.contents
 	]
 	const songs = contents.map(
-		({ musicResponsiveListItemRenderer = {} }, index) => {
-			const {
-				text,
-				navigationEndpoint: {
-					watchEndpoint: { playlistId = '', videoId = '' } = {}
-				} = {}
-			} = musicResponsiveListItemRenderer?.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0]
-			const playlistSetVideoId =
-				musicResponsiveListItemRenderer?.playlistItemData?.playlistSetVideoId
-			let explicit = false
-			if (musicResponsiveListItemRenderer?.badges) {
-				explicit = true
-			}
-			console.log(contents)
-			const length = musicResponsiveListItemRenderer.fixedColumns
-				? musicResponsiveListItemRenderer?.fixedColumns[0]
-						?.musicResponsiveListItemFixedColumnRenderer?.text?.runs[0]?.text
-				: ''
-			return {
-				title: text,
-				playlistId,
-				videoId,
-				musicResponsiveListItemRenderer,
-				index,
-				length,
-				explicit
-			}
-		}
+		({ musicResponsiveListItemRenderer = {} }, index) => ({
+			...MusicResponsiveListItemRenderer({ musicResponsiveListItemRenderer }),
+			index
+		})
 	)
 
 	const releaseInfoParser = () => {
@@ -122,7 +98,7 @@ export function parsePageContents(data: Data) {
 		}
 	}
 	const releaseInfo = releaseInfoParser()
-	console.log(releaseInfo)
+	// console.log(releaseInfo)
 
 	return {
 		items: songs,

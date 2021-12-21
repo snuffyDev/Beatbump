@@ -1,4 +1,13 @@
 export default {
+	clock: `	<circle cx="12" cy="12" r="10" />
+	<path d="M12 6v6l4 2" />
+`,
+	image: `  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+  <circle cx="8.5" cy="8.5" r="1.5" />
+  <polyline points="21 15 16 10 5 21" />`,
+	upload: `  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+  <polyline points="17 8 12 3 7 8" />
+  <line x1="12" y1="3" x2="12" y2="15" />`,
 	frown: `
 <circle cx="12" cy="12" r="10" />
 <path d="M16 16s-1.5-2-4-2-4 2-4 2" />
@@ -28,7 +37,8 @@ export default {
 </g>
 <path d="M -18.57 -22.149 H -16.529 V -18.067 H -12.448 V -16.027 H -16.529 V -11.946 H -18.57 V -16.027 H -22.651 V -18.067 H -18.57 Z" style="stroke-width: 1px;fill: currentColor;paint-order: fill;" transform="matrix(-1, 0, 0, -1, 0, 0)"/>
 `,
-	play: `<polygon points="5 3 19 12 5 21 5 3" />`,
+	play: `<polygon points="5 3 19 12 5 21 5 3" stroke-width="3" />`,
+	'play-player': `<polygon points="5 3 19 12 5 21 5 3" stroke-width="2" />`,
 	pause: `<rect x="6" y="4" width="4" height="16" />
 <rect x="14" y="4" width="4" height="16" />`,
 	dots: `<circle cx="12" cy="12" r="1" />
@@ -76,6 +86,5 @@ export default {
 	radio: `<circle cx="12" cy="12" r="2" />
 <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14" />`,
 	'chevron-right': `<polyline points="9 18 15 12 9 6" />`,
-	'chevron-left': `<polyline points="15 18 9 12 15 6" />
-`
+	'chevron-left': `<polyline points="15 18 9 12 15 6" />`
 }

@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
 	export const ssr = false
 	import type { Load } from '@sveltejs/kit'
-	import { onMount, setContext } from 'svelte'
+	import { onMount, setContext, tick } from 'svelte'
 	export const load: Load = async ({ page }) => {
 		const playlistName = page.params.slug
 		return {
@@ -17,7 +17,7 @@
 	import InfoBox from '$lib/components/Layouts/InfoBox.svelte'
 	import db from '$lib/db'
 	import List from './_List.svelte'
-	import ListItem from '$lib/components/ListItem/ListItem.svelte'
+	import ListItem from './_ListItem.svelte'
 	import { isPagePlaying, key } from '$lib/stores/stores'
 	import list from '$lib/stores/list'
 	import { getSrc } from '$lib/utils'
@@ -29,7 +29,7 @@
 	const ctx = {}
 
 	setContext(ctx, { pageId: playlistName })
-	console.log(playlistName)
+	// console.log(playlistName)
 	let items = []
 	let playlist: {
 		items?: any[]
@@ -37,8 +37,11 @@
 		thumbnail?: string
 		description?: string
 		length?: string
-	}
-	let thumbnail
+		id?: string
+	} = {}
+	let thumbnail = undefined
+	let showEditPlaylist
+
 	onMount(async () => {
 		const promise: {
 			items?: any[]
@@ -52,7 +55,29 @@
 		thumbnail = playlist.thumbnail
 		console.log(promise)
 	})
-	let showEditPlaylist
+	const drop = async (event, target) => {
+		event.dataTransfer.dropEffect = 'move'
+		const start = parseInt(event.dataTransfer.getData('text/plain'))
+		const newTracklist = items
+
+		if (start < target) {
+			newTracklist.splice(target + 1, 0, newTracklist[start])
+			newTracklist.splice(start, 1)
+		} else {
+			newTracklist.splice(target, 0, newTracklist[start])
+			newTracklist.splice(start + 1, 1)
+		}
+		items = newTracklist
+	}
+	const dragstart = (event, i) => {
+		console.log(event, i)
+
+		event.dataTransfer.effectAllowed = 'move'
+		event.dataTransfer.dropEffect = 'move'
+		const start = i
+		event.dataTransfer.setData('text/plain', start)
+	}
+	let hovering: number | boolean = false
 </script>
 
 <Header desc="Playlist" title="Playlist" url="/library" />
@@ -62,8 +87,11 @@
 			defaults={{
 				name: playlist?.name,
 				thumbnail: playlist?.thumbnail,
-				description: playlist?.description
+				description: playlist?.description,
+				id: playlist?.id
 			}}
+			hasFocus={true}
+			isLocalPlaylist={true}
 			on:close={() => (showEditPlaylist = false)}
 			on:cancel={() => (showEditPlaylist = false)}
 			on:submit={async ({ detail }) => {
@@ -80,13 +108,12 @@
 					name: detail.title,
 					description: detail?.description
 				}
-				console.log(promise)
 				showEditPlaylist = false
 			}}
 		/>
 	{/if}
 	<InfoBox
-		thumbnail={playlist?.thumbnail}
+		thumbnail={playlist.thumbnail}
 		description={playlist?.description}
 		title={playlist?.name}
 		editable={true}
@@ -113,10 +140,25 @@
 		]}
 	/>
 
-	<List {items} let:item let:index>
+	<List {items} let:item let:index let:send let:receive>
 		<ListItem
 			{ctx}
+			{send}
+			{receive}
 			page="library"
+			dragTargetIndex={hovering}
+			on:hovering={({ detail }) => (hovering = detail)}
+			on:notHovering={({ detail }) => (hovering = null)}
+			on:dragstart={(event) => dragstart(event, index)}
+			on:drop={async (event) => {
+				drop(event, index)
+				await tick()
+				await db.updatePlaylist({
+					items: [...items],
+					id: playlistName,
+					hideAlert: true
+				})
+			}}
 			on:initLocalList={async ({ detail }) => {
 				$list.mix = [...items]
 				await getSrc($list.mix[index]?.videoId)

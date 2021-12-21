@@ -5,7 +5,7 @@
 	import Icon from '$components/Icon/Icon.svelte'
 	import Search from '$components/Search/Search.svelte'
 	import { tooltip } from '$lib/actions/tooltip'
-	import { clickOutside } from '$lib/js/clickOutside'
+	import { clickOutside } from '$lib/actions/clickOutside'
 	import { circIn } from 'svelte/easing'
 	import { fade } from 'svelte/transition'
 	import Settings from './Settings.svelte'
@@ -20,78 +20,91 @@
 
 		window.history.go(-1)
 	}
+	let referrer
 </script>
 
 <nav class="nav">
 	<div class="logo">
 		{#if !key.includes('home')}
-			<div class="logo-back" on:click={() => goto('/home')}>
+			<div
+				class="logo"
+				style="
+			cursor: pointer;
+			"
+				on:click={navBack}
+			>
+				<Icon name="chevron-left" size="1.5rem" />
+			</div>
+			<a href={`/home`} class="logo-back no-style">
 				<img
 					style="margin-left:1.5rem;"
+					width="32"
+					height="32"
 					src="/logo.svg"
 					alt="logo"
 					title="Beatbump Home"
 				/>
-			</div>
-			<div on:click={navBack}>
-				<Icon name="chevron-left" size="1.5em" />
-			</div>
+			</a>
 		{:else}
-			<img
-				on:click={() => goto('/home')}
-				src="/logo.svg"
-				alt="logo"
-				title="Beatbump Home"
-			/>
+			<a href={`/home`} class="no-style">
+				<img
+					on:click={() => goto('/home')}
+					width="32"
+					height="32"
+					src="/logo.svg"
+					alt="logo"
+					title="Beatbump Home"
+				/>
+			</a>
 		{/if}
 	</div>
 
 	<div class="middle">
-		<div
-			class="nav-item  homeIcon"
+		<button
+			on:click={() => goto('/home')}
+			class="nav-icon icon-btn no-style"
 			use:tooltip
 			data-tooltip="Home"
-			on:click={() => goto('/home')}
+			aria-label="Home"
 			class:active={key.includes('home')}
 		>
 			<!-- <div class="nav-text">Home</div> -->
 			<Icon
 				name="home"
-				color={key.includes('home') ? '#fff' : '#BCBCBE'}
-				size="1.5em"
+				--stroke={key.includes('home') ? '#fff' : '#BCBCBE'}
+				size="1.5rem"
 			/>
-		</div>
+		</button>
 
-		<div
-			class="nav-item trending"
+		<button
+			on:click={() => goto('/trending')}
+			class="nav-icon icon-btn no-style"
 			use:tooltip
 			data-tooltip="Trending"
+			aria-label="Trending"
 			class:active={key.includes('trending')}
-			on:click={() => goto('/trending')}
 		>
-			<!-- <div class="nav-text">Trending</div> -->
 			<Icon
 				name="trending"
-				color={key.includes('trending') ? '#fff' : '#BCBCBE'}
-				size="1.5em"
+				--stroke={key.includes('trending') ? '#fff' : '#BCBCBE'}
+				size="1.5rem"
 			/>
-		</div>
-		<div
+		</button>
+		<button
 			use:tooltip
+			on:click={() => goto('/library')}
 			data-tooltip="Library"
-			class="nav-item btn-favorites"
+			aria-label="library"
+			class="nav-icon icon-btn no-style"
 			class:active={key.includes('library')}
-			on:click|stopPropagation={() => {
-				goto('/library')
-			}}
 		>
 			<!-- <div class="nav-text">Library</div> -->
 			<Icon
 				name="folder"
-				color={$page.path.includes('library') ? '#fff' : '#BCBCBE'}
-				size="1.5em"
+				--stroke={key.includes('library') ? '#fff' : '#BCBCBE'}
+				size="1.5rem"
 			/>
-		</div>
+		</button>
 	</div>
 
 	<div class="items">
@@ -112,26 +125,28 @@
 						hidden = !hidden
 					}}
 				/>
-				<div
+				<button
 					on:click={() => {
 						hidden = !hidden
 					}}
-					class="x-button"
+					class="icon-btn x-button"
+					aria-label="close"
 				>
-					<Icon name="x" size="1.5em" />
-				</div>
+					<Icon name="x" size="1.5rem" />
+				</button>
 			</div>
 		{/if}
 
-		<div
-			class="nav-item__search"
+		<button
+			class="nav-item icon-btn nav-item__search"
 			on:click={() => {
 				shown = !shown
 				hidden = !hidden
 			}}
+			aria-label="Search"
 		>
-			<Icon name="search" size="1.5em" />
-		</div>
+			<Icon name="search" size="1.5rem" />
+		</button>
 		<div
 			use:clickOutside
 			on:click_outside={() => {
@@ -140,56 +155,46 @@
 			style="display:contents; background:inherit;"
 		>
 			<Settings bind:isSettingsOpen />
-			<div
-				class="nav-item btn-settings"
+			<button
+				aria-label="Settings"
+				class="nav-item icon-btn btn-settings"
 				on:click|stopPropagation={() => {
 					isSettingsOpen = !isSettingsOpen
 				}}
 			>
-				<Icon name="settings" size="1.5em" />
-			</div>
+				<Icon name="settings" size="1.5rem" />
+			</button>
 		</div>
 	</div>
 </nav>
 
 <style lang="scss">
-	.active::before {
-		position: absolute;
-		top: 50%;
-		/* right: 0; */
-		/* bottom: 0; */
-		left: 50%;
-		// content: '';
-		border-radius: 9999rem;
-		width: 100%;
-		height: 100%;
-		z-index: -1;
-		color: #fff;
-		background: radial-gradient(
-			circle at center,
-			hsl(0deg 0% 85% / 25%),
-			hsl(0deg 0% 0% / 0%)
-		);
-		padding: 1.5rem;
-		transform: translate(-50%, -50%);
+	nav {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		padding: 1rem;
+
+		position: relative;
+		grid-template-areas: 'l m r';
+		min-height: 4rem;
+		align-content: center;
+		align-items: center;
+		justify-content: space-between;
+		grid-area: n/n/n/n;
+		border-bottom: 0.0625rem hsl(0deg 0% 12%) solid;
 	}
-	-back {
-		visibility: visible !important;
-		display: block !important;
-		@media screen and (max-width: 640px) {
-			visibility: none !important;
-			display: none !important;
-		}
+	img {
+		width: 2.5rem;
+		height: 2.5rem;
 	}
 	.logo {
+		grid-area: l;
 		display: inline-flex;
 		align-items: center;
-		flex-direction: row-reverse;
 		transition: cubic-bezier(0.445, 0.05, 0.55, 0.95) 150ms all;
 		&-back {
 			visibility: visible !important;
 			transition: cubic-bezier(0.445, 0.05, 0.55, 0.95) 150ms all;
-
 			display: block !important;
 			@media screen and (max-width: 640px) {
 				visibility: none !important;
@@ -197,81 +202,15 @@
 			}
 		}
 	}
-	.btn-settings,
-	.btn-favorites {
-		cursor: pointer;
-		display: block !important;
-		visibility: visible !important;
-	}
 	.middle {
-		grid-area: m;
+		position: relative;
+		margin: 0 auto;
 		display: inline-flex;
 		align-items: center;
 		justify-content: space-between;
-		.nav-item {
-			position: relative !important;
-			cursor: pointer;
-			padding: 1rem;
-		}
+		grid-area: m;
+		width: 100%;
 	}
-
-	.homeIcon {
-		visibility: visible;
-	}
-	nav {
-		border-bottom: 0.043128em solid #6d6d6d3a;
-
-		&::before {
-			box-shadow: 0 0.4rem 0.2rem -0.0875rem rgba(15, 15, 15, 11%);
-			position: absolute;
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
-			z-index: -1;
-			content: '';
-		}
-		&.light {
-			border-bottom: 0.043128em solid #6d6d6d9d;
-		}
-	}
-	.x-button {
-		padding: 1em 0 1rem 1rem;
-		right: 0;
-		margin-left: auto;
-		position: relative;
-		cursor: pointer;
-	}
-	.hidden {
-		display: none;
-		visibility: hidden;
-	}
-	.shown {
-		visibility: visible !important;
-	}
-
-	.nav-item {
-		margin-bottom: 0;
-		display: initial;
-		visibility: visible;
-		position: relative;
-		.nav-item {
-			margin-right: 2em;
-		}
-
-		&__search {
-			display: initial;
-			visibility: visible;
-
-			margin-right: 2rem;
-			cursor: pointer;
-		}
-
-		&-desktop {
-			place-items: end;
-		}
-	}
-
 	.items {
 		background-color: inherit;
 		grid-area: r;
@@ -280,13 +219,50 @@
 		display: inline-flex;
 		margin-left: auto;
 		.nav-item {
-			margin-right: 2em;
+			margin-right: 0.2em;
 		}
 		:last-child {
-			margin-right: 0;
+			margin: 0;
 		}
 	}
-	@media screen and (min-width: 640px) {
+
+	button.icon-btn {
+		&::before {
+			position: absolute;
+			content: '';
+			// z-index: -1;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			height: 100%;
+			width: 100%;
+			border-radius: 50%;
+			opacity: 0;
+			transition: linear 100ms, background linear 100ms;
+
+			background-position: center;
+			padding: 8pt;
+
+			// transition: background 0.8s;
+		}
+		@media (hover: hover) {
+			&:hover::before {
+				// background: ;
+				background: hsl(0deg 0% 33% / 8%)
+					radial-gradient(
+						circle,
+						hsl(0deg 0% 0% / 0%) 1%,
+						hsl(0deg 0% 33% / 16%) 0
+					)
+					500%/15000%;
+				opacity: 1;
+			}
+		}
+		&:active::before {
+			background-size: 100%;
+			background-color: #7272723f;
+			transition: background 0;
+		}
 	}
-	/* your styles go here */
 </style>

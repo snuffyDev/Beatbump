@@ -13,10 +13,11 @@
 <script lang="ts">
 	import type Peer from 'peerjs'
 	import Icon from '$lib/components/Icon/Icon.svelte'
-	import db from '$lib/db'
+	import db, { IDBPlaylist } from '$lib/db'
 	import { alertHandler } from '$lib/stores/stores'
 	import { createEventDispatcher, onMount, tick } from 'svelte'
 	import { fade } from 'svelte/transition'
+	import type { Item } from '$lib/types'
 
 	type PeerType = 'Sender' | 'Receiver'
 
@@ -34,9 +35,47 @@
 	$: peerType = check == 'sending' ? 'Sender' : 'Receiver'
 	$: type = check == 'sending' ? true : false
 	$: connection = undefined
-
+	const dataType = ['Playlists', 'Favorites']
+	let kindOfData = dataType
 	const dispatch = createEventDispatcher()
-
+	const stores: {
+		[functionName: string]: Function
+	} = {
+		Playlists: async () => {
+			const _lists = await db.getPlaylists()
+			const lists = await [..._lists]
+			const returned = lists
+			if (lists.length !== 0) {
+				return [...returned]
+			}
+		},
+		Favorites: async () => {
+			const _lists = await db.getFavorites()
+			const lists = await [..._lists]
+			const returned = lists
+			if (lists.length !== 0) {
+				return [...returned]
+			}
+		}
+	}
+	const getObjectStores = (kindOfData: string[]) => {
+		if (kindOfData.length == 0) return
+		return Promise.all([
+			...kindOfData.map((kind) =>
+				stores[kind]()
+					.then((data) => {
+						const items = data
+						return items
+					})
+					.then((list) => {
+						return {
+							type: kind,
+							items: list
+						}
+					})
+			)
+		])
+	}
 	const ID = () => {
 		if (!RTC && !browser) return
 
@@ -50,7 +89,20 @@
 					console.log(connection)
 					// When data is received from sender,
 					// write the contents to IndexedDB
-					await db.setMultiple(JSON.parse(data))
+					const ArrayOfStores = JSON.parse(data)
+					if (Array.isArray(ArrayOfStores)) {
+						ArrayOfStores.forEach(async (obj) => {
+							if (obj?.type == 'Playlists') {
+								const itemList = obj
+								await db.setMultiplePlaylists([...itemList?.items])
+							}
+							if (obj?.type == 'Favorites') {
+								const itemList = obj
+								await db.setMultipleFavorites([...itemList?.items])
+							}
+						})
+						console.log(ArrayOfStores)
+					}
 
 					alertHandler.set({ msg: 'Data sync completed!', type: 'success' })
 					setTimeout(() => {
@@ -85,9 +137,9 @@
 			// Receiver Connection
 		} else {
 			// Sender Connection
-
-			const information = await db.getFavorites()
-			const chData = JSON.stringify(information)
+			const data = await getObjectStores(kindOfData)
+			const chData = await JSON.stringify(data)
+			console.log(data, chData)
 			const conn = peer.connect(peerID)
 			conn.on('open', () => {
 				// Transfer to Receiver
@@ -194,11 +246,33 @@
 						</section>
 					</div>
 					<hr />
+					{#if check == 'sending'}
+						<div class="content">
+							<span class="subheading"
+								>What kind of data would you like to send?</span
+							>
+							<div class="container">
+								{#each dataType as option}
+									<label>
+										{option}
+										<input
+											type="checkbox"
+											bind:group={kindOfData}
+											value={option}
+											name="dataType"
+										/>
+									</label>
+								{/each}
+							</div>
+						</div>
+					{/if}
 				</div>
 				<div class="next">
 					<button
 						class="nextbtn"
-						disabled={check == undefined}
+						disabled={check == 'sending'
+							? check == 'sending' && kindOfData.length === 0
+							: check == undefined}
 						on:click={() => {
 							if (check !== undefined) nextStep()
 						}}>Next Step</button
@@ -308,6 +382,9 @@
 					{:else}
 						<div class="content">
 							<h1>Ready to Receive Data</h1>
+							<span
+								>Your ID: <div class="id-cont"><code>{id}</code></div></span
+							>
 							<div class="subheading">Waiting for sender to connect.</div>
 							<p>
 								Once data transfer is completed, this popup window will close
@@ -377,35 +454,37 @@
 
 	.radio {
 		position: relative;
-	}
-	input[type='checkbox'] {
-		// opacity: 0;
-		// Code to hide the input
-		clip: rect(0 0 0 0);
-		clip-path: inset(100%);
-		height: 1px;
-		overflow: hidden;
-		position: absolute;
-		white-space: nowrap;
-		width: 1px;
+		label input[type='checkbox'] {
+			// opacity: 0;
+			// Code to hide the input
+			appearance: none;
+			clip: rect(0 0 0 0);
+			clip-path: inset(100%);
+			height: 1px;
+			overflow: hidden;
+			position: absolute;
+			white-space: nowrap;
+			width: 1px;
 
-		&:checked + .checkbox-tile,
-		&:checked + .checkbox-tile .label {
-			border-color: #3b9b9b;
-			color: #f2f2f2;
-			text-shadow: 0 0 0.25rem rgba(255, 255, 255, 0.63);
-			&:not(.label) {
-				background-color: rgba(201, 201, 201, 0.274);
-				box-shadow: 0 5px 10px rgba(#000, 0.1);
-			}
-			&:before {
-				transform: scale(1);
-				opacity: 1;
-				background-color: #3b9b9b;
-				border-color: #2260ff;
+			&:checked + .checkbox-tile,
+			&:checked + .checkbox-tile .label {
+				border-color: #3b9b9b;
+				color: #f2f2f2;
+				text-shadow: 0 0 0.25rem rgba(255, 255, 255, 0.63);
+				&:not(.label) {
+					background-color: rgba(201, 201, 201, 0.274);
+					box-shadow: 0 5px 10px rgba(#000, 0.1);
+				}
+				&:before {
+					transform: scale(1);
+					opacity: 1;
+					background-color: #3b9b9b;
+					border-color: #2260ff;
+				}
 			}
 		}
 	}
+
 	.inline {
 		display: flex;
 		align-items: flex-start;

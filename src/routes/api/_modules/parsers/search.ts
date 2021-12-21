@@ -156,6 +156,7 @@ const parseSong = (contents, type): Song[] => {
 	return contents.map((s, i) => {
 		let explicit
 		const { musicResponsiveListItemRenderer: ctx } = s
+
 		if (ctx?.badges) explicit = true
 
 		const params =
@@ -223,7 +224,6 @@ const parseSong = (contents, type): Song[] => {
 		return {
 			...MusicResponsiveListItemRenderer(s),
 			album: albumInfo,
-			artistInfo: artist,
 			explicit,
 			type: type,
 			params: params,

@@ -15,7 +15,8 @@
 		const {
 			sections = [],
 			header = '',
-			title = [] | ''
+			title = [] || '',
+			data = {}
 		} = await response.json()
 		// console.log(sections, header, title)
 		if (response.ok) {
@@ -23,7 +24,8 @@
 				props: {
 					sections,
 					header,
-					title
+					title,
+					data
 				},
 				status: 200
 			}
@@ -35,12 +37,14 @@
 	import type { sections } from '$lib/types/components/sections'
 	export let sections: sections
 	export let header
+	export let data
 	export let title: string
 	import { goto } from '$app/navigation'
 	import Header from '$lib/components/Layouts/Header.svelte'
+	import { Grid, GridItem } from '$lib/components/Grid'
 	import list from '$lib/stores/list'
 	import { page } from '$app/stores'
-	// $: console.log(sections, header, title)
+	$: console.log(data, sections, header, title)
 </script>
 
 <Header
@@ -50,18 +54,21 @@
 />
 
 <main>
-	<div class="header">
-		<h1>{header}</h1>
-	</div>
 	{#each sections as section}
-		<div class="grid">
+		<Grid heading={header} items={section.section} let:item>
+			<GridItem slot="item" {item} />
+		</Grid>
+		<!-- <div class="grid">
 			{#each section.section as item}
 				<div
 					class="item"
 					on:click={() => {
 						item.type == 'albums'
 							? goto('/release?id=' + item?.browseId)
-							: list.initList(item.videoId, item.autoMixList)
+							: list.initList({
+									videoId: item.videoId,
+									playlistId: item.autoMixList
+							  })
 					}}
 				>
 					<div class="img">
@@ -76,7 +83,7 @@
 					</div>
 				</div>
 			{/each}
-		</div>
+		</div>-->
 	{/each}
 </main>
 

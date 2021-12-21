@@ -11,16 +11,6 @@
 	margin: 10pt;
 	width: auto;
 }
-.player-title {
-	// background: rgb(0 0 0 / 96%);
-	align-items: center;
-	bottom: 0;
-	left: 0;
-	place-content: center;
-	position: relative;
-	text-align: center;
-	width: auto;
-}
 .hidden {
 	display: none !important;
 }
@@ -33,7 +23,7 @@
 	max-height: 44pt;
 	max-width: 44pt;
 	margin: 0 2pt;
-	padding: 4pt;
+	padding: 8pt;
 	position: relative;
 	width: auto;
 	isolation: isolate;
@@ -95,15 +85,6 @@
 	width: auto;
 }
 
-.player-duration {
-	font-family: inherit;
-	height: 0;
-	margin-left: auto;
-	margin-right: auto;
-	max-block-size: 0.75rem;
-	padding: 0 0 0.75rem 0rem;
-	z-index: 10;
-}
 .buttons {
 	display: flex;
 	flex-direction: row;
@@ -116,118 +97,39 @@
 	max-width: 100%;
 	min-width: calc(100% - 40px);
 	width: 100%;
-	grid-area: f/f/f/f;
-	min-height: 100%;
-	align-content: start;
+	// grid-area: f/f/f/f;
 	@media screen and (max-width: 600px) {
 		grid-template-areas: "l m r";
 	}
 }
-input[type="range"].volume {
-	width: auto;
-	margin: 0;
-	max-width: 100%;
-	background-color: transparent;
+input[type="range"] {
 	-webkit-appearance: none;
-	max-height: 1rem;
+	background: none;
 	overflow: hidden;
-}
-input[type="range"].volume:focus {
 	outline: none;
-}
-input[type="range"].volume::-webkit-slider-runnable-track {
-	background: rgba(71, 71, 71, 0.9);
-	border: 0;
-	width: 100%;
-	height: 100%;
-	max-height: 1rem;
+	background: #333333;
+	border-radius: 1.666667rem;
+	height: 0.6rem;
 	cursor: pointer;
-}
-input[type="range"].volume::-webkit-slider-thumb {
-	// margin-top: -0.2px;
-	width: 100%;
-	max-width: 1rem;
-	height: 1rem;
-	background: rgb(255, 255, 255);
-	// border: 0;
-	border-radius: 2px;
-	border-left: #0f100e85 0.5px solid;
-	cursor: pointer;
-	-webkit-appearance: none;
-	box-shadow: -80px 0 0 80px #bdbdbdd0;
-}
-input[type="range"].volume:focus::-webkit-slider-runnable-track {
-	background: #43463e;
-}
-input[type="range"].volume::-moz-range-track {
-	background: rgba(71, 71, 71, 0.9);
-	border: 0;
-	width: 100%;
-	height: 100%;
-	max-height: 1rem;
-	cursor: pointer;
-}
-input[type="range"].volume::-moz-range-thumb {
-	// margin-top: -0.2px;
-	width: 100%;
-	max-width: 1rem;
-	height: 1rem;
-	background: rgba(238, 238, 231, 0.93);
-	border: 0;
-	border-left: #0f100e88 0.5px solid;
+	transition-duration: 0.2s;
 
-	border-radius: 2px;
-	cursor: pointer;
-	-webkit-appearance: none;
+	&:hover {
+		background: rgba(255, 255, 255, 0.295);
 
-	box-shadow: -80px 0 0 80px #bdbdbdd0;
-}
-input[type="range"].volume::-ms-track {
-	background: transparent;
-	border-color: transparent;
-	border-width: 0.2px 0;
-	color: transparent;
-	width: 100%;
-	height: 25.6px;
-	cursor: pointer;
-}
-input[type="range"].volume::-ms-fill-lower {
-	background: #0f100e;
-	border: 0;
-}
-input[type="range"].volume::-ms-fill-upper {
-	background: rgba(41, 43, 38, 0.9);
-	border: 0;
-}
-input[type="range"].volume::-ms-thumb {
-	width: 10px;
-	height: 26px;
-	background: rgba(255, 255, 236, 0.93);
-	border: 0;
-	border-radius: 2px;
-	cursor: pointer;
-	margin-top: 0px;
-	/*Needed to keep the Edge thumb centred*/
-}
-input[type="range"].volume:focus::-ms-fill-lower {
-	background: rgba(43, 38, 38, 0.9);
-}
-input[type="range"].volume:focus::-ms-fill-upper {
-	background: #43463e;
-}
-
-img::before,
-video::before {
-	content: "";
-	display: block;
-	padding-top: calc(100% * 2 / 3);
-}
-.video-container {
-	display: none;
-}
-video {
-	display: none !important;
-	visibility: hidden !important;
-}
-@media (min-width: 496px) {
+		&::-webkit-slider-thumb {
+			opacity: 1;
+		}
+	}
+	&::-webkit-slider-runnable-track {
+		overflow: hidden;
+	}
+	&::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		width: 0;
+		height: 1rem;
+		background: white;
+		box-shadow: -100vw -100vh 0 100vw white;
+		opacity: 0.7;
+		transition-duration: 0.2s;
+	}
 }

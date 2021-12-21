@@ -33,7 +33,7 @@
 			{#if loading}
 				<div class="player-spinner" class:fade-out={loading ? true : false} />
 			{:else if !isPlaying}
-				<Icon color="white" name="play" size="2em" />
+				<Icon color="white" name="play-player" size="2em" />
 			{:else}
 				<Icon color="white" name="pause" size="2em" />
 			{/if}

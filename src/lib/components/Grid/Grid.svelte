@@ -1,6 +1,4 @@
 <script lang="ts">
-	import GridItem from './GridItem.svelte'
-
 	export let items = []
 	export let heading = ''
 </script>

@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
+	import type { Load } from '@sveltejs/kit'
 	import { api } from '$lib/api'
-
-	export async function load({ page, fetch }) {
+	export const load: Load = async ({ page, fetch }) => {
 		const response = await api(fetch, {
 			browseId: page.params.slug,
 			endpoint: 'browse',
@@ -15,6 +15,7 @@
 			header,
 			songs
 		} = await response.body
+		// console.log({ carousels, description, thumbnail, header, songs })
 		if (response.ok) {
 			return {
 				props: {
@@ -23,7 +24,6 @@
 					description,
 					thumbnail,
 					header,
-					// songs: response.body,
 					songs,
 					id: page.params.slug
 				},
@@ -36,17 +36,16 @@
 <script lang="ts">
 	import Carousel from '$lib/components/Carousel/Carousel.svelte'
 	import ArtistPageHeader from '../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte'
-	import tags from '$lib/stores/ogtags'
 	import { page } from '$app/stores'
 
 	import ListItem from '$components/ListItem/ListItem.svelte'
 	import { isPagePlaying } from '$lib/stores/stores'
 	import { setContext } from 'svelte'
 	import Header from '$lib/components/Layouts/Header.svelte'
+	import type { Thumbnail } from '$lib/types'
 	export let header
-	// export let headerRaw
 	export let description
-	export let thumbnail
+	export let thumbnail: Array<Thumbnail> = []
 	export let carousels
 	export let songs = []
 	// export let raw
@@ -54,7 +53,7 @@
 	// $: id = id
 	let width
 	const ctx = {}
-	$: console.log(carousels, songs, $page.path)
+	// $: console.log(data, header, carousels, songs, $page.path)
 	setContext(ctx, { pageId: id })
 </script>
 
@@ -67,11 +66,18 @@
 <ArtistPageHeader {description} {header} {width} {thumbnail} />
 <main>
 	<div class="artist-body">
-		{#if songs?.length > 0}
+		{#if songs?.songs?.length > 0}
 			<section>
-				<h1 class="grid-title">Songs</h1>
+				<div class="header">
+					<h1>Songs</h1>
+					<a
+						style="white-space:pre; display: inline-block;"
+						href={`/playlist/${songs?.header?.browseId}`}
+						><small>See All</small></a
+					>
+				</div>
 				<section class="songs">
-					{#each songs as item, index}
+					{#each songs?.songs as item, index}
 						<ListItem
 							{item}
 							{index}
@@ -111,7 +117,6 @@
 	</div>
 </main>
 
-<!-- {/await} -->
 <style lang="scss">
 	.content-wrapper {
 		display: flex;
@@ -131,6 +136,9 @@
 
 	.songs {
 		margin-bottom: 1rem;
+	}
+	main {
+		@include padding;
 	}
 	.artist-body {
 		padding: 2rem 0 2rem;

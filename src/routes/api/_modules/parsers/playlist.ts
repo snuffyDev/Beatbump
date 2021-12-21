@@ -135,7 +135,7 @@ export const parsePlaylist = async (
 				} = {}
 			} = {}
 		} = await data
-		console.log(`value: ${serviceTrackingParams[0].params.value} + ${value}`)
+		// console.log(`value: ${serviceTrackingParams[0].params.value} + ${value}`)
 		// console.log(data, contents, continuations)
 		const cont: NextContinuationData = continuations
 			? continuations[0]?.nextContinuationData

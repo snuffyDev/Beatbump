@@ -2,6 +2,9 @@ import type { PlaylistSearch } from './types/playlist'
 export interface CarouselHeader {
 	browseId?: string
 	title?: string
+	params?: string
+	itct?: string
+	subheading?: string
 }
 
 interface MoodsAndGenresItem {
@@ -21,8 +24,9 @@ export type Item = Song &
 	Record<string, any>
 
 export interface Album {
-	browseId: string
-	title: string
+	browseId?: string
+	title?: string
+	pageType?: string
 }
 export type SearchContents = {
 	results: PlaylistSearch[] | Song[]
@@ -63,19 +67,21 @@ export interface TitleEndpoint {
 	videoId: string
 }
 export interface Artist {
-	browseId: string
-	artist?: string[]
-	artists?: string
+	pageType?: string
+	text?: string
+	browseId?: string
 }
 export interface Thumbnail {
 	url: string
 	width: number
 	height: number
+	placeholder?: string
+	original_url?: string
 }
 
 export interface ArtistInfo {
 	pageType?: string
-	artist?: string | string[]
+	artist?: Array<Artist>
 	browseId?: string
 }
 
@@ -86,10 +92,8 @@ export interface Subtitle extends NavigationEndpoint {
 }
 
 export type NavigationEndpoint = {
-	navigationEndpoint: {
-		browseEndpoint: {
-			browseId: string
-		}
+	browseEndpoint: {
+		browseId: string
 	}
 }
 

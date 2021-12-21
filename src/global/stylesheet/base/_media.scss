@@ -1,15 +1,9 @@
 // BASE MEDIA STYLES
 
-figure {
-	margin: 0;
-}
-
 img,
 picture {
 	margin: 0;
 	border-radius: var(--xs-radius);
-	image-rendering: -webkit-optimize-contrast;
-	image-rendering: crisp-edges;
 	max-width: 100%;
 
 	-webkit-user-drag: none;
@@ -17,6 +11,11 @@ picture {
 	-moz-user-drag: none;
 	-o-user-drag: none;
 	user-drag: none;
+
+	-webkit-touch-callout: none;
+	-webkit-text-size-adjust: none;
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 img::before,

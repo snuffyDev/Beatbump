@@ -5,7 +5,7 @@ export const browseHandler = (pageType: string, browseId: string): void => {
 		goto(`/artist/${browseId}`)
 	} else {
 		pageType.includes('PLAYLIST')
-			? goto('/playlist?list=' + browseId)
+			? goto('/playlist/' + browseId)
 			: goto(
 					'/release?type=' +
 						encodeURIComponent(pageType) +

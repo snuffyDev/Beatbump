@@ -4,7 +4,7 @@
 
 export interface ITwoRowItemRenderer {
 	title?: string
-	thumbnails?: Thumbnail[]
+	thumbnails?: Array<Thumbnail>
 	aspectRatio?: string
 	videoId?: string
 	playlistId?: string
@@ -15,7 +15,7 @@ export interface ITwoRowItemRenderer {
 
 export interface ITwoRowSquareItemRenderer extends ITwoRowItemRenderer {
 	title: string
-	thumbnails: Thumbnail[]
+	thumbnails: Array<Thumbnail>
 	aspectRatio: string
 	playlistId: string
 	endpoint: Endpoint
@@ -54,7 +54,7 @@ interface Thumbnail {
 	url: string
 	width: number
 	height: number
-	placeholder: string
+	placeholder?: string
 }
 
 export type ICarouselTwoRowItem = ITwoRowItemRenderer &

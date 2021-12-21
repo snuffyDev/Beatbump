@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount, tick } from 'svelte'
 	import vp from '$lib/actions/viewport'
+	import type { Item } from '$lib/types'
 	const dispatch = createEventDispatcher()
 	// props
 	export let items
@@ -20,7 +21,7 @@
 	let viewport
 	let contents
 	let viewport_height = 0
-	let visible: { index: number; start?: number; data: Object }[]
+	let visible: { index: number; start?: number; data: Item }[]
 	let mounted
 
 	let top = 0

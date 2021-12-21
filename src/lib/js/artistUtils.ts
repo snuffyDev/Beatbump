@@ -3,14 +3,22 @@ import {
 	MusicTwoRowItemRenderer
 } from '$lib/parsers'
 
-export const parseArtistPage = (header, items) => {
+export const parseArtistPage = (
+	header: {
+		musicImmersiveHeaderRenderer?: any
+		musicVisualHeaderRenderer?: any
+	} = {},
+	items
+) => {
 	// console.log(items)
+	let head = []
 	if (header?.musicImmersiveHeaderRenderer) {
-		header = [header.musicImmersiveHeaderRenderer]
+		head = [header.musicImmersiveHeaderRenderer]
 	} else if (header?.musicVisualHeaderRenderer) {
-		header = [header.musicVisualHeaderRenderer]
+		head = [header.musicVisualHeaderRenderer]
 	}
-	const parsedHeader = header.map((h) => {
+	const parsedHeader = head.map((h) => {
+		const notAllowed = ['loggingContext']
 		const name = h?.title.runs[0].text
 		let description
 		let foregroundThumbnails
@@ -19,6 +27,21 @@ export const parseArtistPage = (header, items) => {
 		const mixInfo =
 			h?.startRadioButton?.buttonRenderer?.navigationEndpoint
 				?.watchPlaylistEndpoint ?? null
+		const shuffle =
+			h?.playButton?.buttonRenderer?.navigationEndpoint?.watchEndpoint !==
+				undefined &&
+			Object.keys(
+				h?.playButton?.buttonRenderer?.navigationEndpoint?.watchEndpoint
+			)
+				.filter((item) => !notAllowed.includes(item))
+				.reduce((obj, key) => {
+					obj[key] =
+						h?.playButton?.buttonRenderer?.navigationEndpoint?.watchEndpoint[
+							key
+						]
+					return obj
+				}, {})
+
 		if (h?.description) {
 			description = h?.description.runs[0].text
 		} else {
@@ -33,7 +56,8 @@ export const parseArtistPage = (header, items) => {
 			thumbnails: thumbnail,
 			mixInfo: mixInfo,
 			description: description,
-			foregroundThumbnails
+			foregroundThumbnails,
+			shuffle
 		}
 	})
 	let songs
@@ -41,7 +65,10 @@ export const parseArtistPage = (header, items) => {
 
 	items.map((i) => {
 		if (i?.musicShelfRenderer) {
-			songs = parseSongs(i?.musicShelfRenderer?.contents)
+			songs = {
+				songs: parseSongs(i?.musicShelfRenderer?.contents),
+				header: { ...i?.musicShelfRenderer?.bottomEndpoint?.browseEndpoint }
+			}
 			// console.log(songs)
 		}
 		if (i?.musicCarouselShelfRenderer) {

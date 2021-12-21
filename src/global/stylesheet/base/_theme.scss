@@ -6,7 +6,7 @@ $sections: (
 	top: (
 		nav,
 	),
-	forms: (
+	form: (
 		select,
 		input,
 		option,
@@ -18,41 +18,33 @@ $themes: (
 		"bottom": #121018,
 		"base": #09090a,
 		"top": #09090a,
-		"forms": #15141d,
+		"form": #15141d,
 		"side": #0e0c13,
 	),
 	dark: (
 		"bottom": #111214,
 		"base": #09090a,
 		"top": #111214,
-		"forms": #131516,
+		"form": #131516,
 		"side": #15191d,
 	),
 	dim: (
 		"bottom": #141820,
 		"base": #09090a,
 		"top": #141820,
-		"forms": #131516,
+		"form": #131516,
 		"side": #0f1116,
-	),
-	light: (
-		"base": #fcf8f8,
-		"bottom": #121018,
-		"top": #cac8c9,
-		"forms": #e3dbf5,
-		"side": #131313,
-		"text": #131314,
 	),
 	midnight: (
 		"base": #05070a,
-		"top": #0d0813,
+		"top": hsl(267, 41%, 6%),
 		"side": #15131f,
 		"bottom": #090d11,
-		"forms": #100f17,
+		"form": #100f17,
 	),
 );
-$theme-name: (dark, dim, midnight, light, ytm);
-$section-names: (base, top, side, bottom, forms);
+$theme-name: (dark, dim, midnight, ytm);
+$section-names: (base, top, side, bottom, form);
 
 :root {
 	--mobile-popper-bg: unset;
@@ -68,43 +60,15 @@ html {
 	@each $theme in $theme-name {
 		&.#{$theme} {
 			--mobile-popper-bg: #{map-get($themes, $theme, "side")};
-			--form-bg: #{map-get($themes, $theme, "forms")};
+			--form-bg: #{map-get($themes, $theme, "form")};
+			--bottom-bg: #{map-get($themes, $theme, "bottom")};
 			--top-bg: #{map-get($themes, $theme, "top")};
-			background: map-get($themes, $theme, "base");
-			@if $theme == light {
-				* {
-					color: #131314;
-				}
-				a,
-				.link {
-					$link-color: #131314;
-					color: $link-color !important;
-					&:hover {
-						color: lighten($link-color, 30%) !important;
-					}
-				}
-				a small {
-					$color: rgb(71, 71, 71);
-					font-size: 0.95rem;
-					font-weight: 700;
-					font-variant-caps: all-petite-caps;
-					letter-spacing: 0.02rem;
-					transition: ease-in-out color 75ms;
-					color: $color !important;
-					&:hover {
-						color: lighten($color, 30%) !important;
-					}
-				}
-				@each $section, $elm in $sections {
-					.#{$elm} {
-						background: map-get($themes, $theme, $section);
-					}
-				}
-			} @else {
-				@each $section, $elm in $sections {
-					.#{$elm} {
-						background: map-get($themes, $theme, $section);
-					}
+			--base-bg: #{map-get($themes, $theme, "base")};
+			background: var(--base-bg);
+
+			@each $section, $elm in $sections {
+				.#{$elm} {
+					background: #{var(--#{$section}-bg)};
 				}
 			}
 		}

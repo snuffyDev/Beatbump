@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { parseNextItem } from '$lib/parsers'
-import type { Item, Song } from '$lib/types'
+import type { Item } from '$lib/types'
 import { getSrc, notify } from '$lib/utils'
 import { currentTitle } from '$stores/stores'
-import { alertHandler } from '$stores/stores'
 import { writable } from 'svelte/store'
 
 import { addToQueue } from '../utils'
@@ -66,6 +65,9 @@ const fetchNext = async ({
 		}
 	)
 		.then((json) => json.json())
+		.then((response) => {
+			return response
+		})
 		.catch((err) => console.error(err))
 }
 
@@ -115,7 +117,7 @@ export default {
 
 			keyId = keyId ? keyId : 0
 			key.set(keyId)
-			if (hasList) {
+			if (hasList == true) {
 				mix = []
 				splitList = []
 				Chunked = {}
@@ -132,16 +134,20 @@ export default {
 				configType: type
 			})
 			const data = await response
-
+			// console.log(data)
 			await getSrc(videoId, playlistId, playerParams)
 			currentTitle.set(data.results[0].title)
 
 			loading = false
 			playerLoading.set(loading)
 
-			continuation = data.continuation
+			continuation =
+				data.continuation && data.continuation.length !== 0 && data.continuation
 			currentMixId = data.currentMixId
-			clickTrackingParams = data.clickTrackingParams
+			clickTrackingParams =
+				data.clickTrackingParams &&
+				data.clickTrackingParams.length !== 0 &&
+				data.clickTrackingParams
 
 			mix = [...data.results]
 			list.set({ currentMixId, clickTrackingParams, continuation, mix })
@@ -175,6 +181,7 @@ export default {
 		})
 		const data = await response
 		// console.log(data)
+		data.results.shift()
 		mix.push(...data.results)
 		continuation = data.continuation
 		list.set({ currentMixId, clickTrackingParams, continuation, mix })

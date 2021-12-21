@@ -28,33 +28,38 @@ export const parseArtist = (data) => {
 }
 
 function parse(header: { musicImmersiveHeaderRenderer: any }, contents: any) {
-	const carouselItems: ICarousel[] | null = []
-	const thumbnail = []
-	let description = ''
-	let items = []
-	const headerContent = []
-	const newData = [parseArtistPage(header, contents)]
-	return newData.map((d) => {
-		carouselItems.push(...d.carouselItems)
-		headerContent.push(d[0])
-		if (d[0]) {
-			d[0].thumbnails?.forEach((h: any) => {
-				thumbnail.push(h)
-			})
-		}
-		if (d?.songs) {
-			items = [...d.songs]
-		} else {
-			items = undefined
-		}
-		description = d[0].description
+	try {
+		let carouselItems: ICarousel[] | null = []
+		const thumbnail = []
+		let description = ''
+		let items = []
+		const headerContent = []
+		const newData = [parseArtistPage(header, contents)]
+		return newData.map((d) => {
+			carouselItems = d.carouselItems
+			headerContent.push(d[0])
+			if (d[0]) {
+				d[0].thumbnails?.forEach((h: any) => {
+					thumbnail.push(h)
+				})
+			}
+			if (d?.songs) {
+				items = d.songs
+			} else {
+				items = undefined
+			}
+			description = d[0].description
 
-		return {
-			header: headerContent[0],
-			songs: items,
-			thumbnail,
-			carousels: carouselItems,
-			description
-		}
-	})
+			return {
+				header: headerContent[0],
+				songs: items,
+				thumbnail,
+				carousels: carouselItems,
+				description,
+				data: { header, contents }
+			}
+		})
+	} catch (err) {
+		console.error(err)
+	}
 }

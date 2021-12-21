@@ -3,12 +3,13 @@ import { writable } from 'svelte/store'
 
 import type { Item } from './types'
 import { notify } from './utils'
-type IDBPlaylist = {
+export type IDBPlaylist = {
 	name?: string
 	description?: string
 	thumbnail?: any
 	items?: Item | Item[]
 	id?: string
+	hideAlert?: boolean
 }
 type IDBRequestTarget = Event & {
 	target: EventTarget & { result: IDBRequest & IDBCursorWithValue }
@@ -62,7 +63,7 @@ const accessDB = () => {
 					const results = e.target.result
 					if (Array.isArray(results)) {
 						items = [...results]
-						console.log(e, results)
+						// console.log(e, results)
 
 						event.target.result.deleteObjectStore('playlists')
 					}
@@ -107,12 +108,13 @@ export default {
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
 				try {
-					let tx = db.transaction('playlists', 'readwrite')
+					// console.log(items)
+					const tx = db.transaction('playlists', 'readwrite')
 					tx.objectStore('playlists').put({
 						name,
 						description,
 						items: Array.isArray(items) ? [...items] : [items],
-						length: items.length,
+						length: Array.isArray(items) ? [...items].length : [items].length,
 						thumbnail,
 						id: mod.generate(32)
 					}).onsuccess = resolve
@@ -132,7 +134,14 @@ export default {
 			})
 		})
 	},
-	updatePlaylist({ id, thumbnail, description, name }: IDBPlaylist) {
+	updatePlaylist({
+		id,
+		thumbnail,
+		description,
+		items,
+		name,
+		hideAlert = false
+	}: IDBPlaylist) {
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
 				try {
@@ -147,7 +156,10 @@ export default {
 								...playlistItem,
 								name: name ?? playlistItem.name,
 								thumbnail: thumbnail ?? playlistItem?.thumbnail,
-								description: description ?? playlistItem.description
+								description: description ?? playlistItem.description,
+								items: Array.isArray(items)
+									? [...items]
+									: [...playlistItem.items]
 							})
 
 							request.onsuccess = function (e: IDBRequestTarget) {
@@ -158,11 +170,11 @@ export default {
 						}
 
 						// list
-						notify('Updated Playlist!', 'success')
+						if (!hideAlert) notify('Updated Playlist!', 'success')
 						// return resolve()
 					}
 					tx.addEventListener('complete', () => {
-						notify('Updated Playlist!', 'success')
+						if (!hideAlert) notify('Updated Playlist!', 'success')
 					})
 					tx.addEventListener('error', function (e) {
 						throw new Error(e)
@@ -185,32 +197,51 @@ export default {
 				notify('Added to favorites!', 'success')
 			})
 			tx.addEventListener('error', function (e) {
-				throw new Error(e)
+				new Error(e)
 			})
-		} catch (e) {
-			console.log(e)
-		}
-	},
-	async setMultiple(items: Item[]) {
-		await accessDB()
-
-		try {
-			const tx = db.transaction(['favorites'], 'readwrite')
-
-			items.forEach((item) => {
-				const request = tx.objectStore('favorites').put(item)
-			})
-			tx.oncomplete = () => {
-				notify('Added items to favorites!', 'success')
-			}
 		} catch (e) {
 			console.error(e)
 		}
 	},
+	setMultipleFavorites(items: Item[]) {
+		return new Promise(function (resolve, reject) {
+			accessDB().then(function () {
+				const tx = db.transaction(['favorites'], 'readwrite')
+
+				items.forEach((item) => {
+					const request = tx.objectStore('favorites').put(item)
+				})
+				tx.oncomplete = () => {
+					notify('Added items to favorites!', 'success')
+				}
+				tx.onerror = function (e) {
+					console.error(e)
+					reject(e)
+				}
+			})
+		})
+	},
+	setMultiplePlaylists(items: IDBPlaylist[]) {
+		return new Promise(function (resolve, reject) {
+			accessDB().then(function () {
+				const tx = db.transaction(['playlists'], 'readwrite')
+
+				items.forEach((item) => {
+					const request = tx.objectStore('playlists').put(item)
+				})
+				tx.oncomplete = () => {
+					notify(`Added ${items.length} new playlists!`, 'success')
+				}
+				tx.onerror = function (e) {
+					console.error(e)
+					reject(e)
+				}
+			})
+		})
+	},
 	async deleteFavorite(item) {
 		if (!item) return 'No item was provided!'
 		await accessDB()
-		// const request = openDB();
 
 		try {
 			db.transaction(['favorites'], 'readwrite')
@@ -263,14 +294,11 @@ export default {
 							const result = e.target.result
 							if (Array.isArray(result)) {
 								lists = result
-								// console.log(lists, e.target.result.value)
-								// e.target.result.continue()
 								resolve([...lists])
 							}
 						}
 					}
 				} catch (e) {
-					// console.error(e)
 					notify('Error! ' + e, 'error')
 					reject([])
 				}
@@ -285,20 +313,15 @@ export default {
 						.transaction('playlists', 'readonly')
 						.objectStore('playlists')
 
-					console.log(id)
 					transaction.openCursor(id).onsuccess = function (
 						e: Event & { target: EventTarget & { result: IDBCursorWithValue } }
 					) {
-						console.log(e)
 						if (e.target.result) {
-							console.log(e.target.result)
 							const playlist = e.target.result.value
-							console.log(playlist, e.target.result)
 							resolve(playlist)
 						}
 					}
 				} catch (e) {
-					// console.error(e)
 					notify('Error! ' + e, 'error')
 					reject([])
 				}

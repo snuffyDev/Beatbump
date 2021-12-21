@@ -40,7 +40,7 @@ const Parsers = async (
 }
 
 export const post = async ({ body }: { body: ReadOnlyFormData }) => {
-	console.log(JSON.stringify(body))
+	// console.log(JSON.stringify(body))
 	const endpoint = body.get('endpoint') || ''
 	const path = body.get('path') || ''
 
@@ -48,7 +48,7 @@ export const post = async ({ body }: { body: ReadOnlyFormData }) => {
 		const videoId = (body.get('videoId') as string) || ''
 		const playlistId = (body.get('playlistId') as string) || ''
 		const ctx = Context.player(videoId, playlistId)
-		console.log(ctx)
+		// console.log(ctx)
 		const req = await sendRequest(ctx, {
 			endpoint: 'player',
 			videoId: videoId,

@@ -23,7 +23,6 @@
 	export let aspectRatio
 	export let isBrowseEndpoint = false
 	let loading
-	let isHidden
 	let RATIO_SQUARE = item.aspectRatio.includes('SQUARE') ? true : false
 	let RATIO_RECT =
 		item.aspectRatio.includes('TWO_LINE_STACK') ||
@@ -42,18 +41,17 @@
 			text: 'View Artist',
 			icon: 'artist',
 			action: async () => {
-				window.scrollTo({
-					behavior: 'smooth',
-					top: 0,
-					left: 0
-				})
-				await tick()
-
 				goto(
 					type == 'new'
 						? `/artist/${item.subtitle[2].navigationEndpoint.browseEndpoint.browseId}`
 						: `/artist/${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
 				)
+				await tick()
+				window.scrollTo({
+					behavior: 'smooth',
+					top: 0,
+					left: 0
+				})
 			}
 		},
 		{
@@ -72,8 +70,7 @@
 			text: 'Add to Playlist',
 			icon: 'playlist-add',
 			action: async () => {
-				if (item.endpoint?.pageType.includes('PLAYLIST')) {
-					console.log('PLAYLIST')
+				if (item.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
 					const response = await fetch(
 						'/api/getQueue.json?playlistId=' + item.playlistId
 					)
@@ -89,7 +86,6 @@
 			text: 'Favorite',
 			icon: 'heart',
 			action: () => {
-				console.log(item)
 				db.setNewFavorite(item)
 			}
 		},
@@ -102,13 +98,11 @@
 					text: `Listen to ${item.title} on Beatbump`,
 					url: `https://beatbump.ml/listen?id=${item.videoId}`
 				}
-				console.log(item.endpoint)
-
 				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_PLAYLIST')) {
 					shareData = {
 						title: item.title,
 						text: `Listen to ${item.title} on Beatbump`,
-						url: `https://beatbump.ml/playlist?list=${item.endpoint?.browseId}`
+						url: `https://beatbump.ml/playlist/${item.endpoint?.browseId}`
 					}
 				}
 				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_ALBUM')) {
@@ -117,7 +111,6 @@
 						text: `Listen to ${item.title} on Beatbump`,
 						url: `https://beatbump.ml/release?id=${item.endpoint?.browseId}`
 					}
-					console.log(shareData)
 				}
 				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_ARTIST')) {
 					shareData = {
@@ -125,7 +118,6 @@
 						text: `${item.title} on Beatbump`,
 						url: `https://beatbump.ml/artist/${item.endpoint?.browseId}`
 					}
-					console.log(shareData)
 				}
 				try {
 					if (!navigator.canShare) {
@@ -145,14 +137,21 @@
 	type CustomEvent = Event & {
 		currentTarget: EventTarget & HTMLImageElement
 	}
+	let errorCount = 0
 	const errorHandler = (event: CustomEvent) => {
-		event.currentTarget.onerror = null
-		event.currentTarget.src =
-			'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjYWNhY2FjIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJtYXRyaXgoMS4yOTkgMCAwIDEuMjcgOTUuNjg4IDE4Ni45NzEpIiBmb250LWZhbWlseT0iTGF0byIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMjAiIGZpbGw9IiMyODI4MjgiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLjI5OSAwIDAgMS4yNyA3OCA0Mi4yODYpIiBkPSJNMCAwaDc3djEzNUgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjwvZz48L3N2Zz4='
+		if (errorCount !== 1) {
+			event.currentTarget.onerror = null
+
+			event.currentTarget.src =
+				'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjNDI0MjQyIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA1LjU0IDE2Ni43OTQpIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCZxdW90O1NlZ29lIFVJJnF1b3Q7LFJvYm90byxPeHlnZW4sVWJ1bnR1LENhbnRhcmVsbCwmcXVvdDtPcGVuIFNhbnMmcXVvdDssJnF1b3Q7SGVsdmV0aWNhIE5ldWUmcXVvdDssc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNmYWZhZmEiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiA1NC44MzkpIiBkPSJNMCAwaDcydjE0Ni4zMjNIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+'
+		} else {
+			errorCount += 1
+			event.currentTarget.onerror = null
+			event.currentTarget.src = item.thumbnails[0].original_url
+		}
 	}
 	const clickHandler = async (event: Event, index) => {
 		loading = true
-		if (event) console.log(event)
 		if (type == 'trending') {
 			//
 			isBrowseEndpoint
@@ -201,11 +200,10 @@
 			loading = false
 		}
 	}
+
 	// $:console.log(item.thumbnails)
-	let srcImg =
-		item.thumbnails[0].width <= 60
-			? item.thumbnails[0].url.replace(/=(w(\d+))-(h(\d+))/g, '=w256-h256')
-			: item.thumbnails[0].url
+	let srcImg = item.thumbnails[item.thumbnails.length - 1].url
+
 	if (kind === 'Singles') {
 		DropdownItems.splice(1, 1)
 		DropdownItems = [...DropdownItems]
@@ -222,6 +220,16 @@
 		]
 	}
 
+	if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_PLAYLIST')) {
+		DropdownItems = [
+			{
+				action: () => list.startPlaylist(item.playlistId),
+				icon: 'shuffle',
+				text: 'Shuffle Playlist'
+			},
+			...DropdownItems
+		]
+	}
 	if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_ARTIST')) {
 		DropdownItems = [
 			...DropdownItems.filter((item) => {
@@ -237,8 +245,8 @@
 	}
 	let node: HTMLElement
 
-	let active
 	let windowWidth
+	$: active = windowWidth < 640 ? true : false
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} />
@@ -283,41 +291,37 @@
 			<img
 				alt="thumbnail"
 				on:error={errorHandler}
-				loading="lazy"
 				class:img16x9={RATIO_RECT}
 				class:img1x1={RATIO_SQUARE}
-				width={item.thumbnails[0].width}
-				height={item.thumbnails[0].height}
-				src={item.thumbnails[0]?.placeholder}
-				use:lazy={{ src: srcImg, placeholder: item.thumbnails[0]?.placeholder }}
+				decoding="async"
+				width={item.thumbnails[item.thumbnails.length - 1].width}
+				height={item.thumbnails[item.thumbnails.length - 1].height}
+				src={item.thumbnails[item.thumbnails.length - 1]?.placeholder}
+				use:lazy={{
+					src: srcImg
+				}}
 			/>
 		</div>
 		<div class="item-menu">
-			<PopperButton bind:isHidden items={DropdownItems} />
+			<PopperButton tabindex="0" items={DropdownItems} />
 		</div>
 	</section>
 	<section class="item-title">
 		<h1 class="link">
-			{item.title.length > 48
-				? item.title.substring(0, 48) + '...'
-				: item.title}
+			{item.title}
 		</h1>
 		{#if item.subtitle}
 			<span class="subtitles secondary">
 				{#each item.subtitle as sub}
-					{#if !sub?.navigationEndpoint}
+					{#if !sub?.browseId}
 						<span>{sub.text}</span>
 					{:else}
 						<a
 							sveltekit:prefetch
 							on:click|stopPropagation|preventDefault={() => {
-								goto(
-									'/artist/' + sub?.navigationEndpoint?.browseEndpoint?.browseId
-								)
+								goto('/artist/' + sub?.browseId)
 							}}
-							href={'/artist/' +
-								sub?.navigationEndpoint?.browseEndpoint?.browseId}
-							><span>{sub.text}</span></a
+							href={'/artist/' + sub?.browseId}><span>{sub.text}</span></a
 						>
 					{/if}
 				{/each}
@@ -327,10 +331,23 @@
 </article>
 
 <style lang="scss">
+	a {
+		color: inherit;
+		transition: color 100ms linear;
+		&:hover {
+			color: #eee;
+		}
+	}
 	.item-title {
-		display: inline-flex;
-		flex-direction: column;
-		gap: 0.25rem;
+		display: inline-block;
+		.link {
+			display: block;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
 	}
 	.item1x1 {
 		// padding-top: 100% !important;
@@ -343,14 +360,13 @@
 	}
 	.img1x1 {
 		// padding-top: 100% !important;
-		min-width: 14rem !important;
 
 		aspect-ratio: 1/1 !important;
-		width: clamp(12rem, 12rem, 22rem) !important;
+		width: clamp(12rem, 14rem, 22rem) !important;
 	}
 	.img16x9 {
 		// padding-top: 56.25% !important;
-		min-width: 100%;
+		max-width: 100%;
 		width: 25rem;
 		aspect-ratio: 16/9 !important;
 		// width: clamp(13rem, 22rem, 22rem) !important;
@@ -361,7 +377,8 @@
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
-		white-space: normal;
+		text-overflow: ellipsis;
+		// white-space: nowrap;
 		cursor: pointer;
 	}
 	h1 {
@@ -371,13 +388,12 @@
 		display: inline;
 	}
 	article {
-		// display: block;
-		// padding-bottom: 1.8rem;
-		// padding-left: 1rem;
-		padding: 0 1rem;
-
+		padding: 1rem;
+		min-width: 12rem;
 		scroll-snap-align: start;
 		// padding-right: 1rem;
+
+		contain: layout paint style;
 		&::before {
 			position: absolute;
 			display: block;
@@ -394,29 +410,23 @@
 		cursor: pointer;
 		user-select: none;
 		border-radius: $sm-radius;
-		contain: strict;
+		overflow: hidden;
 
 		&:focus {
 			border: none;
 		}
 
 		&::before {
-			border-radius: inherit;
 			position: absolute;
 			content: '';
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
+			inset: 0;
 			background: linear-gradient(
 				rgba(0, 0, 0, 0.502),
 				rgba(0, 0, 0, 0),
 				rgba(0, 0, 0, 0)
 			);
 			pointer-events: none;
-			will-change: opacity, background;
-			transition: background cubic-bezier(0.455, 0.03, 0.515, 0.955) 0.1s,
-				opacity cubic-bezier(0.455, 0.03, 0.515, 0.955) 0.1s;
+			transition: background linear 0.1s, opacity linear 0.1s;
 			opacity: 0.1;
 			// z-index: 1;
 		}
@@ -439,9 +449,8 @@
 			height: inherit;
 			aspect-ratio: inherit;
 			user-select: none;
-			// position: absolute;
+
 			object-fit: cover;
-			// border-radius: var(--xs-radius);
 			min-width: 100%;
 			// min-height: 100%;
 		}
@@ -456,9 +465,6 @@
 	}
 
 	.item {
-		display: flex;
-		flex-direction: column;
-		gap: 0.8rem;
 		isolation: isolate;
 
 		// cursor: pointer;
@@ -477,7 +483,7 @@
 		isolation: isolate;
 		margin: 0.25rem;
 		opacity: 0;
-		transition: 50ms opacity cubic-bezier(0.55, 0.055, 0.675, 0.19);
+		transition: 0.1s opacity linear;
 		&:focus-visible,
 		&:focus-within,
 		&:hover {
@@ -487,9 +493,25 @@
 			opacity: 1;
 		}
 	}
+	@mixin active {
+		> .image {
+			&::before {
+				// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
+				background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
+				opacity: 0.7;
+				z-index: 1;
+			}
+		}
+	}
 	.item-thumbnail {
 		position: relative;
 		cursor: pointer;
+		margin-bottom: 0.8rem;
+
+		&:focus-visible,
+		&:focus-within {
+			@include active;
+		}
 	}
 	.hidden {
 		display: none !important;

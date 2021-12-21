@@ -23,39 +23,36 @@ export async function get({ query }) {
 
 	const data = await response.json()
 
-	const {
-		contents: {
-			singleColumnBrowseResultsRenderer: {
-				tabs: [
-					{
-						tabRenderer: {
-							content: { sectionListRenderer: { contents = [] } = {} } = {}
-						} = {}
-					} = {}
-				] = []
-			} = {}
-		} = {}
-	} = await data
-
-	const sections = contents.map(({ gridRenderer = {} }) => {
+	const contents =
+		data.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+			?.content?.sectionListRenderer?.contents
+	let sections = []
+	for (let index = 0; index < contents.length; index++) {
+		const { gridRenderer } = contents[index]
 		const { items = [], header = {} } = gridRenderer
-		const section = items.map(({ musicNavigationButtonRenderer = {} }) => ({
-			text: musicNavigationButtonRenderer.buttonText.runs[0].text,
-			color: `#${(
-				'00000000' +
-				(
-					musicNavigationButtonRenderer.solid.leftStripeColor & 0xffffff
-				).toString(16)
-			).slice(-6)}`,
-			endpoint: {
-				params:
-					musicNavigationButtonRenderer.clickCommand.browseEndpoint.params,
-				browseId:
-					musicNavigationButtonRenderer.clickCommand.browseEndpoint.browseId
+
+		for (let i = 0; i < items.length; i++) {
+			const item = items[i]?.musicNavigationButtonRenderer
+			items[i] = {
+				text: item?.buttonText?.runs[0]?.text,
+				color: `#${(
+					'00000000' + (item?.solid?.leftStripeColor & 0xffffff).toString(16)
+				).slice(-6)}`,
+				endpoint: {
+					params: item?.clickCommand?.browseEndpoint?.params,
+					browseId: item?.clickCommand?.browseEndpoint?.browseId
+				}
 			}
-		}))
-		return { section, title: header.gridHeaderRenderer.title.runs[0].text }
-	})
+		}
+		sections = [
+			...sections,
+			{
+				section: [...items],
+				title: header?.gridHeaderRenderer?.title?.runs[0]?.text
+			}
+		]
+	}
+
 	return {
 		status: 200,
 		body: JSON.stringify(sections)

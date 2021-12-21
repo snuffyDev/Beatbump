@@ -33,7 +33,7 @@ export async function get({
 		)
 		const data = await response.json()
 		const {
-			header,
+			header = {},
 
 			contents: {
 				singleColumnBrowseResultsRenderer: {
@@ -46,16 +46,14 @@ export async function get({
 					] = []
 				} = {}
 			} = {}
-		} = data
-
-		const parsed = parse(header, contents)
+		} = await 	data
+		// console.log(header)
+		const parsed = parse(header, contents)[0]
 
 		return {
-			status: 200,
-			body: {
-				...parsed[0],
-				contents
-			}
+			body: JSON.stringify(parsed),
+			status: 200
+			// headerRaw: header
 		}
 	} catch (err) {
 		console.log(err)
@@ -63,36 +61,39 @@ export async function get({
 	}
 }
 
-function parse(header, contents) {
-	const carouselItems: ICarousel[] | null = []
-	const thumbnail = []
-	let description = ''
-	let items = []
-	const headerContent = []
-	const newData = [
-		parseArtistPage(header?.musicImmersiveHeaderRenderer, contents)
-	]
-	return newData.map((d) => {
-		carouselItems.push(...d.carouselItems)
-		headerContent.push(d[0])
-		if (d[0]) {
-			d[0].thumbnails?.forEach((h) => {
-				thumbnail.push(h)
-			})
-		}
-		if (d?.songs) {
-			items = [...d.songs]
-		} else {
-			items = undefined
-		}
-		description = d[0].description
+function parse(header, contents: any) {
+	try {
+		let carouselItems: ICarousel[] | null = []
+		const thumbnail = []
+		let description = ''
+		let items = []
+		const headerContent = []
+		const newData = [parseArtistPage(header, contents)]
+		return newData.map((d) => {
+			carouselItems = d.carouselItems
+			headerContent.push(d[0])
+			if (d[0]) {
+				d[0].thumbnails?.forEach((h: any) => {
+					thumbnail.push(h)
+				})
+			}
+			if (d?.songs) {
+				items = d.songs
+			} else {
+				items = undefined
+			}
+			description = d[0]?.description
 
-		return {
-			header: headerContent[0],
-			songs: items,
-			thumbnail,
-			carousels: carouselItems,
-			description
-		}
-	})
+			return {
+				header: headerContent[0],
+				songs: items,
+				thumbnail,
+				carousels: carouselItems,
+				description,
+				data: { header, contents }
+			}
+		})
+	} catch (err) {
+		console.error(err)
+	}
 }

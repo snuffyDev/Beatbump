@@ -14,7 +14,7 @@ export interface PlaylistSearch {
 	hash?: string
 	title: string
 	type?: string
-	thumbnails?: Thumbnail[]
+	thumbnails?: Array<Thumbnail>
 	continuation?: NextContinuationData
 }
 export type Menu = {
@@ -28,7 +28,7 @@ export interface IPlaylistItem {
 	navigation?: Menu[]
 	length?: string
 	title: string | TitleEndpoint
-	thumbnail: Thumbnail[] | Thumbnail
+	thumbnail: Array<Thumbnail> | Thumbnail
 	artist?: Artist
 	artistInfo?: ArtistInfo
 	videoId?: string

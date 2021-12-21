@@ -10,7 +10,7 @@
 </script>
 
 <div class="list">
-	{#each items as item, i (item)}
+	{#each items as item, i}
 		<slot {item} index={i} />
 	{/each}
 	{#if !hasData}
@@ -123,4 +123,7 @@
 </div>
 
 <style lang="scss">
+	.list {
+		margin-bottom:0.8rem;
+	}
 </style>

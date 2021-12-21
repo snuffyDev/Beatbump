@@ -35,6 +35,9 @@
 		border-radius: $lg-radius;
 		border: rgba(163, 163, 163, 0.212) solid 1px;
 
+		:first-of-type {
+			margin: 0 auto;
+		}
 		// backdrop-filter: brightness(2);
 	}
 	ul {
@@ -46,7 +49,9 @@
 		margin: 0;
 		display: flex;
 		gap: 0.5rem;
-		padding-right: 0.5rem;
+		padding: 0;
+		// overflow-y: scroll;
+
 		flex-direction: column;
 		// background: inherit;
 		// padding: 0.25rem 0.5rem;

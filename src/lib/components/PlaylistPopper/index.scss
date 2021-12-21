@@ -54,7 +54,7 @@ form {
 	// text-shadow: 1px 1px #fff;
 	// font-weight: 700;
 	font-variant-caps: unset !important;
-	font-size: 10pt;
+	font-size: unset;
 }
 .file-button::after {
 	position: absolute;
@@ -65,7 +65,8 @@ form {
 	content: "Select";
 	color: rgb(238, 238, 238);
 	background: #353535b2;
-	display: block;
+	display: inline-flex;
+	place-items: center;
 	font-weight: 500;
 	// padding: ;
 	padding: 0.4rem 0.7rem;

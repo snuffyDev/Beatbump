@@ -71,7 +71,8 @@ $width: 12rem;
 }
 .metadata {
 	grid-area: metadata;
-	align-self: center;
+	align-self: flex-start;
+
 	@media screen and (min-width: 640px) {
 		align-self: flex-end;
 	}
@@ -106,6 +107,7 @@ $width: 12rem;
 small {
 	display: inline;
 	justify-self: flex-end;
+	font-size: smaller;
 }
 
 .box {
@@ -114,22 +116,22 @@ small {
 	-webkit-user-select: none;
 	// border-color:
 	will-change: contents, width;
-	background-color: rgb(170 170 170 / 10%);
-	border-color: #1b1b1b;
+	background-color: #37455230;
+	border-color: #1f1f1f;
 	border-radius: 0.8em;
 	border-width: 1px;
-	margin: 1em;
+
 	display: grid;
 	grid-template-columns: var(--width) 1fr;
 	grid-gap: 0.5rem 1.25rem;
 	grid-template-areas:
 		"img metadata"
-		"img ."
 		"buttons buttons";
 	padding: 0.8em;
 	transition: all 0.23s cubic-bezier(0.39, 0.575, 0.565, 1);
 	user-select: none;
 	width: auto;
+	margin-bottom: 1rem;
 	@media screen and (min-width: 640px) {
 		grid-template-areas:
 			"img metadata"
@@ -153,18 +155,11 @@ hr {
 	align-self: center;
 	width: 100%;
 	img {
-		box-shadow: 0 0 1.5rem 0.125rem rgb(0 0 0 / 37%);
-		/* max-width: inherit; */
-		/* max-height: inherit; */
 		max-width: inherit;
 		border-radius: 2%;
-		box-shadow: 0 0 1.5rem 0.125rem rgb(0 0 0 / 37%);
 
-		filter: drop-shadow(0.012rem 0.024rem 0.05rem black);
+		filter: drop-shadow(0 0 0.3rem black);
 		will-change: contents, width;
-
-		// min-width: inherit;
-		// min-height: inherit;
 		max-height: inherit;
 		-o-object-fit: cover;
 		object-fit: cover;
@@ -260,24 +255,4 @@ hr {
 		justify-self: center;
 		align-self: center;
 	}
-}
-li,
-.box {
-	align-content: center;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	margin: 1em;
-	background-color: #37455230;
-	padding: 0.8em;
-	display: grid !important;
-	border-color: #1f1f1f;
-	border-width: 1px;
-	border-radius: 0.8em;
-	// width: 100%;
-
-	// transition: all 0.23s cubic-bezier(0.39, 0.575, 0.565, 1);
-	// /* display: flex; */
-	/* flex-wrap: wrap; */
 }

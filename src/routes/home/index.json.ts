@@ -1,158 +1,130 @@
-import BaseContext from '$api/_modules/context'
 import {
 	MoodsAndGenresItem,
 	MusicResponsiveListItemRenderer,
 	MusicTwoRowItemRenderer
 } from '$lib/parsers'
 
-import type { CarouselHeader, CarouselItem } from '$lib/types'
+import type { CarouselHeader } from '$lib/types'
+import type { ICarouselTwoRowItem } from '$lib/types/musicCarouselTwoRowItem'
+import type { IListItemRenderer } from '$lib/types/musicListItemRenderer'
 import type { EndpointOutput } from '@sveltejs/kit'
 interface Response extends EndpointOutput {
 	body?: string | Record<string, any>
 	error?: Error
 }
-export async function get({ query, headers }): Promise<Response> {
-	let headerThumbnail
-	const decode = decodeURIComponent
+export async function get({ query }): Promise<Response> {
 	let ctoken = query.get('ctoken') || ''
 	let itct = query.get('itct') || ''
-	itct = decode(itct)
-	ctoken = decode(ctoken)
+	itct = decodeURIComponent(itct)
+	ctoken = decodeURIComponent(ctoken)
 	const browseId = 'FEmusic_home'
-	const carouselItems = []
+	let carouselItems = []
+	const BASE_URL = 'https://music.youtube.com/youtubei/v1/browse'
+	const params =
+		itct !== ''
+			? `?ctoken=${ctoken}&continuation=${ctoken}&type=next&itct=${itct}&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`
+			: '?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30'
+	const response = await fetch(BASE_URL + params, {
+		headers: {
+			accept: '*/*',
+			'accept-language': 'en-US,en;q=0.9',
+			'cache-control': 'no-cache',
+			'content-type': 'application/json',
+			pragma: 'no-cache',
+			'sec-ch-ua':
+				'"Microsoft Edge";v="95", "Chromium";v="95", ";Not A Brand";v="99"',
+			'sec-ch-ua-mobile': '?0',
+			'sec-ch-ua-platform': '"Windows"',
+			'sec-fetch-dest': 'empty',
+			'sec-fetch-mode': 'same-origin',
+			'sec-fetch-site': 'same-origin',
+			'x-goog-visitor-id': 'CgttaVFvdVdoLVdzSSiViqSMBg%3D%3D',
+			'x-youtube-client-name': '67',
+			'x-youtube-client-version': '1.20211101.00.00',
+			Referer: 'https://music.youtube.com/',
+			Origin: 'https://music.youtube.com',
+			'x-origin': 'https://music.youtube.com',
 
-	const pushItems = (contents = []) => {
-		carouselItems.push(
-			...contents.filter((contents) => {
-				if (contents?.musicCarouselShelfRenderer) {
-					return contents.musicCarouselShelfRenderer
-				}
-				if (contents?.musicImmersiveCarouselShelfRenderer) {
-					return contents.musicImmersiveCarouselShelfRenderer
-				}
-			})
-		)
-	}
-	const response = await fetch(
-		`https://music.youtube.com/youtubei/v1/browse${
-			itct !== ''
-				? `?ctoken=${ctoken}&continuation=${ctoken}&type=next&itct=${itct}&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`
-				: '?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30'
-		}`,
-		{
-			headers: {
-				accept: '*/*',
-				'accept-language': 'en-US,en;q=0.9',
-				'cache-control': 'no-cache',
-				'content-type': 'application/json',
-				pragma: 'no-cache',
-				'sec-ch-ua':
-					'"Microsoft Edge";v="95", "Chromium";v="95", ";Not A Brand";v="99"',
-				'sec-ch-ua-mobile': '?0',
-				'sec-ch-ua-platform': '"Windows"',
-				'sec-fetch-dest': 'empty',
-				'sec-fetch-mode': 'same-origin',
-				'sec-fetch-site': 'same-origin',
-				'x-goog-visitor-id': 'CgttaVFvdVdoLVdzSSiViqSMBg%3D%3D',
-				'x-youtube-client-name': '67',
-				'x-youtube-client-version': '1.20211101.00.00',
-				Referer: 'https://music.youtube.com/',
-				Origin: 'https://music.youtube.com',
-				'x-origin': 'https://music.youtube.com',
+			'Referrer-Policy': 'strict-origin-when-cross-origin'
+		},
+		body: JSON.stringify({
+			browseId: ctoken !== '' ? browseId : '',
 
-				'Referrer-Policy': 'strict-origin-when-cross-origin'
-			},
-			body: JSON.stringify({
-				browseId: ctoken !== '' ? browseId : '',
-
-				context: {
-					client: {
-						clientName: 'WEB_REMIX',
-						clientVersion: '1.20211025.00.00',
-						visitorData: 'CgttaVFvdVdoLVdzSSiViqSMBg%3D%3D',
-						originalUrl: 'https://music.youtube.com/',
-						userAgent:
-							'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36 Edg/95.0.1020.40,gzip(gfe)',
-						utcOffsetMinutes: -new Date().getTimezoneOffset()
-					},
-					user: {
-						enableSafetyMode: false
-					},
-					capabilities: {},
-					request: {
-						internalExperimentFlags: [
-							{
-								key: 'force_music_enable_outertube_tastebuilder_browse',
-								value: 'true'
-							},
-							{
-								key: 'force_music_enable_outertube_playlist_detail_browse',
-								value: 'true'
-							},
-							{
-								key: 'force_music_enable_outertube_search_suggestions',
-								value: 'true'
-							}
-						],
-						sessionIndex: {}
-					}
+			context: {
+				client: {
+					clientName: 'WEB_REMIX',
+					clientVersion: '1.20211025.00.00',
+					visitorData: 'CgttaVFvdVdoLVdzSSiViqSMBg%3D%3D',
+					originalUrl: 'https://music.youtube.com/',
+					userAgent:
+						'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36 Edg/95.0.1020.40,gzip(gfe)',
+					utcOffsetMinutes: -new Date().getTimezoneOffset()
+				},
+				user: {
+					enableSafetyMode: false
+				},
+				capabilities: {},
+				request: {
+					internalExperimentFlags: [
+						{
+							key: 'force_music_enable_outertube_tastebuilder_browse',
+							value: 'true'
+						},
+						{
+							key: 'force_music_enable_outertube_playlist_detail_browse',
+							value: 'true'
+						},
+						{
+							key: 'force_music_enable_outertube_search_suggestions',
+							value: 'true'
+						}
+					],
+					sessionIndex: {}
 				}
-			}),
-			method: 'POST'
-		}
-	)
+			}
+		}),
+		method: 'POST'
+	})
 
 	if (!response.ok) {
 		return { status: response.status, body: response.statusText }
 	}
 	const data = await response.json()
 	if (!ctoken) {
-		let {
-			contents: {
-				singleColumnBrowseResultsRenderer: {
-					tabs: [
-						{
-							tabRenderer: {
-								content: {
-									sectionListRenderer: {
-										contents = [],
-										continuations: [{ nextContinuationData = {} } = {}] = []
-									} = {}
-								} = {}
-							} = {}
-						} = {}
-					] = []
-				} = {}
-			} = {}
-		} = data
-
-		let continuations = nextContinuationData
-		pushItems(contents)
-
-		const resBody = carouselItems.map((carousel) => {
-			return parseCarousel(carousel)
-		})
-		if (resBody) {
-			return {
-				body: {
-					carousels: resBody,
-					headerThumbnail:
-						carouselItems[0]?.musicImmersiveCarouselShelfRenderer
-							?.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail
-							?.thumbnails,
-					continuations
-
-					// data
-				},
-				status: 200
+		const contents =
+			data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+				?.content?.sectionListRenderer?.contents
+		const nextContinuationData =
+			data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+				?.content?.sectionListRenderer?.continuations[0]?.nextContinuationData
+		let headerThumbnail
+		for (let index = 0; index < contents.length; index++) {
+			const element = contents[index]
+			if (element?.musicCarouselShelfRenderer) {
+				// console.log(element)
+				carouselItems = [...carouselItems, parseCarousel({ ...element })]
+			}
+			if (element?.musicImmersiveCarouselShelfRenderer) {
+				headerThumbnail = [
+					...element.musicImmersiveCarouselShelfRenderer?.backgroundImage
+						?.simpleVideoThumbnailRenderer?.thumbnail?.thumbnails
+				].map((d) => {
+					let url = d?.url?.replace('-rj', '-rw')
+					return { ...d, url }
+				})
+				carouselItems = [...carouselItems, parseCarousel({ ...element })]
 			}
 		}
 		return {
-			error: new Error()
+			body: {
+				carousels: carouselItems,
+				headerThumbnail,
+				continuations: nextContinuationData
+			},
+			status: 200
 		}
 	} else {
 		const {
-			continuationContents = {},
 			continuationContents: {
 				sectionListContinuation: {
 					contents = [],
@@ -160,27 +132,27 @@ export async function get({ query, headers }): Promise<Response> {
 				} = {}
 			} = {}
 		} = data
-
-		let continuations = nextContinuationData
-		pushItems(contents)
-		const resBody = carouselItems.map((carousel) => {
-			return parseCarousel(carousel)
-		})
-		if (resBody) {
-			return {
-				body: {
-					carousels: resBody,
-
-					continuations
-				},
-				status: 200
+		for (let index = 0; index < contents.length; index++) {
+			const element = contents[index]
+			if (element?.musicCarouselShelfRenderer) {
+				carouselItems = [...carouselItems, parseCarousel({ ...element })]
 			}
+		}
+
+		return {
+			body: {
+				carousels: carouselItems,
+				continuations: nextContinuationData
+			},
+			status: 200
 		}
 	}
 }
 
-function parseHeader(header: any[]): CarouselHeader[] {
-	return header.map(({ musicCarouselShelfBasicHeaderRenderer } = {}) => {
+function parseHeader({
+	musicCarouselShelfBasicHeaderRenderer
+}): CarouselHeader {
+	if (musicCarouselShelfBasicHeaderRenderer) {
 		let subheading, browseId
 		if (musicCarouselShelfBasicHeaderRenderer?.strapline?.runs[0]?.text) {
 			subheading =
@@ -199,38 +171,47 @@ function parseHeader(header: any[]): CarouselHeader[] {
 			subheading,
 			browseId
 		}
-	})
+	}
 }
 
-function parseBody(contents): CarouselItem[] {
-	return contents.map(({ ...r }) => {
-		if (r.musicTwoRowItemRenderer) {
-			return MusicTwoRowItemRenderer(r)
+function parseBody(
+	contents = []
+):
+	| ICarouselTwoRowItem[]
+	| IListItemRenderer[]
+	| {
+			text: any
+			color: string
+			endpoint: {
+				params: any
+				browseId: any
+			}
+	  }[] {
+	let items = []
+	for (let index = 0; index < contents.length; index++) {
+		const element = contents[index]
+		if (element.musicTwoRowItemRenderer) {
+			items = [...items, MusicTwoRowItemRenderer(element)]
 		}
-		if (r.musicResponsiveListItemRenderer) {
-			return MusicResponsiveListItemRenderer(r)
+		if (element.musicResponsiveListItemRenderer) {
+			items = [...items, MusicResponsiveListItemRenderer(element)]
 		}
-		if (r.musicNavigationButtonRenderer) {
-			return MoodsAndGenresItem(r)
+		if (element.musicNavigationButtonRenderer) {
+			items = [...items, MoodsAndGenresItem(element)]
 		}
-		throw new Error("Unable to parse items, can't find " + `${r}`)
-	})
+	}
+	return items
 }
 
 function parseCarousel(carousel: {
 	musicImmersiveCarouselShelfRenderer?: Record<string, any>
 	musicCarouselShelfRenderer?: Record<string, any>
 }) {
-	if (carousel?.musicImmersiveCarouselShelfRenderer) {
-		headerThumbnail =
-			carousel.musicImmersiveCarouselShelfRenderer?.backgroundImage
-				?.simpleVideoThumbnailRenderer?.thumbnail?.thumbnails
-	}
 	return {
-		header: parseHeader([
+		header: parseHeader(
 			carousel.musicCarouselShelfRenderer?.header ??
 				carousel.musicImmersiveCarouselShelfRenderer?.header
-		])[0],
+		),
 		results: parseBody(
 			carousel.musicCarouselShelfRenderer?.contents ??
 				carousel.musicImmersiveCarouselShelfRenderer?.contents

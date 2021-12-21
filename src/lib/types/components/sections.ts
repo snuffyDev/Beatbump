@@ -1,3 +1,5 @@
+import type { NavigationEndpoint } from '$lib/types'
+
 export type sections = [
 	{
 		section: [
@@ -6,7 +8,9 @@ export type sections = [
 				thumbnail: string
 				title: string
 				browseId: string
-				subtitles: [{ text: string }]
+				videoId?: string
+				autoMixList?: string
+				subtitles: [{ text: string; navigationEndpoint: NavigationEndpoint }]
 			}
 		]
 	}

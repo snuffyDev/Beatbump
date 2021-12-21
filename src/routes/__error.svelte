@@ -11,7 +11,7 @@
 			if (!$navigating) {
 				redir--
 				if (redir <= 0) {
-					goto('/trending')
+					goto('/')
 				} else {
 					timeout = setTimeout(redirect, 1000)
 				}

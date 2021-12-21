@@ -1,4 +1,8 @@
-import { MusicTwoRowItemRenderer } from '$lib/parsers'
+import {
+	MusicResponsiveListItemRenderer,
+	MusicTwoRowItemRenderer
+} from '$lib/parsers'
+import type { CarouselHeader, CarouselItem } from '$lib/types'
 
 type destructure = {
 	contents: {
@@ -60,13 +64,89 @@ export async function get({ params }) {
 			} = {}
 		} = {}
 	} = await data
-	const sections = contents.map(({ gridRenderer = {} }) => {
-		const { items = [], header = {} } = gridRenderer
-		const section = items.map((ctx) => MusicTwoRowItemRenderer(ctx))
-		return { section, title: header.gridHeaderRenderer.title.runs[0].text }
+	let carousels = []
+	let grids = []
+	let sections: Array<{
+		header?: Record<string, any>
+		section?: any[]
+		type?: 'grids'
+	}> = []
+	for (let index = 0; index < contents.length; index++) {
+		const element = { ...contents[index] }
+
+		element?.musicCarouselShelfRenderer && carousels.push(element)
+		element?.gridRenderer && grids.push(element)
+	}
+	if (carousels.length !== 0) {
+		sections = carousels.map(({ musicCarouselShelfRenderer }, i) =>
+			parseCarousel({ musicCarouselShelfRenderer })
+		)
+		if (sections.length !== 0) {
+			return {
+				body: {
+					sections,
+					header: text,
+					type: 'carousel',
+					original: {
+						contents,
+						data
+					}
+				},
+				status: 200
+			}
+		}
+	} else {
+		sections = grids.map(({ gridRenderer = {} }) => {
+			const { items = [], header = {} } = gridRenderer
+			const section = items.map((ctx) => MusicTwoRowItemRenderer(ctx))
+			return {
+				section,
+				title: header?.gridHeaderRenderer?.title?.runs[0]?.text
+			}
+		})
+		// const sections = contents.map(({ gridRenderer = {}, }) => {
+		// 	const { items = [], header = {} } = gridRenderer
+		// 	const section = items.map((ctx) => MusicTwoRowItemRenderer(ctx))
+		// 	return { section, title: header?.gridHeaderRenderer?.title?.runs[0]?.text }
+		// })
+		return {
+			body: {
+				sections,
+				header: text,
+				type: 'grid',
+				original: {
+					contents,
+					data
+				}
+			},
+			status: 200
+		}
+	}
+}
+function parseHeader(header: any[]): CarouselHeader[] {
+	return header.map(({ musicCarouselShelfBasicHeaderRenderer } = {}) => ({
+		title: musicCarouselShelfBasicHeaderRenderer['title']['runs'][0].text,
+		browseId:
+			musicCarouselShelfBasicHeaderRenderer.moreContentButton.buttonRenderer
+				.navigationEndpoint.browseEndpoint.browseId
+	}))
+}
+
+function parseBody(contents): CarouselItem[] {
+	return contents.map(({ ...r }) => {
+		if (r.musicTwoRowItemRenderer) {
+			return MusicTwoRowItemRenderer(r)
+		}
+		if (r.musicResponsiveListItemRenderer) {
+			return MusicResponsiveListItemRenderer(r)
+		}
+
+		throw new Error("Unable to parse items, can't find " + `${r}`)
 	})
+}
+function parseCarousel({ musicCarouselShelfRenderer }) {
 	return {
-		body: { sections, header: text },
-		status: 200
+		header: parseHeader([musicCarouselShelfRenderer.header])[0],
+		results: parseBody(musicCarouselShelfRenderer.contents)
 	}
 }

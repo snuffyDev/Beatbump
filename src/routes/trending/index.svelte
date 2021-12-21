@@ -24,14 +24,10 @@
 <script lang="ts">
 	export let carouselItems: ICarousel
 
-	import { currentTitle } from '$stores/stores'
 	import Carousel from '$components/Carousel/Carousel.svelte'
 	import type { ICarousel } from '$lib/types'
-	import tagStore from '$lib/stores/ogtags'
 	import Header from '$lib/components/Layouts/Header.svelte'
 	// $: console.log(carouselItems)
-
-	$: console.log(carouselItems)
 </script>
 
 <Header
@@ -54,13 +50,15 @@
 				<a class="link" href="/explore"><small>See All</small></a>
 			</div>
 			<box>
-				{#each carouselItems[1].results.slice(1, 15) as { color, endpoint: { params }, text }}
-					<div style={`border-left: 0.5em solid #${color}`} class="box">
-						<div class="innerbox">
-							<a class="innerlink" href={`/explore/${params}`}>{text}</a>
-						</div>
-					</div>
-				{/each}
+				<div class="scroll">
+					{#each carouselItems[1].results as { color, endpoint: { params }, text }}
+						<a
+							style="border-left: 0.5rem solid #{color}"
+							class="box"
+							href="/explore/{params}">{text}</a
+						>
+					{/each}
+				</div>
 			</box>
 		</div>
 	</div>
@@ -95,70 +93,37 @@
 		justify-content: space-around;
 	}
 	box {
-		display: grid;
+		display: flex;
 		width: 100%;
-		white-space: nowrap;
+		overflow-x: auto;
 		padding: 0.8rem;
-
-		grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
-
-		grid-gap: 0.8rem;
+		flex-direction: column;
+	}
+	.scroll {
+		display: flex;
+		flex-flow: column wrap;
+		gap: 0.8rem;
+		max-height: 26rem;
 	}
 	.box {
 		margin-bottom: 0.8rem;
 		cursor: pointer;
-		display: flex;
+		background: #201e27;
+		display: inline-flex;
 		justify-content: flex-start;
 		flex-direction: row;
 		flex-wrap: nowrap;
-		text-align: start;
-		font-size: 100%;
+		text-overflow: clip;
+		font-size: 1.1rem;
+		min-width: 12rem;
+		max-width: 15rem;
 		width: 100%;
-		border-radius: $md-radius;
+		border-radius: 0.8rem;
+		font-family: 'Commissioner', sans-serif;
 
 		align-items: center;
-		border-right: none !important;
-		height: 3rem;
-		position: relative;
-		background: #7875862c;
-		box-shadow: 0 0 0.5rem 0 rgba(0, 0, 0, 0.192);
 
-		.innerbox {
-			height: 100%;
-			padding: 0 0 0 1rem;
-			align-items: center;
-			// border-radius: var(--md-radius) 0 0 var(--md-radius);
-			border-radius: 0 $md-radius $md-radius 0;
-
-			width: 100%;
-			display: flex;
-			position: absolute;
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
-
-			width: 100%;
-		}
-		// &::before {
-		// 	position: absolute;
-		// 	top: 0;
-		// 	right: 0;
-
-		// 	bottom: 0;
-		// 	left: 0;
-		// 	content: '';
-		// 	width: 100%;
-
-		// 	z-index: 0;
-		// 	height: 100%;
-		// }
-	}
-	.innerlink {
-		display: flex;
-		width: 100%;
-		height: 100%;
-		align-items: center;
-		text-shadow: 0 0 0.25rem rgba(0, 0, 0, 0.089);
+		height: 3.5rem;
+		padding: 0 0 0 0.8rem;
 	}
 </style>

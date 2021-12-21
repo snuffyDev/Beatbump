@@ -6,12 +6,14 @@ import {
 } from '$lib/parsers'
 
 import type { CarouselHeader, CarouselItem } from '$lib/types'
+import type { ICarouselTwoRowItem } from '$lib/types/musicCarouselTwoRowItem'
+import type { IListItemRenderer } from '$lib/types/musicListItemRenderer'
 import type { EndpointOutput, RequestHandler } from '@sveltejs/kit'
 
 export const get: RequestHandler<Record<string, any>> = async ({ query }) => {
 	const endpoint = query.get('q') || ''
 	const browseId = 'FEmusic_explore'
-	const carouselItems = []
+	let carouselItems = []
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/${endpoint}?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
@@ -31,65 +33,93 @@ export const get: RequestHandler<Record<string, any>> = async ({ query }) => {
 		return { status: response.status, body: response.statusText }
 	}
 
-	const {
-		contents: {
-			singleColumnBrowseResultsRenderer: {
-				tabs: [
-					{
-						tabRenderer: {
-							content: { sectionListRenderer: { contents = [] } = {} } = {}
-						} = {}
-					} = {}
-				] = []
-			} = {}
-		} = {}
-	} = await response.json()
-	carouselItems.push(
-		...contents.filter((contents) => {
-			if (contents.musicCarouselShelfRenderer)
-				return contents.musicCarouselShelfRenderer
-		})
-	)
-	const resBody = carouselItems.map(({ musicCarouselShelfRenderer }) => {
-		return parseCarousel({ musicCarouselShelfRenderer })
-	})
-	if (resBody) {
-		return {
-			body: JSON.stringify(resBody),
-			status: 200
+	const data = await response.json()
+
+	const contents =
+		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+			?.content?.sectionListRenderer?.contents
+	for (let index = 0; index < contents.length; index++) {
+		const element = { ...contents[index] }
+
+		if (element?.musicCarouselShelfRenderer) {
+			carouselItems = [...carouselItems, element]
 		}
+	}
+
+	for (let index = 0; index < carouselItems.length; index++) {
+		const element = carouselItems[index]
+		carouselItems[index] = parseCarousel({
+			musicCarouselShelfRenderer: element.musicCarouselShelfRenderer
+		})
+	}
+	return {
+		body: JSON.stringify(carouselItems),
+		status: 200
 	}
 	return {
 		error: new Error()
 	}
 }
 
-function parseHeader(header: any[]): CarouselHeader[] {
-	return header.map(({ musicCarouselShelfBasicHeaderRenderer } = {}) => ({
-		title: musicCarouselShelfBasicHeaderRenderer['title']['runs'][0].text,
-		browseId:
-			musicCarouselShelfBasicHeaderRenderer.moreContentButton.buttonRenderer
-				.navigationEndpoint.browseEndpoint.browseId
-	}))
+function parseHeader({
+	musicCarouselShelfBasicHeaderRenderer
+}): CarouselHeader {
+	if (musicCarouselShelfBasicHeaderRenderer) {
+		let subheading, browseId
+		if (musicCarouselShelfBasicHeaderRenderer?.strapline?.runs[0]?.text) {
+			subheading =
+				musicCarouselShelfBasicHeaderRenderer['strapline']['runs'][0].text
+		}
+		if (
+			musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer
+				?.navigationEndpoint?.browseEndpoint?.browseId
+		) {
+			browseId =
+				musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer
+					?.navigationEndpoint?.browseEndpoint?.browseId
+		}
+		return {
+			title: musicCarouselShelfBasicHeaderRenderer['title']['runs'][0].text,
+			subheading,
+			browseId
+		}
+	}
 }
 
-function parseBody(contents): CarouselItem[] {
-	return contents.map(({ ...r }) => {
-		if (r.musicTwoRowItemRenderer) {
-			return MusicTwoRowItemRenderer(r)
+function parseBody(
+	contents = []
+):
+	| ICarouselTwoRowItem[]
+	| IListItemRenderer[]
+	| {
+			text: any
+			color: string
+			endpoint: {
+				params: any
+				browseId: any
+			}
+	  }[] {
+	let items = []
+	for (let index = 0; index < contents.length; index++) {
+		const element = contents[index]
+		if (element.musicTwoRowItemRenderer) {
+			items = [...items, MusicTwoRowItemRenderer(element)]
 		}
-		if (r.musicResponsiveListItemRenderer) {
-			return MusicResponsiveListItemRenderer(r)
+		if (element.musicResponsiveListItemRenderer) {
+			items = [...items, MusicResponsiveListItemRenderer(element)]
 		}
-		if (r.musicNavigationButtonRenderer) {
-			return MoodsAndGenresItem(r)
+		if (element.musicNavigationButtonRenderer) {
+			items = [...items, MoodsAndGenresItem(element)]
 		}
-		throw new Error("Unable to parse items, can't find " + `${r}`)
-	})
+	}
+	return items
 }
-function parseCarousel({ musicCarouselShelfRenderer }) {
+
+function parseCarousel(carousel: {
+	musicCarouselShelfRenderer?: Record<string, any>
+}) {
 	return {
-		header: parseHeader([musicCarouselShelfRenderer.header])[0],
-		results: parseBody(musicCarouselShelfRenderer.contents)
+		header: parseHeader(carousel.musicCarouselShelfRenderer?.header),
+		results: parseBody(carousel.musicCarouselShelfRenderer?.contents)
 	}
 }

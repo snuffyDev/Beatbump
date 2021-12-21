@@ -2,10 +2,11 @@ export default function longpress(node: Node): SvelteActionReturnType {
 	let timer
 	let isTouching
 	function startPress(e) {
+		e.stopPropagation()
 		if (node && node.contains(e.target)) {
 			isTouching = true
 			timer = setTimeout(() => {
-				node.dispatchEvent(new CustomEvent('longpress', node))
+				node.dispatchEvent(new CustomEvent('longpress'))
 			}, 515)
 			node.addEventListener('touchend', cancelPress, {
 				passive: true,

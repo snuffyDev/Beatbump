@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { browser } from '$app/env'
-import { api } from '$lib/api'
 import { sort } from './endpoints/playerUtils'
 import { alertHandler, currentId, updateTrack } from './stores/stores'
-import { key } from './stores/stores'
 
 // notifications
 export const notify = (
@@ -18,7 +16,7 @@ export const notify = (
 	})
 }
 // Shuffle array positions
-export function shuffle(array: any[], index) {
+export function shuffle(array: any[], index: number): any[] {
 	array = [
 		...array.slice(0, index),
 		array[index],
@@ -70,8 +68,9 @@ export const getSrc = async (
 	const data = await res.json()
 	const formats = await sort(data, webM)
 	currentId.set(videoId)
-	console.log(formats)
+	// console.log(formats)
 	const src = formats[0].url !== null ? setTrack(formats, webM) : handleError()
+
 	return src
 }
 
@@ -89,14 +88,18 @@ function setTrack(formats = [], webM) {
 function handleError() {
 	console.log('error')
 
-	notify('An error occurred while initiating playback, skipping...', 'error', 'getNextTrack')
+	notify(
+		'An error occurred while initiating playback, skipping...',
+		'error',
+		'getNextTrack'
+	)
 	return {
 		body: null,
 		error: true
 	}
 }
 
-export const queryParams = (params) =>
+export const queryParams = (params: Record<any, any>): string =>
 	Object.keys(params)
 		.map((k) => {
 			if (params[k] == undefined) return
@@ -106,11 +109,11 @@ export const queryParams = (params) =>
 // parse array object input for child
 
 export const pb = (input: string, query: string, justOne = false) => {
-	const iterate = (x: string | any[], y: string | number) => {
+	const iterate = (x: string | any, y: string | number) => {
 		let r = []
 
-		x.hasOwnProperty(y) && r.push(x[y])
-		if (justOne && x.hasOwnProperty(y)) {
+		Object.prototype.hasOwnProperty.call(x, y) && r.push(x[y])
+		if (justOne && Object.prototype.hasOwnProperty.call(x, y)) {
 			return r.shift()
 		}
 

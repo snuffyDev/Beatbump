@@ -1,43 +1,47 @@
 <script lang="ts">
 	import { browser } from '$app/env'
 	import drag from '$lib/actions/drag'
-	import Icon from '$lib/components/Icon/Icon.svelte'
 	import list from '$lib/stores/list'
-	import { onMount, setContext } from 'svelte'
-	import { quartInOut } from 'svelte/easing'
-	import { fade, fly, slide } from 'svelte/transition'
+	import { setContext, tick } from 'svelte'
+	import { fly } from 'svelte/transition'
 
+	import { createEventDispatcher } from 'svelte'
+	const dispatch = createEventDispatcher()
 	export let autoId
 	export let showing = false
 
-	$: if (browser) active = document.getElementById(autoId)
-	$: mixList = $list.mix
 	const ctxKey = {}
-	let sliding
 	let active
+	let sliding
 	let listContainer: HTMLElement
 	let listWidth
-	$: posY = 0
-	let listHeight = window.innerHeight
+	let posY = 0
+	let listHeight = 0
+	let queueHeight
+
+	$: mixList = $list.mix
+	$: if (browser) active = document.getElementById(autoId)
+
 	setContext(ctxKey, {
 		width: listWidth,
 		scrolling: sliding
 	})
-	function startHandler() {
+	function startHandler({ detail }) {
+		// posY = detail.y
 		sliding = true
 	}
 
 	function release() {
 		if (sliding) {
-			if (posY < listHeight / 1.5) {
-				console.log(posY, listHeight)
+			if (posY < listHeight * 0.3) {
+				open()
+			} else {
 				close()
 			}
 		}
 		sliding = false
 	}
 	function trackMovement({ y }) {
-		// console.log(y, listHeight)
 		if (y <= listHeight && y >= 0) {
 			posY = y
 		} else if (y < listHeight * 0.7) {
@@ -54,96 +58,117 @@
 		posY = 0
 	}
 	function close() {
-		posY = posY
 		showing = false
 		sliding = false
-		posY = 0
+		dispatch('close', { showing })
+		// posY = 0
 	}
-	let mounted
-	$: if (active) active.scrollIntoView(true)
-
-	onMount(() => {
-		active = document.getElementById(autoId)
-		if (active) active.scrollIntoView(true)
-		listContainer = document.getElementById('listContainer')
-		listWidth = listContainer.clientWidth
-	})
-	let queueHeight
+	async function scrollIntoView() {
+		await tick()
+		document.getElementById(autoId).scrollIntoView(true)
+	}
+	$: if (
+		queueHeight !== undefined &&
+		autoId !== undefined &&
+		$list.mix.length !== 0
+	)
+		scrollIntoView()
 	$: transition = sliding
 		? ''
-		: 'transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22)'
-	$: height = listHeight - queueHeight + 0.1
+		: 'transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22);'
+	$: height = queueHeight
+		? `${(listHeight / 13.8) * 2}px`
+		: `${(listHeight / 13.8) * 2}px`
 </script>
 
+<svelte:window bind:innerHeight={listHeight} />
+<svelte:body on:scroll|preventDefault={() => {}} />
+<!-- on:click={console.log} -->
 <div
-	class="listContainer"
-	id="listContainer"
-	bind:clientHeight={queueHeight}
-	style="transform: translate(0, calc({posY}px)); top: calc({height}px - 4.5rem); transition: {transition}; "
-	in:fly|local={{ y: 350, easing: quartInOut }}
-	out:fly|local={{
-		delay: 125,
-		duration: 450,
-		easing: quartInOut,
-		y: 400,
-		opacity: 0.1
-	}}
+	class="backdrop"
+	in:fly={{ duration: 400, delay: 200, y: listHeight, opacity: 0.1 }}
+	out:fly={{ duration: 400 * 2, y: listHeight / 1.2 }}
+	on:scroll|preventDefault
+	on:click|stopPropagation|self={() => dispatch('close', { showing: false })}
 >
 	<div
-		class="handle"
-		use:drag
-		on:dragstart={startHandler}
-		on:dragmove={(e) => trackMovement({ y: e.detail.y })}
-		on:dragend={release}
+		class="listContainer"
+		id="listContainer"
+		bind:clientHeight={queueHeight}
+		style="transform: translate(0, {posY}px); top: {height}; {transition} "
 	>
-		<hr />
-	</div>
-
-	<div class="list">
-		{#if mixList.length > 0}
-			<ul
-				class="list-m"
-				id="list"
-				on:touchstart|stopPropagation={() => {
-					sliding = true
-				}}
-				on:mousedown|stopPropagation={() => {
-					sliding = false
-				}}
-				on:removeItem
-			>
-				{#each mixList as item, index}
-					<slot {item} {ctxKey} {index} />
-				{/each}
-			</ul>
-		{:else}
-			<div class="empty">
-				<span class="empty-title">Empty!</span>
-				<span class="subtitle">Choose a song to see your feed</span>
-			</div>
-		{/if}
+		<div
+			use:drag
+			on:dragstart={startHandler}
+			on:dragmove={(e) => trackMovement({ y: e.detail.y })}
+			on:dragend={release}
+			class="handle"
+		>
+			<hr />
+		</div>
+		<div class="list">
+			{#if mixList.length > 0}
+				<ul
+					class="list-m"
+					id="list"
+					on:touchstart|stopPropagation={() => {
+						sliding = true
+					}}
+					on:mousedown|stopPropagation={() => {
+						sliding = false
+					}}
+					on:removeItem
+				>
+					{#each mixList as item, index}
+						<slot {item} {ctxKey} {index} />
+					{/each}
+				</ul>
+			{:else}
+				<div class="empty">
+					<span class="empty-title">Empty!</span>
+					<span class="subtitle">Choose a song to see your feed</span>
+				</div>
+			{/if}
+		</div>
 	</div>
 </div>
 
 <style lang="scss">
+	.backdrop {
+		background: #0000;
+		overflow: hidden;
+		isolation: isolate;
+		z-index: -1;
+		height: 100vh;
+		width: 100vw;
+	}
 	hr {
-		width: clamp(25%, 35%, 80%);
-		color: hsl(0deg 0% 80%);
-		border-style: solid;
+		&::before {
+			position: absolute;
+			inset: 0;
+			content: '';
+			margin: 0 auto;
+			width: 35%;
+			color: hsl(0deg 0% 80%);
+			border: 1px hsl(0deg 0% 100%) inset;
+			border-color: hsl(0deg 0% 100%);
+			height: 0;
+			line-height: inherit;
+			z-index: 5;
+		}
+		border-color: hsl(0deg 0% 0% / 0%);
+		width: 90%;
+		position: relative;
 	}
 	.handle {
 		width: 100%;
-		position: absolute;
-		top: 0;
-		right: 0;
-		left: 0;
-		bottom: 0;
-		border-bottom: 0.0175rem solid hsla(0, 0%, 66.7%, 0.233);
-		border-top: 0.0175rem solid rgba(170, 170, 170, 0.034);
+
+		border-bottom: 0.0175rem solid hsl(0deg 0% 67% / 43%);
+		border-top: 0.0175rem solid hsl(0deg 0% 67% / 5%);
 		box-shadow: 0 -0.4rem 0.8rem 0.5rem hsl(0deg 0% 100% / 9%);
-		background: hsla(0, 0%, 66.7%, 0.027);
-		z-index: -1;
-		height: 1.5rem;
+		background: #111112;
+		z-index: 1;
+		height: 2rem;
 		display: flex;
 		cursor: pointer;
 		padding: 0.12rem;
@@ -160,36 +185,27 @@
 	}
 
 	.listContainer {
-		// isolation: auto;
 		box-shadow: 0.1em -0.1em 0.1em 0em #00000040,
 			0.1rem -0.1rem 0.05rem 0 rgba(255, 255, 255, 0.048);
-		position: fixed;
+		position: absolute;
 		margin: 0;
 		left: 0;
 		border-radius: 0.8em 0.8em 0 0;
 
-		display: flex;
-		// bottom: 4.5rem;
-		// right: 0;
-		flex: 1 1 auto;
+		display: grid;
+		grid-template-rows: 2rem 1fr;
 		visibility: visible;
-		padding-top: 2rem;
-		height: auto;
-		width: auto;
-		background: inherit;
-		height: 78.75%;
-
-		// bottom: 4.5rem;
-		min-height: 23rem;
+		contain: layout;
+		background: var(--bottom-bg);
+		height: 78vh;
+		transform: translate(0px, 0px);
+		min-height: 0;
 		width: 40%;
-		z-index: -1;
+		z-index: 1;
 		&::before {
 			position: absolute;
 			content: '';
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
+			inset: 0;
 			filter: brightness(0.4);
 			width: 100%;
 			height: 100%;
@@ -213,27 +229,26 @@
 	.list {
 		color: #fff;
 		padding: 0;
-
-		display: flex;
-		flex-direction: column;
+		// min-height: 23rem;
+		margin: 0;
 		min-width: 100%;
 		width: 100%;
 		position: relative;
 		max-height: 100%;
-		// margin: auto;
+		overflow-y: auto;
 	}
 	.list-m {
 		padding: 0;
-		padding-top: 0.125rem;
 		list-style-type: none;
 		touch-action: pan-y;
+		padding-top: 0.125rem;
+		height: 100%;
 		-webkit-user-select: none;
 		-moz-user-select: none;
 		-ms-user-select: none;
 		user-select: none;
 		margin: 0;
-		overflow-y: scroll;
-		height: 100%;
+		// height: 100%;
 		width: 100%;
 		padding-left: 0;
 		padding: 0.225rem 0.6rem;

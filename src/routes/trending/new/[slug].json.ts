@@ -1,3 +1,5 @@
+import { MusicTwoRowItemRenderer } from '$lib/parsers'
+
 /* eslint-disable prefer-const */
 export async function get({ params, query }) {
 	const { slug } = params
@@ -54,30 +56,10 @@ export async function get({ params, query }) {
 	slug.includes('videos') ? (type = 'videos') : (type = 'albums')
 	const sections = contents.map(({ gridRenderer = {} }) => {
 		const { items = [] } = gridRenderer
-		console.log(items)
-		const section = items.map(({ musicTwoRowItemRenderer = {} }) => ({
-			thumbnail:
-				musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer
-					.thumbnail.thumbnails[0].url,
-			title: musicTwoRowItemRenderer.title.runs[0].text,
-			subtitles: musicTwoRowItemRenderer.subtitle.runs,
-			type: type,
-			autoMixList:
-				type == 'videos'
-					? musicTwoRowItemRenderer.menu.menuRenderer.items[0]
-							.menuNavigationItemRenderer.navigationEndpoint.watchEndpoint
-							.playlistId
-					: musicTwoRowItemRenderer.menu.menuRenderer.items[0]
-							.menuNavigationItemRenderer.navigationEndpoint
-							.watchPlaylistEndpoint.playlistId,
-			videoId:
-				musicTwoRowItemRenderer.menu.menuRenderer.items[0]
-					.menuNavigationItemRenderer.navigationEndpoint?.watchEndpoint
-					?.videoId,
-			browseId:
-				musicTwoRowItemRenderer?.navigationEndpoint?.browseEndpoint?.browseId ||
-				null
-		}))
+		// console.log(items)
+		const section = items.map(({ musicTwoRowItemRenderer = {} }) =>
+			MusicTwoRowItemRenderer({ musicTwoRowItemRenderer })
+		)
 		return { section }
 	})
 
@@ -92,7 +74,7 @@ export async function get({ params, query }) {
 	}
 	// console.log(sections)
 	return {
-		body: { title: getTitle(), sections, header: text },
+		body: { title: getTitle(), sections, header: text, data },
 		status: 200
 	}
 }

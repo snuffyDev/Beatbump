@@ -1,6 +1,6 @@
 <script lang="ts">
 	import longpress from '$lib/actions/longpress'
-	import { clickOutside } from '$lib/js/clickOutside'
+	import { clickOutside } from '$lib/actions/clickOutside'
 	import list from '$lib/stores/list'
 	import { currentTitle, key } from '$stores/stores'
 	import { createEventDispatcher, getContext } from 'svelte'
@@ -9,9 +9,8 @@
 	export let item
 	export let index
 	export let ctxKey = {}
-	const { width, sliding } = getContext(ctxKey)
 	const dispatch = createEventDispatcher()
-	let pressing = false
+
 	const DropdownItems = [
 		{
 			text: 'More like this',
@@ -49,8 +48,6 @@
 		<div
 			use:longpress
 			on:longpress={(e) => {
-				pressing = true
-
 				isShowing = true
 				// pressing = false
 			}}
@@ -62,9 +59,12 @@
 			style="min-width:5rem; max-width:5rem;"
 		>
 			<img
-				referrerpolicy="origin-when-cross-origin"
 				src={item.thumbnail ?? item.thumbnails[0].url}
+				width={item.thumbnails[0].width}
+				height={item.thumbnails[0].height}
 				alt="thumbnail"
+				loading="lazy"
+				decoding="async"
 			/>
 			<Popout items={DropdownItems} type="dd-menu" bind:isShowing />
 		</div>
@@ -93,12 +93,14 @@
 	}
 	.clickable {
 		width: 100%;
-		display: inline-flex;
-
+		display: grid;
+		max-width: 100%;
+		/* flex: 1 1 auto; */
+		/* flex-direction: row; */
 		align-items: center;
+		grid-template-columns: 1fr auto;
 	}
 	.p-length {
-		margin-left: auto;
 		align-self: center;
 		white-space: nowrap;
 		padding-right: 0.2rem;
@@ -106,9 +108,9 @@
 	.li-wrapper {
 		position: relative;
 		height: 6.9rem;
-		margin-top: 0.5rem;
+		margin-top: 0.425rem;
 
-		margin-bottom: 0.5rem;
+		margin-bottom: 0.425rem;
 	}
 	.item {
 		display: flex;
@@ -137,9 +139,20 @@
 	.pl-thumbnail {
 		width: auto;
 		height: 5rem;
+		touch-action: none;
 
 		background: #00000027;
 		border-radius: $sm-radius;
+		-webkit-user-drag: none;
+		-khtml-user-drag: none;
+		-moz-user-drag: none;
+		-o-user-drag: none;
+		user-drag: none;
+
+		-webkit-touch-callout: none;
+		-webkit-text-size-adjust: none;
+		-webkit-user-select: none;
+		user-select: none;
 		img {
 			width: auto;
 			height: 100%;
@@ -189,17 +202,16 @@
 		font-size: 1.0125rem;
 	}
 	.p-text {
-		/*margin-left: .5em; */
 		padding-left: 0.5em;
-		display: inline-flex;
-
+		display: flex;
 		overflow: hidden;
-		font-size: $size-1;
+		font-size: 1rem;
 		line-height: 1.75;
 		flex-flow: nowrap;
-		// justify-content: center;
 		flex-direction: column;
 		padding-inline: 0.8em;
+		max-width: 100%;
+		/* margin-right: auto;*/
 	}
 	img::before {
 		content: '';
@@ -207,9 +219,12 @@
 		padding-top: calc(100% * 2 / 3);
 	}
 	.p-title {
-		padding: 0em;
+		padding: 0;
 		font-size: 1.0125rem;
-		white-space: pre-wrap;
+		display: block;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 	@media screen and (max-width: 640px) {
 		.p-text {
@@ -227,9 +242,5 @@
 			padding: 0em;
 			font-size: 1.0175rem;
 		}
-	}
-
-	:root .light * {
-		color: white;
 	}
 </style>

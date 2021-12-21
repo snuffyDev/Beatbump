@@ -31,7 +31,7 @@ export async function get({ query }) {
 	const response = await fetch(url, { headers })
 	const data = await response.arrayBuffer()
 	const raw = Buffer.from(data).toString('base64')
-	console.log(response, data)
+	// console.log(response, data)
 	return {
 		body: {
 			image: 'data:' + 'image/jpeg' + ';base64,' + raw

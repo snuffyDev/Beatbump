@@ -3,10 +3,12 @@
 	from {
 		outline: transparent 0.1px solid;
 		background-color: transparent;
+		opacity: 0;
 	}
 	to {
 		outline: var(--color-gray-4) 0.1px solid;
 		background-color: var(--transparent-gray-3);
+		opacity: 1;
 	}
 }
 @include mixins.keyframe(fade) {
@@ -25,7 +27,7 @@
 	}
 
 	from {
-		transform: translate(100%, -100%);
+		transform: translate(100%, 50%);
 		opacity: 1;
 		// transform: translate(0, 0);
 	}

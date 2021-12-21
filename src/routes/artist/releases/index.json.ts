@@ -74,7 +74,7 @@ export const get = async ({ query }) => {
 	)
 	const data = await response.json()
 	const { header, contents } = await data
-	console.log(encodeURIComponent(params), decodeURIComponent(itct), itct)
+	// console.log(encodeURIComponent(params), decodeURIComponent(itct), itct)
 	if (!response.ok) {
 		return { status: response.status, body: response.statusText }
 	}
@@ -93,7 +93,7 @@ export const get = async ({ query }) => {
 					...parsed
 				}
 			}
-			console.log(data)
+			// console.log(data)
 		})
 	]
 

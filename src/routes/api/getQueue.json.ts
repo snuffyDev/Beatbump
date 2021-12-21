@@ -1,3 +1,5 @@
+import { PlaylistPanelVideoRenderer } from '$lib/parsers'
+import type { Song } from '$lib/types'
 import type { IPlaylistItem } from '$lib/types/playlist'
 import type { EndpointOutput } from '@sveltejs/kit'
 export async function get({
@@ -79,29 +81,8 @@ export async function get({
 		const { queueDatas } = await data
 
 		const q = queueDatas.map(
-			({ content: { playlistPanelVideoRenderer } }): IPlaylistItem => {
-				const length = playlistPanelVideoRenderer?.lengthText?.runs[0].text
-				const artistInfo = {
-					artist: playlistPanelVideoRenderer?.longBylineText?.runs[0]?.text,
-					browseId:
-						playlistPanelVideoRenderer?.longBylineText?.runs[0]
-							?.navigationEndpoint?.browseEndpoint?.browseId
-				}
-				const thumbnails =
-					playlistPanelVideoRenderer?.thumbnail?.thumbnails[0]?.url
-				const title = playlistPanelVideoRenderer?.title?.runs[0]?.text
-				const { videoId = '', playlistId = '' } = {
-					...playlistPanelVideoRenderer?.navigationEndpoint?.watchEndpoint
-				}
-				return {
-					length,
-					title,
-					thumbnail: thumbnails,
-					artistInfo,
-					videoId,
-					playlistId
-				}
-			}
+			({ content: { playlistPanelVideoRenderer } }): Song =>
+				PlaylistPanelVideoRenderer(playlistPanelVideoRenderer)
 		)
 		//
 		return {

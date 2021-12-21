@@ -36,14 +36,7 @@
 	onMount(() => {
 		itemHandler()
 	})
-	type CustomEvent = Event & {
-		currentTarget: EventTarget & HTMLImageElement
-	}
-	const errorHandler = (event: CustomEvent) => {
-		event.currentTarget.onerror = null
-		event.currentTarget.src =
-			'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjYWNhY2FjIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJtYXRyaXgoMS4yOTkgMCAwIDEuMjcgOTUuNjg4IDE4Ni45NzEpIiBmb250LWZhbWlseT0iTGF0byIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMjAiIGZpbGw9IiMyODI4MjgiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLjI5OSAwIDAgMS4yNyA3OCA0Mi4yODYpIiBkPSJNMCAwaDc3djEzNUgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjwvZz48L3N2Zz4='
-	}
+
 	let DropdownItems = [
 		{
 			text: 'View Artist',
@@ -56,9 +49,7 @@
 				})
 
 				await tick()
-				goto(
-					`/artist/${data['artistInfo']['artist'][0]['navigationEndpoint']['browseEndpoint']['browseId']}`
-				)
+				goto(`/artist/${data.artistInfo.artist[0].browseId}`)
 			}
 		},
 		{
@@ -77,6 +68,23 @@
 			text: 'Add to Queue',
 			icon: 'queue',
 			action: () => list.addNext(data, $key)
+		},
+		{
+			text: 'Add to Playlist',
+			icon: 'playlist-add',
+			action: async () => {
+				if (data?.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
+					console.log('PLAYLIST')
+					const response = await fetch(
+						'/api/getQueue.json?playlistId=' + data?.playlistId
+					)
+					const _data = await response.json()
+					const items: Item[] = _data
+					showAddToPlaylistPopper.set({ state: true, item: [...items] })
+				} else {
+					showAddToPlaylistPopper.set({ state: true, item: data })
+				}
+			}
 		},
 		{
 			text: !isLibrary ? 'Favorite' : 'Remove from Favorites',
@@ -114,6 +122,11 @@
 			}
 		}
 	]
+	if (data.type == 'artist') {
+		DropdownItems = [
+			...DropdownItems.filter((item) => !item.text.includes('Add to Playlist'))
+		]
+	}
 	if (data.type == 'playlist') {
 		DropdownItems.splice(1, 1, {
 			text: 'View Playlist',
@@ -124,7 +137,7 @@
 					top: 0,
 					left: 0
 				})
-				goto(`/playlist?list=${data?.browseId}`)
+				goto(`/playlist/${data?.browseId}`)
 			}
 		})
 		DropdownItems.shift()
@@ -132,17 +145,6 @@
 		DropdownItems = [
 			...DropdownItems.filter((item) => !item.text.includes('Favorite'))
 		]
-		DropdownItems.push({
-			text: 'Add to Playlist',
-			icon: 'playlist-add',
-			action: async () => {
-				const _data = await fetch(
-					`/api/getQueue.json?playlistId=${data.playlistId}`
-				).then((data) => data.json())
-				let thumb = data.thumbnails?.reverse()
-				showAddToPlaylistPopper.set({ state: true, item: data })
-			}
-		})
 	}
 	if (data.type == 'video') {
 		DropdownItems = DropdownItems.filter((d) => {
@@ -164,6 +166,9 @@
 	}
 	if (data?.album?.browseId === undefined) {
 		DropdownItems = DropdownItems.filter((d) => d.text !== 'Go to album')
+	}
+	if (data?.artistInfo?.artist[0].browseId === undefined) {
+		DropdownItems = DropdownItems.filter((d) => d.text !== 'View Artist')
 	}
 	const clickHandler = async (event) => {
 		if (
@@ -206,8 +211,10 @@
 
 <div
 	class="container"
-	on:contextmenu={(e) => {
-		window.dispatchEvent(new CustomEvent('contextmenu', { detail: 'listing' }))
+	on:contextmenu|preventDefault={(e) => {
+		window.dispatchEvent(
+			new window.CustomEvent('contextmenu', { detail: 'listing' })
+		)
 
 		PopperStore.set({
 			items: [...DropdownItems],
@@ -226,8 +233,8 @@
 				<div class="thumbnail">
 					<!-- svelte-ignore a11y-missing-attribute -->
 					<img
-						use:longpress
 						id="img"
+						decoding="async"
 						src={data.thumbnails ? data.thumbnails[0]?.url : data.thumbnail}
 						alt="thumbnail"
 					/>
@@ -251,12 +258,9 @@
 						by
 						<a
 							sveltekit:prefetch
-							href={`/artist/${
-								Array.isArray(data.artistInfo?.artist)
-									? data.artistInfo?.artist[0]?.navigationEndpoint
-											?.browseEndpoint?.browseId
-									: data.artistInfo?.browseId
-							}`}
+							on:click|preventDefault={() =>
+								goto(`/artist/${data.artistInfo?.artist[0]?.browseId}`)}
+							href={`/artist/${data.artistInfo?.artist[0]?.browseId}`}
 							>{data.artistInfo?.artist[0].text || data.artistInfo?.artist}</a
 						>
 					</p>
@@ -264,7 +268,11 @@
 				<span class="album">
 					{#if data.album?.browseId}<Icon name="album" size="1em" /><a
 							sveltekit:prefetch
-							href="/release?id={data?.album?.browseId}">{data.album.title}</a
+							on:click|preventDefault={() => {
+								goto(`/release?id=${data?.album?.browseId}`)
+							}}
+							href={`/release?id=${data?.album?.browseId}`}
+							>{data.album.title}</a
 						>
 					{/if}
 				</span>
@@ -342,25 +350,6 @@
 		}
 	}
 
-	.explicit {
-		text-shadow: none;
-		// width: 1rem;
-		// height: 1rem;
-		font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-			Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
-		font-size: calc(0.7143rem / 1.05);
-		flex: none;
-		color: rgb(8, 8, 8);
-		font-weight: 700;
-		// filter: contrast(100%);
-		background: rgba(247, 247, 247, 0.993);
-		padding: 0 0.4em;
-		margin-left: 0.25em;
-		display: inline-block;
-		border-radius: 0.2rem;
-		vertical-align: baseline;
-		border: rgba(255, 255, 255, 0.377) solid 0.01px;
-	}
 	.text-artist {
 		font-size: 0.95rem;
 	}
@@ -398,7 +387,7 @@
 
 	.title {
 		display: inline-flex;
-		width: 100%;
+		// width: 100%;
 		margin-left: 1rem;
 		line-height: 1.3;
 		align-self: center;
@@ -432,10 +421,6 @@
 	@media (min-width: 640px) {
 		.container:active:not(.menu) {
 			background: lighten(#575a6359, 5%);
-		}
-
-		:root .light .container:active:not(.menu) {
-			background: darken(#0a0a0c71, 5%);
 		}
 	}
 </style>

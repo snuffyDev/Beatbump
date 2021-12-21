@@ -2,16 +2,15 @@
 	import type { Load } from '@sveltejs/kit'
 	let path
 	export const load: Load = async ({ stuff, page, fetch }) => {
+		path = stuff.page
 		const browseId = page.query.get('id') || ''
 		const pt = page.query.get('type') || ''
-		path = stuff.page
-		const response = await api(fetch, {
-			path: 'browse',
-			endpoint: 'browse',
-			browseId,
-			type: 'release'
-		})
-		const data = await response.body
+		const response = await fetch(
+			`/api/main.json?q=&endpoint=browse${
+				browseId ? `&browseId=${browseId}` : ''
+			}${pt ? `&pt=${pt}` : ''}`
+		)
+		const data = await response.json()
 		if (!response.ok) {
 			return {
 				props: {
@@ -33,30 +32,33 @@
 </script>
 
 <script lang="ts">
-	import Icon from '$components/Icon/Icon.svelte'
 	import ListItem from '$components/ListItem/ListItem.svelte'
-	import { currentTitle, theme, key } from '$stores/stores'
+	import { currentTitle, key } from '$stores/stores'
 	import { parsePageContents } from '$lib/js/releaseUtils'
 	import { isPagePlaying } from '$stores/stores'
 	import list from '$lib/stores/list'
 	import InfoBox from '$lib/components/Layouts/InfoBox.svelte'
-	import { browser } from '$app/env'
 	import { setContext } from 'svelte'
 	import { page } from '$app/stores'
 	import tagStore from '$lib/stores/ogtags'
 	import { api } from '$lib/api'
+	import Header from '$lib/components/Layouts/Header.svelte'
 	export let data
 	export let id
 	$: id = $page.query.get('id')
 	const promise = parsePageContents(data)
 	let { items, releaseInfo } = promise
-	$: if (browser) console.log(data, promise, releaseInfo)
+	// $: console.log(releaseInfo, items, $page)
+	const setId = () => isPagePlaying.set(id)
 	const playAlbum = () => {
+		setId()
 		list.startPlaylist(releaseInfo.playlistId)
 		key.set(0)
 		currentTitle.set(items[0].title)
 	}
 	const playRadio = () => {
+		setId()
+
 		list.initList({
 			videoId: items[0].videoId,
 			playlistId: releaseInfo?.autoMixId,
@@ -70,28 +72,17 @@
 		/=(w(\d+))-(h(\d+))/g,
 		'=w512-h512'
 	)
-	tagStore.desc(
-		`${releaseInfo.title} by ${releaseInfo.artist.name} on Beatbump`
-	)
-	tagStore.title(releaseInfo.title)
-	tagStore.url(path + `?id=${id}`)
-	tagStore.image(thumbnail)
+
 	const ctx = {}
 	setContext(ctx, { pageId: id })
 </script>
 
-<svelte:head>
-	{#each Object.entries($tagStore) as [property, content]}
-		{#if content}
-			{#if ['title', 'description', 'image'].includes(property)}
-				<meta name={property} {content} />
-			{:else}
-				<meta {property} {content} />
-			{/if}
-		{/if}
-	{/each}
-	<title>{$currentTitle ? $currentTitle : $tagStore.title} - Beatbump</title>
-</svelte:head>
+<Header
+	title={releaseInfo.title}
+	desc={`${releaseInfo.title} by ${releaseInfo.artist.name} on Beatbump`}
+	url={path + `?id=${id}`}
+	image={thumbnail}
+/>
 {#await promise then _}
 	<main>
 		<InfoBox
@@ -109,11 +100,10 @@
 			<ListItem
 				{ctx}
 				page="release"
-				on:pagePlaying={() => {
-					isPagePlaying.set(id)
-				}}
+				on:pagePlaying={() => setId()}
 				{item}
 				{index}
+				parentPlaylistId={releaseInfo?.playlistId}
 			/>
 		{/each}
 	</main>

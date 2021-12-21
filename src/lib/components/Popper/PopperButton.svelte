@@ -1,14 +1,12 @@
 <script lang="ts">
-	import Dropdown from '../Dropdown/Dropdown.svelte'
 	import Icon from '../Icon/Icon.svelte'
 
 	import { PopperStore } from './popperStore'
 	export let items = []
 	export let type = ''
 	export let metadata = {}
-	export let isHidden = false
 	export let size = '1.5rem'
-	export let tabindex = 0
+	export let tabindex: string | number = '0'
 	function Popper(node: HTMLElement) {
 		let x, y, bottom
 		let isOpen
@@ -32,6 +30,7 @@
 			isOpen = true
 			PopperStore.set({
 				items,
+				srcNode: node,
 				direction: 'normal',
 				isOpen: true,
 				type,
@@ -104,7 +103,7 @@
 	}
 </script>
 
-<div class="dd-button" use:Popper {tabindex}>
+<div class="dd-button" role="button" use:Popper {tabindex}>
 	<svelte:component this={Icon} color="#f2f2f2" {size} name="dots" />
 </div>
 

@@ -1,13 +1,11 @@
 <script lang="ts">
 	import Icon from '$components/Icon/Icon.svelte'
-	import { clickOutside } from '$lib/js/clickOutside'
-	import { quartOut } from 'svelte/easing'
-	import { slide } from 'svelte/transition'
+	import { clickOutside } from '$lib/actions/clickOutside'
+	import { cubicOut, quartOut } from 'svelte/easing'
+	// import { slide } from 'svelte/transition'
 
 	import { PopperStore } from '../Popper'
 	import DropdownItem from './DropdownItem.svelte'
-
-	export let color = 'white'
 
 	$: items = $PopperStore.items
 	$: type = $PopperStore.type
@@ -15,6 +13,7 @@
 	$: isHidden = $PopperStore.items.length !== 0
 
 	function onClose() {
+		$PopperStore.srcNode.focus()
 		PopperStore.set({
 			items: [],
 			isOpen: false,
@@ -29,6 +28,36 @@
 	let viewport_width
 	let popperHeight
 	let popper: HTMLElement = undefined
+	export function slide(
+		node: Element,
+		{ delay = 0, duration = 400, easing = cubicOut } = {}
+	) {
+		const style = getComputedStyle(node)
+		const opacity = +style.opacity
+		const height = parseFloat(style.height)
+		const padding_top = parseFloat(style.paddingTop)
+		const padding_bottom = parseFloat(style.paddingBottom)
+		const margin_top = parseFloat(style.marginTop)
+		const margin_bottom = parseFloat(style.marginBottom)
+		const border_top_width = parseFloat(style.borderTopWidth)
+		const border_bottom_width = parseFloat(style.borderBottomWidth)
+
+		return {
+			delay,
+			duration,
+			easing,
+			css: (t, u) =>
+				'overflow: hidden;' +
+				`opacity: ${Math.min(t * 20, 1) * opacity};` +
+				`height: ${t * height}px;` +
+				`padding-top: ${t * padding_top}px;` +
+				`padding-bottom: ${t * padding_bottom}px;` +
+				`margin-top: ${t * margin_top}px;` +
+				`margin-bottom: ${t * margin_bottom}px;` +
+				`border-top-width: ${t * border_top_width}px;` +
+				`border-bottom-width: ${t * border_bottom_width}px;`
+		}
+	}
 	$: rect = popper && popper.getBoundingClientRect()
 	$: posY =
 		$PopperStore.y - popperHeight <= 0
@@ -45,13 +74,24 @@
 				? viewport_width + -width * 1.75
 				: $PopperStore.x
 			: $PopperStore.x - width
-	$: isHidden &&
-		popper &&
-		(() => {
-			// console.log('hasfocus')
-			popper.focus()
-		})()
-	// $: console.log(items, posY)
+	$: if (popper) popper.focus()
+	function focusState(node: HTMLElement) {
+		function handleFocusOut(
+			event: FocusEvent & { relatedTarget: HTMLElement & EventTarget }
+		) {
+			console.log(node.contains(event.relatedTarget))
+			if (!node.contains(event.relatedTarget)) {
+				node.dispatchEvent(new CustomEvent('lostfocus'))
+			}
+		}
+
+		node.addEventListener('focusout', handleFocusOut, { capture: true })
+		return {
+			destroy() {
+				node.removeEventListener('focusout', handleFocusOut, true)
+			}
+		}
+	}
 </script>
 
 <svelte:window
@@ -60,17 +100,20 @@
 />
 
 {#if isHidden}
-	<!-- on:focusout={onClose} -->
 	<div
 		use:clickOutside
-		on:click_outside={onClose}
+		use:focusState
 		bind:clientWidth={width}
 		bind:clientHeight={popperHeight}
-		style="transform: translate({posX}px, {posY}px)"
-		on:mouseleave|stopPropagation={onClose}
 		bind:this={popper}
-		transition:slide={{ duration: 125, easing: quartOut }}
+		on:mouseleave|stopPropagation={onClose}
+		on:lostfocus={onClose}
+		on:click_outside={onClose}
+		in:slide={{ delay: 125, duration: 125 }}
+		out:slide={{ duration: 125 }}
 		class={type == 'player' ? 'dd-player' : 'dd-menu'}
+		style="transform: translate({posX}px, {posY}px)"
+		tabindex="0"
 	>
 		{#each items as item}
 			<DropdownItem

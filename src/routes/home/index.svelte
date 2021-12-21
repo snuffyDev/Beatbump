@@ -2,7 +2,7 @@
 	let path
 
 	export async function load({ fetch, stuff }) {
-		const response = await fetch('/home.json?q=browse')
+		const response = await fetch('/home.json')
 		const data = await response.json()
 		if (!response.ok) {
 			return {
@@ -10,12 +10,13 @@
 				error: new Error(`Error: ${response.statusText}`)
 			}
 		}
+		const { carousels, headerThumbnail = undefined, continuations } = await data
 		path = stuff.page
 		return {
 			props: {
-				carousels: await data.carousels,
-				headerThumbnail: await data.headerThumbnail,
-				continuations: await data.continuations
+				carousels,
+				headerThumbnail,
+				continuations
 				// data: await data.data
 			},
 			maxage: 3600,
@@ -29,26 +30,24 @@
 	import Carousel from '$lib/components/Carousel/Carousel.svelte'
 	import Header from '$lib/components/Layouts/Header.svelte'
 	import Loading from '$lib/components/Loading/Loading.svelte'
-	import tagStore from '$lib/stores/ogtags'
-	import { theme } from '$lib/stores/stores'
 	import type { NextContinuationData, Thumbnail } from '$lib/types'
 
 	export let carousels
-	// export let data
 	export let headerThumbnail: Array<Thumbnail> = []
 	export let continuations: NextContinuationData
 
 	let loading = false
 	let hasData = false
-	// $: if (!import.meta.env.SSR)
-	// 	console.log(carousels, headerThumbnail, continuations, data)
-	// $: console.log(hasData, loading, Object.keys(continuations).length)
 </script>
 
-<Header title="Home" url={path} desc="See the hottest tracks and playlists" />
+<Header
+	title="Home"
+	url={path}
+	desc="Listen to the hottest tracks from your favorite artists, and discover new playlists and mixes."
+/>
 
 <div class="immersive-thumbnail">
-	<div class="gradient" style="--theme: var(--{$theme}-base);" />
+	<div class="gradient" style="--theme: var(--base-bg);" />
 	{#if headerThumbnail.length !== 0}
 		<picture>
 			{#each headerThumbnail as thumbnail, i}
@@ -71,6 +70,7 @@
 				width={headerThumbnail[0].width}
 				height={headerThumbnail[0].height}
 				class="immer-img"
+				loading="eager"
 				alt="large background header"
 			/>
 		</picture>
@@ -108,7 +108,6 @@
 				}
 				hasData = data.continuations === {}
 				return !loading
-				console.log(data)
 			}}
 		/>
 		{#if loading}

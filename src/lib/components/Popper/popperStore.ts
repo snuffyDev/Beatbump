@@ -13,6 +13,7 @@ type PopperStore = {
 	x?: number
 	y?: number
 	bottom?: number
+	srcNode?: HTMLElement
 	direction?: 'normal' | 'right'
 }
 export const PopperStore = _popperStore()

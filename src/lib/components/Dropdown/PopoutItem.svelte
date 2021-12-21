@@ -47,13 +47,14 @@
 
 			transition: cubic-bezier(0.68, -0.55, 0.265, 1.55) all 0.3s;
 		}
-
-		&:last-child {
+		&:first-child {
+			border-top-left-radius: inherit;
+			border-top-right-radius: inherit;
+		}
+		&:last-of-type {
+			border-bottom-left-radius: inherit;
+			border-bottom-right-radius: inherit;
 			border-bottom: none !important;
 		}
-	}
-
-	:root .light * {
-		color: white;
 	}
 </style>

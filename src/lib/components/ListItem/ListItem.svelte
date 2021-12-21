@@ -5,8 +5,8 @@
 	import list from '$lib/stores/list'
 	export let item: Item
 	export let index
-	export let page
 	export let parentPlaylistId = ''
+	export let page
 	export let ctx = {}
 	import { getContext } from 'svelte'
 	import type { Item } from '$lib/types'
@@ -17,29 +17,13 @@
 			isPlaying: true
 		})
 	}
-	let isHovering = false
-	let parent
-</script>
-
-<div
-	bind:this={parent}
-	class="item"
-	class:playing={$isPagePlaying == pageId && item.videoId == $currentId}
-	on:mouseenter|capture={(e) => {
-		if (parent && parent.contains(e.target)) isHovering = true
-	}}
-	on:mouseleave|capture={(e) => {
-		// isHovering = false
-		if (parent && parent.contains(e.target)) {
-			isHovering = true
-		}
-		isHovering = false
-	}}
-	on:click={async () => {
+	async function handleClick(e: MouseEvent) {
+		const target = e.target as HTMLElement
+		if (target.nodeName.match('A')) return
 		// @ts-ignore
 		if (page == 'playlist') {
 			key.set(index)
-			console.log('key: ' + $key, item.playlistId)
+			// console.log('key: ' + $key, item.playlistId)
 			await list.startPlaylist(item.playlistId, index)
 			// await list.initList({
 			// 	videoId: item.videoId,
@@ -52,39 +36,76 @@
 			dispatch('initLocalList', index)
 		} else {
 			key.set(index)
-			console.log(item, item.videoId)
+			// console.log(item, item.videoId)
 			await list.initList({
 				videoId: item.videoId,
-				playlistId: item.playlistId,
+				playlistId: parentPlaylistId,
 				keyId: $key,
 				config: { playerParams: item?.playerParams, type: item?.musicVideoType }
 			})
 		}
 		dispatchPlaying()
+	}
+	let isHovering = false
+	let parent
+</script>
+
+<!-- svelte-ignore a11y-mouse-events-have-key-events -->
+<div
+	bind:this={parent}
+	class="item"
+	class:playing={$isPagePlaying == pageId && item.videoId == $currentId}
+	on:pointerenter={(e) => {
+		if (parent && parent.contains(e.target)) isHovering = true
 	}}
+	on:pointerleave={(e) => {
+		if (parent && parent.contains(e.target)) {
+			isHovering = true
+		}
+		isHovering = false
+	}}
+	on:click={handleClick}
 >
 	<div class="number">
 		<span class:hidden={!isHovering}>
-			<svelte:component this={Icon} name="play" size="1.5em" />
+			<svelte:component this={Icon} name="play-player" size="1.5em" />
 		</span>
-		<!-- content here -->
-		<span class:hidden={isHovering}>{index + 1}<!-- else content here --></span>
+
+		<span class:hidden={isHovering}>{index + 1}</span>
 	</div>
 	<div class="itemInfo">
-		<div class="item-title">
-			{item?.title}
-			{#if item.explicit}
-				<span class="explicit">
-					{item.explicit ? 'E' : ''}
-				</span>
-			{/if}
-		</div>
-		<div class="artists secondary">
-			{#if item.subtitle}
-				{#each item?.subtitle as subtitle}
-					<span class="artist">{subtitle.text}</span>
-				{/each}
-			{/if}
+		{#if item.thumbnails.length !== 0}
+			<div class="thumbnail">
+				<img
+					loading="lazy"
+					src={item.thumbnails[0]?.url}
+					width={item.thumbnails[0]?.width}
+					height={item.thumbnails[0]?.height}
+					alt="thumbnail"
+					decoding="async"
+				/>
+			</div>
+		{/if}
+		<div class="column">
+			<div class="item-title">
+				{item?.title}
+				{#if item.explicit}
+					<span class="explicit">
+						{item.explicit ? 'E' : ''}
+					</span>
+				{/if}
+			</div>
+			<div class="artists secondary">
+				{#if item.artistInfo?.artist}
+					{#each item?.artistInfo?.artist as subtitle}
+						<a
+							class="artist"
+							href={`/artist/${subtitle.browseId}`}
+							sveltekit:prefetch>{subtitle.text}</a
+						>
+					{/each}
+				{/if}
+			</div>
 		</div>
 	</div>
 	<span class="length" class:hidden={!item?.length ? true : false}
@@ -94,27 +115,36 @@
 
 <!-- markup (zero or more items) goes here -->
 <style lang="scss">
-	.artists {
+	.column {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
 	}
+	.thumbnail {
+		max-width: 3.5rem;
+		aspect-ratio: 1/1;
+		margin-right: 1rem;
+		max-height: 3.5rem;
+		width: 100%;
+	}
+
 	.hidden {
 		display: none;
 		visibility: hidden;
 	}
 	.length {
 		align-self: center;
-		margin-right: 1.5rem;
+		// margin-right: 1.5rem;
 		grid-area: r;
 	}
-	.item-wrapper {
-	}
-
 	.itemInfo {
 		display: inline-flex;
-		flex-direction: column;
-		flex: 1 0;
 		align-self: center;
 		line-height: 1.6;
 		margin-right: 1.8rem;
+		grid-area: m;
+		flex-direction: row;
+		flex: 1 0;
 		.item-title {
 			font-weight: 500;
 		}
@@ -137,6 +167,10 @@
 	img {
 		width: auto;
 		height: auto;
+		width: auto;
+		height: auto;
+		aspect-ratio: inherit;
+		object-fit: contain;
 	}
 	img::before {
 		display: block;
@@ -147,23 +181,29 @@
 	.item {
 		display: grid;
 		height: 100%;
-		grid-template-areas: 'c m r';
-		grid-template-columns: auto 1fr auto;
 		align-content: center;
+		grid-template-areas: 'm r';
+		grid-template-columns: 1fr auto;
+
 		-webkit-user-select: none;
+		gap: 0.8rem;
 		-moz-user-select: none;
 		-ms-user-select: none;
 		user-select: none;
 		flex: 0 1 auto;
+		min-height: 3rem;
 		height: auto;
-		border-bottom: calc(0.000321rem / 2) solid rgb(141 141 142 / 34%);
+		border-bottom: 0.0001605rem solid hsl(240deg 0% 55% / 34%);
 		width: 100%;
-		padding: 0.4rem 0 0.4rem 0.15rem;
+		padding: 0.4rem 1.5rem 0.4rem 0.8rem;
+		@media screen and (min-width: 640px) {
+			grid-template-areas: 'c m r';
+			grid-template-columns: 2rem 1fr auto;
+		}
 		@media (hover: hover) {
 			&:hover {
 				background: lighten(#57575831, 1%);
 				transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
-				pointer-events: all;
 			}
 		}
 		&:active:not(.menu) {
@@ -175,29 +215,24 @@
 		background: lighten(#2122254f, 5%);
 		transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
 	}
-	// background-color: transparentize(#aaa, 0.9);
-
-	.itemInfo {
-		grid-area: m;
-		display: flex;
-		flex-direction: column;
-		flex: 1 0;
-		pointer-events: none;
-	}
 
 	.number {
-		width: 2rem;
-		font-size: 1.125rem;
-		font-weight: 600;
-		height: 2rem;
-		grid-area: c;
-		text-align: center;
-		pointer-events: none;
-		opacity: 1;
-		margin-left: 0.4rem;
-		margin-right: 1.1rem;
-		align-self: center;
-
-		justify-self: center;
+		display: none;
+		visibility: none;
+		@media screen and (min-width: 640px) {
+			font-size: 1.125rem;
+			font-weight: 600;
+			grid-area: c;
+			text-align: center;
+			pointer-events: none;
+			opacity: 1;
+			/* margin-right: 1rem; */
+			align-self: center;
+			place-self: center;
+			justify-self: center;
+			display: inline-grid;
+			justify-items: center;
+			visibility: visible;
+		}
 	}
 </style>

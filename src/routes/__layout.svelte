@@ -11,17 +11,21 @@
 </script>
 
 <script lang="ts">
-	import { browser } from '$app/env'
 	import Nav from '$components/Nav/Nav.svelte'
-	import Player from '$components/Player/Player.svelte'
+	import Player from '$lib/components/Player/Player.svelte'
 	import Wrapper from '$components/Wrapper/Wrapper.svelte'
 	import Alert from '$lib/components/Alert/Alert.svelte'
 	import { iOS, showAddToPlaylistPopper } from '$stores/stores'
 	import { onMount } from 'svelte'
 	import { Popper } from '$lib/components/Popper'
-	import '../global/stylesheet/main.scss'
+	import '@fontsource/commissioner/index.css'
+	import '@fontsource/commissioner/500.css'
+	import '@fontsource/commissioner/600.css'
+	import '@fontsource/commissioner/700.css'
+	import '../global/stylesheet/_layout.scss'
 	import { settings } from '$lib/stores/settings'
 	import PlaylistPopper from '$lib/components/PlaylistPopper'
+	import { goto } from '$app/navigation'
 	export let key
 	let main
 	onMount(() => {
@@ -37,6 +41,8 @@
 </script>
 
 <Nav {key} />
+<Popper />
+
 <div
 	class="wrapper"
 	class:no-scroll={key.includes('/search/') ? true : false}
@@ -47,7 +53,6 @@
 		<slot />
 	</Wrapper>
 </div>
-<Popper />
 <PlaylistPopper
 	on:close={() => {
 		showAddToPlaylistPopper.set({ state: false, item: {} })
@@ -59,12 +64,10 @@
 </footer>
 
 <style lang="scss" global>
-	@import '@fontsource/commissioner/index.css';
-	@import '@fontsource/commissioner/500.css';
-	@import '@fontsource/commissioner/600.css';
-	@import '@fontsource/commissioner/700.css';
+	@import '../global/stylesheet/main';
+
 	.wrapper {
-		overflow-y: scroll; /* has to be scroll, not auto */
+		overflow-y: auto; /* has to be scroll, not auto */
 		-webkit-overflow-scrolling: touch;
 	}
 </style>

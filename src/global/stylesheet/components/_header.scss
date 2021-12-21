@@ -1,44 +1,7 @@
-nav.nav {
-	will-change: contents;
-	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
-	right: 0;
-	grid-template-areas: "l m r";
-	height: 4rem;
-	z-index: 5;
-	justify-content: space-between;
-	align-items: center;
-	flex-wrap: nowrap;
+.nav-item {
+	margin: 0 0.4rem;
 	position: relative;
-	align-content: center;
-	padding: 1rem;
-	grid-area: n/n/n/n;
-	// @media screen and (min-width: 640px) {
-	// 	grid-template-columns: auto 1fr;
-	// }
-
-	.logo {
-		position: relative;
-		visibility: visible;
-		justify-self: start;
-		justify-content: start;
-		-o-object-fit: cover;
-		object-fit: cover;
-		cursor: pointer;
-		grid-area: l;
-		img {
-			margin: 0;
-			padding: 0;
-			width: 100%;
-			height: 100%;
-			max-width: 2.5rem;
-			max-height: 2.5rem;
-		}
-		cursor: pointer;
-	}
-}
-.hidden {
-	display: none;
+	display: block;
 }
 .nav-search {
 	display: inline-flex;
@@ -58,6 +21,8 @@ nav.nav {
 	height: 100%;
 	align-items: center;
 	// background: ;: fixed;
+
+	// contain: paint;
 	background: inherit;
 
 	&::before {
@@ -73,9 +38,4 @@ nav.nav {
 		content: "";
 		z-index: -1;
 	}
-}
-
-:root .light .nav-search::before {
-	filter: brightness(0.1);
-	background: var(--light-top);
 }

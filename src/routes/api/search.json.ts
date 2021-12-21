@@ -193,7 +193,18 @@ const parseSong = (contents, type): Song[] => {
 					artists.splice(i + 1, 1)
 				}
 			}
-			artists.reverse()
+			artists = [
+				...artists.reverse().map((item) => {
+					return {
+						text: item?.text,
+						browseId: item?.navigationEndpoint?.browseEndpoint?.browseId,
+						pageType:
+							item?.navigationEndpoint?.browseEndpoint
+								?.browseEndpointContextSupportedConfigs
+								?.browseEndpointContextMusicConfig?.pageType
+					}
+				})
+			]
 		} else {
 			artists = ctx.navigationEndpoint.browseEndpoint.browseId
 		}

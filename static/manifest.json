@@ -22,37 +22,29 @@
 		}
 	],
 	"icons": [
-		{
-			"src": "assets/android/android-launchericon-512-512.png",
-			"sizes": "512x512"
-		},
-		{
-			"src": "assets/android/android-launchericon-192-192.png",
-			"sizes": "192x192"
-		},
-		{
-			"src": "assets/android/android-launchericon-144-144.png",
-			"sizes": "144x144"
-		},
-		{
-			"src": "assets/android/android-launchericon-96-96.png",
-			"sizes": "96x96"
-		},
-		{
-			"src": "assets/android/android-launchericon-72-72.png",
-			"sizes": "72x72"
-		},
-		{
-			"src": "assets/android/android-launchericon-48-48.png",
-			"sizes": "48x48"
-		},
-		{
-			"src": "assets/chrome/chrome-favicon-16-16.png",
-			"sizes": "16x16"
-		},
-		{
-			"src": "assets/chrome/chrome-installprocess-128-128.png",
-			"sizes": "128x128"
-		}
-	]
+    {
+      "src": "android/android-launchericon-512-512.png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "android/android-launchericon-192-192.png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "android/android-launchericon-144-144.png",
+      "sizes": "144x144"
+    },
+    {
+      "src": "android/android-launchericon-96-96.png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "android/android-launchericon-72-72.png",
+      "sizes": "72x72"
+    },
+    {
+      "src": "android/android-launchericon-48-48.png",
+      "sizes": "48x48"
+    }
+  ]
 }

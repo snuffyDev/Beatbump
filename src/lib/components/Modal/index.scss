@@ -9,10 +9,10 @@
 	flex-direction: column;
 	top: 50%;
 	left: 50%;
-	min-width: 30%;
-	width: 100%;
+	min-width: 45vw;
+	// width: 100%;
 	min-height: 50%;
-	max-width: 100%;
+	max-width: 85vw;
 	max-height: 100%;
 	border-radius: $lg-radius;
 	border-color: rgba(129, 129, 129, 0.411);
@@ -21,6 +21,17 @@
 	transform: translate(-50%, -50%);
 	@media screen and (min-width: 640px) {
 		max-width: 75%;
-		max-height: 65%;
+		max-height: 85%;
 	}
+	overflow: hidden;
+}
+
+.modal-container {
+	// max-width: 53.333333rem;
+	// margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	// margin:0 auto;
+	// width
 }

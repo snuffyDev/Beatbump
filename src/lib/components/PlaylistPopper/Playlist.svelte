@@ -23,6 +23,16 @@
 </li>
 
 <style lang="scss">
+	.image {
+		max-width: 5.333333rem;
+		max-height: 5.333333rem;
+		img {
+			max-width: inherit;
+			max-height: inherit;
+			width: 100%;
+			height: 100%;
+		}
+	}
 	.list-item-body {
 		display: flex;
 		flex-direction: column;

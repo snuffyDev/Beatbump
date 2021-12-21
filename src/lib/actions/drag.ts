@@ -1,20 +1,23 @@
 export default function drag(node: HTMLElement) {
-	let x, lastY
+	let x
 	let y
-	let loop
-	let startY
 	let initTop, initHeight
-	function handleMousedown(event) {
+	function getNodeRects(node: HTMLElement) {
 		const { top, height } = node.getBoundingClientRect()
 
-		initTop = top
-		initHeight = height
+		return { initTop: top, initHeight: height }
+	}
+	function handleMousedown(event) {
+		const rects = getNodeRects(node)
+		initTop = rects.initTop
+		initHeight = rects.initHeight
 		if (event.type == 'touchstart') {
 			x = event.touches[0].pageX
 			y = event.touches[0].pageY
+		} else {
+			x = event.pageX
+			y = event.pageY
 		}
-		x = event.pageX
-		y = event.pageY
 		node.dispatchEvent(
 			new CustomEvent('dragstart', {
 				detail: { x, y }
@@ -38,11 +41,10 @@ export default function drag(node: HTMLElement) {
 					detail: {
 						x,
 						y: initHeight + event.touches[0].pageY - initTop,
-						my: event.clientY
+						my: event.pageY
 					}
 				})
 			)
-			lastY = event.touches[0].pageY / 100
 		} else {
 			dx = event.pageX - x
 			dy = event.pageY - y
@@ -54,8 +56,8 @@ export default function drag(node: HTMLElement) {
 				new CustomEvent('dragmove', {
 					detail: {
 						x,
-						y: initHeight + event.pageY - initTop,
-						my: event.clientY,
+						y: initHeight + event.pageY - initTop - 32,
+						my: event.pageY,
 						dx,
 						dy
 					}
@@ -65,7 +67,6 @@ export default function drag(node: HTMLElement) {
 	}
 
 	function handleMouseup(event) {
-		lastY = 0
 		if (event.type == 'touchend') {
 			// console.log(JSON.stringify(event))
 			x = event.changedTouches[0].pageX
@@ -80,7 +81,6 @@ export default function drag(node: HTMLElement) {
 				detail: { x, y }
 			})
 		)
-
 		window.removeEventListener('touchmove', handleMousemove)
 		window.removeEventListener('touchend', handleMouseup)
 		window.removeEventListener('mousemove', handleMousemove)
@@ -89,7 +89,6 @@ export default function drag(node: HTMLElement) {
 
 	node.addEventListener('touchstart', handleMousedown, { passive: true })
 	node.addEventListener('mousedown', handleMousedown, { passive: true })
-
 	return {
 		destroy() {
 			node.removeEventListener('mousedown', handleMousedown, true)

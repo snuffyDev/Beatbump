@@ -4,11 +4,9 @@
 	import icons from './icons'
 	export let name
 	export let size = '1.5rem'
-	export let color = 'currentColor'
-	export let lclass = ''
+	export let color = 'var(--stroke, currentColor)'
 	export let fill = 'none'
 	export let style = ''
-	let box = 24
 	let displayIcon = icons[name]
 </script>
 
@@ -19,8 +17,8 @@
 	stroke-width="2"
 	stroke-linecap="round"
 	stroke-linejoin="round"
-	style="width: {size}; height:{size}; stroke: {color} !important; {style}; transition: stroke linear 50ms;"
-	viewBox="0 0 {box} {box}">{@html displayIcon}</svg
+	style="width: {size}; height:{size}; {style}; transition: stroke linear 50ms;"
+	viewBox="0 0 24 24">{@html displayIcon}</svg
 >
 
 <style>
@@ -36,6 +34,8 @@
 		-webkit-justify-content: center;
 		justify-content: center;
 		position: relative;
+		stroke: var(--stroke, currentColor);
 		vertical-align: middle;
+		shape-rendering: geometricPrecision;
 	}
 </style>

@@ -1,34 +1,25 @@
 <script lang="ts">
-	import { navigating } from '$app/stores'
-	import { fly } from 'svelte/transition'
-	import { quadInOut } from 'svelte/easing'
-	import { tick } from 'svelte'
-	export let main
+	import { fade } from 'svelte/transition'
+	export let main: HTMLElement
 	export let key
-	$: isNavigating = $navigating
-	// $: console.log(isNavigating)
-	$: if (key || isNavigating !== null) catchUp()
+	$: if (key) catchUp()
 	async function catchUp() {
-		// console.log(key)
-		await tick()
-		if (main) main.scrollTo({ top: 0, behavior: 'smooth' })
+		// await tick()
+		if (main) main.scrollTop = 0
 	}
 
 	// $navigating
 </script>
 
 {#key key}
-	<div
-		in:fly={{ x: -5, duration: 200, delay: 125 }}
-		out:fly={{ x: 5, duration: 250, opacity: 0 }}
-	>
+	<div in:fade={{ duration: 250, delay: 250 }} out:fade={{ duration: 250 }}>
 		<slot />
 	</div>
 {/key}
 
 <style>
 	div {
-		display: block;
+		/* display: block; */
 		height: 100%;
 		position: relative;
 	}

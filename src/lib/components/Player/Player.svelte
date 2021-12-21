@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { browser } from '$app/env'
-
 	import { goto } from '$app/navigation'
 	import Icon from '$components/Icon/Icon.svelte'
 	import db from '$lib/db'
-	import { clickOutside } from '$lib/js/clickOutside'
+	import { clickOutside } from '$lib/actions/clickOutside'
 	import list from '$lib/stores/list'
 	import { getSrc, shuffle } from '$lib/utils'
 	import {
@@ -12,10 +11,10 @@
 		iOS,
 		key,
 		playerLoading,
-		theme,
 		updateTrack
 	} from '$stores/stores'
 	import { tick } from 'svelte'
+
 	import { cubicOut } from 'svelte/easing'
 	import { tweened } from 'svelte/motion'
 	import { fade } from 'svelte/transition'
@@ -35,7 +34,7 @@
 	$: player.autoplay = $updateTrack !== undefined ? true : false
 
 	$: player.src = $updateTrack
-	$: isWebkit = $iOS
+	let isWebkit = $iOS
 	let title
 
 	$: autoId = $key
@@ -52,14 +51,54 @@
 	let songBar
 	let seekBar
 	let hoverWidth
-
 	let showing
 	let hovering
-	$: mixList = $list.mix
+	$: DropdownItems =
+		$list.mix.length !== 0 &&
+		[
+			{
+				text: 'View Artist',
+				icon: 'artist',
+				action: () => {
+					window.scrollTo({
+						behavior: 'smooth',
+						top: 0,
+						left: 0
+					})
+					goto(`/artist/${$list.mix[autoId].artistInfo.artist[0].browseId}`)
+				}
+			},
+			{
+				text: 'Add to Favorites',
+				icon: 'heart',
+				action: async () => {
+					// console.log(data)
+					if (!browser) return
+					await db.setNewFavorite($list.mix[autoId])
+				}
+			},
+			{
+				text: 'Shuffle',
+				icon: 'shuffle',
+				action: () => {
+					// console.log(data)
+					const _list = $list.mix
+					$list.mix = [...shuffle(_list, autoId)]
+					// console.log($list.mix)
+				}
+			}
+		].filter((item) => {
+			{
+				if (!$list.mix[autoId].artistInfo.artist[0].browseId) {
+					return
+				} else {
+					return item
+				}
+			}
+		})
 
-	let DropdownItems: Array<any>
 	let once = false
-	$: console.log($list.mix, autoId, $key, $updateTrack)
+	// $: console.log($list.mix, autoId, $key, $updateTrack)
 
 	/*
   	Player Controls
@@ -102,48 +141,16 @@
 	player.addEventListener('loadedmetadata', () => {
 		setPosition()
 		isPlaying = true
-
-		DropdownItems = [
-			{
-				text: 'View Artist',
-				icon: 'artist',
-				action: () => {
-					window.scrollTo({
-						behavior: 'smooth',
-						top: 0,
-						left: 0
-					})
-					goto(`/artist/${mixList[autoId].artistInfo.browseId}`)
-				}
-			},
-			{
-				text: 'Add to Favorites',
-				icon: 'heart',
-				action: async () => {
-					// console.log(data)
-					if (!browser) return
-					await db.setNewFavorite($list.mix[autoId])
-				}
-			},
-			{
-				text: 'Shuffle',
-				icon: 'shuffle',
-				action: () => {
-					// console.log(data)
-					const _list = $list.mix
-					$list.mix = [...shuffle(_list, autoId)]
-					console.log($list.mix)
-				}
-			}
-		]
+		metaDataHandler()
 	})
 
 	player.addEventListener('timeupdate', async () => {
 		time = player.currentTime
 		duration = player.duration
 		remainingTime = duration - time
-		$progress = isWebkit == true ? time * 2 : time
-
+		if (document.visibilityState !== 'hidden') {
+			$progress = isWebkit == true ? time * 2 : time
+		}
 		/* This checks if the user is on an iOS device
 		 	 due to the length of a song being doubled on iOS,
 			 we have to cut the time in half. Doesn't effect other devices.
@@ -176,26 +183,13 @@
 		if ('mediaSession' in navigator) {
 			navigator.mediaSession.metadata = new MediaMetadata({
 				title: $list.mix[autoId || 0]?.title,
-				artist: $list.mix[autoId || 0]?.artistInfo?.artist || null,
-				album:
-					$list.mix[autoId || 0].album?.title ||
-					$list.mix[autoId || 0].album?.text ||
-					undefined,
-				artwork: [
-					{
-						src: $list.mix[autoId || 0].thumbnails
-							? $list.mix[autoId || 0].thumbnails[0].url.replace(
-									/=(w(\d+))-(h(\d+))/g,
-									'=w128-h128'
-							  )
-							: $list.mix[autoId || 0].thumbnail.replace(
-									/=(w(\d+))-(h(\d+))/g,
-									'=w128-h128'
-							  ),
-						sizes: '128x128',
-						type: 'image/jpeg'
-					}
-				]
+				artist: $list.mix[autoId || 0]?.artistInfo?.artist[0].text || null,
+				album: $list.mix[autoId || 0].album?.title ?? undefined,
+				artwork: $list.mix[autoId || 0].thumbnails.map((thumbnail) => ({
+					src: thumbnail.url,
+					sizes: `${thumbnail.width}x${thumbnail.height}`,
+					type: 'image/jpeg'
+				}))
 			})
 			navigator.mediaSession.setActionHandler('play', (session) => {
 				const _play = player.play()
@@ -226,11 +220,21 @@
 	/*
 		Player Track Management
 	*/
+
 	async function getNext() {
 		once = true
 
 		if (autoId == $list.mix.length - 1) {
-			if (!$list.continuation && !$list.clickTrackingParams) return
+			if (!$list.continuation && !$list.clickTrackingParams) {
+				autoId++
+				key.set(autoId)
+				await list.moreLikeThis($list.mix[$list.mix.length - 1])
+				await tick()
+				getTrackURL()
+
+				once = false
+				return
+			}
 			list.getMore(
 				$list.mix[autoId]?.itct,
 				$list.mix[autoId]?.videoId,
@@ -247,10 +251,7 @@
 			try {
 				autoId++
 				key.set(autoId)
-
 				getTrackURL()
-
-				currentTitle.set($list.mix[autoId].title)
 				once = false
 			} catch (error) {
 				console.error('Error!', error)
@@ -258,8 +259,8 @@
 		}
 	}
 
-	function getTrackURL() {
-		return getSrc(mixList[autoId].videoId)
+	async function getTrackURL() {
+		return await getSrc($list.mix[autoId].videoId)
 			.then(({ body, error }) => {
 				if (error === true) {
 					getNext()
@@ -270,10 +271,6 @@
 			.catch((err) => console.error('URL Error! ' + err))
 	}
 
-	function setNext() {
-		getTrackURL()
-		currentTitle.set($list.mix[autoId].title)
-	}
 	function prevBtn() {
 		if (!autoId || autoId < 0) {
 			console.log('cant do that!')
@@ -285,6 +282,7 @@
 	}
 	async function nextBtn() {
 		let gettingNext = false
+		if ($list.mix.length === 0) return
 		if (!gettingNext) {
 			if (autoId == $list.mix.length - 1) {
 				if (!$list.continuation && !$list.clickTrackingParams) return
@@ -345,7 +343,14 @@
 	}
 
 	const shortcut = {
+		Comma: () => {
+			prevBtn()
+		},
+		Period: () => {
+			nextBtn()
+		},
 		Space: () => {
+			if (!player && !player.src) return
 			if (!isPlaying) {
 				const _play = player.play()
 				if (_play !== undefined) {
@@ -399,11 +404,7 @@
 	{/if}
 	<progress bind:this={songBar} value={$progress} max={duration} />
 </div>
-<div
-	class="player"
-	use:keyboardHandler={{ shortcut }}
-	class:light={$theme == 'light'}
->
+<div class="player" use:keyboardHandler={{ shortcut }}>
 	<div
 		style="background:inherit;"
 		on:click_outside={() => {
@@ -413,7 +414,14 @@
 		class="player-left"
 	>
 		{#if showing}
-			<Queue bind:autoId={$key} let:ctxKey bind:showing let:item let:index>
+			<Queue
+				bind:autoId={$key}
+				on:close={({ detail }) => (showing = detail.showing)}
+				let:ctxKey
+				{showing}
+				let:item
+				let:index
+			>
 				<row id={index}>
 					<QueueListItem
 						{ctxKey}
@@ -443,7 +451,6 @@
 				} else {
 					showing = true
 				}
-				showing = showing ? true : false
 			}}
 			class="listButton player-btn"
 		>
@@ -463,13 +470,13 @@
 	/>
 	<div class="player-right">
 		<div
-			class="volume player-btn"
+			class="volume "
 			use:clickOutside
 			on:click_outside={() => (volumeHover = false)}
 		>
 			<div
 				color="white"
-				class="volume-icon"
+				class="volume-icon player-btn"
 				on:click={() => (volumeHover = !volumeHover)}
 			>
 				<Icon color="white" name="volume" size="2rem" />
@@ -489,9 +496,6 @@
 				</div>
 			{/if}
 		</div>
-		<!-- <div class="menu-container__desktop">
-			<Dropdown bind:isHidden type="player" items={DropdownItems} />
-		</div> -->
 	</div>
 	<div class="menu-container">
 		<PopperButton
@@ -505,6 +509,7 @@
 
 <style lang="scss">
 	@import '../../../global/stylesheet/components/_player.scss';
+
 	row {
 		position: relative;
 	}
@@ -530,22 +535,19 @@
 		transform-origin: 0% 50%;
 	}
 
-	.light * {
-		color: white !important;
-	}
-
 	.player {
 		background-color: inherit;
 	}
 	.volume-wrapper {
 		background: var(--dark-bottom);
 		display: flex;
+
 		position: absolute;
 		bottom: 6.5rem;
 		transform: rotate(-90deg);
-		padding: 0;
+		padding: 0 0.4rem;
 		height: 1.3rem;
-		align-items: center;
+		border-radius: 0.6rem;
 	}
 	.volume-slider {
 		height: 100%;
@@ -560,7 +562,7 @@
 		padding: 0;
 		position: relative;
 		will-change: position;
-		margin-right: 5%;
+		margin-right: 8%;
 		grid-area: r;
 		place-self: flex-end;
 		align-self: center;
@@ -571,9 +573,10 @@
 	}
 	.progress-bar {
 		position: relative;
-		height: 0.5rem;
+		grid-row: p;
 		width: 100%;
 		will-change: visibility;
+		height: 100%;
 	}
 	.player-left,
 	.player-right {
@@ -594,8 +597,7 @@
 	progress {
 		display: block;
 		width: 100%;
-		height: 0.5rem;
-		position: absolute;
+		height: inherit;
 		top: 0;
 		cursor: pointer;
 		margin: 0;
@@ -609,10 +611,7 @@
 		&::before {
 			background-color: #232530;
 			position: absolute;
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
+			inset: 0;
 			content: '';
 			width: 100%;
 			z-index: -1;

@@ -1,6 +1,5 @@
 <script context="module">
-	export async function load({ fetch, session }) {
-		console.log(session)
+	export async function load({ fetch }) {
 		const data = await fetch('/explore.json?browseId=FEmusic_moods_and_genres')
 		const response = await data.json()
 
@@ -23,15 +22,10 @@
 
 <script lang="ts">
 	import { Grid } from '$lib/components/Grid'
-
-	// import Grid from '$lib/components/Grid/Grid.svelte'
-
+	import { currentTitle } from '$lib/stores/stores'
 	export let response
 
-	$: console.log(response)
-	import { currentTitle } from '$lib/stores/stores'
-
-	import { onMount } from 'svelte'
+	// $: console.log(response)
 </script>
 
 <svelte:head>
@@ -43,27 +37,16 @@
 <main>
 	{#each response as section}
 		<Grid items={[...section.section]} heading={section.title} let:item>
-			<div
+			<a
 				slot="item"
 				style={`border-left: 0.4286rem solid ${item.color}`}
 				class="box"
+				sveltekit:prefetch
+				href={`/explore/${item.endpoint.params}`}
 			>
-				<a sveltekit:prefetch href={`/explore/${item.endpoint.params}`}
-					>{item.text}</a
-				>
-			</div>
+				{item.text}
+			</a>
 		</Grid>
-		<!-- <div class="breakout">
-			<div class="box-cont">
-				<div class="header">
-					<h1>{section.title}</h1>
-				</div>
-				<box>
-					{#each section.section as item}
-					{/each}
-				</box>
-			</div>
-		</div> -->
 	{/each}
 </main>
 
@@ -87,10 +70,5 @@
 
 		height: 3rem;
 		padding: 0 0 0 1rem;
-
-		a {
-			display: inline-block;
-			width: 100%;
-		}
 	}
 </style>

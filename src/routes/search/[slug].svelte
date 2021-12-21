@@ -34,24 +34,22 @@
 	export let error
 	export let filter
 
-	// $: console.log(contents, continuation)
-	import { currentTitle, search } from '$stores/stores'
 	import { page } from '$app/stores'
 	import { invalidate } from '$app/navigation'
 	import Listing from '$components/Item/Listing.svelte'
-	import type { NextContinuationData, Song } from '$lib/types'
+	import type { Item, NextContinuationData } from '$lib/types'
 	import VirtualList from '$lib/components/SearchList/VirtualList.svelte'
-	import { onMount } from 'svelte'
-	import tagStore from '$lib/stores/ogtags'
-	import Header from '$lib/components/Layouts/Header.svelte'
 
+	import Header from '$lib/components/Layouts/Header.svelte'
+	import { notify } from '$lib/utils'
+	import { writable } from 'svelte/store'
+	const search = writable<Array<Item>>()
 	$: !error && search.set(contents)
 	let title
 	let songTitle = title || $page.params.slug
 	title = songTitle
 	let ctoken = continuation.continuation
 	let itct = continuation.clickTrackingParams
-	// console.log(contents);
 	let isLoading = false
 	let hasData = false
 
@@ -227,7 +225,7 @@
 		}
 	}
 	main {
-		padding: 0 1rem;
+		padding-top: 0;
 	}
 	.end {
 		position: relative;

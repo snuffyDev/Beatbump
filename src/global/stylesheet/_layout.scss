@@ -18,7 +18,7 @@ $sections: (
 		suggestions,
 	),
 );
-$themes: (dark, dim, midnight, light, ytm);
+$themes: (dark, dim, midnight, ytm);
 
 .footer-container {
 	width: 100%;
@@ -27,23 +27,24 @@ $themes: (dark, dim, midnight, light, ytm);
 	position: relative;
 	z-index: 1;
 	isolation: isolate;
-	height: 100%;
 }
 
 .footer-container {
 	grid-area: f/f/f/f;
 	// position: fixed;
-	min-height: 100%;
+	// min-height: 100%;
 	bottom: 0;
 	display: block;
 	// z-index: 1;
 	width: 100%;
 	min-width: 100%;
+	display: grid;
+	width: 100%;
+	grid-template-rows: [p] 0.5rem 1fr;
+	min-width: 100%;
+	flex-direction: column;
 }
 
-:root .light * {
-	color: var(--light-text);
-}
 :root .dark * {
 	color: #f3f3f3;
 }

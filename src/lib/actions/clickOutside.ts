@@ -1,6 +1,6 @@
 export const clickOutside = (node) => {
 	function detect({ target }) {
-		if (!node.contains(target)) {
+		if (!node.contains(target) && !node.isSameNode(document.activeElement)) {
 			node.dispatchEvent(new CustomEvent('click_outside'))
 		}
 	}

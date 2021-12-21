@@ -1,10 +1,10 @@
 <script lang="ts">
-	export let type
 	import { goto } from '$app/navigation'
 	import Icon from '$lib/components/Icon/Icon.svelte'
 	import debounce from '$lib/js/debounce'
-	import { searchState } from '$lib/stores/stores'
 	import { createEventDispatcher } from 'svelte'
+
+	export let type
 
 	let options = [
 		{ label: 'Songs', params: 'EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D' },
@@ -24,7 +24,7 @@
 	let query = ''
 	let filter = filterType ? filterType : options[0].params
 	const dispatch = createEventDispatcher()
-	let results: [] = []
+	let results: Array<{ query?: string; id?: number }> = []
 	async function handleSubmit() {
 		dispatch('submitted', { submitted: true })
 		let url = `/search/${encodeURIComponent(encodeURIComponent(query))}${
@@ -38,18 +38,32 @@
 			'/api/get_search_suggestions.json?q=' + encodeURIComponent(query)
 		)
 		results = await response.json()
-		console.log(results)
 	}, 250)
 </script>
 
-<form class={type} on:submit|preventDefault={handleSubmit}>
+<form
+	aria-expanded="true"
+	aria-owns="suggestions"
+	role="combobox"
+	class={type}
+	on:submit|preventDefault={handleSubmit}
+>
 	<div class="nav-item">
-		<div class="input">
-			<div class="searchBtn" on:click={handleSubmit}>
+		<div role="textbox" aria-activedescendant="searchBox" class="input">
+			<div
+				role="button"
+				aria-label="search button"
+				class="searchBtn"
+				on:click={handleSubmit}
+			>
 				<Icon name="search" size="1rem" />
 			</div>
 			<!-- svelte-ignore a11y-autofocus -->
 			<input
+				aria-placeholder="Search"
+				id="searchBox"
+				autocomplete="off"
+				aria-autocomplete="list"
 				autofocus={type == 'inline' ? true : false}
 				autocorrect="off"
 				type="search"
@@ -63,7 +77,7 @@
 		</div>
 	</div>
 	{#if results.length > 0}
-		<ul class="suggestions">
+		<ul role="listbox" id="suggestions" class="suggestions">
 			{#each results as result (result?.id)}
 				<li
 					on:click={() => {
@@ -78,12 +92,7 @@
 	{/if}
 	<div class="nav-item">
 		<div class="select" class:inline={type == 'inline' ? true : false}>
-			<select
-				on:blur={() => {
-					searchState.set({ option: filter, text: query })
-				}}
-				bind:value={filter}
-			>
+			<select bind:value={filter}>
 				{#each options as option (option.params)}
 					<option value={option.params}>{option.label}</option>
 				{/each}
@@ -97,7 +106,7 @@
 		position: absolute;
 		top: 121%;
 		z-index: 10;
-		background: inherit;
+		background: var(--top-bg);
 		width: 100%;
 		/* max-height: 44vh; */
 		border-radius: $lg-radius;
@@ -126,11 +135,9 @@
 		}
 		// padding: 0.4em;
 	}
-	form {
-		background: inherit;
-		&.inline {
-			position: relative;
-		}
+	form.inline {
+		margin: 0 auto;
+		position: relative;
 	}
 	ul {
 		padding: 0;
@@ -162,69 +169,11 @@
 			}
 		}
 	}
-	.nav-item {
-		position: relative;
-		margin-right: 0.25rem;
-	}
-	.hidden {
-		display: none;
-		visibility: hidden;
-	}
 
-	.mobile-search {
-		display: flex;
-		max-height: 4rem;
-		flex-flow: row nowrap !important;
-	}
 	.x-button {
 		padding: 1em;
 		cursor: pointer;
 		right: 0;
 		position: relative;
-	}
-	.sidebar {
-		overflow-x: hidden;
-		overflow-y: hidden;
-		top: 0;
-		padding: 0 0.3125rem 6rem;
-		border-right: 0.0625rem outset hsla(0, 0%, 66.7%, 0.123);
-		box-sizing: border-box;
-		display: none;
-		visibility: hidden;
-		contain: layout;
-		grid-area: s;
-		grid-template-rows: 1fr 1fr 1fr;
-		grid-gap: 1rem;
-		padding-inline: auto;
-		box-shadow: -0.2rem 0.1rem 1rem 0.1rem rgb(0 0 0 / 49%);
-		justify-items: center;
-	}
-
-	.nav-item {
-		display: flex;
-		flex-direction: column;
-		margin-bottom: 0.53125rem;
-	}
-	form.inline {
-		flex-direction: row;
-		display: flex !important;
-		flex-wrap: nowrap;
-		.nav-item {
-			margin-bottom: 0;
-		}
-	}
-	.header-text {
-		text-align: center;
-		padding-top: 0.5rem;
-		padding-bottom: 0.5rem;
-		font-size: 1.125rem;
-	}
-	.head {
-		width: 100%;
-	}
-	@media (min-width: 640px) {
-		.sidebar {
-			display: grid;
-		}
 	}
 </style>

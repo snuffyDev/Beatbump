@@ -1,7 +1,7 @@
 import { browser } from '$app/env'
-import { get, writable } from 'svelte/store'
+import { writable } from 'svelte/store'
 
-type theme = 'dark' | 'dim' | 'light' | 'midnight' | 'ytm'
+type theme = 'dark' | 'dim' | 'midnight' | 'ytm'
 type Settings = {
 	theme?: theme | string
 	dedupe?: boolean
@@ -16,13 +16,16 @@ export const settings = _settings()
 function _settings() {
 	if (browser) {
 		list = {
-			theme: localStorage.getItem('theme'),
+			theme: localStorage.getItem('theme') as theme,
 			dedupe: JSON.parse(localStorage.getItem('filterAutoPlay')) || true,
 			preferWebM: JSON.parse(localStorage.getItem('preferWebM'))
 		}
 	}
+	if (!list.theme.match(/dark|midnight|dim|ytm/)) {
+		list = { ...list, theme: 'dark' }
+		themeSet('dark')
+	}
 	const { subscribe, set } = writable<Settings>(list)
-	const values = () => ({})
 
 	return {
 		subscribe,
