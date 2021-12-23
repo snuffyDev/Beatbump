@@ -77,8 +77,8 @@
 		? ''
 		: 'transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22);'
 	$: height = queueHeight
-		? `${(listHeight / 13.8) * 2}px`
-		: `${(listHeight / 13.8) * 2}px`
+		? `calc(${(listHeight / 20.2) * 3}px - 0.5rem)`
+		: `calc(${(listHeight / 20.2) * 3}px - 0.5rem)`
 </script>
 
 <svelte:window bind:innerHeight={listHeight} />
@@ -252,7 +252,7 @@
 		width: 100%;
 		padding-left: 0;
 		padding: 0.225rem 0.6rem;
-		padding-bottom: 0.125rem;
+		padding-bottom: 0.6rem;
 		overflow-x: hidden;
 	}
 
@@ -276,7 +276,9 @@
 	}
 	@media screen and (max-width: 640px) {
 		.listContainer {
-			max-width: 100%;
+			margin: 0 auto;
+			right: 0;
+			max-width: 90%;
 			width: 100%;
 		}
 	}

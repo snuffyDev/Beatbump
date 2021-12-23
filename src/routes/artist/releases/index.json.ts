@@ -7,7 +7,7 @@ export const get = async ({ query }) => {
 	// console.log(visitorID)
 
 	const response = await fetch(
-		'https://music.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
+		'https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
 		{
 			headers: {
 				Accept: '*/*',
@@ -63,7 +63,7 @@ export const get = async ({ query }) => {
 						clickTrackingParams: `${itct}`
 					},
 					activePlayers: {},
-					user: { enableSafetyMode: false }
+					user: { lockedSafetyMode: false }
 				},
 				browseId: browseId,
 				params: params

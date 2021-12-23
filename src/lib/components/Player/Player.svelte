@@ -34,14 +34,14 @@
 	$: player.autoplay = $updateTrack !== undefined ? true : false
 
 	$: player.src = $updateTrack
-	let isWebkit = $iOS
+	$: isWebkit = $iOS
 	let title
 
 	$: autoId = $key
 
 	$: time = player.currentTime
-	$: duration = 1000
-	$: remainingTime = 55
+	let duration = 0
+	let remainingTime = 0
 
 	$: volume = 0.5
 	$: player.volume = volume
@@ -53,9 +53,51 @@
 	let hoverWidth
 	let showing
 	let hovering
-	$: DropdownItems =
-		$list.mix.length !== 0 &&
-		[
+	let DropdownItems = []
+	let once = false
+	// $: console.log($list, autoId, $key, $updateTrack)
+
+	/*
+  	Player Controls
+	 */
+	const play = () => {
+		if ('mediaSession' in navigator) {
+			navigator.mediaSession.playbackState = 'playing'
+		}
+		isPlaying = true
+
+		// metaDataHandler()
+	}
+	const pause = () => {
+		if ('mediaSession' in navigator) {
+			navigator.mediaSession.playbackState = 'paused'
+		}
+		isPlaying = false
+		player.pause()
+	}
+	const setPosition = () => {
+		if ('mediaSession' in navigator) {
+			navigator.mediaSession.setPositionState({
+				duration: isWebkit ? player.duration / 2 : player.duration,
+				position: player.currentTime
+			})
+		}
+	}
+	/*
+		Player Event Listeners
+	 */
+	player.addEventListener('load', () => {
+		if ('mediaSession' in navigator) {
+			navigator.mediaSession.setPositionState({
+				duration: player.duration,
+				position: player.currentTime
+			})
+		}
+	})
+	player.addEventListener('loadedmetadata', () => {
+		setPosition()
+		isPlaying = true
+		DropdownItems = [
 			{
 				text: 'View Artist',
 				icon: 'artist',
@@ -89,7 +131,7 @@
 			}
 		].filter((item) => {
 			{
-				if (!$list.mix[autoId].artistInfo.artist[0].browseId) {
+				if (!$list?.mix[autoId]?.artistInfo?.artist[0]?.browseId) {
 					return
 				} else {
 					return item
@@ -97,50 +139,6 @@
 			}
 		})
 
-	let once = false
-	// $: console.log($list.mix, autoId, $key, $updateTrack)
-
-	/*
-  	Player Controls
-	 */
-	const play = () => {
-		if ('mediaSession' in navigator) {
-			navigator.mediaSession.playbackState = 'playing'
-		}
-		isPlaying = true
-		key.set(autoId)
-
-		metaDataHandler()
-	}
-	const pause = () => {
-		if ('mediaSession' in navigator) {
-			navigator.mediaSession.playbackState = 'paused'
-		}
-		isPlaying = false
-		player.pause()
-	}
-	const setPosition = () => {
-		if ('mediaSession' in navigator) {
-			navigator.mediaSession.setPositionState({
-				duration: isWebkit ? player.duration / 2 : player.duration,
-				position: player.currentTime
-			})
-		}
-	}
-	/*
-		Player Event Listeners
-	 */
-	player.addEventListener('load', () => {
-		if ('mediaSession' in navigator) {
-			navigator.mediaSession.setPositionState({
-				duration: isWebkit ? player.duration / 2 : player.duration,
-				position: player.currentTime
-			})
-		}
-	})
-	player.addEventListener('loadedmetadata', () => {
-		setPosition()
-		isPlaying = true
 		metaDataHandler()
 	})
 
@@ -184,15 +182,18 @@
 			navigator.mediaSession.metadata = new MediaMetadata({
 				title: $list.mix[autoId || 0]?.title,
 				artist: $list.mix[autoId || 0]?.artistInfo?.artist[0].text || null,
-				album: $list.mix[autoId || 0].album?.title ?? undefined,
-				artwork: $list.mix[autoId || 0].thumbnails.map((thumbnail) => ({
-					src: thumbnail.url,
-					sizes: `${thumbnail.width}x${thumbnail.height}`,
-					type: 'image/jpeg'
-				}))
+				album: $list.mix[autoId || 0]?.album?.title ?? undefined,
+				artwork: $list.mix[autoId || 0]?.thumbnails
+					.reverse()
+					.map((thumbnail) => ({
+						src: thumbnail.url,
+						sizes: `${thumbnail.width}x${thumbnail.height}`,
+						type: 'image/jpeg'
+					}))
 			})
 			navigator.mediaSession.setActionHandler('play', (session) => {
 				const _play = player.play()
+
 				if (_play !== undefined) {
 					_play
 						.then(() => {
@@ -214,7 +215,7 @@
 				setPosition()
 			})
 			navigator.mediaSession.setActionHandler('previoustrack', prevBtn)
-			navigator.mediaSession.setActionHandler('nexttrack', nextBtn)
+			navigator.mediaSession.setActionHandler('nexttrack', () => getNext())
 		}
 	}
 	/*
@@ -240,13 +241,12 @@
 				$list.mix[autoId]?.videoId,
 				$list.currentMixId,
 				$list.continuation,
-				$list.clickTrackingParams
+				$list.clickTrackingParams,
+				autoId + 1
 			)
 			autoId++
 			key.set(autoId)
 			once = false
-
-			return
 		} else {
 			try {
 				autoId++
@@ -259,16 +259,20 @@
 		}
 	}
 
-	async function getTrackURL() {
-		return await getSrc($list.mix[autoId].videoId)
+	async function getTrackURL(): Promise<string> {
+		return getSrc($list.mix[autoId].videoId)
 			.then(({ body, error }) => {
 				if (error === true) {
 					getNext()
+					return error
 				}
 				currentTitle.set($list.mix[autoId].title)
 				return body
 			})
-			.catch((err) => console.error('URL Error! ' + err))
+			.catch((err) => {
+				console.error('URL Error! ' + err)
+				return err
+			})
 	}
 
 	function prevBtn() {
@@ -278,32 +282,6 @@
 			autoId--
 			key.set(autoId)
 			getTrackURL()
-		}
-	}
-	async function nextBtn() {
-		let gettingNext = false
-		if ($list.mix.length === 0) return
-		if (!gettingNext) {
-			if (autoId == $list.mix.length - 1) {
-				if (!$list.continuation && !$list.clickTrackingParams) return
-
-				gettingNext = true
-				key.set(autoId)
-				await getNext()
-				autoId++
-				key.set(autoId)
-				play()
-				gettingNext = false
-				return
-			} else {
-				gettingNext = true
-				autoId++
-
-				key.set(autoId)
-				getTrackURL()
-				play()
-				gettingNext = false
-			}
 		}
 	}
 
@@ -347,7 +325,7 @@
 			prevBtn()
 		},
 		Period: () => {
-			nextBtn()
+			getNext()
 		},
 		Space: () => {
 			if (!player && !player.src) return
@@ -465,7 +443,10 @@
 			player.play()
 		}}
 		{pause}
-		{nextBtn}
+		nextBtn={() => {
+			if ($list.mix.length === 0) return
+			getNext()
+		}}
 		{prevBtn}
 	/>
 	<div class="player-right">

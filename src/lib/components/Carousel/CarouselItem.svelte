@@ -41,11 +41,7 @@
 			text: 'View Artist',
 			icon: 'artist',
 			action: async () => {
-				goto(
-					type == 'new'
-						? `/artist/${item.subtitle[2].navigationEndpoint.browseEndpoint.browseId}`
-						: `/artist/${item.subtitle[0].navigationEndpoint.browseEndpoint.browseId}`
-				)
+				goto(`/artist/${item.artistInfo.artist[0].browseId}`)
 				await tick()
 				window.scrollTo({
 					behavior: 'smooth',

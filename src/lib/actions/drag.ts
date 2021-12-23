@@ -40,7 +40,7 @@ export default function drag(node: HTMLElement) {
 				new CustomEvent('dragmove', {
 					detail: {
 						x,
-						y: initHeight + event.touches[0].pageY - initTop,
+						y: initHeight + event.touches[0].pageY - initTop - 32,
 						my: event.pageY
 					}
 				})

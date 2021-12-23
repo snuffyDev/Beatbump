@@ -6,7 +6,7 @@ const Base = {
 			visitorData: 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D'
 		},
 		user: {
-			enableSafetyMode: false
+			lockedSafetyMode: false
 		},
 		capabilities: {},
 		request: {
@@ -38,7 +38,7 @@ const Player = {
 			clientVersion: '16.02'
 		},
 		user: {
-			enableSafetyMode: false
+			lockedSafetyMode: false
 		},
 		captionParams: {},
 		params: 'igMDCNgE'

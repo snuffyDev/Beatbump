@@ -6,7 +6,7 @@ export async function get({ params, query }) {
 	// const ctx = query.get('params') || ''
 
 	const response = await fetch(
-		`https://music.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
+		`https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
 			method: 'POST',
 			body: JSON.stringify({
@@ -18,7 +18,7 @@ export async function get({ params, query }) {
 					},
 
 					user: {
-						enableSafetyMode: false
+						lockedSafetyMode: false
 					}
 				},
 				// params: `${ctx}`,

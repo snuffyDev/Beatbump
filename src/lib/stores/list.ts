@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { parseNextItem } from '$lib/parsers'
 import type { Item } from '$lib/types'
-import { getSrc, notify } from '$lib/utils'
+import { getSrc, notify, queryParams } from '$lib/utils'
 import { currentTitle } from '$stores/stores'
 import { writable } from 'svelte/store'
 
@@ -32,14 +32,14 @@ const list = writable({
 	mix
 })
 const fetchNext = async ({
-	params,
-	videoId,
-	itct,
-	playlistId,
-	ctoken,
-	playlistSetVideoId,
-	clickTracking,
-	configType
+	params = undefined,
+	videoId = undefined,
+	itct = undefined,
+	playlistId = undefined,
+	ctoken = undefined,
+	playlistSetVideoId = undefined,
+	clickTracking = undefined,
+	configType = undefined
 }: {
 	itct?: string
 	params?: string
@@ -50,20 +50,27 @@ const fetchNext = async ({
 	clickTracking?: string
 	configType?: string
 }) => {
-	return await fetch(
-		'/api/next.json?videoId=' +
-			encodeURIComponent(videoId) +
-			`${configType ? `&configType=${configType}` : ''}` +
-			`${videoId ? `&playlistId=${playlistId}` : ''}` +
-			`${itct ? `&itct=${itct}` : ''}` +
-			`${params ? `&params=${encodeURIComponent(params)}` : ''}` +
-			`${clickTracking ? `&clickTracking=${clickTracking}` : ''}` +
-			`${ctoken ? `&ctoken=${ctoken}` : ''}` +
-			`${playlistSetVideoId ? `&setVideoId=${playlistSetVideoId}` : ''}`,
-		{
-			headers: { accept: 'application/json' }
-		}
+	let obj = {
+		itct,
+		params,
+		videoId,
+		playlistId,
+		ctoken,
+		playlistSetVideoId,
+		clickTracking,
+		configType
+	}
+	let options = Object.fromEntries(
+		Object.entries(obj)
+			.filter(([_, v]) => v != null)
+			.map(([key, value]) => [key, encodeURIComponent(value)])
 	)
+
+	const _params = queryParams(options)
+	// console.log(options, _params)
+	return await fetch('/api/next.json?' + _params, {
+		headers: { accept: 'application/json' }
+	})
 		.then((json) => json.json())
 		.then((response) => {
 			return response
@@ -134,8 +141,7 @@ export default {
 				configType: type
 			})
 			const data = await response
-			// console.log(data)
-			await getSrc(videoId, playlistId, playerParams)
+			await getSrc(videoId ?? data.results[0].videoId, playlistId, playerParams)
 			currentTitle.set(data.results[0].title)
 
 			loading = false
@@ -182,7 +188,7 @@ export default {
 		const data = await response
 		// console.log(data)
 		data.results.shift()
-		mix.push(...data.results)
+		mix = [...mix, ...data.results]
 		continuation = data.continuation
 		list.set({ currentMixId, clickTrackingParams, continuation, mix })
 		loading = false
@@ -234,7 +240,7 @@ export default {
 			notify('Error starting playback', 'error')
 		}
 	},
-	async getMore(itct, videoId, playlistId, ctoken, clickTrackingParams) {
+	async getMore(itct, videoId, playlistId, ctoken, clickTrackingParams, key) {
 		let loading = true
 		playerLoading.set(loading)
 
@@ -260,6 +266,7 @@ export default {
 				using their API for this purpose  */
 			const data = await fetchNext({
 				params: itct,
+
 				videoId,
 				playlistId,
 				ctoken,
@@ -277,7 +284,6 @@ export default {
 			currentMixId = data.currentMixId
 			clickTrackingParams = data.clickTrackingParams
 			// mix.push(...mix)
-
 			loading = false
 			playerLoading.set(loading)
 			list.set({ currentMixId, clickTrackingParams, continuation, mix })

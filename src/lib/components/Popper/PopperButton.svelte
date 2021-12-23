@@ -103,7 +103,7 @@
 	}
 </script>
 
-<div class="dd-button" role="button" use:Popper {tabindex}>
+<div class="dd-button" role="button" aria-label="menu" use:Popper {tabindex}>
 	<svelte:component this={Icon} color="#f2f2f2" {size} name="dots" />
 </div>
 

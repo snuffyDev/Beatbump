@@ -57,7 +57,7 @@ export async function get({
 							sessionIndex: {}
 						},
 						user: {
-							enableSafetyMode: false
+							lockedSafetyMode: false
 						},
 						activePlayers: {}
 					},

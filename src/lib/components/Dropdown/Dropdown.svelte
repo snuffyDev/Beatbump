@@ -75,6 +75,7 @@
 				: $PopperStore.x
 			: $PopperStore.x - width
 	$: if (popper) popper.focus()
+	// $: console.log($PopperStore)
 	function focusState(node: HTMLElement) {
 		function handleFocusOut(
 			event: FocusEvent & { relatedTarget: HTMLElement & EventTarget }
@@ -90,6 +91,14 @@
 			destroy() {
 				node.removeEventListener('focusout', handleFocusOut, true)
 			}
+		}
+	}
+	function handleKeyDown(event: KeyboardEvent, fn: () => void) {
+		if (event.code === 'Space') {
+			event.preventDefault()
+			const target = event.target as HTMLElement
+			fn()
+			onClose()
 		}
 	}
 </script>
@@ -119,6 +128,7 @@
 			<DropdownItem
 				on:click={item.action}
 				on:click={onClose}
+				on:keydown={(event) => handleKeyDown(event, item.action)}
 				text={item.text}
 				icon={item.icon}
 			/>

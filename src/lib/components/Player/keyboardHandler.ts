@@ -17,6 +17,7 @@ export default function keyboardHandler(
 			!document.activeElement.tagName.match(/SELECT|INPUT|BUTTON/i) &&
 			!document.activeElement.classList.contains('select') &&
 			!document.activeElement.classList.contains('dd-menu') &&
+			!document.activeElement.classList.contains('dd-item') &&
 			!document.activeElement.classList.contains('dd-button')
 		) {
 			event.preventDefault()

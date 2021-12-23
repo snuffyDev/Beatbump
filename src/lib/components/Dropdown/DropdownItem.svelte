@@ -7,7 +7,7 @@
 	// $: console.log(update)
 </script>
 
-<div class="dd-item" tabindex="0" on:click>
+<div class="dd-item" tabindex="0" on:click on:keydown>
 	<Icon name={icon} size="1.5em" />
 	<div class="dd-text">{text}</div>
 </div>

@@ -15,22 +15,23 @@ export async function get({
 	const videoId = query.get('videoId') || ''
 	const playlistId = query.get('playlistId') || ''
 	const ctoken = query.get('ctoken') || undefined
-	const clickTracking = query.get('clickParams') || ''
-	const setVideoId = query.get('setVideoId') || ''
-	const type = query.get('configType') || ''
-
+	const clickTracking = query.get('clickParams') || undefined
+	const setVideoId = query.get('setVideoId') || undefined
+	const type = query.get('configType') || undefined
+	// console.log(params)
 	const response = await fetch(
-		`https://music.youtube.com/youtubei/v1/next?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
+		`https://music.youtube.com/youtubei/v1/next?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
 			method: 'POST',
 			body: JSON.stringify({
 				context: {
 					client: {
 						clientName: 'WEB_REMIX',
-						clientVersion: '0.1'
+						clientVersion: '0.1',
+						visitorData: 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D'
 					},
 					user: {
-						enableSafetyMode: false
+						lockedSafetyMode: false
 					}
 
 					// clickTracking: {
@@ -43,7 +44,7 @@ export async function get({
 				params: `${params ? encodeURIComponent(params) : itct}`,
 				tunerSettingValue: 'AUTOMIX_SETTING_NORMAL',
 				videoId: `${videoId}`,
-				playlistSetVideoId: `${setVideoId}`,
+				playlistSetVideoId: setVideoId,
 				playlistId: `${playlistId}`,
 				watchEndpointMusicConfig: {
 					hasPersistentPlaylistPanel: true,
@@ -52,6 +53,17 @@ export async function get({
 			}),
 			headers: {
 				'Content-Type': 'application/json; charset=utf-8',
+				'X-Goog-AuthUser': '0',
+				'x-origin': 'https://music.youtube.com',
+
+				'X-Goog-Visitor-Id': 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D',
+				'x-youtube-client-name': '67',
+				'x-youtube-client-version': '1.20210901.00.00',
+				'x-youtube-device':
+					'cbr=Edge+Chromium&cbrver=93.0.961.38&ceng=WebKit&cengver=537.36&cos=Windows&cosver=10.0&cplatform=DESKTOP&cyear=2011',
+				'x-youtube-page-label': 'youtube.music.web.client_20210901_00_RC00',
+
+				'x-youtube-utc-offset': '-240',
 				Origin: 'https://music.youtube.com'
 			}
 		}

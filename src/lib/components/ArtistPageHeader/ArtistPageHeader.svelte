@@ -37,6 +37,12 @@
 		}
 	}
 	$: isExpanded && handler()
+	let descClientHeight = undefined
+	let descOffsetHeight = undefined
+	let desc: HTMLElement = undefined
+	// $: descIsOverflow = false
+	$: descIsOverflow = descClientHeight < descOffsetHeight ? false : true
+	// $: console.log(descClientHeight, descOffsetHeight, descIsOverflow)
 	onMount(() => {
 		let start
 		if (img) {
@@ -46,6 +52,10 @@
 
 			img.addEventListener('load', () => {})
 			// console.log(img)
+		}
+		if (desc) {
+			descClientHeight = desc.clientHeight
+			descOffsetHeight = desc.scrollHeight
 		}
 		wrapper = document.getElementById('wrapper')
 		wrapper.addEventListener(
@@ -63,6 +73,7 @@
 			cancelAnimationFrame(timestamp)
 		}
 	})
+	// $: console.log(header)
 </script>
 
 <div class="artist-header">
@@ -152,10 +163,14 @@
 				{/if}
 				<div class="name">{header?.name}</div>
 				{#if description}
-					<div class="description" class:expanded={isExpanded}>
+					<div class="description" bind:this={desc} class:expanded={isExpanded}>
 						{description}
 					</div>
-					<div class="show-more" on:click={() => (isExpanded = !isExpanded)}>
+					<div
+						class="show-more"
+						class:hidden={descIsOverflow}
+						on:click={() => (isExpanded = !isExpanded)}
+					>
 						<span class="btn-text">Show {isExpanded ? 'Less' : 'More'}</span>
 					</div>
 				{/if}
@@ -163,7 +178,11 @@
 					{#if header?.mixInfo !== null}
 						<button
 							class="outlined"
-							on:click={() => list.startPlaylist(header.mixInfo.playlistId)}
+							on:click={() =>
+								list.initList({
+									config: { playerParams: header.mixInfo?.params },
+									playlistId: header.mixInfo?.playlistId
+								})}
 							><Icon size="1.25em" name="radio" /><span class="button-text">
 								Play Radio</span
 							></button
@@ -190,6 +209,9 @@
 
 <!--  -->
 <style lang="scss">
+	.hidden {
+		display: none !important;
+	}
 	.show-more {
 		display: inline-flex;
 		font-size: 1em;
@@ -198,7 +220,6 @@
 		color: rgb(175, 175, 175);
 		font-variant: all-small-caps;
 		align-items: center;
-		margin-bottom: 0.8rem;
 		font-weight: 600;
 		margin-bottom: 1.7rem;
 		font-weight: 600;

@@ -61,7 +61,7 @@ export async function get({ query }): Promise<Response> {
 					utcOffsetMinutes: -new Date().getTimezoneOffset()
 				},
 				user: {
-					enableSafetyMode: false
+					lockedSafetyMode: false
 				},
 				capabilities: {},
 				request: {

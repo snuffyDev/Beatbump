@@ -15,7 +15,7 @@ export const get: RequestHandler<Record<string, any>> = async ({ query }) => {
 	const browseId = 'FEmusic_explore'
 	let carouselItems = []
 	const response = await fetch(
-		`https://music.youtube.com/youtubei/v1/${endpoint}?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
+		`https://music.youtube.com/youtubei/v1/${endpoint}?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
 			method: 'POST',
 			body: JSON.stringify(BaseContext.base(browseId)),

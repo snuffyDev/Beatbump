@@ -18,7 +18,7 @@ export const get: RequestHandler<Record<string, any>> = async ({ query }) => {
 							clientVersion: '16.02'
 						},
 						user: {
-							enableSafetyMode: false
+							lockedSafetyMode: false
 						},
 						captionParams: {}
 					},

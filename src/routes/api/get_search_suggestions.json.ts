@@ -49,7 +49,7 @@ export async function get({ query }) {
 						sessionIndex: {}
 					},
 					user: {
-						enableSafetyMode: false
+						lockedSafetyMode: false
 					},
 					activePlayers: {}
 				},

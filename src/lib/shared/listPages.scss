@@ -1,4 +1,4 @@
-$width: 12rem;
+$width: 14rem;
 :root {
 	--width: #{$width};
 }
@@ -64,21 +64,18 @@ $width: 12rem;
 		// margin: 0.25em 0 0.5em 0;
 		font-size: 1rem;
 	}
-	@media screen and (max-width: 500px) {
-		// font-size: 1.5rem;
-		margin: 0 0 0em 0;
-	}
 }
 .metadata {
 	grid-area: metadata;
 	align-self: flex-start;
-
+	line-height: normal;
 	@media screen and (min-width: 640px) {
 		align-self: flex-end;
 	}
 }
 .info-title {
 	display: flex;
+	margin-bottom: 0.3em;
 }
 .box-title {
 	font-weight: 700;
@@ -91,18 +88,11 @@ $width: 12rem;
 	max-width: 90%;
 	line-break: strict;
 	margin: 0 0 0.2rem;
+
+	word-break: normal;
 	@media screen and (min-width: 640px) {
 		font-size: 2.85rem !important;
 	}
-	// @media screen and (max-width: 640px) {
-	// 	font-size: 1.75em;
-	// }
-	// @media screen and (max-width: 876px) {
-	// 	font-size: 2em;
-	// }
-	// @media screen and (max-width: 500px) {
-	// 	font-size: 1.5rem;
-	// }
 }
 small {
 	display: inline;
@@ -122,21 +112,33 @@ small {
 	border-width: 1px;
 
 	display: grid;
-	grid-template-columns: var(--width) 1fr;
-	grid-gap: 0.5rem 1.25rem;
+	grid-template-columns: 1fr;
+	gap: 0.5rem 1.25rem;
 	grid-template-areas:
-		"img metadata"
-		"buttons buttons";
+		"img"
+		"metadata"
+		"buttons";
 	padding: 0.8em;
 	transition: all 0.23s cubic-bezier(0.39, 0.575, 0.565, 1);
 	user-select: none;
 	width: auto;
 	margin-bottom: 1rem;
-	@media screen and (min-width: 640px) {
+	@media screen and (min-width: 286px) and (max-width: 512px) {
+		grid-template-columns: var(--width) 1fr;
+		gap: 0.5rem 1.25rem;
 		grid-template-areas:
 			"img metadata"
+			"img buttons"
 			"img buttons";
-		grid-gap: 2rem 2rem;
+	}
+	@media screen and (min-width: 512px) {
+		grid-template-columns: var(--width) 1fr;
+
+		gap: 0.25rem 1.25rem;
+		grid-template-areas:
+			"img metadata"
+			"img buttons"
+			"img buttons";
 	}
 }
 hr {
@@ -147,6 +149,9 @@ hr {
 
 	margin-bottom: 0.1em;
 }
+.button-group .container {
+	gap: 0.8rem;
+}
 .img {
 	grid-area: img;
 	position: relative;
@@ -154,6 +159,7 @@ hr {
 	height: auto;
 	align-self: center;
 	width: 100%;
+	max-width: var(--width);
 	img {
 		max-width: inherit;
 		border-radius: 2%;
@@ -189,31 +195,6 @@ hr {
 	}
 	/* float: revert;*/
 }
-.img {
-	position: relative;
-	aspect-ratio: 1/1;
-
-	object-fit: contain;
-	will-change: contents, width;
-
-	img {
-		/* max-width: inherit; */
-		/* max-height: inherit; */
-		min-width: 100%;
-		min-height: var(--width);
-		object-fit: cover;
-		aspect-ratio: inherit;
-		height: 100%;
-		width: 100%;
-	}
-
-	@media screen and (min-width: 640px) {
-		$width: 18.2857rem;
-	}
-	@media screen and (min-width: 960px) {
-		$width: 21.2857rem;
-	}
-}
 
 .info-box {
 	display: flex;
@@ -233,7 +214,7 @@ hr {
 }
 @media screen and (min-width: 720px) and (max-width: 896px) {
 	.img {
-		margin-right: auto;
+		// margin-right: auto;
 	}
 	.info {
 		/* margin-right: auto; */
@@ -245,9 +226,6 @@ hr {
 	}
 }
 @media screen and (max-width: 719px) {
-	.box {
-		flex-direction: column;
-	}
 	.info {
 		padding: 1rem;
 	}

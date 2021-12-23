@@ -39,7 +39,7 @@ async function getPlaylistContinuation(browseId, referrer, ctoken, itct) {
 						visitorData: 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D'
 					},
 					user: {
-						enableSafetyMode: false
+						lockedSafetyMode: false
 					}
 				}
 			}),
@@ -111,7 +111,7 @@ async function getPlaylist(browseId, referrer) {
 					},
 
 					user: {
-						enableSafetyMode: false
+						lockedSafetyMode: false
 					}
 				},
 				browseId: `${browseId}`,

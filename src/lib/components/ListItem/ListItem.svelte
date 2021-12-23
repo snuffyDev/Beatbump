@@ -195,8 +195,9 @@
 		height: auto;
 		border-bottom: 0.0001605rem solid hsl(240deg 0% 55% / 34%);
 		width: 100%;
-		padding: 0.4rem 1.5rem 0.4rem 0.8rem;
+		padding: 0.8rem 1.5rem 0.8rem 0.8rem;
 		@media screen and (min-width: 640px) {
+			padding: 0.4rem 1.5rem 0.4rem 0.8rem;
 			grid-template-areas: 'c m r';
 			grid-template-columns: 2rem 1fr auto;
 		}
