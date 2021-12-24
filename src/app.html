@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 	<head>
 		<meta charset="utf-8" />
 		<meta
@@ -40,10 +40,10 @@
 			var parcelRequire
 
 			if (!('theme' in localStorage)) {
-				localStorage.setItem('theme', 'dark')
+				localStorage.theme = 'dark'
 			}
 
-			document.querySelector('html').classList.add(localStorage.theme)
+			document.documentElement.classList.add(localStorage.theme)
 		</script>
 		%svelte.head%
 	</head>

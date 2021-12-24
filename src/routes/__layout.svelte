@@ -18,14 +18,15 @@
 	import { iOS, showAddToPlaylistPopper } from '$stores/stores'
 	import { onMount } from 'svelte'
 	import { Popper } from '$lib/components/Popper'
+	import { settings } from '$lib/stores/settings'
+	import PlaylistPopper from '$lib/components/PlaylistPopper'
 	import '@fontsource/commissioner/index.css'
 	import '@fontsource/commissioner/500.css'
 	import '@fontsource/commissioner/600.css'
 	import '@fontsource/commissioner/700.css'
 	import '../global/stylesheet/_layout.scss'
-	import { settings } from '$lib/stores/settings'
-	import PlaylistPopper from '$lib/components/PlaylistPopper'
-	import { goto } from '$app/navigation'
+	import '../global/stylesheet/main.scss'
+
 	export let key
 	let main
 	onMount(() => {
@@ -64,8 +65,6 @@
 </footer>
 
 <style lang="scss" global>
-	@import '../global/stylesheet/main';
-
 	.wrapper {
 		overflow-y: auto; /* has to be scroll, not auto */
 		-webkit-overflow-scrolling: touch;
