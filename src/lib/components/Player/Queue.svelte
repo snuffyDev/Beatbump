@@ -3,7 +3,7 @@
 	import drag from '$lib/actions/drag'
 	import list from '$lib/stores/list'
 	import { setContext, tick } from 'svelte'
-	import { fly } from 'svelte/transition'
+	import { fade, fly } from 'svelte/transition'
 
 	import { createEventDispatcher } from 'svelte'
 	const dispatch = createEventDispatcher()
@@ -57,10 +57,13 @@
 	function open() {
 		posY = 0
 	}
-	function close() {
+	async function close() {
 		showing = false
 		sliding = false
 		dispatch('close', { showing })
+		await tick()
+		posY = 0
+
 		// posY = 0
 	}
 	async function scrollIntoView() {
@@ -76,9 +79,9 @@
 	$: transition = sliding
 		? ''
 		: 'transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22);'
-	$: height = queueHeight
-		? `calc(${(listHeight / 20.2) * 3}px - 0.5rem)`
-		: `calc(${(listHeight / 20.2) * 3}px - 0.5rem)`
+	$: height =
+		queueHeight !== undefined && `calc(${(listHeight / 20.2) * 3}px - 0.5rem)`
+	// : `calc(${(listHeight / 20.2) * 3}px - 0.5rem)`
 </script>
 
 <svelte:window bind:innerHeight={listHeight} />
@@ -86,10 +89,10 @@
 <!-- on:click={console.log} -->
 <div
 	class="backdrop"
+	on:click|stopPropagation|self={() => dispatch('close', { showing: false })}
+	on:scroll|preventDefault
 	in:fly={{ duration: 400, delay: 200, y: listHeight, opacity: 0.1 }}
 	out:fly={{ duration: 400 * 2, y: listHeight / 1.2 }}
-	on:scroll|preventDefault
-	on:click|stopPropagation|self={() => dispatch('close', { showing: false })}
 >
 	<div
 		class="listContainer"
@@ -135,12 +138,19 @@
 
 <style lang="scss">
 	.backdrop {
-		background: #0000;
-		overflow: hidden;
-		isolation: isolate;
-		z-index: -1;
+		position: fixed;
+		inset: 0;
+		// background: rgba(255, 255, 255, 0);
+		min-height: 100vh;
+		max-height: 100%;
+		min-width: 100%;
+		max-width: 100%;
+		width: 100%;
 		height: 100vh;
-		width: 100vw;
+		user-select: none;
+		background: #0000;
+		z-index: -5;
+		isolation: isolate;
 	}
 	hr {
 		&::before {
@@ -278,7 +288,7 @@
 		.listContainer {
 			margin: 0 auto;
 			right: 0;
-			max-width: 90%;
+			max-width: 100%;
 			width: 100%;
 		}
 	}

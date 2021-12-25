@@ -29,7 +29,7 @@ $content-width-mobile: 95vw;
 
 $content-width-md: calc(100vw - 0.5625rem - 14rem);
 $content-width-lg: 1080px;
-$content-width-xl: 1400px;
+$content-width-xl: 1440px;
 
 @mixin padding {
 	padding: 4vh 1rem 5vh 1rem;
@@ -42,10 +42,10 @@ $content-width-xl: 1400px;
 	}
 	@media only screen and (min-width: 1367px) and (max-width: 1600px) {
 		max-width: $content-width-lg;
-		padding: 7vh 2rem 0 2rem;
+		padding: 6vh 2rem 0 2rem;
 	}
 	@media only screen and (min-width: 1601px) {
 		max-width: $content-width-xl;
-		padding: 8vh 2rem 0 2rem;
+		padding: 7vh 2rem 0 2rem;
 	}
 }
