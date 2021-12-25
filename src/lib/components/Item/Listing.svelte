@@ -74,7 +74,7 @@
 			icon: 'playlist-add',
 			action: async () => {
 				if (data?.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
-					console.log('PLAYLIST')
+					// console.log('PLAYLIST')
 					const response = await fetch(
 						'/api/getQueue.json?playlistId=' + data?.playlistId
 					)

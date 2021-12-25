@@ -1,7 +1,14 @@
-import { MusicTwoRowItemRenderer } from '$lib/parsers'
+import {
+	MoodsAndGenresItem,
+	MusicResponsiveListItemRenderer,
+	MusicTwoRowItemRenderer
+} from '$lib/parsers'
+import type { CarouselHeader } from '$lib/types'
+import type { ICarouselTwoRowItem } from '$lib/types/musicCarouselTwoRowItem'
+import type { IListItemRenderer } from '$lib/types/musicListItemRenderer'
 
 /* eslint-disable prefer-const */
-export async function get({ params, query }) {
+export async function get({ params }) {
 	const { slug } = params
 	// const ctx = query.get('params') || ''
 
@@ -32,7 +39,6 @@ export async function get({ params, query }) {
 	)
 
 	const data = await response.json()
-	// console.log(data)
 	let {
 		header: {
 			musicHeaderRenderer: {
@@ -54,14 +60,34 @@ export async function get({ params, query }) {
 	let type: string
 
 	slug.includes('videos') ? (type = 'videos') : (type = 'albums')
-	const sections = contents.map(({ gridRenderer = {} }) => {
-		const { items = [] } = gridRenderer
-		// console.log(items)
-		const section = items.map(({ musicTwoRowItemRenderer = {} }) =>
-			MusicTwoRowItemRenderer({ musicTwoRowItemRenderer })
-		)
-		return { section }
-	})
+	let carousels = []
+	let grids = []
+	let sections = []
+	for (let index = 0; index < contents.length; index++) {
+		const element = { ...contents[index] }
+
+		element?.musicCarouselShelfRenderer && carousels.push(element)
+		element?.gridRenderer && grids.push(element)
+	}
+	if (carousels.length !== 0) {
+		for (let index = 0; index < contents.length; index++) {
+			const element = contents[index]
+			if (element?.musicCarouselShelfRenderer) {
+				sections = [...sections, parseCarousel({ ...element })]
+			}
+		}
+	}
+	if (grids.length !== 0) {
+		sections = grids.map(({ gridRenderer = {} }) => {
+			const { items = [], header = {} } = gridRenderer
+			const section = items.map((ctx) => MusicTwoRowItemRenderer(ctx))
+			return {
+				section,
+				type: 'grid',
+				title: header?.gridHeaderRenderer?.title?.runs[0]?.text
+			}
+		})
+	}
 
 	const getTitle = () => {
 		const wordParts: Array<any> = slug.split('_')
@@ -74,7 +100,78 @@ export async function get({ params, query }) {
 	}
 	// console.log(sections)
 	return {
-		body: { title: getTitle(), sections, header: text, data },
+		body: { title: getTitle(), sections, header: text },
 		status: 200
+	}
+}
+
+function parseHeader({
+	musicCarouselShelfBasicHeaderRenderer
+}): CarouselHeader {
+	if (musicCarouselShelfBasicHeaderRenderer) {
+		let subheading, browseId
+		if (musicCarouselShelfBasicHeaderRenderer?.strapline?.runs[0]?.text) {
+			subheading =
+				musicCarouselShelfBasicHeaderRenderer['strapline']['runs'][0].text
+		}
+		if (
+			musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer
+				?.navigationEndpoint?.browseEndpoint?.browseId
+		) {
+			browseId =
+				musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer
+					?.navigationEndpoint?.browseEndpoint?.browseId
+		}
+		return {
+			title: musicCarouselShelfBasicHeaderRenderer['title']['runs'][0].text,
+			subheading,
+			browseId
+		}
+	}
+}
+
+function parseBody(
+	contents = []
+):
+	| ICarouselTwoRowItem[]
+	| IListItemRenderer[]
+	| {
+			text: any
+			color: string
+			endpoint: {
+				params: any
+				browseId: any
+			}
+	  }[] {
+	let items = []
+	for (let index = 0; index < contents.length; index++) {
+		const element = contents[index]
+		if (element.musicTwoRowItemRenderer) {
+			items = [...items, MusicTwoRowItemRenderer(element)]
+		}
+		if (element.musicResponsiveListItemRenderer) {
+			items = [...items, MusicResponsiveListItemRenderer(element)]
+		}
+		if (element.musicNavigationButtonRenderer) {
+			items = [...items, MoodsAndGenresItem(element)]
+		}
+	}
+	return items
+}
+
+function parseCarousel(carousel: {
+	musicImmersiveCarouselShelfRenderer?: Record<string, any>
+	musicCarouselShelfRenderer?: Record<string, any>
+}) {
+	return {
+		header: parseHeader(
+			carousel.musicCarouselShelfRenderer?.header ??
+				carousel.musicImmersiveCarouselShelfRenderer?.header
+		),
+		type: 'carousel',
+		results: parseBody(
+			carousel.musicCarouselShelfRenderer?.contents ??
+				carousel.musicImmersiveCarouselShelfRenderer?.contents
+		)
 	}
 }

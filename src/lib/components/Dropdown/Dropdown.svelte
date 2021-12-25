@@ -13,7 +13,10 @@
 	$: isHidden = $PopperStore.items.length !== 0
 
 	function onClose() {
-		$PopperStore.srcNode.focus()
+		popper = null
+		if ($PopperStore.srcNode !== undefined) {
+			$PopperStore.srcNode.focus()
+		}
 		PopperStore.set({
 			items: [],
 			isOpen: false,
@@ -74,13 +77,13 @@
 				? viewport_width + -width * 1.75
 				: $PopperStore.x
 			: $PopperStore.x - width
-	$: if (popper) popper.focus()
+	$: popper && popper instanceof HTMLElement && popper.focus()
 	// $: console.log($PopperStore)
 	function focusState(node: HTMLElement) {
 		function handleFocusOut(
 			event: FocusEvent & { relatedTarget: HTMLElement & EventTarget }
 		) {
-			console.log(node.contains(event.relatedTarget))
+			// console.log(node.contains(event.relatedTarget))
 			if (!node.contains(event.relatedTarget)) {
 				node.dispatchEvent(new CustomEvent('lostfocus'))
 			}

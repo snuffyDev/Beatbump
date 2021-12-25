@@ -86,11 +86,7 @@ export async function get({ params }) {
 				body: {
 					sections,
 					header: text,
-					type: 'carousel',
-					original: {
-						contents,
-						data
-					}
+					type: 'carousel'
 				},
 				status: 200
 			}
@@ -113,11 +109,7 @@ export async function get({ params }) {
 			body: {
 				sections,
 				header: text,
-				type: 'grid',
-				original: {
-					contents,
-					data
-				}
+				type: 'grid'
 			},
 			status: 200
 		}

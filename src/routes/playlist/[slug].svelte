@@ -9,8 +9,7 @@
 			tracks = [],
 			header = {},
 			continuations = {},
-			// musicDetailHeaderRenderer,
-			data: _data
+			carouselContinuations
 		} = await data
 		if (!response.ok) {
 			return {
@@ -23,10 +22,10 @@
 				tracks: tracks,
 
 				continuations: continuations,
+				carouselContinuations,
 				header: header,
 				id: slug,
-				key: page.path,
-				data: _data
+				key: page.path
 			},
 			stuff: {
 				path: page.path
@@ -42,16 +41,13 @@
 	import List from './_List.svelte'
 	import list from '$lib/stores/list'
 	import { isPagePlaying } from '$lib/stores/stores'
-	import { setContext, tick } from 'svelte'
-	import type { Item } from '$lib/types'
+	import { setContext } from 'svelte'
 
 	import InfoBox from '$lib/components/Layouts/InfoBox.svelte'
 	import { writable } from 'svelte/store'
 	import Header from '$lib/components/Layouts/Header.svelte'
 	import type { Header as HeaderType } from '$lib/types/playlist'
-	import Icon from '$lib/components/Icon/Icon.svelte'
 	import type { IListItemRenderer } from '$lib/types/musicListItemRenderer'
-	import { browser } from '$app/env'
 	import Carousel from '$lib/components/Carousel/Carousel.svelte'
 	import ListInfoBar from '$lib/components/ListInfoBar'
 
@@ -64,9 +60,10 @@
 		subtitles: [],
 		title: ''
 	}
-	export let data
+	// export let data
 	export let id: string
 	export let continuations
+	export let carouselContinuations
 	export let key
 	let ctoken = continuations?.continuation || ''
 	let itct = continuations?.clickTrackingParams || ''
@@ -83,7 +80,8 @@
 	trackStore.set(tracks)
 
 	setContext(ctx, { pageId: id })
-	// $: browser && console.log(data, tracks, continuations, id)
+	// $: browser &&
+	// 	console.log(data, carouselContinuations, tracks, continuations, id)
 
 	pageTitle =
 		pageTitle.length > 64 ? pageTitle.substring(0, 64) + '...' : header.title
@@ -91,10 +89,32 @@
 		header.description.length > 240
 			? header.description.substring(0, 240) + '...'
 			: header.description
+	const getCarousel = async () => {
+		if (!carouselContinuations) return
+		const response = await fetch(
+			'/api/playlist.json' +
+				'?ref=' +
+				id +
+				`${
+					carouselContinuations
+						? `&ctoken=${encodeURIComponent(
+								carouselContinuations?.continuation
+						  )}`
+						: ''
+				}` +
+				'&itct=' +
+				carouselContinuations?.clickTrackingParams
+		)
+		const data = await response.json()
 
+		if (data?.carousel) {
+			carousel = { ...data?.carousel }
+		}
+	}
 	const getContinuation = async () => {
 		if (isLoading || hasData) return
 		if (!itct || !ctoken) {
+			getCarousel()
 			hasData = true
 			return
 		}
@@ -131,9 +151,7 @@
 				*/
 				ctoken = null
 				itct = undefined
-				if (data?.carousel) {
-					carousel = { ...data?.carousel }
-				}
+				getCarousel()
 				hasData = null
 				isLoading = false
 				trackStore.update((t) =>

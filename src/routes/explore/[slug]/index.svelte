@@ -1,13 +1,15 @@
 <script context="module">
-	export async function load({ page, fetch }) {
+	export async function load({ page, fetch, stuff }) {
 		const response = await fetch(`/explore/${page.params.slug}.json`)
-		const { sections, header, original, type } = await response.json()
+		const { sections, header, type } = await response.json()
+
+		let path = stuff.page
 		return {
 			props: {
 				sections,
 				header,
 				type,
-				original
+				path
 			},
 			status: 200
 		}
@@ -17,12 +19,18 @@
 <script lang="ts">
 	import Carousel from '$lib/components/Carousel/Carousel.svelte'
 	import { Grid, GridItem } from '$lib/components/Grid'
+	import Header from '$lib/components/Layouts/Header.svelte'
 	export let sections
+	export let path
 	export let header
 	export let type
-	export let original
 </script>
 
+<Header
+	title="{header} Playlists"
+	url={path}
+	desc="Find the perfect playlist that'll match your mood, or fit any occasion."
+/>
 <main>
 	<div class="header">
 		<h1>{header}</h1>

@@ -3,13 +3,7 @@ import {
 	MusicTwoRowItemRenderer
 } from '$lib/parsers'
 
-import type {
-	Artist,
-	CarouselHeader,
-	CarouselItem,
-	Item,
-	Thumbnail
-} from '$lib/types'
+import type { CarouselHeader, CarouselItem } from '$lib/types'
 import type { NextContinuationData } from '$lib/types'
 import type { IListItemRenderer } from '$lib/types/musicListItemRenderer'
 export async function get({ query }: { query: URLSearchParams }) {
@@ -91,7 +85,6 @@ async function getPlaylistContinuation(browseId, referrer, ctoken, itct) {
 		status: 200,
 		body: {
 			continuations: cont,
-			data,
 			tracks: Tracks.length !== 0 && Tracks,
 			carousel: Carousel
 		}
@@ -143,14 +136,17 @@ async function getPlaylist(browseId, referrer) {
 	} = data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents[0]?.musicPlaylistShelfRenderer
 	const _continue =
 		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
-			?.content?.sectionListRenderer?.continuations
+			?.content?.sectionListRenderer?.continuations || null
 
 	// console.log(musicDetailHeaderRenderer)
-	const cont: NextContinuationData = !data?.contents
+	const cont: NextContinuationData = data?.contents
 		?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content
-		?.sectionListRenderer?.continuations[0]?.nextContinuationData
-		? continuations[0]?.nextContinuationData
-		: _continue[0]?.nextContinuationData
+		?.sectionListRenderer?.continuations
+		? data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+				?.content?.sectionListRenderer?.continuations[0]?.nextContinuationData
+			? continuations !== undefined && continuations[0]?.nextContinuationData
+			: _continue !== null && _continue[0]?.nextContinuationData
+		: null
 	// console.log(_continue)
 	musicDetailHeaderRenderer = [musicDetailHeaderRenderer]
 	const parseHeader = musicDetailHeaderRenderer.map(
@@ -203,7 +199,7 @@ async function getPlaylist(browseId, referrer) {
 		body: {
 			continuations: cont,
 			tracks,
-			data,
+			carouselContinuations: _continue && _continue[0].nextContinuationData,
 			header: parseHeader
 		}
 	}

@@ -23,9 +23,10 @@
 	export let aspectRatio
 	export let isBrowseEndpoint = false
 	let loading
-	let RATIO_SQUARE = item.aspectRatio.includes('SQUARE') ? true : false
+	let RATIO_SQUARE = item.aspectRatio.match(/SQUARE/) ? true : false
 	let RATIO_RECT =
-		item.aspectRatio.includes('TWO_LINE_STACK') ||
+		(item.aspectRatio.includes('TWO_LINE_STACK') &&
+			kind !== 'Fans might also like') ||
 		item.aspectRatio.includes('16_9')
 			? true
 			: false

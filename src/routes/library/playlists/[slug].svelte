@@ -53,7 +53,7 @@
 		playlist = playlist
 		items = [...playlist.items]
 		thumbnail = playlist.thumbnail
-		console.log(promise)
+		// console.log(promise)
 	})
 	const drop = async (event, target) => {
 		event.dataTransfer.dropEffect = 'move'
@@ -70,7 +70,7 @@
 		items = newTracklist
 	}
 	const dragstart = (event, i) => {
-		console.log(event, i)
+		// console.log(event, i)
 
 		event.dataTransfer.effectAllowed = 'move'
 		event.dataTransfer.dropEffect = 'move'

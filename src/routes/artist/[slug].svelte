@@ -48,12 +48,10 @@
 	export let thumbnail: Array<Thumbnail> = []
 	export let carousels
 	export let songs = []
-	// export let raw
 	export let id
-	// $: id = id
 	let width
 	const ctx = {}
-	// $: console.log(data, header, carousels, songs, $page.path)
+	// $: console.log(header, carousels, songs, $page.path)
 	setContext(ctx, { pageId: id })
 </script>
 

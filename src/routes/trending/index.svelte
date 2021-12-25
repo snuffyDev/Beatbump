@@ -27,7 +27,7 @@
 	import Carousel from '$components/Carousel/Carousel.svelte'
 	import type { ICarousel } from '$lib/types'
 	import Header from '$lib/components/Layouts/Header.svelte'
-	$: console.log(carouselItems)
+	// $: console.log(carouselItems)
 </script>
 
 <Header

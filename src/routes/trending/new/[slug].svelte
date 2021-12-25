@@ -15,8 +15,7 @@
 		const {
 			sections = [],
 			header = '',
-			title = [] || '',
-			data = {}
+			title = [] || ''
 		} = await response.json()
 		// console.log(sections, header, title)
 		if (response.ok) {
@@ -24,8 +23,7 @@
 				props: {
 					sections,
 					header,
-					title,
-					data
+					title
 				},
 				status: 200
 			}
@@ -36,15 +34,17 @@
 <script lang="ts">
 	import type { sections } from '$lib/types/components/sections'
 	export let sections: sections
+
 	export let header
-	export let data
+	// export let data
 	export let title: string
 	import { goto } from '$app/navigation'
 	import Header from '$lib/components/Layouts/Header.svelte'
 	import { Grid, GridItem } from '$lib/components/Grid'
 	import list from '$lib/stores/list'
 	import { page } from '$app/stores'
-	$: console.log(data, sections, header, title)
+	import Carousel from '$lib/components/Carousel/Carousel.svelte'
+	// $: console.log(data, sections, header, title)
 </script>
 
 <Header
@@ -54,42 +54,41 @@
 />
 
 <main>
-	{#each sections as section}
-		<Grid heading={header} items={section.section} let:item>
-			<GridItem slot="item" {item} />
-		</Grid>
-		<!-- <div class="grid">
-			{#each section.section as item}
-				<div
-					class="item"
-					on:click={() => {
-						item.type == 'albums'
-							? goto('/release?id=' + item?.browseId)
-							: list.initList({
-									videoId: item.videoId,
-									playlistId: item.autoMixList
-							  })
-					}}
-				>
-					<div class="img">
-						<img loading="lazy" src={item.thumbnail} alt="thumbnail" />
-					</div>
-					<div class="item-title">{item.title}</div>
-					<div class="item-subtitle">
-						{#each item.subtitles as sub}{#if !sub?.navigationEndpoint}{sub.text}{:else}<a
-									href={`/artist/${sub?.navigationEndpoint?.browseEndpoint?.browseId}`}
-									>{sub.text}</a
-								>{/if}{/each}
-					</div>
-				</div>
-			{/each}
-		</div>-->
+	{#if title === 'Charts'}
+		<div class="header">
+			<span class="h1">{header}</span>
+		</div>
+	{/if}
+	{#each sections as section, i}
+		{#if section?.type === 'grid'}
+			<Grid heading={header} items={section.section} let:item>
+				<GridItem slot="item" {item} />
+			</Grid>
+		{:else if i === 1}
+			<Carousel
+				header={section.header}
+				items={section.results}
+				type="artist"
+				kind="Fans might also like"
+				isBrowseEndpoint={true}
+			/>
+		{:else}
+			<Carousel
+				header={section.header}
+				items={section.results}
+				type="home"
+				isBrowseEndpoint={false}
+			/>
+		{/if}
 	{/each}
 </main>
 
 <style lang="scss">
 	h1 {
 		letter-spacing: -0.02em;
+	}
+	.h1 {
+		font-size: 2.88rem;
 	}
 	.header {
 		margin-bottom: 0.8rem;

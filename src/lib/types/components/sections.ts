@@ -1,7 +1,10 @@
-import type { NavigationEndpoint } from '$lib/types'
+import type { CarouselHeader, Item, NavigationEndpoint } from '$lib/types'
 
 export type sections = [
 	{
+		type: string
+		header?: CarouselHeader
+		results?: Item[]
 		section: [
 			{
 				type: string

@@ -71,6 +71,8 @@ export const MusicTwoRowItemRenderer = (ctx: {
 		return {
 			...d,
 			url: url,
+			original_url: d?.url,
+
 			placeholder
 		}
 	})
@@ -146,10 +148,24 @@ export const MusicResponsiveListItemRenderer = (
 	} = ctx?.musicResponsiveListItemRenderer
 	for (let index = 0; index < thumbnails.length; index++) {
 		const thumbnail = thumbnails[index] as Thumbnail
-		let url: string | string[] = thumbnail?.url.split('?')
-		url = url[0].replace('/vi/', '/vi_webp/').replace(/\.jpg|\.png/, '.webp')
+		let url: string | string[]
+		let placeholder
+		if (!thumbnail?.url.includes('lh3.googleusercontent')) {
+			const split_url = thumbnail?.url.split('?')
+			const webp_url = split_url[0]
+				.replace('/vi/', '/vi_webp/')
+				.replace(/\.jpg|\.png/, '.webp')
+			url = webp_url
+			placeholder = webp_url?.replace('sddefault', 'default')
+		} else {
+			const webp_url: string = thumbnail?.url?.replace('-rj', '-rw')
+			url = webp_url
+			placeholder = webp_url?.replace(
+				/(=w(\d+)-h(\d+))/gm,
 
-		const placeholder = url?.replace('sddefault', 'default')
+				'=w1-h1-p-fSoften=50,50,05'
+			)
+		}
 
 		thumbnails[index] = {
 			...thumbnail,
@@ -158,23 +174,6 @@ export const MusicResponsiveListItemRenderer = (
 			placeholder
 		}
 	}
-	// thumbnails = thumbnails.map((d: Thumbnail) => {
-	// 	let url: string = d?.url.split('?')
-	// 	console.log
-	// 	let placeholder = url[0]
-	// 		.replace('/vi/', '/vi_webp/')
-	// 		.replace(/\.jpg|\.png/, '.webp')
-
-	// 	placeholder = placeholder?.replace('sddefault', 'default')
-
-	// 	return {
-	// 		...d,
-	// 		url:  url[0]
-	// 		.replace('/vi/', '/vi_webp/').replace(/\.jpg|\.png/, '.webp'),
-	// 		original_url: d.url,
-	// 		placeholder
-	// 	}
-	// })
 
 	let Item: IListItemRenderer = {
 		subtitle: Array.isArray(
@@ -226,25 +225,25 @@ export const MusicResponsiveListItemRenderer = (
 		},
 		explicit: ctx?.musicResponsiveListItemRenderer.badges ? true : false,
 		title:
-			ctx.musicResponsiveListItemRenderer.flexColumns[0]
-				.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text,
+			ctx.musicResponsiveListItemRenderer?.flexColumns[0]
+				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]?.text,
 		aspectRatio: ctx.musicResponsiveListItemRenderer.flexColumnDisplayStyle,
 		playerParams:
 			ctx.musicResponsiveListItemRenderer.flexColumns[0]
-				.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
+				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
 				?.navigationEndpoint?.watchEndpoint?.playerParams,
 		musicVideoType:
 			ctx.musicResponsiveListItemRenderer.flexColumns[0]
-				.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
+				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
 				?.navigationEndpoint?.watchEndpoint?.watchEndpointMusicConfig
 				?.musicVideoType,
 		videoId:
-			ctx.musicResponsiveListItemRenderer.flexColumns[0]
+			ctx.musicResponsiveListItemRenderer?.flexColumns[0]
 				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
 				?.navigationEndpoint?.watchEndpoint?.videoId || '',
 		playlistId: ctx.musicResponsiveListItemRenderer?.menu?.menuRenderer.items[0]
 			.menuNavigationItemRenderer?.navigationEndpoint?.watchEndpoint?.playlistId
-			? ctx.musicResponsiveListItemRenderer?.menu?.menuRenderer.items[0]
+			? ctx.musicResponsiveListItemRenderer?.menu?.menuRenderer?.items[0]
 					?.menuNavigationItemRenderer.navigationEndpoint?.watchEndpoint
 					?.playlistId
 			: ctx?.musicResponsiveListItemRenderer.navigationEndpoint?.watchEndpoint,

@@ -1,5 +1,5 @@
 <script context="module">
-	export async function load({ fetch }) {
+	export async function load({ fetch, stuff }) {
 		const data = await fetch('/explore.json?browseId=FEmusic_moods_and_genres')
 		const response = await data.json()
 
@@ -10,9 +10,11 @@
 				status: data.status
 			}
 		}
+		const path = stuff.path
 		return {
 			props: {
-				response
+				response,
+				path
 			},
 			maxage: 3600,
 			status: 200
@@ -22,18 +24,18 @@
 
 <script lang="ts">
 	import { Grid } from '$lib/components/Grid'
-	import { currentTitle } from '$lib/stores/stores'
+	import Header from '$lib/components/Layouts/Header.svelte'
 	export let response
+	export let path
 
 	// $: console.log(response)
 </script>
 
-<svelte:head>
-	<title
-		>{$currentTitle == undefined || null ? 'Explore' : $currentTitle} - Beatbump</title
-	>
-</svelte:head>
-
+<Header
+	title="Explore"
+	url={path}
+	desc="Find the perfect playlist that'll match your mood, or fit any occasion."
+/>
 <main>
 	{#each response as section}
 		<Grid items={[...section.section]} heading={section.title} let:item>

@@ -46,7 +46,7 @@
 			console.error(err)
 		}
 	})
-	$: console.log(playlists, favorites)
+	// $: console.log(playlists, favorites)
 </script>
 
 {#if showSyncModal && browser}

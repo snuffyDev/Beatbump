@@ -37,7 +37,7 @@ $content-width-xl: 1400px;
 	max-width: $content-width-mobile;
 	@media only screen and (min-width: 1080px) and (max-width: 1366px) {
 		max-width: $content-width-md;
-		padding: 6vh 2rem 0 2rem;
+		padding: 5vh 2rem 0 2rem;
 		padding-bottom: 0.8rem;
 	}
 	@media only screen and (min-width: 1367px) and (max-width: 1600px) {
