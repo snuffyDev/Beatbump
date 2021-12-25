@@ -194,7 +194,10 @@ main {
 	touch-action: pan-y;
 	grid-area: m/m/m/m;
 }
-
+.hidden {
+	display: none !important;
+	visibility: hidden !important;
+}
 .no-scroll {
 	overflow: hidden !important;
 	overflow-y: hidden !important;
