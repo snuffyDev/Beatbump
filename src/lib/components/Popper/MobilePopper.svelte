@@ -23,18 +23,18 @@
 	function release(e) {
 		// console.log(e)
 		if (sliding) {
-			if (posY < height * 0.3) {
+			if (posY < listHeight * 0.3) {
 				open()
 			} else {
 				close()
 			}
+			sliding = false
 		}
-		sliding = false
 	}
 	function trackMovement({ y }) {
 		if (y <= listHeight && y >= 0) {
 			posY = y
-		} else if (y < listHeight * 0.3) {
+		} else if (y < listHeight * 0.7) {
 			trackOpen()
 		} else {
 			close()
