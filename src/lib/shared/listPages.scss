@@ -25,13 +25,14 @@ $width: 14rem;
 }
 
 .button-group {
-	display: inline-flex;
+	display: flex;
 	flex-wrap: wrap;
 	flex: 0 1 auto;
 	gap: 0.5rem;
 	margin-top: 0.8rem;
 	align-items: center;
 	grid-area: buttons;
+	justify-content: flex-start;
 }
 .editable {
 	&-text:hover {
@@ -125,7 +126,7 @@ small {
 	margin-bottom: 1rem;
 	@media screen and (min-width: 286px) and (max-width: 512px) {
 		grid-template-columns: var(--width) 1fr;
-		gap: 0.5rem 1.25rem;
+		gap: 0.5rem 1rem;
 		grid-template-areas:
 			"img metadata"
 			"img buttons"

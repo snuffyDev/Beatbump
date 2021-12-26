@@ -79,22 +79,20 @@
 		{/if}
 	</div>
 	<div class="button-group">
-		<div class="container row">
-			{#each buttons as { type, icon, text, action }, i}
-				{#if type == 'icon'}
-					<PopperButton items={DropdownItems} />
-				{:else}
-					<Button
-						on:click={action}
-						outlined={i == buttons.length - 1 || type == 'outlined'}
-						icon={typeof icon == 'string'
-							? { name: icon }
-							: { name: icon?.name, size: icon?.size }}
-						{text}
-					/>
-				{/if}
-			{/each}
-		</div>
+		{#each buttons as { type, icon, text, action }, i}
+			{#if type == 'icon'}
+				<PopperButton items={DropdownItems} />
+			{:else}
+				<Button
+					on:click={action}
+					outlined={i == buttons.length - 1 || type == 'outlined'}
+					icon={typeof icon == 'string'
+						? { name: icon }
+						: { name: icon?.name, size: icon?.size }}
+					{text}
+				/>
+			{/if}
+		{/each}
 	</div>
 </div>
 
