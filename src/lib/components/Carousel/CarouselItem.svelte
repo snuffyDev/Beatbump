@@ -336,7 +336,7 @@
 		}
 	}
 	.item-title {
-		display: inline-block;
+		display: block;
 		.link {
 			display: block;
 			display: -webkit-box;
@@ -391,12 +391,12 @@
 		// padding-right: 1rem;
 
 		contain: layout paint style;
-		&::before {
-			position: absolute;
-			display: block;
-			content: '';
-			padding-top: calc(100% * 2 / 3);
-		}
+		// ::before {
+		// 	position: absolute;
+		// 	display: block;
+		// 	content: '';
+		// 	padding-top: calc(100% * 2 / 3);
+		// }
 	}
 	.image {
 		width: 100%;

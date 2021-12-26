@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Select from './Select.svelte'
+
 	import { createEventDispatcher } from 'svelte'
 	import Icon from '../Icon/Icon.svelte'
 	export let value
@@ -6,16 +8,11 @@
 	const dispatch = createEventDispatcher()
 </script>
 
-<div class="sort">
-	<label for="select">Sort</label>
-	<div class="select">
-		<select id="select" bind:value on:change>
-			{#each options as option, i (option.params)}
-				<option value={i}>{option.label}</option>
-			{/each}
-		</select>
+{#if options.length !== 0}
+	<div class="sort">
+		<Select {options} bind:value on:change />
 	</div>
-</div>
+{/if}
 <div class="info-bar">
 	<span class="index">#</span>
 	<span class="mobile-thumbnail"><Icon name="image" size="1em" /></span>

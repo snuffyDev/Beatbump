@@ -55,8 +55,6 @@ $section-names: (base, top, side, bottom, form);
 	}
 }
 html {
-	color: #f2f2f2;
-
 	@each $theme in $theme-name {
 		&.#{$theme} {
 			--mobile-popper-bg: #{map-get($themes, $theme, "side")};

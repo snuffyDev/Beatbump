@@ -141,7 +141,7 @@
 		</div>
 	</Modal>
 {/if}
-<section class="playlist-modal" transition:fly={{ duration: 250, delay: 125 }}>
+<section class="playlist-modal" transition:fade={{ duration: 250, delay: 125 }}>
 	<div class="image">
 		<div class="img-container">
 			{#if thumbnail}

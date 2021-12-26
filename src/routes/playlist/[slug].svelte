@@ -40,7 +40,7 @@
 	import ListItem from '$components/ListItem/ListItem.svelte'
 	import List from './_List.svelte'
 	import list from '$lib/stores/list'
-	import { isPagePlaying } from '$lib/stores/stores'
+	import { isPagePlaying, showAddToPlaylistPopper } from '$lib/stores/stores'
 	import { setContext } from 'svelte'
 
 	import InfoBox from '$lib/components/Layouts/InfoBox.svelte'
@@ -50,6 +50,7 @@
 	import type { IListItemRenderer } from '$lib/types/musicListItemRenderer'
 	import Carousel from '$lib/components/Carousel/Carousel.svelte'
 	import ListInfoBar from '$lib/components/ListInfoBar'
+	import { notify } from '$lib/utils'
 
 	export let tracks: IListItemRenderer[]
 	export let header: HeaderType = {
@@ -279,8 +280,28 @@
 				},
 				icon: 'play',
 				text: 'Start Listening'
+			},
+			{
+				action: () => {},
+				icon: { name: 'dots', size: '1.25rem' },
+				text: '',
+				type: 'icon'
 			}
 		]}
+		on:addqueue={() => {
+			setId()
+			list.startPlaylist(header.playlistId)
+
+			notify(`${pageTitle} added to queue!`, 'success')
+		}}
+		on:playlistAdd={async () => {
+			const response = await fetch(
+				'/api/getQueue.json?playlistId=' + header?.playlistId
+			)
+			const data = await response.json()
+			const items = data
+			showAddToPlaylistPopper.set({ state: true, item: [...items] })
+		}}
 	/>
 	<ListInfoBar
 		bind:value

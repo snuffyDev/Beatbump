@@ -1,11 +1,7 @@
 <script lang="ts">
-	import { browser } from '$app/env'
-
-	import lazy from '$lib/lazy'
-	import Icon from '../Icon/Icon.svelte'
-	import { createEventDispatcher } from 'svelte'
+	import { createEventDispatcher, tick } from 'svelte'
 	import Button from '../Button'
-
+	import PopperButton from '../Popper/PopperButton.svelte'
 	export let thumbnail: string
 	export let title: string = ''
 	export let description = undefined
@@ -15,6 +11,21 @@
 	export let artist = undefined
 	export let editable = false
 	export let type = 'playlist'
+	let DropdownItems = [
+		{
+			text: 'Add to Queue',
+			icon: 'queue',
+			action: () => {
+				dispatch('addqueue')
+			}
+		},
+		{
+			text: 'Add to Playlist',
+			icon: 'playlist-add',
+			action: () => dispatch('playlistAdd')
+		}
+	]
+
 	let width
 	const dispatch = createEventDispatcher()
 </script>
@@ -69,13 +80,19 @@
 	</div>
 	<div class="button-group">
 		<div class="container row">
-			{#each buttons as { icon, text, action }, i}
-				<Button
-					on:click={action}
-					outlined={i == buttons.length - 1}
-					icon={{ name: icon }}
-					{text}
-				/>
+			{#each buttons as { type, icon, text, action }, i}
+				{#if type == 'icon'}
+					<PopperButton items={DropdownItems} />
+				{:else}
+					<Button
+						on:click={action}
+						outlined={i == buttons.length - 1 || type == 'outlined'}
+						icon={typeof icon == 'string'
+							? { name: icon }
+							: { name: icon?.name, size: icon?.size }}
+						{text}
+					/>
+				{/if}
 			{/each}
 		</div>
 	</div>

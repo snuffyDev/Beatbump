@@ -24,6 +24,7 @@
 	import Header from '$lib/components/Layouts/Header.svelte'
 	import { page } from '$app/stores'
 	import CreatePlaylist from '$lib/components/PlaylistPopper/CreatePlaylist.svelte'
+import ListInfoBar from '$lib/components/ListInfoBar'
 
 	export let playlistName
 	const ctx = {}
@@ -139,7 +140,7 @@
 			}
 		]}
 	/>
-
+<ListInfoBar  />
 	<List {items} let:item let:index let:send let:receive>
 		<ListItem
 			{ctx}

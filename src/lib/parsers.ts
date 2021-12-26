@@ -11,7 +11,30 @@ type JSON =
 	| JSON[]
 	| Record<string, { [key: string]: string; value: string }>
 	| { [key: string]: JSON }
+function thumbnailTransformer(url) {
+	let output = {
+		placeholder: '',
+		url: ''
+	}
+	if (!url.includes('lh3.googleusercontent.com')) {
+		const split_url: string = url.split('?')
+		const webp_url = split_url[0]
+			.replace(/\/vi\//, '/vi_webp/')
+			.replace(/\.jpg|\.png/, '.webp')
+		output.url = webp_url
+		output.placeholder = webp_url?.replace('sddefault', 'default')
+		// console.log(output.placeholder, output.url, webp_url)
+	} else {
+		const webp_url: string = url?.replace('-rj', '-rw')
+		output.url = webp_url
+		output.placeholder = webp_url?.replace(
+			/(=w(\d+)-h(\d+))/gm,
 
+			'=w1-h1-p-fSoften=50,50,05'
+		)
+	}
+	return output
+}
 export function parseNextItem(item, length): Array<Item> {
 	item = [item]
 	const result = item.map((item) => {
@@ -59,23 +82,17 @@ export const MusicTwoRowItemRenderer = (ctx: {
 			} = {}
 		} = {}
 	} = ctx
+	for (let index = 0; index < thumbnails.length; index++) {
+		const thumbnail = thumbnails[index]
 
-	thumbnails = thumbnails.map((d) => {
-		const url: string = d?.url?.replace('-rj', '-rw')
-		let placeholder = url
-		placeholder = placeholder?.replace(
-			/(=w(\d+)-h(\d+))/gm,
-
-			'=w1-h1-p-fSoften=50,50,05'
-		)
-		return {
-			...d,
-			url: url,
-			original_url: d?.url,
-
+		const { url, placeholder } = thumbnailTransformer(thumbnail.url)
+		thumbnails[index] = {
+			...thumbnail,
+			url,
+			original_url: thumbnail?.url,
 			placeholder
 		}
-	})
+	}
 
 	const Item: ICarouselTwoRowItem = {
 		title: ctx['musicTwoRowItemRenderer']['title']['runs'][0].text,
@@ -148,24 +165,8 @@ export const MusicResponsiveListItemRenderer = (
 	} = ctx?.musicResponsiveListItemRenderer
 	for (let index = 0; index < thumbnails.length; index++) {
 		const thumbnail = thumbnails[index] as Thumbnail
-		let url: string | string[]
-		let placeholder
-		if (!thumbnail?.url.includes('lh3.googleusercontent')) {
-			const split_url = thumbnail?.url.split('?')
-			const webp_url = split_url[0]
-				.replace('/vi/', '/vi_webp/')
-				.replace(/\.jpg|\.png/, '.webp')
-			url = webp_url
-			placeholder = webp_url?.replace('sddefault', 'default')
-		} else {
-			const webp_url: string = thumbnail?.url?.replace('-rj', '-rw')
-			url = webp_url
-			placeholder = webp_url?.replace(
-				/(=w(\d+)-h(\d+))/gm,
 
-				'=w1-h1-p-fSoften=50,50,05'
-			)
-		}
+		const { url, placeholder } = thumbnailTransformer(thumbnail.url)
 
 		thumbnails[index] = {
 			...thumbnail,
@@ -360,14 +361,16 @@ export const MoodsAndGenresItem = (
 		browseId: any
 	}
 } => {
+	// console.log(
+	// 	ctx.musicNavigationButtonRenderer?.solid.leftStripeColor,
+	// 	typeof ctx.musicNavigationButtonRenderer?.solid.leftStripeColor
+	// )
+
 	const Item = {
 		text: ctx.musicNavigationButtonRenderer?.buttonText.runs[0].text,
-		color: (
-			'00000000' +
-			(
-				ctx.musicNavigationButtonRenderer?.solid.leftStripeColor & 0xffffff
-			).toString(16)
-		).slice(-6),
+		color: ctx.musicNavigationButtonRenderer?.solid.leftStripeColor
+			.toString(16)
+			.slice(2),
 		endpoint: {
 			params:
 				ctx.musicNavigationButtonRenderer?.clickCommand.browseEndpoint.params,

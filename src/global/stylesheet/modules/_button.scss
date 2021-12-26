@@ -85,6 +85,11 @@ $focus-color: #1c1c1c;
 		}
 	}
 }
+// Main Button
+button:not(.icon-btn),
+.button {
+	@extend %button-base;
+}
 
 // Button Types
 ////////////////////////////////
@@ -103,13 +108,9 @@ button.has-icon {
 }
 
 button.outlined {
-	display: inline-flex;
-	align-items: center;
-
 	background: #0000 !important;
 	border: white 0.1rem solid !important;
 	color: white !important;
-	display: inline-flex;
 	font-weight: 500;
 
 	&:active {
@@ -136,16 +137,6 @@ button.outlined {
 		// background-color: transparentize(#fff, 0.3) !important;
 		border-color: rgba(255, 255, 255, 0.667) !important;
 	}
-
-	// font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-	-webkit-font-smoothing: antialiased;
-}
-// Main Button
-.button {
-	@extend %button-base;
-}
-button:not(.icon-btn) {
-	@extend %button-base;
 }
 button.icon-btn {
 	display: inline-flex;

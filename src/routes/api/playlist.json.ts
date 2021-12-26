@@ -173,10 +173,15 @@ async function getPlaylist(browseId, referrer) {
 				}
 			}
 			// const subtitles = [...subtitle?.runs]
-			const desc = description?.runs[0]?.text
-			const _title = title?.runs[0].text
+			const desc =
+				(description &&
+					Array.isArray(description?.runs) &&
+					description?.runs[0]?.text) ??
+				undefined
+			const _title =
+				(title && Array.isArray(title?.runs) && title?.runs[0]?.text) ??
+				undefined
 			return {
-				data,
 				description: desc,
 				subtitles,
 				thumbnails:

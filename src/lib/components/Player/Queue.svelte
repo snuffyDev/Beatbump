@@ -80,7 +80,7 @@
 		? ''
 		: 'transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22);'
 	$: height =
-		queueHeight !== undefined && `calc(${(listHeight / 20.2) * 3}px - 0.5rem)`
+		queueHeight !== undefined && `calc(${listHeight - queueHeight}px - 4rem)`
 	// : `calc(${(listHeight / 20.2) * 3}px - 0.5rem)`
 </script>
 
@@ -160,23 +160,30 @@
 			margin: 0 auto;
 			width: 35%;
 			color: hsl(0deg 0% 80%);
-			border: 1px hsl(0deg 0% 100%) inset;
-			border-color: hsl(0deg 0% 100%);
-			height: 0;
+			background: hsl(0deg 0% 100%);
+			height: 0.0625rem;
+
 			line-height: inherit;
 			z-index: 5;
 		}
-		border-color: hsl(0deg 0% 0% / 0%);
 		width: 90%;
+		border: none;
 		position: relative;
 	}
 	.handle {
 		width: 100%;
 
-		border-bottom: 0.0175rem solid hsl(0deg 0% 67% / 43%);
-		border-top: 0.0175rem solid hsl(0deg 0% 67% / 5%);
+		border-bottom: 0.0175rem groove rgba(171, 171, 171, 0.151);
+		border-top: 0.0175rem groove rgba(171, 171, 171, 0.151);
+		border-top-left-radius: inherit;
+		border-top-right-radius: inherit;
 		box-shadow: 0 -0.4rem 0.8rem 0.5rem hsl(0deg 0% 100% / 9%);
-		background: #111112;
+		background: linear-gradient(
+			to bottom,
+			hsl(240, 10%, 10%),
+			hsl(240, 2%, 7%) 50%,
+			hsl(240, 1%, 6%) 90%
+		);
 		z-index: 1;
 		height: 2rem;
 		display: flex;
@@ -207,7 +214,7 @@
 		visibility: visible;
 		contain: layout;
 		background: var(--bottom-bg);
-		height: 78vh;
+		height: 75vh;
 		transform: translate(0px, 0px);
 		min-height: 0;
 		width: 40%;
@@ -216,7 +223,7 @@
 			position: absolute;
 			content: '';
 			inset: 0;
-			filter: brightness(0.4);
+			filter: brightness(0.5) saturate(0.5);
 			width: 100%;
 			height: 100%;
 			z-index: -1;

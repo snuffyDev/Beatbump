@@ -22,5 +22,6 @@ img::before,
 video::before {
 	display: block;
 	content: "";
+	position: absolute;
 	padding-top: calc(100% * 2 / 3);
 }
