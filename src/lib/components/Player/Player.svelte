@@ -35,7 +35,7 @@
 		: new NodeAudio()
 	$: player.autoplay = $updateTrack !== undefined ? true : false
 
-	$: player.src = $updateTrack
+	$: player.src = $updateTrack.url
 	$: isWebkit = $iOS
 	let title
 
@@ -100,12 +100,10 @@
 		setPosition()
 		isPlaying = true
 		window.bbPlayer = {
-			src: $updateTrack,
+			src: $updateTrack.originalUrl,
 			duration: player.duration,
 			title: $list.mix[autoId].title
 		}
-
-		console.log(window.bbPlayer)
 
 		DropdownItems = [
 			{

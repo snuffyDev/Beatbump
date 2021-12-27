@@ -4,7 +4,7 @@ import type { Writable } from 'svelte/store'
 import { derived, get, writable } from 'svelte/store'
 import { settings } from './settings'
 
-export const updateTrack = writable<string>('')
+export const updateTrack = writable<{ originalUrl?: string; url?: string }>({})
 export const ctxKey = {}
 export const currentTitle = writable(undefined)
 

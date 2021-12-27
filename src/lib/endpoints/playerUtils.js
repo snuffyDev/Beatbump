@@ -42,12 +42,13 @@ export const sort = (data, WebM = false) => {
 		)
 		for (let i = 0; i < formatParent.length; i++) {
 			const element = formatParent[i];
+			let url;
 			WebM === true && element.mimeType.includes('audio') && element.audioChannels === 2 && element.audioQuality.includes('AUDIO_QUALITY_MEDIUM') &&
-				(element.mimeType.includes('mp4') || element.mimeType.includes('webm')) && (element.url = parseProxyRedir(element.url)) && ((
-					element.mimeType = element.mimeType.includes('mp4') ? 'mp4' : 'webm')) && arr.push({ url: element.url, mimeType: element.mimeType })
+				(element.mimeType.includes('mp4') || element.mimeType.includes('webm')) && (url = parseProxyRedir(element.url)) && ((
+					element.mimeType = element.mimeType.includes('mp4') ? 'mp4' : 'webm')) && arr.push({ original_url: element.url, url: url, mimeType: element.mimeType })
 			WebM === false && element.mimeType.includes('audio') && element.audioChannels === 2 && element.audioQuality.includes('AUDIO_QUALITY_MEDIUM') &&
-				(element.mimeType.includes('mp4')) && (element.url = parseProxyRedir(element.url)) && ((
-					element.mimeType = 'mp4')) && arr.push({ url: element.url, mimeType: element.mimeType })
+				(element.mimeType.includes('mp4')) && (url = parseProxyRedir(element.url)) && ((
+					element.mimeType = 'mp4')) && arr.push({ original_url: element.url, url: url, mimeType: element.mimeType })
 		}
 		// formatParent.map((i) => {
 		// 	if (

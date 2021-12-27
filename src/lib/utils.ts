@@ -74,11 +74,17 @@ function setTrack(formats = [], webM) {
 	if (webM) {
 		const item = formats.find((v) => v.mimeType === 'webm')
 		const parsedURL = item !== undefined ? item.url : formats[0].url
-		updateTrack.update(() => parsedURL)
+		updateTrack.update(() => ({
+			originalUrl: formats[0].original_url,
+			url: parsedURL
+		}))
 		return { body: parsedURL, error: false }
 	}
 	const parsedURL = formats[0].url
-	updateTrack.update(() => parsedURL)
+	updateTrack.update(() => ({
+		originalUrl: formats[0].original_url,
+		url: parsedURL
+	}))
 	return { body: parsedURL, error: false }
 }
 function handleError() {
