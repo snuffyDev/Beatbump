@@ -332,6 +332,7 @@
 			-webkit-box-orient: vertical;
 			overflow: hidden;
 			text-overflow: ellipsis;
+			margin-bottom: 0.25em;
 		}
 	}
 	.item1x1 {

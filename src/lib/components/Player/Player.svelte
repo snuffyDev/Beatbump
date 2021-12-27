@@ -27,12 +27,14 @@
 		constructor(...args) {
 			this.addEventListener('play', this.play)
 		}
-		addEventListener(arg0: string, play: () => any) {}
-		play() {}
+		play(arg0: string, play: any) {
+			//
+		}
+		addEventListener(arg0: string, play: any) {
+			//
+		}
 	}
-	const player: HTMLAudioElement & typeof NodeAudio = browser
-		? new Audio()
-		: new NodeAudio()
+	const player: HTMLAudioElement = browser ? new Audio() : new NodeAudio()
 	$: player.autoplay = $updateTrack !== undefined ? true : false
 
 	$: player.src = $updateTrack.url
@@ -191,13 +193,11 @@
 				title: $list.mix[autoId || 0]?.title,
 				artist: $list.mix[autoId || 0]?.artistInfo?.artist[0].text || null,
 				album: $list.mix[autoId || 0]?.album?.title ?? undefined,
-				artwork: $list.mix[autoId || 0]?.thumbnails
-					.reverse()
-					.map((thumbnail) => ({
-						src: thumbnail.url,
-						sizes: `${thumbnail.width}x${thumbnail.height}`,
-						type: 'image/jpeg'
-					}))
+				artwork: $list.mix[autoId || 0]?.thumbnails.map((thumbnail) => ({
+					src: thumbnail.url,
+					sizes: `${thumbnail.width}x${thumbnail.height}`,
+					type: 'image/jpeg'
+				}))
 			})
 			navigator.mediaSession.setActionHandler('play', (session) => {
 				const _play = player.play()

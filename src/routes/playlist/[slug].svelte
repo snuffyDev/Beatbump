@@ -276,10 +276,26 @@
 			{
 				action: () => {
 					setId()
-					list.startPlaylist(header.playlistId)
+					// list.startPlaylist(header.playlistId)
+					list.initList({
+						playlistId: header.playlistId,
+						config: { playerParams: 'wAEB' }
+					})
+				},
+				icon: 'shuffle',
+				text: 'Shuffle'
+			},
+			{
+				action: () => {
+					setId()
+					list.initList({
+						playlistId: header.playlistId,
+						config: { playerParams: 'wAEB8gECGAE%3D' }
+					})
 				},
 				icon: 'play',
-				text: 'Start Listening'
+				type: 'outlined',
+				text: 'Start Radio'
 			},
 			{
 				action: () => {},

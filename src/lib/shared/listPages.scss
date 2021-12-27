@@ -129,8 +129,8 @@ small {
 		gap: 0.5rem 1rem;
 		grid-template-areas:
 			"img metadata"
-			"img buttons"
-			"img buttons";
+			"img metadata"
+			"buttons buttons";
 	}
 	@media screen and (min-width: 512px) {
 		grid-template-columns: var(--width) 1fr;

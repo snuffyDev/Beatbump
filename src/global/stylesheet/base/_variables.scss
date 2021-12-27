@@ -32,7 +32,7 @@ $content-width-lg: 1080px;
 $content-width-xl: 1440px;
 
 @mixin padding {
-	padding: 4vh 1rem 5vh 1rem;
+	padding: 4vh 0.5rem 5vh 0.5rem;
 	padding-bottom: 1vh !important;
 	max-width: $content-width-mobile;
 	@media only screen and (min-width: 1080px) and (max-width: 1366px) {
