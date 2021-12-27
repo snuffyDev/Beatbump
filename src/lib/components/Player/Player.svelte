@@ -13,7 +13,7 @@
 		playerLoading,
 		updateTrack
 	} from '$stores/stores'
-	import { tick } from 'svelte'
+	import { onMount, tick } from 'svelte'
 
 	import { cubicOut } from 'svelte/easing'
 	import { tweened } from 'svelte/motion'
@@ -30,7 +30,9 @@
 		addEventListener(arg0: string, play: () => any) {}
 		play() {}
 	}
-	const player: HTMLAudioElement | any = browser ? new Audio() : new NodeAudio()
+	const player: HTMLAudioElement & typeof NodeAudio = browser
+		? new Audio()
+		: new NodeAudio()
 	$: player.autoplay = $updateTrack !== undefined ? true : false
 
 	$: player.src = $updateTrack
@@ -97,6 +99,14 @@
 	player.addEventListener('loadedmetadata', () => {
 		setPosition()
 		isPlaying = true
+		window.bbPlayer = {
+			src: $updateTrack,
+			duration: player.duration,
+			title: $list.mix[autoId].title
+		}
+
+		console.log(window.bbPlayer)
+
 		DropdownItems = [
 			{
 				text: 'View Artist',

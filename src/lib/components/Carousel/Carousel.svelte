@@ -5,15 +5,13 @@
 	import Icon from '$components/Icon/Icon.svelte'
 	import { page } from '$app/stores'
 	import { onMount } from 'svelte'
-	import observer from './observer'
 
 	export let header: CarouselHeader
 	export let items = []
 	export let type = ''
 	export let kind = 'normal'
 	export let isBrowseEndpoint
-	let isHidden
-	let section = []
+
 	let arr = []
 	let moreOnLeft, moreOnRight
 	if (items.length > 3) {
@@ -73,18 +71,17 @@
 		// let rectValue: any = 0
 	})
 	// $: if (carousel) carousel.scrollLeft += $tween
-	const isArtistPage = $page.path.includes('/artist/')
-	let notArtist = header.browseId?.includes('VLP')
+	const pageIsArtist = $page.path.includes('/artist/')
+
+	let notArtistPageURLs = header.browseId?.includes('VLP')
 		? `/playlist/${header?.browseId}`
 		: `/trending/new/${header?.browseId}${
 				header?.params ? `?params=${header?.params}` : ''
 		  }${header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ''}`
 	let href =
-		header?.browseId && isArtistPage
+		header?.browseId && pageIsArtist
 			? `/artist/releases?browseId=${header?.browseId}&params=${header?.params}&itct=${header?.itct}`
-			: notArtist
-
-	// $: console.log(moreOnLeft, moreOnRight)
+			: notArtistPageURLs
 </script>
 
 <div class="header">
@@ -94,14 +91,11 @@
 	<h1>
 		{header.title}
 	</h1>
-	{#if !isArtistPage && header.browseId}<a
+	{#if !header.title.includes('Videos') && header.browseId}<a
 			style="white-space:pre; display: inline-block;"
 			{href}><small>See All</small></a
-		>{:else if isArtistPage && header.browseId && !header.title.includes('Videos')}
-		<a style="white-space:pre; display: inline-block;" {href}
-			><small>See All</small></a
 		>
-	{:else if isArtistPage && header.title.includes('Videos')}
+	{:else if pageIsArtist && header.title.includes('Videos')}
 		<a
 			style="white-space:pre; display: inline-block;"
 			href={`/playlist/${header?.browseId}`}><small>See All</small></a
@@ -150,7 +144,6 @@
 							{item}
 							{isBrowseEndpoint}
 							index={i}
-							bind:section
 						/>
 					{:else if type == 'artist' || type == 'home'}
 						<CarouselItem
@@ -160,7 +153,6 @@
 							{isBrowseEndpoint}
 							{item}
 							index={i}
-							bind:section
 						/>
 					{:else if type == 'new'}
 						<!-- content here -->
@@ -169,7 +161,6 @@
 							aspectRatio={item.aspectRatio}
 							{item}
 							index={i}
-							bind:section
 						/>
 					{/if}
 				{/each}

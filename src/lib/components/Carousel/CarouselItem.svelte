@@ -6,16 +6,10 @@
 	import list from '$lib/stores/list'
 	import type { CarouselItem, Item } from '$lib/types'
 	import { notify } from '$lib/utils'
-	import {
-		alertHandler,
-		currentTitle,
-		key,
-		showAddToPlaylistPopper
-	} from '$stores/stores'
+	import { currentTitle, key, showAddToPlaylistPopper } from '$stores/stores'
 	import { tick } from 'svelte'
 	import { PopperButton, PopperStore } from '../Popper'
 	import { browseHandler } from './functions'
-	export let section
 	export let index
 	export let item: CarouselItem
 	export let type = ''
@@ -134,18 +128,11 @@
 	type CustomEvent = Event & {
 		currentTarget: EventTarget & HTMLImageElement
 	}
-	let errorCount = 0
 	const errorHandler = (event: CustomEvent) => {
-		if (errorCount !== 1) {
-			event.currentTarget.onerror = null
+		event.currentTarget.onerror = null
 
-			event.currentTarget.src =
-				'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjNDI0MjQyIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA1LjU0IDE2Ni43OTQpIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCZxdW90O1NlZ29lIFVJJnF1b3Q7LFJvYm90byxPeHlnZW4sVWJ1bnR1LENhbnRhcmVsbCwmcXVvdDtPcGVuIFNhbnMmcXVvdDssJnF1b3Q7SGVsdmV0aWNhIE5ldWUmcXVvdDssc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNmYWZhZmEiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiA1NC44MzkpIiBkPSJNMCAwaDcydjE0Ni4zMjNIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+'
-		} else {
-			errorCount += 1
-			event.currentTarget.onerror = null
-			event.currentTarget.src = item.thumbnails[0].original_url
-		}
+		event.currentTarget.src =
+			'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjNDI0MjQyIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA1LjU0IDE2Ni43OTQpIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCZxdW90O1NlZ29lIFVJJnF1b3Q7LFJvYm90byxPeHlnZW4sVWJ1bnR1LENhbnRhcmVsbCwmcXVvdDtPcGVuIFNhbnMmcXVvdDssJnF1b3Q7SGVsdmV0aWNhIE5ldWUmcXVvdDssc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNmYWZhZmEiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiA1NC44MzkpIiBkPSJNMCAwaDcydjE0Ni4zMjNIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+'
 	}
 	const clickHandler = async (event: Event, index) => {
 		loading = true
@@ -243,10 +230,11 @@
 	let node: HTMLElement
 
 	let windowWidth
-	$: active = windowWidth < 640 ? true : false
+	let active
+	// $: active = windowWidth < 640 ? true : false
 </script>
 
-<svelte:window bind:innerWidth={windowWidth} />
+<!-- <svelte:window bind:innerWidth={windowWidth} /> -->
 <article
 	class:item16x9={RATIO_RECT ? true : false}
 	class:item1x1={RATIO_SQUARE ? true : false}
@@ -427,11 +415,6 @@
 			opacity: 0.1;
 			// z-index: 1;
 		}
-		@media screen and (max-width: 640px) {
-			&::before {
-				opacity: 1;
-			}
-		}
 
 		&:active:hover::before {
 			// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
@@ -450,6 +433,14 @@
 			object-fit: cover;
 			min-width: 100%;
 			// min-height: 100%;
+		}
+		@media screen and (max-width: 640px) {
+			&::before {
+				// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
+				background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
+				opacity: 0.7;
+				z-index: 1;
+			}
 		}
 	}
 	.active {

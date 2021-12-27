@@ -96,6 +96,14 @@
 		return {
 			destroy() {
 				node.removeEventListener('click', handleClick)
+				node.removeEventListener(
+					'keydown',
+					(e) => {
+						if (e.code !== 'Space') return
+						node.click()
+					},
+					true
+				)
 				window.removeEventListener('resize', handleResize)
 				window.removeEventListener('scroll', handleScroll, true)
 			}

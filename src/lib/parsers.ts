@@ -19,8 +19,6 @@ function thumbnailTransformer(url) {
 	if (!url.includes('lh3.googleusercontent.com')) {
 		const split_url: string = url.split('?')
 		const webp_url = split_url[0]
-			.replace(/\/vi\//, '/vi_webp/')
-			.replace(/\.jpg|\.png/, '.webp')
 		output.url = webp_url
 		output.placeholder = webp_url?.replace('sddefault', 'default')
 		// console.log(output.placeholder, output.url, webp_url)
