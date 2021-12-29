@@ -49,7 +49,11 @@ const metatags = (): Store => {
 			url: 'https://beatbump.ml' + url
 		}))
 	const image = (image) =>
-		update((i) => ({ ...i, image: image, 'og:image': image }))
+		update((i) => ({
+			...i,
+			image: 'https://beatbump.ml' + image,
+			'og:image': 'https://beatbump.ml' + image
+		}))
 	const init = (
 		_title,
 		_url,
