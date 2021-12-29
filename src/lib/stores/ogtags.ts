@@ -45,8 +45,8 @@ const metatags = (): Store => {
 	const url = (url) =>
 		update((u) => ({
 			...u,
-			'og:url': import.meta.env.VITE_SITE_URL + url,
-			url: import.meta.env.VITE_SITE_URL + url
+			'og:url': 'https://beatbump.ml' + url,
+			url: 'https://beatbump.ml' + url
 		}))
 	const image = (image) =>
 		update((i) => ({ ...i, image: image, 'og:image': image }))
