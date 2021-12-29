@@ -19,8 +19,8 @@ const tags: Tags = {
 	description: 'Unlock your music',
 	url: 'https://beatbump.ml/',
 	type: 'website',
-	image: '/logo.svg',
-	'og:image': '/logo.svg',
+	image: '/favicon.png',
+	'og:image': '/favicon.png',
 	'og:description': 'Unlock your music',
 	'og:type': 'website',
 	'og:url': 'https://beatbump.ml/'
@@ -50,7 +50,7 @@ const metatags = (): Store => {
 		}))
 	const image = (image) =>
 		update((i) => ({ ...i, image: image, 'og:image': image }))
-	const init = (_title, _url, _desc, _image = '/logo.svg') => {
+	const init = (_title, _url, _desc, _image = '/favicon.png') => {
 		_title && title(_title)
 		_url && url(_url)
 		_desc && desc(_desc)
