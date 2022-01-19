@@ -90,6 +90,7 @@
 	}
 	let items
 	$: !error && (items = $search)
+	// $: console.log(items)
 </script>
 
 <!-- {JSON.stringify(results)} -->

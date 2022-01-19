@@ -44,7 +44,7 @@ export interface Song {
 	params?: string
 	autoMixList?: string
 	thumbnails: Array<Thumbnail>
-	length?: string
+	length?: string & { text?: string }
 	explicit?: boolean
 	hash?: string
 	playlistSetVideoId?: string

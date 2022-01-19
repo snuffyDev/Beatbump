@@ -123,13 +123,14 @@ export async function get({ query }): Promise<SearchOutput> {
 const parsePlaylist = (contents): PlaylistSearch[] => {
 	return contents.map(({ musicResponsiveListItemRenderer }) => {
 		const thumbnails =
-			musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail
-				.thumbnails
+			musicResponsiveListItemRenderer?.thumbnail?.musicThumbnailRenderer
+				?.thumbnail?.thumbnails
 		const browseId =
-			musicResponsiveListItemRenderer.navigationEndpoint.browseEndpoint.browseId
+			musicResponsiveListItemRenderer?.navigationEndpoint?.browseEndpoint
+				?.browseId
 		const title =
-			musicResponsiveListItemRenderer.flexColumns[0]
-				.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text
+			musicResponsiveListItemRenderer?.flexColumns[0]
+				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]?.text
 		const flexColumns = pb(
 			musicResponsiveListItemRenderer,
 			'musicResponsiveListItemFlexColumnRenderer',
@@ -173,11 +174,11 @@ const parseSong = (contents, type): Song[] => {
 			const album: {
 				text
 				navigationEndpoint: { browseEndpoint: { browseId } }
-			}[] = albumArr.slice(2, 3)
+			} = albumArr.at(-3)
 
 			albumInfo = {
-				browseId: album[0]?.navigationEndpoint?.browseEndpoint?.browseId,
-				title: album[0]?.text
+				browseId: album?.navigationEndpoint?.browseEndpoint?.browseId,
+				title: album?.text
 			}
 		} else {
 			albumInfo = null

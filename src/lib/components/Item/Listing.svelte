@@ -256,13 +256,17 @@
 				{:else}
 					<p class="text-artist">
 						by
-						<a
-							sveltekit:prefetch
-							on:click|preventDefault={() =>
-								goto(`/artist/${data.artistInfo?.artist[0]?.browseId}`)}
-							href={`/artist/${data.artistInfo?.artist[0]?.browseId}`}
-							>{data.artistInfo?.artist[0].text || data.artistInfo?.artist}</a
-						>
+						{#each data?.artistInfo.artist as artist, i}
+							<a
+								sveltekit:prefetch
+								on:click|preventDefault={() =>
+									goto(`/artist/${artist?.browseId}`)}
+								href={`/artist/${artist?.browseId}`}>{artist.text}</a
+							>
+							{#if i !== data?.artistInfo.artist.length - 1}
+								<span> & </span>
+							{/if}
+						{/each}
 					</p>
 				{/if}
 				<span class="album">
@@ -294,7 +298,6 @@
 							: ''
 				}}
 				type="search"
-				bind:isHidden
 				items={DropdownItems}
 			/>
 		</div>
