@@ -63,13 +63,16 @@
 					const playlist = playlists[e.detail]
 					const items = [...playlist?.items, item]
 					const promise = await db.updatePlaylist({
-						items: Array.isArray(item) ? [...item] : item
+						items: items
 					})
 					showAddToPlaylistPopper.set({ state: false, item: undefined })
-					// console.log({
-					// 	name: playlists[e.detail].name,
-					// 	item
-					// })
+					console.log(
+						{
+							name: playlists[e.detail].name,
+							item
+						},
+						promise
+					)
 				}}
 				items={playlists}
 				on:create={() => {

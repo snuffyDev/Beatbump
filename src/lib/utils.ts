@@ -51,10 +51,7 @@ export const getSrc = async (
 	playlistId?: string,
 	params?: string
 ): Promise<{ body: string; error?: boolean }> => {
-	const webM =
-		browser && JSON.parse(localStorage.getItem('preferWebM')) === true
-			? true
-			: false
+	const webM = false
 
 	const res = await fetch(
 		`/api/player.json?videoId=${videoId}${

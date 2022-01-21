@@ -38,6 +38,10 @@ export const filterAutoPlay = derived(
 	settings,
 	($settings) => $settings?.dedupe
 )
+export const preferWebM = derived(
+	settings,
+	($settings) => $settings?.preferWebM
+)
 export const currentMix = writable({
 	videoId: '',
 	playlistId: '',

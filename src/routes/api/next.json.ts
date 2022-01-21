@@ -28,7 +28,7 @@ export async function get({
 					client: {
 						clientName: 'WEB_REMIX',
 						clientVersion: '0.1',
-						visitorData: 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D'
+						visitorData: 'Cgs3UUllOTNTZmxSQSjw6ayPBg%3D%3D'
 					},
 					user: {
 						lockedSafetyMode: false
@@ -38,32 +38,26 @@ export async function get({
 					// 	clickTrackingParams: `${clickTracking}`
 					// }
 				},
-				continuation: `${ctoken}`,
+				continuation: ctoken,
 				isAudioOnly: true,
 				enablePersistentPlaylistPanel: true,
 				params: `${params ? encodeURIComponent(params) : itct}`,
 				tunerSettingValue: 'AUTOMIX_SETTING_NORMAL',
 				videoId: `${videoId}`,
-				playlistSetVideoId: setVideoId,
+				playlistSetVideoId: `${setVideoId}`,
 				playlistId: `${playlistId}`,
-				watchEndpointMusicConfig: {
-					hasPersistentPlaylistPanel: true,
-					musicVideoType: type ? type : 'MUSIC_VIDEO_TYPE_ATV'
+				watchEndpointMusicSupportedConfigs: {
+					watchEndpointMusicConfig: {
+						musicVideoType: type ? `${type}` : 'MUSIC_VIDEO_TYPE_ATV'
+					}
 				}
 			}),
 			headers: {
 				'Content-Type': 'application/json; charset=utf-8',
-				'X-Goog-AuthUser': '0',
-				'x-origin': 'https://music.youtube.com',
-
-				'X-Goog-Visitor-Id': 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D',
-				'x-youtube-client-name': '67',
-				'x-youtube-client-version': '1.20210901.00.00',
-				'x-youtube-device':
-					'cbr=Edge+Chromium&cbrver=93.0.961.38&ceng=WebKit&cengver=537.36&cos=Windows&cosver=10.0&cplatform=DESKTOP&cyear=2011',
-				'x-youtube-page-label': 'youtube.music.web.client_20210901_00_RC00',
-
-				'x-youtube-utc-offset': '-240',
+				'user-agent':
+					'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36 Edg/97.0.1072.62',
+				'x-goog-authuser': '0',
+				'x-goog-visitor-id': 'Cgs3UUllOTNTZmxSQSjw6ayPBg%3D%3D',
 				Origin: 'https://music.youtube.com'
 			}
 		}

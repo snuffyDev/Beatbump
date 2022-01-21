@@ -157,6 +157,7 @@ export default {
 								name: name ?? playlistItem.name,
 								thumbnail: thumbnail ?? playlistItem?.thumbnail,
 								description: description ?? playlistItem.description,
+								length: items.length,
 								items: Array.isArray(items)
 									? [...items]
 									: [...playlistItem.items]

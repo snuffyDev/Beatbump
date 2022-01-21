@@ -141,7 +141,7 @@ export default {
 				configType: type
 			})
 			const data = await response
-			await getSrc(videoId ?? data.results[0].videoId, playlistId, playerParams)
+			getSrc(videoId ?? data.results[0].videoId, playlistId, playerParams)
 			currentTitle.set(data.results[0].title)
 
 			loading = false

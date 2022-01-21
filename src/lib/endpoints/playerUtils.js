@@ -40,39 +40,39 @@ export const sort = (data, WebM = false) => {
 		const formatParent = streamingData['formats'].concat(
 			streamingData['adaptiveFormats']
 		)
-		for (let i = 0; i < formatParent.length; i++) {
-			const element = formatParent[i];
-			let url;
-			WebM === true && element.mimeType.includes('audio') && element.audioChannels === 2 && element.audioQuality.includes('AUDIO_QUALITY_MEDIUM') &&
-				(element.mimeType.includes('mp4') || element.mimeType.includes('webm')) && (url = parseProxyRedir(element.url)) && ((
-					element.mimeType = element.mimeType.includes('mp4') ? 'mp4' : 'webm')) && arr.push({ original_url: element.url, url: url, mimeType: element.mimeType })
-			WebM === false && element.mimeType.includes('audio') && element.audioChannels === 2 && element.audioQuality.includes('AUDIO_QUALITY_MEDIUM') &&
-				(element.mimeType.includes('mp4')) && (url = parseProxyRedir(element.url)) && ((
-					element.mimeType = 'mp4')) && arr.push({ original_url: element.url, url: url, mimeType: element.mimeType })
-		}
-		// formatParent.map((i) => {
-		// 	if (
-		// 		WebM === true &&
-		// 		i.mimeType.includes('audio') &&
-		// 		i.audioChannels === 2 &&
-		// 		i.audioQuality.includes('AUDIO_QUALITY_MEDIUM') &&
-		// 		(i.mimeType.includes('mp4') || i.mimeType.includes('webm'))
-		// 	) {
-		// 		i.url = parseProxyRedir(i.url)
-		// 		i.mimeType = i.mimeType.includes('mp4') ? 'mp4' : 'webm'
-		// 		return arr.push(i)
-		// 	} else if (
-		// 		WebM === false &&
-		// 		i.mimeType.includes('audio') &&
-		// 		i.audioChannels === 2 &&
-		// 		i.audioQuality.includes('AUDIO_QUALITY_MEDIUM') &&
-		// 		i.mimeType.includes('mp4')
-		// 	) {
-		// 		i.url = parseProxyRedir(i.url)
-		// 		i.mimeType = 'mp4'
-		// 		return arr.push(i)
-		// 	}
-		// })
+		// for (let i = 0; i < formatParent.length; i++) {
+		// 	const element = formatParent[i];
+		// 	let url;
+		// 	WebM === true && element.mimeType.includes('audio') && element.audioChannels === 2 && element.audioQuality.includes('AUDIO_QUALITY_MEDIUM') &&
+		// 		(element.mimeType.includes('mp4') || element.mimeType.includes('webm')) && (url = parseProxyRedir(element.url)) && ((
+		// 			element.mimeType = element.mimeType.includes('mp4') ? 'mp4' : 'webm')) && arr.push({ original_url: element.url, url: url, mimeType: element.mimeType })
+		// 	WebM === false && element.mimeType.includes('audio') && element.audioChannels === 2 && element.audioQuality.includes('AUDIO_QUALITY_MEDIUM') &&
+		// 		(element.mimeType.includes('mp4')) && (url = parseProxyRedir(element.url)) && ((
+		// 			element.mimeType = 'mp4')) && arr.push({ original_url: element.url, url: url, mimeType: element.mimeType })
+		// }
+		formatParent.map((i) => {
+			if (
+				WebM === true &&
+				i.mimeType.includes('audio') &&
+				i.audioChannels === 2 &&
+				i.audioQuality.includes('AUDIO_QUALITY_MEDIUM') &&
+				(i.mimeType.includes('mp4') || i.mimeType.includes('webm'))
+			) {
+
+				i.mimeType = i.mimeType.includes('mp4') ? 'mp4' : 'webm'
+				return arr.push({ original_url: i.url, url: parseProxyRedir(i.url), mimeType: i.mimeType })
+			} else if (
+				WebM === false &&
+				i.mimeType.includes('audio') &&
+				i.audioChannels === 2 &&
+				i.audioQuality.includes('AUDIO_QUALITY_MEDIUM') &&
+				i.mimeType.includes('mp4')
+			) {
+				i.url = parseProxyRedir(i.url)
+				i.mimeType = 'mp4'
+				return arr.push({ original_url: i.url, url: parseProxyRedir(i.url), mimeType: i.mimeType })
+			}
+		})
 		if (arr.length !== 0) {
 			return arr
 		}

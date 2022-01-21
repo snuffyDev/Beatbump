@@ -35,7 +35,7 @@
 		}
 	}
 	const player: HTMLAudioElement = browser ? new Audio() : new NodeAudio()
-	$: player.autoplay = $updateTrack !== undefined ? true : false
+	$: player.autoplay = $updateTrack.url !== undefined ? true : false
 
 	$: player.src = $updateTrack.url
 	$: isWebkit = $iOS
@@ -90,14 +90,7 @@
 	/*
 		Player Event Listeners
 	 */
-	player.addEventListener('load', () => {
-		if ('mediaSession' in navigator) {
-			navigator.mediaSession.setPositionState({
-				duration: player.duration,
-				position: player.currentTime
-			})
-		}
-	})
+
 	player.addEventListener('loadedmetadata', () => {
 		setPosition()
 		isPlaying = true
