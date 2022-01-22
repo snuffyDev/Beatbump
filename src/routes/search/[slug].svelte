@@ -124,7 +124,7 @@
 									invalidate(
 										`/search/${
 											$page.url.pathname
-										}?filter=${$url.searchParams.get('filter')}`
+										}?filter=${$page.url.searchParams.get('filter')}`
 									);
 								}}
 								href={`/search/${didYouMean.term}?filter=${didYouMean.endpoint.params}`}

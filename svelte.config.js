@@ -36,6 +36,7 @@ const config = {
 			template: 'src/app.html',
 			hooks: 'src/hooks'
 		},
+
 		vite: {
 			resolve: {
 				alias: {
