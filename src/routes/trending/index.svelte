@@ -1,33 +1,35 @@
-<script context="module">
-	let path
+<script context="module" lang="ts">
+	import type { Load } from '@sveltejs/kit';
 
-	export async function load({ fetch, stuff }) {
-		const response = await fetch('/trending.json?q=browse')
-		const data = await response.json()
+	let path;
+
+	export const load: Load = async ({ fetch, stuff }) => {
+		const response = await fetch('/trending.json?q=browse');
+		const data = await response.json();
 		if (!response.ok) {
 			return {
 				status: response.status,
-				error: new Error(`Error: ${response.statusText}`)
-			}
+				error: Error(`Error: ${response.statusText}`)
+			};
 		}
-		path = stuff.page
+		path = stuff.page;
 		return {
 			props: {
 				carouselItems: await data
 			},
 			maxage: 3600,
 			status: 200
-		}
-	}
+		};
+	};
 </script>
 
 <script lang="ts">
-	export let carouselItems: ICarousel
+	export let carouselItems: ICarousel;
 
-	import Carousel from '$components/Carousel/Carousel.svelte'
-	import type { ICarousel } from '$lib/types'
-	import Header from '$lib/components/Layouts/Header.svelte'
-	$: console.log(carouselItems)
+	import Carousel from '$components/Carousel/Carousel.svelte';
+	import type { ICarousel } from '$lib/types';
+	import Header from '$lib/components/Layouts/Header.svelte';
+	// $: console.log(carouselItems)
 </script>
 
 <Header

@@ -1,20 +1,20 @@
 <script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit'
-	import { api } from '$lib/api'
-	export const load: Load = async ({ page, fetch }) => {
+	import type { Load } from '@sveltejs/kit';
+	import { api } from '$lib/api';
+	export const load: Load = async ({ params, fetch }) => {
 		const response = await api(fetch, {
-			browseId: page.params.slug,
+			browseId: params.slug,
 			endpoint: 'browse',
 			path: 'artist',
 			type: 'artist'
-		})
+		});
 		let {
 			carousels,
 			description,
 			thumbnail,
 			header,
 			songs
-		} = await response.body
+		} = await response.body;
 		// console.log({ carousels, description, thumbnail, header, songs })
 		if (response.ok) {
 			return {
@@ -25,40 +25,40 @@
 					thumbnail,
 					header,
 					songs,
-					id: page.params.slug
+					id: params.slug
 				},
 				status: 200
-			}
+			};
 		}
-	}
+	};
 </script>
 
 <script lang="ts">
-	import Carousel from '$lib/components/Carousel/Carousel.svelte'
-	import ArtistPageHeader from '../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte'
-	import { page } from '$app/stores'
+	import Carousel from '$lib/components/Carousel/Carousel.svelte';
+	import ArtistPageHeader from '../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte';
+	import { page } from '$app/stores';
 
-	import ListItem from '$components/ListItem/ListItem.svelte'
-	import { isPagePlaying } from '$lib/stores/stores'
-	import { setContext } from 'svelte'
-	import Header from '$lib/components/Layouts/Header.svelte'
-	import type { Thumbnail } from '$lib/types'
-	export let header
-	export let description
-	export let thumbnail: Array<Thumbnail> = []
-	export let carousels
-	export let songs = []
-	export let id
-	let width
-	const ctx = {}
-	// $: console.log(header, carousels, songs, $page.path)
-	setContext(ctx, { pageId: id })
+	import ListItem from '$components/ListItem/ListItem.svelte';
+	import { isPagePlaying } from '$lib/stores/stores';
+	import { setContext } from 'svelte';
+	import Header from '$lib/components/Layouts/Header.svelte';
+	import type { Thumbnail } from '$lib/types';
+	export let header;
+	export let description;
+	export let thumbnail: Array<Thumbnail> = [];
+	export let carousels;
+	export let songs = [];
+	export let id;
+	let width;
+	const ctx = {};
+	// $: console.log(header, carousels, songs, $page.url.pathname)
+	setContext(ctx, { pageId: id });
 </script>
 
 <Header
 	title={header?.name == undefined ? 'Artist' : header?.name}
 	desc={header?.name}
-	url={$page.path}
+	url={$page.url.pathname}
 	image={thumbnail && thumbnail[0]?.url}
 />
 <ArtistPageHeader {description} {header} {width} {thumbnail} />
@@ -82,7 +82,7 @@
 							{ctx}
 							page="artist"
 							on:pagePlaying={() => {
-								isPagePlaying.set(id)
+								isPagePlaying.set(id);
 							}}
 						/>
 					{/each}

@@ -1,18 +1,18 @@
 <script lang="ts">
-	import Icon from '$lib/components/Icon/Icon.svelte'
+	import Icon from '$lib/components/Icon/Icon.svelte';
 
-	import Listing from '$lib/components/Item/Listing.svelte'
+	import Listing from '$lib/components/Item/Listing.svelte';
 
-	import db from '$lib/db'
+	import db from '$lib/db';
 
-	import { onMount, setContext } from 'svelte'
-	let value
-	let songs = []
-	setContext({}, 'library')
+	import { onMount, setContext } from 'svelte';
+	let value;
+	let songs = [];
+	setContext({}, 'library');
 	onMount(async () => {
-		songs = await db.getFavorites()
-	})
-	$: console.log(value, songs)
+		songs = await db.getFavorites();
+	});
+	// $: console.log(value, songs)
 
 	let options = [
 		{
@@ -26,7 +26,7 @@
 			label: 'A-Z',
 			params: 'az',
 			action: () => {
-				songs = [...songs.sort((a, b) => a.title.localeCompare(b.title))]
+				songs = [...songs.sort((a, b) => a.title.localeCompare(b.title))];
 				// console.log('az', songs)
 			}
 		},
@@ -34,11 +34,11 @@
 			label: 'Z-A',
 			params: 'za',
 			action: () => {
-				songs = [...songs.sort((a, b) => b.title.localeCompare(a.title))]
+				songs = [...songs.sort((a, b) => b.title.localeCompare(a.title))];
 				// console.log('za', songs)
 			}
 		}
-	]
+	];
 </script>
 
 <main>
@@ -64,7 +64,7 @@
 		<section>
 			{#key songs}
 				{#each songs as song}
-					<Listing isLibrary={true} data={song} />
+					<Listing data={song} />
 				{/each}
 			{/key}
 		</section>

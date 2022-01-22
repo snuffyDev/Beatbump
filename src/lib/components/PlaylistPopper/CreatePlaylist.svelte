@@ -1,81 +1,81 @@
 <script lang="ts">
-	import { browser } from '$app/env'
-	import { goto } from '$app/navigation'
-	import { page } from '$app/stores'
-	import db from '$lib/db'
+	import { browser } from '$app/env';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import db from '$lib/db';
 
-	import { showAddToPlaylistPopper } from '$lib/stores/stores'
+	import { showAddToPlaylistPopper } from '$lib/stores/stores';
 
-	import { createEventDispatcher, onMount } from 'svelte'
-	import { fade, fly } from 'svelte/transition'
-	import Icon from '../Icon/Icon.svelte'
-	import Modal from '../Modal'
+	import { createEventDispatcher, onMount } from 'svelte';
+	import { fade, fly } from 'svelte/transition';
+	import Icon from '../Icon/Icon.svelte';
+	import Modal from '../Modal';
 	export let defaults: {
-		name?: string
-		thumbnail?: any
-		description?: string
-		id?: string
-	} = {}
-	export let hasFocus = false
-	export let isLocalPlaylist = false
-	let files: Blob & FileList
-	let thumbnail = defaults?.thumbnail ?? undefined
-	let deletePlaylistRequest = false
+		name?: string;
+		thumbnail?: any;
+		description?: string;
+		id?: string;
+	} = {};
+	export let hasFocus = false;
+	export let isLocalPlaylist = false;
+	let files: Blob & FileList;
+	let thumbnail = defaults?.thumbnail ?? undefined;
+	let deletePlaylistRequest = false;
 	const crop = () => {
-		if (!browser && !thumbnail) return
-		const sourceImage = new Image()
-		sourceImage.src = thumbnail
-		const outputAspectRatio = 1
+		if (!browser && !thumbnail) return;
+		const sourceImage = new Image();
+		sourceImage.src = thumbnail;
+		const outputAspectRatio = 1;
 		sourceImage.onload = () => {
-			const sourceWidth = sourceImage.naturalWidth
-			const sourceHeight = sourceImage.naturalHeight
+			const sourceWidth = sourceImage.naturalWidth;
+			const sourceHeight = sourceImage.naturalHeight;
 
-			const aspectRatio = sourceWidth / sourceHeight
+			const aspectRatio = sourceWidth / sourceHeight;
 
-			let outputWidth = sourceWidth
-			let outputHeight = sourceHeight
+			let outputWidth = sourceWidth;
+			let outputHeight = sourceHeight;
 			if (aspectRatio > outputAspectRatio) {
-				outputWidth = sourceHeight * outputAspectRatio
+				outputWidth = sourceHeight * outputAspectRatio;
 			} else if (aspectRatio < outputAspectRatio) {
-				outputHeight = sourceWidth / outputAspectRatio
+				outputHeight = sourceWidth / outputAspectRatio;
 			}
-			const outputX = (outputWidth - sourceWidth) * 0.5
-			const outputY = (outputHeight - sourceHeight) * 0.5
+			const outputX = (outputWidth - sourceWidth) * 0.5;
+			const outputY = (outputHeight - sourceHeight) * 0.5;
 
-			const output = document.createElement('canvas')
-			output.width = outputWidth
-			output.height = outputHeight
+			const output = document.createElement('canvas');
+			output.width = outputWidth;
+			output.height = outputHeight;
 
-			const ctx = output.getContext('2d')
+			const ctx = output.getContext('2d');
 
-			ctx.drawImage(sourceImage, outputX, outputY)
-			thumbnail = output.toDataURL()
-		}
-	}
+			ctx.drawImage(sourceImage, outputX, outputY);
+			thumbnail = output.toDataURL();
+		};
+	};
 	const readFiles = (files) => {
-		const reader = new FileReader()
+		const reader = new FileReader();
 		reader.addEventListener('load', () => {
-			let result = reader.result
-			thumbnail = result
-			crop()
-		})
-		reader.readAsDataURL(files)
-	}
-	let titleValue = defaults?.name ?? undefined
-	let descriptionValue = defaults?.description ?? undefined
-	$: if (files) readFiles(files[0])
+			let result = reader.result;
+			thumbnail = result;
+			crop();
+		});
+		reader.readAsDataURL(files);
+	};
+	let titleValue = defaults?.name ?? undefined;
+	let descriptionValue = defaults?.description ?? undefined;
+	$: if (files) readFiles(files[0]);
 	onMount(() => {
-		const wrapper = document.getElementById('wrapper')
-		if (!$page.path.includes('/search/')) {
-			wrapper.classList.add('soft-no-scroll')
+		const wrapper = document.getElementById('wrapper');
+		if (!$page.url.pathname.includes('/search/')) {
+			wrapper.classList.add('soft-no-scroll');
 		}
 		return () => {
-			if (!$page.path.includes('/search/')) {
-				wrapper.classList.remove('soft-no-scroll')
+			if (!$page.url.pathname.includes('/search/')) {
+				wrapper.classList.remove('soft-no-scroll');
 			}
-		}
-	})
-	const dispatch = createEventDispatcher()
+		};
+	});
+	const dispatch = createEventDispatcher();
 </script>
 
 {#if hasFocus}
@@ -85,7 +85,7 @@
 		transition:fade={{ duration: 125 }}
 		on:scroll|preventDefault
 		on:click={() => {
-			dispatch('close')
+			dispatch('close');
 		}}
 	/>
 {/if}
@@ -93,7 +93,7 @@
 	<Modal
 		zIndex={200}
 		on:close={() => {
-			deletePlaylistRequest = false
+			deletePlaylistRequest = false;
 		}}
 	>
 		<div class="header" slot="header">
@@ -124,17 +124,17 @@
 				<button
 					class="button"
 					on:click|preventDefault={() => {
-						deletePlaylistRequest = false
+						deletePlaylistRequest = false;
 					}}>Cancel</button
 				>
 				<button
 					class="danger outlined"
 					on:click|preventDefault={async () => {
-						db.deletePlaylist(defaults?.id)
-						deletePlaylistRequest = false
+						db.deletePlaylist(defaults?.id);
+						deletePlaylistRequest = false;
 
-						dispatch('close')
-						goto('/library')
+						dispatch('close');
+						goto('/library');
 					}}>Delete Playlist</button
 				>
 			</div>
@@ -169,7 +169,7 @@
 				title: titleValue,
 				description: descriptionValue,
 				thumbnail
-			})
+			});
 		}}
 	>
 		<div class="input-row">
@@ -188,7 +188,7 @@
 				<button
 					class="danger"
 					on:click|preventDefault={() => {
-						deletePlaylistRequest = true
+						deletePlaylistRequest = true;
 					}}>Delete Playlist</button
 				>
 			</div>
@@ -197,7 +197,7 @@
 			<button
 				class="danger outlined"
 				on:click|preventDefault={() => {
-					dispatch('close')
+					dispatch('close');
 				}}>Cancel</button
 			>
 			<button
@@ -207,7 +207,7 @@
 						title: titleValue,
 						description: descriptionValue,
 						thumbnail
-					})
+					});
 				}}>{isLocalPlaylist ? 'Save Changes' : 'Create Playlist'}</button
 			>
 		</div>

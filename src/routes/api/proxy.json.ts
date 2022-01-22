@@ -1,4 +1,4 @@
-import type { EndpointOutput } from '@sveltejs/kit'
+import type { EndpointOutput, RequestHandler } from '@sveltejs/kit'
 const http = async (url, type, headers) => {
 	return fetch(url, { headers })
 		.then((response) => {
@@ -14,7 +14,10 @@ const http = async (url, type, headers) => {
 		})
 		.catch((err) => console.error(err))
 }
-export async function get({ query }) {
+
+export const get: RequestHandler = async ({ url: _url }) => {
+	const query = _url.searchParams
+
 	const type = query.get('type') || 'arrayBuffer'
 	let url: string = query.get('url')
 	url = decodeURIComponent(url)

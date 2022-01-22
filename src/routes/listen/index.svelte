@@ -1,7 +1,8 @@
-<script context="module">
-	export async function load({ page, fetch }) {
-		const id = page.query.get('id')
-		const playlist = page.query.get('list') || undefined
+<script context="module" lang="ts">
+	import type { Load } from '@sveltejs/kit'
+	export const load: Load = async ({ url, params, fetch }) => {
+		const id = url.searchParams.get('id')
+		const playlist = url.searchParams.get('list') || undefined
 		// const meta = await get('player', { videoId: id })
 		// const data = await meta.body
 

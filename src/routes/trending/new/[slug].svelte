@@ -1,22 +1,25 @@
-<script context="module">
-	export async function load({ page, fetch }) {
-		// const params = page.query.get('params')
+<script context="module" lang="ts">
+	import type { Load } from '@sveltejs/kit';
+	export const load: Load = async ({ params, fetch, url }) => {
+		// const params = url.searchParams.get('params')
 		const response = await fetch(
-			`/trending/new/${page.params.slug}.json` +
+			`/trending/new/${params.slug}.json` +
 				`${
-					page.query.get('params') ? `?params=${page.query.get('params')}` : ''
+					url.searchParams.get('params')
+						? `?params=${url.searchParams.get('params')}`
+						: ''
 				}` +
 				`${
-					page.query.get('itct')
-						? `&itct=${encodeURIComponent(page.query.get('itct'))}`
+					url.searchParams.get('itct')
+						? `&itct=${encodeURIComponent(url.searchParams.get('itct'))}`
 						: ''
 				}`
-		)
+		);
 		const {
 			sections = [],
 			header = '',
 			title = [] || ''
-		} = await response.json()
+		} = await response.json();
 		// console.log(sections, header, title)
 		if (response.ok) {
 			return {
@@ -26,30 +29,30 @@
 					title
 				},
 				status: 200
-			}
+			};
 		}
-	}
+	};
 </script>
 
 <script lang="ts">
-	import type { sections } from '$lib/types/components/sections'
-	export let sections: sections
+	import type { sections } from '$lib/types/components/sections';
+	export let sections: sections;
 
-	export let header
+	export let header;
 	// export let data
-	export let title: string
-	import { goto } from '$app/navigation'
-	import Header from '$lib/components/Layouts/Header.svelte'
-	import { Grid, GridItem } from '$lib/components/Grid'
-	import list from '$lib/stores/list'
-	import { page } from '$app/stores'
-	import Carousel from '$lib/components/Carousel/Carousel.svelte'
+	export let title: string;
+	import { goto } from '$app/navigation';
+	import Header from '$lib/components/Layouts/Header.svelte';
+	import { Grid, GridItem } from '$lib/components/Grid';
+	import list from '$lib/stores/list';
+	import { page } from '$app/stores';
+	import Carousel from '$lib/components/Carousel/Carousel.svelte';
 	// $: console.log(data, sections, header, title)
 </script>
 
 <Header
 	title={title ? title.replace(',', ' ') : ''}
-	url={$page.path}
+	url={$page.url.pathname}
 	desc="The latest in music"
 />
 

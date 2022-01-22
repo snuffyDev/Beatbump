@@ -1,5 +1,6 @@
-<script context="module">
-	export async function load({ fetch, stuff }) {
+<script context="module" lang="ts">
+	import type { Load } from '@sveltejs/kit'
+	export const load: Load = async ({ fetch, stuff }) => {
 		const data = await fetch('/explore.json?browseId=FEmusic_moods_and_genres')
 		const response = await data.json()
 

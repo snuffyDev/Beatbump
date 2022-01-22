@@ -3,6 +3,7 @@ import {
 	MusicTwoRowItemRenderer
 } from '$lib/parsers'
 import type { CarouselHeader, CarouselItem } from '$lib/types'
+import type { RequestHandler } from '@sveltejs/kit'
 
 type destructure = {
 	contents: {
@@ -17,7 +18,8 @@ type destructure = {
 		}
 	}
 }
-export async function get({ params }) {
+
+export const get: RequestHandler = async ({ url, params }) => {
 	const { slug } = params
 
 	const response = await fetch(

@@ -7,12 +7,9 @@ import {
 import type { CarouselHeader } from '$lib/types'
 import type { ICarouselTwoRowItem } from '$lib/types/musicCarouselTwoRowItem'
 import type { IListItemRenderer } from '$lib/types/musicListItemRenderer'
-import type { EndpointOutput } from '@sveltejs/kit'
-interface Response extends EndpointOutput {
-	body?: string | Record<string, any>
-	error?: Error
-}
-export async function get({ query }): Promise<Response> {
+import type { RequestHandler } from '@sveltejs/kit'
+export const get: RequestHandler = async ({ url }) => {
+	const query = url.searchParams
 	let ctoken = query.get('ctoken') || ''
 	let itct = query.get('itct') || ''
 	itct = decodeURIComponent(itct)

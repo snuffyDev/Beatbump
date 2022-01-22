@@ -1,87 +1,87 @@
 <script lang="ts">
-	import type { CarouselHeader } from '$lib/types'
+	import type { CarouselHeader } from '$lib/types';
 
-	import CarouselItem from './CarouselItem.svelte'
-	import Icon from '$components/Icon/Icon.svelte'
-	import { page } from '$app/stores'
-	import { onMount } from 'svelte'
+	import CarouselItem from './CarouselItem.svelte';
+	import Icon from '$components/Icon/Icon.svelte';
+	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
 
-	export let header: CarouselHeader
-	export let items = []
-	export let type = ''
-	export let kind = 'normal'
-	export let isBrowseEndpoint
+	export let header: CarouselHeader;
+	export let items = [];
+	export let type = '';
+	export let kind = 'normal';
+	export let isBrowseEndpoint;
 
-	let arr = []
-	let moreOnLeft, moreOnRight
+	let arr = [];
+	let moreOnLeft, moreOnRight;
 	if (items.length > 3) {
-		arr = [...splitArray(items, 4)]
+		arr = [...splitArray(items, 4)];
 	} else {
-		arr = [[...items]]
+		arr = [[...items]];
 	}
 
 	function splitArray(flatArray, numCols) {
-		const newArray = []
+		const newArray = [];
 		for (let c = 0; c < numCols; c++) {
-			newArray.push([])
+			newArray.push([]);
 		}
 		for (let i = 0; i < flatArray.length; i++) {
-			const mod = i % numCols
-			newArray[mod].push(flatArray[i])
+			const mod = i % numCols;
+			newArray[mod].push(flatArray[i]);
 		}
-		return newArray
+		return newArray;
 	}
-	let idx = 0
-	let carousel: HTMLDivElement
+	let idx = 0;
+	let carousel: HTMLDivElement;
 
-	let group = []
+	let group = [];
 	onMount(() => {
-		let frame
+		let frame;
 
 		function scrollHandler() {
-			if (!carousel) return
-			moreOnLeft = carousel.scrollLeft < 15 ? false : true
+			if (!carousel) return;
+			moreOnLeft = carousel.scrollLeft < 15 ? false : true;
 			moreOnRight =
 				carousel.scrollLeft < carousel.scrollWidth - carousel.clientWidth - 15
 					? true
-					: false
-			cancelAnimationFrame(frame)
+					: false;
+			cancelAnimationFrame(frame);
 		}
-		frame = requestAnimationFrame(scrollHandler)
+		frame = requestAnimationFrame(scrollHandler);
 
 		carousel !== undefined &&
 			carousel.addEventListener(
 				'scroll',
 				() => {
-					frame = requestAnimationFrame(scrollHandler)
+					frame = requestAnimationFrame(scrollHandler);
 				},
 				{ passive: true }
-			)
+			);
 
 		return () => {
-			cancelAnimationFrame(frame)
+			cancelAnimationFrame(frame);
 			carousel.removeEventListener(
 				'scroll',
 				() => {
-					frame = requestAnimationFrame(scrollHandler)
+					frame = requestAnimationFrame(scrollHandler);
 				},
 				true
-			)
-		}
+			);
+		};
 		// let rectValue: any = 0
-	})
+	});
 	// $: if (carousel) carousel.scrollLeft += $tween
-	const pageIsArtist = $page.path.includes('/artist/')
+	const pageIsArtist = $page.url.pathname.includes('/artist/');
 
 	let notArtistPageURLs = header.browseId?.includes('VLP')
 		? `/playlist/${header?.browseId}`
 		: `/trending/new/${header?.browseId}${
 				header?.params ? `?params=${header?.params}` : ''
-		  }${header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ''}`
+		  }${header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ''}`;
 	let href =
 		header?.browseId && pageIsArtist
 			? `/artist/releases?browseId=${header?.browseId}&params=${header?.params}&itct=${header?.itct}`
-			: notArtistPageURLs
+			: notArtistPageURLs;
 </script>
 
 <div class="header">
@@ -107,12 +107,12 @@
 		class="left"
 		class:hidden={!moreOnLeft}
 		on:click={() => {
-			if (!arr || idx == 0) return
-			idx--
-			let child = group[idx].children
-			let rect = child[0].getBoundingClientRect()
+			if (!arr || idx == 0) return;
+			idx--;
+			let child = group[idx].children;
+			let rect = child[0].getBoundingClientRect();
 
-			carousel.scrollLeft += rect.left
+			carousel.scrollLeft += rect.left;
 		}}
 	>
 		<Icon name="chevron-left" size="1.5em" />
@@ -122,11 +122,11 @@
 		class="right"
 		class:hidden={!moreOnRight}
 		on:click={() => {
-			if (!arr || idx == group.length - 1) return
-			idx++
-			let child = group[idx].children
-			let rect = child[0].getBoundingClientRect()
-			carousel.scrollLeft += rect.left
+			if (!arr || idx == group.length - 1) return;
+			idx++;
+			let child = group[idx].children;
+			let rect = child[0].getBoundingClientRect();
+			carousel.scrollLeft += rect.left;
 		}}
 	>
 		<Icon name="chevron-right" size="1.5em" />

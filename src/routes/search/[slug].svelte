@@ -1,16 +1,18 @@
-<script context="module">
-	let path
-	export async function load({ page, fetch, stuff }) {
-		const slug = page.params.slug
-		const filter = page.query.get('filter') || ''
-		path = stuff.page
+<script context="module" lang="ts">
+	import type { Load } from '@sveltejs/kit';
+
+	let path;
+	export const load: Load = async ({ url, params, fetch, stuff }) => {
+		const slug = params.slug;
+		const filter = url.searchParams.get('filter') || '';
+		path = stuff.page;
 		// console.log(filter, page, slug)
-		const url = `/api/search.json?q=${encodeURIComponent(slug)}${
+		const apiUrl = `/api/search.json?q=${encodeURIComponent(slug)}${
 			filter !== '' ? `&filter=${encodeURIComponent(filter)}` : ''
-		}`
-		const response = await fetch(url)
-		const data = await response.json()
-		const { contents = {}, continuation = {}, didYouMean, error } = await data
+		}`;
+		const response = await fetch(apiUrl);
+		const data = await response.json();
+		const { contents = {}, continuation = {}, didYouMean, error } = await data;
 
 		if (response.ok) {
 			return {
@@ -22,41 +24,41 @@
 					error
 				},
 				status: 200
-			}
+			};
 		}
-	}
+	};
 </script>
 
 <script lang="ts">
-	export let continuation: NextContinuationData
-	export let contents
-	export let didYouMean
-	export let error
-	export let filter
+	export let continuation: NextContinuationData;
+	export let contents;
+	export let didYouMean;
+	export let error;
+	export let filter;
 
-	import { page } from '$app/stores'
-	import { invalidate } from '$app/navigation'
-	import Listing from '$components/Item/Listing.svelte'
-	import type { Item, NextContinuationData } from '$lib/types'
-	import VirtualList from '$lib/components/SearchList/VirtualList.svelte'
+	import { page } from '$app/stores';
+	import { invalidate } from '$app/navigation';
+	import Listing from '$components/Item/Listing.svelte';
+	import type { Item, NextContinuationData } from '$lib/types';
+	import VirtualList from '$lib/components/SearchList/VirtualList.svelte';
 
-	import Header from '$lib/components/Layouts/Header.svelte'
-	import { notify } from '$lib/utils'
-	import { writable } from 'svelte/store'
-	const search = writable<Array<Item>>()
-	$: !error && search.set(contents)
-	let title
-	let songTitle = title || $page.params.slug
-	title = songTitle
-	let ctoken = continuation.continuation
-	let itct = continuation.clickTrackingParams
-	let isLoading = false
-	let hasData = false
+	import Header from '$lib/components/Layouts/Header.svelte';
+	import { notify } from '$lib/utils';
+	import { writable } from 'svelte/store';
+	const search = writable<Array<Item>>();
+	$: !error && search.set(contents);
+	let title;
+	let songTitle = title || $page.params.slug;
+	title = songTitle;
+	let ctoken = continuation.continuation;
+	let itct = continuation.clickTrackingParams;
+	let isLoading = false;
+	let hasData = false;
 
 	async function paginate() {
-		if (isLoading || hasData) return
+		if (isLoading || hasData) return;
 		try {
-			isLoading = true
+			isLoading = true;
 			const response = await fetch(
 				`/api/search.json?q=` +
 					`&filter=` +
@@ -64,32 +66,32 @@
 					`&params=${itct}${
 						continuation.continuation ? `&ctoken=${ctoken}` : ''
 					}`
-			)
-			const newPage = await response.json()
-			const res = await newPage
+			);
+			const newPage = await response.json();
+			const res = await newPage;
 
 			if (newPage?.error) {
-				error = newPage?.error
+				error = newPage?.error;
 			}
 			if (res.continuation.continuation) {
-				ctoken = res.continuation.continuation
-				itct = res.continuation.clickTrackingParams
-				search.update((u) => [...u, ...res.contents])
-				isLoading = false
-				hasData = newPage.length === 0
-				return hasData
+				ctoken = res.continuation.continuation;
+				itct = res.continuation.clickTrackingParams;
+				search.update((u) => [...u, ...res.contents]);
+				isLoading = false;
+				hasData = newPage.length === 0;
+				return hasData;
 			}
-			return !isLoading
+			return !isLoading;
 		} catch (error) {
-			hasData = null
-			isLoading = false
+			hasData = null;
+			isLoading = false;
 			return {
 				error: new Error(error + ' Unable to get more!')
-			}
+			};
 		}
 	}
-	let items
-	$: !error && (items = $search)
+	let items;
+	$: !error && (items = $search);
 	// $: console.log(items)
 </script>
 
@@ -120,8 +122,10 @@
 								sveltekit:prefetch
 								on:click={() => {
 									invalidate(
-										`/search/${$page.path}?filter=${$page.query.get('filter')}`
-									)
+										`/search/${
+											$page.url.pathname
+										}?filter=${$url.searchParams.get('filter')}`
+									);
 								}}
 								href={`/search/${didYouMean.term}?filter=${didYouMean.endpoint.params}`}
 								>{didYouMean.term}?</a
@@ -133,7 +137,7 @@
 		</section>
 		<VirtualList
 			on:endList={() => {
-				paginate()
+				paginate();
 			}}
 			bind:isLoading
 			bind:hasData

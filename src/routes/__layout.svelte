@@ -1,11 +1,11 @@
 <script context="module" lang="ts">
 	import type { Load } from '@sveltejs/kit'
-	export const load: Load = async ({ page }) => {
+	export const load: Load = async ({ url }) => {
 		return {
 			props: {
-				key: page.path
+				key: url.pathname
 			},
-			stuff: { page: page.path }
+			stuff: { page: url.pathname }
 		}
 	}
 </script>

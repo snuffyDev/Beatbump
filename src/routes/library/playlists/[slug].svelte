@@ -2,8 +2,8 @@
 	export const ssr = false
 	import type { Load } from '@sveltejs/kit'
 	import { onMount, setContext, tick } from 'svelte'
-	export const load: Load = async ({ page }) => {
-		const playlistName = page.params.slug
+	export const load: Load = async ({ params }) => {
+		const playlistName = params.slug
 		return {
 			props: {
 				playlistName
@@ -24,7 +24,7 @@
 	import Header from '$lib/components/Layouts/Header.svelte'
 	import { page } from '$app/stores'
 	import CreatePlaylist from '$lib/components/PlaylistPopper/CreatePlaylist.svelte'
-import ListInfoBar from '$lib/components/ListInfoBar'
+	import ListInfoBar from '$lib/components/ListInfoBar'
 
 	export let playlistName
 	const ctx = {}
@@ -140,7 +140,7 @@ import ListInfoBar from '$lib/components/ListInfoBar'
 			}
 		]}
 	/>
-<ListInfoBar  />
+	<ListInfoBar />
 	<List {items} let:item let:index let:send let:receive>
 		<ListItem
 			{ctx}

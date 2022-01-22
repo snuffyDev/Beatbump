@@ -1,5 +1,7 @@
-export async function get({ query, headers }): Promise<EndpointOutput> {
-	// if (headers.origin !== 'https://beatbump.ml/') {
+import type { RequestHandler } from '@sveltejs/kit'
+
+export const get: RequestHandler = async ({ url }) => {
+	const query = url.searchParams // if (headers.origin !== 'https://beatbump.ml/') {
 	// 	return { status: 403, body: JSON.stringify('CORS error!') }
 	// }
 

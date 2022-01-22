@@ -1,6 +1,7 @@
 import type { RequestHandler } from '@sveltejs/kit'
 
-export const get: RequestHandler<Record<string, any>> = async ({ query }) => {
+export const get: RequestHandler = async ({ url }) => {
+	const query = url.searchParams
 	const videoId = query.get('videoId') || ''
 	const playlistId = query.get('list') || ''
 	const playerParams = query.get('playerParams') || ''

@@ -1,9 +1,11 @@
-<script context="module">
-	export async function load({ page, fetch, stuff }) {
-		const response = await fetch(`/explore/${page.params.slug}.json`)
-		const { sections, header, type } = await response.json()
+<script context="module" lang="ts">
+	import type { Load } from '@sveltejs/kit';
 
-		let path = stuff.page
+	export const load: Load = async ({ page, fetch, stuff }) => {
+		const response = await fetch(`/explore/${page.params.slug}.json`);
+		const { sections, header, type } = await response.json();
+
+		let path = stuff.page;
 		return {
 			props: {
 				sections,
@@ -12,18 +14,18 @@
 				path
 			},
 			status: 200
-		}
-	}
+		};
+	};
 </script>
 
 <script lang="ts">
-	import Carousel from '$lib/components/Carousel/Carousel.svelte'
-	import { Grid, GridItem } from '$lib/components/Grid'
-	import Header from '$lib/components/Layouts/Header.svelte'
-	export let sections
-	export let path
-	export let header
-	export let type
+	import Carousel from '$lib/components/Carousel/Carousel.svelte';
+	import { Grid, GridItem } from '$lib/components/Grid';
+	import Header from '$lib/components/Layouts/Header.svelte';
+	export let sections;
+	export let path;
+	export let header;
+	export let type;
 </script>
 
 <Header

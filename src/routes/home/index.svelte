@@ -1,7 +1,8 @@
 <script context="module" lang="ts">
+	import type { Load } from '@sveltejs/kit'
 	let path
 
-	export async function load({ fetch, stuff }) {
+	export const load: Load = async ({ fetch, stuff }) => {
 		const response = await fetch('/home.json')
 		const data = await response.json()
 		if (!response.ok) {

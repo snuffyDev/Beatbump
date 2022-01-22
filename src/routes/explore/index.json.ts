@@ -1,6 +1,8 @@
+import type { RequestHandler } from '@sveltejs/kit'
 import BaseContext from '../api/_modules/context'
 
-export async function get({ query }) {
+export const get: RequestHandler = async ({ url }) => {
+	const query = url.searchParams
 	const browseId = query.get('browseId')
 
 	const response = await fetch(

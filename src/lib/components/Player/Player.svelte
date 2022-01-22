@@ -1,64 +1,60 @@
 <script lang="ts">
-	import { browser } from '$app/env'
-	import { goto } from '$app/navigation'
-	import Icon from '$components/Icon/Icon.svelte'
-	import db from '$lib/db'
-	import { clickOutside } from '$lib/actions/clickOutside'
-	import list from '$lib/stores/list'
-	import { getSrc, shuffle } from '$lib/utils'
+	import { browser } from '$app/env';
+	import { goto } from '$app/navigation';
+	import Icon from '$components/Icon/Icon.svelte';
+	import db from '$lib/db';
+	import { clickOutside } from '$lib/actions/clickOutside';
+	import list from '$lib/stores/list';
+	import { getSrc, shuffle } from '$lib/utils';
 	import {
 		currentTitle,
 		iOS,
 		key,
 		playerLoading,
 		updateTrack
-	} from '$stores/stores'
-	import { onMount, tick } from 'svelte'
+	} from '$stores/stores';
+	import { onMount, tick } from 'svelte';
 
-	import { cubicOut } from 'svelte/easing'
-	import { tweened } from 'svelte/motion'
-	import { fade } from 'svelte/transition'
-	import { PopperButton } from '../Popper'
-	import Controls from './Controls.svelte'
-	import keyboardHandler from './keyboardHandler'
-	import Queue from './Queue.svelte'
-	import QueueListItem from './QueueListItem.svelte'
+	import { cubicOut } from 'svelte/easing';
+	import { tweened } from 'svelte/motion';
+	import { fade } from 'svelte/transition';
+	import { PopperButton } from '../Popper';
+	import Controls from './Controls.svelte';
+	import keyboardHandler from './keyboardHandler';
+	import Queue from './Queue.svelte';
+	import QueueListItem from './QueueListItem.svelte';
 	class NodeAudio {
-		constructor(...args) {
-			this.addEventListener('play', this.play)
-		}
-		play(arg0: string, play: any) {
-			//
-		}
+		constructor() {}
 		addEventListener(arg0: string, play: any) {
 			//
 		}
 	}
-	const player: HTMLAudioElement = browser ? new Audio() : new NodeAudio()
-	$: player.autoplay = $updateTrack.url !== undefined ? true : false
+	const player: HTMLAudioElement = browser ? new Audio() : new NodeAudio();
+	$: player.autoplay = $updateTrack.url !== null ? true : false;
 
-	$: player.src = $updateTrack.url
-	$: isWebkit = $iOS
-	let title
+	// $: browser && console.log($updateTrack.url, $updateTrack.originalUrl);
+	$: player.src = $updateTrack.url !== null ? $updateTrack.url : '';
+	$: isWebkit = $iOS;
+	let title;
 
-	$: autoId = $key
+	$: autoId = $key;
 
-	$: time = player.currentTime
-	let duration = 0
-	let remainingTime = 0
+	$: time = player.currentTime;
+	let duration = 0;
+	let remainingTime = 0;
 
-	$: volume = 0.5
-	$: player.volume = volume
-	let volumeHover
-	let isPlaying = false
-	let seeking = false
-	let songBar
-	let seekBar
-	let hoverWidth
-	let showing
-	let hovering
-	let DropdownItems = []
-	let once = false
+	$: volume = 0.5;
+	$: player.volume = volume;
+	let volumeHover;
+	let isPlaying = false;
+	let seeking = false;
+	let songBar;
+	let seekBar;
+	let hoverWidth;
+	let showing;
+	let hovering;
+	let DropdownItems = [];
+	let once = false;
 	// $: console.log($list, autoId, $key, $updateTrack)
 
 	/*
@@ -66,39 +62,39 @@
 	 */
 	const play = () => {
 		if ('mediaSession' in navigator) {
-			navigator.mediaSession.playbackState = 'playing'
+			navigator.mediaSession.playbackState = 'playing';
 		}
-		isPlaying = true
+		isPlaying = true;
 
 		// metaDataHandler()
-	}
+	};
 	const pause = () => {
 		if ('mediaSession' in navigator) {
-			navigator.mediaSession.playbackState = 'paused'
+			navigator.mediaSession.playbackState = 'paused';
 		}
-		isPlaying = false
-		player.pause()
-	}
+		isPlaying = false;
+		player.pause();
+	};
 	const setPosition = () => {
 		if ('mediaSession' in navigator) {
 			navigator.mediaSession.setPositionState({
 				duration: isWebkit ? player.duration / 2 : player.duration,
 				position: player.currentTime
-			})
+			});
 		}
-	}
+	};
 	/*
 		Player Event Listeners
 	 */
 
 	player.addEventListener('loadedmetadata', () => {
-		setPosition()
-		isPlaying = true
+		setPosition();
+		isPlaying = true;
 		window.bbPlayer = {
 			src: $updateTrack.originalUrl,
 			duration: player.duration,
 			title: $list.mix[autoId].title
-		}
+		};
 
 		DropdownItems = [
 			{
@@ -109,8 +105,8 @@
 						behavior: 'smooth',
 						top: 0,
 						left: 0
-					})
-					goto(`/artist/${$list.mix[autoId].artistInfo.artist[0].browseId}`)
+					});
+					goto(`/artist/${$list.mix[autoId].artistInfo.artist[0].browseId}`);
 				}
 			},
 			{
@@ -118,8 +114,8 @@
 				icon: 'heart',
 				action: async () => {
 					// console.log(data)
-					if (!browser) return
-					await db.setNewFavorite($list.mix[autoId])
+					if (!browser) return;
+					await db.setNewFavorite($list.mix[autoId]);
 				}
 			},
 			{
@@ -127,30 +123,30 @@
 				icon: 'shuffle',
 				action: () => {
 					// console.log(data)
-					const _list = $list.mix
-					$list.mix = [...shuffle(_list, autoId)]
+					const _list = $list.mix;
+					$list.mix = [...shuffle(_list, autoId)];
 					// console.log($list.mix)
 				}
 			}
 		].filter((item) => {
 			{
 				if (!$list?.mix[autoId]?.artistInfo?.artist[0]?.browseId) {
-					return
+					return;
 				} else {
-					return item
+					return item;
 				}
 			}
-		})
+		});
 
-		metaDataHandler()
-	})
+		metaDataHandler();
+	});
 
 	player.addEventListener('timeupdate', async () => {
-		time = player.currentTime
-		duration = player.duration
-		remainingTime = duration - time
+		time = player.currentTime;
+		duration = player.duration;
+		remainingTime = duration - time;
 		if (document.visibilityState !== 'hidden') {
-			$progress = isWebkit == true ? time * 2 : time
+			$progress = isWebkit == true ? time * 2 : time;
 		}
 		/* This checks if the user is on an iOS device
 		 	 due to the length of a song being doubled on iOS,
@@ -158,65 +154,71 @@
 		*/
 		if (isWebkit && remainingTime <= duration / 2 && once == false) {
 			// await getNext()
-			player.currentTime = player.currentTime * 2
+			player.currentTime = player.currentTime * 2;
 		}
-	})
+	});
 	player.addEventListener('pause', () => {
-		isPlaying = false
-		pause()
-	})
+		isPlaying = false;
+		pause();
+	});
 
-	player.addEventListener('play', () => play())
+	player.addEventListener('play', () => play());
 
-	player.addEventListener('ended', () => getNext())
+	player.addEventListener('ended', () => getNext());
 
 	player.addEventListener('seeked', () => {
-		if (!isPlaying) return
-		play()
-	})
+		if (!isPlaying) return;
+		play();
+	});
 
 	/*
 		Metadata Handler
 	*/
 	function metaDataHandler() {
 		// <!-- if (!player.src) return -->
-
-		if ('mediaSession' in navigator) {
-			navigator.mediaSession.metadata = new MediaMetadata({
-				title: $list.mix[autoId || 0]?.title,
-				artist: $list.mix[autoId || 0]?.artistInfo?.artist[0].text || null,
-				album: $list.mix[autoId || 0]?.album?.title ?? undefined,
-				artwork: $list.mix[autoId || 0]?.thumbnails.map((thumbnail) => ({
+		let thumbnails = [];
+		$list.mix[autoId]?.thumbnails.forEach((thumbnail) => {
+			thumbnails = [
+				...thumbnails,
+				{
 					src: thumbnail.url,
 					sizes: `${thumbnail.width}x${thumbnail.height}`,
 					type: 'image/jpeg'
-				}))
-			})
+				}
+			];
+		});
+		if ('mediaSession' in navigator) {
+			navigator.mediaSession.metadata = new MediaMetadata({
+				title: $list.mix[autoId]?.title,
+				artist: $list.mix[autoId]?.artistInfo?.artist[0].text || null,
+				album: $list.mix[autoId]?.album?.title ?? undefined,
+				artwork: thumbnails
+			});
 			navigator.mediaSession.setActionHandler('play', (session) => {
-				const _play = player.play()
+				const _play = player.play();
 
 				if (_play !== undefined) {
 					_play
 						.then(() => {
-							play()
+							play();
 						})
 						.catch((error) => {
-							console.error(error)
-						})
+							console.error(error);
+						});
 				}
-			})
-			navigator.mediaSession.setActionHandler('pause', pause)
+			});
+			navigator.mediaSession.setActionHandler('pause', pause);
 			navigator.mediaSession.setActionHandler('seekto', (session) => {
 				if (session.fastSeek && 'fastSeek' in player) {
-					player.fastSeek(session.seekTime)
-					setPosition()
-					return
+					player.fastSeek(session.seekTime);
+					setPosition();
+					return;
 				}
-				player.currentTime = session.seekTime
-				setPosition()
-			})
-			navigator.mediaSession.setActionHandler('previoustrack', prevBtn)
-			navigator.mediaSession.setActionHandler('nexttrack', () => getNext())
+				player.currentTime = session.seekTime;
+				setPosition();
+			});
+			navigator.mediaSession.setActionHandler('previoustrack', prevBtn);
+			navigator.mediaSession.setActionHandler('nexttrack', () => getNext());
 		}
 	}
 	/*
@@ -224,18 +226,18 @@
 	*/
 
 	async function getNext() {
-		once = true
+		once = true;
 
 		if (autoId == $list.mix.length - 1) {
 			if (!$list.continuation && !$list.clickTrackingParams) {
-				autoId++
-				key.set(autoId)
-				await list.moreLikeThis($list.mix[$list.mix.length - 1])
-				await tick()
-				getTrackURL()
+				autoId++;
+				key.set(autoId);
+				await list.moreLikeThis($list.mix[$list.mix.length - 1]);
+				await tick();
+				getTrackURL();
 
-				once = false
-				return
+				once = false;
+				return;
 			}
 			list.getMore(
 				$list.mix[autoId]?.itct,
@@ -244,18 +246,18 @@
 				$list.continuation,
 				$list.clickTrackingParams,
 				autoId + 1
-			)
-			autoId++
-			key.set(autoId)
-			once = false
+			);
+			autoId++;
+			key.set(autoId);
+			once = false;
 		} else {
 			try {
-				autoId++
-				key.set(autoId)
-				getTrackURL()
-				once = false
+				autoId++;
+				key.set(autoId);
+				getTrackURL();
+				once = false;
 			} catch (error) {
-				console.error('Error!', error)
+				console.error('Error!', error);
 			}
 		}
 	}
@@ -264,25 +266,25 @@
 		return getSrc($list.mix[autoId].videoId)
 			.then(({ body, error }) => {
 				if (error === true) {
-					getNext()
-					return error
+					getNext();
+					return error;
 				}
-				currentTitle.set($list.mix[autoId].title)
-				return body
+				currentTitle.set($list.mix[autoId].title);
+				return body;
 			})
 			.catch((err) => {
-				console.error('URL Error! ' + err)
-				return err
-			})
+				console.error('URL Error! ' + err);
+				return err;
+			});
 	}
 
 	function prevBtn() {
 		if (!autoId || autoId < 0) {
-			console.log('cant do that!')
+			console.log('cant do that!');
 		} else {
-			autoId--
-			key.set(autoId)
-			getTrackURL()
+			autoId--;
+			key.set(autoId);
+			getTrackURL();
 		}
 	}
 
@@ -292,62 +294,63 @@
 	const progress = tweened(0, {
 		duration: duration,
 		easing: cubicOut
-	})
+	});
 	function trackMouse(event) {
-		if (seeking) seekAudio(event)
-		if (hovering) hoverEvent(event)
+		if (seeking) seekAudio(event);
+		if (hovering) hoverEvent(event);
 	}
 	function seek(event, bounds) {
-		let x = event.pageX - bounds.left
+		let x = event.pageX - bounds.left;
 
-		return Math.min(Math.max(x / bounds.width, 0), 1)
+		return Math.min(Math.max(x / bounds.width, 0), 1);
 	}
 	function hoverEvent(event) {
-		if (!songBar) return
-		hoverWidth = hover(event, songBar.getBoundingClientRect())
+		if (!songBar) return;
+		hoverWidth = hover(event, songBar.getBoundingClientRect());
 	}
 	function hover(event, bounds) {
-		let x = event.clientX + bounds.left
-		return Math.min(Math.max(x / bounds.width, 0), 1)
+		let x = event.clientX + bounds.left;
+		return Math.min(Math.max(x / bounds.width, 0), 1);
 	}
 
 	function seekAudio(event) {
-		if (!songBar && isPlaying === false) return
+		if (!songBar && isPlaying === false) return;
 
-		player.currentTime = seek(event, songBar.getBoundingClientRect()) * duration
+		player.currentTime =
+			seek(event, songBar.getBoundingClientRect()) * duration;
 		player.currentTime =
 			isWebkit == true
 				? (seek(event, songBar.getBoundingClientRect()) * duration) / 2
-				: seek(event, songBar.getBoundingClientRect()) * duration
+				: seek(event, songBar.getBoundingClientRect()) * duration;
 	}
 
 	const shortcut = {
 		Comma: () => {
-			prevBtn()
+			prevBtn();
 		},
 		Period: () => {
-			getNext()
+			getNext();
 		},
 		Space: () => {
-			if (!player && !player.src) return
+			if (!player && !player.src) return;
 			if (!isPlaying) {
-				const _play = player.play()
+				const _play = player.play();
 				if (_play !== undefined) {
 					_play
 						.then(() => {
-							play()
+							play();
 						})
 						.catch((error) => {
-							console.error(error)
-						})
+							console.error(error);
+						});
 				} else {
-					player.play()
+					player.play();
 				}
 			} else {
-				pause()
+				pause();
 			}
 		}
-	}
+	};
 </script>
 
 <svelte:window
@@ -360,18 +363,18 @@
 	transition:fade
 	on:click={seekAudio}
 	on:pointerdown={() => {
-		seeking = false
-		hovering = false
+		seeking = false;
+		hovering = false;
 	}}
 	on:pointerup={() => {
-		seeking = false
-		hovering = false
+		seeking = false;
+		hovering = false;
 	}}
 	on:pointerleave={(event) => {
-		hovering = false
+		hovering = false;
 	}}
 	on:pointerenter={(e) => {
-		hovering = true
+		hovering = true;
 	}}
 >
 	{#if hovering}
@@ -387,7 +390,7 @@
 	<div
 		style="background:inherit;"
 		on:click_outside={() => {
-			showing = false
+			showing = false;
 		}}
 		use:clickOutside
 		class="player-left"
@@ -405,17 +408,17 @@
 					<QueueListItem
 						{ctxKey}
 						on:removeItem={async () => {
-							showing = true
+							showing = true;
 							if (index == $key) {
-								key.set(index - 1)
-								await tick()
-								getNext()
+								key.set(index - 1);
+								await tick();
+								getNext();
 							}
 						}}
 						on:updated={async (event) => {
-							key.set(index - 1)
-							await tick()
-							getNext()
+							key.set(index - 1);
+							await tick();
+							getNext();
 						}}
 						{item}
 						{index}
@@ -426,9 +429,9 @@
 		<div
 			on:click={() => {
 				if (showing) {
-					showing = false
+					showing = false;
 				} else {
-					showing = true
+					showing = true;
 				}
 			}}
 			class="listButton player-btn"
@@ -440,13 +443,13 @@
 		bind:isPlaying
 		bind:loading={$playerLoading}
 		on:play={() => {
-			play()
-			player.play()
+			play();
+			player.play();
 		}}
 		{pause}
 		nextBtn={() => {
-			if ($list.mix.length === 0) return
-			getNext()
+			if ($list.mix.length === 0) return;
+			getNext();
 		}}
 		{prevBtn}
 	/>

@@ -56,8 +56,11 @@ async function fetchAndCache(request: Request) {
 worker.addEventListener('fetch', (event) => {
 	if (event.request.method !== 'GET' || event.request.headers.has('range'))
 		return
-	if (!(event.request.url.indexOf('http') === 0)) return
-	if (event.request.cache === 'only-if-cached' && event.request.mode !== 'same-origin')
+
+	if (
+		event.request.cache === 'only-if-cached' &&
+		event.request.mode !== 'same-origin'
+	)
 		return
 	const url = new URL(event.request.url)
 

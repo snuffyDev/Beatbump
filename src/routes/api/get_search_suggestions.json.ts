@@ -1,4 +1,7 @@
-export async function get({ query }) {
+import type { RequestHandler } from '@sveltejs/kit'
+
+export const get: RequestHandler = async ({ url }) => {
+	const query = url.searchParams
 	let q = query.get('q')
 	q = decodeURIComponent(q)
 	const response = await fetch(

@@ -1,14 +1,10 @@
 import BaseContext from '$api/_modules/context'
 import { parseArtistPage } from '$lib/js/artistUtils'
 import type { ICarousel } from '$lib/types'
-import type { EndpointOutput } from '@sveltejs/kit'
+import type { EndpointOutput, RequestHandler } from '@sveltejs/kit'
 
-export async function get({
-	query
-}: {
-	query: URLSearchParams
-}): Promise<EndpointOutput> {
-	const browseId = query.get('browseId')
+export const get: RequestHandler = async ({ url }) => {
+	const browseId = url.searchParams.get('browseId')
 	try {
 		const response = await fetch(
 			`https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,

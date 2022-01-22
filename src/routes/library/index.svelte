@@ -13,7 +13,6 @@
 
 	import { onMount, setContext } from 'svelte'
 	import Grid from './_components/Grid/Grid.svelte'
-	import Popup from './_components/Popup.svelte'
 	import Sync from './_Sync.svelte'
 	let favorites
 	let playlists

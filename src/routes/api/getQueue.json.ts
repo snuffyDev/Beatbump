@@ -1,12 +1,9 @@
 import { PlaylistPanelVideoRenderer } from '$lib/parsers'
 import type { Song } from '$lib/types'
-import type { IPlaylistItem } from '$lib/types/playlist'
-import type { EndpointOutput } from '@sveltejs/kit'
-export async function get({
-	query
-}: {
-	query: URLSearchParams
-}): Promise<EndpointOutput> {
+import type { RequestHandler } from '@sveltejs/kit'
+
+export const get: RequestHandler = async ({ url }) => {
+	const query = url.searchParams
 	const playlistId = query.get('playlistId') || ''
 	try {
 		const response = await fetch(

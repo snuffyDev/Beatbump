@@ -1,15 +1,12 @@
 /* eslint-disable no-inner-declarations */
 import { parseContents } from '$lib/endpoints/nextUtils'
 
-import type { EndpointOutput } from '@sveltejs/kit'
+import type { EndpointOutput, RequestHandler } from '@sveltejs/kit'
 
 // import NextParser from "/nextUtils";
 
-export async function get({
-	query
-}: {
-	query: URLSearchParams
-}): Promise<EndpointOutput> {
+export const get: RequestHandler = async ({ url }) => {
+	const query = url.searchParams
 	const params = query.get('params') || undefined
 	const itct = query.get('itct') || ''
 	const videoId = query.get('videoId') || ''
@@ -112,7 +109,7 @@ export async function get({
 		)
 		return {
 			status: 200,
-			body: parsed
+			body: JSON.stringify(parsed)
 		}
 	}
 	/*
@@ -145,6 +142,6 @@ export async function get({
 	// console.log(parsed)
 	return {
 		status: 200,
-		body: parsed
+		body: JSON.stringify(parsed)
 	}
 }

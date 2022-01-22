@@ -6,9 +6,11 @@ import {
 import type { CarouselHeader } from '$lib/types'
 import type { ICarouselTwoRowItem } from '$lib/types/musicCarouselTwoRowItem'
 import type { IListItemRenderer } from '$lib/types/musicListItemRenderer'
+import type { RequestHandler } from '@sveltejs/kit'
 
 /* eslint-disable prefer-const */
-export async function get({ params }) {
+
+export const get: RequestHandler = async ({ params }) => {
 	const { slug } = params
 	// const ctx = query.get('params') || ''
 

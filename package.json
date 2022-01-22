@@ -14,7 +14,7 @@
 	"devDependencies": {
 		"@babel/core": "^7.14.0",
 		"@snuffydev/adapter-cloudflare-cache": "^1.0.16",
-		"@sveltejs/adapter-cloudflare": "^1.0.0-next.2",
+		"@sveltejs/adapter-cloudflare": "next",
 		"@sveltejs/adapter-cloudflare-workers": "next",
 		"@sveltejs/adapter-node": "next",
 		"@sveltejs/kit": "next",

@@ -4,14 +4,13 @@ import { parseNextTrack } from './_modules/parsers/next'
 import { parsePlaylist } from './_modules/parsers/playlist'
 import { sendRequest } from './_modules/request'
 
-import type { Request } from '@sveltejs/kit'
-import type { ReadOnlyFormData } from '@sveltejs/kit/types/helper'
+import type { Request, RequestHandler } from '@sveltejs/kit'
+
 type JSON =
 	| string
 	| number
 	| boolean
 	| null
-	| FormDataEntryValue
 	| JSON[]
 	| Record<string, { [key: string]: string; value: string }>
 	| { [key: string]: JSON }
@@ -39,10 +38,11 @@ const Parsers = async (
 	return await Endpoints[`${endpoint}`]()
 }
 
-export const post = async ({ body }: { body: ReadOnlyFormData }) => {
+export const post: RequestHandler = async ({ request: _req }) => {
+	const body = await _req.formData()
 	// console.log(JSON.stringify(body))
-	const endpoint = body.get('endpoint') || ''
-	const path = body.get('path') || ''
+	const endpoint = (body.get('endpoint') as string) || ''
+	const path = (body.get('path') as string) || ''
 
 	if (endpoint === 'player') {
 		const videoId = (body.get('videoId') as string) || ''
@@ -59,14 +59,13 @@ export const post = async ({ body }: { body: ReadOnlyFormData }) => {
 	const type = (body.get('type') as string) || null
 	const playlistId = (body.get('playlistId') as string) || ''
 	const browseId = (body.get('browseId') as string) || ''
-	const continuation = body.get('continuation') || null
+	const continuation = (body.get('continuation') as string) || null
 	const ctx = Context.base(browseId, type)
 	if (path == 'playlist' && browseId && continuation) {
 		console.log('uh oh!')
 		const request = await sendRequest(ctx, {
 			endpoint,
 			type: 'playlist',
-			ref: browseId,
 			playlistId,
 			continuation
 		})

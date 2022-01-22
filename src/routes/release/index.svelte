@@ -1,10 +1,10 @@
 <script context="module" lang="ts">
 	import type { Load } from '@sveltejs/kit'
 	let path
-	export const load: Load = async ({ stuff, page, fetch }) => {
+	export const load: Load = async ({ stuff, url, fetch }) => {
 		path = stuff.page
-		const browseId = page.query.get('id') || ''
-		const pt = page.query.get('type') || ''
+		const browseId = url.searchParams.get('id') || ''
+		const pt = url.searchParams.get('type') || ''
 		const response = await fetch(
 			`/api/main.json?q=&endpoint=browse${
 				browseId ? `&browseId=${browseId}` : ''
@@ -45,7 +45,7 @@
 	import Header from '$lib/components/Layouts/Header.svelte'
 	export let data
 	export let id
-	$: id = $page.query.get('id')
+	$: id = $page.url.searchParams.get('id')
 	const promise = parsePageContents(data)
 	let { items, releaseInfo } = promise
 	// $: console.log(releaseInfo, items, $page)

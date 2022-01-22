@@ -1,9 +1,12 @@
 import { MusicTwoRowItemRenderer } from '$lib/parsers'
+import type { RequestHandler } from '@sveltejs/kit'
 
-export const get = async ({ query }) => {
-	let browseId = query.get('browseId') || ''
-	let params = query.get('params')
-	let itct = query.get('itct') || ''
+export const get: RequestHandler = async ({ url }) => {
+	const query = url.searchParams
+
+	const browseId = query.get('browseId') || ''
+	const params = query.get('params')
+	const itct = query.get('itct') || ''
 	// console.log(visitorID)
 
 	const response = await fetch(

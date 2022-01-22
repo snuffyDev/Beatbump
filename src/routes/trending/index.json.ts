@@ -10,7 +10,8 @@ import type { ICarouselTwoRowItem } from '$lib/types/musicCarouselTwoRowItem'
 import type { IListItemRenderer } from '$lib/types/musicListItemRenderer'
 import type { EndpointOutput, RequestHandler } from '@sveltejs/kit'
 
-export const get: RequestHandler<Record<string, any>> = async ({ query }) => {
+export const get: RequestHandler = async ({ url }) => {
+	const query = url.searchParams
 	const endpoint = query.get('q') || ''
 	const browseId = 'FEmusic_explore'
 	let carouselItems = []

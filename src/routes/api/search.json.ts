@@ -5,13 +5,15 @@ import { MusicResponsiveListItemRenderer } from '$lib/parsers'
 import type { Artist, NextContinuationData, Song } from '$lib/types'
 import type { PlaylistSearch } from '$lib/types/playlist'
 import { pb } from '$lib/utils'
-import type { EndpointOutput } from '@sveltejs/kit'
+import type { EndpointOutput, RequestHandler } from '@sveltejs/kit'
 interface SearchOutput extends EndpointOutput {
 	contents?: Song | PlaylistSearch
 	didYouMean?: { term: string; endpoint: { query; params } }
 	continuation?: NextContinuationData
 }
-export async function get({ query }): Promise<SearchOutput> {
+
+export const get: RequestHandler = async ({ url }) => {
+	const query = url.searchParams
 	let q = query.get('q')
 	q = decodeURIComponent(q)
 	const filter = query.get('filter') || ''

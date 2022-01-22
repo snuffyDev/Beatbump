@@ -1,8 +1,8 @@
-import { dev } from '$app/env'
+import { dev } from '$app/env';
+import type { Handle } from '@sveltejs/kit';
 
-import type { ServerResponse } from '@sveltejs/kit/types/hooks'
-const rootDomain = '*' // or your server IP for dev
-const originURL = '*' // or your server IP for dev
+const rootDomain = '*'; // or your server IP for dev
+const originURL = '*'; // or your server IP for dev
 
 const directives = {
 	'base-uri': ["'self'"],
@@ -59,32 +59,28 @@ const directives = {
 		'https://static.cloudflareinsights.com'
 	],
 	'worker-src': ["'self'"]
-}
+};
 
 const csp = Object.entries(directives)
 	.map(([key, arr]) => key + ' ' + arr.join(' '))
-	.join('; ')
-interface HooksResponse extends ServerResponse {
-	headers: Record<string, string>
-}
-export const handle = async ({ request, resolve }): Promise<HooksResponse> => {
-	request.locals = request.headers
-	const response = await resolve(request)
-	// console.log(request)
+	.join('; ');
+const headers = {
+	'X-Frame-Options': 'SAMEORIGIN',
+	'Referrer-Policy': 'no-referrer',
+	'Access-Control-Allow-Origin': dev ? '*' : originURL,
+	'Permissions-Policy': `accelerometer=(), autoplay="*", camera=(), document-domain=(), encrypted-media=(), fullscreen=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), sync-xhr=(), usb=(), xr-spatial-tracking=(), geolocation=()`,
+	'X-Content-Type-Options': 'nosniff',
+	'Content-Security-Policy': csp,
+	'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload'
+};
+export const handle: Handle = async ({ event, resolve }) => {
+	event.locals = event.request.headers;
+	const response = await resolve(event);
+	Object.entries(headers).forEach(([key, value]) =>
+		response.headers.append(key, value)
+	);
+	// console.log(event.url);
 	// console.log(JSON.stringify(request.headers))
 
-	return {
-		...response,
-		headers: {
-			...response.headers,
-			'X-Frame-Options': 'SAMEORIGIN',
-			'Referrer-Policy': 'no-referrer',
-			'Access-Control-Allow-Origin': dev ? '*' : originURL,
-			'Permissions-Policy': `accelerometer=(), autoplay="*", camera=(), document-domain=(), encrypted-media=(), fullscreen=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), sync-xhr=(), usb=(), xr-spatial-tracking=(), geolocation=()`,
-			'X-Content-Type-Options': 'nosniff',
-			'Content-Security-Policy': csp,
-			'Strict-Transport-Security':
-				'max-age=31536000; includeSubDomains; preload'
-		}
-	}
-}
+	return response;
+};
