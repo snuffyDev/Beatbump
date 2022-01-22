@@ -43,7 +43,7 @@
 	import VirtualList from '$lib/components/SearchList/VirtualList.svelte';
 
 	import Header from '$lib/components/Layouts/Header.svelte';
-	import { notify } from '$lib/utils';
+
 	import { writable } from 'svelte/store';
 	const search = writable<Array<Item>>();
 	$: !error && search.set(contents);

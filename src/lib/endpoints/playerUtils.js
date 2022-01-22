@@ -38,6 +38,7 @@ export const sort = (data, WebM = false) => {
 			return [{ url: null, mimeType: null }]
 		}
 		const formatParent = [...streamingData['formats'], ...streamingData['adaptiveFormats']]
+
 		for (let i = 0; i < formatParent.length; i++) {
 			const element = formatParent[i];
 			let url;
