@@ -76,9 +76,9 @@ const headers = {
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals = event.request.headers;
 	const response = await resolve(event);
-	Object.entries(headers).forEach(([key, value]) =>
-		response.headers.append(key, value)
-	);
+	// Object.entries(headers).forEach(([key, value]) =>
+	// 	response.headers.set(`${key}`, `${value}`)
+	// );
 	// console.log(event.url);
 	// console.log(JSON.stringify(request.headers))
 
