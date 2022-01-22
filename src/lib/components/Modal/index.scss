@@ -10,7 +10,7 @@
 	top: 50%;
 	left: 50%;
 	min-width: 45vw;
-	// width: 100%;
+	width: 100%;
 	min-height: 50%;
 	max-width: 85vw;
 	max-height: 100%;
@@ -20,6 +20,7 @@
 	border-style: solid;
 	transform: translate(-50%, -50%);
 	@media screen and (min-width: 640px) {
+		width: auto;
 		max-width: 75%;
 		max-height: 85%;
 	}
