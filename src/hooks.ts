@@ -1,8 +1,8 @@
 import { dev } from '$app/env';
 import type { Handle } from '@sveltejs/kit';
 
-const rootDomain = '*'; // or your server IP for dev
-const originURL = '*'; // or your server IP for dev
+const rootDomain = import.meta.env.VITE_DOMAIN; // or your server IP for dev
+const originURL = import.meta.env.VITE_SITE_URL; // or your server IP for dev
 
 const directives = {
 	'base-uri': ["'self'"],
@@ -76,9 +76,9 @@ const headers = {
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals = event.request.headers;
 	const response = await resolve(event);
-	// Object.entries(headers).forEach(([key, value]) =>
-	// 	response.headers.set(`${key}`, `${value}`)
-	// );
+	Object.entries(headers).forEach(([key, value]) =>
+		response.headers.set(`${key}`, `${value}`)
+	);
 	// console.log(event.url);
 	// console.log(JSON.stringify(request.headers))
 
