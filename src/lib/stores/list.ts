@@ -172,12 +172,18 @@ export default {
 	},
 	async addNext(item, key) {
 		if (!item) return;
-		const length = await addToQueue(item.videoId);
-		const nextItem = parseNextItem(item, length);
-		mix.splice(key + 1, 0, nextItem);
-		// console.log(mix, nextItem)
-		notify('Added to queue!', 'success');
-		list.set({ currentMixId, clickTrackingParams, continuation, mix });
+
+		try {
+			const length = await addToQueue(item.videoId);
+			const nextItem = parseNextItem(item, length);
+			mix.splice(key + 1, 0, nextItem);
+			// console.log(mix, nextItem)
+			notify(`${item.title} will play next!`, 'success');
+			list.set({ currentMixId, clickTrackingParams, continuation, mix });
+		} catch (err) {
+			notify('Error: ' + err, 'error');
+			console.error(err);
+		}
 	},
 	async moreLikeThis(item) {
 		if (!item) return;

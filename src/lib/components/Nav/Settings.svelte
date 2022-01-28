@@ -1,17 +1,18 @@
 <script>
-	import { fade } from 'svelte/transition'
-	import { circIn } from 'svelte/easing'
-	import { filterAutoPlay, iOS, theme } from '$stores/stores'
-	import { settings } from '$lib/stores/settings'
-	import { queryParams } from '$lib/utils'
+	import { fade } from 'svelte/transition';
+	import { circIn } from 'svelte/easing';
+	import { filterAutoPlay, iOS, theme } from '$stores/stores';
+	import { settings } from '$lib/stores/settings';
+	import { queryParams } from '$lib/utils';
+	import { session } from '$app/stores';
 
-	export let isSettingsOpen
+	export let isSettingsOpen;
 	let themes = [
 		{ name: 'dark' },
 		{ name: 'dim' },
 		{ name: 'midnight' },
 		{ name: 'ytm' }
-	]
+	];
 </script>
 
 {#if isSettingsOpen}
@@ -30,7 +31,7 @@
 					id="select"
 					bind:value={$settings.theme}
 					on:change={() => {
-						localStorage.setItem('theme', $settings.theme)
+						localStorage.setItem('theme', $settings.theme);
 					}}
 				>
 					{#each themes as theme}
@@ -51,11 +52,11 @@
 					localStorage.setItem(
 						'filterAutoPlay',
 						JSON.stringify($settings.dedupe)
-					)
+					);
 				}}
 			/>
 		</div>
-		{#if !$iOS}
+		{#if !$session.iOS}
 			<div class="setting">
 				<label for="checkbox" class="s-text">Prefer WEBM Audio: </label>
 				<input
@@ -66,7 +67,7 @@
 						localStorage.setItem(
 							'preferWebM',
 							JSON.stringify($settings.preferWebM)
-						)
+						);
 					}}
 				/>
 			</div>

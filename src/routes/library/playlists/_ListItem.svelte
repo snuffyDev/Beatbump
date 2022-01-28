@@ -1,29 +1,113 @@
 <script lang="ts">
-	import Icon from '$components/Icon/Icon.svelte'
-	import { currentId, isPagePlaying, key } from '$stores/stores'
-	import { createEventDispatcher } from 'svelte'
-	import list from '$lib/stores/list'
-	export let item: Song
-	export let index
-	export let page
-	export let parentPlaylistId = ''
-	export let ctx = {}
-	export let send
-	export let receive
-	export let dragTargetIndex
-	import { getContext } from 'svelte'
-	import type { Item, Song } from '$lib/types'
-	const { pageId } = getContext(ctx)
-	const dispatch = createEventDispatcher()
+	import Icon from '$components/Icon/Icon.svelte';
+	import { currentId, isPagePlaying, key } from '$stores/stores';
+	import { createEventDispatcher, tick } from 'svelte';
+	import list from '$lib/stores/list';
+	export let item: Song;
+	export let index;
+	export let page;
+	export let parentPlaylistId = '';
+	export let ctx = {};
+	export let send;
+	export let receive;
+	export let dragTargetIndex;
+	import { getContext } from 'svelte';
+	import type { Item, Song } from '$lib/types';
+	import PopperButton from '$lib/components/Popper/PopperButton.svelte';
+	import { goto } from '$app/navigation';
+	import db from '$lib/db';
+	import { notify } from '$lib/utils';
+	const { pageId } = getContext(ctx);
+	const dispatch = createEventDispatcher();
 	function dispatchPlaying() {
 		dispatch('pagePlaying', {
 			isPlaying: true
-		})
+		});
 	}
-	let isHovering = false
-	let parent
+	let isHovering = false;
+	let parent;
+
+	let DropdownItems = [
+		{
+			text: 'View Artist',
+			icon: 'artist',
+			action: async () => {
+				goto(`/artist/${item.artistInfo.artist[0].browseId}`);
+				await tick();
+				window.scrollTo({
+					behavior: 'smooth',
+					top: 0,
+					left: 0
+				});
+			}
+		},
+		{
+			text: 'Remove from Playlist',
+			icon: 'x',
+			action: async () => {
+				const promise = await db.deleteSongFromPlaylist(
+					item.videoId,
+					parentPlaylistId
+				);
+				console.log(promise, item, parentPlaylistId);
+				dispatch('change');
+			}
+		},
+		{
+			text: 'Favorite',
+			icon: 'heart',
+			action: () => {
+				db.setNewFavorite(item);
+			}
+		},
+		{
+			text: 'Share',
+			icon: 'share',
+			action: async () => {
+				let shareData = {
+					title: item.title,
+					text: `Listen to ${item.title} on Beatbump`,
+					url: `https://beatbump.ml/listen?id=${item.videoId}`
+				};
+				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_PLAYLIST')) {
+					shareData = {
+						title: item.title,
+						text: `Listen to ${item.title} on Beatbump`,
+						url: `https://beatbump.ml/playlist/${item.endpoint?.browseId}`
+					};
+				}
+				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_ALBUM')) {
+					shareData = {
+						title: item.title,
+						text: `Listen to ${item.title} on Beatbump`,
+						url: `https://beatbump.ml/release?id=${item.endpoint?.browseId}`
+					};
+				}
+				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_ARTIST')) {
+					shareData = {
+						title: item.title,
+						text: `${item.title} on Beatbump`,
+						url: `https://beatbump.ml/artist/${item.endpoint?.browseId}`
+					};
+				}
+				try {
+					if (!navigator.canShare) {
+						await navigator.clipboard.writeText(shareData.url);
+						notify('Link copied successfully', 'success');
+					} else {
+						const share = await navigator.share(shareData);
+						notify('Shared successfully', 'success');
+					}
+				} catch (error) {
+					notify('Error: ' + error, 'error');
+				}
+			}
+		}
+	];
+	let width = 740;
 </script>
 
+<svelte:window bind:innerWidth={width} />
 <div
 	bind:this={parent}
 	class="item"
@@ -37,21 +121,21 @@
 	on:dragenter={() => dispatch('hovering', index)}
 	on:dragend={() => dispatch('notHovering', null)}
 	on:mouseenter|capture={(e) => {
-		if (parent && parent.contains(e.target)) isHovering = true
+		if (parent && parent.contains(e.target)) isHovering = true;
 	}}
 	on:mouseleave|capture={(e) => {
 		// isHovering = false
 		if (parent && parent.contains(e.target)) {
-			isHovering = true
+			isHovering = true;
 		}
-		isHovering = false
+		isHovering = false;
 	}}
 	on:click={async () => {
 		// @ts-ignore
 		if (page == 'playlist') {
-			key.set(index)
+			key.set(index);
 			// console.log('key: ' + $key, item.playlistId)
-			await list.startPlaylist(item.playlistId, index)
+			await list.startPlaylist(item.playlistId, index);
 			// await list.initList({
 			// 	videoId: item.videoId,
 			// 	playlistId: parentPlaylistId,
@@ -59,19 +143,19 @@
 			// 	config: { playerParams: item?.playerParams, type: item.musicVideoType }
 			// })
 		} else if (page == 'library') {
-			key.set(index)
-			dispatch('initLocalList', index)
+			key.set(index);
+			dispatch('initLocalList', index);
 		} else {
-			key.set(index)
+			key.set(index);
 			// console.log(item, item.videoId)
 			await list.initList({
 				videoId: item.videoId,
 				playlistId: item.playlistId,
 				keyId: $key,
 				config: { playerParams: item?.playerParams, type: item?.musicVideoType }
-			})
+			});
 		}
-		dispatchPlaying()
+		dispatchPlaying();
 	}}
 >
 	<div class="number">
@@ -109,9 +193,15 @@
 			</div>
 		</div>
 	</div>
-	<span class="length" class:hidden={!item?.length ? true : false}
-		>{item?.length}</span
-	>
+	{#if isHovering || width < 640}
+		<div class="length">
+			<PopperButton tabindex="0" items={DropdownItems} />
+		</div>
+	{:else}
+		<span class="length" class:hidden={!item?.length ? true : false}
+			>{item?.length.text ?? item.length}</span
+		>
+	{/if}
 </div>
 
 <!-- markup (zero or more items) goes here -->

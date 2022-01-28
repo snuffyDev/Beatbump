@@ -22,7 +22,6 @@ const config = {
 		postcss: {
 			plugins: [cssnano({ preset: 'cssnano-preset-default' }), autoprefixer({})]
 		},
-		typescript: { tsconfigFile: './tsconfig.json' }
 	}),
 
 	kit: {
@@ -36,7 +35,6 @@ const config = {
 			template: 'src/app.html',
 			hooks: 'src/hooks'
 		},
-
 		vite: {
 			resolve: {
 				alias: {
@@ -45,14 +43,7 @@ const config = {
 					$components: path.resolve('./src/lib/components')
 				}
 			},
-			plugins: [(() => ({
-				configureServer({ middlewares, }) {
-					middlewares.use((_req, res, next) => {
-						res.setHeader("Origin", "https://music.youtube.com");
-						next();
-					});
-				}
-			}))()],
+
 
 		}
 	},

@@ -1,5 +1,5 @@
 import { dev } from '$app/env';
-import type { Handle } from '@sveltejs/kit';
+import type { GetSession, Handle } from '@sveltejs/kit';
 
 const rootDomain = import.meta.env.VITE_DOMAIN; // or your server IP for dev
 const originURL = import.meta.env.VITE_SITE_URL; // or your server IP for dev
@@ -73,8 +73,13 @@ const headers = {
 	'Content-Security-Policy': csp,
 	'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload'
 };
+
+const checkUserAgent = (userAgent: string) =>
+	/i(Phone|Pad|Pod)/i.test(userAgent);
+
 export const handle: Handle = async ({ event, resolve }) => {
-	event.locals = event.request.headers;
+	// console.log(event.request.headers.get('User-Agent'));
+	event.locals.iOS = checkUserAgent(event.request.headers.get('User-Agent'));
 	const response = await resolve(event);
 	Object.entries(headers).forEach(([key, value]) =>
 		response.headers.set(`${key}`, `${value}`)
@@ -83,4 +88,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// console.log(JSON.stringify(request.headers))
 
 	return response;
+};
+
+export const getSession: GetSession = (event) => {
+	return event.locals.iOS
+		? {
+				iOS: event.locals.iOS
+		  }
+		: {};
 };

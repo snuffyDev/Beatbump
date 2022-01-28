@@ -1,107 +1,107 @@
-import { browser } from '$app/env'
-import { writable } from 'svelte/store'
+import { browser } from '$app/env';
+import { writable } from 'svelte/store';
 
-import type { Item } from './types'
-import { notify } from './utils'
+import type { Item } from './types';
+import { notify } from './utils';
 export type IDBPlaylist = {
-	name?: string
-	description?: string
-	thumbnail?: any
-	items?: Item | Item[]
-	id?: string
-	hideAlert?: boolean
-}
+	name?: string;
+	description?: string;
+	thumbnail?: any;
+	items?: Item | Item[];
+	id?: string;
+	hideAlert?: boolean;
+};
 type IDBRequestTarget = Event & {
-	target: EventTarget & { result: IDBRequest & IDBCursorWithValue }
-}
+	target: EventTarget & { result: IDBRequest & IDBCursorWithValue };
+};
 const mod = {
 	charset: 'useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict',
 	generate: (size = 16) => {
-		let id = ''
-		let i = size
+		let id = '';
+		let i = size;
 		while (i--) {
-			id += mod.charset[(Math.random() * mod.charset.length) | 0]
+			id += mod.charset[(Math.random() * mod.charset.length) | 0];
 		}
-		return id
+		return id;
 	}
-}
+};
 
-let db: IDBDatabase
-let DB_VER = 1
-let items: Array<any> = []
+let db: IDBDatabase;
+let DB_VER = 1;
+let items: Array<any> = [];
 
 const accessDB = () => {
-	if (!browser) return
+	if (!browser) return;
 	return new Promise(function (resolve, reject) {
 		if (db != undefined) {
-			return resolve()
+			return resolve();
 		}
-		const request = indexedDB.open('beatbump', 2)
+		const request = indexedDB.open('beatbump', 2);
 
 		function error(error) {
-			reject(error.target.error.message)
-			console.error(error, error.target.error.message)
+			reject(error.target.error.message);
+			console.error(error, error.target.error.message);
 		}
 		request.onupgradeneeded = function (
 			event: IDBVersionChangeEvent & {
 				target: EventTarget & {
-					result: IDBDatabase
-					transaction: IDBTransaction
-				}
+					result: IDBDatabase;
+					transaction: IDBTransaction;
+				};
 			}
 		) {
-			db = event.target.result
-			db.onerror = error
+			db = event.target.result;
+			db.onerror = error;
 			if (
 				db.objectStoreNames.contains('playlists') &&
 				event.target?.transaction.objectStore('playlists').keyPath !== 'id'
 			) {
 				const getOldPlaylists = event.target?.transaction
 					.objectStore('playlists')
-					.getAll()
+					.getAll();
 				getOldPlaylists.onsuccess = function (e: IDBRequestTarget) {
-					const results = e.target.result
+					const results = e.target.result;
 					if (Array.isArray(results)) {
-						items = [...results]
+						items = [...results];
 						// console.log(e, results)
 
-						event.target.result.deleteObjectStore('playlists')
+						event.target.result.deleteObjectStore('playlists');
 					}
 
 					event.target.result.createObjectStore('playlists', {
 						keyPath: 'id'
-					})
-				}
+					});
+				};
 			}
 
 			if (!db.objectStoreNames.contains('favorites')) {
 				db.createObjectStore('favorites', {
 					keyPath: 'videoId' || 'playlistId'
-				})
+				});
 			}
 			if (!db.objectStoreNames.contains('playlists')) {
 				db.createObjectStore('playlists', {
 					keyPath: 'id'
-				})
+				});
 			}
-		}
+		};
 
-		request.onerror = error
+		request.onerror = error;
 		request.onsuccess = function (
 			e: IDBVersionChangeEvent & {
-				target: EventTarget & { result: IDBDatabase }
+				target: EventTarget & { result: IDBDatabase };
 			}
 		) {
-			db = e.target.result
+			db = e.target.result;
 
-			db.onerror = error
+			db.onerror = error;
 			db.addEventListener('close', function (e) {
-				db = undefined
-			})
-			resolve(db)
-		}
-	})
-}
+				db = undefined;
+			});
+			resolve(db);
+		};
+	});
+};
 
 export default {
 	createNewPlaylist({ name, description, items, thumbnail }: IDBPlaylist) {
@@ -109,7 +109,7 @@ export default {
 			accessDB().then(function () {
 				try {
 					// console.log(items)
-					const tx = db.transaction('playlists', 'readwrite')
+					const tx = db.transaction('playlists', 'readwrite');
 					tx.objectStore('playlists').put({
 						name,
 						description,
@@ -117,22 +117,22 @@ export default {
 						length: Array.isArray(items) ? [...items].length : [items].length,
 						thumbnail,
 						id: mod.generate(32)
-					}).onsuccess = resolve
+					}).onsuccess = resolve;
 					tx.addEventListener('complete', function () {
-						resolve({ name, description, items, thumbnail })
-						notify('Created Playlist!', 'success')
-					})
+						resolve({ name, description, items, thumbnail });
+						notify('Created Playlist!', 'success');
+					});
 					tx.addEventListener('error', function (e) {
-						notify('Error: ' + e, 'error')
-						reject(e)
-					})
+						notify('Error: ' + e, 'error');
+						reject(e);
+					});
 				} catch (err) {
-					notify('Error: ' + err, 'error')
-					reject(err)
+					notify('Error: ' + err, 'error');
+					reject(err);
 					// throw new Error(err)
 				}
-			})
-		})
+			});
+		});
 	},
 	updatePlaylist({
 		id,
@@ -145,112 +145,112 @@ export default {
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
 				try {
-					let tx = db.transaction('playlists', 'readwrite')
+					let tx = db.transaction('playlists', 'readwrite');
 					tx.objectStore('playlists').openCursor(id).onsuccess = function (
 						e: IDBRequestTarget
 					) {
-						const cursor = e.target.result
+						const cursor = e.target.result;
 						if (cursor) {
-							const playlistItem = cursor.value
+							const playlistItem = cursor.value;
 							const request = cursor.update({
 								...playlistItem,
 								name: name ?? playlistItem.name,
 								thumbnail: thumbnail ?? playlistItem?.thumbnail,
 								description: description ?? playlistItem.description,
 								length: items.length,
-								items: Array.isArray(items)
-									? [...items]
-									: [...playlistItem.items]
-							})
+								items: Array.isArray(items) ? [...items] : items
+							});
 
 							request.onsuccess = function (e: IDBRequestTarget) {
-								resolve(e.target)
-							}
+								resolve(e.target);
+							};
 
 							// console.log(e.target.result, list)
 						}
 
 						// list
-						if (!hideAlert) notify('Updated Playlist!', 'success')
+						if (!hideAlert) notify('Updated Playlist!', 'success');
 						// return resolve()
-					}
+					};
 					tx.addEventListener('complete', () => {
-						if (!hideAlert) notify('Updated Playlist!', 'success')
-					})
+						if (!hideAlert) notify('Updated Playlist!', 'success');
+					});
 					tx.addEventListener('error', function (e) {
-						throw new Error(e)
-					})
+						console.error(e);
+						throw new Error(e);
+					});
 				} catch (err) {
-					throw new Error(err)
+					console.error(err);
+					throw new Error(err);
 				}
-			})
-		})
+			});
+		});
 	},
 	async setNewFavorite(item: Item) {
-		await accessDB()
-		if (!item) return new Error('No item was provided!')
+		await accessDB();
+		if (!item) return new Error('No item was provided!');
 
 		try {
-			const tx = db.transaction(['favorites'], 'readwrite')
+			const tx = db.transaction(['favorites'], 'readwrite');
 
-			tx.objectStore('favorites').put(item)
+			tx.objectStore('favorites').put(item);
 			tx.addEventListener('complete', () => {
-				notify('Added to favorites!', 'success')
-			})
+				notify('Added to favorites!', 'success');
+			});
 			tx.addEventListener('error', function (e) {
-				new Error(e)
-			})
+				new Error(e);
+			});
 		} catch (e) {
-			console.error(e)
+			console.error(e);
 		}
 	},
 	setMultipleFavorites(items: Item[]) {
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
-				const tx = db.transaction(['favorites'], 'readwrite')
+				const tx = db.transaction(['favorites'], 'readwrite');
 
 				items.forEach((item) => {
-					const request = tx.objectStore('favorites').put(item)
-				})
+					const request = tx.objectStore('favorites').put(item);
+				});
 				tx.oncomplete = () => {
-					notify('Added items to favorites!', 'success')
-				}
+					notify('Added items to favorites!', 'success');
+				};
 				tx.onerror = function (e) {
-					console.error(e)
-					reject(e)
-				}
-			})
-		})
+					console.error(e);
+					reject(e);
+				};
+			});
+		});
 	},
 	setMultiplePlaylists(items: IDBPlaylist[]) {
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
-				const tx = db.transaction(['playlists'], 'readwrite')
+				const tx = db.transaction(['playlists'], 'readwrite');
 
 				items.forEach((item) => {
-					const request = tx.objectStore('playlists').put(item)
-				})
+					const request = tx.objectStore('playlists').put(item);
+				});
 				tx.oncomplete = () => {
-					notify(`Added ${items.length} new playlists!`, 'success')
-				}
+					notify(`Added ${items.length} new playlists!`, 'success');
+				};
 				tx.onerror = function (e) {
-					console.error(e)
-					reject(e)
-				}
-			})
-		})
+					console.error(e);
+					reject(e);
+				};
+			});
+		});
 	},
 	async deleteFavorite(item) {
-		if (!item) return 'No item was provided!'
-		await accessDB()
+		if (!item) return 'No item was provided!';
+		await accessDB();
 
 		try {
 			db.transaction(['favorites'], 'readwrite')
 				.objectStore('favorites')
-				.delete(item.videoId || item.playlistId)
-			notify('Item removed from favorites!', 'success')
+				.delete(item.videoId || item.playlistId);
+			notify('Item removed from favorites!', 'success');
 		} catch (e) {
-			console.error(e)
+			console.error(e);
 		}
 	},
 	async deleteAllPlaylists() {
@@ -260,51 +260,88 @@ export default {
 					.transaction(['playlists'], 'readwrite')
 					.objectStore('playlists')
 					.clear().onsuccess = function (e) {
-					notify('Playlists Deleted!', 'success')
-					resolve('deleted')
-				})
-			})
-		})
+					notify('Playlists Deleted!', 'success');
+					resolve('deleted');
+				});
+			});
+		});
 	},
 	async deletePlaylist(name: string) {
-		if (!name) return 'No playlist name was provided!'
+		if (!name) return 'No playlist name was provided!';
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
 				try {
 					db.transaction(['playlists'], 'readwrite')
 						.objectStore('playlists')
-						.delete(name)
-					notify('Playlist Deleted!', 'success')
+						.delete(name);
+					notify('Playlist Deleted!', 'success');
 				} catch (e) {
-					console.error(e)
+					console.error(e);
 				}
-			})
-		})
+			});
+		});
+	},
+	async deleteSongFromPlaylist(itemVideoId: string, playlistId: string) {
+		if (!itemVideoId) return 'No playlist name was provided!';
+		if (!playlistId) return 'No playlist name was provided!';
+		return new Promise(function (resolve, reject) {
+			accessDB().then(function () {
+				try {
+					db
+						.transaction(['playlists'], 'readwrite')
+						.objectStore('playlists')
+						.openCursor(playlistId).onsuccess = function (e: IDBRequestTarget) {
+						const cursor = e.target.result;
+						if (cursor) {
+							// console.log(items.filter((item) => item.videoId !== itemVideoId))
+							const playlistItem = cursor.value;
+							const request = cursor.update({
+								...playlistItem,
+								length: playlistItem.length--,
+								items:
+									playlistItem.items.filter(
+										(item) => item.videoId !== itemVideoId
+									) || []
+							});
+
+							request.onsuccess = function (e: IDBRequestTarget) {
+								resolve(e.target);
+							};
+
+							// console.log(e.target.result, list)
+						}
+					};
+					notify('Song removed from playlist!', 'success');
+				} catch (e) {
+					console.error(e);
+				}
+			});
+		});
 	},
 	getFavorites(): Promise<Item[]> {
-		let lists: Item[] | null = []
+		let lists: Item[] | null = [];
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
 				try {
 					const transaction = db
 						.transaction('favorites', 'readonly')
-						.objectStore('favorites')
+						.objectStore('favorites');
 
 					transaction.getAll().onsuccess = function (e: IDBRequestTarget) {
 						if (e.target.result) {
-							const result = e.target.result
+							const result = e.target.result;
 							if (Array.isArray(result)) {
-								lists = result
-								resolve([...lists])
+								lists = result;
+								resolve([...lists]);
 							}
 						}
-					}
+					};
 				} catch (e) {
-					notify('Error! ' + e, 'error')
-					reject([])
+					notify('Error! ' + e, 'error');
+					reject([]);
 				}
-			})
-		})
+			});
+		});
 	},
 	getPlaylist(id) {
 		return new Promise(function (resolve, reject) {
@@ -312,63 +349,63 @@ export default {
 				try {
 					const transaction = db
 						.transaction('playlists', 'readonly')
-						.objectStore('playlists')
+						.objectStore('playlists');
 
 					transaction.openCursor(id).onsuccess = function (
 						e: Event & { target: EventTarget & { result: IDBCursorWithValue } }
 					) {
 						if (e.target.result) {
-							const playlist = e.target.result.value
-							resolve(playlist)
+							const playlist = e.target.result.value;
+							resolve(playlist);
 						}
-					}
+					};
 				} catch (e) {
-					notify('Error! ' + e, 'error')
-					reject([])
+					notify('Error! ' + e, 'error');
+					reject([]);
 				}
-			})
-		})
+			});
+		});
 	},
 	getPlaylists(): Promise<IDBPlaylist[]> {
-		let lists: IDBPlaylist[] | null = []
+		let lists: IDBPlaylist[] | null = [];
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
-				let transaction: IDBObjectStore
+				let transaction: IDBObjectStore;
 
 				try {
 					transaction = db
 						.transaction('playlists', 'readwrite')
-						.objectStore('playlists')
+						.objectStore('playlists');
 					if (items.length > 0) {
 						items.forEach((item) => {
-							transaction.put(item)
-						})
+							transaction.put(item);
+						});
 					}
 					transaction.getAll().onsuccess = function (e: IDBRequestTarget) {
 						if (e.target.result) {
-							const result = e.target.result
+							const result = e.target.result;
 							if (Array.isArray(result)) {
-								lists = result
+								lists = result;
 								lists.forEach((item, i, array) => {
-									let id
+									let id;
 									if (!item?.id) {
-										id = mod.generate(32)
-										array[i].id = id
-										transaction.put({ ...array[i] })
+										id = mod.generate(32);
+										array[i].id = id;
+										transaction.put({ ...array[i] });
 									}
-								})
-								resolve([...lists])
+								});
+								resolve([...lists]);
 							} else {
-								reject([])
+								reject([]);
 							}
 						}
-					}
+					};
 					// resolve([...lists])
 				} catch (e) {
-					notify('Error! ' + e, 'error')
-					reject([])
+					notify('Error! ' + e, 'error');
+					reject([]);
 				}
-			})
-		})
+			});
+		});
 	}
-}
+};

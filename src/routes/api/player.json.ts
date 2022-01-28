@@ -1,10 +1,10 @@
-import type { RequestHandler } from '@sveltejs/kit'
+import type { RequestHandler } from '@sveltejs/kit';
 
 export const get: RequestHandler = async ({ url }) => {
-	const query = url.searchParams
-	const videoId = query.get('videoId') || ''
-	const playlistId = query.get('list') || ''
-	const playerParams = query.get('playerParams') || ''
+	const query = url.searchParams;
+	const videoId = query.get('videoId') || '';
+	const playlistId = query.get('list') || '';
+	const playerParams = query.get('playerParams') || '';
 	try {
 		const response = await fetch(
 			'https://music.youtube.com/youtubei/v1/player?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
@@ -31,22 +31,26 @@ export const get: RequestHandler = async ({ url }) => {
 					Origin: 'https://music.youtube.com'
 				}
 			}
-		)
+		);
 
 		if (!response.ok) {
-			return { status: response.status, body: response.statusText }
+			return { status: response.status, body: response.statusText };
 		}
-		const data = await response.json()
-
+		const data = await response.json();
+		const {
+			streamingData = {},
+			videoDetails = {},
+			playabilityStatus = {}
+		} = data;
 		return {
 			status: 200,
-			body: data
-		}
+			body: JSON.stringify({ streamingData, videoDetails, playabilityStatus })
+		};
 	} catch (error) {
-		console.error(error)
+		console.error(error);
 		return {
 			status: 500,
 			body: error.message
-		}
+		};
 	}
-}
+};

@@ -64,7 +64,7 @@ function _verifyUserAgent() {
 	let CheckiOS;
 	let isApple;
 	if (browser) {
-		CheckiOS = /(iPad|iPhone|iPod)/g.test(navigator.userAgent);
+		CheckiOS = /i(Phone|Pad|Pod)/i.test(navigator.userAgent);
 		isApple = CheckiOS ? true : false;
 	}
 	// browser ? console.log(isApple, CheckiOS) : null

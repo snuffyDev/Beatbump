@@ -30,7 +30,6 @@
 	export let key;
 	let main;
 	onMount(() => {
-		iOS.init();
 		const filter = localStorage.getItem('filterAutoPlay');
 		filter ? filter : localStorage.setItem('filterAutoPlay', 'true');
 		settings.set({

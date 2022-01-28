@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { browser } from '$app/env';
 import { sort } from './endpoints/playerUtils';
-import { alertHandler, currentId, updateTrack } from './stores/stores';
+import {
+	alertHandler,
+	currentId,
+	preferWebM,
+	updateTrack
+} from './stores/stores';
 
 // notifications
 export const notify = (
@@ -51,8 +56,11 @@ export const getSrc = async (
 	playlistId?: string,
 	params?: string
 ): Promise<{ body: string; error?: boolean }> => {
-	const webM = false;
-
+	let webM;
+	const unsubscribe = preferWebM.subscribe((v) => {
+		webM = v ? true : false;
+	});
+	unsubscribe();
 	const res = await fetch(
 		`/api/player.json?videoId=${videoId}${
 			playlistId ? `&playlistId=${playlistId}` : ''
@@ -71,17 +79,17 @@ function setTrack(formats = [], webM) {
 	if (webM) {
 		const item = formats.find((v) => v.mimeType === 'webm');
 		const parsedURL = item !== undefined ? item.url : formats[0].url;
-		updateTrack.update(() => ({
+		updateTrack.set({
 			originalUrl: formats[0].original_url,
 			url: parsedURL
-		}));
+		});
 		return { body: parsedURL, error: false };
 	}
 	const parsedURL = formats[0].url;
-	updateTrack.update(() => ({
+	updateTrack.set({
 		originalUrl: formats[0].original_url,
 		url: parsedURL
-	}));
+	});
 	return { body: parsedURL, error: false };
 }
 function handleError() {

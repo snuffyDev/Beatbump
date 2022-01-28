@@ -1,15 +1,15 @@
 <script lang="ts">
-	import longpress from '$lib/actions/longpress'
-	import { clickOutside } from '$lib/actions/clickOutside'
-	import list from '$lib/stores/list'
-	import { currentTitle, key } from '$stores/stores'
-	import { createEventDispatcher, getContext } from 'svelte'
-	import Popout from '../Dropdown/Popout.svelte'
+	import longpress from '$lib/actions/longpress';
+	import { clickOutside } from '$lib/actions/clickOutside';
+	import list from '$lib/stores/list';
+	import { currentTitle, key } from '$stores/stores';
+	import { createEventDispatcher, getContext } from 'svelte';
+	import Popout from '../Dropdown/Popout.svelte';
 
-	export let item
-	export let index
-	export let ctxKey = {}
-	const dispatch = createEventDispatcher()
+	export let item;
+	export let index;
+	export let ctxKey = {};
+	const dispatch = createEventDispatcher();
 
 	const DropdownItems = [
 		{
@@ -20,27 +20,27 @@
 					behavior: 'smooth',
 					top: 0,
 					left: 0
-				})
-				list.moreLikeThis(item)
+				});
+				list.moreLikeThis(item);
 			}
 		},
 		{
 			text: 'Remove from queue',
 			icon: 'x',
 			action: async (params) => {
-				list.removeItem(index)
+				list.removeItem(index);
 			}
 		}
-	]
+	];
 
 	function handleClick(i) {
-		currentTitle.set($list.mix[i].title)
+		currentTitle.set($list.mix[i].title);
 		dispatch('updated', {
 			id: `${i}`
-		})
-		// console.log('itemitem')
+		});
 	}
-	let isShowing = false
+	$: console.log(item);
+	let isShowing = false;
 </script>
 
 <div class="li-wrapper">
@@ -48,20 +48,20 @@
 		<div
 			use:longpress
 			on:longpress={(e) => {
-				isShowing = true
+				isShowing = true;
 				// pressing = false
 			}}
 			use:clickOutside
 			on:click_outside={() => {
-				isShowing = false
+				isShowing = false;
 			}}
 			class="pl-thumbnail"
 			style="min-width:5rem; max-width:5rem;"
 		>
 			<img
 				src={item.thumbnail ?? item.thumbnails[0].url}
-				width={item.thumbnails[0].width}
-				height={item.thumbnails[0].height}
+				width={item.thumbnails && item.thumbnails[0].width}
+				height={item.thumbnails && item.thumbnails[0].height}
 				alt="thumbnail"
 				loading="lazy"
 				decoding="async"
@@ -71,7 +71,7 @@
 		<div
 			class="clickable"
 			on:click|stopPropagation={(event) => {
-				handleClick(index)
+				handleClick(index);
 			}}
 		>
 			<div class="p-text">
@@ -210,7 +210,7 @@
 		flex-flow: nowrap;
 		flex-direction: column;
 		padding-inline: 0.8em;
-		max-width: 100%;
+		max-width: 95%;
 		/* margin-right: auto;*/
 	}
 	img::before {

@@ -5,12 +5,13 @@
 	import db from '$lib/db';
 	import { clickOutside } from '$lib/actions/clickOutside';
 	import list from '$lib/stores/list';
-	import { getSrc, shuffle } from '$lib/utils';
+	import { getSrc, notify, shuffle } from '$lib/utils';
 	import {
 		currentTitle,
 		iOS,
 		key,
 		playerLoading,
+		showAddToPlaylistPopper,
 		updateTrack
 	} from '$stores/stores';
 	import { onMount, tick } from 'svelte';
@@ -23,6 +24,7 @@
 	import keyboardHandler from './keyboardHandler';
 	import Queue from './Queue.svelte';
 	import QueueListItem from './QueueListItem.svelte';
+	import { session } from '$app/stores';
 	class NodeAudio {
 		constructor() {}
 		addEventListener(arg0: string, play: any) {
@@ -31,17 +33,18 @@
 	}
 	const player: HTMLAudioElement = browser ? new Audio() : new NodeAudio();
 	$: player.autoplay = $updateTrack.url !== null ? true : false;
+	// $: player.preload = $updateTrack.url !== null && 'metadata';
 
 	// $: browser && console.log($updateTrack.url, $updateTrack.originalUrl);
 	$: player.src = $updateTrack.url !== null ? $updateTrack.url : '';
-	$: isWebkit = $iOS;
+	$: isWebkit = $session.iOS;
 	let title;
-
+	$: console.log(isWebkit, $session);
 	$: autoId = $key;
 
 	$: time = player.currentTime;
-	let duration = 0;
-	let remainingTime = 0;
+	$: duration = 0;
+	$: remainingTime = 0;
 
 	$: volume = 0.5;
 	$: player.volume = volume;
@@ -53,7 +56,54 @@
 	let hoverWidth;
 	let showing;
 	let hovering;
-	let DropdownItems = [];
+	$: DropdownItems = [
+		{
+			text: 'View Artist',
+			icon: 'artist',
+			action: () => {
+				window.scrollTo({
+					behavior: 'smooth',
+					top: 0,
+					left: 0
+				});
+				goto(`/artist/${$list.mix[autoId].artistInfo.artist[0].browseId}`);
+			}
+		},
+		{
+			text: 'Add to Playlist',
+			icon: 'playlist-add',
+			action: async () => {
+				showAddToPlaylistPopper.set({ state: true, item: $list.mix[autoId] });
+			}
+		},
+		{
+			text: 'Add to Favorites',
+			icon: 'heart',
+			action: async () => {
+				// console.log(data)
+				if (!browser) return;
+				await db.setNewFavorite($list.mix[autoId]);
+			}
+		},
+		{
+			text: 'Shuffle',
+			icon: 'shuffle',
+			action: () => {
+				// console.log(data)
+				const _list = $list.mix;
+				$list.mix = [...shuffle(_list, autoId)];
+				// console.log($list.mix)
+			}
+		}
+	].filter((item) => {
+		{
+			if (!$list?.mix[autoId]?.artistInfo?.artist[0]?.browseId) {
+				return;
+			} else {
+				return item;
+			}
+		}
+	});
 	let once = false;
 	// $: console.log($list, autoId, $key, $updateTrack)
 
@@ -83,6 +133,7 @@
 			});
 		}
 	};
+
 	/*
 		Player Event Listeners
 	 */
@@ -95,48 +146,6 @@
 			duration: player.duration,
 			title: $list.mix[autoId].title
 		};
-
-		DropdownItems = [
-			{
-				text: 'View Artist',
-				icon: 'artist',
-				action: () => {
-					window.scrollTo({
-						behavior: 'smooth',
-						top: 0,
-						left: 0
-					});
-					goto(`/artist/${$list.mix[autoId].artistInfo.artist[0].browseId}`);
-				}
-			},
-			{
-				text: 'Add to Favorites',
-				icon: 'heart',
-				action: async () => {
-					// console.log(data)
-					if (!browser) return;
-					await db.setNewFavorite($list.mix[autoId]);
-				}
-			},
-			{
-				text: 'Shuffle',
-				icon: 'shuffle',
-				action: () => {
-					// console.log(data)
-					const _list = $list.mix;
-					$list.mix = [...shuffle(_list, autoId)];
-					// console.log($list.mix)
-				}
-			}
-		].filter((item) => {
-			{
-				if (!$list?.mix[autoId]?.artistInfo?.artist[0]?.browseId) {
-					return;
-				} else {
-					return item;
-				}
-			}
-		});
 
 		metaDataHandler();
 	});

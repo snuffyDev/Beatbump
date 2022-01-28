@@ -1,7 +1,7 @@
-import type { Item, Song, Thumbnail } from './types'
-import type { ICarouselTwoRowItem } from './types/musicCarouselTwoRowItem'
-import type { IListItemRenderer } from './types/musicListItemRenderer'
-import type { IPlaylistPanelVideoRenderer } from './types/playlistPanelVideoRenderer'
+import type { Item, Song, Thumbnail } from './types';
+import type { ICarouselTwoRowItem } from './types/musicCarouselTwoRowItem';
+import type { IListItemRenderer } from './types/musicListItemRenderer';
+import type { IPlaylistPanelVideoRenderer } from './types/playlistPanelVideoRenderer';
 
 type JSON =
 	| string
@@ -10,33 +10,33 @@ type JSON =
 	| null
 	| JSON[]
 	| Record<string, { [key: string]: string; value: string }>
-	| { [key: string]: JSON }
+	| { [key: string]: JSON };
 function thumbnailTransformer(url) {
 	let output = {
 		placeholder: '',
 		url: ''
-	}
+	};
 	if (!url.includes('lh3.googleusercontent.com')) {
-		const split_url: string = url.split('?')
-		const webp_url = split_url[0]
-		output.url = webp_url
-		output.placeholder = webp_url?.replace('sddefault', 'default')
+		const split_url: string = url.split('?');
+		const webp_url = split_url[0];
+		output.url = webp_url;
+		output.placeholder = webp_url?.replace('sddefault', 'default');
 		// console.log(output.placeholder, output.url, webp_url)
 	} else {
-		const webp_url: string = url?.replace('-rj', '-rw')
-		output.url = webp_url
+		const webp_url: string = url?.replace('-rj', '-rw');
+		output.url = webp_url;
 		output.placeholder = webp_url?.replace(
 			/(=w(\d+)-h(\d+))/gm,
 
 			'=w1-h1-p-fSoften=50,50,05'
-		)
+		);
 	}
-	return output
+	return output;
 }
 export function parseNextItem(item, length): Array<Item> {
-	item = [item]
+	item = [item];
 	const result = item.map((item) => {
-		const title = item.title
+		const title = item.title;
 		if (item?.subtitle) {
 			return {
 				title: title,
@@ -47,9 +47,9 @@ export function parseNextItem(item, length): Array<Item> {
 				},
 				videoId: item.videoId,
 				autoMixList: item.playlistId,
-				thumbnail: item.thumbnails[0].url,
+				thumbnails: item.thumbnails,
 				length: length
-			}
+			};
 		}
 		return {
 			title: title,
@@ -62,16 +62,16 @@ export function parseNextItem(item, length): Array<Item> {
 			},
 			videoId: item.videoId,
 			autoMixList: item.playlistId,
-			thumbnail: item.thumbnails ? item.thumbnails[0].url : item.thumbnail,
+			thumbnail: item.thumbnails,
 			length: length
-		}
-	})
+		};
+	});
 	// console.log(result)
-	return result[0]
+	return result[0];
 }
 
 export const MusicTwoRowItemRenderer = (ctx: {
-	musicTwoRowItemRenderer
+	musicTwoRowItemRenderer;
 }): ICarouselTwoRowItem => {
 	let {
 		musicTwoRowItemRenderer: {
@@ -79,17 +79,17 @@ export const MusicTwoRowItemRenderer = (ctx: {
 				musicThumbnailRenderer: { thumbnail: { thumbnails = [] } = {} } = {}
 			} = {}
 		} = {}
-	} = ctx
+	} = ctx;
 	for (let index = 0; index < thumbnails.length; index++) {
-		const thumbnail = thumbnails[index]
+		const thumbnail = thumbnails[index];
 
-		const { url, placeholder } = thumbnailTransformer(thumbnail.url)
+		const { url, placeholder } = thumbnailTransformer(thumbnail.url);
 		thumbnails[index] = {
 			...thumbnail,
 			url,
 			original_url: thumbnail?.url,
 			placeholder
-		}
+		};
 	}
 
 	const Item: ICarouselTwoRowItem = {
@@ -142,14 +142,14 @@ export const MusicTwoRowItemRenderer = (ctx: {
 							item.navigationEndpoint?.browseEndpoint
 								?.browseEndpointContextSupportedConfigs
 								?.browseEndpointContextMusicConfig?.pageType
-					}
+					};
 				}
-				return { ...item }
+				return { ...item };
 			})
-	}
+	};
 
-	return Item
-}
+	return Item;
+};
 
 export const MusicResponsiveListItemRenderer = (
 	ctx: { musicResponsiveListItemRenderer },
@@ -160,18 +160,18 @@ export const MusicResponsiveListItemRenderer = (
 		thumbnail: {
 			musicThumbnailRenderer: { thumbnail: { thumbnails = [] } = {} } = {}
 		} = {}
-	} = ctx?.musicResponsiveListItemRenderer
+	} = ctx?.musicResponsiveListItemRenderer;
 	for (let index = 0; index < thumbnails.length; index++) {
-		const thumbnail = thumbnails[index] as Thumbnail
+		const thumbnail = thumbnails[index] as Thumbnail;
 
-		const { url, placeholder } = thumbnailTransformer(thumbnail.url)
+		const { url, placeholder } = thumbnailTransformer(thumbnail.url);
 
 		thumbnails[index] = {
 			...thumbnail,
 			url,
 			original_url: thumbnail.url,
 			placeholder
-		}
+		};
 	}
 
 	let Item: IListItemRenderer = {
@@ -193,9 +193,9 @@ export const MusicResponsiveListItemRenderer = (
 								item.navigationEndpoint?.browseEndpoint
 									?.browseEndpointContextSupportedConfigs
 									?.browseEndpointContextMusicConfig?.pageType
-						}
+						};
 					}
-					return { ...item }
+					return { ...item };
 				}
 			)
 		],
@@ -254,7 +254,7 @@ export const MusicResponsiveListItemRenderer = (
 				? ctx?.musicResponsiveListItemRenderer?.fixedColumns[0]
 						?.musicResponsiveListItemFixedColumnRenderer?.text?.runs[0]?.text
 				: undefined
-	}
+	};
 	if (Item !== undefined && playlistSetVideoId) {
 		Item = {
 			...Item,
@@ -264,8 +264,8 @@ export const MusicResponsiveListItemRenderer = (
 				ctx.musicResponsiveListItemRenderer?.overlay
 					?.musicItemThumbnailOverlayRenderer.content?.musicPlayButtonRenderer
 					?.playNavigationEndpoint?.watchEndpoint?.playlistSetVideoId
-		}
-		Item.playlistId = playlistId
+		};
+		Item.playlistId = playlistId;
 	}
 	Item = {
 		...Item,
@@ -274,7 +274,7 @@ export const MusicResponsiveListItemRenderer = (
 				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
 				?.navigationEndpoint?.watchEndpoint?.watchEndpointMusicSupportedConfigs
 				?.watchEndpointMusicConfig?.musicVideoType
-	}
+	};
 	Item = {
 		...Item,
 		playerParams:
@@ -284,9 +284,9 @@ export const MusicResponsiveListItemRenderer = (
 			ctx.musicResponsiveListItemRenderer?.flexColumns[0]
 				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
 				?.navigationEndpoint?.watchEndpoint?.params
-	}
-	return Item
-}
+	};
+	return Item;
+};
 export function PlaylistPanelVideoRenderer(
 	ctx: IPlaylistPanelVideoRenderer
 ): Song {
@@ -298,7 +298,7 @@ export function PlaylistPanelVideoRenderer(
 		playerParams: ctx?.navigationEndpoint?.watchEndpoint?.playerParams,
 		itct: ctx?.navigationEndpoint?.watchEndpoint?.params,
 		index: ctx?.navigationEndpoint?.watchEndpoint?.index
-	}
+	};
 	const Item: Song = {
 		thumbnails: [...ctx?.thumbnail?.thumbnails],
 		artistInfo: {
@@ -327,10 +327,10 @@ export function PlaylistPanelVideoRenderer(
 					item?.menuNavigationItemRenderer &&
 					item?.menuNavigationItemRenderer?.icon?.iconType?.includes('ALBUM')
 				)
-					return item
+					return item;
 			})
 			?.map((item) => {
-				const i = item?.menuNavigationItemRenderer
+				const i = item?.menuNavigationItemRenderer;
 				return {
 					title:
 						ctx?.longBylineText?.runs[ctx?.longBylineText?.runs?.length - 3]
@@ -340,24 +340,24 @@ export function PlaylistPanelVideoRenderer(
 						i?.navigationEndpoint?.browseEndpoint
 							?.browseEndpointContextSupportedConfigs
 							?.browseEndpointContextMusicConfig?.pageType
-				}
+				};
 			})[0],
 		hash:
 			Math?.random()?.toString(36)?.substring(2, 15) +
 			Math?.random()?.toString(36)?.substring(2, 15)
-	}
-	return Item
+	};
+	return Item;
 }
 
 export const MoodsAndGenresItem = (
 	ctx: any
 ): {
-	text: any
-	color: string
+	text: any;
+	color: string;
 	endpoint: {
-		params: any
-		browseId: any
-	}
+		params: any;
+		browseId: any;
+	};
 } => {
 	// console.log(
 	// 	ctx.musicNavigationButtonRenderer?.solid.leftStripeColor,
@@ -375,6 +375,6 @@ export const MoodsAndGenresItem = (
 			browseId:
 				ctx.musicNavigationButtonRenderer?.clickCommand.browseEndpoint.browseId
 		}
-	}
-	return Item
-}
+	};
+	return Item;
+};

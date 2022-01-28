@@ -1,86 +1,86 @@
 <script lang="ts">
-	import { browser } from '$app/env'
-	import drag from '$lib/actions/drag'
-	import list from '$lib/stores/list'
-	import { setContext, tick } from 'svelte'
-	import { fade, fly } from 'svelte/transition'
+	import { browser } from '$app/env';
+	import drag from '$lib/actions/drag';
+	import list from '$lib/stores/list';
+	import { setContext, tick } from 'svelte';
+	import { fade, fly } from 'svelte/transition';
 
-	import { createEventDispatcher } from 'svelte'
-	const dispatch = createEventDispatcher()
-	export let autoId
-	export let showing = false
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
+	export let autoId;
+	export let showing = false;
 
-	const ctxKey = {}
-	let active
-	let sliding
-	let listContainer: HTMLElement
-	let listWidth
-	let posY = 0
-	let listHeight = 0
-	let queueHeight
+	const ctxKey = {};
+	let active;
+	let sliding;
+	let listContainer: HTMLElement;
+	let listWidth;
+	let posY = 0;
+	let listHeight = 0;
+	let queueHeight;
 
-	$: mixList = $list.mix
-	$: if (browser) active = document.getElementById(autoId)
+	$: mixList = $list.mix;
+	$: if (browser) active = document.getElementById(autoId);
 
 	setContext(ctxKey, {
 		width: listWidth,
 		scrolling: sliding
-	})
+	});
 	function startHandler({ detail }) {
 		// posY = detail.y
-		sliding = true
+		sliding = true;
 	}
 
 	function release() {
 		if (sliding) {
 			if (posY < listHeight * 0.3) {
-				open()
+				open();
 			} else {
-				close()
+				close();
 			}
 		}
-		sliding = false
+		sliding = false;
 	}
 	function trackMovement({ y }) {
 		if (y <= listHeight && y >= 0) {
-			posY = y
+			posY = y;
 		} else if (y < listHeight * 0.7) {
-			trackOpen()
+			trackOpen();
 		} else {
-			close()
+			close();
 		}
 		// console.log(y, 'dy: ' + dy)
 	}
 	function trackOpen() {
-		posY = posY
+		posY = posY;
 	}
 	function open() {
-		posY = 0
+		posY = 0;
 	}
 	async function close() {
-		showing = false
-		sliding = false
-		dispatch('close', { showing })
-		await tick()
-		posY = 0
+		showing = false;
+		sliding = false;
+		dispatch('close', { showing });
+		await tick();
+		posY = 0;
 
 		// posY = 0
 	}
 	async function scrollIntoView() {
-		await tick()
-		document.getElementById(autoId).scrollIntoView(true)
+		await tick();
+		document.getElementById(autoId).scrollIntoView(true);
 	}
 	$: if (
 		queueHeight !== undefined &&
 		autoId !== undefined &&
 		$list.mix.length !== 0
 	)
-		scrollIntoView()
+		scrollIntoView();
 	$: transition = sliding
 		? ''
-		: 'transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22);'
+		: 'transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22);';
 	$: height =
-		queueHeight !== undefined && `calc(${listHeight - queueHeight}px - 4rem)`
+		queueHeight !== undefined && `calc(${listHeight - queueHeight}px - 4rem)`;
 	// : `calc(${(listHeight / 20.2) * 3}px - 0.5rem)`
 </script>
 
@@ -92,7 +92,7 @@
 	on:click|stopPropagation|self={() => dispatch('close', { showing: false })}
 	on:scroll|preventDefault
 	in:fly={{ duration: 400, delay: 200, y: listHeight, opacity: 0.1 }}
-	out:fly={{ duration: 400 * 2, y: listHeight / 1.2 }}
+	out:fly={{ duration: 800, y: listHeight / 0.8, opacity: 0.5 }}
 >
 	<div
 		class="listContainer"
@@ -115,10 +115,10 @@
 					class="list-m"
 					id="list"
 					on:touchstart|stopPropagation={() => {
-						sliding = true
+						sliding = true;
 					}}
 					on:mousedown|stopPropagation={() => {
-						sliding = false
+						sliding = false;
 					}}
 					on:removeItem
 				>
