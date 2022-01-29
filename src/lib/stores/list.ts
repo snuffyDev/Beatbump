@@ -177,7 +177,7 @@ export default {
 			const length = await addToQueue(item.videoId);
 			const nextItem = parseNextItem(item, length);
 			mix.splice(key + 1, 0, nextItem);
-			// console.log(mix, nextItem)
+			console.log(mix, nextItem);
 			notify(`${item.title} will play next!`, 'success');
 			list.set({ currentMixId, clickTrackingParams, continuation, mix });
 		} catch (err) {

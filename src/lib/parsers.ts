@@ -62,7 +62,7 @@ export function parseNextItem(item, length): Array<Item> {
 			},
 			videoId: item.videoId,
 			autoMixList: item.playlistId,
-			thumbnail: item.thumbnails,
+			thumbnails: item.thumbnails,
 			length: length
 		};
 	});

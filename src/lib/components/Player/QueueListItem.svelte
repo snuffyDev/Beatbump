@@ -59,7 +59,7 @@
 			style="min-width:5rem; max-width:5rem;"
 		>
 			<img
-				src={item.thumbnail ?? item.thumbnails[0].url}
+				src={item.thumbnails && item.thumbnails[0].url}
 				width={item.thumbnails && item.thumbnails[0].width}
 				height={item.thumbnails && item.thumbnails[0].height}
 				alt="thumbnail"
