@@ -32,6 +32,10 @@ Beatbump is an alternative frontend for YouTube Music created using Svelte/Svelt
 
 AutoPlay is broken on iOS 15, [see this guide](https://github.com/snuffyDev/Beatbump/wiki/Fixing-Background-Autoplay-on-iOS-15) for a fix.
 
+## Browser Extension
+
+To redirect all Youtube Music links to Beatbump, you are highly recommended to download [Libredirect](https://github.com/libredirect/libredirect)
+
 ## Privacy
 
 All data is stored locally on your device. Data synchronization is done using PeerJS, which uses WebRTC for a peer-to-peer connection between browsers.
