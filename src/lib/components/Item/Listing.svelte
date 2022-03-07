@@ -1,41 +1,41 @@
 <script lang="ts">
-	export let data: Item
+	export let data: Item;
 
-	import Loading from '$components/Loading/Loading.svelte'
-	import { hasContext, onMount, tick } from 'svelte'
+	import Loading from '$components/Loading/Loading.svelte';
+	import { hasContext, onMount, tick } from 'svelte';
 
 	import {
 		alertHandler,
 		key,
 		showAddToPlaylistPopper,
 		theme
-	} from '$stores/stores'
-	import Icon from '$components/Icon/Icon.svelte'
-	import { goto } from '$app/navigation'
-	import list from '$lib/stores/list'
-	import type { Item } from '$lib/types'
-	import longpress from '$lib/actions/longpress'
-	import db from '$lib/db'
-	import { browser } from '$app/env'
-	import { createEventDispatcher } from 'svelte'
-	import { PopperButton, PopperStore } from '../Popper'
-	import { notify } from '$lib/utils'
+	} from '$stores/stores';
+	import Icon from '$components/Icon/Icon.svelte';
+	import { goto } from '$app/navigation';
+	import list from '$lib/stores/list';
+	import type { Item } from '$lib/types';
+	import longpress from '$lib/actions/longpress';
+	import db from '$lib/db';
+	import { browser } from '$app/env';
+	import { createEventDispatcher } from 'svelte';
+	import { PopperButton, PopperStore } from '../Popper';
+	import { notify } from '$lib/utils';
 
-	const dispatch = createEventDispatcher()
-	let isLibrary = hasContext('library') ? true : false
-	let videoId = ''
-	let playlistId = ''
-	let songTitle = ''
-	$: title = songTitle = '...'
-	let isHidden: boolean = false
-	let explicit
-	let clicked
-	let artist
-	let hidden = clicked ? true : false
-	let loading = false
+	const dispatch = createEventDispatcher();
+	let isLibrary = hasContext('library') ? true : false;
+	let videoId = '';
+	let playlistId = '';
+	let songTitle = '';
+	$: title = songTitle = '...';
+	let isHidden: boolean = false;
+	let explicit;
+	let clicked;
+	let artist;
+	let hidden = clicked ? true : false;
+	let loading = false;
 	onMount(() => {
-		itemHandler()
-	})
+		itemHandler();
+	});
 
 	let DropdownItems = [
 		{
@@ -46,10 +46,10 @@
 					behavior: 'smooth',
 					top: 0,
 					left: 0
-				})
+				});
 
-				await tick()
-				goto(`/artist/${data.artistInfo.artist[0].browseId}`)
+				await tick();
+				goto(`/artist/${data.artistInfo.artist[0].browseId}`);
 			}
 		},
 		{
@@ -60,8 +60,8 @@
 					behavior: 'smooth',
 					top: 0,
 					left: 0
-				})
-				goto(`/release?id=${data?.album?.browseId}`)
+				});
+				goto(`/release?id=${data?.album?.browseId}`);
 			}
 		},
 		{
@@ -77,12 +77,12 @@
 					// console.log('PLAYLIST')
 					const response = await fetch(
 						'/api/getQueue.json?playlistId=' + data?.playlistId
-					)
-					const _data = await response.json()
-					const items: Item[] = _data
-					showAddToPlaylistPopper.set({ state: true, item: [...items] })
+					);
+					const _data = await response.json();
+					const items: Item[] = _data;
+					showAddToPlaylistPopper.set({ state: true, item: [...items] });
 				} else {
-					showAddToPlaylistPopper.set({ state: true, item: data })
+					showAddToPlaylistPopper.set({ state: true, item: data });
 				}
 			}
 		},
@@ -91,11 +91,11 @@
 			icon: !isLibrary ? 'heart' : 'x',
 			action: async () => {
 				// console.log(data)
-				if (!browser) return
-				!isLibrary && (await db.setNewFavorite(data))
+				if (!browser) return;
+				!isLibrary && (await db.setNewFavorite(data));
 				if (isLibrary) {
-					await db.deleteFavorite(data)
-					dispatch('update')
+					await db.deleteFavorite(data);
+					dispatch('update');
 				}
 			}
 		},
@@ -107,25 +107,25 @@
 					title: data.title,
 					text: `Listen to ${data.title} on Beatbump!`,
 					url: `https://beatbump.ml/listen?id=${data.videoId}`
-				}
+				};
 				try {
 					if (!navigator.canShare) {
-						await navigator.clipboard.writeText(shareData.url)
-						notify('Link copied successfully', 'success')
+						await navigator.clipboard.writeText(shareData.url);
+						notify('Link copied successfully', 'success');
 					} else {
-						const share = await navigator.share(shareData)
-						notify('Shared successfully', 'success')
+						const share = await navigator.share(shareData);
+						notify('Shared successfully', 'success');
 					}
 				} catch (error) {
-					notify('Error: ' + error, 'error')
+					notify('Error: ' + error, 'error');
 				}
 			}
 		}
-	]
+	];
 	if (data.type == 'artist') {
 		DropdownItems = [
 			...DropdownItems.filter((item) => !item.text.includes('Add to Playlist'))
-		]
+		];
 	}
 	if (data.type == 'playlist') {
 		DropdownItems.splice(1, 1, {
@@ -136,39 +136,39 @@
 					behavior: 'smooth',
 					top: 0,
 					left: 0
-				})
-				goto(`/playlist/${data?.browseId}`)
+				});
+				goto(`/playlist/${data?.browseId}`);
 			}
-		})
-		DropdownItems.shift()
-		DropdownItems.pop()
+		});
+		DropdownItems.shift();
+		DropdownItems.pop();
 		DropdownItems = [
 			...DropdownItems.filter((item) => !item.text.includes('Favorite'))
-		]
+		];
 	}
 	if (data.type == 'video') {
 		DropdownItems = DropdownItems.filter((d) => {
-			if (d.text == 'View Artist') return
-		})
+			if (d.text == 'View Artist') return;
+		});
 	}
 	const itemHandler = () => {
-		explicit = data.explicit
-		title = data.title
+		explicit = data.explicit;
+		title = data.title;
 
 		if (data.type !== 'playlist') {
-			artist = data?.artistInfo?.artist
+			artist = data?.artistInfo?.artist;
 		}
 		if (title.length > 48) {
-			title = title.substring(0, 48) + '...'
+			title = title.substring(0, 48) + '...';
 		} else {
-			title = title
+			title = title;
 		}
-	}
+	};
 	if (data?.album?.browseId === undefined) {
-		DropdownItems = DropdownItems.filter((d) => d.text !== 'Go to album')
+		DropdownItems = DropdownItems.filter((d) => d.text !== 'Go to album');
 	}
 	if (data?.artistInfo?.artist[0].browseId === undefined) {
-		DropdownItems = DropdownItems.filter((d) => d.text !== 'View Artist')
+		DropdownItems = DropdownItems.filter((d) => d.text !== 'View Artist');
 	}
 	const clickHandler = async (event) => {
 		if (
@@ -176,20 +176,20 @@
 				(event.target.nodeName == 'A' || event.target.nodeName == 'P')) ||
 			loading
 		)
-			return
+			return;
 		// console.log(event.target)
 		if (data.type == 'artist') {
-			goto(`/artist/${data.artistInfo.artist}`)
-			return
+			goto(`/artist/${data.artistInfo.artist}`);
+			return;
 		}
 		try {
-			loading = true
-			videoId = data.videoId ? data.videoId : ''
+			loading = true;
+			videoId = data.videoId ? data.videoId : '';
 			playlistId = data?.playlistId
 				? data?.playlistId
-				: data.shuffle?.playlistId
+				: data.shuffle?.playlistId;
 			if (data.type == 'playlist') {
-				await list.startPlaylist(playlistId)
+				await list.startPlaylist(playlistId);
 			} else {
 				await list.initList({
 					videoId: videoId,
@@ -197,16 +197,16 @@
 					keyId: 0,
 					clickTracking: data.params,
 					config: { playerParams: data.playerParams, type: data.musicVideoType }
-				})
+				});
 			}
-			key.set(0)
-			loading = false
-			return
+			key.set(0);
+			loading = false;
+			return;
 		} catch (error) {
-			console.log(error)
-			return
+			console.log(error);
+			return;
 		}
-	}
+	};
 </script>
 
 <div
@@ -214,19 +214,19 @@
 	on:contextmenu|preventDefault={(e) => {
 		window.dispatchEvent(
 			new window.CustomEvent('contextmenu', { detail: 'listing' })
-		)
+		);
 
 		PopperStore.set({
 			items: [...DropdownItems],
 			x: e.pageX,
 			y: e.pageY,
 			direction: 'right'
-		})
+		});
 	}}
 >
 	<div class="innercard">
 		<div class="itemWrapper" on:click|stopPropagation={clickHandler}>
-			<div class="img-container">
+			<div class="img-container" class:artist-img={data.type == 'artist'}>
 				{#if loading}
 					<Loading size="3em" />
 				{/if}
@@ -273,7 +273,7 @@
 					{#if data.album?.browseId}<Icon name="album" size="1em" /><a
 							sveltekit:prefetch
 							on:click|preventDefault={() => {
-								goto(`/release?id=${data?.album?.browseId}`)
+								goto(`/release?id=${data?.album?.browseId}`);
 							}}
 							href={`/release?id=${data?.album?.browseId}`}
 							>{data.album.title}</a
@@ -400,8 +400,6 @@
 	.img-container {
 		position: relative;
 		display: block;
-		width: auto;
-		height: auto;
 		width: 100%;
 		max-width: 5rem;
 		min-width: 5rem;
@@ -414,12 +412,15 @@
 			background: rgba(13, 13, 15, 0.192);
 			border-radius: inherit;
 			img {
-				border-radius: $xs-radius;
+				border-radius: inherit;
 				width: 100%;
 				height: 100%;
 				object-fit: contain;
 			}
 		}
+	}
+	.artist-img {
+		border-radius: 99999em;
 	}
 	@media (min-width: 640px) {
 		.container:active:not(.menu) {

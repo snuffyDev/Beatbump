@@ -20,7 +20,7 @@
 	$: if (isShowing) fetchPlaylists();
 	const dispatch = createEventDispatcher();
 	let hasFocus;
-	$: console.log(playlists, showConfirmation, item);
+	// $: console.log(playlists, showConfirmation, item);
 </script>
 
 {#if showCreatePlaylist}

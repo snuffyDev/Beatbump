@@ -39,7 +39,7 @@
 			id: `${i}`
 		});
 	}
-	$: console.log(item);
+	// $: console.log(item);
 	let isShowing = false;
 </script>
 
@@ -64,7 +64,6 @@
 				height={item.thumbnails && item.thumbnails[0].height}
 				alt="thumbnail"
 				loading="lazy"
-				decoding="async"
 			/>
 			<Popout items={DropdownItems} type="dd-menu" bind:isShowing />
 		</div>

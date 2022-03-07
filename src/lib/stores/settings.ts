@@ -6,6 +6,7 @@ type Settings = {
 	theme?: theme | string
 	dedupe?: boolean
 	preferWebM?: boolean
+	
 }
 let list: Settings = {
 	theme: 'dark',

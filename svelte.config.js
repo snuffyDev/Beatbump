@@ -26,7 +26,6 @@ const config = {
 
 	kit: {
 		adapter: dev ? node() : adapter(),
-		target: '#app',
 		files: {
 			assets: 'static',
 			lib: 'src/lib',

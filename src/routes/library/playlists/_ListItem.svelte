@@ -124,7 +124,6 @@
 		if (parent && parent.contains(e.target)) isHovering = true;
 	}}
 	on:mouseleave|capture={(e) => {
-		// isHovering = false
 		if (parent && parent.contains(e.target)) {
 			isHovering = true;
 		}
@@ -134,20 +133,13 @@
 		// @ts-ignore
 		if (page == 'playlist') {
 			key.set(index);
-			// console.log('key: ' + $key, item.playlistId)
 			await list.startPlaylist(item.playlistId, index);
-			// await list.initList({
-			// 	videoId: item.videoId,
-			// 	playlistId: parentPlaylistId,
-			// 	keyId: $key,
-			// 	config: { playerParams: item?.playerParams, type: item.musicVideoType }
-			// })
 		} else if (page == 'library') {
 			key.set(index);
 			dispatch('initLocalList', index);
 		} else {
 			key.set(index);
-			// console.log(item, item.videoId)
+
 			await list.initList({
 				videoId: item.videoId,
 				playlistId: item.playlistId,
@@ -199,7 +191,7 @@
 		</div>
 	{:else}
 		<span class="length" class:hidden={!item?.length ? true : false}
-			>{item?.length.text ?? item.length}</span
+			>{(item?.length?.text ?? item.length) || ''}</span
 		>
 	{/if}
 </div>
@@ -241,6 +233,10 @@
 		flex: 1 0;
 		pointer-events: none;
 		.item-title {
+			max-width: 63ch;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			white-space: nowrap;
 			font-weight: 500;
 		}
 		.artist {

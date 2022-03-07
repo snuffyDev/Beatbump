@@ -2,32 +2,25 @@
 	import { browser } from '$app/env';
 	import drag from '$lib/actions/drag';
 	import list from '$lib/stores/list';
-	import { setContext, tick } from 'svelte';
-	import { fade, fly } from 'svelte/transition';
+	import { tick } from 'svelte';
+	import { fly } from 'svelte/transition';
 
 	import { createEventDispatcher } from 'svelte';
+	import { quartOut } from 'svelte/easing';
 	const dispatch = createEventDispatcher();
 	export let autoId;
 	export let showing = false;
 
 	const ctxKey = {};
 	let active;
-	let sliding;
-	let listContainer: HTMLElement;
-	let listWidth;
+	let sliding = false;
 	let posY = 0;
 	let listHeight = 0;
-	let queueHeight;
+	let queueHeight = 0;
 
-	$: mixList = $list.mix;
 	$: if (browser) active = document.getElementById(autoId);
 
-	setContext(ctxKey, {
-		width: listWidth,
-		scrolling: sliding
-	});
 	function startHandler({ detail }) {
-		// posY = detail.y
 		sliding = true;
 	}
 
@@ -81,6 +74,7 @@
 		: 'transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22);';
 	$: height =
 		queueHeight !== undefined && `calc(${listHeight - queueHeight}px - 4rem)`;
+
 	// : `calc(${(listHeight / 20.2) * 3}px - 0.5rem)`
 </script>
 
@@ -91,14 +85,14 @@
 	class="backdrop"
 	on:click|stopPropagation|self={() => dispatch('close', { showing: false })}
 	on:scroll|preventDefault
-	in:fly={{ duration: 400, delay: 200, y: listHeight, opacity: 0.1 }}
-	out:fly={{ duration: 800, y: listHeight / 0.8, opacity: 0.5 }}
+	in:fly|local={{ duration: 400, delay: 200, y: queueHeight, easing: quartOut }}
+	out:fly|local={{ duration: 400, y: listHeight, easing: quartOut }}
 >
 	<div
 		class="listContainer"
 		id="listContainer"
 		bind:clientHeight={queueHeight}
-		style="transform: translate(0, {posY}px); top: {height}; {transition} "
+		style="transform: translate(0, {posY}px); top: {height}; {transition};"
 	>
 		<div
 			use:drag
@@ -110,7 +104,7 @@
 			<hr />
 		</div>
 		<div class="list">
-			{#if mixList.length > 0}
+			{#if $list.mix.length > 0}
 				<ul
 					class="list-m"
 					id="list"
@@ -120,9 +114,8 @@
 					on:mousedown|stopPropagation={() => {
 						sliding = false;
 					}}
-					on:removeItem
 				>
-					{#each mixList as item, index}
+					{#each $list.mix as item, index}
 						<slot {item} {ctxKey} {index} />
 					{/each}
 				</ul>

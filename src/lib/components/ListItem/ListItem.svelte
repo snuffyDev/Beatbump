@@ -1,68 +1,156 @@
 <script lang="ts">
-	import Icon from '$components/Icon/Icon.svelte'
-	import { currentId, isPagePlaying, key } from '$stores/stores'
-	import { createEventDispatcher } from 'svelte'
-	import list from '$lib/stores/list'
-	export let item: Item
-	export let index
-	export let parentPlaylistId = ''
-	export let page
-	export let ctx = {}
-	import { getContext } from 'svelte'
-	import type { Item } from '$lib/types'
-	const { pageId } = getContext(ctx)
-	const dispatch = createEventDispatcher()
-	function dispatchPlaying() {
+	import Icon from '$components/Icon/Icon.svelte';
+	import {
+		currentId,
+		isPagePlaying,
+		key,
+		showAddToPlaylistPopper
+	} from '$stores/stores';
+	import { createEventDispatcher, tick } from 'svelte';
+	import list from '$lib/stores/list';
+	export let item: Item;
+	export let index;
+	export let parentPlaylistId = '';
+	export let page;
+	export let ctx = {};
+	import { getContext } from 'svelte';
+	import type { Item } from '$lib/types';
+	import PopperButton from '../Popper/PopperButton.svelte';
+	import { notify } from '$lib/utils';
+	import db from '$lib/db';
+	import { goto } from '$app/navigation';
+	const { pageId } = getContext(ctx);
+	const dispatch = createEventDispatcher();
+
+	const dispatchPlaying = () =>
 		dispatch('pagePlaying', {
 			isPlaying: true
-		})
-	}
+		});
+
 	async function handleClick(e: MouseEvent) {
-		const target = e.target as HTMLElement
-		if (target.nodeName.match('A')) return
+		const target = e.target as HTMLElement;
+		if (target.nodeName.match('A')) return;
 		// @ts-ignore
 		if (page == 'playlist') {
-			key.set(index)
-			// console.log('key: ' + $key, item.playlistId)
-			await list.startPlaylist(item.playlistId, index)
-			// await list.initList({
-			// 	videoId: item.videoId,
-			// 	playlistId: parentPlaylistId,
-			// 	keyId: $key,
-			// 	config: { playerParams: item?.playerParams, type: item.musicVideoType }
-			// })
+			key.set(index);
+			await list.startPlaylist(item.playlistId, index);
 		} else if (page == 'library') {
-			key.set(index)
-			dispatch('initLocalList', index)
+			key.set(index);
+			dispatch('initLocalList', index);
 		} else {
-			key.set(index)
+			key.set(index);
 			// console.log(item, item.videoId)
 			await list.initList({
 				videoId: item.videoId,
 				playlistId: parentPlaylistId,
 				keyId: $key,
 				config: { playerParams: item?.playerParams, type: item?.musicVideoType }
-			})
+			});
 		}
-		dispatchPlaying()
+		dispatchPlaying();
 	}
-	let isHovering = false
-	let parent
+	let DropdownItems = [
+		{
+			text: 'View Artist',
+			icon: 'artist',
+			action: async () => {
+				goto(`/artist/${item.artistInfo.artist[0].browseId}`);
+				await tick();
+				window.scrollTo({
+					behavior: 'smooth',
+					top: 0,
+					left: 0
+				});
+			}
+		},
+		{
+			text: 'Add to Playlist',
+			icon: 'playlist-add',
+			action: async () => {
+				if (item.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
+					const response = await fetch(
+						'/api/getQueue.json?playlistId=' + item.playlistId
+					);
+					const data = await response.json();
+					const items: Item[] = data;
+					showAddToPlaylistPopper.set({ state: true, item: [...items] });
+				} else {
+					showAddToPlaylistPopper.set({ state: true, item: item });
+				}
+				dispatch('change');
+			}
+		},
+		{
+			text: 'Favorite',
+			icon: 'heart',
+			action: () => {
+				db.setNewFavorite(item);
+			}
+		},
+		{
+			text: 'Share',
+			icon: 'share',
+			action: async () => {
+				let shareData = {
+					title: item.title,
+					text: `Listen to ${item.title} on Beatbump`,
+					url: `https://beatbump.ml/listen?id=${item.videoId}`
+				};
+				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_PLAYLIST')) {
+					shareData = {
+						title: item.title,
+						text: `Listen to ${item.title} on Beatbump`,
+						url: `https://beatbump.ml/playlist/${item.endpoint?.browseId}`
+					};
+				}
+				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_ALBUM')) {
+					shareData = {
+						title: item.title,
+						text: `Listen to ${item.title} on Beatbump`,
+						url: `https://beatbump.ml/release?id=${item.endpoint?.browseId}`
+					};
+				}
+				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_ARTIST')) {
+					shareData = {
+						title: item.title,
+						text: `${item.title} on Beatbump`,
+						url: `https://beatbump.ml/artist/${item.endpoint?.browseId}`
+					};
+				}
+				try {
+					if (!navigator.canShare) {
+						await navigator.clipboard.writeText(shareData.url);
+						notify('Link copied successfully', 'success');
+					} else {
+						const share = await navigator.share(shareData);
+						notify('Shared successfully', 'success');
+					}
+				} catch (error) {
+					notify('Error: ' + error, 'error');
+				}
+			}
+		}
+	];
+
+	let isHovering = false;
+	let parent;
+	let width = 740;
 </script>
 
+<svelte:window bind:innerWidth={width} />
 <!-- svelte-ignore a11y-mouse-events-have-key-events -->
 <div
 	bind:this={parent}
 	class="item"
 	class:playing={$isPagePlaying == pageId && item.videoId == $currentId}
 	on:pointerenter={(e) => {
-		if (parent && parent.contains(e.target)) isHovering = true
+		if (parent && parent.contains(e.target)) isHovering = true;
 	}}
 	on:pointerleave={(e) => {
 		if (parent && parent.contains(e.target)) {
-			isHovering = true
+			isHovering = true;
 		}
-		isHovering = false
+		isHovering = false;
 	}}
 	on:click={handleClick}
 >
@@ -108,9 +196,15 @@
 			</div>
 		</div>
 	</div>
-	<span class="length" class:hidden={!item?.length ? true : false}
-		>{item?.length}</span
-	>
+	{#if isHovering || width < 640}
+		<div class="length">
+			<PopperButton tabindex="0" items={DropdownItems} />
+		</div>
+	{:else}
+		<span class="length" class:hidden={!item?.length ? true : false}
+			>{(item?.length?.text ?? item.length) || ''}</span
+		>
+	{/if}
 </div>
 
 <!-- markup (zero or more items) goes here -->
@@ -140,13 +234,18 @@
 	.itemInfo {
 		display: inline-flex;
 		align-self: center;
-		line-height: 1.6;
+		// line-height: 1.6;
 		margin-right: 1.8rem;
 		grid-area: m;
 		flex-direction: row;
 		flex: 1 0;
 		.item-title {
 			font-weight: 500;
+
+			max-width: 63ch;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			white-space: nowrap;
 		}
 		.artist {
 			font-family: 'Commissioner', sans-serif;
@@ -180,7 +279,6 @@
 	}
 	.item {
 		display: grid;
-		height: 100%;
 		align-content: center;
 		grid-template-areas: 'm r';
 		grid-template-columns: 1fr auto;
@@ -192,10 +290,9 @@
 		user-select: none;
 		flex: 0 1 auto;
 		min-height: 3rem;
-		height: auto;
 		border-bottom: 0.0001605rem solid hsl(240deg 0% 55% / 34%);
 		width: 100%;
-		padding: 0.8rem 1.5rem 0.8rem 0.8rem;
+		padding: 0.8em 1.5em 0.8em 0.8em;
 		@media screen and (min-width: 640px) {
 			padding: 0.4rem 1.5rem 0.4rem 0.8rem;
 			grid-template-areas: 'c m r';
@@ -221,17 +318,14 @@
 		display: none;
 		visibility: none;
 		@media screen and (min-width: 640px) {
-			font-size: 1.125rem;
 			font-weight: 600;
 			grid-area: c;
 			text-align: center;
 			pointer-events: none;
 			opacity: 1;
 			/* margin-right: 1rem; */
-			align-self: center;
 			place-self: center;
-			justify-self: center;
-			display: inline-grid;
+			display: grid;
 			justify-items: center;
 			visibility: visible;
 		}

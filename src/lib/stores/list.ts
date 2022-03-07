@@ -142,7 +142,9 @@ export default {
 			});
 			const data = response;
 			getSrc(videoId ?? data.results[0].videoId, playlistId, playerParams);
-			currentTitle.set(data.results[0].title);
+			currentTitle.set(
+				(Array.isArray(data.results) && data.results[0].title) ?? undefined
+			);
 
 			loading = false;
 			playerLoading.set(loading);

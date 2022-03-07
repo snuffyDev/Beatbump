@@ -1,26 +1,26 @@
 <script>
-	import { browser } from '$app/env'
-	import { goto } from '$app/navigation'
-	import { page } from '$app/stores'
-	import Icon from '$components/Icon/Icon.svelte'
-	import Search from '$components/Search/Search.svelte'
-	import { tooltip } from '$lib/actions/tooltip'
-	import { clickOutside } from '$lib/actions/clickOutside'
-	import { circIn } from 'svelte/easing'
-	import { fade } from 'svelte/transition'
-	import Settings from './Settings.svelte'
+	import { browser } from '$app/env';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import Icon from '$components/Icon/Icon.svelte';
+	import Search from '$components/Search/Search.svelte';
+	import { tooltip } from '$lib/actions/tooltip';
+	import { clickOutside } from '$lib/actions/clickOutside';
+	import { circIn } from 'svelte/easing';
+	import { fade } from 'svelte/transition';
+	import Settings from './Settings.svelte';
 
-	export let key
-	let isHidden = true
-	let hidden = isHidden ? true : false
-	let isSettingsOpen
-	let shown
+	export let key;
+	let isHidden = true;
+	let hidden = isHidden ? true : false;
+	let isSettingsOpen;
+	let shown;
 	const navBack = () => {
-		if (!browser) return
+		if (!browser) return;
 
-		window.history.go(-1)
-	}
-	let referrer
+		window.history.go(-1);
+	};
+	let referrer;
 </script>
 
 <nav class="nav">
@@ -112,7 +112,7 @@
 			<div
 				use:clickOutside
 				on:click_outside={() => {
-					hidden = !hidden
+					hidden = !hidden;
 				}}
 				class="nav-search"
 				transition:fade={{ duration: 75, easing: circIn }}
@@ -122,12 +122,12 @@
 				<Search
 					type="inline"
 					on:submitted={() => {
-						hidden = !hidden
+						hidden = !hidden;
 					}}
 				/>
 				<button
 					on:click={() => {
-						hidden = !hidden
+						hidden = !hidden;
 					}}
 					class="icon-btn x-button"
 					aria-label="close"
@@ -140,8 +140,8 @@
 		<button
 			class="nav-item icon-btn nav-item__search"
 			on:click={() => {
-				shown = !shown
-				hidden = !hidden
+				shown = !shown;
+				hidden = !hidden;
 			}}
 			aria-label="Search"
 		>
@@ -150,7 +150,7 @@
 		<div
 			use:clickOutside
 			on:click_outside={() => {
-				isSettingsOpen = false
+				isSettingsOpen = false;
 			}}
 			style="display:contents; background:inherit;"
 		>
@@ -159,7 +159,7 @@
 				aria-label="Settings"
 				class="nav-item icon-btn btn-settings"
 				on:click|stopPropagation={() => {
-					isSettingsOpen = !isSettingsOpen
+					isSettingsOpen = !isSettingsOpen;
 				}}
 			>
 				<Icon name="settings" size="1.5rem" />
@@ -239,7 +239,7 @@
 			width: 100%;
 			border-radius: 50%;
 			opacity: 0;
-			transition: linear 100ms, background linear 100ms;
+			transition: color linear 100ms, background linear 100ms;
 
 			background-position: center;
 			padding: 8pt;
