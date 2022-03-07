@@ -101,8 +101,30 @@ async function getPlaylist(browseId, referrer) {
 			body: JSON.stringify({
 				context: {
 					client: {
+						// clientName: 'WEB_REMIX',
+						// clientVersion: '1.20211025.00.00',
 						clientName: 'WEB_REMIX',
-						clientVersion: '1.20211025.00.00',
+						clientVersion: '0.1',
+						deviceMake: 'google',
+						platform: 'DESKTOP',
+						deviceModel: 'bot',
+						experimentIds: [],
+						experimentsToken: '',
+						osName: 'Googlebot',
+						osVersion: '2.1',
+						locationInfo: {
+							locationPermissionAuthorizationStatus:
+								'LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED'
+						},
+						musicAppInfo: {
+							musicActivityMasterSwitch:
+								'MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE',
+							musicLocationMasterSwitch:
+								'MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE',
+							pwaInstallabilityStatus: 'PWA_INSTALLABILITY_STATUS_UNKNOWN'
+						},
+						utcOffsetMinutes: -new Date().getTimezoneOffset(),
+						originalUrl: 'https://music.youtube.com/playlist?list=' + browseId,
 						visitorData: 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D'
 					},
 
@@ -122,6 +144,9 @@ async function getPlaylist(browseId, referrer) {
 				Origin: 'https://music.youtube.com',
 				'x-origin': 'https://music.youtube.com',
 				'X-Goog-Visitor-Id': 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D',
+
+				'User-Agent':
+					'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
 				referer:
 					'https://music.youtube.com/playlist?list=' + referrer || browseId
 			}
@@ -130,8 +155,14 @@ async function getPlaylist(browseId, referrer) {
 	if (!response.ok) {
 		return { status: response.status, body: response.statusText };
 	}
+
 	const data = await response.json();
-	let { musicDetailHeaderRenderer = {} } = data?.header;
+	let musicDetailHeaderRenderer = {};
+	if (Object.prototype.hasOwnProperty.call(data, 'header')) {
+		const { musicDetailHeaderRenderer: detailHeader = {} } = data?.header;
+		musicDetailHeaderRenderer = { ...detailHeader };
+	}
+
 	const {
 		contents,
 		playlistId,
@@ -150,78 +181,83 @@ async function getPlaylist(browseId, referrer) {
 			? continuations !== undefined && continuations[0]?.nextContinuationData
 			: _continue !== null && _continue[0]?.nextContinuationData
 		: null;
-	// console.log(_continue)
-	musicDetailHeaderRenderer = [musicDetailHeaderRenderer];
-	const parseHeader = musicDetailHeaderRenderer.map(
-		({
-			description = {},
-			subtitle = {},
-			thumbnail = {},
-			secondSubtitle = {},
-			title = {}
-		}) => {
-			let subtitles = [];
-			let _secondSubtitle = [];
-			if (Array.isArray(subtitle?.runs) && subtitle?.runs.length !== 0) {
-				for (const { text } of subtitle?.runs) {
-					subtitles = [...subtitles, text];
+
+	const getHeader = () => {
+		const createArray = (key) =>
+			Array.isArray(musicDetailHeaderRenderer[key]['runs']) &&
+			(() => {
+				let arr = [];
+				for (const { text } of musicDetailHeaderRenderer[key]['runs']) {
+					arr = [...arr, text];
 				}
+				return arr;
+			})();
+		const ALLOWED_KEYS = new Set([
+			'subtitles',
+			'secondSubtitle',
+			'description',
+			'thumbnail',
+			'title'
+		]);
+		const key_map = Object.keys(musicDetailHeaderRenderer);
+		let len = key_map.length;
+		while (len--) {
+			const key = key_map[len];
+			if (!ALLOWED_KEYS.has(key)) {
+				delete musicDetailHeaderRenderer[key];
 			}
 			if (
-				Array.isArray(secondSubtitle?.runs) &&
-				secondSubtitle?.runs.length !== 0
+				(key === 'subtitles' || key === 'secondSubtitle') &&
+				musicDetailHeaderRenderer[key]['runs']['length'] !== 0
 			) {
-				for (const { text } of secondSubtitle?.runs) {
-					_secondSubtitle = [..._secondSubtitle, text];
-				}
+				musicDetailHeaderRenderer[key] = createArray(key) ?? [];
 			}
-			// const subtitles = [...subtitle?.runs]
-			const desc =
-				(description &&
-					Array.isArray(description?.runs) &&
-					description?.runs[0]?.text) ??
-				undefined;
-			const _title =
-				(title && Array.isArray(title?.runs) && title?.runs[0]?.text) ??
-				undefined;
-			return {
-				description: desc,
-				subtitles,
-				thumbnails:
-					thumbnail?.croppedSquareThumbnailRenderer?.thumbnail?.thumbnails ||
-					null,
-				playlistId: playlistId,
-				secondSubtitle: _secondSubtitle,
-				title: _title || 'error'
-			};
+			if (
+				key === 'description' &&
+				Array.isArray(musicDetailHeaderRenderer[key]?.runs) &&
+				musicDetailHeaderRenderer[key]?.runs.length !== 0
+			) {
+				musicDetailHeaderRenderer[key] =
+					musicDetailHeaderRenderer[key].runs[0]?.text || undefined;
+			}
+			if (key === 'thumbnail') {
+				musicDetailHeaderRenderer[key + 's'] =
+					musicDetailHeaderRenderer[key]?.croppedSquareThumbnailRenderer
+						?.thumbnail?.thumbnails || null;
+				delete musicDetailHeaderRenderer[key];
+			}
+			if (key === 'title')
+				musicDetailHeaderRenderer[key] =
+					musicDetailHeaderRenderer[key]['runs'][0]['text'] || 'Error';
 		}
-	)[0];
-	// const [contents] = playlist;
+		musicDetailHeaderRenderer['playlistId'] = playlistId;
+		ALLOWED_KEYS.clear();
+	};
+	getHeader();
 
-	const tracks = parseTrack(contents, playlistId).filter((e) => {
-		return e != null;
-	});
-	// console.log('TRACKS: ' + tracks);
+	const tracks = parseTrack(contents, playlistId ?? browseId.slice(2));
+
 	return {
 		status: 200,
 		body: JSON.stringify({
 			continuations: cont,
 			tracks,
 			carouselContinuations: _continue && _continue[0].nextContinuationData,
-			header: parseHeader
+			header: musicDetailHeaderRenderer
 		})
 	};
 }
-function parseTrack(contents = [], playlistId?): Array<IListItemRenderer> {
-	let Tracks = [];
-	for (let index = 0; index < contents.length; index++) {
-		const element = contents[index];
-		Tracks = [
-			...Tracks,
-			MusicResponsiveListItemRenderer(element, true, playlistId)
-		];
+function parseTrack(
+	contents = [],
+	playlistId?: string
+): Array<IListItemRenderer> {
+	let index = contents.length;
+	while (index--) {
+		contents[index] =
+			MusicResponsiveListItemRenderer(contents[index], true, playlistId) ||
+			undefined;
 	}
-	return Tracks;
+	return contents;
 }
 function parseHeader(header: any[]): CarouselHeader[] {
 	return header.map(({ musicCarouselShelfBasicHeaderRenderer } = {}) => ({

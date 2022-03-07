@@ -20,12 +20,12 @@
 			// 	isOpen = false
 			// }
 			// console.log(event)
+			event.stopPropagation();
 			if (isOpen) {
 				isOpen = false;
 				PopperStore.reset();
 				return;
 			}
-			event.stopPropagation();
 
 			const rect = node.getBoundingClientRect();
 			x = rect.left;

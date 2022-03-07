@@ -40,7 +40,10 @@
 	let loading = false
 	let hasData = false
 </script>
+<svelte:head>
+	<link rel="preload" as="image" href="{headerThumbnail[0].url}">
 
+</svelte:head>
 <Header
 	title="Home"
 	url={path}

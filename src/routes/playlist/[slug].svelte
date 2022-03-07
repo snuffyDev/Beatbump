@@ -4,6 +4,7 @@
 		const { slug } = params;
 		const response = await fetch(`/api/playlist.json?list=${params.slug}`);
 		const data = await response.json();
+
 		// console.log(data);
 		const {
 			tracks = [],
@@ -51,6 +52,7 @@
 	import Carousel from '$lib/components/Carousel/Carousel.svelte';
 	import ListInfoBar from '$lib/components/ListInfoBar';
 	import { notify } from '$lib/utils';
+	import { browser } from '$app/env';
 
 	export let tracks: IListItemRenderer[];
 	export let header: HeaderType = {
@@ -82,14 +84,19 @@
 
 	setContext(ctx, { pageId: id });
 	// $: browser &&
-	// 	console.log(data, carouselContinuations, tracks, continuations, id)
+	$: browser &&
+		console.log(header, carouselContinuations, tracks, continuations, id);
 
 	pageTitle =
-		pageTitle.length > 64 ? pageTitle.substring(0, 64) + '...' : header.title;
+		pageTitle.length > 64
+			? pageTitle.substring(0, 64) + '...'
+			: header?.title || '';
 	description =
-		header.description.length > 240
-			? header.description.substring(0, 240) + '...'
-			: header.description;
+		header?.description !== undefined
+			? header?.description.length > 240
+				? header?.description.substring(0, 240) + '...'
+				: header?.description
+			: '';
 	const getCarousel = async () => {
 		if (!carouselContinuations) return;
 		const response = await fetch(
@@ -256,69 +263,77 @@
 </script>
 
 <svelte:window bind:innerWidth={width} />
-<Header
-	title={header?.title}
-	url={`${key}/${id}`}
-	desc={description}
-	image={header?.thumbnails[header.thumbnails?.length - 1]?.url}
-/>
-<main>
-	<InfoBox
-		subtitles={header.subtitles}
-		secondSubtitle={header.secondSubtitle}
-		thumbnail={header.thumbnails[header.thumbnails?.length - 1].url.replace(
-			/=(w(\d+))-(h(\d+))/g,
-			'=w512-h512'
-		)}
-		title={pageTitle}
-		{description}
-		buttons={[
-			{
-				action: () => {
-					setId();
-					// list.startPlaylist(header.playlistId)
-					list.initList({
-						playlistId: header.playlistId,
-						config: { playerParams: 'wAEB' }
-					});
-				},
-				icon: 'shuffle',
-				text: 'Shuffle'
-			},
-			{
-				action: () => {
-					setId();
-					list.initList({
-						playlistId: header.playlistId,
-						config: { playerParams: 'wAEB8gECGAE%3D' }
-					});
-				},
-				icon: 'play',
-				type: 'outlined',
-				text: 'Start Radio'
-			},
-			{
-				action: () => {},
-				icon: { name: 'dots', size: '1.25rem' },
-				text: '',
-				type: 'icon'
-			}
-		]}
-		on:addqueue={() => {
-			setId();
-			list.startPlaylist(header.playlistId);
-
-			notify(`${pageTitle} added to queue!`, 'success');
-		}}
-		on:playlistAdd={async () => {
-			const response = await fetch(
-				'/api/getQueue.json?playlistId=' + header?.playlistId
-			);
-			const data = await response.json();
-			const items = data;
-			showAddToPlaylistPopper.set({ state: true, item: [...items] });
-		}}
+{#if header.title !== 'error'}
+	<Header
+		title={header?.title}
+		url={`${key}`}
+		desc={description}
+		image={header?.thumbnails !== null
+			? header?.thumbnails[header?.thumbnails?.length - 1]?.url
+			: undefined}
 	/>
+{/if}
+<main>
+	{#if header.title !== 'error'}
+		<InfoBox
+			subtitles={header?.subtitles}
+			secondSubtitle={header?.secondSubtitle}
+			thumbnail={header?.thumbnails !== null
+				? header?.thumbnails[header?.thumbnails?.length - 1].url.replace(
+						/=(w(\d+))-(h(\d+))/g,
+						'=w512-h512'
+				  )
+				: undefined}
+			title={pageTitle}
+			{description}
+			buttons={[
+				{
+					action: () => {
+						setId();
+						// list.startPlaylist(header.playlistId)
+						list.initList({
+							playlistId: header.playlistId,
+							config: { playerParams: 'wAEB' }
+						});
+					},
+					icon: 'shuffle',
+					text: 'Shuffle'
+				},
+				{
+					action: () => {
+						setId();
+						list.initList({
+							playlistId: header.playlistId,
+							config: { playerParams: 'wAEB8gECGAE%3D' }
+						});
+					},
+					icon: 'play',
+					type: 'outlined',
+					text: 'Start Radio'
+				},
+				{
+					action: () => {},
+					icon: { name: 'dots', size: '1.25rem' },
+					text: '',
+					type: 'icon'
+				}
+			]}
+			on:addqueue={() => {
+				setId();
+				list.startPlaylist(header.playlistId);
+
+				notify(`${pageTitle} added to queue!`, 'success');
+			}}
+			on:playlistAdd={async () => {
+				const response = await fetch(
+					'/api/getQueue.json?playlistId=' + header?.playlistId
+				);
+				const data = await response.json();
+				const items = data;
+				showAddToPlaylistPopper.set({ state: true, item: [...items] });
+			}}
+		/>
+	{/if}
 	<ListInfoBar
 		bind:value
 		on:change={async () => {

@@ -217,7 +217,7 @@
 	.thumbnail {
 		max-width: 3.5rem;
 		aspect-ratio: 1/1;
-		margin-right: 1rem;
+		/* margin-right: 1rem; */
 		max-height: 3.5rem;
 		width: 100%;
 	}
@@ -232,29 +232,30 @@
 		grid-area: r;
 	}
 	.itemInfo {
-		display: inline-flex;
+		display: flex;
 		align-self: center;
-		// line-height: 1.6;
-		margin-right: 1.8rem;
+		/* padding-right: 1.8rem; */
 		grid-area: m;
 		flex-direction: row;
-		flex: 1 0;
+		flex: none;
+		gap: 0.7em;
 		.item-title {
 			font-weight: 500;
-
-			max-width: 63ch;
+			max-width: calc(100vw - 22ch);
 			text-overflow: ellipsis;
 			overflow: hidden;
 			white-space: nowrap;
+			display: block;
 		}
 		.artist {
 			font-family: 'Commissioner', sans-serif;
 			font-weight: 400;
+			font-size: 0.9em;
 		}
 	}
 	.item {
 		cursor: pointer;
-		height: 5rem;
+		height: 4.25rem;
 	}
 
 	.text-title {

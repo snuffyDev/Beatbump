@@ -78,9 +78,9 @@ input[type='search'] {
 	position: relative;
 	border: 0.066667rem solid hsla(0, 0%, 66.7%, 0.219);
 	border-radius: var(--sm-radius);
-	box-shadow: inset 0em 0em 1em 0.1em rgba(247, 247, 247, 0.055),
-		0 0 0.25em 0.02em hsla(0, 0%, 66.7%, 0) !important;
-	transition: all 0.1s cubic-bezier(0.47, 0.25, 0.745, 0.715);
+	box-shadow: 0 0 0.25em 0.02em hsla(0, 0%, 66.7%, 0) !important;
+	transition: 0.1s cubic-bezier(0.47, 0.25, 0.745, 0.715);
+	transition-property: border, filter;
 	width: 100%;
 	height: auto;
 	min-height: 5ch;

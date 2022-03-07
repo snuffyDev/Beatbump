@@ -175,30 +175,48 @@ export const MusicResponsiveListItemRenderer = (
 	}
 
 	let Item: IListItemRenderer = {
-		subtitle: Array.isArray(
-			ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
-				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs
-		) && [
-			...ctx?.musicResponsiveListItemRenderer?.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs.map(
-				(item) => {
-					if (
-						item?.navigationEndpoint?.browseEndpoint?.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig?.pageType.includes(
-							'ARTIST'
-						)
-					) {
-						return {
-							text: item.text,
-							browseId: item.navigationEndpoint?.browseEndpoint?.browseId,
-							pageType:
-								item.navigationEndpoint?.browseEndpoint
-									?.browseEndpointContextSupportedConfigs
-									?.browseEndpointContextMusicConfig?.pageType
-						};
-					}
-					return { ...item };
+		subtitle:
+			Array.isArray(
+				ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
+					?.musicResponsiveListItemFlexColumnRenderer?.text?.runs
+			) &&
+			(() => {
+				let arr: any[] = [];
+				let length =
+					ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
+						?.musicResponsiveListItemFlexColumnRenderer?.text?.runs.length;
+				while (length--) {
+					arr[
+						length
+					] = ctx?.musicResponsiveListItemRenderer?.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[
+						length
+					]?.navigationEndpoint?.browseEndpoint?.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig?.pageType.includes(
+						'ARTIST'
+					)
+						? {
+								text:
+									ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
+										?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[
+										length
+									].text,
+								browseId:
+									ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
+										?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[
+										length
+									].navigationEndpoint?.browseEndpoint?.browseId,
+								pageType:
+									ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
+										?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[
+										length
+									]?.navigationEndpoint?.browseEndpoint
+										?.browseEndpointContextSupportedConfigs
+										?.browseEndpointContextMusicConfig?.pageType
+						  }
+						: ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
+								?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[length];
 				}
-			)
-		],
+				return arr;
+			})(),
 		artistInfo: {
 			artist: Array.isArray(
 				ctx?.musicResponsiveListItemRenderer?.flexColumns[1]

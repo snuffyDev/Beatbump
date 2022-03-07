@@ -24,8 +24,6 @@
 	import '@fontsource/commissioner/500.css';
 	import '@fontsource/commissioner/600.css';
 	import '@fontsource/commissioner/700.css';
-	import '../global/stylesheet/_layout.scss';
-	import '../global/stylesheet/main.scss';
 
 	export let key;
 	let main;
@@ -64,6 +62,9 @@
 </footer>
 
 <style lang="scss" global>
+	@import '../global/stylesheet/_layout.scss';
+	@import '../global/stylesheet/main.scss';
+
 	.wrapper {
 		overflow-y: auto; /* has to be scroll, not auto */
 		-webkit-overflow-scrolling: touch;

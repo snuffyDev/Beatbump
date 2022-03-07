@@ -23,7 +23,7 @@ $focus-color: #1c1c1c;
 
 	border: 0.15rem solid hsl(0deg 0% 7%);
 	border-radius: v.$base-radius;
-	font-family: "Commissioner", sans-serif;
+	font-family: 'Commissioner', sans-serif;
 	cursor: pointer;
 	font-size: unset;
 	gap: 0.25rem;
@@ -58,9 +58,9 @@ $focus-color: #1c1c1c;
 	@media (hover: hover) {
 		&:hover {
 			color: rgb(15, 15, 15) !important;
-			background: lighten($focus-background, 30%) !important;
+			background: lighten($focus-background, 13%) !important;
 			border-color: #202020 !important;
-			// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
+			box-shadow: 0 0 0.05rem 0.05rem rgba(0, 0, 0, 0.226) inset;
 			outline: 0;
 			text-decoration: none;
 			cursor: pointer;

@@ -1,11 +1,11 @@
 <script context="module" lang="ts">
 	import type { Load } from '@sveltejs/kit';
 
-	export const load: Load = async ({ page, fetch, stuff }) => {
-		const response = await fetch(`/explore/${page.params.slug}.json`);
+	export const load: Load = async ({ url, params, fetch, stuff }) => {
+		const response = await fetch(`/explore/${params.slug}.json`);
 		const { sections, header, type } = await response.json();
 
-		let path = stuff.page;
+		let path = url.pathname;
 		return {
 			props: {
 				sections,
