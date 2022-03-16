@@ -1,9 +1,7 @@
-# Beatbump
-
 <img align="right" src="/.repo/images/logo-header.png" width="128px" height="128px" />
 
+# Beatbump
 Beatbump is an alternative frontend for YouTube Music created using Svelte/SvelteKit, and powered by Cloudflare Workers.
-
 
 **Live Site**: https://beatbump.ml/
 
@@ -11,6 +9,14 @@ Beatbump is an alternative frontend for YouTube Music created using Svelte/Svelt
 
 | <img src="/.repo/images/artistpagegif.gif" width="640" height="auto"/> | <img src="/.repo/images/pwa.jpg" width="320" height="auto"/> | <img src="/.repo/images/trending.jpeg" width="640" height="auto"/> |
 | ---------------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------ |
+<p align="center">
+	  <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">
+    <img alt="License: AGPLv3" src="https://shields.io/badge/License-AGPL%20v3-blue.svg">
+  </a>
+  <a href="https://github.com/humanetech-community/awesome-humane-tech">
+    <img alt="Awesome Humane Tech" src="https://raw.githubusercontent.com/humanetech-community/awesome-humane-tech/main/humane-tech-badge.svg?sanitize=true">
+  </a>
+</p>
 
 ## Features
 
@@ -26,6 +32,7 @@ Beatbump is an alternative frontend for YouTube Music created using Svelte/Svelt
   - Synchronize your library across your devices!
   - Custom Playlists
 - Uses a custom wrapper around the YouTube Music API
+- User never connects to Youtube's servers
 - Multiple themes
 
 ## Important Notice for iOS 15 Users
