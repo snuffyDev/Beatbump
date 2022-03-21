@@ -128,7 +128,7 @@
 					}}>Cancel</button
 				>
 				<button
-					class="danger outlined"
+					class="outlined danger"
 					on:click|preventDefault={async () => {
 						db.deletePlaylist(defaults?.id);
 						deletePlaylistRequest = false;
@@ -317,17 +317,19 @@
 		display: flex;
 		flex-direction: column;
 		// flex-wrap: wrap;
-		top: 50%;
-		// inset: 0;
-		left: 50%;
 		min-width: 50%;
 		min-height: 50%;
 		width: fit-content;
 		max-width: 100%;
 		max-height: 85vh;
-		flex: 1 1 auto;
+		// flex: 1 1 auto;
 		// height: 100%;
 		overflow-y: auto;
+		top: 0;
+		left: 0;
+		top: 50%;
+		// inset: 0;
+		left: 50%;
 		// grid-area: m/m/m/m;
 		border-radius: $lg-radius;
 		border-color: rgba(129, 129, 129, 0.411);
@@ -336,7 +338,7 @@
 		transform: translate(-50%, -50%);
 		padding: 1.2rem;
 
-		justify-content: space-around;
+		// justify-content: space-around;
 	}
 	.image {
 		align-self: center;
@@ -346,10 +348,14 @@
 		background: hsl(200deg 7% 8% / 85%);
 		padding: 1rem;
 		// max-height: 14rem;
+		min-height: 0;
+		height: 100%;
 		max-width: 16rem;
 		border-radius: inherit;
 		border: 1px #e3e3e32f solid;
 		align-items: center;
 		gap: 0.8rem;
+		max-height: calc(100vmax * 0.66 - 38vmin);
+		max-width: calc(100vw * 0.66 - 14vmax);
 	}
 </style>

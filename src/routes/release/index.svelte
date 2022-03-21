@@ -46,21 +46,21 @@
 	export let data;
 	export let id;
 	$: id = $page.url.searchParams.get('id');
-	console.log(data);
 	const promise = parsePageContents(data);
+	// console.log(promise, data);
 	let { items, releaseInfo } = promise;
 	// $: console.log(releaseInfo, items, $page)
 	const setId = () => isPagePlaying.set(id);
 	const playAlbum = () => {
 		setId();
-		list.startPlaylist(releaseInfo.playlistId);
+		list.initPlaylistSession({ playlistId: releaseInfo.playlistId });
 		key.set(0);
 		currentTitle.set(items[0].title);
 	};
 	const playRadio = () => {
 		setId();
 
-		list.initList({
+		list.initAutoMixSession({
 			videoId: items[0].videoId,
 			playlistId: releaseInfo?.autoMixId,
 			keyId: 0

@@ -1,19 +1,23 @@
 <script lang="ts">
-	import { goto } from '$app/navigation'
-	import lazy from '$lib/lazy'
-	import type { Item } from '$lib/types'
-	import list from '$lib/stores/list'
-	export let item: Item
+	import { goto } from '$app/navigation';
+	import lazy from '$lib/lazy';
+	import type { Item } from '$lib/types';
+	import list from '$lib/stores/list';
+	export let item: Item;
 </script>
 
 <article
 	class="item"
 	on:click={() => {
-		const itemType = item.endpoint?.pageType
-		itemType.includes('PLAYLIST') && goto('/playlist/' + item.endpoint.browseId)
-		itemType.includes('ALBUM') && goto('/release?id=' + item.endpoint.browseId)
+		const itemType = item.endpoint?.pageType;
+		itemType.includes('PLAYLIST') &&
+			goto('/playlist/' + item.endpoint.browseId);
+		itemType.includes('ALBUM') && goto('/release?id=' + item.endpoint.browseId);
 		item.videoId &&
-			list.initList({ videoId: item.videoId, playlistId: item.playlistId })
+			list.initAutoMixSession({
+				videoId: item.videoId,
+				playlistId: item.playlistId
+			});
 	}}
 >
 	<div class="img">
@@ -22,9 +26,9 @@
 			height={item.thumbnails[0].height}
 			loading="lazy"
 			on:error={(e) => {
-				e.currentTarget.onerror = null
+				e.currentTarget.onerror = null;
 				e.currentTarget.src =
-					'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjNDI0MjQyIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA1LjU0IDE2Ni43OTQpIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCZxdW90O1NlZ29lIFVJJnF1b3Q7LFJvYm90byxPeHlnZW4sVWJ1bnR1LENhbnRhcmVsbCwmcXVvdDtPcGVuIFNhbnMmcXVvdDssJnF1b3Q7SGVsdmV0aWNhIE5ldWUmcXVvdDssc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNmYWZhZmEiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiA1NC44MzkpIiBkPSJNMCAwaDcydjE0Ni4zMjNIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+'
+					'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjNDI0MjQyIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA1LjU0IDE2Ni43OTQpIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCZxdW90O1NlZ29lIFVJJnF1b3Q7LFJvYm90byxPeHlnZW4sVWJ1bnR1LENhbnRhcmVsbCwmcXVvdDtPcGVuIFNhbnMmcXVvdDssJnF1b3Q7SGVsdmV0aWNhIE5ldWUmcXVvdDssc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNmYWZhZmEiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiA1NC44MzkpIiBkPSJNMCAwaDcydjE0Ni4zMjNIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+';
 			}}
 			decoding="async"
 			use:lazy={{ src: item.thumbnails[0].url }}
@@ -42,7 +46,7 @@
 					<a
 						sveltekit:prefetch
 						on:click|stopPropagation|preventDefault={() => {
-							goto('/artist/' + sub?.browseId)
+							goto('/artist/' + sub?.browseId);
 						}}
 						href={'/artist/' + sub?.browseId}><span>{sub.text}</span></a
 					>

@@ -9,6 +9,7 @@ export type IDBPlaylist = {
 	thumbnail?: any;
 	items?: Item | Item[];
 	id?: string;
+	length?: number;
 	hideAlert?: boolean;
 };
 type IDBRequestTarget = Event & {
@@ -152,13 +153,18 @@ export default {
 						const cursor = e.target.result;
 						if (cursor) {
 							const playlistItem = cursor.value;
+							console.log(items, playlistItem);
 							const request = cursor.update({
 								...playlistItem,
 								name: name ?? playlistItem.name,
 								thumbnail: thumbnail ?? playlistItem?.thumbnail,
 								description: description ?? playlistItem.description,
-								length: items.length,
-								items: Array.isArray(items) ? [...items] : items
+								length: Array.isArray(items)
+									? items.length
+									: playlistItem.length,
+								items: Array.isArray(items)
+									? [...items]
+									: [...playlistItem.items]
 							});
 
 							request.onsuccess = function (e: IDBRequestTarget) {
@@ -391,6 +397,26 @@ export default {
 									if (!item?.id) {
 										id = mod.generate(32);
 										array[i].id = id;
+										transaction.put({ ...array[i] });
+									}
+									if (Array.isArray(item.items) && item.items.length !== 0) {
+										let items_length = item.items.length;
+										while (items_length--) {
+											if (Array.isArray(item.items[items_length])) {
+												const _illegalArray: unknown = item.items[items_length];
+
+												array[i].items.splice(items_length, 1);
+												array[i].items = [
+													...array[i].items,
+													...(_illegalArray as Array<Item>)
+												];
+											}
+											console.log(array);
+											// transaction.put({...array[i]})
+										}
+										array[i].length = Array.isArray(array[i].items)
+											? [...array[i].items].length
+											: array[i].length;
 										transaction.put({ ...array[i] });
 									}
 								});

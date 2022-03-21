@@ -20,7 +20,7 @@
 			// 	isOpen = false
 			// }
 			// console.log(event)
-			event.stopPropagation();
+			event.stopImmediatePropagation();
 			if (isOpen) {
 				isOpen = false;
 				PopperStore.reset();

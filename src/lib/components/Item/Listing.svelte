@@ -67,7 +67,7 @@
 		{
 			text: 'Add to Queue',
 			icon: 'queue',
-			action: () => list.addNext(data, $key)
+			action: () => list.setTrackWillPlayNext(data, $key)
 		},
 		{
 			text: 'Add to Playlist',
@@ -189,9 +189,9 @@
 				? data?.playlistId
 				: data.shuffle?.playlistId;
 			if (data.type == 'playlist') {
-				await list.startPlaylist(playlistId);
+				await list.initPlaylistSession({ playlistId });
 			} else {
-				await list.initList({
+				await list.initAutoMixSession({
 					videoId: videoId,
 					playlistId: playlistId || data.autoMixList,
 					keyId: 0,

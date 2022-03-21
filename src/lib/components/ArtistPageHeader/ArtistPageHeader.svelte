@@ -1,78 +1,78 @@
 <script lang="ts">
-	import list from '$lib/stores/list'
-	import Icon from '$lib/components/Icon/Icon.svelte'
-	import { theme } from '$lib/stores/stores'
-	import { onMount } from 'svelte'
-	import { browser } from '$app/env'
-	import { shuffle } from '$lib/utils'
+	import list from '$lib/stores/list';
+	import Icon from '$lib/components/Icon/Icon.svelte';
+	import { theme } from '$lib/stores/stores';
+	import { onMount } from 'svelte';
+	import { browser } from '$app/env';
+	import { shuffle } from '$lib/utils';
 
-	export let header
-	export let thumbnail = []
-	export let description: string
-	let container: HTMLDivElement
-	let y = 0
-	let wrapper: HTMLElement
-	let isExpanded
-	let scroll
-	let opacity = 0
-	let img: HTMLImageElement
-	let timestamp
+	export let header;
+	export let thumbnail = [];
+	export let description: string;
+	let container: HTMLDivElement;
+	let y = 0;
+	let wrapper: HTMLElement;
+	let isExpanded;
+	let scroll;
+	let opacity = 0;
+	let img: HTMLImageElement;
+	let timestamp;
 	type CustomEvent = Event & {
-		currentTarget: EventTarget & HTMLImageElement & HTMLPictureElement
-		target: EventTarget & HTMLImageElement & HTMLPictureElement
-	}
+		currentTarget: EventTarget & HTMLImageElement & HTMLPictureElement;
+		target: EventTarget & HTMLImageElement & HTMLPictureElement;
+	};
 	const imageLoadHandler = (event: CustomEvent) => {
-		opacity = 1
+		opacity = 1;
 		// 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjYWNhY2FjIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJtYXRyaXgoMS4yOTkgMCAwIDEuMjcgOTUuNjg4IDE4Ni45NzEpIiBmb250LWZhbWlseT0iTGF0byIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMjAiIGZpbGw9IiMyODI4MjgiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLjI5OSAwIDAgMS4yNyA3OCA0Mi4yODYpIiBkPSJNMCAwaDc3djEzNUgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjwvZz48L3N2Zz4='
-	}
+	};
 	const handler = () => {
-		if (!browser) return
-		if (container) scroll = container.getBoundingClientRect()
+		if (!browser) return;
+		if (container) scroll = container.getBoundingClientRect();
 		// console.log(scroll)
 		if (container) {
 			y =
 				window.innerWidth < 500
 					? Math.min(Math.max(-scroll.top / window.innerHeight, 0), 1) * 250
-					: Math.min(Math.max(-scroll.top / window.innerHeight, 0), 1) * 125
+					: Math.min(Math.max(-scroll.top / window.innerHeight, 0), 1) * 125;
 		}
-	}
-	$: isExpanded && handler()
-	let descClientHeight = undefined
-	let descOffsetHeight = undefined
-	let desc: HTMLElement = undefined
+	};
+	$: isExpanded && handler();
+	let descClientHeight = undefined;
+	let descOffsetHeight = undefined;
+	let desc: HTMLElement = undefined;
 	// $: descIsOverflow = false
-	$: descIsOverflow = descClientHeight < descOffsetHeight ? false : true
+	$: descIsOverflow = descClientHeight < descOffsetHeight ? false : true;
 	// $: console.log(descClientHeight, descOffsetHeight, descIsOverflow)
 	onMount(() => {
-		let start
+		let start;
 		if (img) {
 			img.decode().then(() => {
-				opacity = 1
-			})
+				opacity = 1;
+			});
 
-			img.addEventListener('load', () => {})
+			img.addEventListener('load', () => {});
 			// console.log(img)
 		}
 		if (desc) {
-			descClientHeight = desc.clientHeight
-			descOffsetHeight = desc.scrollHeight
+			descClientHeight = desc.clientHeight;
+			descOffsetHeight = desc.scrollHeight;
 		}
-		wrapper = document.getElementById('wrapper')
+		wrapper = document.getElementById('wrapper');
 		wrapper.addEventListener(
 			'scroll',
 			() => (timestamp = requestAnimationFrame(handler))
-		)
+		);
 		return () => {
 			img.removeEventListener('load', () => {
-				opacity = 1
-			})
+				opacity = 1;
+			});
 			wrapper.removeEventListener(
 				'scroll',
 				() => (timestamp = requestAnimationFrame(handler))
-			)
-			cancelAnimationFrame(timestamp)
-		}
-	})
+			);
+			cancelAnimationFrame(timestamp);
+		};
+	});
 	// $: console.log(header)
 </script>
 
@@ -179,7 +179,7 @@
 						<button
 							class="outlined"
 							on:click={() =>
-								list.initList({
+								list.initAutoMixSession({
 									config: { playerParams: header.mixInfo?.params },
 									playlistId: header.mixInfo?.playlistId
 								})}
@@ -191,7 +191,7 @@
 					{#if header?.shuffle !== false}
 						<button
 							on:click={() =>
-								list.initList({
+								list.initAutoMixSession({
 									videoId: header.shuffle?.videoId,
 									config: { playerParams: header.shuffle?.params },
 									playlistId: header.shuffle?.playlistId
@@ -338,7 +338,7 @@
 			padding-top: 18rem;
 		}
 		@media only screen and (min-width: 1601px) {
-			padding-top: 38rem;
+			padding-top: 33vh;
 		}
 		// box-shadow: 0 0 0.5rem 0.5rem #000;
 

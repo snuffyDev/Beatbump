@@ -21,6 +21,30 @@ export const notify = (
 	});
 };
 // Shuffle array positions
+export function seededShuffle<T>(array: T[], _seed?: number): T[] {
+	let rand: () => number;
+
+	if (typeof _seed === 'number') {
+		let seed = _seed;
+		// Seeded random number generator in JS. Modified from:
+		// https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
+		rand = () => {
+			const x = Math.sin(seed++) * 179426549; // throw away most significant digits and reduce any potential bias
+			return x - Math.floor(x);
+		};
+	} else {
+		rand = Math.random;
+	}
+
+	for (let i = array.length - 1; i > 0; i -= 1) {
+		const j = Math.floor(rand() * (i + 1));
+		const temp = array[i];
+		array[i] = array[j];
+		array[j] = temp;
+	}
+	return array;
+}
+
 export function shuffle(array: any[], index: number): any[] {
 	array = [
 		...array.slice(0, index),

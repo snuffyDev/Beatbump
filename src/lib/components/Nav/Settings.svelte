@@ -1,7 +1,7 @@
 <script>
 	import { fade } from 'svelte/transition';
 	import { circIn } from 'svelte/easing';
-	import { filterAutoPlay, iOS, theme } from '$stores/stores';
+	import { filterAutoPlay, theme } from '$stores/stores';
 	import { settings } from '$lib/stores/settings';
 	import { queryParams } from '$lib/utils';
 	import { session } from '$app/stores';

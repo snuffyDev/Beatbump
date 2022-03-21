@@ -1,10 +1,10 @@
-import { PlaylistPanelVideoRenderer } from '$lib/parsers'
-import type { Song } from '$lib/types'
-import type { RequestHandler } from '@sveltejs/kit'
+import { PlaylistPanelVideoRenderer } from '$lib/parsers';
+import type { Song } from '$lib/types';
+import type { RequestHandler } from '@sveltejs/kit';
 
 export const get: RequestHandler = async ({ url }) => {
-	const query = url.searchParams
-	const playlistId = query.get('playlistId') || ''
+	const query = url.searchParams;
+	const playlistId = query.get('playlistId') || '';
 	try {
 		const response = await fetch(
 			`https://music.youtube.com/youtubei/v1/music/get_queue?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
@@ -68,31 +68,31 @@ export const get: RequestHandler = async ({ url }) => {
 						'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 				}
 			}
-		)
+		);
 
 		if (!response.ok) {
 			// NOT res.status >= 200 && res.status < 300
-			return { status: response.status, body: response.statusText }
+			return { status: response.status, body: response.statusText };
 		}
-		const data = await response.json()
-		const { queueDatas } = await data
+		const data = await response.json();
+		const { queueDatas } = await data;
 
 		const q = queueDatas.map(
 			({ content: { playlistPanelVideoRenderer } }): Song =>
 				PlaylistPanelVideoRenderer(playlistPanelVideoRenderer)
-		)
+		);
 		//
 		return {
 			status: 200,
 			body: JSON.stringify(q)
-		}
+		};
 	} catch (error) {
 		// output to netlify function log
-		console.log(error)
+		// console.log(error)
 		return {
 			status: 500,
 			// Could be a custom message or object i.e. JSON.stringify(err)
 			body: JSON.stringify({ msg: error.message })
-		}
+		};
 	}
-}
+};

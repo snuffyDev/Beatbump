@@ -21,14 +21,14 @@
 					top: 0,
 					left: 0
 				});
-				list.moreLikeThis(item);
+				list.getMoreLikeThis(item);
 			}
 		},
 		{
 			text: 'Remove from queue',
 			icon: 'x',
 			action: async (params) => {
-				list.removeItem(index);
+				list.removeTrack(index);
 			}
 		}
 	];

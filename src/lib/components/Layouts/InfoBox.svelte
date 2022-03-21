@@ -1,22 +1,22 @@
 <script lang="ts">
-	import { createEventDispatcher, tick } from 'svelte'
-	import Button from '../Button'
-	import PopperButton from '../Popper/PopperButton.svelte'
-	export let thumbnail: string
-	export let title: string = ''
-	export let description = undefined
-	export let subtitles = []
-	export let secondSubtitle = []
-	export let buttons = []
-	export let artist = undefined
-	export let editable = false
-	export let type = 'playlist'
+	import { createEventDispatcher, tick } from 'svelte';
+	import Button from '../Button';
+	import PopperButton from '../Popper/PopperButton.svelte';
+	export let thumbnail: string;
+	export let title: string = '';
+	export let description = undefined;
+	export let subtitles = [];
+	export let secondSubtitle = [];
+	export let buttons = [];
+	export let artist = undefined;
+	export let editable = false;
+	export let type = 'playlist';
 	let DropdownItems = [
 		{
 			text: 'Add to Queue',
 			icon: 'queue',
 			action: () => {
-				dispatch('addqueue')
+				dispatch('addqueue');
 			}
 		},
 		{
@@ -24,10 +24,10 @@
 			icon: 'playlist-add',
 			action: () => dispatch('playlistAdd')
 		}
-	]
+	];
 
-	let width
-	const dispatch = createEventDispatcher()
+	let width;
+	const dispatch = createEventDispatcher();
 </script>
 
 <svelte:window bind:innerWidth={width} />
@@ -50,7 +50,9 @@
 				</p>
 				<span class="secondary subtitle-group">
 					<p class="secondary subtitle">
-						{subtitles.join(' ')}
+						{Array.isArray(subtitles) && subtitles.length !== 0
+							? subtitles.join(' ')
+							: ''}
 					</p>
 					<em
 						><small class="subtitle">
@@ -65,12 +67,14 @@
 					<span class="explicit"> E </span>
 				{/if}
 				{#each artist as artist, i}
-					<a sveltekit:prefetch href={`/artist/${artist.channelId}`}
-						>{artist.name}</a
-					>
-					<!-- {#if i !== artist.length - 1}
-						•
-					{/if} -->
+					{#if artist.channelId}
+						<a sveltekit:prefetch href={`/artist/${artist.channelId}`}
+							>{artist.name}</a
+						>
+					{:else}
+						<span>{artist.name}</span>
+						<!-- {#if i !== artist.length - 1}
+					-->{/if}
 				{/each}
 				<small>
 					• {subtitles[0].year} • {subtitles[0].tracks}

@@ -9,12 +9,12 @@ import type { IListItemRenderer } from '$lib/types/musicListItemRenderer';
 import type { RequestHandler } from '@sveltejs/kit';
 
 export const get: RequestHandler = async ({ url }) => {
+	// console.time('playlist');
 	const query = url.searchParams;
 	const browseId = query.get('list') || '';
 	const itct = query.get('itct') || '';
 	const ctoken = query.get('ctoken') || '';
 	const referrer = query.get('ref') || '';
-
 	// console.log(browseId, ctoken)
 
 	if (ctoken !== '') {
@@ -186,8 +186,14 @@ async function getPlaylist(browseId, referrer) {
 		const createArray = (key) =>
 			Array.isArray(musicDetailHeaderRenderer[key]['runs']) &&
 			(() => {
+				let len = musicDetailHeaderRenderer[key]['runs'].length;
 				let arr = [];
-				for (const { text } of musicDetailHeaderRenderer[key]['runs']) {
+				// for (const { text } of musicDetailHeaderRenderer[key]['runs']) {
+				for (
+					const text = musicDetailHeaderRenderer[key]['runs']['text'];
+					len--;
+
+				) {
 					arr = [...arr, text];
 				}
 				return arr;
@@ -201,7 +207,7 @@ async function getPlaylist(browseId, referrer) {
 		]);
 		const key_map = Object.keys(musicDetailHeaderRenderer);
 		let len = key_map.length;
-		while (len--) {
+		for (; len--; ) {
 			const key = key_map[len];
 			if (!ALLOWED_KEYS.has(key)) {
 				delete musicDetailHeaderRenderer[key];
@@ -251,12 +257,18 @@ function parseTrack(
 	contents = [],
 	playlistId?: string
 ): Array<IListItemRenderer> {
+	// const map = new Map()
 	let index = contents.length;
-	while (index--) {
+	for (; index--; ) {
 		contents[index] =
 			MusicResponsiveListItemRenderer(contents[index], true, playlistId) ||
 			undefined;
 	}
+	// while (index--) {
+	// 	contents[index] =
+	// 		MusicResponsiveListItemRenderer(contents[index], true, playlistId) ||
+	// 		undefined;
+	// }
 	return contents;
 }
 function parseHeader(header: any[]): CarouselHeader[] {

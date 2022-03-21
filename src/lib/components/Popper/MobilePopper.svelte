@@ -1,22 +1,22 @@
 <script lang="ts">
-	import { browser } from '$app/env'
+	import { browser } from '$app/env';
 
-	import drag from '$lib/actions/drag'
-	import list from '$lib/stores/list'
-	import { key } from '$lib/stores/stores'
-	import { afterUpdate } from 'svelte'
-	import { fade, fly } from 'svelte/transition'
-	import Icon from '../Icon/Icon.svelte'
-	import { PopperStore } from './popperStore'
-	$: items = $PopperStore.items
-	$: type = $PopperStore.type
+	import drag from '$lib/actions/drag';
+	import list from '$lib/stores/list';
+	import { key } from '$lib/stores/stores';
+	import { afterUpdate } from 'svelte';
+	import { fade, fly } from 'svelte/transition';
+	import Icon from '../Icon/Icon.svelte';
+	import { PopperStore } from './popperStore';
+	$: items = $PopperStore.items;
+	$: type = $PopperStore.type;
 
-	let listHeight
-	let sliding
-	let posY = 0
+	let listHeight;
+	let sliding;
+	let posY = 0;
 
 	function startHandler({ detail }) {
-		sliding = true
+		sliding = true;
 		// posY = detail.y
 	}
 
@@ -24,45 +24,45 @@
 		// console.log(e)
 		if (sliding) {
 			if (posY < listHeight * 0.3) {
-				open()
+				open();
 			} else {
-				close()
+				close();
 			}
-			sliding = false
+			sliding = false;
 		}
 	}
 	function trackMovement({ y }) {
 		if (y <= listHeight && y >= 0) {
-			posY = y
+			posY = y;
 		} else if (y < listHeight * 0.7) {
-			trackOpen()
+			trackOpen();
 		} else {
-			close()
+			close();
 		}
 	}
 	function trackOpen() {
-		posY = posY
+		posY = posY;
 	}
 	function open() {
-		posY = 0
+		posY = 0;
 	}
 	function close() {
-		posY = 0
-		PopperStore.reset()
-		allowScroll()
-		sliding = false
+		posY = 0;
+		PopperStore.reset();
+		allowScroll();
+		sliding = false;
 	}
 	function noScroll() {
-		if (!browser) return
+		if (!browser) return;
 	}
 	function allowScroll() {
-		if (!browser) return
-		PopperStore.set({ items: [], isOpen: false, type })
+		if (!browser) return;
+		PopperStore.set({ items: [], isOpen: false, type });
 	}
-	$: items && noScroll()
-	let popperClientHeight
-	let popper: Element = undefined
-	$: height = listHeight - popperClientHeight
+	$: items && noScroll();
+	let popperClientHeight;
+	let popper: Element = undefined;
+	$: height = listHeight - popperClientHeight;
 	// $: console.log(
 	// 	`posY: ${posY}, ${$PopperStore.metadata} height: ${height}; popperHeight: ${popperClientHeight}`
 	// )

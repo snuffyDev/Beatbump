@@ -39,22 +39,23 @@ export const get: RequestHandler = async ({ url }) => {
 	const contents =
 		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
 			?.content?.sectionListRenderer?.contents;
-	for (let index = 0; index < contents.length; index++) {
-		const element = { ...contents[index] };
-
-		if (element?.musicCarouselShelfRenderer) {
-			carouselItems = [...carouselItems, element];
+	let index = contents.length;
+	for (; index--; ) {
+		if (contents[index]?.musicCarouselShelfRenderer) {
+			carouselItems = [...carouselItems, contents[index]];
 		}
 	}
-
-	for (let index = 0; index < carouselItems.length; index++) {
-		const element = carouselItems[index];
-		carouselItems[index] = parseCarousel({
-			musicCarouselShelfRenderer: element.musicCarouselShelfRenderer
+	let idx = carouselItems.length;
+	// console.log(carouselItems);
+	for (; idx--; ) {
+		// console.log(idx);
+		carouselItems[idx] = parseCarousel({
+			musicCarouselShelfRenderer: carouselItems[idx].musicCarouselShelfRenderer
 		});
 	}
+	// console.log(carouselItems.)
 	return {
-		body: JSON.stringify(carouselItems),
+		body: JSON.stringify({ carouselItems, data }),
 		status: 200
 	};
 	return {
@@ -88,7 +89,7 @@ function parseHeader({
 }
 
 function parseBody(
-	contents = []
+	contents: Record<string, any> = []
 ):
 	| ICarouselTwoRowItem[]
 	| IListItemRenderer[]
@@ -100,27 +101,34 @@ function parseBody(
 				browseId: any;
 			};
 	  }[] {
-	let items = [];
-	for (let index = 0; index < contents.length; index++) {
-		const element = contents[index];
-		if (element.musicTwoRowItemRenderer) {
-			items = [...items, MusicTwoRowItemRenderer(element)];
+	let items: unknown[] = [];
+	let index = contents.length;
+	for (; index--; ) {
+		if (contents[index].musicTwoRowItemRenderer) {
+			items = [MusicTwoRowItemRenderer(contents[index]), ...items];
 		}
-		if (element.musicResponsiveListItemRenderer) {
-			items = [...items, MusicResponsiveListItemRenderer(element)];
+		if (contents[index].musicResponsiveListItemRenderer) {
+			items = [MusicResponsiveListItemRenderer(contents[index]), ...items];
 		}
-		if (element.musicNavigationButtonRenderer) {
-			items = [...items, MoodsAndGenresItem(element)];
+		if (contents[index].musicNavigationButtonRenderer) {
+			items = [MoodsAndGenresItem(contents[index]), ...items];
 		}
 	}
 	return items;
 }
 
 function parseCarousel(carousel: {
+	musicImmersiveCarouselShelfRenderer?: Record<string, any>;
 	musicCarouselShelfRenderer?: Record<string, any>;
 }) {
 	return {
-		header: parseHeader(carousel.musicCarouselShelfRenderer?.header),
-		results: parseBody(carousel.musicCarouselShelfRenderer?.contents)
+		header: parseHeader(
+			carousel?.musicCarouselShelfRenderer?.header ??
+				carousel.musicImmersiveCarouselShelfRenderer?.header
+		),
+		results: parseBody(
+			carousel?.musicCarouselShelfRenderer?.contents ??
+				carousel.musicImmersiveCarouselShelfRenderer?.contents
+		)
 	};
 }

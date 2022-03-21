@@ -12,6 +12,7 @@
 	// pointer-events: none;
 	background: rgba(255, 255, 255, 0);
 	z-index: 500;
+	-ms-scroll-chaining: none;
 	overscroll-behavior: none;
 }
 .backdrop {
@@ -24,6 +25,9 @@
 	max-width: 100%;
 	width: 100%;
 	height: 100%;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
 	user-select: none;
 
 	z-index: 5;
@@ -33,7 +37,7 @@ hr {
 	&::before {
 		position: absolute;
 		inset: 0;
-		content: '';
+		content: "";
 		margin: 0 auto;
 		width: 35%;
 		color: hsl(0deg 0% 80%);
@@ -69,7 +73,7 @@ hr {
 }
 .m-metadata {
 	display: flex;
-	grid-template-columns: auto 1fr;
+	// grid-template-columns: auto 1fr;
 	max-height: 8rem;
 	height: auto;
 	position: relative;
@@ -83,27 +87,40 @@ hr {
 	flex-direction: row;
 }
 .image {
+	// position: relative;
+	// min-height: 0;
+	// /* height: auto; */
+	// /* width: auto; */
+	// min-height: 0;
+	// // max-height: 100%;
+	// max-width: 100%;
+	// height: auto;
+	// // width: 100%;
+	// aspect-ratio: 1/1 auto;
+	min-height: 0;
+	max-width: 11em;
 	position: relative;
-	min-height: 0;
-	/* height: auto; */
-	/* width: auto; */
-	min-height: 0;
-	// max-height: 100%;
-	max-width: 100%;
-	height: auto;
-	// width: 100%;
-	aspect-ratio: 1/1 auto;
+	width: auto;
 	img {
-		aspect-ratio: 1/1 auto;
 		width: 100%;
-		max-width: 12rem;
+		max-width: 100%;
 		height: auto;
-		max-height: inherit;
+		min-height: 0;
+		/* max-height: inherit; */
 		border-radius: var(--md-radius);
 		-o-object-fit: contain;
-		object-fit: contain;
-		position: inherit;
-		// vertical-align: text-top;
+		object-fit: scale-down;
+		position: relative;
+		// aspect-ratio: 1/1 auto;
+		// width: 100%;
+		// max-width: 12rem;
+		// height: auto;
+		// max-height: inherit;
+		// border-radius: var(--md-radius);
+		// -o-object-fit: contain;
+		// object-fit: contain;
+		// position: inherit;
+		// // vertical-align: text-top;
 	}
 }
 .metatext {
@@ -146,7 +163,7 @@ svg,
 	contain: layout;
 	width: clamp(80%, 90%, 640px);
 	min-height: 10%;
-	max-height: 72vh;
+	max-height: 80vh;
 	height: auto;
 	transform: translateY(0px);
 	max-width: 640px;
@@ -158,11 +175,12 @@ svg,
 }
 .handle {
 	top: 0;
+	-webkit-filter: brightness(0.6);
 	filter: brightness(0.6);
 	background-color: var(--mobile-popper-bg);
 	cursor: pointer;
 	width: 100%;
-	height: 1.1rem;
+	height: 1.8rem;
 	position: absolute;
 	box-shadow: 0 0 0.25rem 0 rgba(255, 255, 255, 0.158);
 	display: flex;
@@ -171,6 +189,11 @@ svg,
 	right: 0;
 	border-top-left-radius: var(--xl-radius);
 	border-top-right-radius: var(--xl-radius);
+
+	border-bottom: 0.0175rem groove rgba(171, 171, 171, 0.151);
+	border-top: 0.0175rem groove rgba(171, 171, 171, 0.151);
+	box-shadow: 0 -0.4rem 28px -12px rgb(255, 255, 255);
+	background: linear-gradient(to bottom, hsl(240, 10%, 10%), hsl(240, 2%, 7%) 50%, hsl(240, 1%, 6%) 90%);
 }
 li,
 ul {
@@ -197,5 +220,8 @@ li {
 			cursor: pointer;
 			background-color: rgba(170, 170, 170, 0.178);
 		}
+	}
+	.text {
+		margin-left: 0.3em;
 	}
 }

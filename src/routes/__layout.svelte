@@ -15,7 +15,7 @@
 	import Player from '$lib/components/Player/Player.svelte';
 	import Wrapper from '$components/Wrapper/Wrapper.svelte';
 	import Alert from '$lib/components/Alert/Alert.svelte';
-	import { iOS, showAddToPlaylistPopper } from '$stores/stores';
+	import { showAddToPlaylistPopper } from '$stores/stores';
 	import { onMount } from 'svelte';
 	import { Popper } from '$lib/components/Popper';
 	import { settings } from '$lib/stores/settings';
@@ -66,7 +66,7 @@
 	@import '../global/stylesheet/main.scss';
 
 	.wrapper {
-		overflow-y: auto; /* has to be scroll, not auto */
+		overflow-y: auto;
 		-webkit-overflow-scrolling: touch;
 	}
 </style>

@@ -14,9 +14,9 @@ html {
 html {
 	font-size: 12px;
 }
-@media (hover: hover) {
-	:focus-visible:not(input):not(.input):not(select):not(.select):not(.no-style) {
-		outline: 0.16666rem rgb(113, 175, 255) solid !important;
+@media (pointer: fine) {
+	*:focus-visible:not(input):not(.input):not(select):not(.select):not(.no-style) {
+		outline: 0.16666em rgb(113, 175, 255) solid !important;
 	}
 }
 // :focus:not(:focus-visible) {
@@ -81,16 +81,15 @@ body {
 
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
-	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
 	-webkit-tap-highlight-color: transparent;
 	-webkit-font-smoothing: antialiased;
-	@media screen and (min-width: 40rem) and (max-width: 85.375rem) {
+	@media screen and (min-width: 40rem) and (max-width: 115.375rem) {
 		--base-font-size: 0.875rem;
 	}
-	@media screen and (min-width: 83.375rem) and (max-width: 134rem) {
+	@media screen and (min-width: 115.375rem) and (max-width: 134rem) {
 		--base-font-size: 1rem;
 	}
 	@media screen and (min-width: 134.75rem) {
@@ -131,6 +130,8 @@ body {
 	min-width: 1rem;
 	max-width: 20rem;
 	text-transform: capitalize;
+	width: -webkit-max-content;
+	width: -moz-max-content;
 	width: max-content;
 	position: absolute;
 	display: block;
@@ -162,8 +163,11 @@ html {
 	*,
 	::before,
 	::after {
+		-webkit-animation-delay: -1ms !important;
 		animation-delay: -1ms !important;
+		-webkit-animation-duration: 1ms !important;
 		animation-duration: 1ms !important;
+		-webkit-animation-iteration-count: 1 !important;
 		animation-iteration-count: 1 !important;
 		background-attachment: initial !important;
 		scroll-behavior: auto !important;

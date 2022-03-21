@@ -12,10 +12,12 @@
 				error: Error(`Error: ${response.statusText}`)
 			};
 		}
+		const { carouselItems, data: _data } = data;
 		path = stuff.page;
 		return {
 			props: {
-				carouselItems: await data
+				carouselItems,
+				_data
 			},
 			maxage: 3600,
 			status: 200
@@ -25,11 +27,11 @@
 
 <script lang="ts">
 	export let carouselItems: ICarousel;
-
+	export let _data;
 	import Carousel from '$components/Carousel/Carousel.svelte';
 	import type { ICarousel } from '$lib/types';
 	import Header from '$lib/components/Layouts/Header.svelte';
-	// $: console.log(carouselItems)
+	// $: console.log(carouselItems, _data);
 </script>
 
 <Header
@@ -40,20 +42,20 @@
 <main>
 	<Carousel
 		isBrowseEndpoint={false}
-		header={carouselItems[2].header}
-		items={carouselItems[2].results}
+		header={carouselItems[1].header}
+		items={carouselItems[1].results}
 		type="trending"
 	/>
 
 	<div class="breakout">
 		<div class="box-cont">
 			<div class="header">
-				<h1>{carouselItems[1].header.title}</h1>
+				<h1>{carouselItems[2].header.title}</h1>
 				<a class="link" href="/explore"><small>See All</small></a>
 			</div>
 			<box>
 				<div class="scroll">
-					{#each carouselItems[1].results as { color, endpoint: { params }, text }}
+					{#each carouselItems[2].results as { color, endpoint: { params }, text }}
 						<a
 							style="border-left: 0.5rem solid #{color}"
 							class="box"
@@ -65,14 +67,14 @@
 		</div>
 	</div>
 	<Carousel
-		header={carouselItems[3].header}
-		items={carouselItems[3].results}
+		header={carouselItems[0].header}
+		items={carouselItems[0].results}
 		isBrowseEndpoint={false}
 		type="trending"
 	/>
 	<Carousel
-		header={carouselItems[0].header}
-		items={carouselItems[0].results}
+		header={carouselItems[3].header}
+		items={carouselItems[3].results}
 		type="trending"
 		isBrowseEndpoint={true}
 	/>

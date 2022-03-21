@@ -17,13 +17,13 @@ function thumbnailTransformer(url) {
 		url: ''
 	};
 	if (!url.includes('lh3.googleusercontent.com')) {
-		const split_url: string = url.split('?');
+		const split_url = url.split('?');
 		const webp_url = split_url[0];
 		output.url = webp_url;
 		output.placeholder = webp_url?.replace('sddefault', 'default');
 		// console.log(output.placeholder, output.url, webp_url)
 	} else {
-		const webp_url: string = url?.replace('-rj', '-rw');
+		const webp_url = url?.replace('-rj', '-rw');
 		output.url = webp_url;
 		output.placeholder = webp_url?.replace(
 			/(=w(\d+)-h(\d+))/gm,
@@ -80,11 +80,12 @@ export const MusicTwoRowItemRenderer = (ctx: {
 			} = {}
 		} = {}
 	} = ctx;
-	for (let index = 0; index < thumbnails.length; index++) {
-		const thumbnail = thumbnails[index];
+	let len = thumbnails.length;
+	for (; len--; ) {
+		const thumbnail = thumbnails[len];
 
 		const { url, placeholder } = thumbnailTransformer(thumbnail.url);
-		thumbnails[index] = {
+		thumbnails[len] = {
 			...thumbnail,
 			url,
 			original_url: thumbnail?.url,
@@ -161,7 +162,8 @@ export const MusicResponsiveListItemRenderer = (
 			musicThumbnailRenderer: { thumbnail: { thumbnails = [] } = {} } = {}
 		} = {}
 	} = ctx?.musicResponsiveListItemRenderer;
-	for (let index = 0; index < thumbnails.length; index++) {
+	let index = thumbnails.length;
+	for (; index--; ) {
 		const thumbnail = thumbnails[index] as Thumbnail;
 
 		const { url, placeholder } = thumbnailTransformer(thumbnail.url);
@@ -185,7 +187,7 @@ export const MusicResponsiveListItemRenderer = (
 				let length =
 					ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
 						?.musicResponsiveListItemFlexColumnRenderer?.text?.runs.length;
-				while (length--) {
+				for (; length--; ) {
 					arr[
 						length
 					] = ctx?.musicResponsiveListItemRenderer?.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[

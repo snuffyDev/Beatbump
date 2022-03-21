@@ -1,16 +1,16 @@
 <script lang="ts">
-	import db from '$lib/db'
+	import db from '$lib/db';
 
-	export let item = {}
-	export let i
-	import { createEventDispatcher } from 'svelte'
-	const dispatch = createEventDispatcher()
-	let active
+	export let item = {};
+	export let i;
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
+	let active;
 </script>
 
 <li
 	on:click={() => {
-		dispatch('click', i)
+		dispatch('click', i);
 	}}
 >
 	<div class="image">
@@ -18,7 +18,7 @@
 	</div>
 	<div class="list-item-body">
 		<p class="title">{item.name}</p>
-		<p>{item.items.length} songs</p>
+		<p>{Array.isArray(item.items) ? item?.items.length : '??'} songs</p>
 	</div>
 </li>
 

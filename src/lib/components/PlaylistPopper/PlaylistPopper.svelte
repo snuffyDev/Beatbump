@@ -61,7 +61,10 @@
 				on:click={async (e) => {
 					showConfirmation = { index: e.detail, state: true };
 					const playlist = playlists[e.detail];
-					const items = [...playlist?.items, item];
+					const items = [
+						...playlist?.items,
+						Array.isArray(item) ? [...item] : item
+					];
 					const promise = await db.updatePlaylist({
 						hideAlert: false,
 						id: playlist.id,

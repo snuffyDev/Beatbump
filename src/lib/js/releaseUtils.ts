@@ -1,23 +1,23 @@
-import { MusicResponsiveListItemRenderer } from '$lib/parsers'
+import { MusicResponsiveListItemRenderer } from '$lib/parsers';
 type Data = {
 	header: {
 		musicDetailHeaderRenderer: {
-			title
+			title;
 			subtitle: {
 				runs: [
 					{
-						text: string
-						navigationEndpoint: { browseEndpoint: { browseId: string } }
+						text: string;
+						navigationEndpoint: { browseEndpoint: { browseId: string } };
 					}
-				]
-			}
-			menu
-			thumbnail
-			moreButton
-			subtitleBadges
-			secondSubtitle: { runs: [{ text: string }] }
-		}
-	}
+				];
+			};
+			menu;
+			thumbnail;
+			moreButton;
+			subtitleBadges;
+			secondSubtitle: { runs: [{ text: string }] };
+		};
+	};
 	contents: {
 		singleColumnBrowseResultsRenderer: {
 			tabs: [
@@ -25,44 +25,44 @@ type Data = {
 					tabRenderer: {
 						content: {
 							sectionListRenderer: {
-								contents: [{ musicShelfRenderer: { contents } }]
-							}
-						}
-					}
+								contents: [{ musicShelfRenderer: { contents } }];
+							};
+						};
+					};
 				}
-			]
-		}
-	}
-}
+			];
+		};
+	};
+};
 /* eslint-disable no-prototype-builtins */
 export function parsePageContents(data: Data) {
-	let items = []
+	let items = [];
 	// console.log(contents)
 	let t = {
 		items: 'item'
-	}
+	};
 	const contents = [
 		...data.contents?.singleColumnBrowseResultsRenderer?.tabs[0].tabRenderer
 			.content.sectionListRenderer.contents[0].musicShelfRenderer.contents
-	]
+	];
 	const songs = contents.map(
 		({ musicResponsiveListItemRenderer = {} }, index) => ({
 			...MusicResponsiveListItemRenderer({ musicResponsiveListItemRenderer }),
 			index
 		})
-	)
+	);
 
 	const releaseInfoParser = () => {
-		const year = data.header?.musicDetailHeaderRenderer.subtitle?.runs.pop()
-		const length = data.header?.musicDetailHeaderRenderer.subtitle?.runs.shift()
+		const year = data.header?.musicDetailHeaderRenderer.subtitle?.runs.pop();
+		const length = data.header?.musicDetailHeaderRenderer.subtitle?.runs.shift();
 		const artists = [
 			...data.header?.musicDetailHeaderRenderer.subtitle?.runs
-				.filter((item) => !item.text.includes('•'))
+				.filter((item) => !item.text.match(/[\s]?•[\s]?/))
 				.map((item) => ({
 					name: item.text,
 					channelId: item?.navigationEndpoint?.browseEndpoint?.browseId || ''
 				}))
-		]
+		];
 		return {
 			playlistId:
 				data.header?.musicDetailHeaderRenderer.menu?.menuRenderer
@@ -95,13 +95,13 @@ export function parsePageContents(data: Data) {
 				data.header?.musicDetailHeaderRenderer.menu?.menuRenderer?.items[1]
 					?.menuNavigationItemRenderer?.navigationEndpoint
 					?.watchPlaylistEndpoint?.playlistId || null
-		}
-	}
-	const releaseInfo = releaseInfoParser()
+		};
+	};
+	const releaseInfo = releaseInfoParser();
 	// console.log(releaseInfo)
 
 	return {
 		items: songs,
 		releaseInfo: releaseInfo
-	}
+	};
 }

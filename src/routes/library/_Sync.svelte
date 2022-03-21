@@ -13,7 +13,7 @@
 <script lang="ts">
 	import type Peer from 'peerjs'
 	import Icon from '$lib/components/Icon/Icon.svelte'
-	import db, { IDBPlaylist } from '$lib/db'
+	import db, { type IDBPlaylist } from '$lib/db'
 	import { alertHandler } from '$lib/stores/stores'
 	import { createEventDispatcher, onMount, tick } from 'svelte'
 	import { fade } from 'svelte/transition'

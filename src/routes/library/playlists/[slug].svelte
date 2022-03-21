@@ -19,7 +19,7 @@
 	import ListItem from './_ListItem.svelte';
 	import { isPagePlaying, key } from '$lib/stores/stores';
 	import list from '$lib/stores/list';
-	import { getSrc } from '$lib/utils';
+	import { getSrc, seededShuffle } from '$lib/utils';
 	import Header from '$lib/components/Layouts/Header.svelte';
 	import { page } from '$app/stores';
 	import CreatePlaylist from '$lib/components/PlaylistPopper/CreatePlaylist.svelte';
@@ -129,12 +129,27 @@
 					key.set(0);
 
 					$list.mix = [...items];
+					isPagePlaying.set(playlistName);
 					await getSrc(items[0]?.videoId);
+				}
+			},
+			{
+				icon: 'shuffle',
+				text: 'Shuffle',
+
+				action: async () => {
+					// showEditPlaylist = true;
+					isPagePlaying.set(playlistName);
+					// $list.mix = ;
+					list.shuffleRandom([...items]);
+
+					await getSrc($list.mix[0]?.videoId);
 				}
 			},
 			{
 				icon: 'edit',
 				text: 'Edit Playlist',
+				type: 'outlined',
 				action: async () => {
 					showEditPlaylist = true;
 				}

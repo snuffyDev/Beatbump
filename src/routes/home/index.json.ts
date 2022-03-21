@@ -95,21 +95,29 @@ export const get: RequestHandler = async ({ url }) => {
 			data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
 				?.content?.sectionListRenderer?.continuations[0]?.nextContinuationData;
 		let headerThumbnail;
-		for (let index = 0; index < contents.length; index++) {
-			const element = contents[index];
-			if (element?.musicCarouselShelfRenderer) {
+
+		let contentLength = contents.length;
+		for (; contentLength--; ) {
+			if (contents[contentLength]?.musicCarouselShelfRenderer) {
 				// console.log(element)
-				carouselItems = [...carouselItems, parseCarousel({ ...element })];
+				carouselItems = [
+					parseCarousel({ ...contents[contentLength] }),
+					...carouselItems
+				];
 			}
-			if (element?.musicImmersiveCarouselShelfRenderer) {
+			if (contents[contentLength]?.musicImmersiveCarouselShelfRenderer) {
 				headerThumbnail = [
-					...element.musicImmersiveCarouselShelfRenderer?.backgroundImage
-						?.simpleVideoThumbnailRenderer?.thumbnail?.thumbnails
+					...contents[contentLength].musicImmersiveCarouselShelfRenderer
+						?.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail
+						?.thumbnails
 				].map((d) => {
 					let url = d?.url?.replace('-rj', '-rw');
 					return { ...d, url };
 				});
-				carouselItems = [...carouselItems, parseCarousel({ ...element })];
+				carouselItems = [
+					parseCarousel({ ...contents[contentLength] }),
+					...carouselItems
+				];
 			}
 		}
 		return {
@@ -129,10 +137,13 @@ export const get: RequestHandler = async ({ url }) => {
 				} = {}
 			} = {}
 		} = data;
-		for (let index = 0; index < contents.length; index++) {
-			const element = contents[index];
-			if (element?.musicCarouselShelfRenderer) {
-				carouselItems = [...carouselItems, parseCarousel({ ...element })];
+		let contentLength = contents.length;
+		for (; contentLength--; ) {
+			if (contents[contentLength]?.musicCarouselShelfRenderer) {
+				carouselItems = [
+					parseCarousel({ ...contents[contentLength] }),
+					...carouselItems
+				];
 			}
 		}
 
@@ -185,16 +196,16 @@ function parseBody(
 			};
 	  }[] {
 	let items: unknown[] = [];
-	for (let index = 0; index < contents.length; index++) {
-		const element = contents[index];
-		if (element.musicTwoRowItemRenderer) {
-			items = [...items, MusicTwoRowItemRenderer(element)];
+	let index = contents.length;
+	for (; index--; ) {
+		if (contents[index].musicTwoRowItemRenderer) {
+			items = [MusicTwoRowItemRenderer(contents[index]), ...items];
 		}
-		if (element.musicResponsiveListItemRenderer) {
-			items = [...items, MusicResponsiveListItemRenderer(element)];
+		if (contents[index].musicResponsiveListItemRenderer) {
+			items = [MusicResponsiveListItemRenderer(contents[index]), ...items];
 		}
-		if (element.musicNavigationButtonRenderer) {
-			items = [...items, MoodsAndGenresItem(element)];
+		if (contents[index].musicNavigationButtonRenderer) {
+			items = [MoodsAndGenresItem(contents[index]), ...items];
 		}
 	}
 	return items;

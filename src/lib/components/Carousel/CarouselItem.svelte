@@ -26,7 +26,7 @@
 			: false;
 
 	const playAlbum = () => {
-		list.startPlaylist(item.playlistId);
+		list.initPlaylistSession({ playlistId: item.playlistId });
 		key.set(0);
 		currentTitle.set(item.title);
 	};
@@ -49,10 +49,11 @@
 			text: 'Add to Queue',
 			icon: 'queue',
 			action: () => {
-				!kind && list.addNext(item, $key);
-				kind == 'Videos' && list.addNext(item, $key);
+				!kind && list.setTrackWillPlayNext(item, $key);
+				kind == 'Videos' && list.setTrackWillPlayNext(item, $key);
 				kind == 'Albums' && playAlbum();
-				kind == 'Featured on' && list.startPlaylist(item.playlistId);
+				kind == 'Featured on' &&
+					list.initPlaylistSession({ playlistId: item.playlistId });
 
 				notify(`${item.title} will play next!`, 'success');
 			}
@@ -145,7 +146,7 @@
 							'&id=' +
 							encodeURIComponent(item.endpoint?.browseId)
 				  )
-				: await list.initList({
+				: await list.initAutoMixSession({
 						videoId: item.videoId,
 						playlistId: item.playlistId,
 						config: { type: item?.musicVideoType }
@@ -161,7 +162,7 @@
 			!isBrowseEndpoint &&
 			item.videoId !== undefined &&
 			!item?.endpoint?.pageType.includes('ARTIST')
-				? await list.initList({
+				? await list.initAutoMixSession({
 						videoId: item.videoId,
 						playlistId: item.playlistId
 				  })
@@ -175,7 +176,7 @@
 			!isBrowseEndpoint &&
 			item.videoId !== undefined &&
 			!item?.endpoint?.pageType.includes('ARTIST')
-				? await list.initList({
+				? await list.initAutoMixSession({
 						videoId: item.videoId,
 						playlistId: item.playlistId,
 						keyId: index
@@ -207,7 +208,7 @@
 	if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_PLAYLIST')) {
 		DropdownItems = [
 			{
-				action: () => list.startPlaylist(item.playlistId),
+				action: () => list.initPlaylistSession({ playlistId: item.playlistId }),
 				icon: 'shuffle',
 				text: 'Shuffle Playlist'
 			},
@@ -332,7 +333,7 @@
 			-webkit-box-orient: vertical;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			margin-bottom: 0.25em;
+			margin-bottom: 0.125em;
 		}
 	}
 	.item1x1 {
@@ -462,6 +463,12 @@
 		+ .item-menu {
 			opacity: 1 !important;
 		}
+		& {
+			box-shadow: 0px -1px 27px -16px #000 !important;
+		}
+		&:active:hover {
+			box-shadow: 0px -1px 27px -12px #000 !important;
+		}
 	}
 
 	.item-menu {
@@ -495,7 +502,7 @@
 	.item-thumbnail {
 		position: relative;
 		cursor: pointer;
-		margin-bottom: 0.8rem;
+		margin-bottom: 0.5em;
 
 		&:focus-visible,
 		&:focus-within {

@@ -1,14 +1,16 @@
 <img align="right" src="/.repo/images/logo-header.png" width="128px" height="128px" />
 
 # Beatbump
+
 Beatbump is an alternative frontend for YouTube Music created using Svelte/SvelteKit, and powered by Cloudflare Workers.
 
 **Live Site**: https://beatbump.ml/
 
-**Documentation** _(work in progress)_: https://snuffydev.github.io/Beatbump/index.html#/
+> Currently, Beatbump is undergoing a major rewrite/code cleanup in a separate branch. To see the latest changes, switch over to the rewrite branch.
 
 | <img src="/.repo/images/artistpagegif.gif" width="640" height="auto"/> | <img src="/.repo/images/pwa.jpg" width="320" height="auto"/> | <img src="/.repo/images/trending.jpeg" width="640" height="auto"/> |
 | ---------------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------ |
+
 <p align="center">
 	  <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">
     <img alt="License: AGPLv3" src="https://shields.io/badge/License-AGPL%20v3-blue.svg">
@@ -27,40 +29,31 @@ Beatbump is an alternative frontend for YouTube Music created using Svelte/Svelt
   - Note: all content is audio-only.
 - View Artist pages for your favorite content
 - Personal Library
-	- Stored locally on your device
+  - Stored locally on your device
   - Hear a song you like? Save it for later by adding it to your favorites!
   - Synchronize your library across your devices!
   - Custom Playlists
 - Uses a custom wrapper around the YouTube Music API
-- User never connects to Youtube's servers
 - Multiple themes
-
-## Important Notice for iOS 15 Users
-
-AutoPlay is broken on iOS 15, [see this guide](https://github.com/snuffyDev/Beatbump/wiki/Fixing-Background-Autoplay-on-iOS-15) for a fix.
-
-## Browser Extension
-
-To redirect all Youtube Music links to Beatbump, you are highly recommended to download [Libredirect](https://github.com/libredirect/libredirect)
 
 ## Privacy
 
 All data is stored locally on your device. Data synchronization is done using PeerJS, which uses WebRTC for a peer-to-peer connection between browsers.
 
-## Libraries used
+### Extensions
 
-- [PeerJS](https://www.npmjs.com/package/peerjs) - WebRTC data synchronization
+Privacy is something you shouldn't have to think about. Using the browser extension LibRedirect, you can automatically redirect YouTube Music links to Beatbump. For more information, please visit the [LibRedirect Repo](https://github.com/libredirect/libredirect).
 
-## Contributing
+## Development
 
-This project is in it's infancy, so for stability reasons, this repository is currently not accepting pull requests for now. You can download the repo and modify the code to fit your needs best.
+### Contributing
 
-Once the documentation is finished, this repo will accept them.
+At the present moment, for stability reasons, Pull Requests generally will not be accepted. This will change soon once the current code overhaul is completed, or nearly completed.
 
-## Development and Deploying
+### Deploying Beatbump
 
 You can find the documentation [here](https://snuffydev.github.io/Beatbump/#/) for setup information.
 
-## Inspirations
+### Project Inspirations
 
 - [Invidious](https://github.com/iv-org/invidious) - a privacy focused alternative YouTube front end.

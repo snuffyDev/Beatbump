@@ -57,32 +57,3 @@ export const currentMix = writable({
 		{ id: '', videoId: '', thumbnail: '', artist: '', title: '', length: '' }
 	]
 });
-export const iOS = _verifyUserAgent();
-
-function _verifyUserAgent() {
-	const { subscribe, set, update } = writable(undefined);
-	let CheckiOS;
-	let isApple;
-	if (browser) {
-		CheckiOS = /i(Phone|Pad|Pod)/i.test(navigator.userAgent);
-		isApple = CheckiOS ? true : false;
-	}
-	// browser ? console.log(isApple, CheckiOS) : null
-
-	return {
-		subscribe,
-		set,
-		update,
-		get: (user) => get(iOS),
-		init: () => {
-			if (!browser) return;
-			set(isApple);
-			browser ? localStorage.setItem('iOSClient', isApple) : null;
-		},
-		reset: () => {
-			if (!browser) return;
-			set(undefined);
-			browser ? localStorage.removeItem('iOSClient') : null;
-		}
-	};
-}

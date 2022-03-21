@@ -1,37 +1,268 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { parseNextItem } from '$lib/parsers';
 import type { Item } from '$lib/types';
-import { getSrc, notify, queryParams } from '$lib/utils';
-import { currentTitle } from '$stores/stores';
-import { writable } from 'svelte/store';
+import { addToQueue, getSrc, notify, queryParams } from '$lib/utils';
 
-import { addToQueue } from '../utils';
-import { filterAutoPlay, key, playerLoading } from './stores';
+import { writable, get, type Readable, type Writable, type Unsubscriber } from 'svelte/store'
+import { currentTitle, filterAutoPlay, key, playerLoading } from './stores';
 
-let hasList = false;
-let mix: Item[] = [];
-let continuation: string;
-let clickTrackingParams: string;
+interface ISessionListProvider {
+	currentMixId: string;
+	continuation: string;
+	clickTrackingParams: string;
+	mix: Array<Item>
+}
 
-let splitList: any[];
-let splitListIndex = 0;
-let currentMixId: string;
-let loading = false;
-type ChunkedPlaylist = {
-	chunks?: any[][];
-	origLength?: number;
+interface ISessionListService {
+	subscribe: Writable<ISessionListProvider>['subscribe'],
+set: Writable<ISessionListProvider>['set'],
+	/** Initialize a new automix session */
+	initAutoMixSession(args: {
+		videoId?: string;
+		playlistId?: string;
+		keyId?: number;
+		playlistSetVideoId?: string;
+		clickTracking?: string;
+		config?: { playerParams?: string; type?: string };
+	}): Promise<void>;
+	/** Initializes a new playlist session */
+	initPlaylistSession(args: { playlistId: string, index?: number }): Promise<{ body: string; error?: boolean; }>
+
+	/** Continues current automix session by fetching the next batch of songs */
+	getSessionContinuation(args: { itct: string, videoId: string, playlistId: string, ctoken: string, clickTrackingParams: string, key: number })
+
+	/**
+	 * Fetches a set of similar songs and appends them to the current
+	 * automix session
+	 */
+	getMoreLikeThis(args: { videoId: string; autoMixList?: string }): Promise<void>;
+
+	/** Sets the item passed to the function to play next */
+	setTrackWillPlayNext(item: Item, key: number): Promise<void>;
+
+	removeTrack(index: number): void;
+
+	shuffleRandom(items: Array<Item>): void;
+
+	shuffle(index: number, preserveBeforeActive?: boolean): void;
+
+}
+type _T = { mix: Item[], currentMixId: string, clickTrackingParams: string; continuation: string }
+const SessionListService: ISessionListService = _sessionListService();
+function _sessionListService() {
+	// default values for the store
+	let mix = [], continuation, clickTrackingParams, currentMixId;
+
+	const { set, subscribe, update } = writable({ mix, currentMixId: undefined, clickTrackingParams: undefined, continuation: undefined })
+
+
+	// Used when playlist session is initialized with more than 50 items
+	let chunkedListOriginalLen: number;
+	let chunkedPlaylistCurrentIdx: number;
+	let chunkedPlaylist
+	const chunkedPlaylistMap = new Map()
+
+	return {
+		subscribe,
+		set,
+		async initAutoMixSession({ clickTracking, keyId = 0, playlistId, playlistSetVideoId, videoId, config: { playerParams = '', type = '' } = {} }) {
+			try {
+				playerLoading.set(true);
+				key.set(keyId);
+				if (get(SessionListService).mix.length > 0) {
+					mix = [];
+
+				}
+				const response = await fetchNext({
+					params: playerParams ? playerParams : '',
+					videoId,
+					playlistId: playlistId ? playlistId : '',
+
+					playlistSetVideoId: playlistSetVideoId ? playlistSetVideoId : '',
+					clickTracking,
+					configType: type
+				});
+
+				const data = await response;
+				getSrc(videoId ?? data.results[0].videoId, playlistId, playerParams)
+				currentTitle.set(
+					(Array.isArray(data.results) && data.results[0].title) ?? undefined
+				);
+
+				playerLoading.set(false);
+				continuation = data.continuation && data.continuation.length !== 0 && data.continuation;
+				currentMixId = data.currentMixId;
+				clickTrackingParams = data.clickTrackingParams ** data.clickTrackingParams.length !== 0 && data.clickTrackingParams;
+
+				mix = [...data.results];
+				set({ currentMixId, clickTrackingParams, continuation, mix });
+			} catch (err) {
+				playerLoading.set(false);
+				console.error(err);
+			}
+
+		},
+		async initPlaylistSession(args) {
+			const { playlistId = '', index = 0 } = args;
+			playerLoading.set(true);
+			if (mix.length !== 0) mix = [];
+			key.set(index);
+			try {
+				const data = await fetch(
+					`/api/getQueue.json?playlistId=${playlistId}`
+				).then((data) => data.json());
+				mix = [...data];
+				mix = [...mix.filter((item) => item.title)];
+				// console.log(args, data, mix, split(mix, 50) )
+
+				if (mix.length > 50) {
+					chunkedListOriginalLen = mix.length;
+					for (const [key, value] of
+						split(mix, 50).entries()
+					) {
+						// console.log(key, value)
+						chunkedPlaylistMap.set(key, value)
+						// console.log(chunkedPlaylistMap)
+					}
+					// mix = Array.from(chunkedPlaylistMap)
+					if (index < chunkedPlaylistMap.get(0).length) {
+						mix = Array.from(chunkedPlaylistMap.get(0));
+					} else {
+						let temp = []
+						chunkedPlaylistMap.forEach((value, key) => {
+							if (index > value.length) {
+								temp = [...temp, Array.from(chunkedPlaylistMap.get(key))]
+							}
+							if (index < value.length - 1 && index > chunkedPlaylistMap[key - 1].length) {
+								mix = [...temp, Array.from(chunkedPlaylistMap.get(index))];
+							}
+						}
+
+						);
+					}
+				}
+
+
+				playerLoading.set(false);
+				set({ currentMixId, clickTrackingParams, continuation, mix });
+
+				return await getSrc(mix[index].videoId, playlistId)
+			} catch (err) {
+				console.error(err)
+
+				playerLoading.set(false);
+				notify('Error starting playback', 'error');
+
+			}
+		},
+
+		async getMoreLikeThis({ videoId, autoMixList }) {
+			if (!videoId || !autoMixList) { notify('Error: No track videoId was provided!', 'error'); return; }
+			playerLoading.set(true);
+			const response = await fetchNext({
+				videoId: videoId,
+				playlistId: autoMixList
+			});
+			const data = await response;
+			// console.log(data)
+			data.results.shift();
+			mix = [...mix, ...data.results];
+			continuation = data.continuation;
+			set({ currentMixId, clickTrackingParams, continuation, mix });
+			playerLoading.set(false);
+		},
+		async getSessionContinuation({ clickTrackingParams, ctoken, itct, key, playlistId, videoId }) {
+			playerLoading.set(true);
+
+			if (chunkedPlaylistMap.size && mix.length < chunkedListOriginalLen - 1) {
+				chunkedPlaylistCurrentIdx++;
+
+				const src = await getSrc(mix[mix.length - 1].videoId);
+				mix = [...mix, ...chunkedPlaylistMap[chunkedPlaylistCurrentIdx]];
+				mix = get(filterAutoPlay) ? [...filterList(mix)] : [...mix];
+				playerLoading.set(false);
+				set({ currentMixId, clickTrackingParams, continuation, mix });
+				return await src;
+			}
+			const data = await fetchNext({
+				params: itct,
+
+				videoId,
+				playlistId,
+				ctoken,
+				clickTracking: clickTrackingParams
+			});
+			mix = get(filterAutoPlay) ? filterList([...mix, ...data.results]) : [...mix, ...data.results];
+
+			continuation = data.continuation;
+			currentMixId = data.currentMixId;
+			clickTrackingParams = data.clickTrackingParams;
+
+			playerLoading.set(false);
+			set({ currentMixId, clickTrackingParams, continuation, mix });
+			return await getSrc(data.results[0].videoId);
+
+		},
+		removeTrack(index) {
+			mix.splice(index, 1);
+			set({ mix, currentMixId, clickTrackingParams, continuation })
+		},
+		async setTrackWillPlayNext(item: Item, key) {
+			if (!item) { notify('No track to remove was provided!', 'error'); return }
+			try {
+				const lengthOfCurrentItem = await addToQueue(item.videoId);
+				const nextItem = parseNextItem(item, lengthOfCurrentItem);
+				mix.splice(key + 1, 0, nextItem);
+				notify(`${item.title} will play next!`, 'success');
+				set({ currentMixId, clickTrackingParams, continuation, mix });
+
+			} catch (err) {
+				console.error(err);
+				notify(`Error: ${err}`, 'error');
+			}
+		},
+
+		shuffleRandom(items = []) {
+			mix = [...items.sort(() => Math.random() - 0.6)]
+			set({ clickTrackingParams, continuation, currentMixId, mix });
+
+		},
+		shuffle(index: number, preserveBeforeActive = true) {
+			if (typeof index !== 'number') return;
+			if (!preserveBeforeActive) {
+				mix = [...mix.sort(() => Math.random() - 0.5)]
+			}
+			else {
+				mix = [...mix.slice(0, index), mix[index], ...mix.slice(index + 1).sort(() => Math.random() - 0.5)]
+			}
+			// console.log(mix)
+			set({ clickTrackingParams, continuation, currentMixId, mix });
+		}
+	}
+}
+
+
+// SessionListService Utils
+
+/** Take an array, turn it into chunks[][] of size `chunk` */
+function split(arr, chunk) {
+	const temp = [];
+	let i = 0;
+
+	while (i < arr.length) {
+		temp.push(arr.slice(i, chunk + i));
+		i += chunk;
+	}
+
+	return temp;
+}
+
+function filterList(list) {
+	return ([...list].filter(
+		((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set())
+	));
 };
-let Chunked: ChunkedPlaylist = {};
 
-let filterSetting = false;
-
-const list = writable({
-	currentMixId,
-	continuation,
-	clickTrackingParams,
-	mix
-});
-const fetchNext = ({
+function fetchNext({
 	params = undefined,
 	videoId = undefined,
 	itct = undefined,
@@ -49,8 +280,8 @@ const fetchNext = ({
 	playlistSetVideoId?: string;
 	clickTracking?: string;
 	configType?: string;
-}) => {
-	let obj = {
+}) {
+	const obj = {
 		itct,
 		params,
 		videoId,
@@ -60,7 +291,7 @@ const fetchNext = ({
 		clickTracking,
 		configType
 	};
-	let options = Object.fromEntries(
+	const options = Object.fromEntries(
 		Object.entries(obj)
 			.filter(([_, v]) => v != null)
 			.map(([key, value]) => [key, encodeURIComponent(value)])
@@ -78,226 +309,4 @@ const fetchNext = ({
 		.catch((err) => console.error(err));
 };
 
-const unsubscribe = filterAutoPlay.subscribe((setting) => {
-	filterSetting = setting;
-});
-unsubscribe();
-
-const filterList = (list) => {
-	return (mix = [...list].filter(
-		((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(new Set())
-	));
-};
-
-function split(arr, chunk) {
-	const temp = [];
-	let i = 0;
-
-	while (i < arr.length) {
-		temp.push(arr.slice(i, chunk + i));
-		i += chunk;
-	}
-
-	return temp;
-}
-export default {
-	subscribe: list.subscribe,
-	set: list.set,
-	async initList({
-		videoId,
-		playlistId,
-		keyId,
-		playlistSetVideoId,
-		clickTracking,
-		config: { playerParams = '', type = '' } = {}
-	}: {
-		videoId?: string;
-		playlistId?: string;
-		keyId?: number;
-		playlistSetVideoId?: string;
-		clickTracking?: string;
-		config?: { playerParams?: string; type?: string };
-	}) {
-		try {
-			loading = true;
-			playerLoading.set(loading);
-
-			keyId = keyId ? keyId : 0;
-			key.set(keyId);
-			if (hasList == true) {
-				mix = [];
-				splitList = [];
-				Chunked = {};
-			}
-			hasList = true;
-
-			const response = await fetchNext({
-				params: playerParams ? playerParams : '',
-				videoId,
-				playlistId: playlistId ? playlistId : '',
-
-				playlistSetVideoId: playlistSetVideoId ? playlistSetVideoId : '',
-				clickTracking,
-				configType: type
-			});
-			const data = response;
-			getSrc(videoId ?? data.results[0].videoId, playlistId, playerParams);
-			currentTitle.set(
-				(Array.isArray(data.results) && data.results[0].title) ?? undefined
-			);
-
-			loading = false;
-			playerLoading.set(loading);
-
-			continuation =
-				data.continuation &&
-				data.continuation.length !== 0 &&
-				data.continuation;
-			currentMixId = data.currentMixId;
-			clickTrackingParams =
-				data.clickTrackingParams &&
-				data.clickTrackingParams.length !== 0 &&
-				data.clickTrackingParams;
-
-			mix = [...data.results];
-			list.set({ currentMixId, clickTrackingParams, continuation, mix });
-		} catch (err) {
-			loading = false;
-			playerLoading.set(loading);
-			console.error(err);
-		}
-	},
-	removeItem(index) {
-		mix.splice(index, 1);
-		mix = [...mix];
-		list.set({ currentMixId, clickTrackingParams, continuation, mix });
-	},
-	async addNext(item, key) {
-		if (!item) return;
-
-		try {
-			const length = await addToQueue(item.videoId);
-			const nextItem = parseNextItem(item, length);
-			mix.splice(key + 1, 0, nextItem);
-			console.log(mix, nextItem);
-			notify(`${item.title} will play next!`, 'success');
-			list.set({ currentMixId, clickTrackingParams, continuation, mix });
-		} catch (err) {
-			notify('Error: ' + err, 'error');
-			console.error(err);
-		}
-	},
-	async moreLikeThis(item) {
-		if (!item) return;
-		loading = true;
-		playerLoading.set(loading);
-		const response = await fetchNext({
-			videoId: item.videoId,
-			playlistId: item.autoMixList
-		});
-		const data = await response;
-		// console.log(data)
-		data.results.shift();
-		mix = [...mix, ...data.results];
-		continuation = data.continuation;
-		list.set({ currentMixId, clickTrackingParams, continuation, mix });
-		loading = false;
-		playerLoading.set(loading);
-	},
-	async startPlaylist(playlistId: string, index = 0) {
-		loading = true;
-		playerLoading.set(loading);
-		if (hasList) mix = [];
-		hasList = true;
-		key.set(index);
-		try {
-			const data = await fetch(
-				`/api/getQueue.json?playlistId=${playlistId}`
-			).then((data) => data.json());
-			mix = [...data];
-			mix = [...mix.filter((item) => item.title)];
-			if (mix.length > 50) {
-				Chunked = {
-					chunks: [...split(mix, 50)],
-					origLength: mix.length
-				};
-
-				splitList = Chunked.chunks;
-
-				if (index < splitList[0].length) {
-					mix = splitList[0];
-				} else {
-					let temp = [];
-					splitList.forEach((chunk, i) => {
-						if (index > chunk.length) {
-							temp = [...temp, splitList[i]];
-						}
-						if (index < chunk.length - 1 && index > splitList[i--].length) {
-							mix = [...temp, ...splitList[i]];
-						}
-					});
-				}
-			}
-			loading = false;
-			playerLoading.set(loading);
-
-			list.set({ currentMixId, clickTrackingParams, continuation, mix });
-			return await getSrc(mix[index].videoId);
-		} catch (error) {
-			console.error(`Error starting playlist!\nOriginal Error:\n${error}`);
-			loading = false;
-			playerLoading.set(loading);
-			notify('Error starting playback', 'error');
-		}
-	},
-	async getMore(itct, videoId, playlistId, ctoken, clickTrackingParams, key) {
-		let loading = true;
-		playerLoading.set(loading);
-
-		if (splitList && mix.length < Chunked.origLength - 1) {
-			splitListIndex++;
-
-			const src = await getSrc(mix[mix.length - 1].videoId);
-			mix = [...mix, ...splitList[splitListIndex]];
-			filterSetting ? filterList([...mix]) : (mix = [...mix]);
-			loading = false;
-			playerLoading.set(loading);
-			list.set({ currentMixId, clickTrackingParams, continuation, mix });
-			return await src;
-		} else {
-			/*  Fetch the next batch of songs for autoplay
-				- autoId: current position in mix
-				- itct: params for /api/player.json (typically 'OAHyAQIIAQ%3D%3D')
-				- videoId: current videoId
-				- playlistId: current playlistId
-				- ctoken: continuation token retrieved when mix is first initialized
-				- playlistSetVideoId: set to '' since it is not a Playlist, it only is an autoplay
-				= clickTrackingParams: YouTube sends these for certain requests to prevent people
-				using their API for this purpose  */
-			const data = await fetchNext({
-				params: itct,
-
-				videoId,
-				playlistId,
-				ctoken,
-				clickTracking: clickTrackingParams
-			});
-			mix = filterSetting
-				? [...mix, ...data.results].filter(
-						((set) => (f) => !set.has(f.videoId) && set.add(f.videoId))(
-							new Set()
-						)
-				  )
-				: [...mix, ...data.results];
-			// mix = [...mix, ...data.results]
-			continuation = data.continuation;
-			currentMixId = data.currentMixId;
-			clickTrackingParams = data.clickTrackingParams;
-			// mix.push(...mix)
-			loading = false;
-			playerLoading.set(loading);
-			list.set({ currentMixId, clickTrackingParams, continuation, mix });
-			return await getSrc(data.results[0].videoId);
-		}
-	}
-};
+export default SessionListService;

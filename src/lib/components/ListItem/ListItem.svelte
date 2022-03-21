@@ -33,17 +33,16 @@
 		// @ts-ignore
 		if (page == 'playlist') {
 			key.set(index);
-			await list.startPlaylist(item.playlistId, index);
+			await list.initPlaylistSession({ playlistId: item.playlistId, index });
 		} else if (page == 'library') {
 			key.set(index);
 			dispatch('initLocalList', index);
 		} else {
-			key.set(index);
 			// console.log(item, item.videoId)
-			await list.initList({
+			await list.initAutoMixSession({
 				videoId: item.videoId,
 				playlistId: parentPlaylistId,
-				keyId: $key,
+				keyId: page === 'artist' ? 0 : index,
 				config: { playerParams: item?.playerParams, type: item?.musicVideoType }
 			});
 		}
@@ -220,6 +219,7 @@
 		/* margin-right: 1rem; */
 		max-height: 3.5rem;
 		width: 100%;
+		border-radius: var(--xs-radius);
 	}
 
 	.hidden {
@@ -265,11 +265,12 @@
 		}
 	}
 	img {
-		width: auto;
-		height: auto;
-		width: auto;
-		height: auto;
-		aspect-ratio: inherit;
+		width: 100%;
+		height: 100%;
+		// width: auto;
+		// height: auto;
+		// border-radius: initial;
+		aspect-ratio: 1/1;
 		object-fit: contain;
 	}
 	img::before {

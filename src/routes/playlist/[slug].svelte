@@ -84,8 +84,8 @@
 
 	setContext(ctx, { pageId: id });
 	// $: browser &&
-	$: browser &&
-		console.log(header, carouselContinuations, tracks, continuations, id);
+	// $: browser &&
+	// 	console.log(header, carouselContinuations, tracks, continuations, id);
 
 	pageTitle =
 		pageTitle.length > 64
@@ -291,7 +291,7 @@
 					action: () => {
 						setId();
 						// list.startPlaylist(header.playlistId)
-						list.initList({
+						list.initAutoMixSession({
 							playlistId: header.playlistId,
 							config: { playerParams: 'wAEB' }
 						});
@@ -302,7 +302,7 @@
 				{
 					action: () => {
 						setId();
-						list.initList({
+						list.initAutoMixSession({
 							playlistId: header.playlistId,
 							config: { playerParams: 'wAEB8gECGAE%3D' }
 						});
@@ -320,7 +320,7 @@
 			]}
 			on:addqueue={() => {
 				setId();
-				list.startPlaylist(header.playlistId);
+				list.initPlaylistSession({ playlistId: header.playlistId });
 
 				notify(`${pageTitle} added to queue!`, 'success');
 			}}

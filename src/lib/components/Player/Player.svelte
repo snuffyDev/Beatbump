@@ -8,7 +8,6 @@
 	import { getSrc, notify, shuffle } from '$lib/utils';
 	import {
 		currentTitle,
-		iOS,
 		key,
 		playerLoading,
 		showAddToPlaylistPopper,
@@ -56,6 +55,7 @@
 	let hoverWidth;
 	let showing;
 	let hovering;
+	// $: console.log($list);
 	$: DropdownItems = [
 		{
 			text: 'View Artist',
@@ -90,8 +90,8 @@
 			icon: 'shuffle',
 			action: () => {
 				// console.log(data)
-				const _list = $list.mix;
-				$list.mix = [...shuffle(_list, autoId)];
+				list.shuffle($key, true);
+				// console.log($list.mix, `Player Comp`);
 				// console.log($list.mix)
 			}
 		}
@@ -185,23 +185,30 @@
 	*/
 	function metaDataHandler() {
 		// <!-- if (!player.src) return -->
-		let thumbnails = [];
-		$list.mix[autoId]?.thumbnails.forEach((thumbnail) => {
-			thumbnails = [
-				...thumbnails,
-				{
-					src: thumbnail.url,
-					sizes: `${thumbnail.width}x${thumbnail.height}`,
-					type: 'image/jpeg'
-				}
-			];
-		});
+
 		if ('mediaSession' in navigator) {
 			navigator.mediaSession.metadata = new MediaMetadata({
 				title: $list.mix[autoId]?.title,
 				artist: $list.mix[autoId]?.artistInfo?.artist[0].text || null,
 				album: $list.mix[autoId]?.album?.title ?? undefined,
-				artwork: thumbnails
+				artwork: [
+					{
+						src:
+							$list.mix[autoId]?.thumbnails[
+								$list.mix[autoId]?.thumbnails.length - 1
+							].url,
+						sizes: `${
+							$list.mix[autoId]?.thumbnails[
+								$list.mix[autoId]?.thumbnails.length - 1
+							].width
+						}x${
+							$list.mix[autoId]?.thumbnails[
+								$list.mix[autoId]?.thumbnails.length - 1
+							].height
+						}`,
+						type: 'image/jpeg'
+					}
+				]
 			});
 			navigator.mediaSession.setActionHandler('play', (session) => {
 				const _play = player.play();
@@ -241,21 +248,21 @@
 			if (!$list.continuation && !$list.clickTrackingParams) {
 				autoId++;
 				key.set(autoId);
-				await list.moreLikeThis($list.mix[$list.mix.length - 1]);
+				await list.getMoreLikeThis($list.mix[$list.mix.length - 1]);
 				await tick();
 				getTrackURL();
 
 				once = false;
 				return;
 			}
-			list.getMore(
-				$list.mix[autoId]?.itct,
-				$list.mix[autoId]?.videoId,
-				$list.currentMixId,
-				$list.continuation,
-				$list.clickTrackingParams,
-				autoId + 1
-			);
+			list.getSessionContinuation({
+				itct: $list.mix[autoId]?.itct,
+				videoId: $list.mix[autoId]?.videoId,
+				playlistId: $list.currentMixId,
+				ctoken: $list.continuation,
+				clickTrackingParams: $list.clickTrackingParams,
+				key: autoId + 1
+			});
 			autoId++;
 			key.set(autoId);
 			once = false;

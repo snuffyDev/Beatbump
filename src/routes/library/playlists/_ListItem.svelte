@@ -3,30 +3,51 @@
 	import { currentId, isPagePlaying, key } from '$stores/stores';
 	import { createEventDispatcher, tick } from 'svelte';
 	import list from '$lib/stores/list';
-	export let item: Song;
+	export let item: Item;
 	export let index;
-	export let page;
 	export let parentPlaylistId = '';
-	export let ctx = {};
+	export let page;
+
 	export let send;
 	export let receive;
 	export let dragTargetIndex;
+	export let ctx = {};
 	import { getContext } from 'svelte';
-	import type { Item, Song } from '$lib/types';
+	import type { Item } from '$lib/types';
 	import PopperButton from '$lib/components/Popper/PopperButton.svelte';
-	import { goto } from '$app/navigation';
-	import db from '$lib/db';
 	import { notify } from '$lib/utils';
+	import db from '$lib/db';
+	import { goto } from '$app/navigation';
 	const { pageId } = getContext(ctx);
 	const dispatch = createEventDispatcher();
-	function dispatchPlaying() {
+
+	const dispatchPlaying = () =>
 		dispatch('pagePlaying', {
 			isPlaying: true
 		});
-	}
-	let isHovering = false;
-	let parent;
 
+	async function handleClick(e: MouseEvent) {
+		const target = e.target as HTMLElement;
+		if (target.nodeName.match('A')) return;
+		// @ts-ignore
+		if (page == 'playlist') {
+			key.set(index);
+			await list.initPlaylistSession({ playlistId: item.playlistId, index });
+		} else if (page == 'library') {
+			key.set(index);
+			dispatch('initLocalList', index);
+		} else {
+			key.set(index);
+			// console.log(item, item.videoId)
+			await list.initAutoMixSession({
+				videoId: item.videoId,
+				playlistId: parentPlaylistId,
+				keyId: $key,
+				config: { playerParams: item?.playerParams, type: item?.musicVideoType }
+			});
+		}
+		dispatchPlaying();
+	}
 	let DropdownItems = [
 		{
 			text: 'View Artist',
@@ -49,7 +70,7 @@
 					item.videoId,
 					parentPlaylistId
 				);
-				console.log(promise, item, parentPlaylistId);
+				// console.log(promise, item, parentPlaylistId);
 				dispatch('change');
 			}
 		},
@@ -104,16 +125,21 @@
 			}
 		}
 	];
+
+	let isHovering = false;
+	let parent;
 	let width = 740;
 </script>
 
 <svelte:window bind:innerWidth={width} />
+<!-- svelte-ignore a11y-mouse-events-have-key-events -->
 <div
 	bind:this={parent}
 	class="item"
-	class:playing={dragTargetIndex == index &&
-		$isPagePlaying == pageId &&
-		item.videoId == $currentId}
+	class:playing={$isPagePlaying == pageId && item.videoId == $currentId}
+	on:pointerenter={(e) => {
+		if (parent && parent.contains(e.target)) isHovering = true;
+	}}
 	draggable={true}
 	on:dragstart
 	on:drop|preventDefault
@@ -123,32 +149,13 @@
 	on:mouseenter|capture={(e) => {
 		if (parent && parent.contains(e.target)) isHovering = true;
 	}}
-	on:mouseleave|capture={(e) => {
+	on:pointerleave={(e) => {
 		if (parent && parent.contains(e.target)) {
 			isHovering = true;
 		}
 		isHovering = false;
 	}}
-	on:click={async () => {
-		// @ts-ignore
-		if (page == 'playlist') {
-			key.set(index);
-			await list.startPlaylist(item.playlistId, index);
-		} else if (page == 'library') {
-			key.set(index);
-			dispatch('initLocalList', index);
-		} else {
-			key.set(index);
-
-			await list.initList({
-				videoId: item.videoId,
-				playlistId: item.playlistId,
-				keyId: $key,
-				config: { playerParams: item?.playerParams, type: item?.musicVideoType }
-			});
-		}
-		dispatchPlaying();
-	}}
+	on:click={handleClick}
 >
 	<div class="number">
 		<span class:hidden={!isHovering}>
@@ -158,15 +165,18 @@
 		<span class:hidden={isHovering}>{index + 1}</span>
 	</div>
 	<div class="itemInfo">
-		<div class="thumbnail">
-			<img
-				loading="lazy"
-				src={item.thumbnails[0].url}
-				width={item.thumbnails[0].width}
-				height={item.thumbnails[0].height}
-				alt="thumbnail"
-			/>
-		</div>
+		{#if item.thumbnails.length !== 0}
+			<div class="thumbnail">
+				<img
+					loading="lazy"
+					src={item.thumbnails[0]?.url}
+					width={item.thumbnails[0]?.width}
+					height={item.thumbnails[0]?.height}
+					alt="thumbnail"
+					decoding="async"
+				/>
+			</div>
+		{/if}
 		<div class="column">
 			<div class="item-title">
 				{item?.title}
@@ -179,7 +189,11 @@
 			<div class="artists secondary">
 				{#if item.artistInfo?.artist}
 					{#each item?.artistInfo?.artist as subtitle}
-						<span class="artist">{subtitle.text}</span>
+						<a
+							class="artist"
+							href={`/artist/${subtitle.browseId}`}
+							sveltekit:prefetch>{subtitle.text}</a
+						>
 					{/each}
 				{/if}
 			</div>
@@ -206,11 +220,11 @@
 	.thumbnail {
 		max-width: 3.5rem;
 		aspect-ratio: 1/1;
-		margin-right: 1rem;
+		/* margin-right: 1rem; */
+		max-height: 3.5rem;
 		width: 100%;
 	}
-	.artists {
-	}
+
 	.hidden {
 		display: none;
 		visibility: hidden;
@@ -220,33 +234,31 @@
 		// margin-right: 1.5rem;
 		grid-area: r;
 	}
-	.item-wrapper {
-	}
-
 	.itemInfo {
-		display: inline-flex;
+		display: flex;
 		align-self: center;
-		line-height: 1.6;
-		margin-right: 1.8rem;
+		/* padding-right: 1.8rem; */
 		grid-area: m;
 		flex-direction: row;
-		flex: 1 0;
-		pointer-events: none;
+		flex: none;
+		gap: 0.7em;
 		.item-title {
-			max-width: 63ch;
+			font-weight: 500;
+			max-width: calc(100vw - 22ch);
 			text-overflow: ellipsis;
 			overflow: hidden;
 			white-space: nowrap;
-			font-weight: 500;
+			display: block;
 		}
 		.artist {
 			font-family: 'Commissioner', sans-serif;
 			font-weight: 400;
+			font-size: 0.9em;
 		}
 	}
 	.item {
 		cursor: pointer;
-		height: 5rem;
+		height: 4.25rem;
 	}
 
 	.text-title {
@@ -271,7 +283,6 @@
 	}
 	.item {
 		display: grid;
-		height: 100%;
 		align-content: center;
 		grid-template-areas: 'm r';
 		grid-template-columns: 1fr auto;
@@ -282,11 +293,12 @@
 		-ms-user-select: none;
 		user-select: none;
 		flex: 0 1 auto;
-		height: auto;
+		min-height: 3rem;
 		border-bottom: 0.0001605rem solid hsl(240deg 0% 55% / 34%);
 		width: 100%;
-		padding: 0.4rem 1.5rem 0.4rem 0.8rem;
+		padding: 0.8em 1.5em 0.8em 0.8em;
 		@media screen and (min-width: 640px) {
+			padding: 0.4rem 1.5rem 0.4rem 0.8rem;
 			grid-template-areas: 'c m r';
 			grid-template-columns: 2rem 1fr auto;
 		}
@@ -294,7 +306,6 @@
 			&:hover {
 				background: lighten(#57575831, 1%);
 				transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
-				pointer-events: all;
 			}
 		}
 		&:active:not(.menu) {
@@ -311,17 +322,14 @@
 		display: none;
 		visibility: none;
 		@media screen and (min-width: 640px) {
-			font-size: 1.125rem;
 			font-weight: 600;
 			grid-area: c;
 			text-align: center;
 			pointer-events: none;
 			opacity: 1;
 			/* margin-right: 1rem; */
-			align-self: center;
 			place-self: center;
-			justify-self: center;
-			display: inline-grid;
+			display: grid;
 			justify-items: center;
 			visibility: visible;
 		}

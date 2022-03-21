@@ -1,34 +1,34 @@
 <script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit'
+	import type { Load } from '@sveltejs/kit';
 	export const load: Load = async ({ url, params, fetch }) => {
-		const id = url.searchParams.get('id')
-		const playlist = url.searchParams.get('list') || undefined
+		const id = url.searchParams.get('id');
+		const playlist = url.searchParams.get('list') || undefined;
 		// const meta = await get('player', { videoId: id })
 		// const data = await meta.body
 
 		if (!id) {
-			return { redirect: '/trending', status: 301 }
+			return { redirect: '/trending', status: 301 };
 		}
 		const metadata = await fetch(
 			`/api/player.json?videoId=${id ? id : ''}${
 				playlist ? `&playlistId=${playlist}` : ''
 			}`
-		)
+		);
 		const list = await fetch(
 			`/api/next.json?videoId=${id ? id : ''}${
 				playlist ? `&playlistId=${playlist}` : ''
 			}`
-		)
-		const listData = await list.json()
+		);
+		const listData = await list.json();
 
-		const data = await metadata.json()
+		const data = await metadata.json();
 		const {
 			videoDetails: {
 				title = '',
 				videoId = '',
 				thumbnail: { thumbnails = [] } = {}
 			} = {}
-		} = data
+		} = data;
 
 		return {
 			props: {
@@ -40,21 +40,21 @@
 				// data: listData
 			},
 			status: 200
-		}
-	}
+		};
+	};
 </script>
 
 <script>
-	export let videoId
-	export let playlist
-	export let thumbnails = []
-	export let title
-	export let related
+	export let videoId;
+	export let playlist;
+	export let thumbnails = [];
+	export let title;
+	export let related;
 	// export let data
-	import { goto } from '$app/navigation'
-	import Icon from '$lib/components/Icon/Icon.svelte'
-	import Listing from '$lib/components/Item/Listing.svelte'
-	import list from '$lib/stores/list'
+	import { goto } from '$app/navigation';
+	import Icon from '$lib/components/Icon/Icon.svelte';
+	import Listing from '$lib/components/Item/Listing.svelte';
+	import list from '$lib/stores/list';
 	// $: console.log(related)
 	// $: console.log(videoId, playlist, thumbnails, title)
 </script>
@@ -88,10 +88,10 @@
 			<span class="title h4">{title}</span>
 			<button
 				on:click={() => {
-					list.initList({
+					list.initAutoMixSession({
 						videoId,
 						playlistId: playlist ?? related?.currentMixId
-					})
+					});
 				}}
 				><Icon name="play" size="1.25em" color="black" /><span class="text"
 					>Start Listening</span
