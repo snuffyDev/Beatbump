@@ -8,23 +8,15 @@
 			path: 'artist',
 			type: 'artist'
 		});
-		let {
-			carousels,
-			description,
-			thumbnail,
-			header,
-			songs
-		} = await response.body;
-		// console.log({ carousels, description, thumbnail, header, songs })
+		let { header, body } = (await response.body) as ArtistPage;
+
 		if (response.ok) {
 			return {
 				props: {
-					carousels,
-					// headerRaw,
-					description,
-					thumbnail,
+					carousels: body?.carousels,
+
 					header,
-					songs,
+					songs: body?.songs,
 					id: params.slug
 				},
 				status: 200
@@ -42,16 +34,18 @@
 	import { isPagePlaying } from '$lib/stores/stores';
 	import { setContext } from 'svelte';
 	import Header from '$lib/components/Layouts/Header.svelte';
-	import type { Thumbnail } from '$lib/types';
-	export let header;
-	export let description;
-	export let thumbnail: Array<Thumbnail> = [];
-	export let carousels;
-	export let songs = [];
+
+	import type {
+		ArtistPage,
+		ArtistPageBody,
+		IArtistPageHeader
+	} from '$lib/js/artist';
+	export let header: IArtistPageHeader;
+	export let carousels: ArtistPageBody['carousels'];
+	export let songs: ArtistPageBody['songs'] = {};
 	export let id;
-	let width;
+
 	const ctx = {};
-	// $: console.log(header, carousels, songs, $page.url.pathname)
 	setContext(ctx, { pageId: id });
 </script>
 
@@ -59,12 +53,16 @@
 	title={header?.name == undefined ? 'Artist' : header?.name}
 	desc={header?.name}
 	url={$page.url.pathname}
-	image={thumbnail && thumbnail[0]?.url}
+	image={header?.thumbnails && header?.thumbnails[0]?.url}
 />
-<ArtistPageHeader {description} {header} {width} {thumbnail} />
+<ArtistPageHeader
+	description={header?.description}
+	{header}
+	thumbnail={header?.thumbnails}
+/>
 <main>
 	<div class="artist-body">
-		{#if songs?.songs?.length > 0}
+		{#if songs?.items?.length > 0}
 			<section>
 				<div class="header">
 					<h1>Songs</h1>
@@ -75,7 +73,7 @@
 					>
 				</div>
 				<section class="songs">
-					{#each songs?.songs as item, index}
+					{#each songs?.items as item, index}
 						<ListItem
 							{item}
 							{index}

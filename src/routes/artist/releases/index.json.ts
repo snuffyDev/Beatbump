@@ -1,12 +1,12 @@
-import { MusicTwoRowItemRenderer } from '$lib/parsers'
-import type { RequestHandler } from '@sveltejs/kit'
+import { MusicTwoRowItemRenderer } from '$lib/parsers';
+import type { RequestHandler } from '@sveltejs/kit';
 
 export const get: RequestHandler = async ({ url }) => {
-	const query = url.searchParams
+	const query = url.searchParams;
 
-	const browseId = query.get('browseId') || ''
-	const params = query.get('params')
-	const itct = query.get('itct') || ''
+	const browseId = query.get('browseId') || '';
+	const params = query.get('params');
+	const itct = query.get('itct') || '';
 	// console.log(visitorID)
 
 	const response = await fetch(
@@ -74,39 +74,39 @@ export const get: RequestHandler = async ({ url }) => {
 			method: 'POST'
 			// credentials: 'include'
 		}
-	)
-	const data = await response.json()
-	const { header, contents } = await data
+	);
+	const data = await response.json();
+	const { header, contents } = await data;
 	// console.log(encodeURIComponent(params), decodeURIComponent(itct), itct)
 	if (!response.ok) {
-		return { status: response.status, body: response.statusText }
+		return { status: response.status, body: response.statusText };
 	}
 
 	const grid: {
-		items: any[]
-		header: { gridHeaderRenderer: { title: { runs: [{ text: string }] } } }
+		items: any[];
+		header: { gridHeaderRenderer: { title: { runs: [{ text: string }] } } };
 	} =
 		contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content
-			?.sectionListRenderer?.contents[0]?.gridRenderer
+			?.sectionListRenderer?.contents[0]?.gridRenderer;
 	const items = [
 		...grid.items.map((data) => {
 			if (data.musicTwoRowItemRenderer) {
-				const parsed = MusicTwoRowItemRenderer(data)
+				const parsed = MusicTwoRowItemRenderer(data);
 				return {
 					...parsed
-				}
+				};
 			}
 			// console.log(data)
 		})
-	]
+	];
 
 	const head = {
 		artist: header?.musicHeaderRenderer?.title?.runs[0]?.text,
 		type: grid.header.gridHeaderRenderer.title.runs[0].text
-	}
+	};
 
 	return {
 		body: { header: head, contents: [...items] },
 		status: 200
-	}
-}
+	};
+};

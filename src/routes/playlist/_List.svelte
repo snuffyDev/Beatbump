@@ -1,12 +1,12 @@
 <script lang="ts">
-	import viewport from '$lib/actions/viewport'
-	import ListItem from '$lib/components/ListItem/ListItem.svelte'
-	import { createEventDispatcher } from 'svelte'
+	import viewport from '$lib/actions/viewport';
+	import ListItem from '$lib/components/ListItem/ListItem.svelte';
+	import { createEventDispatcher } from 'svelte';
 
-	export let items = []
-	export let hasData = false
-	export let isLoading = false
-	const dispatch = createEventDispatcher()
+	export let items = [];
+	export let hasData = false;
+	export let isLoading = false;
+	const dispatch = createEventDispatcher();
 </script>
 
 <div class="list">
@@ -124,6 +124,6 @@
 
 <style lang="scss">
 	.list {
-		margin-bottom:0.8rem;
+		margin-bottom: 0.8rem;
 	}
 </style>

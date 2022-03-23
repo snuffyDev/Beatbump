@@ -10,7 +10,7 @@
 	/* outline: solid #11111161 1px; */
 	position: relative;
 	&::before {
-		content: "";
+		content: '';
 		position: absolute;
 		width: 100%;
 		height: 100%;
@@ -20,8 +20,8 @@
 }
 
 .dd-button svg {
-	filter: drop-shadow(-0rem -0rem 0.05rem hsl(0deg 0% 0% / 99%)) drop-shadow(0rem 0rem 0.05rem hsl(0deg 0% 0% / 99%))
-		contrast(2);
+	filter: drop-shadow(-0rem -0rem 0.05rem hsl(0deg 0% 0% / 99%))
+		drop-shadow(0rem 0rem 0.05rem hsl(0deg 0% 0% / 99%)) contrast(2);
 
 	// filter: drop-shadow(-0rem -0rem 0.15rem hsl(0deg 0% 0% / 52%));
 }

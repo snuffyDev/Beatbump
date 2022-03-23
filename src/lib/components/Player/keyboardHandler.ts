@@ -12,7 +12,7 @@ export default function keyboardHandler(
 			event.key.match(/F[1-9]+/) ||
 			event.code == 'Tab'
 		)
-			return
+			return;
 		if (
 			!document.activeElement.tagName.match(/SELECT|INPUT|BUTTON/i) &&
 			!document.activeElement.classList.contains('select') &&
@@ -20,23 +20,23 @@ export default function keyboardHandler(
 			!document.activeElement.classList.contains('dd-item') &&
 			!document.activeElement.classList.contains('dd-button')
 		) {
-			event.preventDefault()
+			event.preventDefault();
 			// node.dispatchEvent(new CustomEvent('longpress', no
 			Object.keys(params.shortcut).forEach((key) => {
 				if (event.code === key) {
 					if (Array.isArray(params.shortcut[key])) {
-						params.shortcut[key].forEach((fn) => fn(event))
+						params.shortcut[key].forEach((fn) => fn(event));
 					} else {
-						params.shortcut[key](event)
+						params.shortcut[key](event);
 					}
 				}
-			})
+			});
 		}
 	}
-	window.addEventListener('keydown', keyDown)
+	window.addEventListener('keydown', keyDown);
 	return {
 		destroy() {
-			window.removeEventListener('keydown', keyDown)
+			window.removeEventListener('keydown', keyDown);
 		}
-	}
+	};
 }

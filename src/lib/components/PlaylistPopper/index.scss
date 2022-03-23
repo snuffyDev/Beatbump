@@ -8,13 +8,13 @@ form {
 	align-self: flex-start;
 	gap: 0.8rem;
 }
-[type="file"] {
+[type='file'] {
 	min-width: 10rem;
 	margin: 0;
 	filter: opacity(0);
 	opacity: 0;
 }
-[type="file"]::-webkit-file-upload-button {
+[type='file']::-webkit-file-upload-button {
 	visibility: hidden;
 }
 .file {
@@ -26,19 +26,20 @@ form {
 	max-width: 15.5rem;
 }
 .file-button {
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
-		"Helvetica Neue", sans-serif;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+		Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 	&:hover::after {
 		background: #525252b2;
 	}
 }
 .file-button::before {
-	content: "Choose an image";
+	content: 'Choose an image';
 	display: inline-block;
 	background: var(--form-bg);
 	border: 0.0625rem solid hsla(0, 0%, 66.7%, 0.219);
 	border-radius: $md-radius;
-	box-shadow: inset 0.1125em -0.1125em 1em 0.5em hsla(0, 0%, 96.9%, 0.014), 0 0 0.25em 0.02em hsla(0, 0%, 66.7%, 0) !important;
+	box-shadow: inset 0.1125em -0.1125em 1em 0.5em hsla(0, 0%, 96.9%, 0.014),
+		0 0 0.25em 0.02em hsla(0, 0%, 66.7%, 0) !important;
 
 	padding: 0.4rem 0.7rem;
 	outline: none;
@@ -62,7 +63,7 @@ form {
 	right: 0;
 	bottom: 0;
 	// left:0;
-	content: "Select";
+	content: 'Select';
 	color: rgb(238, 238, 238);
 	background: #353535b2;
 	display: inline-flex;
@@ -72,10 +73,10 @@ form {
 	padding: 0.4rem 0.7rem;
 	transition: background linear 125ms;
 }
-[type="file"]:hover::before {
+[type='file']:hover::before {
 	border-color: black;
 }
-[type="file"]:active::before {
+[type='file']:active::before {
 	background: -webkit-linear-gradient(to top, #e3e3e3, #f9f9f9);
 }
 .playlist-modal {

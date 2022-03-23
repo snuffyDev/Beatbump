@@ -21,7 +21,7 @@ picture {
 img::before,
 video::before {
 	display: block;
-	content: "";
+	content: '';
 	position: absolute;
 	padding-top: calc(100% * 2 / 3);
 }

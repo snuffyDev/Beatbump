@@ -1,8 +1,8 @@
-import { goto } from '$app/navigation'
+import { goto } from '$app/navigation';
 
 export const browseHandler = (pageType: string, browseId: string): void => {
 	if (pageType.includes('ARTIST')) {
-		goto(`/artist/${browseId}`)
+		goto(`/artist/${browseId}`);
 	} else {
 		pageType.includes('PLAYLIST')
 			? goto('/playlist/' + browseId)
@@ -11,6 +11,6 @@ export const browseHandler = (pageType: string, browseId: string): void => {
 						encodeURIComponent(pageType) +
 						'&id=' +
 						encodeURIComponent(browseId)
-			  )
+			  );
 	}
-}
+};

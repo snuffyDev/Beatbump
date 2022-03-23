@@ -30,7 +30,7 @@
 
 	&::before {
 		position: absolute;
-		content: "";
+		content: '';
 		z-index: -1;
 		top: 0;
 		right: 0;
@@ -50,7 +50,8 @@
 	@media (hover: hover) {
 		&:hover::before {
 			// background: ;
-			background: #55555528 radial-gradient(circle, transparent 1%, #55555528 1%) center/15000%;
+			background: #55555528
+				radial-gradient(circle, transparent 1%, #55555528 1%) center/15000%;
 			opacity: 1;
 		}
 	}
@@ -93,16 +94,16 @@
 	will-change: contents;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
-	grid-template-areas: "l m r r";
+	grid-template-areas: 'l m r r';
 	max-width: 100%;
 	min-width: calc(100% - 40px);
 	width: 100%;
 	// grid-area: f/f/f/f;
 	@media screen and (max-width: 600px) {
-		grid-template-areas: "l m r";
+		grid-template-areas: 'l m r';
 	}
 }
-input[type="range"] {
+input[type='range'] {
 	-webkit-appearance: none;
 	background: none;
 	overflow: hidden;

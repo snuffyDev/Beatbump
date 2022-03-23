@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition'
-	export let main: HTMLElement
-	export let key
-	$: if (key) catchUp()
+	import { fade } from 'svelte/transition';
+	export let main: HTMLElement;
+	export let key;
+	$: if (key) catchUp();
 	async function catchUp() {
 		// await tick()
-		if (main) main.scrollTop = 0
+		if (main) main.scrollTop = 0;
 	}
 
 	// $navigating

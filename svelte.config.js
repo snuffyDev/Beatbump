@@ -1,33 +1,33 @@
 // /* eslint-disable no-undef */
 
-import node from '@sveltejs/adapter-node'
-import adapter from '@sveltejs/adapter-cloudflare-workers'
+import node from '@sveltejs/adapter-node';
+import adapter from '@sveltejs/adapter-cloudflare-workers';
 // import worker from '@snuffydev/adapter-cloudflare-cache'
-import autoprefixer from 'autoprefixer'
-import cssnano from 'cssnano'
-import path from 'path'
-import sveltePreprocess from 'svelte-preprocess'
+import autoprefixer from 'autoprefixer';
+import cssnano from 'cssnano';
+import path from 'path';
+import sveltePreprocess from 'svelte-preprocess';
 import dotenv from 'dotenv';
 dotenv.config();
 
+const rootDomain = process.env['VITE_DOMAIN']; // or your server IP for dev
+const originURL = process.env['VITE_SITE_URL']; // or your server IP for dev
 
-const rootDomain = process.env["VITE_DOMAIN"]; // or your server IP for dev
-const originURL = process.env["VITE_SITE_URL"]; // or your server IP for dev
-
-const check = process.env.NODE_ENV
-const dev = check === 'development'
+const check = process.env.NODE_ENV;
+const dev = check === 'development';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	preprocess: sveltePreprocess({
 		sass: false,
 		scss: {
-
-			includePaths: ['src'], prependData: '@import "src/global/stylesheet/base/_variables.scss";', renderSync: true
+			includePaths: ['src'],
+			prependData: '@import "src/global/stylesheet/base/_variables.scss";',
+			renderSync: true
 		},
 
 		postcss: {
 			plugins: [cssnano({ preset: 'cssnano-preset-default' }), autoprefixer({})]
-		},
+		}
 	}),
 
 	kit: {
@@ -40,12 +40,12 @@ const config = {
 				'connect-src': dev
 					? ['self', 'ws://localhost:*', 'ws://*', 'blob://*', '*']
 					: [
-						'self',
-						'ws://localhost:*',
-						'https://*.googlevideo.com',
-						'wss://*.peerjs.com',
-						'ws://*.peerjs.com'
-					],
+							'self',
+							'ws://localhost:*',
+							'https://*.googlevideo.com',
+							'wss://*.peerjs.com',
+							'ws://*.peerjs.com'
+					  ],
 				// 'connect-src': ,
 				'img-src': [
 					'self',
@@ -105,19 +105,15 @@ const config = {
 					$api: path.resolve('./src/routes/api'),
 					$components: path.resolve('./src/lib/components')
 				}
-			},
-
-
+			}
 		}
 	},
 	onwarn(warning, defaultHandler) {
 		// don't warn on <marquee> elements, cos they're cool
-		if (warning.code === "css-unused-selector")
-			return;
+		if (warning.code === 'css-unused-selector') return;
 
 		// handle all other warnings normally
 		defaultHandler(warning);
 	}
-
-}
-export default config
+};
+export default config;

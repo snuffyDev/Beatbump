@@ -1,18 +1,22 @@
 <script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit'
-	let path
+	import type { Load } from '@sveltejs/kit';
+	let path;
 
 	export const load: Load = async ({ fetch, stuff }) => {
-		const response = await fetch('/home.json')
-		const data = await response.json()
+		const response = await fetch('/home.json');
+		const data = await response.json();
 		if (!response.ok) {
 			return {
 				status: response.status,
 				error: new Error(`Error: ${response.statusText}`)
-			}
+			};
 		}
-		const { carousels, headerThumbnail = undefined, continuations } = await data
-		path = stuff.page
+		const {
+			carousels,
+			headerThumbnail = undefined,
+			continuations
+		} = await data;
+		path = stuff.page;
 		return {
 			props: {
 				carousels,
@@ -22,27 +26,27 @@
 			},
 			maxage: 3600,
 			status: 200
-		}
-	}
+		};
+	};
 </script>
 
 <script lang="ts">
-	import viewport from '$lib/actions/viewport'
-	import Carousel from '$lib/components/Carousel/Carousel.svelte'
-	import Header from '$lib/components/Layouts/Header.svelte'
-	import Loading from '$lib/components/Loading/Loading.svelte'
-	import type { NextContinuationData, Thumbnail } from '$lib/types'
+	import viewport from '$lib/actions/viewport';
+	import Carousel from '$lib/components/Carousel/Carousel.svelte';
+	import Header from '$lib/components/Layouts/Header.svelte';
+	import Loading from '$lib/components/Loading/Loading.svelte';
+	import type { NextContinuationData, Thumbnail } from '$lib/types';
 
-	export let carousels
-	export let headerThumbnail: Array<Thumbnail> = []
-	export let continuations: NextContinuationData
+	export let carousels;
+	export let headerThumbnail: Array<Thumbnail> = [];
+	export let continuations: NextContinuationData;
 
-	let loading = false
-	let hasData = false
+	let loading = false;
+	let hasData = false;
 </script>
-<svelte:head>
-	<link rel="preload" as="image" href="{headerThumbnail[0].url}">
 
+<svelte:head>
+	<link rel="preload" as="image" href={headerThumbnail[0].url} />
 </svelte:head>
 <Header
 	title="Home"
@@ -94,23 +98,23 @@
 			class="viewport"
 			use:viewport={{ margin: '0px 450px' }}
 			on:enterViewport={async () => {
-				if (loading || hasData) return
-				loading = true
+				if (loading || hasData) return;
+				loading = true;
 				const response = await fetch(
 					`/home.json?itct=${encodeURIComponent(
 						continuations.clickTrackingParams
 					)}&ctoken=${encodeURIComponent(continuations.continuation)}&type=next`
-				)
-				const data = await response.json()
+				);
+				const data = await response.json();
 				// const {continuations, carousels} = data;
 				if (data.continuations !== {}) {
-					continuations = data.continuations
-					carousels = [...carousels, ...data.carousels]
-					loading = false
-					return hasData
+					continuations = data.continuations;
+					carousels = [...carousels, ...data.carousels];
+					loading = false;
+					return hasData;
 				}
-				hasData = data.continuations === {}
-				return !loading
+				hasData = data.continuations === {};
+				return !loading;
 			}}
 		/>
 		{#if loading}

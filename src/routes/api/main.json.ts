@@ -1,11 +1,11 @@
-import type { RequestHandler } from '@sveltejs/kit'
+import type { RequestHandler } from '@sveltejs/kit';
 
 export const get: RequestHandler = async ({ url }) => {
-	const query = url.searchParams // if (headers.origin !== 'https://beatbump.ml/') {
+	const query = url.searchParams; // if (headers.origin !== 'https://beatbump.ml/') {
 	// 	return { status: 403, body: JSON.stringify('CORS error!') }
 	// }
 
-	const browseId = query.get('browseId')
+	const browseId = query.get('browseId');
 	// console.log(endpoint)
 
 	const response = await fetch(
@@ -74,16 +74,16 @@ export const get: RequestHandler = async ({ url }) => {
 					'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 			}
 		}
-	)
+	);
 
 	// if (!response.ok) {
 	// 	// NOT res.status >= 200 && res.status < 300
 	// 	return { status: response.status, body: response.statusText }
 	// }
-	const data = await response.json()
+	const data = await response.json();
 
 	return {
 		status: 200,
 		body: JSON.stringify(data)
-	}
-}
+	};
+};

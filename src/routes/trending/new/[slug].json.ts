@@ -2,16 +2,16 @@ import {
 	MoodsAndGenresItem,
 	MusicResponsiveListItemRenderer,
 	MusicTwoRowItemRenderer
-} from '$lib/parsers'
-import type { CarouselHeader } from '$lib/types'
-import type { ICarouselTwoRowItem } from '$lib/types/musicCarouselTwoRowItem'
-import type { IListItemRenderer } from '$lib/types/musicListItemRenderer'
-import type { RequestHandler } from '@sveltejs/kit'
+} from '$lib/parsers';
+import type { CarouselHeader } from '$lib/types';
+import type { ICarouselTwoRowItem } from '$lib/types/musicCarouselTwoRowItem';
+import type { IListItemRenderer } from '$lib/types/musicListItemRenderer';
+import type { RequestHandler } from '@sveltejs/kit';
 
 /* eslint-disable prefer-const */
 
 export const get: RequestHandler = async ({ params }) => {
-	const { slug } = params
+	const { slug } = params;
 	// const ctx = query.get('params') || ''
 
 	const response = await fetch(
@@ -38,9 +38,9 @@ export const get: RequestHandler = async ({ params }) => {
 				Origin: 'https://music.youtube.com'
 			}
 		}
-	)
+	);
 
-	const data = await response.json()
+	const data = await response.json();
 	let {
 		header: {
 			musicHeaderRenderer: {
@@ -58,63 +58,63 @@ export const get: RequestHandler = async ({ params }) => {
 				] = []
 			} = {}
 		} = {}
-	} = await data
-	let type: string
+	} = await data;
+	let type: string;
 
-	slug.includes('videos') ? (type = 'videos') : (type = 'albums')
-	let carousels = []
-	let grids = []
-	let sections = []
+	slug.includes('videos') ? (type = 'videos') : (type = 'albums');
+	let carousels = [];
+	let grids = [];
+	let sections = [];
 	for (let index = 0; index < contents.length; index++) {
-		const element = { ...contents[index] }
+		const element = { ...contents[index] };
 
-		element?.musicCarouselShelfRenderer && carousels.push(element)
-		element?.gridRenderer && grids.push(element)
+		element?.musicCarouselShelfRenderer && carousels.push(element);
+		element?.gridRenderer && grids.push(element);
 	}
 	if (carousels.length !== 0) {
 		for (let index = 0; index < contents.length; index++) {
-			const element = contents[index]
+			const element = contents[index];
 			if (element?.musicCarouselShelfRenderer) {
-				sections = [...sections, parseCarousel({ ...element })]
+				sections = [...sections, parseCarousel({ ...element })];
 			}
 		}
 	}
 	if (grids.length !== 0) {
 		sections = grids.map(({ gridRenderer = {} }) => {
-			const { items = [], header = {} } = gridRenderer
-			const section = items.map((ctx) => MusicTwoRowItemRenderer(ctx))
+			const { items = [], header = {} } = gridRenderer;
+			const section = items.map((ctx) => MusicTwoRowItemRenderer(ctx));
 			return {
 				section,
 				type: 'grid',
 				title: header?.gridHeaderRenderer?.title?.runs[0]?.text
-			}
-		})
+			};
+		});
 	}
 
 	const getTitle = () => {
-		const wordParts: Array<any> = slug.split('_')
+		const wordParts: Array<any> = slug.split('_');
 		for (let i = 0; i < wordParts.length; i++) {
-			wordParts[i] = wordParts[i][0].toUpperCase() + wordParts[i].substr(1)
+			wordParts[i] = wordParts[i][0].toUpperCase() + wordParts[i].substr(1);
 		}
-		wordParts.join(' ')
-		const final = wordParts.shift()
-		return wordParts.join(' ')
-	}
+		wordParts.join(' ');
+		const final = wordParts.shift();
+		return wordParts.join(' ');
+	};
 	// console.log(sections)
 	return {
 		body: { title: getTitle(), sections, header: text },
 		status: 200
-	}
-}
+	};
+};
 
 function parseHeader({
 	musicCarouselShelfBasicHeaderRenderer
 }): CarouselHeader {
 	if (musicCarouselShelfBasicHeaderRenderer) {
-		let subheading, browseId
+		let subheading, browseId;
 		if (musicCarouselShelfBasicHeaderRenderer?.strapline?.runs[0]?.text) {
 			subheading =
-				musicCarouselShelfBasicHeaderRenderer['strapline']['runs'][0].text
+				musicCarouselShelfBasicHeaderRenderer['strapline']['runs'][0].text;
 		}
 		if (
 			musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer
@@ -122,13 +122,13 @@ function parseHeader({
 		) {
 			browseId =
 				musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer
-					?.navigationEndpoint?.browseEndpoint?.browseId
+					?.navigationEndpoint?.browseEndpoint?.browseId;
 		}
 		return {
 			title: musicCarouselShelfBasicHeaderRenderer['title']['runs'][0].text,
 			subheading,
 			browseId
-		}
+		};
 	}
 }
 
@@ -138,32 +138,32 @@ function parseBody(
 	| ICarouselTwoRowItem[]
 	| IListItemRenderer[]
 	| {
-			text: any
-			color: string
+			text: any;
+			color: string;
 			endpoint: {
-				params: any
-				browseId: any
-			}
+				params: any;
+				browseId: any;
+			};
 	  }[] {
-	let items = []
+	let items = [];
 	for (let index = 0; index < contents.length; index++) {
-		const element = contents[index]
+		const element = contents[index];
 		if (element.musicTwoRowItemRenderer) {
-			items = [...items, MusicTwoRowItemRenderer(element)]
+			items = [...items, MusicTwoRowItemRenderer(element)];
 		}
 		if (element.musicResponsiveListItemRenderer) {
-			items = [...items, MusicResponsiveListItemRenderer(element)]
+			items = [...items, MusicResponsiveListItemRenderer(element)];
 		}
 		if (element.musicNavigationButtonRenderer) {
-			items = [...items, MoodsAndGenresItem(element)]
+			items = [...items, MoodsAndGenresItem(element)];
 		}
 	}
-	return items
+	return items;
 }
 
 function parseCarousel(carousel: {
-	musicImmersiveCarouselShelfRenderer?: Record<string, any>
-	musicCarouselShelfRenderer?: Record<string, any>
+	musicImmersiveCarouselShelfRenderer?: Record<string, any>;
+	musicCarouselShelfRenderer?: Record<string, any>;
 }) {
 	return {
 		header: parseHeader(
@@ -175,5 +175,5 @@ function parseCarousel(carousel: {
 			carousel.musicCarouselShelfRenderer?.contents ??
 				carousel.musicImmersiveCarouselShelfRenderer?.contents
 		)
-	}
+	};
 }

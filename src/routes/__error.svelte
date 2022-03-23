@@ -1,27 +1,27 @@
 <script>
-	import { dev } from '$app/env'
+	import { dev } from '$app/env';
 
-	import { goto } from '$app/navigation'
-	import { navigating } from '$app/stores'
-	import { onMount } from 'svelte'
-	let redir = 6
-	let timeout
+	import { goto } from '$app/navigation';
+	import { navigating } from '$app/stores';
+	import { onMount } from 'svelte';
+	let redir = 6;
+	let timeout;
 	onMount(() => {
 		const redirect = () => {
 			if (!$navigating) {
-				redir--
+				redir--;
 				if (redir <= 0) {
-					goto('/')
+					goto('/');
 				} else {
-					timeout = setTimeout(redirect, 1000)
+					timeout = setTimeout(redirect, 1000);
 				}
 			} else {
-				clearTimeout(timeout)
+				clearTimeout(timeout);
 			}
-		}
-		if (!dev) redirect()
-	})
-	$: $navigating && timeout && clearTimeout(timeout)
+		};
+		if (!dev) redirect();
+	});
+	$: $navigating && timeout && clearTimeout(timeout);
 </script>
 
 <main>

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte'
-	import Icon from '../Icon/Icon.svelte'
-	export let value
-	export let options = []
-	const dispatch = createEventDispatcher()
+	import { createEventDispatcher } from 'svelte';
+	import Icon from '../Icon/Icon.svelte';
+	export let value;
+	export let options = [];
+	const dispatch = createEventDispatcher();
 </script>
 
 <label for="select">Sort</label>

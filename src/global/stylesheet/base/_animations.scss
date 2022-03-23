@@ -32,7 +32,7 @@
 		// transform: translate(0, 0);
 	}
 }
-@mixin anim($name: "slide-up") {
+@mixin anim($name: 'slide-up') {
 	@include mixins.keyframe($name) {
 		0% {
 			opacity: 0;

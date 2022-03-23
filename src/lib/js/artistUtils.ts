@@ -1,32 +1,32 @@
 import {
 	MusicResponsiveListItemRenderer,
 	MusicTwoRowItemRenderer
-} from '$lib/parsers'
+} from '$lib/parsers';
 
 export const parseArtistPage = (
 	header: {
-		musicImmersiveHeaderRenderer?: any
-		musicVisualHeaderRenderer?: any
+		musicImmersiveHeaderRenderer?: any;
+		musicVisualHeaderRenderer?: any;
 	} = {},
 	items
 ) => {
 	// console.log(items)
-	let head = []
+	let head = [];
 	if (header?.musicImmersiveHeaderRenderer) {
-		head = [header.musicImmersiveHeaderRenderer]
+		head = [header.musicImmersiveHeaderRenderer];
 	} else if (header?.musicVisualHeaderRenderer) {
-		head = [header.musicVisualHeaderRenderer]
+		head = [header.musicVisualHeaderRenderer];
 	}
 	const parsedHeader = head.map((h) => {
-		const notAllowed = ['loggingContext']
-		const name = h?.title.runs[0].text
-		let description
-		let foregroundThumbnails
+		const notAllowed = ['loggingContext'];
+		const name = h?.title.runs[0].text;
+		let description;
+		let foregroundThumbnails;
 		const thumbnail =
-			h?.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails
+			h?.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails;
 		const mixInfo =
 			h?.startRadioButton?.buttonRenderer?.navigationEndpoint
-				?.watchPlaylistEndpoint ?? null
+				?.watchPlaylistEndpoint ?? null;
 		const shuffle =
 			h?.playButton?.buttonRenderer?.navigationEndpoint?.watchEndpoint !==
 				undefined &&
@@ -38,18 +38,18 @@ export const parseArtistPage = (
 					obj[key] =
 						h?.playButton?.buttonRenderer?.navigationEndpoint?.watchEndpoint[
 							key
-						]
-					return obj
-				}, {})
+						];
+					return obj;
+				}, {});
 
 		if (h?.description) {
-			description = h?.description.runs[0].text
+			description = h?.description.runs[0].text;
 		} else {
-			description = ''
+			description = '';
 		}
 		if (h?.foregroundThumbnail) {
 			foregroundThumbnails =
-				h?.foregroundThumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails
+				h?.foregroundThumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails;
 		}
 		return {
 			name: name,
@@ -58,17 +58,17 @@ export const parseArtistPage = (
 			description: description,
 			foregroundThumbnails,
 			shuffle
-		}
-	})
-	let songs
-	let carouselItems = []
+		};
+	});
+	let songs;
+	let carouselItems = [];
 
 	items.map((i) => {
 		if (i?.musicShelfRenderer) {
 			songs = {
 				songs: parseSongs(i?.musicShelfRenderer?.contents),
 				header: { ...i?.musicShelfRenderer?.bottomEndpoint?.browseEndpoint }
-			}
+			};
 			// console.log(songs)
 		}
 		if (i?.musicCarouselShelfRenderer) {
@@ -78,23 +78,23 @@ export const parseArtistPage = (
 					i?.musicCarouselShelfRenderer.header
 						?.musicCarouselShelfBasicHeaderRenderer
 				])
-			]
+			];
 		}
-	})
+	});
 	// console.log(`items`, carouselItems)
-	return { ...parsedHeader, songs, carouselItems }
-}
+	return { ...parsedHeader, songs, carouselItems };
+};
 
 function parseSongs(items) {
-	let results = []
-	let explicit
+	let results = [];
+	let explicit;
 	results = [
 		...items.map((song) => {
-			const Item = MusicResponsiveListItemRenderer(song)
-			return Item
+			const Item = MusicResponsiveListItemRenderer(song);
+			return Item;
 		})
-	]
-	return results
+	];
+	return results;
 }
 
 function parseCarouselItem(items, header = []) {
@@ -102,19 +102,19 @@ function parseCarouselItem(items, header = []) {
 	// console.log(items)
 	const contents = items.map((item) => {
 		// console.log(ctx, ctx?.musicTwoRowItemRenderer)\
-		const Item = MusicTwoRowItemRenderer(item)
+		const Item = MusicTwoRowItemRenderer(item);
 		if (Item.playlistId !== undefined || Item.playlistId !== null) {
-			return Item
+			return Item;
 		} else {
-			return Item
+			return Item;
 		}
-	})
+	});
 	// console.log(contents)
 	const head = header.map((i) => {
-		const title = i?.title?.runs[0].text
-		const endpoint = i?.title?.runs[0].navigationEndpoint
-		const moreButton = i.moreContentButton?.buttonRenderer?.navigationEndpoint
-		const type = title
+		const title = i?.title?.runs[0].text;
+		const endpoint = i?.title?.runs[0].navigationEndpoint;
+		const moreButton = i.moreContentButton?.buttonRenderer?.navigationEndpoint;
+		const type = title;
 		if (endpoint) {
 			return {
 				title,
@@ -125,11 +125,11 @@ function parseCarouselItem(items, header = []) {
 				itct: i?.moreContentButton?.buttonRenderer?.trackingParams,
 				browseId: moreButton?.browseEndpoint?.browseId,
 				params: moreButton?.browseEndpoint?.params
-			}
+			};
 		} else {
-			return { title, type: type }
+			return { title, type: type };
 		}
-	})
+	});
 	// console.log(head)
-	return { header: head[0], contents }
+	return { header: head[0], contents };
 }

@@ -1,6 +1,6 @@
-import { parseArtistPage } from '$lib/js/artistUtils'
+import { ArtistPageParser } from '$lib/js/artist';
 
-import type { ICarousel } from '$lib/types'
+import type { ICarousel } from '$lib/types';
 
 export const parseArtist = (data) => {
 	const {
@@ -17,49 +17,7 @@ export const parseArtist = (data) => {
 				] = []
 			} = {}
 		} = {}
-	} = data
+	} = data;
 	// console.log(header)
-	const parsed = parse(header, contents)
-
-	return {
-		...parsed[0]
-		// headerRaw: header
-	}
-}
-
-function parse(header: { musicImmersiveHeaderRenderer: any }, contents: any) {
-	try {
-		let carouselItems: ICarousel[] | null = []
-		const thumbnail = []
-		let description = ''
-		let items = []
-		const headerContent = []
-		const newData = [parseArtistPage(header, contents)]
-		return newData.map((d) => {
-			carouselItems = d.carouselItems
-			headerContent.push(d[0])
-			if (d[0]) {
-				d[0].thumbnails?.forEach((h: any) => {
-					thumbnail.push(h)
-				})
-			}
-			if (d?.songs) {
-				items = d.songs
-			} else {
-				items = undefined
-			}
-			description = d[0].description
-
-			return {
-				header: headerContent[0],
-				songs: items,
-				thumbnail,
-				carousels: carouselItems,
-				description,
-				data: { header, contents }
-			}
-		})
-	} catch (err) {
-		console.error(err)
-	}
-}
+	return ArtistPageParser({ header, items: contents })
+};

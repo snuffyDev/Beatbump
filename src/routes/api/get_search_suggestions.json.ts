@@ -1,9 +1,9 @@
-import type { RequestHandler } from '@sveltejs/kit'
+import type { RequestHandler } from '@sveltejs/kit';
 
 export const get: RequestHandler = async ({ url }) => {
-	const query = url.searchParams
-	let q = query.get('q')
-	q = decodeURIComponent(q)
+	const query = url.searchParams;
+	let q = query.get('q');
+	q = decodeURIComponent(q);
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/music/get_search_suggestions?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
@@ -66,20 +66,20 @@ export const get: RequestHandler = async ({ url }) => {
 					'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 			}
 		}
-	)
-	const data = await response.json()
+	);
+	const data = await response.json();
 	const {
 		contents: [
 			{ searchSuggestionsSectionRenderer: { contents = [] } = {} } = {}
 		] = []
-	} = data
+	} = data;
 	const results = contents.map(({ searchSuggestionRenderer }, i) => {
 		return {
 			query: searchSuggestionRenderer.navigationEndpoint.searchEndpoint.query,
 			id: i
-		}
-	})
+		};
+	});
 	if (results) {
-		return { body: results, status: 200 }
+		return { body: results, status: 200 };
 	}
-}
+};

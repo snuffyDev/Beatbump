@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte'
-	import { updateTrack } from '$lib/stores/stores'
-	import Icon from '../Icon/Icon.svelte'
+	import { createEventDispatcher } from 'svelte';
+	import { updateTrack } from '$lib/stores/stores';
+	import Icon from '../Icon/Icon.svelte';
 	// export let canPlay
-	export let prevBtn
-	export let nextBtn
-	export let isPlaying
-	export let pause
-	export let loading
-	const dispatch = createEventDispatcher()
+	export let prevBtn;
+	export let nextBtn;
+	export let isPlaying;
+	export let pause;
+	export let loading;
+	const dispatch = createEventDispatcher();
 
-	const playEvent = () => dispatch('play')
+	const playEvent = () => dispatch('play');
 </script>
 
 <div class="player-controls">
@@ -21,12 +21,12 @@
 		<div
 			class="player-btn player-title"
 			on:click={(e) => {
-				if (!$updateTrack) return
+				if (!$updateTrack) return;
 				if (!isPlaying) {
 					// console.log(e)
-					playEvent()
+					playEvent();
 				} else {
-					pause()
+					pause();
 				}
 			}}
 		>

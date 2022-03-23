@@ -1,47 +1,47 @@
 $sections: (
 	bottom: (
 		footer-container,
-		player,
+		player
 	),
 	top: (
-		nav,
+		nav
 	),
 	form: (
 		select,
 		input,
 		option,
-		suggestions,
-	),
+		suggestions
+	)
 );
 $themes: (
 	ytm: (
-		"bottom": #121018,
-		"base": #09090a,
-		"top": #09090a,
-		"form": #15141d,
-		"side": #0e0c13,
+		'bottom': #121018,
+		'base': #09090a,
+		'top': #09090a,
+		'form': #15141d,
+		'side': #0e0c13
 	),
 	dark: (
-		"bottom": #111214,
-		"base": #09090a,
-		"top": #111214,
-		"form": #131516,
-		"side": #15191d,
+		'bottom': #111214,
+		'base': #09090a,
+		'top': #111214,
+		'form': #131516,
+		'side': #15191d
 	),
 	dim: (
-		"bottom": #141820,
-		"base": #09090a,
-		"top": #141820,
-		"form": #131516,
-		"side": #0f1116,
+		'bottom': #141820,
+		'base': #09090a,
+		'top': #141820,
+		'form': #131516,
+		'side': #0f1116
 	),
 	midnight: (
-		"base": #05070a,
-		"top": hsl(267, 41%, 6%),
-		"side": #15131f,
-		"bottom": #090d11,
-		"form": #100f17,
-	),
+		'base': #05070a,
+		'top': hsl(267, 41%, 6%),
+		'side': #15131f,
+		'bottom': #090d11,
+		'form': #100f17
+	)
 );
 $theme-name: (dark, dim, midnight, ytm);
 $section-names: (base, top, side, bottom, form);
@@ -57,11 +57,11 @@ $section-names: (base, top, side, bottom, form);
 html {
 	@each $theme in $theme-name {
 		&.#{$theme} {
-			--mobile-popper-bg: #{map-get($themes, $theme, "side")};
-			--form-bg: #{map-get($themes, $theme, "form")};
-			--bottom-bg: #{map-get($themes, $theme, "bottom")};
-			--top-bg: #{map-get($themes, $theme, "top")};
-			--base-bg: #{map-get($themes, $theme, "base")};
+			--mobile-popper-bg: #{map-get($themes, $theme, 'side')};
+			--form-bg: #{map-get($themes, $theme, 'form')};
+			--bottom-bg: #{map-get($themes, $theme, 'bottom')};
+			--top-bg: #{map-get($themes, $theme, 'top')};
+			--base-bg: #{map-get($themes, $theme, 'base')};
 			background: var(--base-bg);
 
 			@each $section, $elm in $sections {

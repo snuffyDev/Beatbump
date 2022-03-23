@@ -7,21 +7,21 @@ export function enhance(
 		error,
 		result
 	}: {
-		pending?: (data: FormData, form: HTMLFormElement) => void
-		error?: (res: Response, error: Error, form: HTMLFormElement) => void
-		result: (res: Response, form: HTMLFormElement) => void
+		pending?: (data: FormData, form: HTMLFormElement) => void;
+		error?: (res: Response, error: Error, form: HTMLFormElement) => void;
+		result: (res: Response, form: HTMLFormElement) => void;
 	}
 ): { destroy: () => void } {
-	let current_token: unknown
+	let current_token: unknown;
 
 	async function handle_submit(e: Event) {
-		const token = (current_token = {})
+		const token = (current_token = {});
 
-		e.preventDefault()
+		e.preventDefault();
 
-		const body = new FormData(form)
+		const body = new FormData(form);
 
-		if (pending) pending(body, form)
+		if (pending) pending(body, form);
 
 		try {
 			const res = await fetch(form.action, {
@@ -30,31 +30,31 @@ export function enhance(
 					accept: 'application/json'
 				},
 				body
-			})
+			});
 
-			if (token !== current_token) return
+			if (token !== current_token) return;
 
 			if (res.ok) {
-				result(res, form)
+				result(res, form);
 			} else if (error) {
-				error(res, null, form)
+				error(res, null, form);
 			} else {
-				console.error(await res.text())
+				console.error(await res.text());
 			}
 		} catch (e) {
 			if (error) {
-				error(null, e, form)
+				error(null, e, form);
 			} else {
-				throw e
+				throw e;
 			}
 		}
 	}
 
-	form.addEventListener('submit', handle_submit)
+	form.addEventListener('submit', handle_submit);
 
 	return {
 		destroy() {
-			form.removeEventListener('submit', handle_submit)
+			form.removeEventListener('submit', handle_submit);
 		}
-	}
+	};
 }

@@ -14,13 +14,13 @@ This will respond with JSON in this shape:
 
 ```ts
 type Search = {
-	contents: SongResult[] | PlaylistSearch[]
-	continuation: NextContinuationData
-}
+	contents: SongResult[] | PlaylistSearch[];
+	continuation: NextContinuationData;
+};
 
 interface NextContinuationData {
-	continuation: string
-	clickTrackingParams: string
+	continuation: string;
+	clickTrackingParams: string;
 }
 ```
 
@@ -49,43 +49,43 @@ This endpoint's response typically will look like this:
 ```ts
 // Response from Beatbump's endpoint
 type Search = {
-	contents: SongResult[] | PlaylistSearch[]
-	continuation: NextContinuationData
-}
+	contents: SongResult[] | PlaylistSearch[];
+	continuation: NextContinuationData;
+};
 
 // Shape of the continuation data object
 interface NextContinuationData {
-	continuation: string
-	clickTrackingParams: string
+	continuation: string;
+	clickTrackingParams: string;
 }
 ```
 
 ```ts
 // Song result also doubles as video and artist result
 type SongResult = {
-	album?: Album
-	artistInfo?: ArtistInfo
-	explicit?: string
-	hash: string
-	index?: number
-	length?: string
-	params?: string
-	playlistId?: string
-	title?: string
-	thumbnails: [{ url: string }]
-	type?: string
-	videoId: string
-}
+	album?: Album;
+	artistInfo?: ArtistInfo;
+	explicit?: string;
+	hash: string;
+	index?: number;
+	length?: string;
+	params?: string;
+	playlistId?: string;
+	title?: string;
+	thumbnails: [{ url: string }];
+	type?: string;
+	videoId: string;
+};
 // Playlist search result
 interface PlaylistSearch {
-	playlistId: string
-	metaData?: string | string[]
-	browseId?: string
-	hash?: string
-	title: string
-	type?: string
-	thumbnails?: Thumbnail[]
-	continuation?: NextContinuationData
+	playlistId: string;
+	metaData?: string | string[];
+	browseId?: string;
+	hash?: string;
+	title: string;
+	type?: string;
+	thumbnails?: Thumbnail[];
+	continuation?: NextContinuationData;
 }
 ```
 

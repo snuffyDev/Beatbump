@@ -95,7 +95,7 @@ $width: 1fr;
 	font-weight: 700;
 	font-size: 2em !important;
 	letter-spacing: -0.01rem;
-	font-family: "Commissioner", sans-serif !important;
+	font-family: 'Commissioner', sans-serif !important;
 
 	text-overflow: ellipsis;
 	display: block;
@@ -136,9 +136,9 @@ small {
 	grid-template-columns: 1fr;
 	gap: 0.5rem 1.25rem;
 	grid-template-areas:
-		"img"
-		"metadata"
-		"buttons";
+		'img'
+		'metadata'
+		'buttons';
 	padding: 0.8em;
 	transition: all 0.23s cubic-bezier(0.39, 0.575, 0.565, 1);
 	user-select: none;
@@ -153,18 +153,18 @@ small {
 		grid-template-columns: 1fr;
 		gap: 0.5rem 1rem;
 		grid-template-areas:
-			"img img"
-			"metadata metadata"
-			"buttons buttons ";
+			'img img'
+			'metadata metadata'
+			'buttons buttons ';
 	}
 	@media screen and (min-width: 512px) {
 		grid-template-columns: min(var(--width), 24rem) 1fr;
 
 		gap: 0.25rem 2.05em;
 		grid-template-areas:
-			"img metadata"
-			"img buttons"
-			"img buttons";
+			'img metadata'
+			'img buttons'
+			'img buttons';
 	}
 }
 hr {

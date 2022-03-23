@@ -1,12 +1,12 @@
 <script context="module" lang="ts">
-	import { browser } from '$app/env'
-	let _Peer: typeof Peer
-	let RTC_module
+	import { browser } from '$app/env';
+	let _Peer: typeof Peer;
+	let RTC_module;
 	if (browser) {
-		RTC_module = import('peerjs')
+		RTC_module = import('peerjs');
 		RTC_module.then((module) => {
-			_Peer = module.default
-		})
+			_Peer = module.default;
+		});
 	}
 </script>
 
@@ -184,7 +184,7 @@
 		<div
 			class="x-button"
 			on:click={() => {
-				dispatch('close')
+				dispatch('close');
 			}}
 		>
 			<Icon name="x" size="1.5rem" />
@@ -274,7 +274,7 @@
 							? check == 'sending' && kindOfData.length === 0
 							: check == undefined}
 						on:click={() => {
-							if (check !== undefined) nextStep()
+							if (check !== undefined) nextStep();
 						}}>Next Step</button
 					>
 				</div>
@@ -294,12 +294,12 @@
 									<p
 										class="copy link"
 										on:click={async () => {
-											if (!browser) return
-											await navigator.clipboard.writeText(id)
-											copyText = 'copied!'
+											if (!browser) return;
+											await navigator.clipboard.writeText(id);
+											copyText = 'copied!';
 											setTimeout(() => {
-												copyText = 'copy'
-											}, 1500)
+												copyText = 'copy';
+											}, 1500);
 										}}
 									>
 										{copyText}
@@ -309,9 +309,9 @@
 							<button
 								class="small"
 								on:click={async () => {
-									if (!browser) return
+									if (!browser) return;
 
-									ID()
+									ID();
 								}}>Create ID</button
 							>
 						</section>
@@ -322,7 +322,7 @@
 						class="nextbtn"
 						disabled={id == 'unset'}
 						on:click={() => {
-							if (id !== 'unset') nextStep()
+							if (id !== 'unset') nextStep();
 						}}>Next Step</button
 					>
 				</div>
@@ -355,7 +355,7 @@
 								<div class="id-cont">
 									<input
 										on:submit|preventDefault={async () => {
-											connect()
+											connect();
 										}}
 										bind:value={peerID}
 										class="input"
@@ -375,7 +375,7 @@
 								class="nextBtn"
 								disabled={peerID.length < 1}
 								on:click={() => {
-									connect()
+									connect();
 								}}>Connect</button
 							>
 						</div>

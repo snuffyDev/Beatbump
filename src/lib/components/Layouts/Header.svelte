@@ -1,14 +1,14 @@
 <script>
-	import tagStore from '$lib/stores/ogtags'
-	import { currentTitle } from '$lib/stores/stores'
+	import tagStore from '$lib/stores/ogtags';
+	import { currentTitle } from '$lib/stores/stores';
 
-	export let title
-	export let desc = ''
-	export let url
-	export let image = '/favicon.png'
+	export let title;
+	export let desc = '';
+	export let url;
+	export let image = '/favicon.png';
 	// $: slug = slug
 	// $: console.log(name)
-	tagStore.init(title, url, desc, image)
+	tagStore.init(title, url, desc, image);
 </script>
 
 <svelte:head>

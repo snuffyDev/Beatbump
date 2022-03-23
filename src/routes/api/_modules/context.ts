@@ -28,7 +28,7 @@ const Base = {
 		},
 		utcOffsetMinutes: -new Date().getTimezoneOffset()
 	}
-}
+};
 const Player = {
 	context: {
 		client: {
@@ -43,10 +43,10 @@ const Player = {
 		captionParams: {},
 		params: 'igMDCNgE'
 	}
-}
+};
 
-const context = { Base, Player }
-context.Base
+const context = { Base, Player };
+context.Base;
 export default {
 	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 	player: (videoId: string, playlistId?: string) => ({
@@ -67,9 +67,9 @@ export default {
 						pageType: 'MUSIC_PAGE_TYPE_' + type.toUpperCase()
 					}
 				}
-			}
+			};
 		} else {
-			return { context: { ...Base.context }, browseId: browseId ?? null }
+			return { context: { ...Base.context }, browseId: browseId ?? null };
 		}
 	}
-}
+};

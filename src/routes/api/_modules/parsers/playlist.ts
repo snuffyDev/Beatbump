@@ -1,29 +1,29 @@
 /* eslint-disable prefer-const */
 
-import { MusicResponsiveListItemRenderer } from '$lib/parsers'
-import type { Artist, Item, NextContinuationData, Thumbnail } from '$lib/types'
-import type { IListItemRenderer } from '$lib/types/musicListItemRenderer'
-import type { IPlaylistItem, PlaylistData } from '$lib/types/playlist'
-import { pb } from '$lib/utils'
+import { MusicResponsiveListItemRenderer } from '$lib/parsers';
+import type { Artist, Item, NextContinuationData, Thumbnail } from '$lib/types';
+import type { IListItemRenderer } from '$lib/types/musicListItemRenderer';
+import type { IPlaylistItem, PlaylistData } from '$lib/types/playlist';
+import { pb } from '$lib/utils';
 
 function parseTrack(contents = [], playlistId?): Array<IListItemRenderer> {
 	const Tracks = contents.map((item) => {
 		if (!item) {
-			return null
+			return null;
 		}
-		return MusicResponsiveListItemRenderer(item, true, playlistId)
-	})
-	return Tracks
+		return MusicResponsiveListItemRenderer(item, true, playlistId);
+	});
+	return Tracks;
 }
 
 export const parsePlaylist = async (
 	data: {
 		header: {
 			musicDetailHeaderRenderer: {
-				description: { runs: [{ text: string }] }
-				thumbnail: {}
-			}
-		}
+				description: { runs: [{ text: string }] };
+				thumbnail: {};
+			};
+		};
 		contents: {
 			singleColumnBrowseResultsRenderer: {
 				tabs: [
@@ -36,19 +36,19 @@ export const parsePlaylist = async (
 									contents: [
 										{
 											musicPlaylistShelfRenderer: {
-												contents: Array<IListItemRenderer>
-												playlistId: string
-												continuations: NextContinuationData
-											}
+												contents: Array<IListItemRenderer>;
+												playlistId: string;
+												continuations: NextContinuationData;
+											};
 										}
-									]
-								}
-							}
-						}
+									];
+								};
+							};
+						};
 					}
-				]
-			}
-		}
+				];
+			};
+		};
 	},
 	next?: boolean
 ): Promise<PlaylistData> => {
@@ -79,13 +79,13 @@ export const parsePlaylist = async (
 					] = []
 				} = {}
 			} = {}
-		} = data
+		} = data;
 
 		// console.log(musicDetailHeaderRenderer)
 		const cont: NextContinuationData = continuations
 			? continuations[0]?.nextContinuationData
-			: ''
-		musicDetailHeaderRenderer = [musicDetailHeaderRenderer]
+			: '';
+		musicDetailHeaderRenderer = [musicDetailHeaderRenderer];
 		const parseHeader = musicDetailHeaderRenderer.map(
 			({
 				description = {},
@@ -94,10 +94,10 @@ export const parsePlaylist = async (
 				secondSubtitle = {},
 				title = {}
 			}) => {
-				const subtitles = pb(subtitle, 'runs:text', false)
-				const desc = pb(description, 'runs:0:text', false)
-				const _title = pb(title, 'runs:0:text', false)
-				secondSubtitle = pb(secondSubtitle, 'runs:text', false)
+				const subtitles = pb(subtitle, 'runs:text', false);
+				const desc = pb(description, 'runs:0:text', false);
+				const _title = pb(title, 'runs:0:text', false);
+				secondSubtitle = pb(secondSubtitle, 'runs:text', false);
 				return {
 					data,
 					description: desc,
@@ -108,20 +108,20 @@ export const parsePlaylist = async (
 					playlistId: playlistId,
 					secondSubtitle,
 					title: _title || 'error'
-				}
+				};
 			}
-		)[0]
+		)[0];
 		// const [contents] = playlist;
 
 		const tracks = parseTrack(contents, playlistId).filter((e) => {
-			return e != null
-		})
+			return e != null;
+		});
 		// console.log('TRACKS: ' + Tracks)
 		return {
 			continuations: cont,
 			tracks,
 			header: parseHeader
-		}
+		};
 	} else {
 		const {
 			responseContext: {
@@ -134,18 +134,18 @@ export const parsePlaylist = async (
 					continuations = []
 				} = {}
 			} = {}
-		} = await data
+		} = await data;
 		// console.log(`value: ${serviceTrackingParams[0].params.value} + ${value}`)
 		// console.log(data, contents, continuations)
 		const cont: NextContinuationData = continuations
 			? continuations[0]?.nextContinuationData
-			: null
-		const Tracks = parseTrack(contents, value.slice(2))
+			: null;
+		const Tracks = parseTrack(contents, value.slice(2));
 		// console.log(referrer.slice(1))
 		return {
 			continuations: cont,
 
 			tracks: Tracks
-		}
+		};
 	}
-}
+};

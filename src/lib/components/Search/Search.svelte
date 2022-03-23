@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { goto } from '$app/navigation'
-	import Icon from '$lib/components/Icon/Icon.svelte'
-	import debounce from '$lib/js/debounce'
-	import { createEventDispatcher } from 'svelte'
+	import { goto } from '$app/navigation';
+	import Icon from '$lib/components/Icon/Icon.svelte';
+	import debounce from '$lib/js/debounce';
+	import { createEventDispatcher } from 'svelte';
 
-	export let type
+	export let type;
 
 	let options = [
 		{ label: 'Songs', params: 'EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D' },
@@ -19,26 +19,26 @@
 			label: 'Community Playlists',
 			params: 'EgeKAQQoAEABagwQDhAKEAkQAxAEEAU%3D'
 		}
-	]
-	let filterType
-	let query = ''
-	let filter = filterType ? filterType : options[0].params
-	const dispatch = createEventDispatcher()
-	let results: Array<{ query?: string; id?: number }> = []
+	];
+	let filterType;
+	let query = '';
+	let filter = filterType ? filterType : options[0].params;
+	const dispatch = createEventDispatcher();
+	let results: Array<{ query?: string; id?: number }> = [];
 	async function handleSubmit() {
-		dispatch('submitted', { submitted: true })
+		dispatch('submitted', { submitted: true });
 		let url = `/search/${encodeURIComponent(encodeURIComponent(query))}${
 			filter !== undefined ? `?filter=${filter}` : ''
-		}`
-		goto(url)
+		}`;
+		goto(url);
 	}
 	const typeahead = debounce(async () => {
-		if (query == '' || undefined) return (results = [])
+		if (query == '' || undefined) return (results = []);
 		const response = await fetch(
 			'/api/get_search_suggestions.json?q=' + encodeURIComponent(query)
-		)
-		results = await response.json()
-	}, 250)
+		);
+		results = await response.json();
+	}, 250);
 </script>
 
 <form
@@ -69,8 +69,8 @@
 				type="search"
 				placeholder="Search"
 				on:keyup={(e) => {
-					if (e.shiftKey && e.ctrlKey && e.repeat) return
-					typeahead()
+					if (e.shiftKey && e.ctrlKey && e.repeat) return;
+					typeahead();
 				}}
 				bind:value={query}
 			/>
@@ -81,8 +81,8 @@
 			{#each results as result (result?.id)}
 				<li
 					on:click={() => {
-						query = result.query
-						handleSubmit()
+						query = result.query;
+						handleSubmit();
 					}}
 				>
 					{result.query}

@@ -1,4 +1,4 @@
-import { parseContents } from '$lib/endpoints/nextUtils'
+import { parseContents } from '$lib/endpoints/nextUtils';
 
 export const parseNextTrack = (data, itct) => {
 	if (!itct) {
@@ -35,16 +35,16 @@ export const parseNextTrack = (data, itct) => {
 				} = {}
 			} = {},
 			currentVideoEndpoint: { watchEndpoint = {} } = {}
-		} = data
+		} = data;
 		const parsed = parseContents(
 			contents,
 			continuation,
 			clickTrackingParams,
 			watchEndpoint ? watchEndpoint : ''
-		)
+		);
 		return {
 			body: parsed
-		}
+		};
 	}
 	/*
 	 * This is for when you are already listening to a song
@@ -65,16 +65,16 @@ export const parseNextTrack = (data, itct) => {
 				...rest
 			} = {}
 		} = {}
-	} = data
+	} = data;
 	// return { body: { rest, contents, continuation, data, clickTrackingParams } }
 	const parsed = parseContents(
 		contents,
 		continuation,
 		clickTrackingParams,
 		rest
-	)
+	);
 	// console.log(parsed)
 	return {
 		body: parsed
-	}
-}
+	};
+};

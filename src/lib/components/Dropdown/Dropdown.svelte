@@ -1,21 +1,21 @@
 <script lang="ts">
-	import Icon from '$components/Icon/Icon.svelte'
-	import { clickOutside } from '$lib/actions/clickOutside'
-	import { cubicOut, quartOut } from 'svelte/easing'
+	import Icon from '$components/Icon/Icon.svelte';
+	import { clickOutside } from '$lib/actions/clickOutside';
+	import { cubicOut, quartOut } from 'svelte/easing';
 	// import { slide } from 'svelte/transition'
 
-	import { PopperStore } from '../Popper'
-	import DropdownItem from './DropdownItem.svelte'
+	import { PopperStore } from '../Popper';
+	import DropdownItem from './DropdownItem.svelte';
 
-	$: items = $PopperStore.items
-	$: type = $PopperStore.type
+	$: items = $PopperStore.items;
+	$: type = $PopperStore.type;
 
-	$: isHidden = $PopperStore.items.length !== 0
+	$: isHidden = $PopperStore.items.length !== 0;
 
 	function onClose() {
-		popper = null
+		popper = null;
 		if ($PopperStore.srcNode !== undefined) {
-			$PopperStore.srcNode.focus()
+			$PopperStore.srcNode.focus();
 		}
 		PopperStore.set({
 			items: [],
@@ -24,26 +24,26 @@
 			x: undefined,
 			y: undefined,
 			bottom: undefined
-		})
+		});
 	}
-	let width
-	let viewport_height
-	let viewport_width
-	let popperHeight
-	let popper: HTMLElement = undefined
+	let width;
+	let viewport_height;
+	let viewport_width;
+	let popperHeight;
+	let popper: HTMLElement = undefined;
 	export function slide(
 		node: Element,
 		{ delay = 0, duration = 400, easing = cubicOut } = {}
 	) {
-		const style = getComputedStyle(node)
-		const opacity = +style.opacity
-		const height = parseFloat(style.height)
-		const padding_top = parseFloat(style.paddingTop)
-		const padding_bottom = parseFloat(style.paddingBottom)
-		const margin_top = parseFloat(style.marginTop)
-		const margin_bottom = parseFloat(style.marginBottom)
-		const border_top_width = parseFloat(style.borderTopWidth)
-		const border_bottom_width = parseFloat(style.borderBottomWidth)
+		const style = getComputedStyle(node);
+		const opacity = +style.opacity;
+		const height = parseFloat(style.height);
+		const padding_top = parseFloat(style.paddingTop);
+		const padding_bottom = parseFloat(style.paddingBottom);
+		const margin_top = parseFloat(style.marginTop);
+		const margin_bottom = parseFloat(style.marginBottom);
+		const border_top_width = parseFloat(style.borderTopWidth);
+		const border_bottom_width = parseFloat(style.borderBottomWidth);
 
 		return {
 			delay,
@@ -59,15 +59,15 @@
 				`margin-bottom: ${t * margin_bottom}px;` +
 				`border-top-width: ${t * border_top_width}px;` +
 				`border-bottom-width: ${t * border_bottom_width}px;`
-		}
+		};
 	}
-	$: rect = popper && popper.getBoundingClientRect()
+	$: rect = popper && popper.getBoundingClientRect();
 	$: posY =
 		$PopperStore.y - popperHeight <= 0
 			? $PopperStore.y
 			: $PopperStore.bottom + popperHeight >= viewport_height
 			? $PopperStore.y - popperHeight
-			: $PopperStore.y
+			: $PopperStore.y;
 
 	$: posX =
 		$PopperStore.direction === 'right'
@@ -76,8 +76,8 @@
 				: rect?.right >= viewport_width
 				? viewport_width + -width * 1.75
 				: $PopperStore.x
-			: $PopperStore.x - width
-	$: popper && popper instanceof HTMLElement && popper.focus()
+			: $PopperStore.x - width;
+	$: popper && popper instanceof HTMLElement && popper.focus();
 	// $: console.log($PopperStore)
 	function focusState(node: HTMLElement) {
 		function handleFocusOut(
@@ -85,23 +85,23 @@
 		) {
 			// console.log(node.contains(event.relatedTarget))
 			if (!node.contains(event.relatedTarget)) {
-				node.dispatchEvent(new CustomEvent('lostfocus'))
+				node.dispatchEvent(new CustomEvent('lostfocus'));
 			}
 		}
 
-		node.addEventListener('focusout', handleFocusOut, { capture: true })
+		node.addEventListener('focusout', handleFocusOut, { capture: true });
 		return {
 			destroy() {
-				node.removeEventListener('focusout', handleFocusOut, true)
+				node.removeEventListener('focusout', handleFocusOut, true);
 			}
-		}
+		};
 	}
 	function handleKeyDown(event: KeyboardEvent, fn: () => void) {
 		if (event.code === 'Space') {
-			event.preventDefault()
-			const target = event.target as HTMLElement
-			fn()
-			onClose()
+			event.preventDefault();
+			const target = event.target as HTMLElement;
+			fn();
+			onClose();
 		}
 	}
 </script>

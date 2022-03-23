@@ -3,57 +3,57 @@
 </script>
 
 <script lang="ts">
-	import { browser } from '$app/env'
-	import Icon from '$lib/components/Icon/Icon.svelte'
+	import { browser } from '$app/env';
+	import Icon from '$lib/components/Icon/Icon.svelte';
 
-	import Listing from '$lib/components/Item/Listing.svelte'
-	import CreatePlaylist from '$lib/components/PlaylistPopper/CreatePlaylist.svelte'
+	import Listing from '$lib/components/Item/Listing.svelte';
+	import CreatePlaylist from '$lib/components/PlaylistPopper/CreatePlaylist.svelte';
 	// import type { Item } from '$lib/types'
-	import db from '$lib/db'
+	import db from '$lib/db';
 
-	import { onMount, setContext } from 'svelte'
-	import Grid from './_components/Grid/Grid.svelte'
-	import Sync from './_Sync.svelte'
-	let favorites
-	let playlists
+	import { onMount, setContext } from 'svelte';
+	import Grid from './_components/Grid/Grid.svelte';
+	import Sync from './_Sync.svelte';
+	let favorites;
+	let playlists;
 
-	let showSyncModal
-	let showPlaylistModal
-	setContext('library', { isLibrary: true })
+	let showSyncModal;
+	let showPlaylistModal;
+	setContext('library', { isLibrary: true });
 	type customEvent = Event & {
-		currentTarget: EventTarget & HTMLImageElement & HTMLElement
-	}
+		currentTarget: EventTarget & HTMLImageElement & HTMLElement;
+	};
 
 	const updateFavorites = async () => {
-		favorites = await db.getFavorites()
-		favorites = [...favorites.slice(0, 5)]
-		return favorites
-	}
+		favorites = await db.getFavorites();
+		favorites = [...favorites.slice(0, 5)];
+		return favorites;
+	};
 	const updatePlaylists = async () => {
-		playlists = await db.getPlaylists()
-		playlists = [...playlists]
-		return playlists
-	}
+		playlists = await db.getPlaylists();
+		playlists = [...playlists];
+		return playlists;
+	};
 	// let lib: Writable<[]> = getContext('db')
 	onMount(async () => {
 		try {
-			const hasPlaylists = await db.getPlaylists()
-			const hasFavorites = await db.getFavorites()
-			favorites = hasFavorites.length !== 0 && [...hasFavorites.slice(0, 5)]
-			playlists = hasPlaylists.length !== 0 && [...hasPlaylists]
+			const hasPlaylists = await db.getPlaylists();
+			const hasFavorites = await db.getFavorites();
+			favorites = hasFavorites.length !== 0 && [...hasFavorites.slice(0, 5)];
+			playlists = hasPlaylists.length !== 0 && [...hasPlaylists];
 		} catch (err) {
-			console.error(err)
+			console.error(err);
 		}
-	})
+	});
 	// $: console.log(playlists, favorites)
 </script>
 
 {#if showSyncModal && browser}
 	<Sync
 		on:close={() => {
-			updateFavorites()
-			updatePlaylists()
-			showSyncModal = false
+			updateFavorites();
+			updatePlaylists();
+			showSyncModal = false;
 		}}
 	/>
 {/if}
@@ -62,7 +62,7 @@
 		<h1>Your Library</h1>
 		<button
 			on:click={() => {
-				showSyncModal = true
+				showSyncModal = true;
 			}}
 			><Icon name="send" size="1.1em" />
 			<span class="btn-text">Sync Your Data</span></button
@@ -81,7 +81,7 @@
 				{#each favorites as favorite}
 					<Listing
 						on:update={() => {
-							updateFavorites()
+							updateFavorites();
 						}}
 						data={favorite}
 					/>
@@ -118,12 +118,12 @@
 						e.detail?.thumbnail ??
 						'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjNDI0MjQyIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA1LjU0IDE2Ni43OTQpIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCZxdW90O1NlZ29lIFVJJnF1b3Q7LFJvYm90byxPeHlnZW4sVWJ1bnR1LENhbnRhcmVsbCwmcXVvdDtPcGVuIFNhbnMmcXVvdDssJnF1b3Q7SGVsdmV0aWNhIE5ldWUmcXVvdDssc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNmYWZhZmEiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiA1NC44MzkpIiBkPSJNMCAwaDcydjE0Ni4zMjNIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+',
 					items: []
-				})
-				await updatePlaylists()
-				showPlaylistModal = false
+				});
+				await updatePlaylists();
+				showPlaylistModal = false;
 			}}
 			on:close={() => {
-				showPlaylistModal = false
+				showPlaylistModal = false;
 			}}
 		/>
 	{/if}
@@ -133,14 +133,14 @@
 				heading="Your Playlists"
 				items={playlists}
 				on:new_playlist={() => {
-					showPlaylistModal = true
+					showPlaylistModal = true;
 				}}
 			>
 				<button
 					slot="buttons"
 					class="outlined"
 					on:click={() => {
-						db.deleteAllPlaylists()
+						db.deleteAllPlaylists();
 					}}
 					><Icon name="x" size="1.1em" /><span class="btn-text"
 						>Delete All Playlists</span

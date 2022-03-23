@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { goto } from '$app/navigation'
-	import GridItem from './GridItem.svelte'
+	import { goto } from '$app/navigation';
+	import GridItem from './GridItem.svelte';
 
-	export let items = []
-	export let heading = ''
-	import { createEventDispatcher } from 'svelte'
-	const dispatch = createEventDispatcher()
+	export let items = [];
+	export let heading = '';
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
 </script>
 
 <div class="grid-container">

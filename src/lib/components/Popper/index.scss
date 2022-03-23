@@ -37,7 +37,7 @@ hr {
 	&::before {
 		position: absolute;
 		inset: 0;
-		content: "";
+		content: '';
 		margin: 0 auto;
 		width: 35%;
 		color: hsl(0deg 0% 80%);
@@ -193,7 +193,12 @@ svg,
 	border-bottom: 0.0175rem groove rgba(171, 171, 171, 0.151);
 	border-top: 0.0175rem groove rgba(171, 171, 171, 0.151);
 	box-shadow: 0 -0.4rem 28px -12px rgb(255, 255, 255);
-	background: linear-gradient(to bottom, hsl(240, 10%, 10%), hsl(240, 2%, 7%) 50%, hsl(240, 1%, 6%) 90%);
+	background: linear-gradient(
+		to bottom,
+		hsl(240, 10%, 10%),
+		hsl(240, 2%, 7%) 50%,
+		hsl(240, 1%, 6%) 90%
+	);
 }
 li,
 ul {

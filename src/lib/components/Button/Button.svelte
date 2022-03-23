@@ -1,12 +1,12 @@
 <script lang="ts">
-	import Icon from '../Icon/Icon.svelte'
-	import '../../../global/stylesheet/modules/_button.scss'
-	export let icon: { name?: string; size?: string } = undefined
-	export let text: string | boolean = false
-	export let outlined = false
-	export let disabled = false
-	let className = ''
-	export { className as class }
+	import Icon from '../Icon/Icon.svelte';
+	import '../../../global/stylesheet/modules/_button.scss';
+	export let icon: { name?: string; size?: string } = undefined;
+	export let text: string | boolean = false;
+	export let outlined = false;
+	export let disabled = false;
+	let className = '';
+	export { className as class };
 </script>
 
 <button

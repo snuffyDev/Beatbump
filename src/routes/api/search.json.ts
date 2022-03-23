@@ -1,29 +1,29 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 // import BaseContext from '$api/_modules/contexts/context'
-import { MusicResponsiveListItemRenderer } from '$lib/parsers'
+import { MusicResponsiveListItemRenderer } from '$lib/parsers';
 
-import type { Artist, NextContinuationData, Song } from '$lib/types'
-import type { PlaylistSearch } from '$lib/types/playlist'
-import { pb } from '$lib/utils'
-import type { EndpointOutput, RequestHandler } from '@sveltejs/kit'
+import type { Artist, NextContinuationData, Song } from '$lib/types';
+import type { PlaylistSearch } from '$lib/types/playlist';
+import { pb } from '$lib/utils';
+import type { EndpointOutput, RequestHandler } from '@sveltejs/kit';
 interface SearchOutput extends EndpointOutput {
-	contents?: Song | PlaylistSearch
-	didYouMean?: { term: string; endpoint: { query; params } }
-	continuation?: NextContinuationData
+	contents?: Song | PlaylistSearch;
+	didYouMean?: { term: string; endpoint: { query; params } };
+	continuation?: NextContinuationData;
 }
 
 export const get: RequestHandler = async ({ url }) => {
-	const query = url.searchParams
-	let q = query.get('q')
-	q = decodeURIComponent(q)
-	const filter = query.get('filter') || ''
-	const videoId = query.get('videoId') || ''
-	const itct = query.get('itct') || ''
-	const playlistId = query.get('playlistId') || ''
-	const ctoken = query.get('ctoken') || ''
-	const browseId = query.get('browseId') || ''
+	const query = url.searchParams;
+	let q = query.get('q');
+	q = decodeURIComponent(q);
+	const filter = query.get('filter') || '';
+	const videoId = query.get('videoId') || '';
+	const itct = query.get('itct') || '';
+	const playlistId = query.get('playlistId') || '';
+	const ctoken = query.get('ctoken') || '';
+	const browseId = query.get('browseId') || '';
 
-	const pageType = query.get('pt') || ''
+	const pageType = query.get('pt') || '';
 
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/search?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${
@@ -84,12 +84,12 @@ export const get: RequestHandler = async ({ url }) => {
 					'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 			}
 		}
-	)
+	);
 
 	if (!response.ok) {
-		return { status: response.status, body: response.statusText }
+		return { status: response.status, body: response.statusText };
 	}
-	const data = await response.json()
+	const data = await response.json();
 	let {
 		continuationContents,
 		contents: {
@@ -108,38 +108,38 @@ export const get: RequestHandler = async ({ url }) => {
 				] = []
 			} = {}
 		} = {}
-	} = data
+	} = data;
 	if (Object.prototype.hasOwnProperty.call(data, 'continuationContents')) {
 		return {
 			status: 200,
 			body: parseSearchResult(continuationContents, true, filter)
-		}
+		};
 	} else {
 		return {
 			status: 200,
 			body: parseSearchResult(contents, false, filter)
-		}
+		};
 	}
-}
+};
 // Parse the playlist results for search.
 const parsePlaylist = (contents): PlaylistSearch[] => {
 	return contents.map(({ musicResponsiveListItemRenderer }) => {
 		const thumbnails =
 			musicResponsiveListItemRenderer?.thumbnail?.musicThumbnailRenderer
-				?.thumbnail?.thumbnails
+				?.thumbnail?.thumbnails;
 		const browseId =
 			musicResponsiveListItemRenderer?.navigationEndpoint?.browseEndpoint
-				?.browseId
+				?.browseId;
 		const title =
 			musicResponsiveListItemRenderer?.flexColumns[0]
-				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]?.text
+				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]?.text;
 		const flexColumns = pb(
 			musicResponsiveListItemRenderer,
 			'musicResponsiveListItemFlexColumnRenderer',
 			true
-		)
-		let metaData = pb(flexColumns[1], 'runs:text', true)
-		metaData = metaData.join('')
+		);
+		let metaData = pb(flexColumns[1], 'runs:text', true);
+		metaData = metaData.join('');
 
 		return {
 			thumbnails: thumbnails,
@@ -151,49 +151,49 @@ const parsePlaylist = (contents): PlaylistSearch[] => {
 					?.watchPlaylistEndpoint?.playlistId,
 			title: title,
 			type: 'playlist'
-		}
-	})
-}
+		};
+	});
+};
 
 const parseSong = (contents, type): Song[] => {
 	return contents.map((s, i) => {
-		let explicit
-		const { musicResponsiveListItemRenderer: ctx } = s
-		if (ctx?.badges) explicit = true
+		let explicit;
+		const { musicResponsiveListItemRenderer: ctx } = s;
+		if (ctx?.badges) explicit = true;
 
 		const params =
 			ctx.menu?.menuRenderer?.items[0]?.menuNavigationItemRenderer
-				?.navigationEndpoint.watchEndpoint?.params
+				?.navigationEndpoint.watchEndpoint?.params;
 
 		const {
 			runs: metaInfo = []
-		} = ctx.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text
+		} = ctx.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text;
 
-		let albumInfo
+		let albumInfo;
 		if (type == 'song') {
 			const albumArr: [] =
-				ctx.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs
+				ctx.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs;
 			const album: {
-				text
-				navigationEndpoint: { browseEndpoint: { browseId } }
-			} = albumArr.at(-3)
+				text;
+				navigationEndpoint: { browseEndpoint: { browseId } };
+			} = albumArr.at(-3);
 
 			albumInfo = {
 				browseId: album?.navigationEndpoint?.browseEndpoint?.browseId,
 				title: album?.text
-			}
+			};
 		} else {
-			albumInfo = null
+			albumInfo = null;
 		}
 
-		const length = metaInfo[metaInfo.length - 1]
-		let artists = []
+		const length = metaInfo[metaInfo.length - 1];
+		let artists = [];
 		if (type !== 'artist') {
-			const artistsArr = metaInfo.reverse()
-			artists = artistsArr.slice(4)
+			const artistsArr = metaInfo.reverse();
+			artists = artistsArr.slice(4);
 			if (artists.length > 1) {
 				for (let i = 0; i < artists.length; i++) {
-					artists.splice(i + 1, 1)
+					artists.splice(i + 1, 1);
 				}
 			}
 			artists = [
@@ -205,34 +205,34 @@ const parseSong = (contents, type): Song[] => {
 							item?.navigationEndpoint?.browseEndpoint
 								?.browseEndpointContextSupportedConfigs
 								?.browseEndpointContextMusicConfig?.pageType
-					}
+					};
 				})
-			]
+			];
 		} else {
-			artists = ctx.navigationEndpoint.browseEndpoint.browseId
+			artists = ctx.navigationEndpoint.browseEndpoint.browseId;
 		}
-		let browseId
+		let browseId;
 		if (
 			ctx.menu?.menuRenderer?.items[5]?.menuNavigationItemRenderer
 				?.navigationEndpoint?.browseEndpoint
 		) {
-			const menu = ctx.menu?.menuRenderer.items
-			const { musicNavigationItemRenderer: items = [] } = menu
+			const menu = ctx.menu?.menuRenderer.items;
+			const { musicNavigationItemRenderer: items = [] } = menu;
 
 			if (items.length > 4) {
-				browseId = items[3].navigationEndpoint.browseEndpoint.browseId
+				browseId = items[3].navigationEndpoint.browseEndpoint.browseId;
 			} else {
-				browseId = undefined
+				browseId = undefined;
 			}
 		} else {
 			browseId =
 				ctx.flexColumns[1].musicResponsiveListItemFlexColumnRenderer?.text
-					?.runs[0]?.navigationEndpoint?.browseEndpoint?.browseId
+					?.runs[0]?.navigationEndpoint?.browseEndpoint?.browseId;
 		}
 		const artist: Artist = {
 			browseId: browseId,
 			artist: artists
-		}
+		};
 
 		return {
 			...MusicResponsiveListItemRenderer(s),
@@ -243,9 +243,9 @@ const parseSong = (contents, type): Song[] => {
 			params: params,
 			length: length,
 			index: i++
-		}
-	})
-}
+		};
+	});
+};
 
 function parseSearchResult(data, cont, filter?) {
 	/*
@@ -253,113 +253,113 @@ function parseSearchResult(data, cont, filter?) {
         cont = continuation
 				*/
 
-	let continuation
+	let continuation;
 
-	let didYouMean
-	let ctx
+	let didYouMean;
+	let ctx;
 
 	if (cont) {
-		ctx = [data]
+		ctx = [data];
 	} else {
 		/*  Error Handling
             Message Renderer is for when something goes horribly wrong,
             itemSectionRenderer is for when there's an error
         */
-		if (data[0]?.messageRenderer) return []
+		if (data[0]?.messageRenderer) return [];
 		if (data[0]?.itemSectionRenderer) {
 			if (data[0]?.itemSectionRenderer?.contents[0].messageRenderer)
-				return { error: 'No Results Found' }
+				return { error: 'No Results Found' };
 			didYouMean = correctedQuery(
 				data[0]?.itemSectionRenderer?.contents[0].didYouMeanRenderer
-			)
+			);
 
-			ctx = [data[1]]
+			ctx = [data[1]];
 		} else {
-			ctx = [data[0]]
+			ctx = [data[0]];
 		}
 	}
 	// Safety net
 	if (ctx?.itemSectionRenderer) {
-		return []
+		return [];
 	}
 
-	let results: Song[] | PlaylistSearch[] = []
+	let results: Song[] | PlaylistSearch[] = [];
 
 	ctx.map((c) => {
-		let contents = []
+		let contents = [];
 		if (cont) {
-			const { musicShelfContinuation } = c
-			contents.push(musicShelfContinuation)
+			const { musicShelfContinuation } = c;
+			contents.push(musicShelfContinuation);
 		} else {
-			const { musicShelfRenderer } = c
-			contents.push(musicShelfRenderer)
+			const { musicShelfRenderer } = c;
+			contents.push(musicShelfRenderer);
 		}
 		/* Search for if the request is for Playlists
            If not, then parse song request.
         */
-		filter = decodeURIComponent(filter)
+		filter = decodeURIComponent(filter);
 		const paramList = [
 			'EgWKAQIoAWoKEAMQBBAKEAUQCQ==',
 			'EgeKAQQoADgBagwQDhAKEAkQAxAEEAU=',
 			'EgeKAQQoAEABagwQDhAKEAkQAxAEEAU='
-		]
-		const videoParams = 'EgWKAQIQAWoKEAMQBBAKEAUQCQ=='
-		const artistParams = 'EgWKAQIgAWoKEAMQBBAKEAkQBQ=='
+		];
+		const videoParams = 'EgWKAQIQAWoKEAMQBBAKEAUQCQ==';
+		const artistParams = 'EgWKAQIgAWoKEAMQBBAKEAkQBQ==';
 		if (
 			!paramList.includes(filter) &&
 			!artistParams.includes(filter) &&
 			!videoParams.includes(filter)
 		) {
-			const { contents: ctx } = contents[0]
-			continuation = continuationCheck(contents[0])
+			const { contents: ctx } = contents[0];
+			continuation = continuationCheck(contents[0]);
 
-			results = parseSong(ctx, 'song')
-			return { results, continuation }
+			results = parseSong(ctx, 'song');
+			return { results, continuation };
 		} else if (videoParams == filter) {
-			continuation = continuationCheck(contents[0])
+			continuation = continuationCheck(contents[0]);
 
-			const { contents: ctx } = contents[0]
-			results = parseSong(ctx, 'video')
+			const { contents: ctx } = contents[0];
+			results = parseSong(ctx, 'video');
 
-			return { results, continuation }
+			return { results, continuation };
 		} else if (
 			filter == artistParams ||
 			filter == 'EgWKAQIgAWoKEAMQBBAKEAkQBQ%3D%3D'
 		) {
-			continuation = continuationCheck(contents[0])
+			continuation = continuationCheck(contents[0]);
 
-			const { contents: ctx } = contents[0]
-			results = parseSong(ctx, 'artist')
+			const { contents: ctx } = contents[0];
+			results = parseSong(ctx, 'artist');
 		} else {
-			continuation = continuationCheck(contents[0])
-			contents = contents[0]?.contents
-			results = parsePlaylist(contents)
-			return { results, continuation }
+			continuation = continuationCheck(contents[0]);
+			contents = contents[0]?.contents;
+			results = parsePlaylist(contents);
+			return { results, continuation };
 		}
-	})
+	});
 
 	if (didYouMean !== undefined) {
 		return {
 			contents: results,
 			didYouMean: didYouMean,
 			continuation: continuation
-		}
+		};
 	}
-	return { contents: results, continuation: continuation }
+	return { contents: results, continuation: continuation };
 }
 function continuationCheck(contents) {
 	if (!Object.prototype.hasOwnProperty.call(contents, 'continuations')) {
-		return
+		return;
 	}
-	return { ...contents?.continuations[0].nextContinuationData }
+	return { ...contents?.continuations[0].nextContinuationData };
 }
 /* Return the data for if there is a corrected query */
 function correctedQuery(ctx) {
-	const correctTerm = ctx?.correctedQuery?.runs[0].text
-	const correctedEndpoint = ctx?.correctedQueryEndpoint?.searchEndpoint
+	const correctTerm = ctx?.correctedQuery?.runs[0].text;
+	const correctedEndpoint = ctx?.correctedQueryEndpoint?.searchEndpoint;
 
 	return {
 		term: correctTerm,
 		endpoint: correctedEndpoint
-	}
+	};
 }

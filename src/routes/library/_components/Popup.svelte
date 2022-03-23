@@ -1,26 +1,26 @@
 <script lang="ts">
-	import { alertHandler } from '$lib/stores/stores'
+	import { alertHandler } from '$lib/stores/stores';
 
-	import { createEventDispatcher } from 'svelte'
-	import { fade, fly } from 'svelte/transition'
-	let thumbnail
+	import { createEventDispatcher } from 'svelte';
+	import { fade, fly } from 'svelte/transition';
+	let thumbnail;
 	const readFiles = (
 		e: Event & {
-			target: HTMLInputElement & EventTarget
-			currentTarget: HTMLInputElement & EventTarget
+			target: HTMLInputElement & EventTarget;
+			currentTarget: HTMLInputElement & EventTarget;
 		}
 	) => {
-		const files = e.target.files[0]
-		const reader = new FileReader()
+		const files = e.target.files[0];
+		const reader = new FileReader();
 		reader.addEventListener('load', () => {
-			let result = reader.result
-			thumbnail = result
-		})
+			let result = reader.result;
+			thumbnail = result;
+		});
 		if (files) {
-			reader.readAsDataURL(files)
+			reader.readAsDataURL(files);
 		}
-	}
-	const dispatch = createEventDispatcher()
+	};
+	const dispatch = createEventDispatcher();
 </script>
 
 <div
@@ -56,8 +56,8 @@
 			alertHandler.set({
 				msg: 'Testing -- currently unimplemented',
 				type: 'error'
-			})
-			dispatch('close')
+			});
+			dispatch('close');
 		}}
 	>
 		<div class="input-row">
@@ -73,8 +73,8 @@
 				alertHandler.set({
 					msg: 'Testing -- currently unimplemented',
 					type: 'error'
-				})
-				dispatch('close')
+				});
+				dispatch('close');
 			}}>Submit</button
 		>
 	</form>

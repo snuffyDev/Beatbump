@@ -175,26 +175,26 @@
 					</div>
 				{/if}
 				<div class="btn-wrpr">
-					{#if header?.mixInfo !== null}
+					{#if header?.buttons.radio !== null}
 						<button
 							class="outlined"
 							on:click={() =>
 								list.initAutoMixSession({
-									config: { playerParams: header.mixInfo?.params },
-									playlistId: header.mixInfo?.playlistId
+									config: { playerParams: header.buttons.radio?.params },
+									playlistId: header.buttons.radio?.playlistId
 								})}
 							><Icon size="1.25em" name="radio" /><span class="button-text">
 								Play Radio</span
 							></button
 						>
 					{/if}
-					{#if header?.shuffle !== false}
+					{#if header?.buttons.shuffle !== false}
 						<button
 							on:click={() =>
 								list.initAutoMixSession({
-									videoId: header.shuffle?.videoId,
-									config: { playerParams: header.shuffle?.params },
-									playlistId: header.shuffle?.playlistId
+									videoId: header.buttons.shuffle?.videoId,
+									config: { playerParams: header.buttons.shuffle?.params },
+									playlistId: header.buttons.shuffle?.playlistId
 								})}
 							><Icon size="1.25em" name="shuffle" /><span class="button-text">
 								Shuffle</span

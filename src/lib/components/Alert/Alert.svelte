@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { alertHandler } from '$lib/stores/stores'
+	import { alertHandler } from '$lib/stores/stores';
 
-	import { fly } from 'svelte/transition'
+	import { fly } from 'svelte/transition';
 </script>
 
 <div class="alert-container">
@@ -10,8 +10,8 @@
 			transition:fly={{ y: 150, duration: 750 }}
 			on:introend={() => {
 				setTimeout(() => {
-					alertHandler.set({ msg: undefined, action: undefined })
-				}, 3000)
+					alertHandler.set({ msg: undefined, action: undefined });
+				}, 3000);
 			}}
 			class={`alert m-alert-${$alertHandler.type}`}
 		>

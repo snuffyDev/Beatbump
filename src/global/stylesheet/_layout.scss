@@ -6,17 +6,17 @@
 $sections: (
 	bottom: (
 		footer-container,
-		player,
+		player
 	),
 	top: (
-		nav,
+		nav
 	),
 	forms: (
 		select,
 		input,
 		option,
-		suggestions,
-	),
+		suggestions
+	)
 );
 $themes: (dark, dim, midnight, ytm);
 

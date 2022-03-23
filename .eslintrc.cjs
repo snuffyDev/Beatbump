@@ -25,4 +25,4 @@ module.exports = {
 		es2020: true,
 		node: true
 	}
-}
+};

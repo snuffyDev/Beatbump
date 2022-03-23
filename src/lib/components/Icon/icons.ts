@@ -87,4 +87,4 @@ export default {
 <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14" />`,
 	'chevron-right': `<polyline points="9 18 15 12 9 6" />`,
 	'chevron-left': `<polyline points="15 18 9 12 15 6" />`
-}
+};

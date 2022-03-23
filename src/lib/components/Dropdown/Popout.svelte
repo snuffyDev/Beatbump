@@ -1,26 +1,26 @@
 <script lang="ts">
-	import { createEventDispatcher, setContext } from 'svelte'
-	import { quartInOut } from 'svelte/easing'
-	import { slide } from 'svelte/transition'
-	import PopoutItem from './PopoutItem.svelte'
+	import { createEventDispatcher, setContext } from 'svelte';
+	import { quartInOut } from 'svelte/easing';
+	import { slide } from 'svelte/transition';
+	import PopoutItem from './PopoutItem.svelte';
 
-	export let isShowing
-	export let type = ''
-	export let items = []
-	export let color = 'white'
-	let showing = false
-	$: menuToggle = showing ? true : false
-	const dispatch = createEventDispatcher()
-	setContext('menu', { update: isShowing })
+	export let isShowing;
+	export let type = '';
+	export let items = [];
+	export let color = 'white';
+	let showing = false;
+	$: menuToggle = showing ? true : false;
+	const dispatch = createEventDispatcher();
+	setContext('menu', { update: isShowing });
 </script>
 
 {#if isShowing}
 	<div
 		on:mouseleave={() => {
-			isShowing = false
+			isShowing = false;
 		}}
 		on:focusout={() => {
-			isShowing = false
+			isShowing = false;
 		}}
 		transition:slide={{ duration: 200, easing: quartInOut }}
 		class="menu"
@@ -29,8 +29,8 @@
 			<PopoutItem
 				{color}
 				on:click={() => {
-					item.action(item)
-					isShowing = false
+					item.action(item);
+					isShowing = false;
 				}}
 				text={item.text}
 				icon={item.icon}
