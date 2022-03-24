@@ -86,7 +86,7 @@
 			style={`background-image: linear-gradient(1turn, var(--base-bg) ${Math.min(
 				Math.max(0, y),
 				70
-			)}%, transparent); transition: cubic-bezier(0.6, -0.28, 0.74, 0.05) all 120ms`}
+			)}%, transparent); transition: cubic-bezier(0.6, -0.28, 0.74, 0.05) background 120ms`}
 			id="gradient"
 			class="gradient"
 		/>
@@ -252,13 +252,13 @@
 			white-space: normal;
 			letter-spacing: -0.0125rem;
 			white-space: normal;
-			max-height: calc(var(--lines) * 14px * var(--line-height));
+			max-height: calc(var(--lines) * 1rem * var(--line-height));
 			margin-bottom: 0.8rem;
 			&.expanded {
 				--lines: 12;
 				--max-lines: var(--lines);
 				-webkit-line-clamp: var(--max-lines);
-				max-height: calc(var(--max-lines) * 14px * var(--line-height));
+				max-height: calc(var(--max-lines) * 1rem * var(--line-height));
 			}
 		}
 	}

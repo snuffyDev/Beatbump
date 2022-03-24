@@ -47,8 +47,8 @@
 	export let id;
 	$: id = $page.url.searchParams.get('id');
 	const promise = parsePageContents(data);
-	// console.log(promise, data);
 	let { items, releaseInfo } = promise;
+	// $: console.log(promise, data);
 	// $: console.log(releaseInfo, items, $page)
 	const setId = () => isPagePlaying.set(id);
 	const playAlbum = () => {

@@ -8,6 +8,7 @@ import {
 import type { CarouselHeader, CarouselItem } from '$lib/types';
 import type { ICarouselTwoRowItem } from '$lib/types/musicCarouselTwoRowItem';
 import type { IListItemRenderer } from '$lib/types/musicListItemRenderer';
+import { iterOptimized } from '$lib/utils/collections/array';
 import type { RequestHandler } from '@sveltejs/kit';
 
 export const get: RequestHandler = async ({ url }) => {
@@ -48,14 +49,19 @@ export const get: RequestHandler = async ({ url }) => {
 	}
 	let idx = carouselItems.length;
 	// console.log(carouselItems);
-	for (; idx--; ) {
-		// console.log(idx);
-		carouselItems[-1 - idx + carouselItems.length] = parseCarousel({
-			musicCarouselShelfRenderer:
-				carouselItems[-1 - idx + carouselItems.length]
-					.musicCarouselShelfRenderer
-		});
-	}
+	carouselItems = iterOptimized(carouselItems, (item, index) =>
+		parseCarousel({
+			musicCarouselShelfRenderer: item.musicCarouselShelfRenderer
+		})
+	);
+	// for (; idx--; ) {
+	// 	// console.log(idx);
+	// 	carouselItems[-1 - idx + carouselItems.length] = parseCarousel({
+	// 		musicCarouselShelfRenderer:
+	// 			carouselItems[-1 - idx + carouselItems.length]
+	// 				.musicCarouselShelfRenderer
+	// 	});
+	// }
 	// console.log(carouselItems.)
 	console.timeEnd('start');
 	return {

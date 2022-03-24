@@ -3,5 +3,6 @@
 	"editor.quickSuggestions": null,
 	"typescript.enablePromptUseWorkspaceTsdk": true,
 	"eslint.probe": ["javascript", "typescript", "html", "markdown", "svelte"],
-	"liveServer.settings.port": 5655
+
+	"exportall.config.folderListener": ["/src/lib/utils"]
 }

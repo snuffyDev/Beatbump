@@ -210,6 +210,12 @@
 		justify-content: space-between;
 		grid-area: m;
 		width: 100%;
+		gap: 0.275rem;
+
+		@media screen and (min-width: 640px) {
+			max-width: 50%;
+			justify-content: safe;
+		}
 	}
 	.items {
 		background-color: inherit;

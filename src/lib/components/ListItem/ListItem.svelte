@@ -141,9 +141,16 @@
 <div
 	bind:this={parent}
 	class="item"
+	tabindex="0"
 	class:playing={$isPagePlaying == pageId && item.videoId == $currentId}
 	on:pointerenter={(e) => {
 		if (parent && parent.contains(e.target)) isHovering = true;
+	}}
+	on:focusin={() => {
+		isHovering = true;
+	}}
+	on:focusout={() => {
+		isHovering = false;
 	}}
 	on:pointerleave={(e) => {
 		if (parent && parent.contains(e.target)) {
@@ -174,7 +181,7 @@
 			</div>
 		{/if}
 		<div class="column">
-			<div class="item-title">
+			<div class="item-title" tabindex="0">
 				{item?.title}
 				{#if item.explicit}
 					<span class="explicit">
@@ -196,7 +203,7 @@
 		</div>
 	</div>
 	{#if isHovering || width < 640}
-		<div class="length">
+		<div class="length" tabindex="0" on:focus={() => (isHovering = true)}>
 			<PopperButton tabindex="0" items={DropdownItems} />
 		</div>
 	{:else}

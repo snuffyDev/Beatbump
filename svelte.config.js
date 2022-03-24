@@ -13,6 +13,8 @@ dotenv.config();
 const rootDomain = process.env['VITE_DOMAIN']; // or your server IP for dev
 const originURL = process.env['VITE_SITE_URL']; // or your server IP for dev
 
+const docker = process.env.DOCKER_BUILD;
+console.log(docker);
 const check = process.env.NODE_ENV;
 const dev = check === 'development';
 /** @type {import('@sveltejs/kit').Config} */

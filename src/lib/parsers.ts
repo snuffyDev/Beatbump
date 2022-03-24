@@ -223,24 +223,41 @@ export const MusicResponsiveListItemRenderer = (
 			artist: Array.isArray(
 				ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
 					?.musicResponsiveListItemFlexColumnRenderer?.text?.runs
-			) && [
-				{
-					text:
-						ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
-							?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]?.text,
-					browseId:
-						ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
-							?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
-							?.navigationEndpoint?.browseEndpoint?.browseId,
+			)
+				? [
+						{
+							text:
+								ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
+									?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
+									?.text,
+							browseId:
+								ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
+									?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
+									?.navigationEndpoint?.browseEndpoint?.browseId,
 
-					pageType:
-						ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
-							?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
-							?.navigationEndpoint?.browseEndpoint
-							?.browseEndpointContextSupportedConfigs
-							?.browseEndpointContextMusicConfig?.pageType
-				}
-			]
+							pageType:
+								ctx?.musicResponsiveListItemRenderer?.flexColumns[1]
+									?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
+									?.navigationEndpoint?.browseEndpoint
+									?.browseEndpointContextSupportedConfigs
+									?.browseEndpointContextMusicConfig?.pageType
+						}
+				  ]
+				: Array.isArray(
+						ctx?.musicResponsiveListItemRenderer?.menu?.menuRenderer?.items
+				  ) &&
+				  ctx?.musicResponsiveListItemRenderer?.menu?.menuRenderer?.items[4]
+						?.menuNavigationItemRenderer?.navigationEndpoint?.browseEndpoint
+						?.browseId && [
+						{
+							text: '',
+							browseId:
+								ctx?.musicResponsiveListItemRenderer?.menu?.menuRenderer
+									?.items[4]?.menuNavigationItemRenderer?.navigationEndpoint
+									?.browseEndpoint?.browseId,
+							pageType: 'MUSIC_PAGE_TYPE_ARTIST'
+						}
+				  ]
 		},
 		explicit: ctx?.musicResponsiveListItemRenderer.badges ? true : false,
 		title:

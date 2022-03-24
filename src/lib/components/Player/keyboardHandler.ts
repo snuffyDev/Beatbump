@@ -14,7 +14,8 @@ export default function keyboardHandler(
 		)
 			return;
 		if (
-			!document.activeElement.tagName.match(/SELECT|INPUT|BUTTON/i) &&
+			!document.activeElement.tagName.match(/SELECT|INPUT|BUTTON|A/i) &&
+			!document.activeElement.attributes.getNamedItem('tabindex') &&
 			!document.activeElement.classList.contains('select') &&
 			!document.activeElement.classList.contains('dd-menu') &&
 			!document.activeElement.classList.contains('dd-item') &&

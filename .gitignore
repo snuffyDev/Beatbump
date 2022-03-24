@@ -20,4 +20,4 @@ src/routes/trending/test/index.svelte
 package-lock.json
 package-lock.json
 .sveltegen.json
-src/lib/js/artist.ts
+.vscode/settings.json

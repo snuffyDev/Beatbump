@@ -73,7 +73,7 @@
 		? ''
 		: 'transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22);';
 	$: height =
-		queueHeight !== undefined && `calc(${listHeight - queueHeight}px - 4rem)`;
+		queueHeight !== undefined && `calc(${listHeight - queueHeight}px)`;
 
 	// : `calc(${(listHeight / 20.2) * 3}px - 0.5rem)`
 </script>
@@ -85,7 +85,7 @@
 	class="backdrop"
 	on:click|stopPropagation|self={() => dispatch('close', { showing: false })}
 	on:scroll|preventDefault
-	in:fly|local={{ duration: 400, delay: 200, y: queueHeight, easing: quartOut }}
+	in:fly|local={{ duration: 800, delay: 400, y: queueHeight, easing: quartOut }}
 	out:fly|local={{ duration: 400, y: listHeight, easing: quartOut }}
 >
 	<div

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { elasticOut, expoInOut, expoOut } from 'svelte/easing';
+
 	import { fade } from 'svelte/transition';
 	export let main: HTMLElement;
 	export let key;
@@ -12,7 +14,7 @@
 </script>
 
 {#key key}
-	<div in:fade={{ duration: 250, delay: 250 }} out:fade={{ duration: 250 }}>
+	<div in:fade={{ duration: 175, delay: 250 }} out:fade={{ duration: 175 }}>
 		<slot />
 	</div>
 {/key}
