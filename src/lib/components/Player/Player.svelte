@@ -38,7 +38,7 @@
 	$: player.src = $updateTrack.url !== null ? $updateTrack.url : '';
 	$: isWebkit = $session.iOS;
 	let title;
-	$: console.log($list.mix, isWebkit, $session);
+	// $: console.log($list.mix, isWebkit, $session);
 	$: autoId = $key;
 
 	$: time = player.currentTime;

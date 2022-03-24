@@ -1,8 +1,8 @@
 const parseProxyRedir = (url) => {
-	// let new_url = url.replace('https://', '');
-	// new_url = new_url.split('/');
-	// new_url = new_url[2] !== undefined ? new_url[2] : new_url[1];
-	// url = 'https://redirector.googlevideo.com/' + new_url;
+	let new_url = url.replace('https://', '');
+	new_url = new_url.split('/');
+	new_url = new_url[2] !== undefined ? new_url[2] : new_url[1];
+	url = 'https://redirector.googlevideo.com/' + new_url;
 	return url;
 };
 

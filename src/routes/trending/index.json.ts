@@ -11,6 +11,7 @@ import type { IListItemRenderer } from '$lib/types/musicListItemRenderer';
 import type { RequestHandler } from '@sveltejs/kit';
 
 export const get: RequestHandler = async ({ url }) => {
+	console.time('start');
 	const query = url.searchParams;
 	const endpoint = query.get('q') || '';
 	const browseId = 'FEmusic_explore';
@@ -42,24 +43,24 @@ export const get: RequestHandler = async ({ url }) => {
 	let index = contents.length;
 	for (; index--; ) {
 		if (contents[index]?.musicCarouselShelfRenderer) {
-			carouselItems = [...carouselItems, contents[index]];
+			carouselItems.push(contents[index]);
 		}
 	}
 	let idx = carouselItems.length;
 	// console.log(carouselItems);
 	for (; idx--; ) {
 		// console.log(idx);
-		carouselItems[idx] = parseCarousel({
-			musicCarouselShelfRenderer: carouselItems[idx].musicCarouselShelfRenderer
+		carouselItems[-1 - idx + carouselItems.length] = parseCarousel({
+			musicCarouselShelfRenderer:
+				carouselItems[-1 - idx + carouselItems.length]
+					.musicCarouselShelfRenderer
 		});
 	}
 	// console.log(carouselItems.)
+	console.timeEnd('start');
 	return {
 		body: JSON.stringify({ carouselItems, data }),
 		status: 200
-	};
-	return {
-		error: new Error()
 	};
 };
 
@@ -104,14 +105,25 @@ function parseBody(
 	let items: unknown[] = [];
 	let index = contents.length;
 	for (; index--; ) {
-		if (contents[index].musicTwoRowItemRenderer) {
-			items = [MusicTwoRowItemRenderer(contents[index]), ...items];
+		if (contents[-1 - index + contents.length].musicTwoRowItemRenderer) {
+			items[-1 - index + contents.length] = MusicTwoRowItemRenderer(
+				contents[-1 - index + contents.length]
+			);
+			// items = [MusicTwoRowItemRenderer(contents[index]), ...items];
 		}
-		if (contents[index].musicResponsiveListItemRenderer) {
-			items = [MusicResponsiveListItemRenderer(contents[index]), ...items];
+		if (
+			contents[-1 - index + contents.length].musicResponsiveListItemRenderer
+		) {
+			items[-1 - index + contents.length] = MusicResponsiveListItemRenderer(
+				contents[-1 - index + contents.length]
+			);
+			// items = [MusicResponsiveListItemRenderer(contents[index]), ...items];
 		}
-		if (contents[index].musicNavigationButtonRenderer) {
-			items = [MoodsAndGenresItem(contents[index]), ...items];
+		if (contents[-1 - index + contents.length].musicNavigationButtonRenderer) {
+			items[-1 - index + contents.length] = MoodsAndGenresItem(
+				contents[-1 - index + contents.length]
+			);
+			// items = [MoodsAndGenresItem(contents[index]), ...items];
 		}
 	}
 	return items;

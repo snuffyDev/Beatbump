@@ -77,40 +77,50 @@ export const get: RequestHandler = async ({ url }) => {
 		/* For when you are NOT listening to a song.
 		 ********************************************/
 		if (!ctoken) {
+			const contents = data?.contents?.singleColumnMusicWatchNextResultsRenderer
+				?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs[0]?.tabRenderer
+				?.content?.musicQueueRenderer?.content?.playlistPanelRenderer
+				?.contents as Array<any>;
 			const {
-				contents: {
-					singleColumnMusicWatchNextResultsRenderer: {
-						tabbedRenderer: {
-							watchNextTabbedResultsRenderer: {
-								tabs: [
-									{
-										tabRenderer: {
-											content: {
-												musicQueueRenderer: {
-													content: {
-														playlistPanelRenderer: {
-															contents = [],
-															continuations: [
-																{
-																	nextRadioContinuationData: {
-																		clickTrackingParams = '',
-																		continuation = ''
-																	} = {}
-																} = {}
-															] = []
-														} = {}
-													} = {}
-												} = {}
-											} = {}
-										} = {}
-									} = {}
-								] = []
-							} = {}
-						} = {}
-					} = {}
-				} = {},
-				currentVideoEndpoint: { watchEndpoint = {} } = {}
-			} = data;
+				clickTrackingParams,
+				continuation
+			} = data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.continuations[0]?.nextRadioContinuationData;
+			const watchEndpoint = data?.currentVideoEndpoint?.watchEndpoint;
+			// const {
+			// console.log(contents, clickTrackingParams, continuation, watchEndpoint);
+			// 	contents: {
+			// 		singleColumnMusicWatchNextResultsRenderer: {
+			// 			tabbedRenderer: {
+			// 				watchNextTabbedResultsRenderer: {
+			// 					tabs: [
+			// 						{
+			// 							tabRenderer: {
+			// 								content: {
+			// 									musicQueueRenderer: {
+			// 										content: {
+			// 											playlistPanelRenderer: {
+			// 												contents = [],
+			// 												continuations: [
+			// 													{
+			// 														nextRadioContinuationData: {
+			// 															clickTrackingParams = '',
+			// 															continuation = ''
+			// 														} = {}
+			// 													} = {}
+			// 												] = []
+			// 											} = {}
+			// 										} = {}
+			// 									} = {}
+			// 								} = {}
+			// 							} = {}
+			// 						} = {}
+			// 					] = []
+			// 				} = {}
+			// 			} = {}
+			// 		} = {}
+			// 	} = {},
+			// 	currentVideoEndpoint: { watchEndpoint = {} } = {}
+			// } = data;
 			const parsed = parseContents(
 				contents,
 				continuation,
