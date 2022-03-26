@@ -2,11 +2,11 @@ import {
 	MoodsAndGenresItem,
 	MusicResponsiveListItemRenderer,
 	MusicTwoRowItemRenderer
-} from '$lib/parsers';
-import type { CarouselHeader } from '$lib/types';
-import type { ICarouselTwoRowItem } from '$lib/types/musicCarouselTwoRowItem';
-import type { IListItemRenderer } from '$lib/types/musicListItemRenderer';
-import type { RequestHandler } from '@sveltejs/kit';
+} from "$lib/parsers";
+import type { CarouselHeader } from "$lib/types";
+import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
+import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+import type { RequestHandler } from "@sveltejs/kit";
 
 /* eslint-disable prefer-const */
 
@@ -17,13 +17,13 @@ export const get: RequestHandler = async ({ params }) => {
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
-			method: 'POST',
+			method: "POST",
 			body: JSON.stringify({
 				context: {
 					// clickTracking: { clickTrackingParams: `${itct}` },
 					client: {
-						clientName: 'WEB_REMIX',
-						clientVersion: '0.1'
+						clientName: "WEB_REMIX",
+						clientVersion: "0.1"
 					},
 
 					user: {
@@ -34,8 +34,8 @@ export const get: RequestHandler = async ({ params }) => {
 				browseId: `${slug}`
 			}),
 			headers: {
-				'Content-Type': 'application/json; charset=utf-8',
-				Origin: 'https://music.youtube.com'
+				"Content-Type": "application/json; charset=utf-8",
+				Origin: "https://music.youtube.com"
 			}
 		}
 	);
@@ -44,7 +44,7 @@ export const get: RequestHandler = async ({ params }) => {
 	let {
 		header: {
 			musicHeaderRenderer: {
-				title: { runs: [{ text = '' } = {}] = [] } = {}
+				title: { runs: [{ text = "" } = {}] = [] } = {}
 			} = {}
 		} = {},
 		contents: {
@@ -61,7 +61,7 @@ export const get: RequestHandler = async ({ params }) => {
 	} = await data;
 	let type: string;
 
-	slug.includes('videos') ? (type = 'videos') : (type = 'albums');
+	slug.includes("videos") ? (type = "videos") : (type = "albums");
 	let carousels = [];
 	let grids = [];
 	let sections = [];
@@ -85,20 +85,20 @@ export const get: RequestHandler = async ({ params }) => {
 			const section = items.map((ctx) => MusicTwoRowItemRenderer(ctx));
 			return {
 				section,
-				type: 'grid',
+				type: "grid",
 				title: header?.gridHeaderRenderer?.title?.runs[0]?.text
 			};
 		});
 	}
 
 	const getTitle = () => {
-		const wordParts: Array<any> = slug.split('_');
+		const wordParts: Array<any> = slug.split("_");
 		for (let i = 0; i < wordParts.length; i++) {
 			wordParts[i] = wordParts[i][0].toUpperCase() + wordParts[i].substr(1);
 		}
-		wordParts.join(' ');
+		wordParts.join(" ");
 		const final = wordParts.shift();
-		return wordParts.join(' ');
+		return wordParts.join(" ");
 	};
 	// console.log(sections)
 	return {
@@ -114,7 +114,7 @@ function parseHeader({
 		let subheading, browseId;
 		if (musicCarouselShelfBasicHeaderRenderer?.strapline?.runs[0]?.text) {
 			subheading =
-				musicCarouselShelfBasicHeaderRenderer['strapline']['runs'][0].text;
+				musicCarouselShelfBasicHeaderRenderer["strapline"]["runs"][0].text;
 		}
 		if (
 			musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer
@@ -125,7 +125,7 @@ function parseHeader({
 					?.navigationEndpoint?.browseEndpoint?.browseId;
 		}
 		return {
-			title: musicCarouselShelfBasicHeaderRenderer['title']['runs'][0].text,
+			title: musicCarouselShelfBasicHeaderRenderer["title"]["runs"][0].text,
 			subheading,
 			browseId
 		};
@@ -170,7 +170,7 @@ function parseCarousel(carousel: {
 			carousel.musicCarouselShelfRenderer?.header ??
 				carousel.musicImmersiveCarouselShelfRenderer?.header
 		),
-		type: 'carousel',
+		type: "carousel",
 		results: parseBody(
 			carousel.musicCarouselShelfRenderer?.contents ??
 				carousel.musicImmersiveCarouselShelfRenderer?.contents

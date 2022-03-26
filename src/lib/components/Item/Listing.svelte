@@ -1,32 +1,32 @@
 <script lang="ts">
 	export let data: Item;
 
-	import Loading from '$components/Loading/Loading.svelte';
-	import { hasContext, onMount, tick } from 'svelte';
+	import Loading from "$components/Loading/Loading.svelte";
+	import { hasContext, onMount, tick } from "svelte";
 
 	import {
 		alertHandler,
 		key,
 		showAddToPlaylistPopper,
 		theme
-	} from '$stores/stores';
-	import Icon from '$components/Icon/Icon.svelte';
-	import { goto } from '$app/navigation';
-	import list from '$lib/stores/list';
-	import type { Item } from '$lib/types';
-	import longpress from '$lib/actions/longpress';
-	import db from '$lib/db';
-	import { browser } from '$app/env';
-	import { createEventDispatcher } from 'svelte';
-	import { PopperButton, PopperStore } from '../Popper';
-	import { notify } from '$lib/utils';
+	} from "$stores/stores";
+	import Icon from "$components/Icon/Icon.svelte";
+	import { goto } from "$app/navigation";
+	import list from "$lib/stores/list";
+	import type { Item } from "$lib/types";
+	import longpress from "$lib/actions/longpress";
+	import db from "$lib/db";
+	import { browser } from "$app/env";
+	import { createEventDispatcher } from "svelte";
+	import { PopperButton, PopperStore } from "../Popper";
+	import { notify } from "$lib/utils";
 
 	const dispatch = createEventDispatcher();
-	let isLibrary = hasContext('library') ? true : false;
-	let videoId = '';
-	let playlistId = '';
-	let songTitle = '';
-	$: title = songTitle = '...';
+	let isLibrary = hasContext("library") ? true : false;
+	let videoId = "";
+	let playlistId = "";
+	let songTitle = "";
+	$: title = songTitle = "...";
 	let isHidden: boolean = false;
 	let explicit;
 	let clicked;
@@ -39,11 +39,11 @@
 
 	let DropdownItems = [
 		{
-			text: 'View Artist',
-			icon: 'artist',
+			text: "View Artist",
+			icon: "artist",
 			action: async () => {
 				window.scrollTo({
-					behavior: 'smooth',
+					behavior: "smooth",
 					top: 0,
 					left: 0
 				});
@@ -53,11 +53,11 @@
 			}
 		},
 		{
-			text: 'Go to album',
-			icon: 'album',
+			text: "Go to album",
+			icon: "album",
 			action: () => {
 				window.scrollTo({
-					behavior: 'smooth',
+					behavior: "smooth",
 					top: 0,
 					left: 0
 				});
@@ -65,18 +65,18 @@
 			}
 		},
 		{
-			text: 'Add to Queue',
-			icon: 'queue',
+			text: "Add to Queue",
+			icon: "queue",
 			action: () => list.setTrackWillPlayNext(data, $key)
 		},
 		{
-			text: 'Add to Playlist',
-			icon: 'playlist-add',
+			text: "Add to Playlist",
+			icon: "playlist-add",
 			action: async () => {
 				if (data?.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
 					// console.log('PLAYLIST')
 					const response = await fetch(
-						'/api/getQueue.json?playlistId=' + data?.playlistId
+						"/api/getQueue.json?playlistId=" + data?.playlistId
 					);
 					const _data = await response.json();
 					const items: Item[] = _data;
@@ -87,21 +87,21 @@
 			}
 		},
 		{
-			text: !isLibrary ? 'Favorite' : 'Remove from Favorites',
-			icon: !isLibrary ? 'heart' : 'x',
+			text: !isLibrary ? "Favorite" : "Remove from Favorites",
+			icon: !isLibrary ? "heart" : "x",
 			action: async () => {
 				// console.log(data)
 				if (!browser) return;
 				!isLibrary && (await db.setNewFavorite(data));
 				if (isLibrary) {
 					await db.deleteFavorite(data);
-					dispatch('update');
+					dispatch("update");
 				}
 			}
 		},
 		{
-			text: 'Share',
-			icon: 'share',
+			text: "Share",
+			icon: "share",
 			action: async () => {
 				const shareData = {
 					title: data.title,
@@ -111,29 +111,29 @@
 				try {
 					if (!navigator.canShare) {
 						await navigator.clipboard.writeText(shareData.url);
-						notify('Link copied successfully', 'success');
+						notify("Link copied successfully", "success");
 					} else {
 						const share = await navigator.share(shareData);
-						notify('Shared successfully', 'success');
+						notify("Shared successfully", "success");
 					}
 				} catch (error) {
-					notify('Error: ' + error, 'error');
+					notify("Error: " + error, "error");
 				}
 			}
 		}
 	];
-	if (data.type == 'artist') {
+	if (data.type == "artist") {
 		DropdownItems = [
-			...DropdownItems.filter((item) => !item.text.includes('Add to Playlist'))
+			...DropdownItems.filter((item) => !item.text.includes("Add to Playlist"))
 		];
 	}
-	if (data.type == 'playlist') {
+	if (data.type == "playlist") {
 		DropdownItems.splice(1, 1, {
-			text: 'View Playlist',
-			icon: 'list',
+			text: "View Playlist",
+			icon: "list",
 			action: () => {
 				window.scrollTo({
-					behavior: 'smooth',
+					behavior: "smooth",
 					top: 0,
 					left: 0
 				});
@@ -143,52 +143,52 @@
 		DropdownItems.shift();
 		DropdownItems.pop();
 		DropdownItems = [
-			...DropdownItems.filter((item) => !item.text.includes('Favorite'))
+			...DropdownItems.filter((item) => !item.text.includes("Favorite"))
 		];
 	}
-	if (data.type == 'video') {
+	if (data.type == "video") {
 		DropdownItems = DropdownItems.filter((d) => {
-			if (d.text == 'View Artist') return;
+			if (d.text == "View Artist") return;
 		});
 	}
 	const itemHandler = () => {
 		explicit = data.explicit;
 		title = data.title;
 
-		if (data.type !== 'playlist') {
+		if (data.type !== "playlist") {
 			artist = data?.artistInfo?.artist;
 		}
 		if (title.length > 48) {
-			title = title.substring(0, 48) + '...';
+			title = title.substring(0, 48) + "...";
 		} else {
 			title = title;
 		}
 	};
 	if (data?.album?.browseId === undefined) {
-		DropdownItems = DropdownItems.filter((d) => d.text !== 'Go to album');
+		DropdownItems = DropdownItems.filter((d) => d.text !== "Go to album");
 	}
 	if (data?.artistInfo?.artist[0].browseId === undefined) {
-		DropdownItems = DropdownItems.filter((d) => d.text !== 'View Artist');
+		DropdownItems = DropdownItems.filter((d) => d.text !== "View Artist");
 	}
 	const clickHandler = async (event) => {
 		if (
 			(event.target instanceof HTMLElement &&
-				(event.target.nodeName == 'A' || event.target.nodeName == 'P')) ||
+				(event.target.nodeName == "A" || event.target.nodeName == "P")) ||
 			loading
 		)
 			return;
 		// console.log(event.target)
-		if (data.type == 'artist') {
+		if (data.type == "artist") {
 			goto(`/artist/${data.artistInfo.artist}`);
 			return;
 		}
 		try {
 			loading = true;
-			videoId = data.videoId ? data.videoId : '';
+			videoId = data.videoId ? data.videoId : "";
 			playlistId = data?.playlistId
 				? data?.playlistId
 				: data.shuffle?.playlistId;
-			if (data.type == 'playlist') {
+			if (data.type == "playlist") {
 				await list.initPlaylistSession({ playlistId });
 			} else {
 				await list.initAutoMixSession({
@@ -213,20 +213,20 @@
 	class="container"
 	on:contextmenu|preventDefault={(e) => {
 		window.dispatchEvent(
-			new window.CustomEvent('contextmenu', { detail: 'listing' })
+			new window.CustomEvent("contextmenu", { detail: "listing" })
 		);
 
 		PopperStore.set({
 			items: [...DropdownItems],
 			x: e.pageX,
 			y: e.pageY,
-			direction: 'right'
+			direction: "right"
 		});
 	}}
 >
 	<div class="innercard">
 		<div class="itemWrapper" on:click|stopPropagation={clickHandler}>
-			<div class="img-container" class:artist-img={data.type == 'artist'}>
+			<div class="img-container" class:artist-img={data.type == "artist"}>
 				{#if loading}
 					<Loading size="3em" />
 				{/if}
@@ -245,13 +245,13 @@
 					>{title}
 					<span class="explicit" class:hidden={!data.explicit}> E </span></span
 				>
-				{#if data.type == 'artist'}
+				{#if data.type == "artist"}
 					<p class="artist-stats">
 						Artist &CenterDot; {data?.length?.text}
 					</p>
-				{:else if data.type == 'playlist'}
+				{:else if data.type == "playlist"}
 					<p class="text-artist">
-						{data.type == 'playlist' ? `${data.metaData}` : ''}
+						{data.type == "playlist" ? `${data.metaData}` : ""}
 					</p>
 				{:else}
 					<p class="text-artist">
@@ -287,15 +287,15 @@
 			<PopperButton
 				metadata={{
 					artist:
-						data.type !== 'playlist' && Array.isArray(data?.artistInfo?.artist)
+						data.type !== "playlist" && Array.isArray(data?.artistInfo?.artist)
 							? [...data?.artistInfo?.artist]
 							: data?.artistInfo?.artist ?? undefined,
 					thumbnail: data.thumbnails ? data.thumbnails[0]?.url : data.thumbnail,
 					title: title,
 					length:
-						data.type !== 'artist' && data.type !== 'playlist'
+						data.type !== "artist" && data.type !== "playlist"
 							? data?.length?.text
-							: ''
+							: ""
 				}}
 				type="search"
 				items={DropdownItems}
@@ -372,7 +372,7 @@
 	}
 	img::before {
 		display: block;
-		content: '';
+		content: "";
 		padding-top: calc(100% * 2 / 3);
 	}
 	.innercard {

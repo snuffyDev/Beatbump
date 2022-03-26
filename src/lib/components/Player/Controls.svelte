@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import { updateTrack } from '$lib/stores/stores';
-	import Icon from '../Icon/Icon.svelte';
+	import { createEventDispatcher } from "svelte";
+	import { updateTrack } from "$lib/stores/stores";
+	import Icon from "../Icon/Icon.svelte";
 	// export let canPlay
 	export let prevBtn;
 	export let nextBtn;
@@ -10,7 +10,7 @@
 	export let loading;
 	const dispatch = createEventDispatcher();
 
-	const playEvent = () => dispatch('play');
+	const playEvent = () => dispatch("play");
 </script>
 
 <div class="player-controls">
@@ -45,7 +45,7 @@
 </div>
 
 <style lang="scss">
-	@import '../../../global/stylesheet/components/_player.scss';
+	@import "../../../global/stylesheet/components/_player.scss";
 	.player-btn {
 		padding: 8pt;
 	}

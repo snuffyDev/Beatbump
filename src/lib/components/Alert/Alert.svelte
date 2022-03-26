@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { alertHandler } from '$lib/stores/stores';
+	import { alertHandler } from "$lib/stores/stores";
 
-	import { fly } from 'svelte/transition';
+	import { fly } from "svelte/transition";
 </script>
 
 <div class="alert-container">

@@ -1,6 +1,6 @@
 <script>
-	import { fade } from 'svelte/transition';
-	export let size = '4em';
+	import { fade } from "svelte/transition";
+	export let size = "4em";
 </script>
 
 <div

@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
+	import type { Load } from "@sveltejs/kit";
 	export const load: Load = async ({ params, fetch, url }) => {
 		const { slug } = params;
 		const response = await fetch(`/api/playlist.json?list=${params.slug}`);
@@ -38,38 +38,38 @@
 </script>
 
 <script lang="ts">
-	import ListItem from '$components/ListItem/ListItem.svelte';
-	import List from './_List.svelte';
-	import list from '$lib/stores/list';
-	import { isPagePlaying, showAddToPlaylistPopper } from '$lib/stores/stores';
-	import { setContext } from 'svelte';
+	import ListItem from "$components/ListItem/ListItem.svelte";
+	import List from "./_List.svelte";
+	import list from "$lib/stores/list";
+	import { isPagePlaying, showAddToPlaylistPopper } from "$lib/stores/stores";
+	import { setContext } from "svelte";
 
-	import InfoBox from '$lib/components/Layouts/InfoBox.svelte';
-	import { writable } from 'svelte/store';
-	import Header from '$lib/components/Layouts/Header.svelte';
-	import type { Header as HeaderType } from '$lib/types/playlist';
-	import type { IListItemRenderer } from '$lib/types/musicListItemRenderer';
-	import Carousel from '$lib/components/Carousel/Carousel.svelte';
-	import ListInfoBar from '$lib/components/ListInfoBar';
-	import { notify } from '$lib/utils';
-	import { browser } from '$app/env';
+	import InfoBox from "$lib/components/Layouts/InfoBox.svelte";
+	import { writable } from "svelte/store";
+	import Header from "$lib/components/Layouts/Header.svelte";
+	import type { Header as HeaderType } from "$lib/types/playlist";
+	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+	import Carousel from "$lib/components/Carousel/Carousel.svelte";
+	import ListInfoBar from "$lib/components/ListInfoBar";
+	import { notify } from "$lib/utils";
+	import { browser } from "$app/env";
 
 	export let tracks: IListItemRenderer[];
 	export let header: HeaderType = {
 		thumbnails: [],
-		description: '',
-		playlistId: '',
+		description: "",
+		playlistId: "",
 		secondSubtitle: [],
 		subtitles: [],
-		title: ''
+		title: ""
 	};
 	// export let data
 	export let id: string;
 	export let continuations;
 	export let carouselContinuations;
 	export let key;
-	let ctoken = continuations?.continuation || '';
-	let itct = continuations?.clickTrackingParams || '';
+	let ctoken = continuations?.continuation || "";
+	let itct = continuations?.clickTrackingParams || "";
 	let width;
 	let pageTitle = header?.title;
 	let description;
@@ -89,28 +89,28 @@
 
 	pageTitle =
 		pageTitle.length > 64
-			? pageTitle.substring(0, 64) + '...'
-			: header?.title || '';
+			? pageTitle.substring(0, 64) + "..."
+			: header?.title || "";
 	description =
 		header?.description !== undefined
 			? header?.description.length > 240
-				? header?.description.substring(0, 240) + '...'
+				? header?.description.substring(0, 240) + "..."
 				: header?.description
-			: '';
+			: "";
 	const getCarousel = async () => {
 		if (!carouselContinuations) return;
 		const response = await fetch(
-			'/api/playlist.json' +
-				'?ref=' +
+			"/api/playlist.json" +
+				"?ref=" +
 				id +
 				`${
 					carouselContinuations
 						? `&ctoken=${encodeURIComponent(
 								carouselContinuations?.continuation
 						  )}`
-						: ''
+						: ""
 				}` +
-				'&itct=' +
+				"&itct=" +
 				carouselContinuations?.clickTrackingParams
 		);
 		const data = await response.json();
@@ -130,11 +130,11 @@
 		try {
 			isLoading = true;
 			const response = await fetch(
-				'/api/playlist.json' +
-					'?ref=' +
+				"/api/playlist.json" +
+					"?ref=" +
 					id +
-					`${ctoken ? `&ctoken=${encodeURIComponent(ctoken)}` : ''}` +
-					'&itct=' +
+					`${ctoken ? `&ctoken=${encodeURIComponent(ctoken)}` : ""}` +
+					"&itct=" +
 					itct
 			);
 			const data = await response.json();
@@ -180,15 +180,15 @@
 	let value;
 	let options = [
 		{
-			label: 'Unsorted',
-			params: 'nosort',
+			label: "Unsorted",
+			params: "nosort",
 			action: () => {
-				console.log('nosort');
+				console.log("nosort");
 			}
 		},
 		{
-			label: 'Artist (A-Z)',
-			params: 'a-az',
+			label: "Artist (A-Z)",
+			params: "a-az",
 			action: () => {
 				$trackStore = [
 					...$trackStore.sort((a, b) => {
@@ -205,8 +205,8 @@
 			}
 		},
 		{
-			label: 'Artist (Z-A)',
-			params: 'a-za',
+			label: "Artist (Z-A)",
+			params: "a-za",
 			action: () => {
 				$trackStore = [
 					...$trackStore.sort((a, b) => {
@@ -223,8 +223,8 @@
 			}
 		},
 		{
-			label: 'Title (A-Z)',
-			params: 't-az',
+			label: "Title (A-Z)",
+			params: "t-az",
 			action: () => {
 				$trackStore = [
 					...$trackStore.sort((a, b) => {
@@ -241,8 +241,8 @@
 			}
 		},
 		{
-			label: 'Title (Z-A)',
-			params: 't-za',
+			label: "Title (Z-A)",
+			params: "t-za",
 			action: () => {
 				$trackStore = [
 					...$trackStore.sort((a, b) => {
@@ -263,7 +263,7 @@
 </script>
 
 <svelte:window bind:innerWidth={width} />
-{#if header.title !== 'error'}
+{#if header.title !== "error"}
 	<Header
 		title={header?.title}
 		url={`${key}`}
@@ -274,14 +274,14 @@
 	/>
 {/if}
 <main>
-	{#if header.title !== 'error'}
+	{#if header.title !== "error"}
 		<InfoBox
 			subtitles={header?.subtitles}
 			secondSubtitle={header?.secondSubtitle}
 			thumbnail={header?.thumbnails !== null
 				? header?.thumbnails[header?.thumbnails?.length - 1].url.replace(
 						/=(w(\d+))-(h(\d+))/g,
-						'=w512-h512'
+						"=w512-h512"
 				  )
 				: undefined}
 			title={pageTitle}
@@ -293,40 +293,40 @@
 						// list.startPlaylist(header.playlistId)
 						list.initAutoMixSession({
 							playlistId: header.playlistId,
-							config: { playerParams: 'wAEB' }
+							config: { playerParams: "wAEB" }
 						});
 					},
-					icon: 'shuffle',
-					text: 'Shuffle'
+					icon: "shuffle",
+					text: "Shuffle"
 				},
 				{
 					action: () => {
 						setId();
 						list.initAutoMixSession({
 							playlistId: header.playlistId,
-							config: { playerParams: 'wAEB8gECGAE%3D' }
+							config: { playerParams: "wAEB8gECGAE%3D" }
 						});
 					},
-					icon: 'play',
-					type: 'outlined',
-					text: 'Start Radio'
+					icon: "play",
+					type: "outlined",
+					text: "Start Radio"
 				},
 				{
 					action: () => {},
-					icon: { name: 'dots', size: '1.25rem' },
-					text: '',
-					type: 'icon'
+					icon: { name: "dots", size: "1.25rem" },
+					text: "",
+					type: "icon"
 				}
 			]}
 			on:addqueue={() => {
 				setId();
 				list.initPlaylistSession({ playlistId: header.playlistId });
 
-				notify(`${pageTitle} added to queue!`, 'success');
+				notify(`${pageTitle} added to queue!`, "success");
 			}}
 			on:playlistAdd={async () => {
 				const response = await fetch(
-					'/api/getQueue.json?playlistId=' + header?.playlistId
+					"/api/getQueue.json?playlistId=" + header?.playlistId
 				);
 				const data = await response.json();
 				const items = data;

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import Icon from '../Icon/Icon.svelte';
+	import Icon from "../Icon/Icon.svelte";
 
-	import { PopperStore } from './popperStore';
+	import { PopperStore } from "./popperStore";
 	export let items = [];
-	export let type = '';
+	export let type = "";
 	export let metadata = {};
-	export let size = '1.5rem';
-	export let tabindex: string | number = '0';
+	export let size = "1.5rem";
+	export let tabindex: string | number = "0";
 	function Popper(node: HTMLElement) {
 		let x, y, bottom;
 		let isOpen;
@@ -36,7 +36,7 @@
 			PopperStore.set({
 				items,
 				srcNode: node,
-				direction: 'normal',
+				direction: "normal",
 				isOpen: true,
 				type,
 				x,
@@ -55,7 +55,7 @@
 				PopperStore.set({
 					items,
 					isOpen: true,
-					direction: 'normal',
+					direction: "normal",
 					type,
 					x,
 					y,
@@ -81,36 +81,36 @@
 			// console.log(x, y, bottom)
 			// PopperStore.reset()
 		}
-		node.addEventListener('click', handleClick, {
+		node.addEventListener("click", handleClick, {
 			passive: true,
 			capture: true
 		});
 		node.addEventListener(
-			'keydown',
+			"keydown",
 			(e) => {
-				if (e.code !== 'Space') return;
+				if (e.code !== "Space") return;
 				node.click();
 			},
 			{ capture: true }
 		);
-		window.addEventListener('resize', handleResize);
-		window.addEventListener('scroll', handleScroll, {
+		window.addEventListener("resize", handleResize);
+		window.addEventListener("scroll", handleScroll, {
 			capture: true,
 			passive: true
 		});
 		return {
 			destroy() {
-				node.removeEventListener('click', handleClick);
+				node.removeEventListener("click", handleClick);
 				node.removeEventListener(
-					'keydown',
+					"keydown",
 					(e) => {
-						if (e.code !== 'Space') return;
+						if (e.code !== "Space") return;
 						node.click();
 					},
 					true
 				);
-				window.removeEventListener('resize', handleResize);
-				window.removeEventListener('scroll', handleScroll, true);
+				window.removeEventListener("resize", handleResize);
+				window.removeEventListener("scroll", handleScroll, true);
 			}
 		};
 	}

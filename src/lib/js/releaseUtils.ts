@@ -1,4 +1,4 @@
-import { MusicResponsiveListItemRenderer } from '$lib/parsers';
+import { MusicResponsiveListItemRenderer } from "$lib/parsers";
 type Data = {
 	header: {
 		musicDetailHeaderRenderer: {
@@ -39,7 +39,7 @@ export function parsePageContents(data: Data) {
 	let items = [];
 	// console.log(contents)
 	let t = {
-		items: 'item'
+		items: "item"
 	};
 	const contents = [
 		...data.contents?.singleColumnBrowseResultsRenderer?.tabs[0].tabRenderer
@@ -60,7 +60,7 @@ export function parsePageContents(data: Data) {
 				.filter((item) => !item.text.match(/[\s]?•[\s]?/))
 				.map((item) => ({
 					name: item.text,
-					channelId: item?.navigationEndpoint?.browseEndpoint?.browseId || ''
+					channelId: item?.navigationEndpoint?.browseEndpoint?.browseId || ""
 				}))
 		];
 		return {
@@ -79,7 +79,7 @@ export function parsePageContents(data: Data) {
 							?.text,
 					type: length.text,
 					contentRating: data.header?.musicDetailHeaderRenderer?.hasOwnProperty(
-						'subtitleBadges'
+						"subtitleBadges"
 					)
 						? true
 						: false

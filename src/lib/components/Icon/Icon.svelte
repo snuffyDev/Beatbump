@@ -1,12 +1,12 @@
 <svelte:options namespace="svg" />
 
 <script lang="ts">
-	import icons from './icons';
+	import icons from "./icons";
 	export let name;
-	export let size = '1.5rem';
-	export let color = 'var(--stroke, currentColor)';
-	export let fill = 'none';
-	export let style = '';
+	export let size = "1.5rem";
+	export let color = "var(--stroke, currentColor)";
+	export let fill = "none";
+	export let style = "";
 	let displayIcon = icons[name];
 </script>
 

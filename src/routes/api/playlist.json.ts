@@ -1,23 +1,23 @@
 import {
 	MusicResponsiveListItemRenderer,
 	MusicTwoRowItemRenderer
-} from '$lib/parsers';
+} from "$lib/parsers";
 
-import type { CarouselHeader, CarouselItem } from '$lib/types';
-import type { NextContinuationData } from '$lib/types';
-import type { IListItemRenderer } from '$lib/types/musicListItemRenderer';
-import type { RequestHandler } from '@sveltejs/kit';
+import type { CarouselHeader, CarouselItem } from "$lib/types";
+import type { NextContinuationData } from "$lib/types";
+import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+import type { RequestHandler } from "@sveltejs/kit";
 
 export const get: RequestHandler = async ({ url }) => {
 	// console.time('playlist');
 	const query = url.searchParams;
-	const browseId = query.get('list') || '';
-	const itct = query.get('itct') || '';
-	const ctoken = query.get('ctoken') || '';
-	const referrer = query.get('ref') || '';
+	const browseId = query.get("list") || "";
+	const itct = query.get("itct") || "";
+	const ctoken = query.get("ctoken") || "";
+	const referrer = query.get("ref") || "";
 	// console.log(browseId, ctoken)
 
-	if (ctoken !== '') {
+	if (ctoken !== "") {
 		return getPlaylistContinuation(browseId, referrer, ctoken, itct);
 	}
 	return getPlaylist(browseId, referrer);
@@ -27,13 +27,13 @@ async function getPlaylistContinuation(browseId, referrer, ctoken, itct) {
 		`https://music.youtube.com/youtubei/v1/browse?ctoken=${ctoken}` +
 			`&continuation=${ctoken}&type=next&itct=${itct}&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
-			method: 'POST',
+			method: "POST",
 			body: JSON.stringify({
 				context: {
 					client: {
-						clientName: 'WEB_REMIX',
-						clientVersion: '1.20211025.00.00',
-						visitorData: 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D'
+						clientName: "WEB_REMIX",
+						clientVersion: "1.20211025.00.00",
+						visitorData: "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D"
 					},
 					user: {
 						lockedSafetyMode: false
@@ -41,15 +41,15 @@ async function getPlaylistContinuation(browseId, referrer, ctoken, itct) {
 				}
 			}),
 			headers: {
-				'Content-Type': 'application/json; charset=utf-8',
+				"Content-Type": "application/json; charset=utf-8",
 
-				'X-Goog-AuthUser': '0',
-				Origin: 'https://music.youtube.com',
-				'x-origin': 'https://music.youtube.com',
+				"X-Goog-AuthUser": "0",
+				Origin: "https://music.youtube.com",
+				"x-origin": "https://music.youtube.com",
 
-				'X-Goog-Visitor-Id': 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D',
+				"X-Goog-Visitor-Id": "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D",
 				referer:
-					'https://music.youtube.com/playlist?list=' + referrer.slice(2) ||
+					"https://music.youtube.com/playlist?list=" + referrer.slice(2) ||
 					browseId
 			}
 		}
@@ -95,37 +95,37 @@ async function getPlaylistContinuation(browseId, referrer, ctoken, itct) {
 }
 async function getPlaylist(browseId, referrer) {
 	const response = await fetch(
-		'https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
+		"https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30",
 		{
-			method: 'POST',
+			method: "POST",
 			body: JSON.stringify({
 				context: {
 					client: {
 						// clientName: 'WEB_REMIX',
 						// clientVersion: '1.20211025.00.00',
-						clientName: 'WEB_REMIX',
-						clientVersion: '0.1',
-						deviceMake: 'google',
-						platform: 'DESKTOP',
-						deviceModel: 'bot',
+						clientName: "WEB_REMIX",
+						clientVersion: "0.1",
+						deviceMake: "google",
+						platform: "DESKTOP",
+						deviceModel: "bot",
 						experimentIds: [],
-						experimentsToken: '',
-						osName: 'Googlebot',
-						osVersion: '2.1',
+						experimentsToken: "",
+						osName: "Googlebot",
+						osVersion: "2.1",
 						locationInfo: {
 							locationPermissionAuthorizationStatus:
-								'LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED'
+								"LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED"
 						},
 						musicAppInfo: {
 							musicActivityMasterSwitch:
-								'MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE',
+								"MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
 							musicLocationMasterSwitch:
-								'MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE',
-							pwaInstallabilityStatus: 'PWA_INSTALLABILITY_STATUS_UNKNOWN'
+								"MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE",
+							pwaInstallabilityStatus: "PWA_INSTALLABILITY_STATUS_UNKNOWN"
 						},
 						utcOffsetMinutes: -new Date().getTimezoneOffset(),
-						originalUrl: 'https://music.youtube.com/playlist?list=' + browseId,
-						visitorData: 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D'
+						originalUrl: "https://music.youtube.com/playlist?list=" + browseId,
+						visitorData: "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D"
 					},
 
 					user: {
@@ -134,21 +134,21 @@ async function getPlaylist(browseId, referrer) {
 				},
 				browseId: `${browseId}`,
 				browseEndpointContextMusicConfig: {
-					pageType: 'MUSIC_PAGE_TYPE_PLAYLIST'
+					pageType: "MUSIC_PAGE_TYPE_PLAYLIST"
 				}
 			}),
 			headers: {
-				'Content-Type': 'application/json; charset=utf-8',
+				"Content-Type": "application/json; charset=utf-8",
 
-				'X-Goog-AuthUser': '0',
-				Origin: 'https://music.youtube.com',
-				'x-origin': 'https://music.youtube.com',
-				'X-Goog-Visitor-Id': 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D',
+				"X-Goog-AuthUser": "0",
+				Origin: "https://music.youtube.com",
+				"x-origin": "https://music.youtube.com",
+				"X-Goog-Visitor-Id": "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D",
 
-				'User-Agent':
-					'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+				"User-Agent":
+					"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
 				referer:
-					'https://music.youtube.com/playlist?list=' + referrer || browseId
+					"https://music.youtube.com/playlist?list=" + referrer || browseId
 			}
 		}
 	);
@@ -158,7 +158,7 @@ async function getPlaylist(browseId, referrer) {
 
 	const data = await response.json();
 	let musicDetailHeaderRenderer = {};
-	if (Object.prototype.hasOwnProperty.call(data, 'header')) {
+	if (Object.prototype.hasOwnProperty.call(data, "header")) {
 		const { musicDetailHeaderRenderer: detailHeader = {} } = data?.header;
 		musicDetailHeaderRenderer = { ...detailHeader };
 	}
@@ -184,13 +184,13 @@ async function getPlaylist(browseId, referrer) {
 
 	const getHeader = () => {
 		const createArray = (key) =>
-			Array.isArray(musicDetailHeaderRenderer[key]['runs']) &&
+			Array.isArray(musicDetailHeaderRenderer[key]["runs"]) &&
 			(() => {
-				let len = musicDetailHeaderRenderer[key]['runs'].length;
+				let len = musicDetailHeaderRenderer[key]["runs"].length;
 				let arr = [];
 				// for (const { text } of musicDetailHeaderRenderer[key]['runs']) {
 				for (
-					const text = musicDetailHeaderRenderer[key]['runs']['text'];
+					const text = musicDetailHeaderRenderer[key]["runs"]["text"];
 					len--;
 
 				) {
@@ -199,11 +199,11 @@ async function getPlaylist(browseId, referrer) {
 				return arr;
 			})();
 		const ALLOWED_KEYS = new Set([
-			'subtitles',
-			'secondSubtitle',
-			'description',
-			'thumbnail',
-			'title'
+			"subtitles",
+			"secondSubtitle",
+			"description",
+			"thumbnail",
+			"title"
 		]);
 		const key_map = Object.keys(musicDetailHeaderRenderer);
 		let len = key_map.length;
@@ -213,30 +213,30 @@ async function getPlaylist(browseId, referrer) {
 				delete musicDetailHeaderRenderer[key];
 			}
 			if (
-				(key === 'subtitles' || key === 'secondSubtitle') &&
-				musicDetailHeaderRenderer[key]['runs']['length'] !== 0
+				(key === "subtitles" || key === "secondSubtitle") &&
+				musicDetailHeaderRenderer[key]["runs"]["length"] !== 0
 			) {
 				musicDetailHeaderRenderer[key] = createArray(key) ?? [];
 			}
 			if (
-				key === 'description' &&
+				key === "description" &&
 				Array.isArray(musicDetailHeaderRenderer[key]?.runs) &&
 				musicDetailHeaderRenderer[key]?.runs.length !== 0
 			) {
 				musicDetailHeaderRenderer[key] =
 					musicDetailHeaderRenderer[key].runs[0]?.text || undefined;
 			}
-			if (key === 'thumbnail') {
-				musicDetailHeaderRenderer[key + 's'] =
+			if (key === "thumbnail") {
+				musicDetailHeaderRenderer[key + "s"] =
 					musicDetailHeaderRenderer[key]?.croppedSquareThumbnailRenderer
 						?.thumbnail?.thumbnails || null;
 				delete musicDetailHeaderRenderer[key];
 			}
-			if (key === 'title')
+			if (key === "title")
 				musicDetailHeaderRenderer[key] =
-					musicDetailHeaderRenderer[key]['runs'][0]['text'] || 'Error';
+					musicDetailHeaderRenderer[key]["runs"][0]["text"] || "Error";
 		}
-		musicDetailHeaderRenderer['playlistId'] = playlistId;
+		musicDetailHeaderRenderer["playlistId"] = playlistId;
 		ALLOWED_KEYS.clear();
 	};
 	getHeader();
@@ -273,7 +273,7 @@ function parseTrack(
 }
 function parseHeader(header: any[]): CarouselHeader[] {
 	return header.map(({ musicCarouselShelfBasicHeaderRenderer } = {}) => ({
-		title: musicCarouselShelfBasicHeaderRenderer['title']['runs'][0].text
+		title: musicCarouselShelfBasicHeaderRenderer["title"]["runs"][0].text
 	}));
 }
 

@@ -1,7 +1,7 @@
 import {
 	MusicResponsiveListItemRenderer,
 	MusicTwoRowItemRenderer
-} from '$lib/parsers';
+} from "$lib/parsers";
 
 export const parseArtistPage = (
 	header: {
@@ -18,7 +18,7 @@ export const parseArtistPage = (
 		head = [header.musicVisualHeaderRenderer];
 	}
 	const parsedHeader = head.map((h) => {
-		const notAllowed = ['loggingContext'];
+		const notAllowed = ["loggingContext"];
 		const name = h?.title.runs[0].text;
 		let description;
 		let foregroundThumbnails;
@@ -45,7 +45,7 @@ export const parseArtistPage = (
 		if (h?.description) {
 			description = h?.description.runs[0].text;
 		} else {
-			description = '';
+			description = "";
 		}
 		if (h?.foregroundThumbnail) {
 			foregroundThumbnails =

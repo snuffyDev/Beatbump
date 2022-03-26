@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
-	import Icon from '../Icon/Icon.svelte';
+	import { getContext } from "svelte";
+	import Icon from "../Icon/Icon.svelte";
 
-	export let text = '';
-	export let icon = '';
-	export let color = 'white';
+	export let text = "";
+	export let icon = "";
+	export let color = "white";
 
-	getContext('menu');
+	getContext("menu");
 </script>
 
 <div class="popout-item" style="color:{color}" on:click>

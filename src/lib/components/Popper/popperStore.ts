@@ -1,9 +1,9 @@
-import { writable } from 'svelte/store';
+import { writable } from "svelte/store";
 
 type PopperStore = {
 	items: any[];
 	isOpen?: boolean;
-	type?: 'player' | string;
+	type?: "player" | string;
 	metadata?: {
 		thumbnail: string;
 		// artist: string
@@ -14,14 +14,14 @@ type PopperStore = {
 	y?: number;
 	bottom?: number;
 	srcNode?: HTMLElement;
-	direction?: 'normal' | 'right';
+	direction?: "normal" | "right";
 };
 export const PopperStore = _popperStore();
 function _popperStore() {
 	const { set, subscribe } = writable<PopperStore>({
 		items: [],
 		isOpen: false,
-		type: ''
+		type: ""
 	});
 	return {
 		subscribe,

@@ -1,9 +1,9 @@
 <script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
+	import type { Load } from "@sveltejs/kit";
 	export const load: Load = async ({ fetch, url }) => {
-		let browseId = url.searchParams.get('browseId');
-		let params = url.searchParams.get('params');
-		let itct = url.searchParams.get('itct');
+		let browseId = url.searchParams.get("browseId");
+		let params = url.searchParams.get("params");
+		let itct = url.searchParams.get("itct");
 		const response = await fetch(
 			`/artist/releases.json?browseId=${encodeURIComponent(
 				browseId
@@ -24,7 +24,7 @@
 </script>
 
 <script lang="ts">
-	import { GridItem, Grid } from '$lib/components/Grid';
+	import { GridItem, Grid } from "$lib/components/Grid";
 
 	export let header;
 	export let contents = [];

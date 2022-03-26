@@ -1,34 +1,34 @@
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from "@sveltejs/kit";
 
 export const get: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;
-	const videoId = query.get('videoId') || '';
-	const playlistId = query.get('list') || '';
-	const playerParams = query.get('playerParams') || '';
+	const videoId = query.get("videoId") || "";
+	const playlistId = query.get("list") || "";
+	const playerParams = query.get("playerParams") || "";
 	try {
 		const response = await fetch(
-			'https://music.youtube.com/youtubei/v1/player?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
+			"https://music.youtube.com/youtubei/v1/player?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30",
 			{
-				method: 'POST',
+				method: "POST",
 				body: JSON.stringify({
 					videoId: `${videoId}`,
 					context: {
 						client: {
-							hl: 'en',
-							clientName: 'ANDROID',
-							clientVersion: '16.02'
+							hl: "en",
+							clientName: "ANDROID",
+							clientVersion: "16.02"
 						},
 						user: {
 							lockedSafetyMode: false
 						},
 						captionParams: {}
 					},
-					params: playerParams ? playerParams : '',
+					params: playerParams ? playerParams : "",
 					playlistId: `${playlistId}`
 				}),
 				headers: {
-					'Content-Type': 'application/json; charset=utf-8',
-					Origin: 'https://music.youtube.com'
+					"Content-Type": "application/json; charset=utf-8",
+					Origin: "https://music.youtube.com"
 				}
 			}
 		);

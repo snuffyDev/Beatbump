@@ -1,14 +1,14 @@
 <script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
+	import type { Load } from "@sveltejs/kit";
 
 	let path;
 	export const load: Load = async ({ url, params, fetch, stuff }) => {
 		const slug = params.slug;
-		const filter = url.searchParams.get('filter') || '';
+		const filter = url.searchParams.get("filter") || "";
 		path = stuff.page;
 		// console.log(filter, page, slug)
 		const apiUrl = `/api/search.json?q=${encodeURIComponent(slug)}${
-			filter !== '' ? `&filter=${encodeURIComponent(filter)}` : ''
+			filter !== "" ? `&filter=${encodeURIComponent(filter)}` : ""
 		}`;
 		const response = await fetch(apiUrl);
 		const data = await response.json();
@@ -36,15 +36,15 @@
 	export let error;
 	export let filter;
 
-	import { page } from '$app/stores';
-	import { invalidate } from '$app/navigation';
-	import Listing from '$components/Item/Listing.svelte';
-	import type { Item, NextContinuationData } from '$lib/types';
-	import VirtualList from '$lib/components/SearchList/VirtualList.svelte';
+	import { page } from "$app/stores";
+	import { invalidate } from "$app/navigation";
+	import Listing from "$components/Item/Listing.svelte";
+	import type { Item, NextContinuationData } from "$lib/types";
+	import VirtualList from "$lib/components/SearchList/VirtualList.svelte";
 
-	import Header from '$lib/components/Layouts/Header.svelte';
+	import Header from "$lib/components/Layouts/Header.svelte";
 
-	import { writable } from 'svelte/store';
+	import { writable } from "svelte/store";
 	const search = writable<Array<Item>>();
 	$: !error && search.set(contents);
 	let title;
@@ -64,7 +64,7 @@
 					`&filter=` +
 					filter +
 					`&params=${itct}${
-						continuation.continuation ? `&ctoken=${ctoken}` : ''
+						continuation.continuation ? `&ctoken=${ctoken}` : ""
 					}`
 			);
 			const newPage = await response.json();
@@ -86,7 +86,7 @@
 			hasData = null;
 			isLoading = false;
 			return {
-				error: new Error(error + ' Unable to get more!')
+				error: new Error(error + " Unable to get more!")
 			};
 		}
 	}
@@ -124,7 +124,7 @@
 									invalidate(
 										`/search/${
 											$page.url.pathname
-										}?filter=${$page.url.searchParams.get('filter')}`
+										}?filter=${$page.url.searchParams.get("filter")}`
 									);
 								}}
 								href={`/search/${didYouMean.term}?filter=${didYouMean.endpoint.params}`}
@@ -177,7 +177,7 @@
 		/* grid-area: select; */
 		align-content: center;
 		font-size: 0.95rem;
-		grid-template-areas: 'select';
+		grid-template-areas: "select";
 		/* position: relative; */
 		/* overflow: visible; */
 		width: 100%;
@@ -185,7 +185,7 @@
 		max-width: 16ch;
 		&::after {
 			grid-area: select;
-			content: '';
+			content: "";
 			justify-self: end;
 			align-self: center;
 			margin-right: 0.7rem;
@@ -249,7 +249,7 @@
 	}
 	.searchHeader {
 		padding: 0.8rem 0 0.8rem 0;
-		font-family: 'Commissioner', sans-serif;
+		font-family: "Commissioner", sans-serif;
 		margin-left: auto;
 		display: flex;
 		// flex-direction: row;

@@ -5,7 +5,7 @@ import type {
 	TitleEndpoint,
 	ArtistInfo,
 	Item
-} from '$lib/types';
+} from "$lib/types";
 
 export interface PlaylistSearch {
 	playlistId: string;

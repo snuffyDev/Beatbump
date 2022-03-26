@@ -1,33 +1,33 @@
-import BaseContext from '$api/_modules/context';
+import BaseContext from "$api/_modules/context";
 import {
 	MoodsAndGenresItem,
 	MusicResponsiveListItemRenderer,
 	MusicTwoRowItemRenderer
-} from '$lib/parsers';
+} from "$lib/parsers";
 
-import type { CarouselHeader, CarouselItem } from '$lib/types';
-import type { ICarouselTwoRowItem } from '$lib/types/musicCarouselTwoRowItem';
-import type { IListItemRenderer } from '$lib/types/musicListItemRenderer';
-import { iterOptimized } from '$lib/utils/collections/array';
-import type { RequestHandler } from '@sveltejs/kit';
+import type { CarouselHeader, CarouselItem } from "$lib/types";
+import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
+import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+import { iterOptimized } from "$lib/utils/collections/array";
+import type { RequestHandler } from "@sveltejs/kit";
 
 export const get: RequestHandler = async ({ url }) => {
-	console.time('start');
+	console.time("start");
 	const query = url.searchParams;
-	const endpoint = query.get('q') || '';
-	const browseId = 'FEmusic_explore';
+	const endpoint = query.get("q") || "";
+	const browseId = "FEmusic_explore";
 	let carouselItems = [];
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/${endpoint}?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
-			method: 'POST',
+			method: "POST",
 			body: JSON.stringify(BaseContext.base(browseId)),
 
 			headers: {
-				'Content-Type': 'application/json; charset=utf-8',
-				Origin: 'https://music.youtube.com',
-				'User-Agent':
-					'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+				"Content-Type": "application/json; charset=utf-8",
+				Origin: "https://music.youtube.com",
+				"User-Agent":
+					"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
 			}
 		}
 	);
@@ -63,7 +63,7 @@ export const get: RequestHandler = async ({ url }) => {
 	// 	});
 	// }
 	// console.log(carouselItems.)
-	console.timeEnd('start');
+	console.timeEnd("start");
 	return {
 		body: JSON.stringify({ carouselItems, data }),
 		status: 200
@@ -77,7 +77,7 @@ function parseHeader({
 		let subheading, browseId;
 		if (musicCarouselShelfBasicHeaderRenderer?.strapline?.runs[0]?.text) {
 			subheading =
-				musicCarouselShelfBasicHeaderRenderer['strapline']['runs'][0].text;
+				musicCarouselShelfBasicHeaderRenderer["strapline"]["runs"][0].text;
 		}
 		if (
 			musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer
@@ -88,7 +88,7 @@ function parseHeader({
 					?.navigationEndpoint?.browseEndpoint?.browseId;
 		}
 		return {
-			title: musicCarouselShelfBasicHeaderRenderer['title']['runs'][0].text,
+			title: musicCarouselShelfBasicHeaderRenderer["title"]["runs"][0].text,
 			subheading,
 			browseId
 		};

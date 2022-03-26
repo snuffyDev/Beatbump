@@ -1,58 +1,58 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 // import BaseContext from '$api/_modules/contexts/context'
-import { MusicResponsiveListItemRenderer } from '$lib/parsers';
+import { MusicResponsiveListItemRenderer } from "$lib/parsers";
 
-import type { Artist, NextContinuationData, Song } from '$lib/types';
-import type { PlaylistSearch } from '$lib/types/playlist';
-import { pb } from '$lib/utils';
-import type { EndpointOutput } from '@sveltejs/kit';
+import type { Artist, NextContinuationData, Song } from "$lib/types";
+import type { PlaylistSearch } from "$lib/types/playlist";
+import { pb } from "$lib/utils";
+import type { EndpointOutput } from "@sveltejs/kit";
 interface SearchOutput extends EndpointOutput {
 	contents?: Song | PlaylistSearch;
 	didYouMean?: { term: string; endpoint: { query; params } };
 	continuation?: NextContinuationData;
 }
 export async function get({ query }): Promise<SearchOutput> {
-	let q = query.get('q');
+	let q = query.get("q");
 	q = decodeURIComponent(q);
-	const filter = query.get('filter') || '';
-	const videoId = query.get('videoId') || '';
-	const itct = query.get('itct') || '';
-	const playlistId = query.get('playlistId') || '';
-	const ctoken = query.get('ctoken') || '';
-	const browseId = query.get('browseId') || '';
+	const filter = query.get("filter") || "";
+	const videoId = query.get("videoId") || "";
+	const itct = query.get("itct") || "";
+	const playlistId = query.get("playlistId") || "";
+	const ctoken = query.get("ctoken") || "";
+	const browseId = query.get("browseId") || "";
 
-	const pageType = query.get('pt') || '';
+	const pageType = query.get("pt") || "";
 
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/search?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${
-			ctoken !== '' ? '' : `&sp=EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D`
+			ctoken !== "" ? "" : `&sp=EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D`
 		}${
-			ctoken !== ''
+			ctoken !== ""
 				? `&ctoken=${ctoken}&continuation=${ctoken}&itct=${itct}&type='next'`
-				: ''
+				: ""
 		}`,
 		{
-			method: 'POST',
+			method: "POST",
 			body: JSON.stringify({
 				context: {
 					client: {
-						clientName: 'WEB_REMIX',
-						clientVersion: '0.1'
+						clientName: "WEB_REMIX",
+						clientVersion: "0.1"
 					},
 					capabilities: {},
 					request: {
 						internalExperimentFlags: [
 							{
-								key: 'force_music_enable_outertube_tastebuilder_browse',
-								value: 'true'
+								key: "force_music_enable_outertube_tastebuilder_browse",
+								value: "true"
 							},
 							{
-								key: 'force_music_enable_outertube_playlist_detail_browse',
-								value: 'true'
+								key: "force_music_enable_outertube_playlist_detail_browse",
+								value: "true"
 							},
 							{
-								key: 'force_music_enable_outertube_search_suggestions',
-								value: 'true'
+								key: "force_music_enable_outertube_search_suggestions",
+								value: "true"
 							}
 						],
 						sessionIndex: {}
@@ -71,15 +71,15 @@ export async function get({ query }): Promise<SearchOutput> {
 				isAudioOnly: true,
 				query: `${q}`,
 
-				params: filter !== '' ? `${filter}` : '',
+				params: filter !== "" ? `${filter}` : "",
 				videoId: `${videoId}`,
 				playlistId: `${playlistId}`
 			}),
 			headers: {
-				'Content-Type': 'application/json; charset=utf-8',
-				Origin: 'https://music.youtube.com',
-				'User-Agent':
-					'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+				"Content-Type": "application/json; charset=utf-8",
+				Origin: "https://music.youtube.com",
+				"User-Agent":
+					"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
 			}
 		}
 	);
@@ -107,7 +107,7 @@ export async function get({ query }): Promise<SearchOutput> {
 			} = {}
 		} = {}
 	} = data;
-	if (Object.prototype.hasOwnProperty.call(data, 'continuationContents')) {
+	if (Object.prototype.hasOwnProperty.call(data, "continuationContents")) {
 		return {
 			status: 200,
 			body: parseSearchResult(continuationContents, true, filter)
@@ -133,11 +133,11 @@ const parsePlaylist = (contents): PlaylistSearch[] => {
 				.musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
 		const flexColumns = pb(
 			musicResponsiveListItemRenderer,
-			'musicResponsiveListItemFlexColumnRenderer',
+			"musicResponsiveListItemFlexColumnRenderer",
 			true
 		);
-		let metaData = pb(flexColumns[1], 'runs:text', true);
-		metaData = metaData.join('');
+		let metaData = pb(flexColumns[1], "runs:text", true);
+		metaData = metaData.join("");
 
 		return {
 			thumbnails: thumbnails,
@@ -148,7 +148,7 @@ const parsePlaylist = (contents): PlaylistSearch[] => {
 					?.menuNavigationItemRenderer?.navigationEndpoint
 					?.watchPlaylistEndpoint?.playlistId,
 			title: title,
-			type: 'playlist'
+			type: "playlist"
 		};
 	});
 };
@@ -169,7 +169,7 @@ const parseSong = (contents, type): Song[] => {
 		} = ctx.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text;
 
 		let albumInfo;
-		if (type == 'song') {
+		if (type == "song") {
 			const albumArr: [] =
 				ctx.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs;
 			const album: {
@@ -187,7 +187,7 @@ const parseSong = (contents, type): Song[] => {
 
 		const length = metaInfo[metaInfo.length - 1];
 		let artists = [];
-		if (type !== 'artist') {
+		if (type !== "artist") {
 			const artistsArr = metaInfo.reverse();
 			artists = artistsArr.slice(4);
 			if (artists.length > 1) {
@@ -255,7 +255,7 @@ function parseSearchResult(data, cont, filter?) {
 		if (data[0]?.messageRenderer) return [];
 		if (data[0]?.itemSectionRenderer) {
 			if (data[0]?.itemSectionRenderer?.contents[0].messageRenderer)
-				return { error: 'No Results Found' };
+				return { error: "No Results Found" };
 			didYouMean = correctedQuery(
 				data[0]?.itemSectionRenderer?.contents[0].didYouMeanRenderer
 			);
@@ -286,13 +286,13 @@ function parseSearchResult(data, cont, filter?) {
         */
 		filter = decodeURIComponent(filter);
 		const paramList = [
-			'EgWKAQIoAWoKEAMQBBAKEAUQCQ==',
-			'EgeKAQQoADgBagwQDhAKEAkQAxAEEAU=',
-			'EgeKAQQoAEABagwQDhAKEAkQAxAEEAU='
+			"EgWKAQIoAWoKEAMQBBAKEAUQCQ==",
+			"EgeKAQQoADgBagwQDhAKEAkQAxAEEAU=",
+			"EgeKAQQoAEABagwQDhAKEAkQAxAEEAU="
 		];
-		const videoParams = 'EgWKAQIQAWoKEAMQBBAKEAUQCQ==';
-		const artistParams = 'EgWKAQIgAWoKEAMQBBAKEAkQBQ==';
-		if (filter == '') {
+		const videoParams = "EgWKAQIQAWoKEAMQBBAKEAUQCQ==";
+		const artistParams = "EgWKAQIgAWoKEAMQBBAKEAkQBQ==";
+		if (filter == "") {
 		} else if (
 			!paramList.includes(filter) &&
 			!artistParams.includes(filter) &&
@@ -301,23 +301,23 @@ function parseSearchResult(data, cont, filter?) {
 			const { contents: ctx } = contents[0];
 			continuation = continuationCheck(contents[0]);
 
-			results = parseSong(ctx, 'song');
+			results = parseSong(ctx, "song");
 			return { results, continuation };
 		} else if (videoParams == filter) {
 			continuation = continuationCheck(contents[0]);
 
 			const { contents: ctx } = contents[0];
-			results = parseSong(ctx, 'video');
+			results = parseSong(ctx, "video");
 
 			return { results, continuation };
 		} else if (
 			filter == artistParams ||
-			filter == 'EgWKAQIgAWoKEAMQBBAKEAkQBQ%3D%3D'
+			filter == "EgWKAQIgAWoKEAMQBBAKEAkQBQ%3D%3D"
 		) {
 			continuation = continuationCheck(contents[0]);
 
 			const { contents: ctx } = contents[0];
-			results = parseSong(ctx, 'artist');
+			results = parseSong(ctx, "artist");
 		} else {
 			continuation = continuationCheck(contents[0]);
 			contents = contents[0]?.contents;
@@ -336,7 +336,7 @@ function parseSearchResult(data, cont, filter?) {
 	return { contents: results, continuation: continuation };
 }
 function continuationCheck(contents) {
-	if (!Object.prototype.hasOwnProperty.call(contents, 'continuations')) {
+	if (!Object.prototype.hasOwnProperty.call(contents, "continuations")) {
 		return;
 	}
 	return { ...contents?.continuations[0].nextContinuationData };

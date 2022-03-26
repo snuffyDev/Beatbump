@@ -1,32 +1,32 @@
 /* eslint-disable no-inner-declarations */
-import { parseContents } from '$lib/endpoints/nextUtils';
+import { parseContents } from "$lib/endpoints/nextUtils";
 
-import type { EndpointOutput, RequestHandler } from '@sveltejs/kit';
+import type { EndpointOutput, RequestHandler } from "@sveltejs/kit";
 
 // import NextParser from "/nextUtils";
 
 export const get: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;
-	const params = query.get('params') || undefined;
-	const itct = query.get('itct') || '';
-	const videoId = query.get('videoId') || '';
-	const playlistId = query.get('playlistId') || '';
-	const ctoken = query.get('ctoken') || undefined;
-	const clickTracking = query.get('clickParams') || undefined;
-	const setVideoId = query.get('setVideoId') || undefined;
-	const type = query.get('configType') || undefined;
+	const params = query.get("params") || undefined;
+	const itct = query.get("itct") || "";
+	const videoId = query.get("videoId") || "";
+	const playlistId = query.get("playlistId") || "";
+	const ctoken = query.get("ctoken") || undefined;
+	const clickTracking = query.get("clickParams") || undefined;
+	const setVideoId = query.get("setVideoId") || undefined;
+	const type = query.get("configType") || undefined;
 	// console.log(params)
 	try {
 		const response = await fetch(
 			`https://music.youtube.com/youtubei/v1/next?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 			{
-				method: 'POST',
+				method: "POST",
 				body: JSON.stringify({
 					context: {
 						client: {
-							clientName: 'WEB_REMIX',
-							clientVersion: '0.1',
-							visitorData: 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D'
+							clientName: "WEB_REMIX",
+							clientVersion: "0.1",
+							visitorData: "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D"
 						},
 						user: {
 							lockedSafetyMode: false
@@ -40,32 +40,32 @@ export const get: RequestHandler = async ({ url }) => {
 					isAudioOnly: true,
 					enablePersistentPlaylistPanel: true,
 					params: `${params ? encodeURIComponent(params) : itct}`,
-					tunerSettingValue: 'AUTOMIX_SETTING_NORMAL',
+					tunerSettingValue: "AUTOMIX_SETTING_NORMAL",
 					videoId: `${videoId}`,
 					playlistSetVideoId: setVideoId,
 					playlistId: `${playlistId}`,
 					watchEndpointMusicConfig: {
 						hasPersistentPlaylistPanel: true,
-						musicVideoType: type ? type : 'MUSIC_VIDEO_TYPE_ATV'
+						musicVideoType: type ? type : "MUSIC_VIDEO_TYPE_ATV"
 					}
 				}),
 				headers: {
-					'Content-Type': 'application/json; charset=utf-8',
-					'user-agent':
-						'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36 Edg/97.0.1072.62',
-					'x-goog-authuser': '0',
-					'x-goog-visitor-id': 'Cgs3UUllOTNTZmxSQSjw6ayPBg%3D%3D',
-					'X-Goog-AuthUser': '0',
-					'x-origin': 'https://music.youtube.com',
+					"Content-Type": "application/json; charset=utf-8",
+					"user-agent":
+						"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36 Edg/97.0.1072.62",
+					"x-goog-authuser": "0",
+					"x-goog-visitor-id": "Cgs3UUllOTNTZmxSQSjw6ayPBg%3D%3D",
+					"X-Goog-AuthUser": "0",
+					"x-origin": "https://music.youtube.com",
 
-					'X-Goog-Visitor-Id': 'CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D',
-					'x-youtube-client-name': '67',
-					'x-youtube-client-version': '1.20210901.00.00',
-					'x-youtube-device':
-						'cbr=Edge+Chromium&cbrver=93.0.961.38&ceng=WebKit&cengver=537.36&cos=Windows&cosver=10.0&cplatform=DESKTOP&cyear=2011',
-					'x-youtube-page-label': 'youtube.music.web.client_20210901_00_RC00',
+					"X-Goog-Visitor-Id": "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D",
+					"x-youtube-client-name": "67",
+					"x-youtube-client-version": "1.20210901.00.00",
+					"x-youtube-device":
+						"cbr=Edge+Chromium&cbrver=93.0.961.38&ceng=WebKit&cengver=537.36&cos=Windows&cosver=10.0&cplatform=DESKTOP&cyear=2011",
+					"x-youtube-page-label": "youtube.music.web.client_20210901_00_RC00",
 
-					Origin: 'https://music.youtube.com'
+					Origin: "https://music.youtube.com"
 				}
 			}
 		);
@@ -125,7 +125,7 @@ export const get: RequestHandler = async ({ url }) => {
 				contents,
 				continuation,
 				clickTrackingParams,
-				watchEndpoint ? watchEndpoint : ''
+				watchEndpoint ? watchEndpoint : ""
 			);
 			return {
 				status: 200,
@@ -143,8 +143,8 @@ export const get: RequestHandler = async ({ url }) => {
 					continuations: [
 						{
 							nextRadioContinuationData: {
-								clickTrackingParams = '',
-								continuation = ''
+								clickTrackingParams = "",
+								continuation = ""
 							} = {}
 						} = {}
 					] = [],

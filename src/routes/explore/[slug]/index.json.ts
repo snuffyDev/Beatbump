@@ -1,9 +1,9 @@
 import {
 	MusicResponsiveListItemRenderer,
 	MusicTwoRowItemRenderer
-} from '$lib/parsers';
-import type { CarouselHeader, CarouselItem } from '$lib/types';
-import type { RequestHandler } from '@sveltejs/kit';
+} from "$lib/parsers";
+import type { CarouselHeader, CarouselItem } from "$lib/types";
+import type { RequestHandler } from "@sveltejs/kit";
 
 type destructure = {
 	contents: {
@@ -25,12 +25,12 @@ export const get: RequestHandler = async ({ url, params }) => {
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
-			method: 'POST',
+			method: "POST",
 			body: JSON.stringify({
 				context: {
 					client: {
-						clientName: 'WEB_REMIX',
-						clientVersion: '0.1'
+						clientName: "WEB_REMIX",
+						clientVersion: "0.1"
 					},
 
 					user: {
@@ -38,11 +38,11 @@ export const get: RequestHandler = async ({ url, params }) => {
 					}
 				},
 				params: `${slug}`,
-				browseId: 'FEmusic_moods_and_genres_category'
+				browseId: "FEmusic_moods_and_genres_category"
 			}),
 			headers: {
-				'Content-Type': 'application/json; charset=utf-8',
-				Origin: 'https://music.youtube.com'
+				"Content-Type": "application/json; charset=utf-8",
+				Origin: "https://music.youtube.com"
 			}
 		}
 	);
@@ -51,7 +51,7 @@ export const get: RequestHandler = async ({ url, params }) => {
 	let {
 		header: {
 			musicHeaderRenderer: {
-				title: { runs: [{ text = '' } = {}] = [] } = {}
+				title: { runs: [{ text = "" } = {}] = [] } = {}
 			} = {}
 		} = {},
 		contents: {
@@ -71,7 +71,7 @@ export const get: RequestHandler = async ({ url, params }) => {
 	let sections: Array<{
 		header?: Record<string, any>;
 		section?: any[];
-		type?: 'grids';
+		type?: "grids";
 	}> = [];
 	for (let index = 0; index < contents.length; index++) {
 		const element = { ...contents[index] };
@@ -88,7 +88,7 @@ export const get: RequestHandler = async ({ url, params }) => {
 				body: {
 					sections,
 					header: text,
-					type: 'carousel'
+					type: "carousel"
 				},
 				status: 200
 			};
@@ -111,7 +111,7 @@ export const get: RequestHandler = async ({ url, params }) => {
 			body: {
 				sections,
 				header: text,
-				type: 'grid'
+				type: "grid"
 			},
 			status: 200
 		};
@@ -119,7 +119,7 @@ export const get: RequestHandler = async ({ url, params }) => {
 };
 function parseHeader(header: any[]): CarouselHeader[] {
 	return header.map(({ musicCarouselShelfBasicHeaderRenderer } = {}) => ({
-		title: musicCarouselShelfBasicHeaderRenderer['title']['runs'][0].text,
+		title: musicCarouselShelfBasicHeaderRenderer["title"]["runs"][0].text,
 		browseId:
 			musicCarouselShelfBasicHeaderRenderer.moreContentButton.buttonRenderer
 				.navigationEndpoint.browseEndpoint.browseId

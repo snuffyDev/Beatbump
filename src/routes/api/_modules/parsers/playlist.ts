@@ -1,10 +1,10 @@
 /* eslint-disable prefer-const */
 
-import { MusicResponsiveListItemRenderer } from '$lib/parsers';
-import type { Artist, Item, NextContinuationData, Thumbnail } from '$lib/types';
-import type { IListItemRenderer } from '$lib/types/musicListItemRenderer';
-import type { IPlaylistItem, PlaylistData } from '$lib/types/playlist';
-import { pb } from '$lib/utils';
+import { MusicResponsiveListItemRenderer } from "$lib/parsers";
+import type { Artist, Item, NextContinuationData, Thumbnail } from "$lib/types";
+import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+import type { IPlaylistItem, PlaylistData } from "$lib/types/playlist";
+import { pb } from "$lib/utils";
 
 function parseTrack(contents = [], playlistId?): Array<IListItemRenderer> {
 	const Tracks = contents.map((item) => {
@@ -67,7 +67,7 @@ export const parsePlaylist = async (
 											{
 												musicPlaylistShelfRenderer: {
 													contents = [],
-													playlistId = '',
+													playlistId = "",
 													continuations = []
 												} = {}
 											}
@@ -84,7 +84,7 @@ export const parsePlaylist = async (
 		// console.log(musicDetailHeaderRenderer)
 		const cont: NextContinuationData = continuations
 			? continuations[0]?.nextContinuationData
-			: '';
+			: "";
 		musicDetailHeaderRenderer = [musicDetailHeaderRenderer];
 		const parseHeader = musicDetailHeaderRenderer.map(
 			({
@@ -94,10 +94,10 @@ export const parsePlaylist = async (
 				secondSubtitle = {},
 				title = {}
 			}) => {
-				const subtitles = pb(subtitle, 'runs:text', false);
-				const desc = pb(description, 'runs:0:text', false);
-				const _title = pb(title, 'runs:0:text', false);
-				secondSubtitle = pb(secondSubtitle, 'runs:text', false);
+				const subtitles = pb(subtitle, "runs:text", false);
+				const desc = pb(description, "runs:0:text", false);
+				const _title = pb(title, "runs:0:text", false);
+				secondSubtitle = pb(secondSubtitle, "runs:text", false);
 				return {
 					data,
 					description: desc,
@@ -107,7 +107,7 @@ export const parsePlaylist = async (
 						null,
 					playlistId: playlistId,
 					secondSubtitle,
-					title: _title || 'error'
+					title: _title || "error"
 				};
 			}
 		)[0];
@@ -126,7 +126,7 @@ export const parsePlaylist = async (
 		const {
 			responseContext: {
 				serviceTrackingParams,
-				serviceTrackingParams: [{ params: [{ value = '' }] = [] }] = []
+				serviceTrackingParams: [{ params: [{ value = "" }] = [] }] = []
 			} = {},
 			continuationContents: {
 				musicPlaylistShelfContinuation: {

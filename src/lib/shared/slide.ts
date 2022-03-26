@@ -1,4 +1,4 @@
-import { cubicOut } from 'svelte/easing';
+import { cubicOut } from "svelte/easing";
 
 export type EasingFunction = (t: number) => number;
 
@@ -34,7 +34,7 @@ export function slide(
 		duration,
 		easing,
 		css: (t) =>
-			'overflow: hidden;' +
+			"overflow: hidden;" +
 			`opacity: ${Math.min(t * 20, 1) * opacity};` +
 			`height: ${1 - y * t * height}px;` +
 			`padding-top: ${(1 - y) * t * padding_top}px;` +

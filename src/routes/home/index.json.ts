@@ -2,59 +2,59 @@ import {
 	MoodsAndGenresItem,
 	MusicResponsiveListItemRenderer,
 	MusicTwoRowItemRenderer
-} from '$lib/parsers';
+} from "$lib/parsers";
 
-import type { CarouselHeader } from '$lib/types';
-import type { ICarouselTwoRowItem } from '$lib/types/musicCarouselTwoRowItem';
-import type { IListItemRenderer } from '$lib/types/musicListItemRenderer';
-import type { RequestHandler } from '@sveltejs/kit';
+import type { CarouselHeader } from "$lib/types";
+import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
+import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+import type { RequestHandler } from "@sveltejs/kit";
 export const get: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;
-	let ctoken = query.get('ctoken') || '';
-	let itct = query.get('itct') || '';
+	let ctoken = query.get("ctoken") || "";
+	let itct = query.get("itct") || "";
 	itct = decodeURIComponent(itct);
 	ctoken = decodeURIComponent(ctoken);
-	const browseId = 'FEmusic_home';
+	const browseId = "FEmusic_home";
 	let carouselItems = [];
-	const BASE_URL = 'https://music.youtube.com/youtubei/v1/browse';
+	const BASE_URL = "https://music.youtube.com/youtubei/v1/browse";
 	const params =
-		itct !== ''
+		itct !== ""
 			? `?ctoken=${ctoken}&continuation=${ctoken}&type=next&itct=${itct}&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`
-			: '?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30';
+			: "?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30";
 	const response = await fetch(BASE_URL + params, {
 		headers: {
-			accept: '*/*',
-			'accept-language': 'en-US,en;q=0.9',
-			'cache-control': 'no-cache',
-			'content-type': 'application/json',
-			pragma: 'no-cache',
-			'sec-ch-ua':
+			accept: "*/*",
+			"accept-language": "en-US,en;q=0.9",
+			"cache-control": "no-cache",
+			"content-type": "application/json",
+			pragma: "no-cache",
+			"sec-ch-ua":
 				'"Microsoft Edge";v="95", "Chromium";v="95", ";Not A Brand";v="99"',
-			'sec-ch-ua-mobile': '?0',
-			'sec-ch-ua-platform': '"Windows"',
-			'sec-fetch-dest': 'empty',
-			'sec-fetch-mode': 'same-origin',
-			'sec-fetch-site': 'same-origin',
-			'x-goog-visitor-id': 'CgttaVFvdVdoLVdzSSiViqSMBg%3D%3D',
-			'x-youtube-client-name': '67',
-			'x-youtube-client-version': '1.20211101.00.00',
-			Referer: 'https://music.youtube.com/',
-			Origin: 'https://music.youtube.com',
-			'x-origin': 'https://music.youtube.com',
+			"sec-ch-ua-mobile": "?0",
+			"sec-ch-ua-platform": '"Windows"',
+			"sec-fetch-dest": "empty",
+			"sec-fetch-mode": "same-origin",
+			"sec-fetch-site": "same-origin",
+			"x-goog-visitor-id": "CgttaVFvdVdoLVdzSSiViqSMBg%3D%3D",
+			"x-youtube-client-name": "67",
+			"x-youtube-client-version": "1.20211101.00.00",
+			Referer: "https://music.youtube.com/",
+			Origin: "https://music.youtube.com",
+			"x-origin": "https://music.youtube.com",
 
-			'Referrer-Policy': 'strict-origin-when-cross-origin'
+			"Referrer-Policy": "strict-origin-when-cross-origin"
 		},
 		body: JSON.stringify({
-			browseId: ctoken !== '' ? browseId : '',
+			browseId: ctoken !== "" ? browseId : "",
 
 			context: {
 				client: {
-					clientName: 'WEB_REMIX',
-					clientVersion: '1.20211025.00.00',
-					visitorData: 'CgttaVFvdVdoLVdzSSiViqSMBg%3D%3D',
-					originalUrl: 'https://music.youtube.com/',
+					clientName: "WEB_REMIX",
+					clientVersion: "1.20211025.00.00",
+					visitorData: "CgttaVFvdVdoLVdzSSiViqSMBg%3D%3D",
+					originalUrl: "https://music.youtube.com/",
 					userAgent:
-						'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36 Edg/95.0.1020.40,gzip(gfe)',
+						"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36 Edg/95.0.1020.40,gzip(gfe)",
 					utcOffsetMinutes: -new Date().getTimezoneOffset()
 				},
 				user: {
@@ -64,23 +64,23 @@ export const get: RequestHandler = async ({ url }) => {
 				request: {
 					internalExperimentFlags: [
 						{
-							key: 'force_music_enable_outertube_tastebuilder_browse',
-							value: 'true'
+							key: "force_music_enable_outertube_tastebuilder_browse",
+							value: "true"
 						},
 						{
-							key: 'force_music_enable_outertube_playlist_detail_browse',
-							value: 'true'
+							key: "force_music_enable_outertube_playlist_detail_browse",
+							value: "true"
 						},
 						{
-							key: 'force_music_enable_outertube_search_suggestions',
-							value: 'true'
+							key: "force_music_enable_outertube_search_suggestions",
+							value: "true"
 						}
 					],
 					sessionIndex: {}
 				}
 			}
 		}),
-		method: 'POST'
+		method: "POST"
 	});
 
 	if (!response.ok) {
@@ -111,7 +111,7 @@ export const get: RequestHandler = async ({ url }) => {
 						?.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail
 						?.thumbnails
 				].map((d) => {
-					let url = d?.url?.replace('-rj', '-rw');
+					let url = d?.url?.replace("-rj", "-rw");
 					return { ...d, url };
 				});
 				carouselItems = [
@@ -164,7 +164,7 @@ function parseHeader({
 		let subheading, browseId;
 		if (musicCarouselShelfBasicHeaderRenderer?.strapline?.runs[0]?.text) {
 			subheading =
-				musicCarouselShelfBasicHeaderRenderer['strapline']['runs'][0].text;
+				musicCarouselShelfBasicHeaderRenderer["strapline"]["runs"][0].text;
 		}
 		if (
 			musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer
@@ -175,7 +175,7 @@ function parseHeader({
 					?.navigationEndpoint?.browseEndpoint?.browseId;
 		}
 		return {
-			title: musicCarouselShelfBasicHeaderRenderer['title']['runs'][0].text,
+			title: musicCarouselShelfBasicHeaderRenderer["title"]["runs"][0].text,
 			subheading,
 			browseId
 		};

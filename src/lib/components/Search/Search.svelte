@@ -1,41 +1,41 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import Icon from '$lib/components/Icon/Icon.svelte';
-	import debounce from '$lib/js/debounce';
-	import { createEventDispatcher } from 'svelte';
+	import { goto } from "$app/navigation";
+	import Icon from "$lib/components/Icon/Icon.svelte";
+	import debounce from "$lib/js/debounce";
+	import { createEventDispatcher } from "svelte";
 
 	export let type;
 
 	let options = [
-		{ label: 'Songs', params: 'EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D' },
-		{ label: 'Videos', params: 'EgWKAQIQAWoKEAMQBBAKEAkQBQ%3D%3D' },
-		{ label: 'Artists', params: 'EgWKAQIgAWoKEAMQBBAKEAkQBQ%3D%3D' },
-		{ label: 'All Playlists', params: 'EgWKAQIoAWoKEAMQBBAKEAUQCQ%3D%3D' },
+		{ label: "Songs", params: "EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D" },
+		{ label: "Videos", params: "EgWKAQIQAWoKEAMQBBAKEAkQBQ%3D%3D" },
+		{ label: "Artists", params: "EgWKAQIgAWoKEAMQBBAKEAkQBQ%3D%3D" },
+		{ label: "All Playlists", params: "EgWKAQIoAWoKEAMQBBAKEAUQCQ%3D%3D" },
 		{
-			label: 'Featured Playlists',
-			params: 'EgeKAQQoADgBagwQDhAKEAkQAxAEEAU%3D'
+			label: "Featured Playlists",
+			params: "EgeKAQQoADgBagwQDhAKEAkQAxAEEAU%3D"
 		},
 		{
-			label: 'Community Playlists',
-			params: 'EgeKAQQoAEABagwQDhAKEAkQAxAEEAU%3D'
+			label: "Community Playlists",
+			params: "EgeKAQQoAEABagwQDhAKEAkQAxAEEAU%3D"
 		}
 	];
 	let filterType;
-	let query = '';
+	let query = "";
 	let filter = filterType ? filterType : options[0].params;
 	const dispatch = createEventDispatcher();
 	let results: Array<{ query?: string; id?: number }> = [];
 	async function handleSubmit() {
-		dispatch('submitted', { submitted: true });
+		dispatch("submitted", { submitted: true });
 		let url = `/search/${encodeURIComponent(encodeURIComponent(query))}${
-			filter !== undefined ? `?filter=${filter}` : ''
+			filter !== undefined ? `?filter=${filter}` : ""
 		}`;
 		goto(url);
 	}
 	const typeahead = debounce(async () => {
-		if (query == '' || undefined) return (results = []);
+		if (query == "" || undefined) return (results = []);
 		const response = await fetch(
-			'/api/get_search_suggestions.json?q=' + encodeURIComponent(query)
+			"/api/get_search_suggestions.json?q=" + encodeURIComponent(query)
 		);
 		results = await response.json();
 	}, 250);
@@ -64,7 +64,7 @@
 				id="searchBox"
 				autocomplete="off"
 				aria-autocomplete="list"
-				autofocus={type == 'inline' ? true : false}
+				autofocus={type == "inline" ? true : false}
 				autocorrect="off"
 				type="search"
 				placeholder="Search"
@@ -91,7 +91,7 @@
 		</ul>
 	{/if}
 	<div class="nav-item">
-		<div class="select" class:inline={type == 'inline' ? true : false}>
+		<div class="select" class:inline={type == "inline" ? true : false}>
 			<select bind:value={filter}>
 				{#each options as option (option.params)}
 					<option value={option.params}>{option.label}</option>
@@ -120,7 +120,7 @@
 			border-radius: inherit;
 			bottom: 0;
 			left: 0;
-			content: '';
+			content: "";
 			width: 100%;
 			height: 100%;
 			background: rgba(255, 255, 255, 0.007);

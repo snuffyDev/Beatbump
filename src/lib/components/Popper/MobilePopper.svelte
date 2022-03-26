@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { browser } from '$app/env';
+	import { browser } from "$app/env";
 
-	import drag from '$lib/actions/drag';
-	import list from '$lib/stores/list';
-	import { key } from '$lib/stores/stores';
-	import { afterUpdate } from 'svelte';
-	import { fade, fly } from 'svelte/transition';
-	import Icon from '../Icon/Icon.svelte';
-	import { PopperStore } from './popperStore';
+	import drag from "$lib/actions/drag";
+	import list from "$lib/stores/list";
+	import { key } from "$lib/stores/stores";
+	import { afterUpdate } from "svelte";
+	import { fade, fly } from "svelte/transition";
+	import Icon from "../Icon/Icon.svelte";
+	import { PopperStore } from "./popperStore";
 	$: items = $PopperStore.items;
 	$: type = $PopperStore.type;
 
@@ -97,7 +97,7 @@
 			>
 				<hr />
 			</div>
-			{#if type == 'player'}
+			{#if type == "player"}
 				<section class="m-metadata">
 					<div class="image" style="">
 						<img
@@ -121,7 +121,7 @@
 					</div>
 				</section>
 			{/if}
-			{#if type == 'search' && $PopperStore.metadata?.artist !== undefined && $PopperStore.metadata.artist.length}
+			{#if type == "search" && $PopperStore.metadata?.artist !== undefined && $PopperStore.metadata.artist.length}
 				<section class="m-metadata">
 					<div class="image">
 						<img src={$PopperStore.metadata.thumbnail} alt="" />
@@ -130,11 +130,11 @@
 						<span class="title">{$PopperStore.metadata.title}</span>
 
 						{#each $PopperStore.metadata?.artist as artist}
-							<span class="artist"> {artist.text ?? ''}</span>
+							<span class="artist"> {artist.text ?? ""}</span>
 						{/each}
 						<span />
 						<span class="length">
-							{$PopperStore.metadata?.length ?? ''}
+							{$PopperStore.metadata?.length ?? ""}
 						</span>
 					</div>
 				</section>

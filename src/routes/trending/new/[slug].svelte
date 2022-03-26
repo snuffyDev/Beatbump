@@ -1,24 +1,24 @@
 <script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
+	import type { Load } from "@sveltejs/kit";
 	export const load: Load = async ({ params, fetch, url }) => {
 		// const params = url.searchParams.get('params')
 		const response = await fetch(
 			`/trending/new/${params.slug}.json` +
 				`${
-					url.searchParams.get('params')
-						? `?params=${url.searchParams.get('params')}`
-						: ''
+					url.searchParams.get("params")
+						? `?params=${url.searchParams.get("params")}`
+						: ""
 				}` +
 				`${
-					url.searchParams.get('itct')
-						? `&itct=${encodeURIComponent(url.searchParams.get('itct'))}`
-						: ''
+					url.searchParams.get("itct")
+						? `&itct=${encodeURIComponent(url.searchParams.get("itct"))}`
+						: ""
 				}`
 		);
 		const {
 			sections = [],
-			header = '',
-			title = [] || ''
+			header = "",
+			title = [] || ""
 		} = await response.json();
 		// console.log(sections, header, title)
 		if (response.ok) {
@@ -35,35 +35,35 @@
 </script>
 
 <script lang="ts">
-	import type { sections } from '$lib/types/components/sections';
+	import type { sections } from "$lib/types/components/sections";
 	export let sections: sections;
 
 	export let header;
 	// export let data
 	export let title: string;
-	import { goto } from '$app/navigation';
-	import Header from '$lib/components/Layouts/Header.svelte';
-	import { Grid, GridItem } from '$lib/components/Grid';
-	import list from '$lib/stores/list';
-	import { page } from '$app/stores';
-	import Carousel from '$lib/components/Carousel/Carousel.svelte';
+	import { goto } from "$app/navigation";
+	import Header from "$lib/components/Layouts/Header.svelte";
+	import { Grid, GridItem } from "$lib/components/Grid";
+	import list from "$lib/stores/list";
+	import { page } from "$app/stores";
+	import Carousel from "$lib/components/Carousel/Carousel.svelte";
 	// $: console.log(data, sections, header, title)
 </script>
 
 <Header
-	title={title ? title.replace(',', ' ') : ''}
+	title={title ? title.replace(",", " ") : ""}
 	url={$page.url.pathname}
 	desc="The latest in music"
 />
 
 <main>
-	{#if title === 'Charts'}
+	{#if title === "Charts"}
 		<div class="header">
 			<span class="h1">{header}</span>
 		</div>
 	{/if}
 	{#each sections as section, i}
-		{#if section?.type === 'grid'}
+		{#if section?.type === "grid"}
 			<Grid heading={header} items={section.section} let:item>
 				<GridItem slot="item" {item} />
 			</Grid>
@@ -122,7 +122,7 @@
 	.item-title {
 		display: inline;
 		padding: 0.3rem 0.1rem;
-		font-family: 'Commissioner';
+		font-family: "Commissioner";
 		font-weight: 500;
 		font-size: 1.1em;
 		letter-spacing: -0.02em;

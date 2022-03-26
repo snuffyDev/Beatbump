@@ -1,14 +1,14 @@
 <script lang="ts">
-	import Icon from '$lib/components/Icon/Icon.svelte';
+	import Icon from "$lib/components/Icon/Icon.svelte";
 
-	import Listing from '$lib/components/Item/Listing.svelte';
+	import Listing from "$lib/components/Item/Listing.svelte";
 
-	import db from '$lib/db';
+	import db from "$lib/db";
 
-	import { onMount, setContext } from 'svelte';
+	import { onMount, setContext } from "svelte";
 	let value;
 	let songs = [];
-	setContext({}, 'library');
+	setContext({}, "library");
 	onMount(async () => {
 		songs = await db.getFavorites();
 	});
@@ -16,23 +16,23 @@
 
 	let options = [
 		{
-			label: 'Unsorted',
-			params: 'nosort',
+			label: "Unsorted",
+			params: "nosort",
 			action: () => {
 				// console.log('nosort', songs)
 			}
 		},
 		{
-			label: 'A-Z',
-			params: 'az',
+			label: "A-Z",
+			params: "az",
 			action: () => {
 				songs = [...songs.sort((a, b) => a.title.localeCompare(b.title))];
 				// console.log('az', songs)
 			}
 		},
 		{
-			label: 'Z-A',
-			params: 'za',
+			label: "Z-A",
+			params: "za",
 			action: () => {
 				songs = [...songs.sort((a, b) => b.title.localeCompare(a.title))];
 				// console.log('za', songs)

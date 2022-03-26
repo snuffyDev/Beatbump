@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
+	import type { Load } from "@sveltejs/kit";
 
 	export const load: Load = async ({ url, params, fetch, stuff }) => {
 		const response = await fetch(`/explore/${params.slug}.json`);
@@ -19,9 +19,9 @@
 </script>
 
 <script lang="ts">
-	import Carousel from '$lib/components/Carousel/Carousel.svelte';
-	import { Grid, GridItem } from '$lib/components/Grid';
-	import Header from '$lib/components/Layouts/Header.svelte';
+	import Carousel from "$lib/components/Carousel/Carousel.svelte";
+	import { Grid, GridItem } from "$lib/components/Grid";
+	import Header from "$lib/components/Layouts/Header.svelte";
 	export let sections;
 	export let path;
 	export let header;
@@ -38,7 +38,7 @@
 		<h1>{header}</h1>
 	</div>
 	{#each [...sections] as section}
-		{#if type == 'grid'}
+		{#if type == "grid"}
 			<Grid heading={section.title} items={section.section} let:item>
 				<GridItem slot="item" {item} />
 			</Grid>

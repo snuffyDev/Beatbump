@@ -1,6 +1,6 @@
-import type { Song } from '$lib/types';
-import type { IPlaylistPanelVideoRenderer } from '../types/playlistPanelVideoRenderer';
-import { PlaylistPanelVideoRenderer } from '../parsers';
+import type { Song } from "$lib/types";
+import type { IPlaylistPanelVideoRenderer } from "../types/playlistPanelVideoRenderer";
+import { PlaylistPanelVideoRenderer } from "../parsers";
 
 type PanelAlias = { playlistPanelVideoRenderer: IPlaylistPanelVideoRenderer };
 
@@ -21,11 +21,11 @@ export function parseContents(
 		if (
 			Object.prototype.hasOwnProperty.call(
 				contents[idx],
-				'playlistPanelVideoRenderer'
+				"playlistPanelVideoRenderer"
 			)
 		) {
 			contents[idx] = PlaylistPanelVideoRenderer(
-				contents[idx]['playlistPanelVideoRenderer']
+				contents[idx]["playlistPanelVideoRenderer"]
 			) as Song;
 		} else {
 			contents[idx] = false;

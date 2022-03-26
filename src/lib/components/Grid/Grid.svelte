@@ -1,6 +1,6 @@
 <script lang="ts">
 	export let items = [];
-	export let heading = '';
+	export let heading = "";
 </script>
 
 <div class="grid-container">

@@ -1,13 +1,13 @@
 <script lang="ts">
-	import Dropdown from '../Dropdown/Dropdown.svelte';
-	import MobilePopper from './MobilePopper.svelte';
+	import Dropdown from "../Dropdown/Dropdown.svelte";
+	import MobilePopper from "./MobilePopper.svelte";
 
 	const poppers = [
 		{
-			name: 'mobile',
+			name: "mobile",
 			component: MobilePopper
 		},
-		{ name: 'desktop', component: Dropdown }
+		{ name: "desktop", component: Dropdown }
 	];
 	let width;
 	$: popper = width < 640 ? poppers[0] : poppers[1];

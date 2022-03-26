@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { alertHandler } from '$lib/stores/stores';
+	import { alertHandler } from "$lib/stores/stores";
 
-	import { createEventDispatcher } from 'svelte';
-	import { fade, fly } from 'svelte/transition';
+	import { createEventDispatcher } from "svelte";
+	import { fade, fly } from "svelte/transition";
 	let thumbnail;
 	const readFiles = (
 		e: Event & {
@@ -12,7 +12,7 @@
 	) => {
 		const files = e.target.files[0];
 		const reader = new FileReader();
-		reader.addEventListener('load', () => {
+		reader.addEventListener("load", () => {
 			let result = reader.result;
 			thumbnail = result;
 		});
@@ -25,7 +25,7 @@
 
 <div
 	class="backdrop"
-	on:click={() => dispatch('close')}
+	on:click={() => dispatch("close")}
 	transition:fade={{ duration: 125 }}
 />
 
@@ -35,7 +35,7 @@
 			<img src={thumbnail} width="200" height="200" alt="thumbnail" />
 		{:else}
 			<img
-				src={'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIxMDAgLTEzLjA4OSA1MDAgNTAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGZpbGw9IiNhNmE2YTYiIGQ9Ik0xMDAtMTMuMDg5aDUwMHY1MDBIMTAweiIvPjxwYXRoIGQ9Ik0zNjUuMTIzIDMzNy4yMzdoLTMydi03OS41NzZoLTc5LjU3NXYtMzJoNzkuNTc1di03OS41NzVoMzJ2NzkuNTc1SDQ0NC43djMyaC03OS41NzZ6IiBmaWxsPSIjZDhkOGQ4Ii8+PC9zdmc+'}
+				src={"data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIxMDAgLTEzLjA4OSA1MDAgNTAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGZpbGw9IiNhNmE2YTYiIGQ9Ik0xMDAtMTMuMDg5aDUwMHY1MDBIMTAweiIvPjxwYXRoIGQ9Ik0zNjUuMTIzIDMzNy4yMzdoLTMydi03OS41NzZoLTc5LjU3NXYtMzJoNzkuNTc1di03OS41NzVoMzJ2NzkuNTc1SDQ0NC43djMyaC03OS41NzZ6IiBmaWxsPSIjZDhkOGQ4Ii8+PC9zdmc+"}
 				width="200"
 				height="200"
 				alt="thumbnail"
@@ -54,10 +54,10 @@
 	<form
 		on:submit|preventDefault={() => {
 			alertHandler.set({
-				msg: 'Testing -- currently unimplemented',
-				type: 'error'
+				msg: "Testing -- currently unimplemented",
+				type: "error"
 			});
-			dispatch('close');
+			dispatch("close");
 		}}
 	>
 		<div class="input-row">
@@ -71,10 +71,10 @@
 		<button
 			on:click|preventDefault={() => {
 				alertHandler.set({
-					msg: 'Testing -- currently unimplemented',
-					type: 'error'
+					msg: "Testing -- currently unimplemented",
+					type: "error"
 				});
-				dispatch('close');
+				dispatch("close");
 			}}>Submit</button
 		>
 	</form>
@@ -97,13 +97,13 @@
 			margin-bottom: 0 !important;
 		}
 	}
-	[type='file'] {
+	[type="file"] {
 		min-width: 10rem;
 		margin: 0;
 		filter: opacity(0);
 		opacity: 0;
 	}
-	[type='file']::-webkit-file-upload-button {
+	[type="file"]::-webkit-file-upload-button {
 		visibility: hidden;
 	}
 	.file {
@@ -115,15 +115,15 @@
 		max-width: 15.5rem;
 	}
 	.file-button {
-		font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-			Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
+		font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+			Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
 			sans-serif;
 		&:hover::after {
 			background: #525252b2;
 		}
 	}
 	.file-button::before {
-		content: 'Choose an image';
+		content: "Choose an image";
 		display: inline-block;
 		background: var(--form-bg);
 		border: 0.0625rem solid hsla(0, 0%, 66.7%, 0.219);
@@ -153,7 +153,7 @@
 		right: 0;
 		bottom: 0;
 		// left:0;
-		content: 'Select';
+		content: "Select";
 		color: rgb(238, 238, 238);
 		background: #353535b2;
 		display: block;
@@ -162,10 +162,10 @@
 		padding: 0.4rem 0.7rem;
 		transition: background linear 125ms;
 	}
-	[type='file']:hover::before {
+	[type="file"]:hover::before {
 		border-color: black;
 	}
-	[type='file']:active::before {
+	[type="file"]:active::before {
 		background: -webkit-linear-gradient(to top, #e3e3e3, #f9f9f9);
 	}
 	.playlist-modal {

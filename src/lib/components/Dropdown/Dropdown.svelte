@@ -1,11 +1,11 @@
 <script lang="ts">
-	import Icon from '$components/Icon/Icon.svelte';
-	import { clickOutside } from '$lib/actions/clickOutside';
-	import { cubicOut, quartOut } from 'svelte/easing';
+	import Icon from "$components/Icon/Icon.svelte";
+	import { clickOutside } from "$lib/actions/clickOutside";
+	import { cubicOut, quartOut } from "svelte/easing";
 	// import { slide } from 'svelte/transition'
 
-	import { PopperStore } from '../Popper';
-	import DropdownItem from './DropdownItem.svelte';
+	import { PopperStore } from "../Popper";
+	import DropdownItem from "./DropdownItem.svelte";
 
 	$: items = $PopperStore.items;
 	$: type = $PopperStore.type;
@@ -50,7 +50,7 @@
 			duration,
 			easing,
 			css: (t, u) =>
-				'overflow: hidden;' +
+				"overflow: hidden;" +
 				`opacity: ${Math.min(t * 20, 1) * opacity};` +
 				`height: ${t * height}px;` +
 				`padding-top: ${t * padding_top}px;` +
@@ -70,7 +70,7 @@
 			: $PopperStore.y;
 
 	$: posX =
-		$PopperStore.direction === 'right'
+		$PopperStore.direction === "right"
 			? popper && rect?.left <= 0
 				? $PopperStore.x + rect?.width
 				: rect?.right >= viewport_width
@@ -85,19 +85,19 @@
 		) {
 			// console.log(node.contains(event.relatedTarget))
 			if (!node.contains(event.relatedTarget)) {
-				node.dispatchEvent(new CustomEvent('lostfocus'));
+				node.dispatchEvent(new CustomEvent("lostfocus"));
 			}
 		}
 
-		node.addEventListener('focusout', handleFocusOut, { capture: true });
+		node.addEventListener("focusout", handleFocusOut, { capture: true });
 		return {
 			destroy() {
-				node.removeEventListener('focusout', handleFocusOut, true);
+				node.removeEventListener("focusout", handleFocusOut, true);
 			}
 		};
 	}
 	function handleKeyDown(event: KeyboardEvent, fn: () => void) {
-		if (event.code === 'Space') {
+		if (event.code === "Space") {
 			event.preventDefault();
 			const target = event.target as HTMLElement;
 			fn();
@@ -123,7 +123,7 @@
 		on:click_outside={onClose}
 		in:slide={{ delay: 125, duration: 125 }}
 		out:slide={{ duration: 125 }}
-		class={type == 'player' ? 'dd-player' : 'dd-menu'}
+		class={type == "player" ? "dd-player" : "dd-menu"}
 		style="transform: translate({posX}px, {posY}px)"
 		tabindex="0"
 	>

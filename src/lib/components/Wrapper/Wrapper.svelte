@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { elasticOut, expoInOut, expoOut } from 'svelte/easing';
+	import { elasticOut, expoInOut, expoOut } from "svelte/easing";
 
-	import { fade } from 'svelte/transition';
+	import { fade } from "svelte/transition";
 	export let main: HTMLElement;
 	export let key;
 	$: if (key) catchUp();

@@ -1,9 +1,9 @@
 <script>
-	import { dev } from '$app/env';
+	import { dev } from "$app/env";
 
-	import { goto } from '$app/navigation';
-	import { navigating } from '$app/stores';
-	import { onMount } from 'svelte';
+	import { goto } from "$app/navigation";
+	import { navigating } from "$app/stores";
+	import { onMount } from "svelte";
 	let redir = 6;
 	let timeout;
 	onMount(() => {
@@ -11,7 +11,7 @@
 			if (!$navigating) {
 				redir--;
 				if (redir <= 0) {
-					goto('/');
+					goto("/");
 				} else {
 					timeout = setTimeout(redirect, 1000);
 				}

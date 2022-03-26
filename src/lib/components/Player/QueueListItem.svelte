@@ -1,10 +1,10 @@
 <script lang="ts">
-	import longpress from '$lib/actions/longpress';
-	import { clickOutside } from '$lib/actions/clickOutside';
-	import list from '$lib/stores/list';
-	import { currentTitle, key } from '$stores/stores';
-	import { createEventDispatcher, getContext } from 'svelte';
-	import Popout from '../Dropdown/Popout.svelte';
+	import longpress from "$lib/actions/longpress";
+	import { clickOutside } from "$lib/actions/clickOutside";
+	import list from "$lib/stores/list";
+	import { currentTitle, key } from "$stores/stores";
+	import { createEventDispatcher, getContext } from "svelte";
+	import Popout from "../Dropdown/Popout.svelte";
 
 	export let item;
 	export let index;
@@ -13,11 +13,11 @@
 
 	const DropdownItems = [
 		{
-			text: 'More like this',
-			icon: 'music',
+			text: "More like this",
+			icon: "music",
 			action: async (params) => {
 				window.scrollTo({
-					behavior: 'smooth',
+					behavior: "smooth",
 					top: 0,
 					left: 0
 				});
@@ -25,8 +25,8 @@
 			}
 		},
 		{
-			text: 'Remove from queue',
-			icon: 'x',
+			text: "Remove from queue",
+			icon: "x",
 			action: async (params) => {
 				list.removeTrack(index);
 			}
@@ -35,7 +35,7 @@
 
 	function handleClick(i) {
 		currentTitle.set($list.mix[i].title);
-		dispatch('updated', {
+		dispatch("updated", {
 			id: `${i}`
 		});
 	}
@@ -80,7 +80,7 @@
 				</span>
 			</div>
 			<span class="p-length">
-				{item.length ?? ''}
+				{item.length ?? ""}
 			</span>
 		</div>
 	</li>
@@ -213,7 +213,7 @@
 		/* margin-right: auto;*/
 	}
 	img::before {
-		content: '';
+		content: "";
 		display: block;
 		padding-top: calc(100% * 2 / 3);
 	}

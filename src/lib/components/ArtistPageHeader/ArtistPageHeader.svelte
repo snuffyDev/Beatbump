@@ -1,10 +1,10 @@
 <script lang="ts">
-	import list from '$lib/stores/list';
-	import Icon from '$lib/components/Icon/Icon.svelte';
-	import { theme } from '$lib/stores/stores';
-	import { onMount } from 'svelte';
-	import { browser } from '$app/env';
-	import { shuffle } from '$lib/utils';
+	import list from "$lib/stores/list";
+	import Icon from "$lib/components/Icon/Icon.svelte";
+	import { theme } from "$lib/stores/stores";
+	import { onMount } from "svelte";
+	import { browser } from "$app/env";
+	import { shuffle } from "$lib/utils";
 
 	export let header;
 	export let thumbnail = [];
@@ -50,24 +50,24 @@
 				opacity = 1;
 			});
 
-			img.addEventListener('load', () => {});
+			img.addEventListener("load", () => {});
 			// console.log(img)
 		}
 		if (desc) {
 			descClientHeight = desc.clientHeight;
 			descOffsetHeight = desc.scrollHeight;
 		}
-		wrapper = document.getElementById('wrapper');
+		wrapper = document.getElementById("wrapper");
 		wrapper.addEventListener(
-			'scroll',
+			"scroll",
 			() => (timestamp = requestAnimationFrame(handler))
 		);
 		return () => {
-			img.removeEventListener('load', () => {
+			img.removeEventListener("load", () => {
 				opacity = 1;
 			});
 			wrapper.removeEventListener(
-				'scroll',
+				"scroll",
 				() => (timestamp = requestAnimationFrame(handler))
 			);
 			cancelAnimationFrame(timestamp);
@@ -171,7 +171,7 @@
 						class:hidden={descIsOverflow}
 						on:click={() => (isExpanded = !isExpanded)}
 					>
-						<span class="btn-text">Show {isExpanded ? 'Less' : 'More'}</span>
+						<span class="btn-text">Show {isExpanded ? "Less" : "More"}</span>
 					</div>
 				{/if}
 				<div class="btn-wrpr">
@@ -302,7 +302,7 @@
 			position: absolute;
 			z-index: -1;
 			inset: 0;
-			content: '';
+			content: "";
 			width: 100%;
 			height: 100%;
 			backdrop-filter: blur(0.05rem);
@@ -344,7 +344,7 @@
 
 		&::before {
 			position: absolute;
-			content: '';
+			content: "";
 			top: 0;
 			bottom: 0;
 			left: 0;
@@ -369,7 +369,7 @@
 			width: 100%;
 			height: 100%;
 			z-index: -5;
-			content: '';
+			content: "";
 			// background-image: linear-gradient(
 			// 	1turn,
 			// 	var(--midnight-base),
@@ -424,7 +424,7 @@
 				font-weight: 700;
 				font-size: 2.5rem;
 				display: inline-block;
-				font-family: 'Commissioner', sans-serif;
+				font-family: "Commissioner", sans-serif;
 
 				text-shadow: rgba(0, 0, 0, 0.171) 0.2rem -0.12rem 0.5rem;
 

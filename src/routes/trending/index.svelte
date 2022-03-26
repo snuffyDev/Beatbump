@@ -1,10 +1,10 @@
 <script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
+	import type { Load } from "@sveltejs/kit";
 
 	let path;
 
 	export const load: Load = async ({ fetch, stuff }) => {
-		const response = await fetch('/trending.json?q=browse');
+		const response = await fetch("/trending.json?q=browse");
 		const data = await response.json();
 		if (!response.ok) {
 			return {
@@ -28,9 +28,9 @@
 <script lang="ts">
 	export let carouselItems: ICarousel;
 	export let _data;
-	import Carousel from '$components/Carousel/Carousel.svelte';
-	import type { ICarousel } from '$lib/types';
-	import Header from '$lib/components/Layouts/Header.svelte';
+	import Carousel from "$components/Carousel/Carousel.svelte";
+	import type { ICarousel } from "$lib/types";
+	import Header from "$lib/components/Layouts/Header.svelte";
 	// $: console.log(carouselItems, _data);
 </script>
 
@@ -81,7 +81,7 @@
 </main>
 
 <style lang="scss">
-	@import '../../global/stylesheet/components/_carousel';
+	@import "../../global/stylesheet/components/_carousel";
 	.breakout {
 		border-radius: 0.8rem;
 		-webkit-overflow-scrolling: touch;
@@ -123,7 +123,7 @@
 		max-width: 15rem;
 		width: 100%;
 		border-radius: 0.8rem;
-		font-family: 'Commissioner', sans-serif;
+		font-family: "Commissioner", sans-serif;
 
 		align-items: center;
 

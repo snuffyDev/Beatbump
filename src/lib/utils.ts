@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { browser } from '$app/env';
-import { sort } from './endpoints/playerUtils';
+import { browser } from "$app/env";
+import { sort } from "./endpoints/playerUtils";
 import {
 	alertHandler,
 	currentId,
 	preferWebM,
 	updateTrack
-} from './stores/stores';
+} from "./stores/stores";
 
 // notifications
 export const notify = (
 	msg: string,
-	type: 'success' | 'error',
+	type: "success" | "error",
 	action?: string
 ): void => {
 	alertHandler.set({
@@ -24,7 +24,7 @@ export const notify = (
 export function seededShuffle<T>(array: T[], _seed?: number): T[] {
 	let rand: () => number;
 
-	if (typeof _seed === 'number') {
+	if (typeof _seed === "number") {
 		let seed = _seed;
 		// Seeded random number generator in JS. Modified from:
 		// https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
@@ -55,19 +55,19 @@ export function shuffle(array: any[], index: number): any[] {
 	return array;
 }
 function format(seconds) {
-	if (isNaN(seconds)) return '...';
+	if (isNaN(seconds)) return "...";
 
 	const minutes = Math.floor(seconds / 60);
 	seconds = Math.floor(seconds % 60);
-	if (seconds < 10) seconds = '0' + seconds;
+	if (seconds < 10) seconds = "0" + seconds;
 
 	return `${minutes}:${seconds}`;
 }
 
 // Fetches a song length for adding to queue
 export const addToQueue = async (videoId: string): Promise<string> => {
-	const url = `/api/player.json${videoId ? `?videoId=${videoId}` : ''}`;
-	const data = await fetch(url, { headers: { accept: 'application/json' } })
+	const url = `/api/player.json${videoId ? `?videoId=${videoId}` : ""}`;
+	const data = await fetch(url, { headers: { accept: "application/json" } })
 		.then((json) => json.json())
 		.catch((err) => console.log(err));
 	const length = format(data.videoDetails.lengthSeconds);
@@ -87,8 +87,8 @@ export const getSrc = async (
 	unsubscribe();
 	const res = await fetch(
 		`/api/player.json?videoId=${videoId}${
-			playlistId ? `&playlistId=${playlistId}` : ''
-		}${params ? `&playerParams=${params}` : ''}`
+			playlistId ? `&playlistId=${playlistId}` : ""
+		}${params ? `&playerParams=${params}` : ""}`
 	);
 	const data = await res.json();
 	const formats = sort(data, webM);
@@ -101,7 +101,7 @@ export const getSrc = async (
 
 function setTrack(formats = [], webM) {
 	if (webM) {
-		const item = formats.find((v) => v.mimeType === 'webm');
+		const item = formats.find((v) => v.mimeType === "webm");
 		const parsedURL = item !== undefined ? item.url : formats[0].url;
 		updateTrack.set({
 			originalUrl: formats[0].original_url,
@@ -117,12 +117,12 @@ function setTrack(formats = [], webM) {
 	return { body: parsedURL, error: false };
 }
 function handleError() {
-	console.log('error');
+	console.log("error");
 
 	notify(
-		'An error occurred while initiating playback, skipping...',
-		'error',
-		'getNextTrack'
+		"An error occurred while initiating playback, skipping...",
+		"error",
+		"getNextTrack"
 	);
 	return {
 		body: null,
@@ -134,9 +134,9 @@ export const queryParams = (params: Record<any, any>): string =>
 	Object.keys(params)
 		.map((k) => {
 			if (params[k] == undefined) return;
-			return k + '=' + params[k];
+			return k + "=" + params[k];
 		})
-		.join('&');
+		.join("&");
 // parse array object input for child
 
 export const pb = (input: string, query: string, justOne = false): any => {
@@ -163,7 +163,7 @@ export const pb = (input: string, query: string, justOne = false): any => {
 		return r.length == 1 ? r.shift() : r;
 	};
 
-	let d = query.split(':'),
+	let d = query.split(":"),
 		v = input;
 	for (let i = 0; i < d.length; i++) {
 		v = iterate(v, d[i]);

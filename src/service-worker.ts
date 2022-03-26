@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { build, files, timestamp } from '$service-worker';
+import { build, files, timestamp } from "$service-worker";
 
 const worker = (self as unknown) as ServiceWorkerGlobalScope;
 const FILES = `cache-${timestamp}`;
@@ -10,7 +10,7 @@ const FILES = `cache-${timestamp}`;
 const to_cache = build.concat(files);
 const staticAssets = new Set(to_cache);
 
-worker.addEventListener('install', (event) => {
+worker.addEventListener("install", (event) => {
 	event.waitUntil(
 		caches
 			.open(FILES)
@@ -21,7 +21,7 @@ worker.addEventListener('install', (event) => {
 	);
 });
 
-worker.addEventListener('activate', (event) => {
+worker.addEventListener("activate", (event) => {
 	event.waitUntil(
 		caches.keys().then(async (keys) => {
 			// delete old caches
@@ -53,25 +53,25 @@ async function fetchAndCache(request: Request) {
 	}
 }
 
-worker.addEventListener('fetch', (event) => {
-	if (event.request.method !== 'GET' || event.request.headers.has('range'))
+worker.addEventListener("fetch", (event) => {
+	if (event.request.method !== "GET" || event.request.headers.has("range"))
 		return;
-	if (!(event.request.url.indexOf('http') === 0)) return;
+	if (!(event.request.url.indexOf("http") === 0)) return;
 	if (
-		event.request.cache === 'only-if-cached' &&
-		event.request.mode !== 'same-origin'
+		event.request.cache === "only-if-cached" &&
+		event.request.mode !== "same-origin"
 	)
 		return;
 	const url = new URL(event.request.url);
 
 	// don't try to handle e.g. data: URIs
-	const isHttp = url.protocol.startsWith('http');
+	const isHttp = url.protocol.startsWith("http");
 	const isDevServerRequest =
 		url.hostname === self.location.hostname && url.port !== self.location.port;
 	const isStaticAsset =
 		url.host === self.location.host && staticAssets.has(url.pathname);
 	const skipBecauseUncached =
-		event.request.cache === 'only-if-cached' && !isStaticAsset;
+		event.request.cache === "only-if-cached" && !isStaticAsset;
 
 	if (isHttp && !isDevServerRequest && !skipBecauseUncached) {
 		event.respondWith(

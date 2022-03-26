@@ -1,12 +1,12 @@
 <script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
-	import { api } from '$lib/api';
+	import type { Load } from "@sveltejs/kit";
+	import { api } from "$lib/api";
 	export const load: Load = async ({ params, fetch }) => {
 		const response = await api(fetch, {
 			browseId: params.slug,
-			endpoint: 'browse',
-			path: 'artist',
-			type: 'artist'
+			endpoint: "browse",
+			path: "artist",
+			type: "artist"
 		});
 		let { header, body } = (await response.body) as ArtistPage;
 
@@ -26,23 +26,23 @@
 </script>
 
 <script lang="ts">
-	import Carousel from '$lib/components/Carousel/Carousel.svelte';
-	import ArtistPageHeader from '../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte';
-	import { page } from '$app/stores';
+	import Carousel from "$lib/components/Carousel/Carousel.svelte";
+	import ArtistPageHeader from "../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte";
+	import { page } from "$app/stores";
 
-	import ListItem from '$components/ListItem/ListItem.svelte';
-	import { isPagePlaying } from '$lib/stores/stores';
-	import { setContext } from 'svelte';
-	import Header from '$lib/components/Layouts/Header.svelte';
+	import ListItem from "$components/ListItem/ListItem.svelte";
+	import { isPagePlaying } from "$lib/stores/stores";
+	import { setContext } from "svelte";
+	import Header from "$lib/components/Layouts/Header.svelte";
 
 	import type {
 		ArtistPage,
 		ArtistPageBody,
 		IArtistPageHeader
-	} from '$lib/js/artist';
+	} from "$lib/js/artist";
 	export let header: IArtistPageHeader;
-	export let carousels: ArtistPageBody['carousels'];
-	export let songs: ArtistPageBody['songs'] = {};
+	export let carousels: ArtistPageBody["carousels"];
+	export let songs: ArtistPageBody["songs"] = {};
 	export let id;
 
 	const ctx = {};
@@ -50,7 +50,7 @@
 </script>
 
 <Header
-	title={header?.name == undefined ? 'Artist' : header?.name}
+	title={header?.name == undefined ? "Artist" : header?.name}
 	desc={header?.name}
 	url={$page.url.pathname}
 	image={header?.thumbnails && header?.thumbnails[0]?.url}

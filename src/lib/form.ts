@@ -27,7 +27,7 @@ export function enhance(
 			const res = await fetch(form.action, {
 				method: form.method,
 				headers: {
-					accept: 'application/json'
+					accept: "application/json"
 				},
 				body
 			});
@@ -50,11 +50,11 @@ export function enhance(
 		}
 	}
 
-	form.addEventListener('submit', handle_submit);
+	form.addEventListener("submit", handle_submit);
 
 	return {
 		destroy() {
-			form.removeEventListener('submit', handle_submit);
+			form.removeEventListener("submit", handle_submit);
 		}
 	};
 }

@@ -1,24 +1,24 @@
-import type { RequestHandler } from '@sveltejs/kit';
-import BaseContext from '../api/_modules/context';
+import type { RequestHandler } from "@sveltejs/kit";
+import BaseContext from "../api/_modules/context";
 
 export const get: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;
-	const browseId = query.get('browseId');
+	const browseId = query.get("browseId");
 
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 		{
-			method: 'POST',
+			method: "POST",
 			body: JSON.stringify({
 				...BaseContext.base(browseId)
 
 				// browseId: `${browseId}`
 			}),
 			headers: {
-				'Content-Type': 'application/json; charset=utf-8',
-				Origin: 'https://music.youtube.com',
-				'User-Agent':
-					'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+				"Content-Type": "application/json; charset=utf-8",
+				Origin: "https://music.youtube.com",
+				"User-Agent":
+					"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
 			}
 		}
 	);
@@ -38,7 +38,7 @@ export const get: RequestHandler = async ({ url }) => {
 			items[i] = {
 				text: item?.buttonText?.runs[0]?.text,
 				color: `#${(
-					'00000000' + (item?.solid?.leftStripeColor & 0xffffff).toString(16)
+					"00000000" + (item?.solid?.leftStripeColor & 0xffffff).toString(16)
 				).slice(-6)}`,
 				endpoint: {
 					params: item?.clickCommand?.browseEndpoint?.params,

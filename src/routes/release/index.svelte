@@ -1,14 +1,14 @@
 <script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
+	import type { Load } from "@sveltejs/kit";
 	let path;
 	export const load: Load = async ({ stuff, url, fetch }) => {
 		path = stuff.page;
-		const browseId = url.searchParams.get('id') || '';
-		const pt = url.searchParams.get('type') || '';
+		const browseId = url.searchParams.get("id") || "";
+		const pt = url.searchParams.get("type") || "";
 		const response = await fetch(
 			`/api/main.json?q=&endpoint=browse${
-				browseId ? `&browseId=${browseId}` : ''
-			}${pt ? `&pt=${pt}` : ''}`
+				browseId ? `&browseId=${browseId}` : ""
+			}${pt ? `&pt=${pt}` : ""}`
 		);
 		const data = await response.json();
 		if (!response.ok) {
@@ -32,20 +32,20 @@
 </script>
 
 <script lang="ts">
-	import ListItem from '$components/ListItem/ListItem.svelte';
-	import { currentTitle, key } from '$stores/stores';
-	import { parsePageContents } from '$lib/js/releaseUtils';
-	import { isPagePlaying } from '$stores/stores';
-	import list from '$lib/stores/list';
-	import InfoBox from '$lib/components/Layouts/InfoBox.svelte';
-	import { setContext } from 'svelte';
-	import { page } from '$app/stores';
-	import tagStore from '$lib/stores/ogtags';
-	import { api } from '$lib/api';
-	import Header from '$lib/components/Layouts/Header.svelte';
+	import ListItem from "$components/ListItem/ListItem.svelte";
+	import { currentTitle, key } from "$stores/stores";
+	import { parsePageContents } from "$lib/js/releaseUtils";
+	import { isPagePlaying } from "$stores/stores";
+	import list from "$lib/stores/list";
+	import InfoBox from "$lib/components/Layouts/InfoBox.svelte";
+	import { setContext } from "svelte";
+	import { page } from "$app/stores";
+	import tagStore from "$lib/stores/ogtags";
+	import { api } from "$lib/api";
+	import Header from "$lib/components/Layouts/Header.svelte";
 	export let data;
 	export let id;
-	$: id = $page.url.searchParams.get('id');
+	$: id = $page.url.searchParams.get("id");
 	const promise = parsePageContents(data);
 	let { items, releaseInfo } = promise;
 	// $: console.log(promise, data);
@@ -71,7 +71,7 @@
 	$: hasList = $list.mix.length > 0;
 	let thumbnail = releaseInfo?.thumbnails[0]?.url.replace(
 		/=(w(\d+))-(h(\d+))/g,
-		'=w512-h512'
+		"=w512-h512"
 	);
 
 	const ctx = {};
@@ -89,8 +89,8 @@
 		<InfoBox
 			{thumbnail}
 			buttons={[
-				{ text: 'Play Album', action: () => playAlbum(), icon: 'play' },
-				{ text: 'Album Radio', action: () => playRadio(), icon: 'play' }
+				{ text: "Play Album", action: () => playAlbum(), icon: "play" },
+				{ text: "Album Radio", action: () => playRadio(), icon: "play" }
 			]}
 			title={releaseInfo.title}
 			artist={releaseInfo.artist}

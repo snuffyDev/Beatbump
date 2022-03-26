@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
-	import { onMount, setContext, tick } from 'svelte';
+	import type { Load } from "@sveltejs/kit";
+	import { onMount, setContext, tick } from "svelte";
 	export const load: Load = async ({ params }) => {
 		const playlistName = params.slug;
 		return {
@@ -13,17 +13,17 @@
 </script>
 
 <script lang="ts">
-	import InfoBox from '$lib/components/Layouts/InfoBox.svelte';
-	import db from '$lib/db';
-	import List from './_List.svelte';
-	import ListItem from './_ListItem.svelte';
-	import { isPagePlaying, key } from '$lib/stores/stores';
-	import list from '$lib/stores/list';
-	import { getSrc, seededShuffle } from '$lib/utils';
-	import Header from '$lib/components/Layouts/Header.svelte';
-	import { page } from '$app/stores';
-	import CreatePlaylist from '$lib/components/PlaylistPopper/CreatePlaylist.svelte';
-	import ListInfoBar from '$lib/components/ListInfoBar';
+	import InfoBox from "$lib/components/Layouts/InfoBox.svelte";
+	import db from "$lib/db";
+	import List from "./_List.svelte";
+	import ListItem from "./_ListItem.svelte";
+	import { isPagePlaying, key } from "$lib/stores/stores";
+	import list from "$lib/stores/list";
+	import { getSrc, seededShuffle } from "$lib/utils";
+	import Header from "$lib/components/Layouts/Header.svelte";
+	import { page } from "$app/stores";
+	import CreatePlaylist from "$lib/components/PlaylistPopper/CreatePlaylist.svelte";
+	import ListInfoBar from "$lib/components/ListInfoBar";
 
 	export let playlistName;
 	const ctx = {};
@@ -58,8 +58,8 @@
 		console.log(playlist);
 	});
 	const drop = async (event, target) => {
-		event.dataTransfer.dropEffect = 'move';
-		const start = parseInt(event.dataTransfer.getData('text/plain'));
+		event.dataTransfer.dropEffect = "move";
+		const start = parseInt(event.dataTransfer.getData("text/plain"));
 		const newTracklist = items;
 
 		if (start < target) {
@@ -74,10 +74,10 @@
 	const dragstart = (event, i) => {
 		// console.log(event, i)
 
-		event.dataTransfer.effectAllowed = 'move';
-		event.dataTransfer.dropEffect = 'move';
+		event.dataTransfer.effectAllowed = "move";
+		event.dataTransfer.dropEffect = "move";
 		const start = i;
-		event.dataTransfer.setData('text/plain', start);
+		event.dataTransfer.setData("text/plain", start);
 	};
 	let hovering: number | boolean = false;
 </script>
@@ -120,11 +120,11 @@
 		title={playlist?.name}
 		editable={true}
 		type="playlist"
-		subtitles={[playlist?.length, playlist?.length > 1 ? 'Songs' : 'Song']}
+		subtitles={[playlist?.length, playlist?.length > 1 ? "Songs" : "Song"]}
 		buttons={[
 			{
-				icon: 'play',
-				text: 'Start Playlist',
+				icon: "play",
+				text: "Start Playlist",
 				action: async () => {
 					key.set(0);
 
@@ -134,8 +134,8 @@
 				}
 			},
 			{
-				icon: 'shuffle',
-				text: 'Shuffle',
+				icon: "shuffle",
+				text: "Shuffle",
 
 				action: async () => {
 					// showEditPlaylist = true;
@@ -147,9 +147,9 @@
 				}
 			},
 			{
-				icon: 'edit',
-				text: 'Edit Playlist',
-				type: 'outlined',
+				icon: "edit",
+				text: "Edit Playlist",
+				type: "outlined",
 				action: async () => {
 					showEditPlaylist = true;
 				}

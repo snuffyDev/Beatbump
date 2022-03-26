@@ -1,4 +1,4 @@
-import type { CarouselHeader, Item, NavigationEndpoint } from '$lib/types';
+import type { CarouselHeader, Item, NavigationEndpoint } from "$lib/types";
 
 export type sections = [
 	{

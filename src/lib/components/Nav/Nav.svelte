@@ -1,14 +1,14 @@
 <script>
-	import { browser } from '$app/env';
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
-	import Icon from '$components/Icon/Icon.svelte';
-	import Search from '$components/Search/Search.svelte';
-	import { tooltip } from '$lib/actions/tooltip';
-	import { clickOutside } from '$lib/actions/clickOutside';
-	import { circIn } from 'svelte/easing';
-	import { fade } from 'svelte/transition';
-	import Settings from './Settings.svelte';
+	import { browser } from "$app/env";
+	import { goto } from "$app/navigation";
+	import { page } from "$app/stores";
+	import Icon from "$components/Icon/Icon.svelte";
+	import Search from "$components/Search/Search.svelte";
+	import { tooltip } from "$lib/actions/tooltip";
+	import { clickOutside } from "$lib/actions/clickOutside";
+	import { circIn } from "svelte/easing";
+	import { fade } from "svelte/transition";
+	import Settings from "./Settings.svelte";
 
 	export let key;
 	let isHidden = true;
@@ -25,7 +25,7 @@
 
 <nav class="nav">
 	<div class="logo">
-		{#if !key.includes('home')}
+		{#if !key.includes("home")}
 			<div
 				class="logo"
 				style="
@@ -48,7 +48,7 @@
 		{:else}
 			<a href={`/home`} class="no-style">
 				<img
-					on:click={() => goto('/home')}
+					on:click={() => goto("/home")}
 					width="32"
 					height="32"
 					src="/logo.svg"
@@ -61,47 +61,47 @@
 
 	<div class="middle">
 		<button
-			on:click={() => goto('/home')}
+			on:click={() => goto("/home")}
 			class="nav-icon icon-btn no-style"
 			use:tooltip
 			data-tooltip="Home"
 			aria-label="Home"
-			class:active={key.includes('home')}
+			class:active={key.includes("home")}
 		>
 			<!-- <div class="nav-text">Home</div> -->
 			<Icon
 				name="home"
-				--stroke={key.includes('home') ? '#fff' : '#BCBCBE'}
+				--stroke={key.includes("home") ? "#fff" : "#BCBCBE"}
 				size="1.5rem"
 			/>
 		</button>
 
 		<button
-			on:click={() => goto('/trending')}
+			on:click={() => goto("/trending")}
 			class="nav-icon icon-btn no-style"
 			use:tooltip
 			data-tooltip="Trending"
 			aria-label="Trending"
-			class:active={key.includes('trending')}
+			class:active={key.includes("trending")}
 		>
 			<Icon
 				name="trending"
-				--stroke={key.includes('trending') ? '#fff' : '#BCBCBE'}
+				--stroke={key.includes("trending") ? "#fff" : "#BCBCBE"}
 				size="1.5rem"
 			/>
 		</button>
 		<button
 			use:tooltip
-			on:click={() => goto('/library')}
+			on:click={() => goto("/library")}
 			data-tooltip="Library"
 			aria-label="library"
 			class="nav-icon icon-btn no-style"
-			class:active={key.includes('library')}
+			class:active={key.includes("library")}
 		>
 			<!-- <div class="nav-text">Library</div> -->
 			<Icon
 				name="folder"
-				--stroke={key.includes('library') ? '#fff' : '#BCBCBE'}
+				--stroke={key.includes("library") ? "#fff" : "#BCBCBE"}
 				size="1.5rem"
 			/>
 		</button>
@@ -175,7 +175,7 @@
 		padding: 1rem;
 
 		position: relative;
-		grid-template-areas: 'l m r';
+		grid-template-areas: "l m r";
 		min-height: 4rem;
 		align-content: center;
 		align-items: center;
@@ -235,7 +235,7 @@
 	button.icon-btn {
 		&::before {
 			position: absolute;
-			content: '';
+			content: "";
 			// z-index: -1;
 			top: 0;
 			right: 0;

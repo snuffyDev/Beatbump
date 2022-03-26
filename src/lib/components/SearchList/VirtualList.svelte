@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount, tick } from 'svelte';
-	import vp from '$lib/actions/viewport';
-	import type { Item } from '$lib/types';
+	import { createEventDispatcher, onMount, tick } from "svelte";
+	import vp from "$lib/actions/viewport";
+	import type { Item } from "$lib/types";
 	const dispatch = createEventDispatcher();
 	// props
 	export let items;
-	export let height = '100%';
+	export let height = "100%";
 	export let itemHeight = undefined;
 	export let isLoading = false;
 	export let hasData = false;
@@ -73,10 +73,10 @@
 				handle_scroll();
 			}
 		}
-		node.addEventListener('scroll', handleScroll, { passive: true });
+		node.addEventListener("scroll", handleScroll, { passive: true });
 		return {
 			destroy: () => {
-				node.removeEventListener('scroll', handleScroll, true);
+				node.removeEventListener("scroll", handleScroll, true);
 			}
 		};
 	}
@@ -144,7 +144,7 @@
 	}
 	// trigger initial refresh
 	onMount(() => {
-		rows = contents.getElementsByTagName('svelte-virtual-list-row');
+		rows = contents.getElementsByTagName("svelte-virtual-list-row");
 		if (items.length > 1) mounted = true;
 	});
 </script>
@@ -165,7 +165,7 @@
 			</svelte-virtual-list-row>
 		{/each}
 		{#if !hasData}
-			<div use:vp on:enterViewport={() => dispatch('endList')} />
+			<div use:vp on:enterViewport={() => dispatch("endList")} />
 
 			{#if isLoading}
 				<div class="loading-results" style="padding: 0em;">

@@ -1,4 +1,4 @@
-import type { PlaylistSearch } from './types/playlist';
+import type { PlaylistSearch } from "./types/playlist";
 export interface CarouselHeader {
 	browseId?: string;
 	title?: string;
@@ -149,8 +149,8 @@ export interface mixList {
 	length: string;
 }
 export enum RequestType {
-	artist = 'artist',
-	playlist = 'playlist'
+	artist = "artist",
+	playlist = "playlist"
 }
 export type JSON =
 	| string

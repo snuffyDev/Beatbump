@@ -1,11 +1,11 @@
 <script>
-	import tagStore from '$lib/stores/ogtags';
-	import { currentTitle } from '$lib/stores/stores';
+	import tagStore from "$lib/stores/ogtags";
+	import { currentTitle } from "$lib/stores/stores";
 
 	export let title;
-	export let desc = '';
+	export let desc = "";
 	export let url;
-	export let image = '/favicon.png';
+	export let image = "/favicon.png";
 	// $: slug = slug
 	// $: console.log(name)
 	tagStore.init(title, url, desc, image);
@@ -14,7 +14,7 @@
 <svelte:head>
 	{#each Object.entries($tagStore) as [property, content]}
 		{#if content}
-			{#if ['title', 'description', 'image'].includes(property)}
+			{#if ["title", "description", "image"].includes(property)}
 				<meta name={property} {content} />
 			{:else}
 				<meta {property} {content} />

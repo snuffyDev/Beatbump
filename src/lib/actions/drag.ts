@@ -11,7 +11,7 @@ export default function drag(node: HTMLElement) {
 		const rects = getNodeRects(node);
 		initTop = rects.initTop;
 		initHeight = rects.initHeight;
-		if (event.type == 'touchstart') {
+		if (event.type == "touchstart") {
 			x = event.touches[0].pageX;
 			y = event.touches[0].pageY;
 		} else {
@@ -19,25 +19,25 @@ export default function drag(node: HTMLElement) {
 			y = event.pageY;
 		}
 		node.dispatchEvent(
-			new CustomEvent('dragstart', {
+			new CustomEvent("dragstart", {
 				detail: { x, y }
 			})
 		);
 
-		window.addEventListener('touchmove', handleMousemove, { passive: true });
-		window.addEventListener('touchend', handleMouseup, { passive: true });
-		window.addEventListener('mousemove', handleMousemove);
-		window.addEventListener('mouseup', handleMouseup, { passive: true });
+		window.addEventListener("touchmove", handleMousemove, { passive: true });
+		window.addEventListener("touchend", handleMouseup, { passive: true });
+		window.addEventListener("mousemove", handleMousemove);
+		window.addEventListener("mouseup", handleMouseup, { passive: true });
 	}
 
 	function handleMousemove(event) {
 		let dx, dy;
-		if (event.type == 'touchmove') {
+		if (event.type == "touchmove") {
 			// console.log(x, y, dx, dy)
 			x = event.touches[0].pageX;
 			y = event.touches[0].pageY;
 			node.dispatchEvent(
-				new CustomEvent('dragmove', {
+				new CustomEvent("dragmove", {
 					detail: {
 						x,
 						y: initHeight + event.touches[0].pageY - initTop - 32,
@@ -53,7 +53,7 @@ export default function drag(node: HTMLElement) {
 
 			// console.log(x, y, dx, dy)
 			node.dispatchEvent(
-				new CustomEvent('dragmove', {
+				new CustomEvent("dragmove", {
 					detail: {
 						x,
 						y: initHeight + event.pageY - initTop - 32,
@@ -67,7 +67,7 @@ export default function drag(node: HTMLElement) {
 	}
 
 	function handleMouseup(event) {
-		if (event.type == 'touchend') {
+		if (event.type == "touchend") {
 			// console.log(JSON.stringify(event))
 			x = event.changedTouches[0].pageX;
 			y = event.changedTouches[0].pageY;
@@ -77,22 +77,22 @@ export default function drag(node: HTMLElement) {
 		}
 
 		node.dispatchEvent(
-			new CustomEvent('dragend', {
+			new CustomEvent("dragend", {
 				detail: { x, y }
 			})
 		);
-		window.removeEventListener('touchmove', handleMousemove);
-		window.removeEventListener('touchend', handleMouseup);
-		window.removeEventListener('mousemove', handleMousemove);
-		window.removeEventListener('mouseup', handleMouseup);
+		window.removeEventListener("touchmove", handleMousemove);
+		window.removeEventListener("touchend", handleMouseup);
+		window.removeEventListener("mousemove", handleMousemove);
+		window.removeEventListener("mouseup", handleMouseup);
 	}
 
-	node.addEventListener('touchstart', handleMousedown, { passive: true });
-	node.addEventListener('mousedown', handleMousedown, { passive: true });
+	node.addEventListener("touchstart", handleMousedown, { passive: true });
+	node.addEventListener("mousedown", handleMousedown, { passive: true });
 	return {
 		destroy() {
-			node.removeEventListener('mousedown', handleMousedown, true);
-			node.removeEventListener('touchstart', handleMousedown, true);
+			node.removeEventListener("mousedown", handleMousedown, true);
+			node.removeEventListener("touchstart", handleMousedown, true);
 		}
 	};
 }

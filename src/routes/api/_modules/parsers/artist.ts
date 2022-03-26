@@ -1,6 +1,6 @@
-import { ArtistPageParser } from '$lib/js/artist';
+import { ArtistPageParser } from "$lib/js/artist";
 
-import type { ICarousel } from '$lib/types';
+import type { ICarousel } from "$lib/types";
 
 export const parseArtist = (data) => {
 	const {
@@ -19,5 +19,5 @@ export const parseArtist = (data) => {
 		} = {}
 	} = data;
 	// console.log(header)
-	return ArtistPageParser({ header, items: contents })
+	return ArtistPageParser({ header, items: contents });
 };

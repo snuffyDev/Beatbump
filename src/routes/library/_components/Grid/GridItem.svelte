@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import lazy from '$lib/lazy';
-	import type { Item } from '$lib/types';
-	import list from '$lib/stores/list';
+	import { goto } from "$app/navigation";
+	import lazy from "$lib/lazy";
+	import type { Item } from "$lib/types";
+	import list from "$lib/stores/list";
 	export let item;
 </script>
 
 <article class="item" on:click>
 	<div class="img">
 		<img
-			width={'200'}
-			height={'200'}
+			width={"200"}
+			height={"200"}
 			loading="lazy"
 			src={item.thumbnail}
 			alt="thumbnail"
@@ -19,12 +19,12 @@
 	<div class="item-text">
 		<div class="item-title">{item.name}</div>
 		<div class="item-description">
-			{@html item?.description ? item.description + ` &bull; ` : ''}
+			{@html item?.description ? item.description + ` &bull; ` : ""}
 			{#if item.items !== undefined}
 				{item?.items?.length == 1
 					? `1 Song`
 					: item?.items?.length == 0
-					? 'No tracks'
+					? "No tracks"
 					: `${item?.items?.length} Songs`}
 			{/if}
 		</div>
@@ -57,7 +57,7 @@
 	.item-title {
 		display: inline;
 		padding: 0.3rem 0.1rem;
-		font-family: 'Commissioner';
+		font-family: "Commissioner";
 		font-weight: 500;
 		font-size: 1.1em;
 		letter-spacing: -0.02em;

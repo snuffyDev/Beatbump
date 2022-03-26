@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import Playlist from './Playlist.svelte';
+	import { createEventDispatcher } from "svelte";
+	import Playlist from "./Playlist.svelte";
 	export let items = [];
 	const dispatch = createEventDispatcher();
 </script>
 
 <ul>
 	<li>
-		<button on:click={() => dispatch('create')} class="create"
+		<button on:click={() => dispatch("create")} class="create"
 			>Create New Playlist</button
 		>
 	</li>

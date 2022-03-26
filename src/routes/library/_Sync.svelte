@@ -1,9 +1,9 @@
 <script context="module" lang="ts">
-	import { browser } from '$app/env';
+	import { browser } from "$app/env";
 	let _Peer: typeof Peer;
 	let RTC_module;
 	if (browser) {
-		RTC_module = import('peerjs');
+		RTC_module = import("peerjs");
 		RTC_module.then((module) => {
 			_Peer = module.default;
 		});
@@ -176,7 +176,7 @@
 <svelte:window on:keydown={keyDownListener} />
 <div
 	class="backdrop"
-	on:click={() => dispatch('close')}
+	on:click={() => dispatch("close")}
 	transition:fade={{ duration: 150, delay: 150 }}
 />
 <div class="sync-wrapper">
@@ -184,7 +184,7 @@
 		<div
 			class="x-button"
 			on:click={() => {
-				dispatch('close');
+				dispatch("close");
 			}}
 		>
 			<Icon name="x" size="1.5rem" />
@@ -218,8 +218,8 @@
 									<input
 										id="sending"
 										type="checkbox"
-										on:input={() => (check = 'sending')}
-										checked={check == 'sending'}
+										on:input={() => (check = "sending")}
+										checked={check == "sending"}
 									/>
 									<span class="checkbox-tile"
 										><Icon name="send" size="2em" /><span class="label"
@@ -233,8 +233,8 @@
 									<input
 										id="receiving"
 										type="checkbox"
-										on:input={() => (check = 'receiving')}
-										checked={check == 'receiving'}
+										on:input={() => (check = "receiving")}
+										checked={check == "receiving"}
 									/>
 									<span class="checkbox-tile"
 										><Icon name="import" size="2em" /><span class="label"
@@ -246,7 +246,7 @@
 						</section>
 					</div>
 					<hr />
-					{#if check == 'sending'}
+					{#if check == "sending"}
 						<div class="content">
 							<span class="subheading"
 								>What kind of data would you like to send?</span
@@ -270,8 +270,8 @@
 				<div class="next">
 					<button
 						class="nextbtn"
-						disabled={check == 'sending'
-							? check == 'sending' && kindOfData.length === 0
+						disabled={check == "sending"
+							? check == "sending" && kindOfData.length === 0
 							: check == undefined}
 						on:click={() => {
 							if (check !== undefined) nextStep();
@@ -296,9 +296,9 @@
 										on:click={async () => {
 											if (!browser) return;
 											await navigator.clipboard.writeText(id);
-											copyText = 'copied!';
+											copyText = "copied!";
 											setTimeout(() => {
-												copyText = 'copy';
+												copyText = "copy";
 											}, 1500);
 										}}
 									>
@@ -320,19 +320,19 @@
 				<div class="next">
 					<button
 						class="nextbtn"
-						disabled={id == 'unset'}
+						disabled={id == "unset"}
 						on:click={() => {
-							if (id !== 'unset') nextStep();
+							if (id !== "unset") nextStep();
 						}}>Next Step</button
 					>
 				</div>
 			{:else if stepCounter == 3}
 				<div class="screen">
-					{#if check == 'sending'}
+					{#if check == "sending"}
 						<div class="content">
 							<h1>
 								Get the {(peerType =
-									check !== 'sending' ? 'Sender' : 'Receiver')}'s ID
+									check !== "sending" ? "Sender" : "Receiver")}'s ID
 							</h1>
 							<div class="subheading">Let's find the other device</div>
 							<p>
@@ -348,7 +348,7 @@
 								</div>
 
 								<p>
-									{(peerType = check !== 'sending' ? 'Sender' : 'Receiver')}'s
+									{(peerType = check !== "sending" ? "Sender" : "Receiver")}'s
 									ID:
 								</p>
 
@@ -424,7 +424,7 @@
 		position: relative;
 
 		&:before {
-			content: '';
+			content: "";
 			position: absolute;
 			display: block;
 			width: 1.25rem;
@@ -454,7 +454,7 @@
 
 	.radio {
 		position: relative;
-		label input[type='checkbox'] {
+		label input[type="checkbox"] {
 			// opacity: 0;
 			// Code to hide the input
 			appearance: none;

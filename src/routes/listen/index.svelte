@@ -1,22 +1,22 @@
 <script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
+	import type { Load } from "@sveltejs/kit";
 	export const load: Load = async ({ url, params, fetch }) => {
-		const id = url.searchParams.get('id');
-		const playlist = url.searchParams.get('list') || undefined;
+		const id = url.searchParams.get("id");
+		const playlist = url.searchParams.get("list") || undefined;
 		// const meta = await get('player', { videoId: id })
 		// const data = await meta.body
 
 		if (!id) {
-			return { redirect: '/trending', status: 301 };
+			return { redirect: "/trending", status: 301 };
 		}
 		const metadata = await fetch(
-			`/api/player.json?videoId=${id ? id : ''}${
-				playlist ? `&playlistId=${playlist}` : ''
+			`/api/player.json?videoId=${id ? id : ""}${
+				playlist ? `&playlistId=${playlist}` : ""
 			}`
 		);
 		const list = await fetch(
-			`/api/next.json?videoId=${id ? id : ''}${
-				playlist ? `&playlistId=${playlist}` : ''
+			`/api/next.json?videoId=${id ? id : ""}${
+				playlist ? `&playlistId=${playlist}` : ""
 			}`
 		);
 		const listData = await list.json();
@@ -24,8 +24,8 @@
 		const data = await metadata.json();
 		const {
 			videoDetails: {
-				title = '',
-				videoId = '',
+				title = "",
+				videoId = "",
 				thumbnail: { thumbnails = [] } = {}
 			} = {}
 		} = data;
@@ -51,10 +51,10 @@
 	export let title;
 	export let related;
 	// export let data
-	import { goto } from '$app/navigation';
-	import Icon from '$lib/components/Icon/Icon.svelte';
-	import Listing from '$lib/components/Item/Listing.svelte';
-	import list from '$lib/stores/list';
+	import { goto } from "$app/navigation";
+	import Icon from "$lib/components/Icon/Icon.svelte";
+	import Listing from "$lib/components/Item/Listing.svelte";
+	import list from "$lib/stores/list";
 	// $: console.log(related)
 	// $: console.log(videoId, playlist, thumbnails, title)
 </script>
@@ -69,7 +69,7 @@
 	<meta
 		property="og:url"
 		content={`https://beatbump.ml/listen?id=${videoId}${
-			playlist ? `&list=${playlist}` : ''
+			playlist ? `&list=${playlist}` : ""
 		}`}
 	/>
 	<title>{title} | Beatbump</title>
@@ -133,7 +133,7 @@
 	}
 	header {
 		display: grid;
-		grid-template-areas: 'img body';
+		grid-template-areas: "img body";
 		grid-template-columns: 0.5fr 1fr;
 		grid-template-rows: 1fr;
 
@@ -149,8 +149,8 @@
 		transition: all 0.23s cubic-bezier(0.39, 0.575, 0.565, 1);
 		@media screen and (min-width: 640px) {
 			grid-template-areas:
-				'img body'
-				'img .';
+				"img body"
+				"img .";
 			grid-template-rows: 1fr 1fr;
 		}
 	}

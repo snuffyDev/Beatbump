@@ -1,41 +1,41 @@
 <script lang="ts">
-	import Icon from '$components/Icon/Icon.svelte';
-	import { currentId, isPagePlaying, key } from '$stores/stores';
-	import { createEventDispatcher, tick } from 'svelte';
-	import list from '$lib/stores/list';
+	import Icon from "$components/Icon/Icon.svelte";
+	import { currentId, isPagePlaying, key } from "$stores/stores";
+	import { createEventDispatcher, tick } from "svelte";
+	import list from "$lib/stores/list";
 	export let item: Item;
 	export let index;
-	export let parentPlaylistId = '';
+	export let parentPlaylistId = "";
 	export let page;
 
 	export let send;
 	export let receive;
 	export let dragTargetIndex;
 	export let ctx = {};
-	import { getContext } from 'svelte';
-	import type { Item } from '$lib/types';
-	import PopperButton from '$lib/components/Popper/PopperButton.svelte';
-	import { notify } from '$lib/utils';
-	import db from '$lib/db';
-	import { goto } from '$app/navigation';
+	import { getContext } from "svelte";
+	import type { Item } from "$lib/types";
+	import PopperButton from "$lib/components/Popper/PopperButton.svelte";
+	import { notify } from "$lib/utils";
+	import db from "$lib/db";
+	import { goto } from "$app/navigation";
 	const { pageId } = getContext(ctx);
 	const dispatch = createEventDispatcher();
 
 	const dispatchPlaying = () =>
-		dispatch('pagePlaying', {
+		dispatch("pagePlaying", {
 			isPlaying: true
 		});
 
 	async function handleClick(e: MouseEvent) {
 		const target = e.target as HTMLElement;
-		if (target.nodeName.match('A')) return;
+		if (target.nodeName.match("A")) return;
 		// @ts-ignore
-		if (page == 'playlist') {
+		if (page == "playlist") {
 			key.set(index);
 			await list.initPlaylistSession({ playlistId: item.playlistId, index });
-		} else if (page == 'library') {
+		} else if (page == "library") {
 			key.set(index);
-			dispatch('initLocalList', index);
+			dispatch("initLocalList", index);
 		} else {
 			key.set(index);
 			// console.log(item, item.videoId)
@@ -50,61 +50,61 @@
 	}
 	let DropdownItems = [
 		{
-			text: 'View Artist',
-			icon: 'artist',
+			text: "View Artist",
+			icon: "artist",
 			action: async () => {
 				goto(`/artist/${item.artistInfo.artist[0].browseId}`);
 				await tick();
 				window.scrollTo({
-					behavior: 'smooth',
+					behavior: "smooth",
 					top: 0,
 					left: 0
 				});
 			}
 		},
 		{
-			text: 'Remove from Playlist',
-			icon: 'x',
+			text: "Remove from Playlist",
+			icon: "x",
 			action: async () => {
 				const promise = await db.deleteSongFromPlaylist(
 					item.videoId,
 					parentPlaylistId
 				);
 				// console.log(promise, item, parentPlaylistId);
-				dispatch('change');
+				dispatch("change");
 			}
 		},
 		{
-			text: 'Favorite',
-			icon: 'heart',
+			text: "Favorite",
+			icon: "heart",
 			action: () => {
 				db.setNewFavorite(item);
 			}
 		},
 		{
-			text: 'Share',
-			icon: 'share',
+			text: "Share",
+			icon: "share",
 			action: async () => {
 				let shareData = {
 					title: item.title,
 					text: `Listen to ${item.title} on Beatbump`,
 					url: `https://beatbump.ml/listen?id=${item.videoId}`
 				};
-				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_PLAYLIST')) {
+				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_PLAYLIST")) {
 					shareData = {
 						title: item.title,
 						text: `Listen to ${item.title} on Beatbump`,
 						url: `https://beatbump.ml/playlist/${item.endpoint?.browseId}`
 					};
 				}
-				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_ALBUM')) {
+				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ALBUM")) {
 					shareData = {
 						title: item.title,
 						text: `Listen to ${item.title} on Beatbump`,
 						url: `https://beatbump.ml/release?id=${item.endpoint?.browseId}`
 					};
 				}
-				if (item.endpoint?.pageType?.includes('MUSIC_PAGE_TYPE_ARTIST')) {
+				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST")) {
 					shareData = {
 						title: item.title,
 						text: `${item.title} on Beatbump`,
@@ -114,13 +114,13 @@
 				try {
 					if (!navigator.canShare) {
 						await navigator.clipboard.writeText(shareData.url);
-						notify('Link copied successfully', 'success');
+						notify("Link copied successfully", "success");
 					} else {
 						const share = await navigator.share(shareData);
-						notify('Shared successfully', 'success');
+						notify("Shared successfully", "success");
 					}
 				} catch (error) {
-					notify('Error: ' + error, 'error');
+					notify("Error: " + error, "error");
 				}
 			}
 		}
@@ -144,8 +144,8 @@
 	on:dragstart
 	on:drop|preventDefault
 	on:dragover|preventDefault={() => {}}
-	on:dragenter={() => dispatch('hovering', index)}
-	on:dragend={() => dispatch('notHovering', null)}
+	on:dragenter={() => dispatch("hovering", index)}
+	on:dragend={() => dispatch("notHovering", null)}
 	on:mouseenter|capture={(e) => {
 		if (parent && parent.contains(e.target)) isHovering = true;
 	}}
@@ -182,7 +182,7 @@
 				{item?.title}
 				{#if item.explicit}
 					<span class="explicit">
-						{item.explicit ? 'E' : ''}
+						{item.explicit ? "E" : ""}
 					</span>
 				{/if}
 			</div>
@@ -205,7 +205,7 @@
 		</div>
 	{:else}
 		<span class="length" class:hidden={!item?.length ? true : false}
-			>{(item?.length?.text ?? item.length) || ''}</span
+			>{(item?.length?.text ?? item.length) || ""}</span
 		>
 	{/if}
 </div>
@@ -251,7 +251,7 @@
 			display: block;
 		}
 		.artist {
-			font-family: 'Commissioner', sans-serif;
+			font-family: "Commissioner", sans-serif;
 			font-weight: 400;
 			font-size: 0.9em;
 		}
@@ -277,14 +277,14 @@
 	}
 	img::before {
 		display: block;
-		content: '';
+		content: "";
 		padding-top: calc(100% * 2 / 3);
 		/* You could reduce this expression with a preprocessor or by doing the math. I've kept the longer form in `calc()` to make the math more readable for this demo. */
 	}
 	.item {
 		display: grid;
 		align-content: center;
-		grid-template-areas: 'm r';
+		grid-template-areas: "m r";
 		grid-template-columns: 1fr auto;
 
 		-webkit-user-select: none;
@@ -299,7 +299,7 @@
 		padding: 0.8em 1.5em 0.8em 0.8em;
 		@media screen and (min-width: 640px) {
 			padding: 0.4rem 1.5rem 0.4rem 0.8rem;
-			grid-template-areas: 'c m r';
+			grid-template-areas: "c m r";
 			grid-template-columns: 2rem 1fr auto;
 		}
 		@media (hover: hover) {

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { browser } from '$app/env';
-	import drag from '$lib/actions/drag';
-	import list from '$lib/stores/list';
-	import { tick } from 'svelte';
-	import { fly } from 'svelte/transition';
+	import { browser } from "$app/env";
+	import drag from "$lib/actions/drag";
+	import list from "$lib/stores/list";
+	import { tick } from "svelte";
+	import { fly } from "svelte/transition";
 
-	import { createEventDispatcher } from 'svelte';
-	import { quartOut } from 'svelte/easing';
+	import { createEventDispatcher } from "svelte";
+	import { quartOut } from "svelte/easing";
 	const dispatch = createEventDispatcher();
 	export let autoId;
 	export let showing = false;
@@ -53,7 +53,7 @@
 	async function close() {
 		showing = false;
 		sliding = false;
-		dispatch('close', { showing });
+		dispatch("close", { showing });
 		await tick();
 		posY = 0;
 
@@ -70,8 +70,8 @@
 	)
 		scrollIntoView();
 	$: transition = sliding
-		? ''
-		: 'transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22);';
+		? ""
+		: "transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22);";
 	$: height =
 		queueHeight !== undefined && `calc(${listHeight - queueHeight}px)`;
 
@@ -83,7 +83,7 @@
 <!-- on:click={console.log} -->
 <div
 	class="backdrop"
-	on:click|stopPropagation|self={() => dispatch('close', { showing: false })}
+	on:click|stopPropagation|self={() => dispatch("close", { showing: false })}
 	on:scroll|preventDefault
 	in:fly|local={{ duration: 800, delay: 400, y: queueHeight, easing: quartOut }}
 	out:fly|local={{ duration: 400, y: listHeight, easing: quartOut }}
@@ -149,7 +149,7 @@
 		&::before {
 			position: absolute;
 			inset: 0;
-			content: '';
+			content: "";
 			margin: 0 auto;
 			width: 35%;
 			color: hsl(0deg 0% 80%);
@@ -214,7 +214,7 @@
 		z-index: 1;
 		&::before {
 			position: absolute;
-			content: '';
+			content: "";
 			inset: 0;
 			filter: brightness(0.5) saturate(0.5);
 			width: 100%;
@@ -267,7 +267,7 @@
 	}
 
 	.empty-title {
-		font-family: 'Gill Sans', 'Gill Sans MT', 'Calibri', 'Trebuchet MS',
+		font-family: "Gill Sans", "Gill Sans MT", "Calibri", "Trebuchet MS",
 			sans-serif;
 		text-transform: capitalize;
 		text-align: center;

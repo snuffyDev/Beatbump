@@ -1,4 +1,4 @@
-import { parseContents } from '$lib/endpoints/nextUtils';
+import { parseContents } from "$lib/endpoints/nextUtils";
 
 export const parseNextTrack = (data, itct) => {
 	if (!itct) {
@@ -18,8 +18,8 @@ export const parseNextTrack = (data, itct) => {
 														continuations: [
 															{
 																nextRadioContinuationData: {
-																	clickTrackingParams = '',
-																	continuation = ''
+																	clickTrackingParams = "",
+																	continuation = ""
 																} = {}
 															} = {}
 														] = []
@@ -40,7 +40,7 @@ export const parseNextTrack = (data, itct) => {
 			contents,
 			continuation,
 			clickTrackingParams,
-			watchEndpoint ? watchEndpoint : ''
+			watchEndpoint ? watchEndpoint : ""
 		);
 		return {
 			body: parsed
@@ -57,8 +57,8 @@ export const parseNextTrack = (data, itct) => {
 				continuations: [
 					{
 						nextRadioContinuationData: {
-							clickTrackingParams = '',
-							continuation = ''
+							clickTrackingParams = "",
+							continuation = ""
 						} = {}
 					} = {}
 				] = [],

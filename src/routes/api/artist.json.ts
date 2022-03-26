@@ -1,29 +1,29 @@
-import BaseContext from '$api/_modules/context';
-import { parseArtistPage } from '$lib/js/artistUtils';
-import type { ICarousel } from '$lib/types';
-import type { EndpointOutput, RequestHandler } from '@sveltejs/kit';
+import BaseContext from "$api/_modules/context";
+import { parseArtistPage } from "$lib/js/artistUtils";
+import type { ICarousel } from "$lib/types";
+import type { EndpointOutput, RequestHandler } from "@sveltejs/kit";
 
 export const get: RequestHandler = async ({ url }) => {
-	const browseId = url.searchParams.get('browseId');
+	const browseId = url.searchParams.get("browseId");
 	try {
 		const response = await fetch(
 			`https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
 			{
-				method: 'POST',
+				method: "POST",
 				body: JSON.stringify({
 					...BaseContext,
 					browseEndpointContextMusicConfig: {
 						browseEndpointContextMusicConfig: {
-							pageType: 'MUSIC_PAGE_TYPE_ARTIST'
+							pageType: "MUSIC_PAGE_TYPE_ARTIST"
 						}
 					},
 					browseId: `${browseId}`
 				}),
 				headers: {
-					'Content-Type': 'application/json; charset=utf-8',
-					Origin: 'https://music.youtube.com',
-					'User-Agent':
-						'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+					"Content-Type": "application/json; charset=utf-8",
+					Origin: "https://music.youtube.com",
+					"User-Agent":
+						"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
 				}
 			}
 		);
@@ -61,7 +61,7 @@ function parse(header, contents: any) {
 	try {
 		let carouselItems: ICarousel[] | null = [];
 		const thumbnail = [];
-		let description = '';
+		let description = "";
 		let items = [];
 		const headerContent = [];
 		const newData = [parseArtistPage(header, contents)];

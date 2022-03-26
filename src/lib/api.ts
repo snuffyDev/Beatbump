@@ -1,5 +1,5 @@
-import type { RequestParams } from './types';
-import { queryParams } from './utils';
+import type { RequestParams } from "./types";
+import { queryParams } from "./utils";
 type Fetch = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
 type APIResponse = {
 	body?: {
@@ -18,11 +18,11 @@ export async function api(
 	const urlParams = queryParams(params);
 	// Make fetch call
 	const response = await fetch(`/api/api.json`, {
-		method: 'POST',
+		method: "POST",
 		body: urlParams,
 
 		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded'
+			"Content-Type": "application/x-www-form-urlencoded"
 		}
 	});
 	const data = await response.json();

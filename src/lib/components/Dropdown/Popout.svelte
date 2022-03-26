@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { createEventDispatcher, setContext } from 'svelte';
-	import { quartInOut } from 'svelte/easing';
-	import { slide } from 'svelte/transition';
-	import PopoutItem from './PopoutItem.svelte';
+	import { createEventDispatcher, setContext } from "svelte";
+	import { quartInOut } from "svelte/easing";
+	import { slide } from "svelte/transition";
+	import PopoutItem from "./PopoutItem.svelte";
 
 	export let isShowing;
-	export let type = '';
+	export let type = "";
 	export let items = [];
-	export let color = 'white';
+	export let color = "white";
 	let showing = false;
 	$: menuToggle = showing ? true : false;
 	const dispatch = createEventDispatcher();
-	setContext('menu', { update: isShowing });
+	setContext("menu", { update: isShowing });
 </script>
 
 {#if isShowing}

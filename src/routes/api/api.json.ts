@@ -1,10 +1,10 @@
-import Context from './_modules/context';
-import { parseArtist } from './_modules/parsers/artist';
-import { parseNextTrack } from './_modules/parsers/next';
-import { parsePlaylist } from './_modules/parsers/playlist';
-import { sendRequest } from './_modules/request';
+import Context from "./_modules/context";
+import { parseArtist } from "./_modules/parsers/artist";
+import { parseNextTrack } from "./_modules/parsers/next";
+import { parsePlaylist } from "./_modules/parsers/playlist";
+import { sendRequest } from "./_modules/request";
 
-import type { Request, RequestHandler } from '@sveltejs/kit';
+import type { Request, RequestHandler } from "@sveltejs/kit";
 
 type JSON =
 	| string
@@ -41,31 +41,31 @@ const Parsers = async (
 export const post: RequestHandler = async ({ request: _req }) => {
 	const body = await _req.formData();
 	// console.log(JSON.stringify(body))
-	const endpoint = (body.get('endpoint') as string) || '';
-	const path = (body.get('path') as string) || '';
+	const endpoint = (body.get("endpoint") as string) || "";
+	const path = (body.get("path") as string) || "";
 
-	if (endpoint === 'player') {
-		const videoId = (body.get('videoId') as string) || '';
-		const playlistId = (body.get('playlistId') as string) || '';
+	if (endpoint === "player") {
+		const videoId = (body.get("videoId") as string) || "";
+		const playlistId = (body.get("playlistId") as string) || "";
 		const ctx = Context.player(videoId, playlistId);
 		// console.log(ctx)
 		const req = await sendRequest(ctx, {
-			endpoint: 'player',
+			endpoint: "player",
 			videoId: videoId,
 			playlistId: playlistId
 		});
 		return { status: 200, body: req };
 	}
-	const type = (body.get('type') as string) || null;
-	const playlistId = (body.get('playlistId') as string) || '';
-	const browseId = (body.get('browseId') as string) || '';
-	const continuation = (body.get('continuation') as string) || null;
+	const type = (body.get("type") as string) || null;
+	const playlistId = (body.get("playlistId") as string) || "";
+	const browseId = (body.get("browseId") as string) || "";
+	const continuation = (body.get("continuation") as string) || null;
 	const ctx = Context.base(browseId, type);
-	if (path == 'playlist' && browseId && continuation) {
-		console.log('uh oh!');
+	if (path == "playlist" && browseId && continuation) {
+		console.log("uh oh!");
 		const request = await sendRequest(ctx, {
 			endpoint,
-			type: 'playlist',
+			type: "playlist",
 			playlistId,
 			continuation
 		});
@@ -83,7 +83,7 @@ export const post: RequestHandler = async ({ request: _req }) => {
 		browseId: browseId ? browseId : playlistId,
 		continuation
 	});
-	if (type === 'release') {
+	if (type === "release") {
 		return { status: 200, body: request };
 	}
 	// console.log(request)

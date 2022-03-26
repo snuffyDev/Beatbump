@@ -1,15 +1,15 @@
-import { goto } from '$app/navigation';
+import { goto } from "$app/navigation";
 
 export const browseHandler = (pageType: string, browseId: string): void => {
-	if (pageType.includes('ARTIST')) {
+	if (pageType.includes("ARTIST")) {
 		goto(`/artist/${browseId}`);
 	} else {
-		pageType.includes('PLAYLIST')
-			? goto('/playlist/' + browseId)
+		pageType.includes("PLAYLIST")
+			? goto("/playlist/" + browseId)
 			: goto(
-					'/release?type=' +
+					"/release?type=" +
 						encodeURIComponent(pageType) +
-						'&id=' +
+						"&id=" +
 						encodeURIComponent(browseId)
 			  );
 	}

@@ -1,17 +1,17 @@
 <script>
-	import { fade } from 'svelte/transition';
-	import { circIn } from 'svelte/easing';
-	import { filterAutoPlay, theme } from '$stores/stores';
-	import { settings } from '$lib/stores/settings';
-	import { queryParams } from '$lib/utils';
-	import { session } from '$app/stores';
+	import { fade } from "svelte/transition";
+	import { circIn } from "svelte/easing";
+	import { filterAutoPlay, theme } from "$stores/stores";
+	import { settings } from "$lib/stores/settings";
+	import { queryParams } from "$lib/utils";
+	import { session } from "$app/stores";
 
 	export let isSettingsOpen;
 	let themes = [
-		{ name: 'dark' },
-		{ name: 'dim' },
-		{ name: 'midnight' },
-		{ name: 'ytm' }
+		{ name: "dark" },
+		{ name: "dim" },
+		{ name: "midnight" },
+		{ name: "ytm" }
 	];
 </script>
 
@@ -31,7 +31,7 @@
 					id="select"
 					bind:value={$settings.theme}
 					on:change={() => {
-						localStorage.setItem('theme', $settings.theme);
+						localStorage.setItem("theme", $settings.theme);
 					}}
 				>
 					{#each themes as theme}
@@ -50,7 +50,7 @@
 				on:change={() => {
 					// settings.setDedupe(!filter)
 					localStorage.setItem(
-						'filterAutoPlay',
+						"filterAutoPlay",
 						JSON.stringify($settings.dedupe)
 					);
 				}}
@@ -65,7 +65,7 @@
 					on:change={async () => {
 						// settings.setPreferWebM(!preferWebM)
 						localStorage.setItem(
-							'preferWebM',
+							"preferWebM",
 							JSON.stringify($settings.preferWebM)
 						);
 					}}

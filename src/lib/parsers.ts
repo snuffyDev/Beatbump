@@ -1,7 +1,7 @@
-import type { Item, Song, Thumbnail } from './types';
-import type { ICarouselTwoRowItem } from './types/musicCarouselTwoRowItem';
-import type { IListItemRenderer } from './types/musicListItemRenderer';
-import type { IPlaylistPanelVideoRenderer } from './types/playlistPanelVideoRenderer';
+import type { Item, Song, Thumbnail } from "./types";
+import type { ICarouselTwoRowItem } from "./types/musicCarouselTwoRowItem";
+import type { IListItemRenderer } from "./types/musicListItemRenderer";
+import type { IPlaylistPanelVideoRenderer } from "./types/playlistPanelVideoRenderer";
 
 type JSON =
 	| string
@@ -13,22 +13,22 @@ type JSON =
 	| { [key: string]: JSON };
 function thumbnailTransformer(url) {
 	let output = {
-		placeholder: '',
-		url: ''
+		placeholder: "",
+		url: ""
 	};
-	if (!url.includes('lh3.googleusercontent.com')) {
-		const split_url = url.split('?');
+	if (!url.includes("lh3.googleusercontent.com")) {
+		const split_url = url.split("?");
 		const webp_url = split_url[0];
 		output.url = webp_url;
-		output.placeholder = webp_url?.replace('sddefault', 'default');
+		output.placeholder = webp_url?.replace("sddefault", "default");
 		// console.log(output.placeholder, output.url, webp_url)
 	} else {
-		const webp_url = url?.replace('-rj', '-rw');
+		const webp_url = url?.replace("-rj", "-rw");
 		output.url = webp_url;
 		output.placeholder = webp_url?.replace(
 			/(=w(\d+)-h(\d+))/gm,
 
-			'=w1-h1-p-fSoften=50,50,05'
+			"=w1-h1-p-fSoften=50,50,05"
 		);
 	}
 	return output;
@@ -41,7 +41,7 @@ export function parseNextItem(item, length): Array<Item> {
 			return {
 				title: title,
 				artistInfo: {
-					pageType: 'MUSIC_PAGE_TYPE_ARTIST',
+					pageType: "MUSIC_PAGE_TYPE_ARTIST",
 					artist: item.subtitle[0].text,
 					browseId: item.subtitle[0].browseId
 				},
@@ -54,7 +54,7 @@ export function parseNextItem(item, length): Array<Item> {
 		return {
 			title: title,
 			artistInfo: {
-				pageType: 'MUSIC_PAGE_TYPE_ARTIST',
+				pageType: "MUSIC_PAGE_TYPE_ARTIST",
 				artist: Array.isArray(item.artistInfo)
 					? item.artistInfo.artist[0]
 					: item.artistInfo.artist,
@@ -94,7 +94,7 @@ export const MusicTwoRowItemRenderer = (ctx: {
 	}
 
 	const Item: ICarouselTwoRowItem = {
-		title: ctx['musicTwoRowItemRenderer']['title']['runs'][0].text,
+		title: ctx["musicTwoRowItemRenderer"]["title"]["runs"][0].text,
 		thumbnails,
 		aspectRatio: ctx.musicTwoRowItemRenderer.aspectRatio,
 		videoId:
@@ -133,7 +133,7 @@ export const MusicTwoRowItemRenderer = (ctx: {
 			[...ctx?.musicTwoRowItemRenderer?.subtitle?.runs].map((item) => {
 				if (
 					item?.navigationEndpoint?.browseEndpoint?.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig?.pageType.includes(
-						'ARTIST'
+						"ARTIST"
 					)
 				) {
 					return {
@@ -193,7 +193,7 @@ export const MusicResponsiveListItemRenderer = (
 					] = ctx?.musicResponsiveListItemRenderer?.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[
 						length
 					]?.navigationEndpoint?.browseEndpoint?.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig?.pageType.includes(
-						'ARTIST'
+						"ARTIST"
 					)
 						? {
 								text:
@@ -250,12 +250,12 @@ export const MusicResponsiveListItemRenderer = (
 						?.menuNavigationItemRenderer?.navigationEndpoint?.browseEndpoint
 						?.browseId && [
 						{
-							text: '',
+							text: "",
 							browseId:
 								ctx?.musicResponsiveListItemRenderer?.menu?.menuRenderer
 									?.items[4]?.menuNavigationItemRenderer?.navigationEndpoint
 									?.browseEndpoint?.browseId,
-							pageType: 'MUSIC_PAGE_TYPE_ARTIST'
+							pageType: "MUSIC_PAGE_TYPE_ARTIST"
 						}
 				  ]
 		},
@@ -276,7 +276,7 @@ export const MusicResponsiveListItemRenderer = (
 		videoId:
 			ctx.musicResponsiveListItemRenderer?.flexColumns[0]
 				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
-				?.navigationEndpoint?.watchEndpoint?.videoId || '',
+				?.navigationEndpoint?.watchEndpoint?.videoId || "",
 		playlistId: ctx.musicResponsiveListItemRenderer?.menu?.menuRenderer.items[0]
 			.menuNavigationItemRenderer?.navigationEndpoint?.watchEndpoint?.playlistId
 			? ctx.musicResponsiveListItemRenderer?.menu?.menuRenderer?.items[0]
@@ -362,7 +362,7 @@ export function PlaylistPanelVideoRenderer(
 			?.filter((item) => {
 				if (
 					item?.menuNavigationItemRenderer &&
-					item?.menuNavigationItemRenderer?.icon?.iconType?.includes('ALBUM')
+					item?.menuNavigationItemRenderer?.icon?.iconType?.includes("ALBUM")
 				)
 					return item;
 			})

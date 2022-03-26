@@ -1,8 +1,8 @@
-import { browser } from '$app/env';
-import type { Item } from '$lib/types';
-import type { Writable } from 'svelte/store';
-import { derived, get, writable } from 'svelte/store';
-import { settings } from './settings';
+import { browser } from "$app/env";
+import type { Item } from "$lib/types";
+import type { Writable } from "svelte/store";
+import { derived, get, writable } from "svelte/store";
+import { settings } from "./settings";
 
 export const updateTrack = writable<{ originalUrl?: string; url?: string }>({
 	url: null,
@@ -17,9 +17,9 @@ type Alert = {
 	type?: string;
 };
 type AlertStore = {
-	subscribe: Writable<Alert>['subscribe'];
-	set: Writable<Alert>['set'];
-	update: Writable<Alert>['update'];
+	subscribe: Writable<Alert>["subscribe"];
+	set: Writable<Alert>["set"];
+	update: Writable<Alert>["update"];
 };
 
 // Derived from Settings
@@ -42,7 +42,7 @@ export const alertHandler: AlertStore = writable({
 
 export const isPagePlaying = writable();
 export const key = writable<number>(0);
-export const currentId = writable('');
+export const currentId = writable("");
 export const playerLoading = writable(false);
 
 export const showAddToPlaylistPopper = writable<{
@@ -51,9 +51,9 @@ export const showAddToPlaylistPopper = writable<{
 }>({ state: false });
 
 export const currentMix = writable({
-	videoId: '',
-	playlistId: '',
+	videoId: "",
+	playlistId: "",
 	list: [
-		{ id: '', videoId: '', thumbnail: '', artist: '', title: '', length: '' }
+		{ id: "", videoId: "", thumbnail: "", artist: "", title: "", length: "" }
 	]
 });

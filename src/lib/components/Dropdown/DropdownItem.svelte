@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Icon from '../Icon/Icon.svelte';
+	import Icon from "../Icon/Icon.svelte";
 
-	export let text = '';
-	export let icon = '';
+	export let text = "";
+	export let icon = "";
 
 	// $: console.log(update)
 </script>

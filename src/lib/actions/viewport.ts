@@ -7,12 +7,12 @@ function ensureIntersectionObserver(options?: { margin: string }) {
 		(entries) => {
 			entries.forEach((entry) => {
 				const eventName = entry.isIntersecting
-					? 'enterViewport'
-					: 'exitViewport';
+					? "enterViewport"
+					: "exitViewport";
 				entry.target.dispatchEvent(new CustomEvent(eventName));
 			});
 		},
-		{ rootMargin: options ? options.margin : '0px 350px', threshold: 0 }
+		{ rootMargin: options ? options.margin : "0px 350px", threshold: 0 }
 	);
 }
 

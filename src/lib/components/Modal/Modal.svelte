@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { fly, fade } from 'svelte/transition';
-	import { createEventDispatcher } from 'svelte';
-	import { clickOutside } from '$lib/actions/clickOutside';
+	import { fly, fade } from "svelte/transition";
+	import { createEventDispatcher } from "svelte";
+	import { clickOutside } from "$lib/actions/clickOutside";
 	export let hasFocus = true;
 	export let zIndex = 50;
 	const dispatch = createEventDispatcher();
@@ -10,9 +10,9 @@
 		if (event.defaultPrevented) {
 			return; // Do nothing if the event was already processed
 		}
-		if (event.key == 'Esc' || event.key == 'Escape') {
+		if (event.key == "Esc" || event.key == "Escape") {
 			event.preventDefault();
-			dispatch('close');
+			dispatch("close");
 		}
 	}
 </script>
@@ -20,7 +20,7 @@
 <svelte:window />
 <div
 	class="backdrop"
-	on:click|self={() => dispatch('close')}
+	on:click|self={() => dispatch("close")}
 	transition:fade={{ duration: 125 }}
 	style="z-index: {zIndex};"
 >
@@ -29,7 +29,7 @@
 		aria-modal="true"
 		on:click_outside={() => {
 			if (!hasFocus) return;
-			dispatch('close');
+			dispatch("close");
 		}}
 		use:clickOutside
 		role="dialog"

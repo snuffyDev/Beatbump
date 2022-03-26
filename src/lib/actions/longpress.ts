@@ -5,17 +5,17 @@ export default function longpress(node: Node): SvelteActionReturnType {
 		if (node && node.contains(e.target)) {
 			isTouching = true;
 			timer = setTimeout(() => {
-				node.dispatchEvent(new CustomEvent('longpress'));
+				node.dispatchEvent(new CustomEvent("longpress"));
 			}, 515);
-			node.addEventListener('touchend', cancelPress, {
+			node.addEventListener("touchend", cancelPress, {
 				passive: true,
 				capture: true
 			});
-			node.addEventListener('touchmove', touchMove, {
+			node.addEventListener("touchmove", touchMove, {
 				passive: true,
 				capture: true
 			});
-			node.addEventListener('mouseup', cancelPress, {
+			node.addEventListener("mouseup", cancelPress, {
 				passive: true,
 				capture: true
 			});
@@ -26,20 +26,20 @@ export default function longpress(node: Node): SvelteActionReturnType {
 	}
 	function cancelPress() {
 		clearTimeout(timer);
-		node.removeEventListener('touchend', cancelPress);
-		node.removeEventListener('mouseup', cancelPress);
+		node.removeEventListener("touchend", cancelPress);
+		node.removeEventListener("mouseup", cancelPress);
 	}
 
-	node.addEventListener('touchstart', startPress, {
+	node.addEventListener("touchstart", startPress, {
 		passive: true,
 		capture: true
 	});
-	node.addEventListener('mousedown', startPress);
+	node.addEventListener("mousedown", startPress);
 	return {
 		destroy() {
-			node.removeEventListener('touchstart', startPress);
+			node.removeEventListener("touchstart", startPress);
 
-			node.removeEventListener('mousedown', startPress);
+			node.removeEventListener("mousedown", startPress);
 		}
 	};
 }

@@ -1,9 +1,9 @@
 import {
 	MusicResponsiveListItemRenderer,
 	MusicTwoRowItemRenderer
-} from '$lib/parsers';
-import type { CarouselHeader, ICarousel, Item, Thumbnail } from '$lib/types';
-import type { IMusicResponsiveListItemRenderer } from '$lib/types/internals';
+} from "$lib/parsers";
+import type { CarouselHeader, ICarousel, Item, Thumbnail } from "$lib/types";
+import type { IMusicResponsiveListItemRenderer } from "$lib/types/internals";
 
 export interface IArtistPageHeader {
 	name: string;
@@ -53,23 +53,23 @@ export function ArtistPageParser({
 	const carousels = [];
 
 	for (; len--; ) {
-		if (items[len]['musicShelfRenderer']) {
+		if (items[len]["musicShelfRenderer"]) {
 			songs = {
-				items: parseSongs(items[len]['musicShelfRenderer']['contents']),
-				header: items[len]['musicCarouselShelfRenderer']
+				items: parseSongs(items[len]["musicShelfRenderer"]["contents"]),
+				header: items[len]["musicCarouselShelfRenderer"]
 					? {
-							...items[len]['musicCarouselShelfRenderer']['bottomEndpoint'][
-								'browseEndpoint'
+							...items[len]["musicCarouselShelfRenderer"]["bottomEndpoint"][
+								"browseEndpoint"
 							]
 					  }
 					: undefined
 			};
 		}
-		if (items[len]['musicCarouselShelfRenderer']) {
+		if (items[len]["musicCarouselShelfRenderer"]) {
 			carousels[len - 1] = parseCarousel(
-				items[len]['musicCarouselShelfRenderer']['contents'],
-				items[len]['musicCarouselShelfRenderer']['header'][
-					'musicCarouselShelfBasicHeaderRenderer'
+				items[len]["musicCarouselShelfRenderer"]["contents"],
+				items[len]["musicCarouselShelfRenderer"]["header"][
+					"musicCarouselShelfBasicHeaderRenderer"
 				]
 			);
 		}
@@ -103,26 +103,26 @@ function parseCarousel(items = [], _header) {
 	}
 
 	const header = {
-		title: _header['title']['runs'][0]['text'],
-		endpoint: _header['title']['runs'][0]['navigationEndpoint'] ?? undefined,
+		title: _header["title"]["runs"][0]["text"],
+		endpoint: _header["title"]["runs"][0]["navigationEndpoint"] ?? undefined,
 		itct:
-			(_header['moreContentButton'] &&
+			(_header["moreContentButton"] &&
 				encodeURIComponent(
 					_header.moreContentButton?.buttonRenderer?.navigationEndpoint
 						?.clickTrackingParams
 				)) ??
 			undefined,
-		browseId: _header['moreContentButton']
-			? _header['moreContentButton']['buttonRenderer']['navigationEndpoint'][
-					'browseEndpoint'
-			  ]['browseId']
+		browseId: _header["moreContentButton"]
+			? _header["moreContentButton"]["buttonRenderer"]["navigationEndpoint"][
+					"browseEndpoint"
+			  ]["browseId"]
 			: undefined,
-		params: _header['moreContentButton']
-			? _header['moreContentButton']['buttonRenderer']['navigationEndpoint'][
-					'browseEndpoint'
-			  ]['params']
+		params: _header["moreContentButton"]
+			? _header["moreContentButton"]["buttonRenderer"]["navigationEndpoint"][
+					"browseEndpoint"
+			  ]["params"]
 			: undefined,
-		type: _header['title']['runs'][0]['text'],
+		type: _header["title"]["runs"][0]["text"],
 		data: _header
 	};
 	// moreContentButton.buttonRenderer.trackingParams
@@ -134,49 +134,45 @@ function parseCarousel(items = [], _header) {
 // Main header parser
 function parseArtistHeader(header: any): IArtistPageHeader {
 	return {
-		name: header['title']['runs'][0]['text'] || null,
-		description: header['description']
-			? header['description']['runs'][0]['text']
+		name: header["title"]["runs"][0]["text"] || null,
+		description: header["description"]
+			? header["description"]["runs"][0]["text"]
 			: undefined,
-		foregroundThumbnails: header['foregroundThumbnail']
-			? header['foregroundThumbnail']['musicThumbnailRenderer']['thumbnail'][
-					'thumbnails'
+		foregroundThumbnails: header["foregroundThumbnail"]
+			? header["foregroundThumbnail"]["musicThumbnailRenderer"]["thumbnail"][
+					"thumbnails"
 			  ]
 			: undefined,
 		thumbnails:
-			header['thumbnail']['musicThumbnailRenderer']['thumbnail'][
-				'thumbnails'
+			header["thumbnail"]["musicThumbnailRenderer"]["thumbnail"][
+				"thumbnails"
 			] || [],
 		buttons: {
-			radio: {
-				params: header['startRadioButton']['buttonRenderer'][
-					'navigationEndpoint'
-				]['watchPlaylistEndpoint']
-					? header['startRadioButton']['buttonRenderer']['navigationEndpoint'][
-							'watchPlaylistEndpoint'
-					  ]['params']
-					: undefined,
-				playlistId: header['startRadioButton']['buttonRenderer'][
-					'navigationEndpoint'
-				]['watchPlaylistEndpoint']
-					? header['startRadioButton']['buttonRenderer']['navigationEndpoint'][
-							'watchPlaylistEndpoint'
-					  ]['playlistId']
-					: undefined
-			},
-			shuffle: {
+			radio: header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"][
+				"watchPlaylistEndpoint"
+			] && {
 				params:
-					header['playButton']['buttonRenderer']['navigationEndpoint'][
-						'watchEndpoint'
-					]['params'],
+					header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"][
+						"watchPlaylistEndpoint"
+					]["params"] ?? undefined,
 				playlistId:
-					header['playButton']['buttonRenderer']['navigationEndpoint'][
-						'watchEndpoint'
-					]['playlistId'],
+					header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"][
+						"watchPlaylistEndpoint"
+					]["playlistId"] ?? undefined
+			},
+			shuffle: header["playButton"]["buttonRenderer"]["navigationEndpoint"] && {
+				params:
+					header["playButton"]["buttonRenderer"]["navigationEndpoint"][
+						"watchEndpoint"
+					]["params"] ?? undefined,
+				playlistId:
+					header["playButton"]["buttonRenderer"]["navigationEndpoint"][
+						"watchEndpoint"
+					]["playlistId"] ?? undefined,
 				videoId:
-					header['playButton']['buttonRenderer']['navigationEndpoint'][
-						'watchEndpoint'
-					]['videoId']
+					header["playButton"]["buttonRenderer"]["navigationEndpoint"][
+						"watchEndpoint"
+					]["videoId"] ?? undefined
 			}
 		}
 	};

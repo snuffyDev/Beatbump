@@ -1,28 +1,28 @@
 <script lang="ts">
-	import { createEventDispatcher, tick } from 'svelte';
-	import Button from '../Button';
-	import PopperButton from '../Popper/PopperButton.svelte';
+	import { createEventDispatcher, tick } from "svelte";
+	import Button from "../Button";
+	import PopperButton from "../Popper/PopperButton.svelte";
 	export let thumbnail: string;
-	export let title: string = '';
+	export let title: string = "";
 	export let description = undefined;
 	export let subtitles = [];
 	export let secondSubtitle = [];
 	export let buttons = [];
 	export let artist = undefined;
 	export let editable = false;
-	export let type = 'playlist';
+	export let type = "playlist";
 	let DropdownItems = [
 		{
-			text: 'Add to Queue',
-			icon: 'queue',
+			text: "Add to Queue",
+			icon: "queue",
 			action: () => {
-				dispatch('addqueue');
+				dispatch("addqueue");
 			}
 		},
 		{
-			text: 'Add to Playlist',
-			icon: 'playlist-add',
-			action: () => dispatch('playlistAdd')
+			text: "Add to Playlist",
+			icon: "playlist-add",
+			action: () => dispatch("playlistAdd")
 		}
 	];
 
@@ -40,7 +40,7 @@
 		<div class="info-title">
 			<span class="box-title">{title}</span>
 		</div>
-		{#if description && type == 'playlist'}
+		{#if description && type == "playlist"}
 			{#key description}
 				<p
 					class="secondary subtitle description"
@@ -51,17 +51,17 @@
 				<span class="secondary subtitle-group">
 					<p class="secondary subtitle">
 						{Array.isArray(subtitles) && subtitles.length !== 0
-							? subtitles.join(' ')
-							: ''}
+							? subtitles.join(" ")
+							: ""}
 					</p>
 					<em
 						><small class="subtitle">
-							{secondSubtitle.join(' ')}
+							{secondSubtitle.join(" ")}
 						</small>
 					</em>
 				</span>
 			{/key}
-		{:else if type == 'release'}
+		{:else if type == "release"}
 			<p>
 				{#if subtitles[0]?.contentRating}
 					<span class="explicit"> E </span>
@@ -84,13 +84,13 @@
 	</div>
 	<div class="button-group">
 		{#each buttons as { type, icon, text, action }, i}
-			{#if type == 'icon'}
+			{#if type == "icon"}
 				<PopperButton items={DropdownItems} />
 			{:else}
 				<Button
 					on:click={action}
-					outlined={i == buttons.length - 1 || type == 'outlined'}
-					icon={typeof icon == 'string'
+					outlined={i == buttons.length - 1 || type == "outlined"}
+					icon={typeof icon == "string"
 						? { name: icon }
 						: { name: icon?.name, size: icon?.size }}
 					{text}
@@ -101,7 +101,7 @@
 </div>
 
 <style lang="scss">
-	@import '../../shared/listPages.scss';
+	@import "../../shared/listPages.scss";
 
 	p {
 		margin-top: 0;

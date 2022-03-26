@@ -1,9 +1,9 @@
 <script context="module" lang="ts">
-	import type { Load } from '@sveltejs/kit';
+	import type { Load } from "@sveltejs/kit";
 	let path;
 
 	export const load: Load = async ({ fetch, stuff }) => {
-		const response = await fetch('/home.json');
+		const response = await fetch("/home.json");
 		const data = await response.json();
 		if (!response.ok) {
 			return {
@@ -31,11 +31,11 @@
 </script>
 
 <script lang="ts">
-	import viewport from '$lib/actions/viewport';
-	import Carousel from '$lib/components/Carousel/Carousel.svelte';
-	import Header from '$lib/components/Layouts/Header.svelte';
-	import Loading from '$lib/components/Loading/Loading.svelte';
-	import type { NextContinuationData, Thumbnail } from '$lib/types';
+	import viewport from "$lib/actions/viewport";
+	import Carousel from "$lib/components/Carousel/Carousel.svelte";
+	import Header from "$lib/components/Layouts/Header.svelte";
+	import Loading from "$lib/components/Loading/Loading.svelte";
+	import type { NextContinuationData, Thumbnail } from "$lib/types";
 
 	export let carousels;
 	export let headerThumbnail: Array<Thumbnail> = [];
@@ -96,7 +96,7 @@
 	{#if Object.keys(continuations).length}
 		<div
 			class="viewport"
-			use:viewport={{ margin: '0px 450px' }}
+			use:viewport={{ margin: "0px 450px" }}
 			on:enterViewport={async () => {
 				if (loading || hasData) return;
 				loading = true;

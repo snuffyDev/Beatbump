@@ -1,8 +1,8 @@
-import { browser } from '$app/env';
-import { writable } from 'svelte/store';
+import { browser } from "$app/env";
+import { writable } from "svelte/store";
 
-import type { Item } from './types';
-import { notify } from './utils';
+import type { Item } from "./types";
+import { notify } from "./utils";
 export type IDBPlaylist = {
 	name?: string;
 	description?: string;
@@ -16,9 +16,9 @@ type IDBRequestTarget = Event & {
 	target: EventTarget & { result: IDBRequest & IDBCursorWithValue };
 };
 const mod = {
-	charset: 'useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict',
+	charset: "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict",
 	generate: (size = 16) => {
-		let id = '';
+		let id = "";
 		let i = size;
 		while (i--) {
 			id += mod.charset[(Math.random() * mod.charset.length) | 0];
@@ -37,7 +37,7 @@ const accessDB = () => {
 		if (db != undefined) {
 			return resolve();
 		}
-		const request = indexedDB.open('beatbump', 2);
+		const request = indexedDB.open("beatbump", 2);
 
 		function error(error) {
 			reject(error.target.error.message);
@@ -54,11 +54,11 @@ const accessDB = () => {
 			db = event.target.result;
 			db.onerror = error;
 			if (
-				db.objectStoreNames.contains('playlists') &&
-				event.target?.transaction.objectStore('playlists').keyPath !== 'id'
+				db.objectStoreNames.contains("playlists") &&
+				event.target?.transaction.objectStore("playlists").keyPath !== "id"
 			) {
 				const getOldPlaylists = event.target?.transaction
-					.objectStore('playlists')
+					.objectStore("playlists")
 					.getAll();
 				getOldPlaylists.onsuccess = function (e: IDBRequestTarget) {
 					const results = e.target.result;
@@ -66,23 +66,23 @@ const accessDB = () => {
 						items = [...results];
 						// console.log(e, results)
 
-						event.target.result.deleteObjectStore('playlists');
+						event.target.result.deleteObjectStore("playlists");
 					}
 
-					event.target.result.createObjectStore('playlists', {
-						keyPath: 'id'
+					event.target.result.createObjectStore("playlists", {
+						keyPath: "id"
 					});
 				};
 			}
 
-			if (!db.objectStoreNames.contains('favorites')) {
-				db.createObjectStore('favorites', {
-					keyPath: 'videoId' || 'playlistId'
+			if (!db.objectStoreNames.contains("favorites")) {
+				db.createObjectStore("favorites", {
+					keyPath: "videoId" || "playlistId"
 				});
 			}
-			if (!db.objectStoreNames.contains('playlists')) {
-				db.createObjectStore('playlists', {
-					keyPath: 'id'
+			if (!db.objectStoreNames.contains("playlists")) {
+				db.createObjectStore("playlists", {
+					keyPath: "id"
 				});
 			}
 		};
@@ -96,7 +96,7 @@ const accessDB = () => {
 			db = e.target.result;
 
 			db.onerror = error;
-			db.addEventListener('close', function (e) {
+			db.addEventListener("close", function (e) {
 				db = undefined;
 			});
 			resolve(db);
@@ -110,8 +110,8 @@ export default {
 			accessDB().then(function () {
 				try {
 					// console.log(items)
-					const tx = db.transaction('playlists', 'readwrite');
-					tx.objectStore('playlists').put({
+					const tx = db.transaction("playlists", "readwrite");
+					tx.objectStore("playlists").put({
 						name,
 						description,
 						items: Array.isArray(items) ? [...items] : [items],
@@ -119,16 +119,16 @@ export default {
 						thumbnail,
 						id: mod.generate(32)
 					}).onsuccess = resolve;
-					tx.addEventListener('complete', function () {
+					tx.addEventListener("complete", function () {
 						resolve({ name, description, items, thumbnail });
-						notify('Created Playlist!', 'success');
+						notify("Created Playlist!", "success");
 					});
-					tx.addEventListener('error', function (e) {
-						notify('Error: ' + e, 'error');
+					tx.addEventListener("error", function (e) {
+						notify("Error: " + e, "error");
 						reject(e);
 					});
 				} catch (err) {
-					notify('Error: ' + err, 'error');
+					notify("Error: " + err, "error");
 					reject(err);
 					// throw new Error(err)
 				}
@@ -146,8 +146,8 @@ export default {
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
 				try {
-					let tx = db.transaction('playlists', 'readwrite');
-					tx.objectStore('playlists').openCursor(id).onsuccess = function (
+					let tx = db.transaction("playlists", "readwrite");
+					tx.objectStore("playlists").openCursor(id).onsuccess = function (
 						e: IDBRequestTarget
 					) {
 						const cursor = e.target.result;
@@ -175,13 +175,13 @@ export default {
 						}
 
 						// list
-						if (!hideAlert) notify('Updated Playlist!', 'success');
+						if (!hideAlert) notify("Updated Playlist!", "success");
 						// return resolve()
 					};
-					tx.addEventListener('complete', () => {
-						if (!hideAlert) notify('Updated Playlist!', 'success');
+					tx.addEventListener("complete", () => {
+						if (!hideAlert) notify("Updated Playlist!", "success");
 					});
-					tx.addEventListener('error', function (e) {
+					tx.addEventListener("error", function (e) {
 						console.error(e);
 						throw new Error(e);
 					});
@@ -194,16 +194,16 @@ export default {
 	},
 	async setNewFavorite(item: Item) {
 		await accessDB();
-		if (!item) return new Error('No item was provided!');
+		if (!item) return new Error("No item was provided!");
 
 		try {
-			const tx = db.transaction(['favorites'], 'readwrite');
+			const tx = db.transaction(["favorites"], "readwrite");
 
-			tx.objectStore('favorites').put(item);
-			tx.addEventListener('complete', () => {
-				notify('Added to favorites!', 'success');
+			tx.objectStore("favorites").put(item);
+			tx.addEventListener("complete", () => {
+				notify("Added to favorites!", "success");
 			});
-			tx.addEventListener('error', function (e) {
+			tx.addEventListener("error", function (e) {
 				new Error(e);
 			});
 		} catch (e) {
@@ -213,13 +213,13 @@ export default {
 	setMultipleFavorites(items: Item[]) {
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
-				const tx = db.transaction(['favorites'], 'readwrite');
+				const tx = db.transaction(["favorites"], "readwrite");
 
 				items.forEach((item) => {
-					const request = tx.objectStore('favorites').put(item);
+					const request = tx.objectStore("favorites").put(item);
 				});
 				tx.oncomplete = () => {
-					notify('Added items to favorites!', 'success');
+					notify("Added items to favorites!", "success");
 				};
 				tx.onerror = function (e) {
 					console.error(e);
@@ -231,13 +231,13 @@ export default {
 	setMultiplePlaylists(items: IDBPlaylist[]) {
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
-				const tx = db.transaction(['playlists'], 'readwrite');
+				const tx = db.transaction(["playlists"], "readwrite");
 
 				items.forEach((item) => {
-					const request = tx.objectStore('playlists').put(item);
+					const request = tx.objectStore("playlists").put(item);
 				});
 				tx.oncomplete = () => {
-					notify(`Added ${items.length} new playlists!`, 'success');
+					notify(`Added ${items.length} new playlists!`, "success");
 				};
 				tx.onerror = function (e) {
 					console.error(e);
@@ -247,14 +247,14 @@ export default {
 		});
 	},
 	async deleteFavorite(item) {
-		if (!item) return 'No item was provided!';
+		if (!item) return "No item was provided!";
 		await accessDB();
 
 		try {
-			db.transaction(['favorites'], 'readwrite')
-				.objectStore('favorites')
+			db.transaction(["favorites"], "readwrite")
+				.objectStore("favorites")
 				.delete(item.videoId || item.playlistId);
-			notify('Item removed from favorites!', 'success');
+			notify("Item removed from favorites!", "success");
 		} catch (e) {
 			console.error(e);
 		}
@@ -263,24 +263,24 @@ export default {
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
 				const tx = (db
-					.transaction(['playlists'], 'readwrite')
-					.objectStore('playlists')
+					.transaction(["playlists"], "readwrite")
+					.objectStore("playlists")
 					.clear().onsuccess = function (e) {
-					notify('Playlists Deleted!', 'success');
-					resolve('deleted');
+					notify("Playlists Deleted!", "success");
+					resolve("deleted");
 				});
 			});
 		});
 	},
 	async deletePlaylist(name: string) {
-		if (!name) return 'No playlist name was provided!';
+		if (!name) return "No playlist name was provided!";
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
 				try {
-					db.transaction(['playlists'], 'readwrite')
-						.objectStore('playlists')
+					db.transaction(["playlists"], "readwrite")
+						.objectStore("playlists")
 						.delete(name);
-					notify('Playlist Deleted!', 'success');
+					notify("Playlist Deleted!", "success");
 				} catch (e) {
 					console.error(e);
 				}
@@ -288,14 +288,14 @@ export default {
 		});
 	},
 	async deleteSongFromPlaylist(itemVideoId: string, playlistId: string) {
-		if (!itemVideoId) return 'No playlist name was provided!';
-		if (!playlistId) return 'No playlist name was provided!';
+		if (!itemVideoId) return "No playlist name was provided!";
+		if (!playlistId) return "No playlist name was provided!";
 		return new Promise(function (resolve, reject) {
 			accessDB().then(function () {
 				try {
 					db
-						.transaction(['playlists'], 'readwrite')
-						.objectStore('playlists')
+						.transaction(["playlists"], "readwrite")
+						.objectStore("playlists")
 						.openCursor(playlistId).onsuccess = function (e: IDBRequestTarget) {
 						const cursor = e.target.result;
 						if (cursor) {
@@ -317,7 +317,7 @@ export default {
 							// console.log(e.target.result, list)
 						}
 					};
-					notify('Song removed from playlist!', 'success');
+					notify("Song removed from playlist!", "success");
 				} catch (e) {
 					console.error(e);
 				}
@@ -330,8 +330,8 @@ export default {
 			accessDB().then(function () {
 				try {
 					const transaction = db
-						.transaction('favorites', 'readonly')
-						.objectStore('favorites');
+						.transaction("favorites", "readonly")
+						.objectStore("favorites");
 
 					transaction.getAll().onsuccess = function (e: IDBRequestTarget) {
 						if (e.target.result) {
@@ -343,7 +343,7 @@ export default {
 						}
 					};
 				} catch (e) {
-					notify('Error! ' + e, 'error');
+					notify("Error! " + e, "error");
 					reject([]);
 				}
 			});
@@ -354,8 +354,8 @@ export default {
 			accessDB().then(function () {
 				try {
 					const transaction = db
-						.transaction('playlists', 'readonly')
-						.objectStore('playlists');
+						.transaction("playlists", "readonly")
+						.objectStore("playlists");
 
 					transaction.openCursor(id).onsuccess = function (
 						e: Event & { target: EventTarget & { result: IDBCursorWithValue } }
@@ -366,7 +366,7 @@ export default {
 						}
 					};
 				} catch (e) {
-					notify('Error! ' + e, 'error');
+					notify("Error! " + e, "error");
 					reject([]);
 				}
 			});
@@ -380,8 +380,8 @@ export default {
 
 				try {
 					transaction = db
-						.transaction('playlists', 'readwrite')
-						.objectStore('playlists');
+						.transaction("playlists", "readwrite")
+						.objectStore("playlists");
 					if (items.length > 0) {
 						items.forEach((item) => {
 							transaction.put(item);
@@ -428,7 +428,7 @@ export default {
 					};
 					// resolve([...lists])
 				} catch (e) {
-					notify('Error! ' + e, 'error');
+					notify("Error! " + e, "error");
 					reject([]);
 				}
 			});

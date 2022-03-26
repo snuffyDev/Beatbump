@@ -1,5 +1,5 @@
-import type { Album, ArtistInfo, NextContinuationData } from '$lib/types';
-import type { PlaylistSearch } from './playlist';
+import type { Album, ArtistInfo, NextContinuationData } from "$lib/types";
+import type { PlaylistSearch } from "./playlist";
 
 export type Search = {
 	contents: SongResult[] | PlaylistSearch[];

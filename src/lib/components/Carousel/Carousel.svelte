@@ -1,15 +1,15 @@
 <script lang="ts">
-	import type { CarouselHeader } from '$lib/types';
+	import type { CarouselHeader } from "$lib/types";
 
-	import CarouselItem from './CarouselItem.svelte';
-	import Icon from '$components/Icon/Icon.svelte';
-	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
+	import CarouselItem from "./CarouselItem.svelte";
+	import Icon from "$components/Icon/Icon.svelte";
+	import { page } from "$app/stores";
+	import { onMount } from "svelte";
 
 	export let header: CarouselHeader;
 	export let items = [];
-	export let type = '';
-	export let kind = 'normal';
+	export let type = "";
+	export let kind = "normal";
 	export let isBrowseEndpoint;
 
 	let arr = [];
@@ -51,7 +51,7 @@
 
 		carousel !== undefined &&
 			carousel.addEventListener(
-				'scroll',
+				"scroll",
 				() => {
 					frame = requestAnimationFrame(scrollHandler);
 				},
@@ -61,7 +61,7 @@
 		return () => {
 			cancelAnimationFrame(frame);
 			carousel.removeEventListener(
-				'scroll',
+				"scroll",
 				() => {
 					frame = requestAnimationFrame(scrollHandler);
 				},
@@ -71,13 +71,13 @@
 		// let rectValue: any = 0
 	});
 	// $: if (carousel) carousel.scrollLeft += $tween
-	const pageIsArtist = $page.url.pathname.includes('/artist/');
+	const pageIsArtist = $page.url.pathname.includes("/artist/");
 
-	let notArtistPageURLs = header.browseId?.includes('VLP')
+	let notArtistPageURLs = header.browseId?.includes("VLP")
 		? `/playlist/${header?.browseId}`
 		: `/trending/new/${header?.browseId}${
-				header?.params ? `?params=${header?.params}` : ''
-		  }${header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ''}`;
+				header?.params ? `?params=${header?.params}` : ""
+		  }${header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ""}`;
 	let href =
 		header?.browseId && pageIsArtist
 			? `/artist/releases?browseId=${header?.browseId}&params=${header?.params}&itct=${header?.itct}`
@@ -91,11 +91,11 @@
 	<h1>
 		{header.title}
 	</h1>
-	{#if !header.title.includes('Videos') && header.browseId}<a
+	{#if !header.title.includes("Videos") && header.browseId}<a
 			style="white-space:pre; display: inline-block;"
 			{href}><small>See All</small></a
 		>
-	{:else if pageIsArtist && header.title.includes('Videos')}
+	{:else if pageIsArtist && header.title.includes("Videos")}
 		<a
 			style="white-space:pre; display: inline-block;"
 			href={`/playlist/${header?.browseId}`}><small>See All</small></a
@@ -136,7 +136,7 @@
 		{#each arr as item, index}
 			<div class="c-group" bind:this={group[index]}>
 				{#each item as item, i}
-					{#if type == 'trending'}
+					{#if type == "trending"}
 						<!-- {JSON.stringify(item[1], title, thumbnail, subtitle)} -->
 						<CarouselItem
 							type="trending"
@@ -145,7 +145,7 @@
 							{isBrowseEndpoint}
 							index={i}
 						/>
-					{:else if type == 'artist' || type == 'home'}
+					{:else if type == "artist" || type == "home"}
 						<CarouselItem
 							{type}
 							{kind}
@@ -154,7 +154,7 @@
 							{item}
 							index={i}
 						/>
-					{:else if type == 'new'}
+					{:else if type == "new"}
 						<!-- content here -->
 						<CarouselItem
 							type="new"
@@ -170,7 +170,7 @@
 </div>
 
 <style lang="scss">
-	@import '../../../global/stylesheet/components/_carousel';
+	@import "../../../global/stylesheet/components/_carousel";
 	.subheading {
 		margin-bottom: 0;
 		color: rgb(175, 175, 175);
@@ -184,7 +184,7 @@
 		position: relative;
 		&::before {
 			display: block;
-			content: '';
+			content: "";
 			position: absolute;
 
 			padding-top: calc(100% * 2 / 3);

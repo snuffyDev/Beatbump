@@ -1,7 +1,7 @@
 <script lang="ts">
-	import viewport from '$lib/actions/viewport';
-	import ListItem from '$lib/components/ListItem/ListItem.svelte';
-	import { createEventDispatcher } from 'svelte';
+	import viewport from "$lib/actions/viewport";
+	import ListItem from "$lib/components/ListItem/ListItem.svelte";
+	import { createEventDispatcher } from "svelte";
 
 	export let items = [];
 	export let hasData = false;
@@ -14,7 +14,7 @@
 		<slot {item} index={i} />
 	{/each}
 	{#if !hasData}
-		<div use:viewport on:enterViewport={() => dispatch('getMore')} />
+		<div use:viewport on:enterViewport={() => dispatch("getMore")} />
 
 		{#if isLoading}
 			<div class="loading-results" style="padding: 0em;">

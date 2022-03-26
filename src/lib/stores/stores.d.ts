@@ -1,5 +1,5 @@
 interface Alert {
 	msg: string;
-	type: 'success' | 'error';
+	type: "success" | "error";
 	action: string;
 }

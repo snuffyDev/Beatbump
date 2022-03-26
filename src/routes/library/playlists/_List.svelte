@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import { quintOut } from 'svelte/easing';
-	import { crossfade } from 'svelte/transition';
+	import { createEventDispatcher } from "svelte";
+	import { quintOut } from "svelte/easing";
+	import { crossfade } from "svelte/transition";
 
 	export let items = [];
 	const [send, receive] = crossfade({
 		fallback(node, params) {
 			const style = getComputedStyle(node);
-			const transform = style.transform === 'none' ? '' : style.transform;
+			const transform = style.transform === "none" ? "" : style.transform;
 
 			return {
 				duration: 600,
