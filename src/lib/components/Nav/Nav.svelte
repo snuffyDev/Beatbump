@@ -191,10 +191,8 @@
 		grid-area: l;
 		display: inline-flex;
 		align-items: center;
-		transition: cubic-bezier(0.445, 0.05, 0.55, 0.95) 150ms all;
 		&-back {
 			visibility: visible !important;
-			transition: cubic-bezier(0.445, 0.05, 0.55, 0.95) 150ms all;
 			display: block !important;
 			@media screen and (max-width: 640px) {
 				visibility: none !important;

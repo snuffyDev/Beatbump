@@ -47,6 +47,7 @@
 	import list from "$lib/stores/list";
 	import { page } from "$app/stores";
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
+	import CarouselItem from "$lib/components/Carousel/CarouselItem.svelte";
 	// $: console.log(data, sections, header, title)
 </script>
 
@@ -65,7 +66,16 @@
 	{#each sections as section, i}
 		{#if section?.type === "grid"}
 			<Grid heading={header} items={section.section} let:item>
-				<GridItem slot="item" {item} />
+				<!-- <GridItem slot="item" {item} /> -->
+				<CarouselItem
+					index
+					aspectRatio={item.aspectRatio}
+					{item}
+					kind="album"
+					type="home"
+					isBrowseEndpoint={true}
+					slot="item"
+				/>
 			</Grid>
 		{:else if i === 1}
 			<Carousel

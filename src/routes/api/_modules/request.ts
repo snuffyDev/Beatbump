@@ -3,7 +3,7 @@
 import type { NextContinuationData, RequestParams } from "$lib/types";
 import { queryParams } from "$lib/utils";
 import type { EndpointOutput } from "@sveltejs/kit";
-
+// import fetch from "node-fetch";
 export const sendRequest = async (
 	body: any,
 	params: RequestParams
@@ -33,6 +33,7 @@ export const sendRequest = async (
 		method: "POST",
 		headers: headers,
 		body: JSON.stringify(body)
+		// keepalive: true
 	};
 	// console.log(init)
 	let addQueryParams;
@@ -51,16 +52,22 @@ export const sendRequest = async (
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/${
 			params.endpoint
-		}?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${`&${addQueryParams}`}${
-			params.endpoint !== "player" ? `&alt=json` : " "
-		}`,
+		}?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${
+			addQueryParams ? `&${addQueryParams}` : ""
+		}${params.endpoint !== "player" ? `&alt=json` : " "}` +
+			"&prettyPrint=false",
 		init
 	);
-	const data = await response.json();
-
+	const stream = await response.json();
+	// const textStream = stream.pipeThrough(new TextDecoderStream()).tee();
+	// let data = "";
+	// for await (const chunk of textStream) {
+	// 	data += chunk;
+	// 	console.log(chunk);
+	// }
 	// if (!response.ok) {
 	// 	return { status: response.status, body: response.statusText }
 	// }
 
-	return data;
+	return stream;
 };

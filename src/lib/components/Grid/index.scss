@@ -1,7 +1,7 @@
 // @use "../../../global/stylesheet/base/typography" as type;
 .grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
 	grid-gap: 0.5rem;
 	justify-items: center;
 	// place-items: center;

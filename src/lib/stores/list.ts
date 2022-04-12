@@ -1,9 +1,9 @@
 import { parseNextItem } from '$lib/parsers';
 import type { Item } from '$lib/types';
-import { addToQueue, getSrc, notify, queryParams } from '$lib/utils';
+import { addToQueue, getSrc, notify, queryParams } from '$lib/utils/utils';
 
 import { writable, get, type Readable, type Writable, type Unsubscriber } from 'svelte/store'
-import { currentTitle, filterAutoPlay, key, playerLoading } from './stores';
+import { currentTitle, filterAutoPlay, key as mixListIndex, playerLoading } from './stores';
 
 interface ISessionListProvider {
 	currentMixId: string;
@@ -67,7 +67,7 @@ function _sessionListService() {
 		async initAutoMixSession({ clickTracking, keyId = 0, playlistId, playlistSetVideoId, videoId, config: { playerParams = '', type = '' } = {} }) {
 			try {
 				playerLoading.set(true);
-				key.set(keyId);
+				mixListIndex.set(keyId);
 				if (get(SessionListService).mix.length > 0) {
 					mix = [];
 
@@ -91,7 +91,7 @@ function _sessionListService() {
 				playerLoading.set(false);
 				continuation = data.continuation && data.continuation.length !== 0 && data.continuation;
 				currentMixId = data.currentMixId;
-				clickTrackingParams = data.clickTrackingParams ** data.clickTrackingParams.length !== 0 && data.clickTrackingParams;
+				clickTrackingParams = data.clickTrackingParams && data.clickTrackingParams.length !== 0 && data.clickTrackingParams;
 
 				mix = [...data.results];
 				set({ currentMixId, clickTrackingParams, continuation, mix });
@@ -105,7 +105,7 @@ function _sessionListService() {
 			const { playlistId = '', index = 0 } = args;
 			playerLoading.set(true);
 			if (mix.length !== 0) mix = [];
-			key.set(index);
+			mixListIndex.set(index);
 			try {
 				const data = await fetch(
 					`/api/getQueue.json?playlistId=${playlistId}`
@@ -199,7 +199,8 @@ function _sessionListService() {
 
 			playerLoading.set(false);
 			set({ currentMixId, clickTrackingParams, continuation, mix });
-			return await getSrc(data.results[0].videoId);
+			mixListIndex.set(key)
+			return await getSrc(mix[key].videoId);
 
 		},
 		removeTrack(index) {
@@ -293,7 +294,7 @@ function fetchNext({
 	};
 	const options = Object.fromEntries(
 		Object.entries(obj)
-			.filter(([_, v]) => v != null)
+			.filter(([_, v]) => v != (null || undefined))
 			.map(([key, value]) => [key, encodeURIComponent(value)])
 	);
 

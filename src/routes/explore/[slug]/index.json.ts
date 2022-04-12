@@ -23,7 +23,7 @@ export const get: RequestHandler = async ({ url, params }) => {
 	const { slug } = params;
 
 	const response = await fetch(
-		`https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
+		`https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&prettyPrint=false`,
 		{
 			method: "POST",
 			body: JSON.stringify({

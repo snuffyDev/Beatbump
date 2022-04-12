@@ -105,7 +105,7 @@
 			action: async () => {
 				const shareData = {
 					title: data.title,
-					text: `Listen to ${data.title} on Beatbump!`,
+
 					url: `https://beatbump.ml/listen?id=${data.videoId}`
 				};
 				try {

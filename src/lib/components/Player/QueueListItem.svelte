@@ -133,7 +133,8 @@
 		width: 100%;
 
 		background-color: transparentize(rgba(170, 170, 170, 0.801), 0.7);
-		transition: all cubic-bezier(0.39, 0.575, 0.565, 1) 0.15s;
+		transition:  cubic-bezier(0.39, 0.575, 0.565, 1) 0.15s;
+		transition-property: background-color, ;
 	}
 	.pl-thumbnail {
 		width: auto;
@@ -169,14 +170,14 @@
 
 			&:active {
 				background-color: rgba(245, 241, 241, 0.295);
-				transition: all cubic-bezier(0.39, 0.575, 0.565, 1) 0.23s;
+				transition:  cubic-bezier(0.39, 0.575, 0.565, 1) 0.23s;
+
 				border: rgba(170, 170, 170, 0.801) solid 0.5rem;
 			}
 		}
 	}
 	.active {
 		background-color: hsl(0deg 0% 64% / 29%) !important;
-		transition: all cubic-bezier(0.39, 0.575, 0.565, 1) 0.15s;
 		.pl-thumbnail {
 			background: rgba(126, 126, 126, 0.11);
 			img {

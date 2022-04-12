@@ -33,8 +33,8 @@ function lazy(
 				});
 			},
 			{
-				rootMargin: "50px 210px",
-				threshold: 0
+				rootMargin: "85px 200px",
+				threshold: 0.1
 			}
 		);
 

@@ -3,7 +3,8 @@
 	let path;
 
 	export const load: Load = async ({ fetch, stuff }) => {
-		const response = await fetch("/home.json");
+	console.time("TIMER")
+	const response = await fetch("/home.json");
 		const data = await response.json();
 		if (!response.ok) {
 			return {
@@ -17,6 +18,7 @@
 			continuations
 		} = await data;
 		path = stuff.page;
+		console.timeEnd("TIMER")
 		return {
 			props: {
 				carousels,
@@ -46,7 +48,13 @@
 </script>
 
 <svelte:head>
-	<link rel="preload" as="image" href={headerThumbnail[0].url} />
+	<link
+		rel="preload"
+		as="image"
+		href={Array.isArray(headerThumbnail) &&
+			headerThumbnail.length !== 0 &&
+			headerThumbnail[0].url}
+	/>
 </svelte:head>
 <Header
 	title="Home"
@@ -96,7 +104,7 @@
 	{#if Object.keys(continuations).length}
 		<div
 			class="viewport"
-			use:viewport={{ margin: "0px 450px" }}
+			use:viewport={{ margin: "0px 325px" }}
 			on:enterViewport={async () => {
 				if (loading || hasData) return;
 				loading = true;
@@ -117,11 +125,11 @@
 				return !loading;
 			}}
 		/>
-		{#if loading}
-			<div class="loading">
+
+			<div class="loading" style:opacity={loading ? 1 : 0}>
 				<Loading />
 			</div>
-		{/if}
+
 	{/if}
 </main>
 
@@ -130,6 +138,8 @@
 		height: 8rem;
 	}
 	.loading {
+		transition: opacity cubic-bezier(0.95, 0.05, 0.795, 0.035) 500ms;
+		opacity:0;
 		display: flex;
 		position: relative;
 		margin: 0 auto;
@@ -146,6 +156,8 @@
 		top: 0;
 		left: 0;
 		right: 0;
+
+    contain: layout style paint;
 	}
 	.gradient {
 		position: absolute;

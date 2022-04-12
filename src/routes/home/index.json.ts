@@ -7,6 +7,7 @@ import {
 import type { CarouselHeader } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+import { iter, map } from "$lib/utils/collections/array";
 import type { RequestHandler } from "@sveltejs/kit";
 export const get: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;
@@ -19,8 +20,8 @@ export const get: RequestHandler = async ({ url }) => {
 	const BASE_URL = "https://music.youtube.com/youtubei/v1/browse";
 	const params =
 		itct !== ""
-			? `?ctoken=${ctoken}&continuation=${ctoken}&type=next&itct=${itct}&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`
-			: "?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30";
+			? `?ctoken=${ctoken}&continuation=${ctoken}&type=next&itct=${itct}&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&prettyPrint=false`
+			: "?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&prettyPrint=false";
 	const response = await fetch(BASE_URL + params, {
 		headers: {
 			accept: "*/*",
@@ -35,9 +36,9 @@ export const get: RequestHandler = async ({ url }) => {
 			"sec-fetch-dest": "empty",
 			"sec-fetch-mode": "same-origin",
 			"sec-fetch-site": "same-origin",
-			"x-goog-visitor-id": "CgttaVFvdVdoLVdzSSiViqSMBg%3D%3D",
-			"x-youtube-client-name": "67",
-			"x-youtube-client-version": "1.20211101.00.00",
+			"X-Goog-Visitor-id": "CgttaVFvdVdoLVdzSSiViqSMBg%3D%3D",
+			"X-Youtube-Client-Name": "67",
+			"X-Youtube-Client-Version": "1.20211101.00.00",
 			Referer: "https://music.youtube.com/",
 			Origin: "https://music.youtube.com",
 			"x-origin": "https://music.youtube.com",
@@ -88,7 +89,7 @@ export const get: RequestHandler = async ({ url }) => {
 	}
 	const data = await response.json();
 	if (!ctoken) {
-		const contents =
+		const _contents =
 			data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
 				?.content?.sectionListRenderer?.contents;
 		const nextContinuationData =
@@ -96,30 +97,20 @@ export const get: RequestHandler = async ({ url }) => {
 				?.content?.sectionListRenderer?.continuations[0]?.nextContinuationData;
 		let headerThumbnail;
 
-		let contentLength = contents.length;
-		for (; contentLength--; ) {
-			if (contents[contentLength]?.musicCarouselShelfRenderer) {
-				// console.log(element)
-				carouselItems = [
-					parseCarousel({ ...contents[contentLength] }),
-					...carouselItems
-				];
+		// let contentLength = contents.length;
+		iter(_contents, (item, index) => {
+			if (item?.musicCarouselShelfRenderer) {
+				carouselItems[index] = parseCarousel(item);
 			}
-			if (contents[contentLength]?.musicImmersiveCarouselShelfRenderer) {
-				headerThumbnail = [
-					...contents[contentLength].musicImmersiveCarouselShelfRenderer
-						?.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail
-						?.thumbnails
-				].map((d) => {
-					let url = d?.url?.replace("-rj", "-rw");
-					return { ...d, url };
-				});
-				carouselItems = [
-					parseCarousel({ ...contents[contentLength] }),
-					...carouselItems
-				];
+			if (item?.musicImmersiveCarouselShelfRenderer) {
+				headerThumbnail = item?.musicImmersiveCarouselShelfRenderer?.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail?.thumbnails.slice(
+					0
+				);
+				carouselItems[index] = parseCarousel(item);
 			}
-		}
+			// return undefined
+		});
+		// console.log(carouselItems)
 		return {
 			body: {
 				carousels: carouselItems,
@@ -137,16 +128,13 @@ export const get: RequestHandler = async ({ url }) => {
 				} = {}
 			} = {}
 		} = data;
-		let contentLength = contents.length;
-		for (; contentLength--; ) {
-			if (contents[contentLength]?.musicCarouselShelfRenderer) {
-				carouselItems = [
-					parseCarousel({ ...contents[contentLength] }),
-					...carouselItems
-				];
+		iter(contents, (item, index) => {
+			if (item?.musicCarouselShelfRenderer) {
+				carouselItems[index] = parseCarousel(item);
 			}
-		}
 
+			// return undefined
+		});
 		return {
 			body: {
 				carousels: carouselItems,
@@ -195,34 +183,37 @@ function parseBody(
 				browseId: any;
 			};
 	  }[] {
-	let items: unknown[] = [];
-	let index = contents.length;
-	for (; index--; ) {
-		if (contents[index].musicTwoRowItemRenderer) {
-			items = [MusicTwoRowItemRenderer(contents[index]), ...items];
+	const items: unknown[] = [];
+	// let index = contents.length;
+	iter(contents, (item, index) => {
+		if (item?.musicTwoRowItemRenderer) {
+			items[index] = MusicTwoRowItemRenderer(item);
 		}
-		if (contents[index].musicResponsiveListItemRenderer) {
-			items = [MusicResponsiveListItemRenderer(contents[index]), ...items];
+		if (item?.musicResponsiveListItemRenderer) {
+			items[index] = MusicResponsiveListItemRenderer(item);
 		}
-		if (contents[index].musicNavigationButtonRenderer) {
-			items = [MoodsAndGenresItem(contents[index]), ...items];
+		if (item?.musicNavigationButtonRenderer) {
+			items[index] = MoodsAndGenresItem(item);
 		}
-	}
+	});
 	return items;
 }
 
-function parseCarousel(carousel: {
+function parseCarousel({
+	musicImmersiveCarouselShelfRenderer,
+	musicCarouselShelfRenderer
+}: {
 	musicImmersiveCarouselShelfRenderer?: Record<string, any>;
 	musicCarouselShelfRenderer?: Record<string, any>;
 }) {
 	return {
 		header: parseHeader(
-			carousel.musicCarouselShelfRenderer?.header ??
-				carousel.musicImmersiveCarouselShelfRenderer?.header
+			musicCarouselShelfRenderer?.header ??
+				musicImmersiveCarouselShelfRenderer?.header
 		),
 		results: parseBody(
-			carousel.musicCarouselShelfRenderer?.contents ??
-				carousel.musicImmersiveCarouselShelfRenderer?.contents
+			musicCarouselShelfRenderer?.contents ??
+				musicImmersiveCarouselShelfRenderer?.contents
 		)
 	};
 }

@@ -38,7 +38,12 @@
 	</div>
 	<div class="metadata">
 		<div class="info-title">
-			<span class="box-title">{title}</span>
+			<span class="box-title"
+				>{title}
+				{#if subtitles[0]?.contentRating}
+					<span class="explicit"> E </span>
+				{/if}</span
+			>
 		</div>
 		{#if description && type == "playlist"}
 			{#key description}
@@ -56,16 +61,13 @@
 					</p>
 					<em
 						><small class="subtitle">
-							{secondSubtitle.join(" ")}
+							{Array.isArray(secondSubtitle) && secondSubtitle.join(" ")}
 						</small>
 					</em>
 				</span>
 			{/key}
 		{:else if type == "release"}
 			<p>
-				{#if subtitles[0]?.contentRating}
-					<span class="explicit"> E </span>
-				{/if}
 				{#each artist as artist, i}
 					{#if artist.channelId}
 						<a sveltekit:prefetch href={`/artist/${artist.channelId}`}

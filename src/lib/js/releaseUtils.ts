@@ -4,18 +4,16 @@ type Data = {
 		musicDetailHeaderRenderer: {
 			title;
 			subtitle: {
-				runs: [
-					{
-						text: string;
-						navigationEndpoint: { browseEndpoint: { browseId: string } };
-					}
-				];
+				runs: {
+					text: string;
+					navigationEndpoint: { browseEndpoint: { browseId: string } };
+				}[];
 			};
 			menu;
 			thumbnail;
 			moreButton;
 			subtitleBadges;
-			secondSubtitle: { runs: [{ text: string }] };
+			secondSubtitle: { runs: { text: string }[] };
 		};
 	};
 	contents: {
@@ -36,11 +34,7 @@ type Data = {
 };
 /* eslint-disable no-prototype-builtins */
 export function parsePageContents(data: Data) {
-	let items = [];
 	// console.log(contents)
-	let t = {
-		items: "item"
-	};
 	const contents = [
 		...data.contents?.singleColumnBrowseResultsRenderer?.tabs[0].tabRenderer
 			.content.sectionListRenderer.contents[0].musicShelfRenderer.contents

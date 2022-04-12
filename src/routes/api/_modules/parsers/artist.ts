@@ -5,7 +5,7 @@ import type { ICarousel } from "$lib/types";
 export const parseArtist = (data) => {
 	const {
 		header,
-
+		responseContext,
 		contents: {
 			singleColumnBrowseResultsRenderer: {
 				tabs: [
@@ -18,6 +18,10 @@ export const parseArtist = (data) => {
 			} = {}
 		} = {}
 	} = data;
-	// console.log(header)
-	return ArtistPageParser({ header, items: contents });
+	// console.log(responseContext);
+	return ArtistPageParser({
+		header,
+		items: contents,
+		visitorData: responseContext["visitorData"]
+	});
 };

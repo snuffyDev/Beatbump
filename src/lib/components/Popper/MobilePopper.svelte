@@ -7,7 +7,7 @@
 	import { afterUpdate } from "svelte";
 	import { fade, fly } from "svelte/transition";
 	import Icon from "../Icon/Icon.svelte";
-	import { PopperStore } from "./popperStore";
+	import { isOpen, PopperStore } from "./popperStore";
 	$: items = $PopperStore.items;
 	$: type = $PopperStore.type;
 
@@ -50,6 +50,7 @@
 		posY = 0;
 		PopperStore.reset();
 		allowScroll();
+		$isOpen = false;
 		sliding = false;
 	}
 	function noScroll() {
@@ -81,9 +82,11 @@
 		class="drag"
 		bind:clientHeight={popperClientHeight}
 		bind:this={popper}
-		in:fly={{ duration: 400, delay: 200, y: listHeight, opacity: 0.1 }}
+		in:fly={{ duration: 400, delay: 400, y: listHeight, opacity: 0.1 }}
 		out:fly={{ duration: 400 * 2, y: listHeight / 1.2 }}
-		style="transform: translateY({posY}px); top:{height}px;  {sliding
+		style="transform: translateY({posY}px); top:{height
+			? `${height}px`
+			: `-100%`};  {sliding
 			? ''
 			: 'transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22)'};"
 	>

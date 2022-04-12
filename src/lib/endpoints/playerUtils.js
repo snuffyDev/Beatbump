@@ -1,6 +1,8 @@
+import { iter } from "$lib/utils/collections";
+
 const parseProxyRedir = (url) => {
-	let new_url = url.replace("https://", "");
-	new_url = new_url.split("/");
+	let new_url = url.replace("https://", "").split("/");
+
 	new_url = new_url[2] !== undefined ? new_url[2] : new_url[1];
 	url = "https://redirector.googlevideo.com/" + new_url;
 	return url;
@@ -13,7 +15,7 @@ export const sort = (data, WebM = false) => {
 			return [{ url: null, error: json.playabilityStatus.status }];
 		}
 		const streamingData = json.streamingData;
-		let arr = [];
+		const arr = [];
 		if (streamingData["dashManifestUrl"]) {
 			streamingData["formats"].map((format) => {
 				if (
@@ -36,40 +38,35 @@ export const sort = (data, WebM = false) => {
 
 			return [{ url: null, mimeType: null }];
 		}
-		const formatParent = streamingData["formats"].concat(
-			streamingData["adaptiveFormats"]
-		);
-		let len = formatParent.length;
-		for (; len--; ) {
-			let url;
-			WebM === true &&
-				formatParent[len].mimeType.includes("audio") &&
-				formatParent[len].audioChannels === 2 &&
-				formatParent[len].audioQuality.includes("AUDIO_QUALITY_MEDIUM") &&
-				(formatParent[len].mimeType.includes("mp4") ||
-					formatParent[len].mimeType.includes("webm")) &&
-				(url = parseProxyRedir(formatParent[len].url)) &&
-				(formatParent[len].mimeType = formatParent[len].mimeType.includes("mp4")
-					? "mp4"
-					: "webm") &&
-				arr.push({
-					original_url: formatParent[len].url,
-					url: url,
-					mimeType: formatParent[len].mimeType
-				});
-			WebM === false &&
-				formatParent[len].mimeType.includes("audio") &&
-				formatParent[len].audioChannels === 2 &&
-				formatParent[len].audioQuality.includes("AUDIO_QUALITY_MEDIUM") &&
-				formatParent[len].mimeType.includes("mp4") &&
-				(url = parseProxyRedir(formatParent[len].url)) &&
-				(formatParent[len].mimeType = "mp4") &&
-				arr.push({
-					original_url: formatParent[len].url,
-					url: url,
-					mimeType: formatParent[len].mimeType
-				});
-		}
+		const formatParent = streamingData["adaptiveFormats"];
+
+		iter(formatParent, (item) => {
+			let url = "";
+			if (WebM === true) {
+				item.mimeType.includes("audio") &&
+					item.audioChannels === 2 &&
+					item.audioQuality.includes("AUDIO_QUALITY_MEDIUM") &&
+					(item.mimeType.includes("mp4") || item.mimeType.includes("webm")) &&
+					(item.mimeType = item.mimeType.includes("mp4") ? "mp4" : "webm") &&
+					arr.push({
+						original_url: item.url,
+						url: item.url,
+						mimeType: item.mimeType
+					});
+			}
+			if (WebM === false) {
+				item.mimeType.includes("audio") &&
+					item.audioChannels === 2 &&
+					item.audioQuality.includes("AUDIO_QUALITY_MEDIUM") &&
+					item.mimeType.includes("mp4") &&
+					(item.mimeType = "mp4") &&
+					arr.push({
+						original_url: item.url,
+						url: item.url,
+						mimeType: item.mimeType
+					});
+			}
+		});
 
 		if (arr.length !== 0) {
 			return arr;

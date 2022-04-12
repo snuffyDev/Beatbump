@@ -1,14 +1,13 @@
 @use "../base/variables" as v;
+@use "sass:color";
 
-// BASE BUTTON STYLES
-// All rules related to the .button module
-$background: #ffffff;
+$background: hsl(0deg 0% 98%);
 $color: #0d0d0d;
 $focus-background: #cccccc;
 $focus-color: #1c1c1c;
 %active {
 	color: $focus-color;
-	background: $focus-background !important;
+	// background: $focus-background !important;
 	border-color: $focus-color !important;
 	// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
 	outline: 0;
@@ -17,10 +16,10 @@ $focus-color: #1c1c1c;
 }
 %button-base {
 	display: inline-flex;
-	color: #0e0e0e !important; //  is added to colors in order to make button utility immutable.  Otherwise, it's common for `a` styles to override button specificity.
+	color: #0e0e0e !important;
 	background: $background;
 
-	border: 0.15rem solid hsl(0deg 0% 7%);
+	border: 0.15em solid hsl(0deg 0% 7%);
 	border-radius: v.$base-radius;
 	font-family: "Commissioner", sans-serif;
 	cursor: pointer;
@@ -28,35 +27,23 @@ $focus-color: #1c1c1c;
 	gap: 0.25em;
 	font-weight: 500;
 	text-transform: none;
-	// margin-bottom: 0.5rem;
-	// text-align: center;
-	// vertical-align: middle;
 	white-space: nowrap;
 	cursor: pointer;
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
-	padding: 0.5625rem 1.1rem;
-	// height: 100%;
-	// width: 100%;
-	/* align-items: center; */
-	transition: background linear 75ms, color linear 75ms;
+	padding: 0.5625em 1.1em;
 	text-transform: capitalize;
-	// font-weight: 600;
-	font-size: 1rem;
+	font-size: 1em;
 	justify-content: center;
 	align-items: center;
 	vertical-align: middle;
-	// &:focus {
-	//     outline: thin dotted #333;
-	//     outline-offset: -2px;
-	// }
 	transition: background linear 75ms, color linear 75ms;
 	@media (hover: hover) {
 		&:hover {
 			color: rgb(15, 15, 15) !important;
-			background: lighten($focus-background, 10%) !important;
+			background: color.scale($focus-background, $lightness: 70%) !important;
 			border-color: #202020 !important;
 			box-shadow: 0 0 0.05rem 0.05rem rgba(0, 0, 0, 0.226) inset;
 			outline: 0;
@@ -64,13 +51,21 @@ $focus-color: #1c1c1c;
 			cursor: pointer;
 		}
 	}
+	&:hover:active,
 	&:active,
 	&.active {
-		@extend %active;
 		// background: #f1f1f1 !important;
-		color: lighten($focus-color, 10%) !important 	;
+		// color: color.scale($focus-color, $lightness: 0%) !important 	;
 		border-color: $focus-color !important;
-		background: lighten($focus-background, 3%) !important;
+		background: color.scale($focus-background, $lightness: 25%) !important;
+
+		color: $focus-color;
+		// background: $focus-background !important;
+		border-color: $focus-color !important;
+		// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
+		outline: 0;
+		text-decoration: none;
+		cursor: pointer;
 	}
 	&:disabled,
 	.disabled {
@@ -109,8 +104,8 @@ button.has-icon {
 
 button.outlined {
 	background: #0000 !important;
-	border: white 0.1rem solid !important;
-	color: white !important;
+	border: $background 0.1em solid !important;
+	color: $background !important;
 	font-weight: 500;
 
 	&:active {
@@ -129,7 +124,7 @@ button.outlined {
 		&:hover {
 			background: rgba(255, 255, 255, 0.034) !important;
 			border-color: rgba(194, 170, 194, 0.667) !important;
-			color: rgb(236, 236, 236) !important;
+			color: rgb(231, 221, 231) !important;
 		}
 	}
 	&:active {

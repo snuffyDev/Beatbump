@@ -8,12 +8,13 @@
 			path: "artist",
 			type: "artist"
 		});
-		let { header, body } = (await response.body) as ArtistPage;
+		let { header, body, visitorData } = (await response.body) as ArtistPage;
 
 		if (response.ok) {
 			return {
 				props: {
 					carousels: body?.carousels,
+					visitorData,
 
 					header,
 					songs: body?.songs,
@@ -44,6 +45,7 @@
 	export let carousels: ArtistPageBody["carousels"];
 	export let songs: ArtistPageBody["songs"] = {};
 	export let id;
+	export let visitorData = "";
 
 	const ctx = {};
 	setContext(ctx, { pageId: id });
@@ -63,9 +65,9 @@
 <main>
 	<div class="artist-body">
 		{#if songs?.items?.length > 0}
-			<section>
+			<section class="song-list">
 				<div class="header">
-					<h1>Songs</h1>
+					<span class="h2">Songs</span>
 					<a
 						style="white-space:pre; display: inline-block;"
 						href={`/playlist/${songs?.header?.browseId}`}
@@ -90,6 +92,7 @@
 		{#each carousels as { contents, header }, i}
 			{#if i == carousels.length - 1}
 				<Carousel
+					{visitorData}
 					items={contents}
 					type="artist"
 					kind={header?.type}
@@ -101,6 +104,7 @@
 			{:else}
 				<Carousel
 					items={contents}
+					{visitorData}
 					type="artist"
 					kind={header?.type}
 					isBrowseEndpoint={false}
@@ -114,6 +118,9 @@
 </main>
 
 <style lang="scss">
+	.song-list {
+		margin-bottom: 3.3339em;
+	}
 	.content-wrapper {
 		display: flex;
 		max-width: inherit;
@@ -129,15 +136,16 @@
 		padding: 0;
 		width: 100%;
 	}
-
+	section {
+	}
 	.songs {
 		margin-bottom: 1rem;
 	}
 	main {
-		@include padding;
+		@include content-spacing($type: "padding");
 	}
 	.artist-body {
-		padding: 2rem 0 2rem;
+		padding: 1.25rem 0 2rem;
 		// padding-bottom: 2rem;
 		@media screen and (max-width: 500px) {
 			// padding: 0 1rem;

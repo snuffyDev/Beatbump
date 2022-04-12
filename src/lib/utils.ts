@@ -7,6 +7,7 @@ import {
 	preferWebM,
 	updateTrack
 } from "./stores/stores";
+import { findFirst } from "./utils/collections";
 
 // notifications
 export const notify = (
@@ -93,7 +94,7 @@ export const getSrc = async (
 	const data = await res.json();
 	const formats = sort(data, webM);
 	currentId.set(videoId);
-	// console.log(formats)
+	console.log(formats);
 	const src = formats[0].url !== null ? setTrack(formats, webM) : handleError();
 
 	return src;
@@ -101,7 +102,7 @@ export const getSrc = async (
 
 function setTrack(formats = [], webM) {
 	if (webM) {
-		const item = formats.find((v) => v.mimeType === "webm");
+		const item = findFirst(formats, (v) => v.mimeType === "webm");
 		const parsedURL = item !== undefined ? item.url : formats[0].url;
 		updateTrack.set({
 			originalUrl: formats[0].original_url,

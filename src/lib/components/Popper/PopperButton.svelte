@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Icon from "../Icon/Icon.svelte";
+	import { isOpen } from "./popperStore";
 
 	import { PopperStore } from "./popperStore";
 	export let items = [];
@@ -7,9 +8,9 @@
 	export let metadata = {};
 	export let size = "1.5rem";
 	export let tabindex: string | number = "0";
+	let nodeIsOpen = false;
 	function Popper(node: HTMLElement) {
 		let x, y, bottom;
-		let isOpen;
 		let timer;
 		let initY;
 		function handleClick(
@@ -21,18 +22,20 @@
 			// }
 			// console.log(event)
 			event.stopImmediatePropagation();
-			if (isOpen) {
-				isOpen = false;
+			if ($isOpen) {
 				PopperStore.reset();
-				return;
+				if (nodeIsOpen) {
+					nodeIsOpen = false;
+					return;
+				}
 			}
-
 			const rect = node.getBoundingClientRect();
+			nodeIsOpen = true;
 			x = rect.left;
 			y = rect.top;
 			initY = rect.top;
 			bottom = rect.bottom;
-			isOpen = true;
+			isOpen.set(true);
 			PopperStore.set({
 				items,
 				srcNode: node,
@@ -63,7 +66,6 @@
 					bottom
 				});
 				return;
-				isOpen = false;
 			});
 			timer = log;
 			// console.log(timer)

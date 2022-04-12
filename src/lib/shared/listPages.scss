@@ -1,3 +1,4 @@
+@use "../../global/stylesheet/base/variables" as v;
 $width: 1fr;
 :root {
 	--width: #{$width};
@@ -136,7 +137,7 @@ small {
 	-webkit-user-select: none;
 	// border-color:
 	will-change: contents, width;
-	background-color: #37455230;
+	background-color: #37455200;
 	border-color: #1f1f1f;
 	border-radius: 0.8em;
 	border-width: 1px;
@@ -148,12 +149,12 @@ small {
 		"img"
 		"metadata"
 		"buttons";
-	padding: 0.8em;
-	transition: all 0.23s cubic-bezier(0.39, 0.575, 0.565, 1);
+	margin-inline: 0.8em;
 	user-select: none;
 	width: auto;
-	margin-bottom: 1rem;
-
+	// @include v.content-spacing($type: "margin");
+	-webkit-margin-after: 3.3333em;
+	margin-block-end: 3.3333em;
 	max-width: 100%;
 	overflow-wrap: break-word;
 	// white-space: nowrap;

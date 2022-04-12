@@ -1,10 +1,8 @@
 <script lang="ts">
 	import list from "$lib/stores/list";
 	import Icon from "$lib/components/Icon/Icon.svelte";
-	import { theme } from "$lib/stores/stores";
 	import { onMount } from "svelte";
 	import { browser } from "$app/env";
-	import { shuffle } from "$lib/utils";
 
 	export let header;
 	export let thumbnail = [];
@@ -23,26 +21,23 @@
 	};
 	const imageLoadHandler = (event: CustomEvent) => {
 		opacity = 1;
-		// 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjYWNhY2FjIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJtYXRyaXgoMS4yOTkgMCAwIDEuMjcgOTUuNjg4IDE4Ni45NzEpIiBmb250LWZhbWlseT0iTGF0byIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMjAiIGZpbGw9IiMyODI4MjgiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLjI5OSAwIDAgMS4yNyA3OCA0Mi4yODYpIiBkPSJNMCAwaDc3djEzNUgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjwvZz48L3N2Zz4='
 	};
 	const handler = () => {
 		if (!browser) return;
-		if (container) scroll = container.getBoundingClientRect();
-		// console.log(scroll)
 		if (container) {
+			scroll = container.getBoundingClientRect();
+			const calc = -scroll.top / window.innerHeight;
 			y =
 				window.innerWidth < 500
-					? Math.min(Math.max(-scroll.top / window.innerHeight, 0), 1) * 250
-					: Math.min(Math.max(-scroll.top / window.innerHeight, 0), 1) * 125;
+					? Math.min(Math.max(calc, 0), 1) * 325
+					: Math.min(Math.max(calc, 0), 1) * 116;
 		}
 	};
 	$: isExpanded && handler();
 	let descClientHeight = undefined;
 	let descOffsetHeight = undefined;
 	let desc: HTMLElement = undefined;
-	// $: descIsOverflow = false
 	$: descIsOverflow = descClientHeight < descOffsetHeight ? false : true;
-	// $: console.log(descClientHeight, descOffsetHeight, descIsOverflow)
 	onMount(() => {
 		let start;
 		if (img) {
@@ -51,7 +46,6 @@
 			});
 
 			img.addEventListener("load", () => {});
-			// console.log(img)
 		}
 		if (desc) {
 			descClientHeight = desc.clientHeight;
@@ -85,7 +79,7 @@
 			bind:this={container}
 			style={`background-image: linear-gradient(1turn, var(--base-bg) ${Math.min(
 				Math.max(0, y),
-				70
+				100
 			)}%, transparent); transition: cubic-bezier(0.6, -0.28, 0.74, 0.05) background 120ms`}
 			id="gradient"
 			class="gradient"
@@ -331,7 +325,7 @@
 		/* max-height: 30rem; */
 		padding-top: 16vh;
 		overflow: hidden;
-		transition: background-color 0.5s cubic-bezier(0.19, 0, 0.7, 1);
+		transition: background-color 0.8s cubic-bezier(0.19, 0, 0.7, 1);
 		background-color: rgba(0, 0, 0, 0.1);
 
 		@media only screen and (min-width: 1080px) and (max-width: 1600px) {
@@ -406,7 +400,9 @@
 		z-index: 1;
 
 		// padding-left: 3.5rem;
-		@include padding;
+		@include content-spacing($type: "padding");
+		@include content-width();
+		padding-bottom: 0 !important;
 		margin: 0 auto;
 
 		.content-wrapper {

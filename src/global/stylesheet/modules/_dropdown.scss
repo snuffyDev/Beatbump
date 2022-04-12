@@ -1,7 +1,7 @@
 .dd-text {
 	display: inline-block;
 	margin-left: 0.5em;
-	font-size: 1em;
+	font-size: 0.95rem;
 	white-space: nowrap;
 	color: inherit;
 }
@@ -15,13 +15,16 @@
 		width: 100%;
 		height: 100%;
 		inset: 0;
-		filter: drop-shadow(0rem 0rem 0.15rem hsl(0deg 0% 0% / 52%)) contrast(2);
+		-webkit-filter: drop-shadow(0rem 0rem 0.15rem hsl(0deg 0% 0% / 52%)) contrast(2);
+		        filter: drop-shadow(0rem 0rem 0.15rem hsl(0deg 0% 0% / 52%)) contrast(2);
 	}
 }
 
 .dd-button svg {
-	filter: drop-shadow(-0rem -0rem 0.05rem hsl(0deg 0% 0% / 99%))
-		drop-shadow(0rem 0rem 0.05rem hsl(0deg 0% 0% / 99%)) contrast(2);
+	-webkit-filter: drop-shadow(-0rem -0rem 0.05rem hsl(0deg 0% 0% / 99%)) drop-shadow(0rem 0rem 0.05rem hsl(0deg 0% 0% / 99%))
+		contrast(2);
+	        filter: drop-shadow(-0rem -0rem 0.05rem hsl(0deg 0% 0% / 99%)) drop-shadow(0rem 0rem 0.05rem hsl(0deg 0% 0% / 99%))
+		contrast(2);
 
 	// filter: drop-shadow(-0rem -0rem 0.15rem hsl(0deg 0% 0% / 52%));
 }

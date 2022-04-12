@@ -154,7 +154,7 @@
 </main>
 
 <style lang="scss">
-	section {
+	section:not(:last-of-type) {
 		margin-top: 1rem;
 		margin-bottom: 4.5rem;
 	}

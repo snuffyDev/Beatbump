@@ -8,17 +8,17 @@ import {
 import type { CarouselHeader, CarouselItem } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
-import { iterOptimized } from "$lib/utils/collections/array";
+import { map } from "$lib/utils/collections/array";
 import type { RequestHandler } from "@sveltejs/kit";
 
 export const get: RequestHandler = async ({ url }) => {
-	console.time("start");
+	// console.time("start");
 	const query = url.searchParams;
 	const endpoint = query.get("q") || "";
 	const browseId = "FEmusic_explore";
 	let carouselItems = [];
 	const response = await fetch(
-		`https://music.youtube.com/youtubei/v1/${endpoint}?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
+		`https://music.youtube.com/youtubei/v1/${endpoint}?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&prettyPrint=false`,
 		{
 			method: "POST",
 			body: JSON.stringify(BaseContext.base(browseId)),
@@ -47,23 +47,11 @@ export const get: RequestHandler = async ({ url }) => {
 			carouselItems.push(contents[index]);
 		}
 	}
-	let idx = carouselItems.length;
-	// console.log(carouselItems);
-	carouselItems = iterOptimized(carouselItems, (item, index) =>
+	carouselItems = map(carouselItems, (item, index) =>
 		parseCarousel({
 			musicCarouselShelfRenderer: item.musicCarouselShelfRenderer
 		})
 	);
-	// for (; idx--; ) {
-	// 	// console.log(idx);
-	// 	carouselItems[-1 - idx + carouselItems.length] = parseCarousel({
-	// 		musicCarouselShelfRenderer:
-	// 			carouselItems[-1 - idx + carouselItems.length]
-	// 				.musicCarouselShelfRenderer
-	// 	});
-	// }
-	// console.log(carouselItems.)
-	console.timeEnd("start");
 	return {
 		body: JSON.stringify({ carouselItems, data }),
 		status: 200

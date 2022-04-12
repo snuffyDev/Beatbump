@@ -5,7 +5,7 @@
 	import db from "$lib/db";
 	import { clickOutside } from "$lib/actions/clickOutside";
 	import list from "$lib/stores/list";
-	import { getSrc, notify, shuffle } from "$lib/utils";
+	import { getSrc } from "$lib/utils/utils";
 	import {
 		currentTitle,
 		key,
@@ -13,7 +13,7 @@
 		showAddToPlaylistPopper,
 		updateTrack
 	} from "$stores/stores";
-	import { onMount, tick } from "svelte";
+	import { tick } from "svelte";
 
 	import { cubicOut } from "svelte/easing";
 	import { tweened } from "svelte/motion";
@@ -37,13 +37,12 @@
 	// $: browser && console.log($updateTrack.url, $updateTrack.originalUrl);
 	$: player.src = $updateTrack.url !== null ? $updateTrack.url : "";
 	$: isWebkit = $session.iOS;
-	let title;
 	// $: console.log($list.mix, isWebkit, $session);
 	$: autoId = $key;
 
 	$: time = player.currentTime;
-	$: duration = 0;
-	$: remainingTime = 0;
+	let duration = 0;
+	let remainingTime = 0;
 
 	$: volume = 0.5;
 	$: player.volume = volume;
@@ -55,7 +54,6 @@
 	let hoverWidth;
 	let showing;
 	let hovering;
-	// $: console.log($list);
 	$: DropdownItems = [
 		{
 			text: "View Artist",
@@ -80,7 +78,6 @@
 			text: "Add to Favorites",
 			icon: "heart",
 			action: async () => {
-				// console.log(data)
 				if (!browser) return;
 				await db.setNewFavorite($list.mix[autoId]);
 			}
@@ -89,10 +86,7 @@
 			text: "Shuffle",
 			icon: "shuffle",
 			action: () => {
-				// console.log(data)
 				list.shuffle($key, true);
-				// console.log($list.mix, `Player Comp`);
-				// console.log($list.mix)
 			}
 		}
 	].filter((item) => {
@@ -105,7 +99,6 @@
 		}
 	});
 	let once = false;
-	// $: console.log($list, autoId, $key, $updateTrack)
 
 	/*
   	Player Controls
@@ -115,8 +108,6 @@
 			navigator.mediaSession.playbackState = "playing";
 		}
 		isPlaying = true;
-
-		// metaDataHandler()
 	};
 	const pause = () => {
 		if ("mediaSession" in navigator) {
@@ -150,7 +141,7 @@
 		metaDataHandler();
 	});
 
-	player.addEventListener("timeupdate", async () => {
+	player.addEventListener("timeupdate", () => {
 		time = player.currentTime;
 		duration = player.duration;
 		remainingTime = duration - time;
@@ -162,7 +153,6 @@
 			 we have to cut the time in half. Doesn't effect other devices.
 		*/
 		if (isWebkit && remainingTime <= duration / 2 && once == false) {
-			// await getNext()
 			player.currentTime = player.currentTime * 2;
 		}
 	});
@@ -184,8 +174,6 @@
 		Metadata Handler
 	*/
 	function metaDataHandler() {
-		// <!-- if (!player.src) return -->
-
 		if ("mediaSession" in navigator) {
 			navigator.mediaSession.metadata = new MediaMetadata({
 				title: $list.mix[autoId]?.title,
@@ -373,7 +361,6 @@
 	on:pointerup={() => (seeking = false)}
 	on:pointermove={trackMouse}
 />
-
 <div
 	class="progress-bar"
 	transition:fade
@@ -578,6 +565,7 @@
 		width: 100%;
 		will-change: visibility;
 		height: 100%;
+		background-color: #232530;
 	}
 	.player-left,
 	.player-right {
@@ -609,6 +597,7 @@
 		border: transparent;
 		padding: 0;
 		will-change: contents;
+		isolation: isolate;
 		&::before {
 			background-color: #232530;
 			position: absolute;

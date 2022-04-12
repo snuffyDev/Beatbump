@@ -14,18 +14,18 @@ html {
 html {
 	font-size: 12px;
 }
-@media (pointer: fine) {
-	*:focus-visible:not(input):not(.input):not(select):not(.select):not(.no-style) {
-		outline: 0.16666em rgb(113, 175, 255) solid !important;
-	}
-}
+// @media (pointer: fine) {
+// 	*:focus-visible:not(input):not(.input):not(select):not(.select):not(.no-style) {
+// 		outline: 0.16666em rgb(113, 175, 255) solid !important;
+// 	}
+// }
 // :focus:not(:focus-visible) {
 // 	outline: none;
 // }
 html,
 body {
 	background-color: #09090a;
-	color: #fefefe;
+	color: var(--color-dark);
 	line-height: 1.5;
 	position: fixed;
 	min-height: 100vh;
@@ -41,8 +41,8 @@ body {
 }
 
 :root {
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-		Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+		"Helvetica Neue", sans-serif;
 	word-wrap: break-word;
 	-webkit-text-size-adjust: 100%;
 	--base-font-size: 0.75rem;
@@ -84,7 +84,7 @@ body {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
-	-webkit-tap-highlight-color: transparent;
+	-webkit-tap-highlight-color: transparent !important;
 	-webkit-font-smoothing: antialiased;
 	@media screen and (min-width: 40rem) and (max-width: 115.375rem) {
 		--base-font-size: 0.875rem;
@@ -121,8 +121,8 @@ body {
 	box-shadow: 0px 0px 1px #323232;
 	background: #121212;
 	font-size: v.$size-1;
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-		Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+		"Helvetica Neue", sans-serif;
 	border-radius: 4px;
 	color: #f1f1f1;
 	padding: 0.3rem;
@@ -179,7 +179,8 @@ html {
 main {
 	margin: 0 auto;
 	position: relative;
-	@include v.padding;
+	@include v.content-spacing($type: "padding");
+	@include v.content-width();
 }
 .backdrop {
 	position: fixed;

@@ -1,17 +1,18 @@
 .header {
 	display: block;
 	font-weight: 600;
-	margin-bottom: 1.5rem;
-	// padding: 0.4rem 0.4rem 0.2rem 0;
-	/* flex-direction: row; */
+	// margin-bottom: 1.33333em;
+	padding-top: 0.66667em;
 	justify-content: flex-start;
 	align-items: baseline;
 	/* white-space: pre; */
 	max-width: 100%;
 	h1,
-	h2 {
-		margin-right: 0.728rem;
-		margin-bottom: 0;
+	h2,
+	.h1,
+	.h2 {
+		margin-right: 0.175em;
+		// margin-bottom: 0;
 		// white-space: pre;
 		display: inline-block;
 	}
@@ -29,6 +30,7 @@
 		color: $color;
 		&:hover {
 			color: lighten($color, 30%);
+			-webkit-text-decoration: underline 0.001rem solid;
 			text-decoration: underline 0.001rem solid;
 			text-underline-offset: 0.001rem;
 		}

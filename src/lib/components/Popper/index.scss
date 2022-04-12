@@ -3,8 +3,11 @@
 	flex-direction: column;
 	// grid-template-rows: 0.5fr 1fr;
 
-	gap: 0.8rem;
+	gap: 0.85em;
 	color: #fff !important;
+	&:first-child:not(.handle) {
+		margin-top: 0.6125em;
+	}
 }
 .drag-wrapper {
 	position: fixed;
@@ -23,8 +26,8 @@
 	max-height: 100%;
 	min-width: 100%;
 	max-width: 100%;
-	width: 100%;
-	height: 100%;
+	width: 100vw;
+	height: 100vh;
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
@@ -32,6 +35,13 @@
 
 	z-index: 5;
 	isolation: isolate;
+	&::before {
+		position: absolute;
+		content: "";
+		inset: 0;
+		background: linear-gradient(to top, #000, rgba(255, 255, 255, 0.007));
+		opacity: 0.15;
+	}
 }
 hr {
 	&::before {
@@ -100,17 +110,35 @@ hr {
 	min-height: 0;
 	max-width: 11em;
 	position: relative;
-	width: auto;
+	width: 100%;
+	display: grid;
+	padding: 0;
+	margin: 0;
+	place-items: center;
+	isolation: isolate;
+	&::before {
+		position: absolute;
+		inset: 0;
+
+		background: linear-gradient(to top, #000, rgba(61, 61, 61, 0.11));
+		opacity: 0.4;
+		height: 100%;
+		content: "";
+		z-index: 1;
+		border-radius: var(--md-radius);
+	}
 	img {
 		width: 100%;
 		max-width: 100%;
-		height: auto;
+		// height: auto;
 		min-height: 0;
+		height: inherit;
 		/* max-height: inherit; */
 		border-radius: var(--md-radius);
 		-o-object-fit: contain;
 		object-fit: scale-down;
-		position: relative;
+		// position: absolute;
+		// inset: 0;
 		// aspect-ratio: 1/1 auto;
 		// width: 100%;
 		// max-width: 12rem;
@@ -193,12 +221,8 @@ svg,
 	border-bottom: 0.0175rem groove rgba(171, 171, 171, 0.151);
 	border-top: 0.0175rem groove rgba(171, 171, 171, 0.151);
 	box-shadow: 0 -0.4rem 28px -12px rgb(255, 255, 255);
-	background: linear-gradient(
-		to bottom,
-		hsl(240, 10%, 10%),
-		hsl(240, 2%, 7%) 50%,
-		hsl(240, 1%, 6%) 90%
-	);
+
+	background: linear-gradient(to bottom, hsl(240, 10%, 10%), hsl(240, 2%, 7%) 50%, hsl(240, 1%, 6%) 90%);
 }
 li,
 ul {
@@ -210,7 +234,7 @@ ul {
 ul {
 	display: inherit;
 	flex-direction: inherit;
-	gap: 0.25rem;
+	gap: 0.333em;
 }
 
 li {
@@ -225,6 +249,10 @@ li {
 			cursor: pointer;
 			background-color: rgba(170, 170, 170, 0.178);
 		}
+	}
+	&:active:hover {
+		cursor: pointer;
+		background-color: rgba(170, 170, 170, 0.178);
 	}
 	.text {
 		margin-left: 0.3em;

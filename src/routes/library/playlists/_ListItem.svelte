@@ -87,20 +87,20 @@
 			action: async () => {
 				let shareData = {
 					title: item.title,
-					text: `Listen to ${item.title} on Beatbump`,
+
 					url: `https://beatbump.ml/listen?id=${item.videoId}`
 				};
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_PLAYLIST")) {
 					shareData = {
 						title: item.title,
-						text: `Listen to ${item.title} on Beatbump`,
+
 						url: `https://beatbump.ml/playlist/${item.endpoint?.browseId}`
 					};
 				}
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ALBUM")) {
 					shareData = {
 						title: item.title,
-						text: `Listen to ${item.title} on Beatbump`,
+
 						url: `https://beatbump.ml/release?id=${item.endpoint?.browseId}`
 					};
 				}

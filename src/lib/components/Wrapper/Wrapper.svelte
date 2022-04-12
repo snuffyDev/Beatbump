@@ -14,7 +14,7 @@
 </script>
 
 {#key key}
-	<div in:fade={{ duration: 175, delay: 250 }} out:fade={{ duration: 175 }}>
+	<div in:fade={{ duration: 250, delay: 250 }} out:fade={{ duration: 250 }}>
 		<slot />
 	</div>
 {/key}

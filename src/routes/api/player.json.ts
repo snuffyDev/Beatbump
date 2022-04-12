@@ -7,7 +7,7 @@ export const get: RequestHandler = async ({ url }) => {
 	const playerParams = query.get("playerParams") || "";
 	try {
 		const response = await fetch(
-			"https://music.youtube.com/youtubei/v1/player?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30",
+			"https://music.youtube.com/youtubei/v1/player?key=AIzaSyBAETezhkwP0ZWA02RsqT1zu78Fpt0bC_s",
 			{
 				method: "POST",
 				body: JSON.stringify({
@@ -16,7 +16,8 @@ export const get: RequestHandler = async ({ url }) => {
 						client: {
 							hl: "en",
 							clientName: "ANDROID",
-							clientVersion: "16.02"
+							clientVersion: "16.20"
+							// deviceModel: "iPhone14,3"
 						},
 						user: {
 							lockedSafetyMode: false
@@ -37,20 +38,20 @@ export const get: RequestHandler = async ({ url }) => {
 			return { status: response.status, body: response.statusText };
 		}
 		const data = await response.json();
-		const {
-			streamingData = {},
-			videoDetails = {},
-			playabilityStatus = {}
-		} = data;
+		// const {
+		// 	streamingData = {},
+		// 	videoDetails = {},
+		// 	playabilityStatus = {}
+		// } = data;
 		return {
 			status: 200,
-			body: JSON.stringify({ streamingData, videoDetails, playabilityStatus })
+			body: data
 		};
 	} catch (error) {
 		console.error(error);
 		return {
 			status: 500,
-			body: error.message
+			error: new Error(error.message)
 		};
 	}
 };

@@ -20,6 +20,7 @@
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
 		"baseUrl": ".",
+		// "strict": true,
 		"allowJs": true,
 		"checkJs": true,
 		"paths": {
@@ -29,7 +30,8 @@
 			"$components/*": ["src/lib/components/*"],
 			"$stores/*": ["src/lib/stores/*"],
 			"$api/*": ["src/routes/api/*"]
-		}
+		},
+		"types": ["node"]
 	},
 	"extends": "./.svelte-kit/tsconfig.json",
 	"include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"]

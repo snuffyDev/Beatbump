@@ -87,20 +87,20 @@
 			action: async () => {
 				let shareData = {
 					title: item.title,
-					text: `Listen to ${item.title} on Beatbump`,
+
 					url: `https://beatbump.ml/listen?id=${item.videoId}`
 				};
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_PLAYLIST")) {
 					shareData = {
 						title: item.title,
-						text: `Listen to ${item.title} on Beatbump`,
+
 						url: `https://beatbump.ml/playlist/${item.endpoint?.browseId}`
 					};
 				}
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ALBUM")) {
 					shareData = {
 						title: item.title,
-						text: `Listen to ${item.title} on Beatbump`,
+
 						url: `https://beatbump.ml/release?id=${item.endpoint?.browseId}`
 					};
 				}
@@ -232,6 +232,7 @@
 
 	let windowWidth;
 	let active;
+	$: isArtistKind = kind === "Fans might also like";
 	// $: active = windowWidth < 640 ? true : false
 </script>
 
@@ -267,6 +268,7 @@
 		<div
 			class="image"
 			class:active
+			class:isArtistKind
 			class:img16x9={RATIO_RECT ? true : false}
 			class:img1x1={RATIO_SQUARE ? true : false}
 			tabindex="0"
@@ -279,7 +281,7 @@
 				on:error={errorHandler}
 				class:img16x9={RATIO_RECT}
 				class:img1x1={RATIO_SQUARE}
-				decoding="async"
+				decoding="sync"
 				width={item.thumbnails[0].width}
 				height={item.thumbnails[0].height}
 				src={item.thumbnails[0]?.placeholder}
@@ -292,10 +294,10 @@
 			<PopperButton tabindex="0" items={DropdownItems} />
 		</div>
 	</section>
-	<section class="item-title">
-		<h1 class="link">
+	<section class="item-title" class:isArtistKind>
+		<span class="h1 link">
 			{item.title}
-		</h1>
+		</span>
 		{#if item.subtitle}
 			<span class="subtitles secondary">
 				{#each item.subtitle as sub}
@@ -317,6 +319,12 @@
 </article>
 
 <style lang="scss">
+	.item-title.isArtistKind {
+		text-align: center;
+	}
+	.image.isArtistKind {
+		border-radius: 99999em;
+	}
 	a {
 		color: inherit;
 		transition: color 100ms linear;
@@ -326,6 +334,8 @@
 	}
 	.item-title {
 		display: block;
+
+		contain: content;
 		.link {
 			display: block;
 			display: -webkit-box;
@@ -333,7 +343,7 @@
 			-webkit-box-orient: vertical;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			margin-bottom: 0.125em;
+			margin-bottom: 0.333em;
 		}
 	}
 	.item1x1 {
@@ -368,10 +378,11 @@
 		// white-space: nowrap;
 		cursor: pointer;
 	}
-	h1 {
-		font-size: 1.125rem;
-		font-weight: 500;
-		margin-bottom: 0;
+	.h1 {
+		font-size: 1.15em;
+		line-height: 1.25;
+		font-weight: 400 !important;
+		margin-bottom: 0.777em;
 		display: inline;
 	}
 	article {
@@ -503,6 +514,8 @@
 		position: relative;
 		cursor: pointer;
 		margin-bottom: 0.5em;
+
+		contain: paint;
 
 		&:focus-visible,
 		&:focus-within {

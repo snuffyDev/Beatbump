@@ -1,6 +1,7 @@
 import type { Song } from "$lib/types";
 import type { IPlaylistPanelVideoRenderer } from "../types/playlistPanelVideoRenderer";
 import { PlaylistPanelVideoRenderer } from "../parsers";
+import { findAll, map } from "$lib/utils/collections";
 
 type PanelAlias = { playlistPanelVideoRenderer: IPlaylistPanelVideoRenderer };
 
@@ -10,31 +11,29 @@ export function parseContents(
 	clickTrackingParams: string,
 	current: any
 ): {
-	results: Array<Song>;
+	results: Array<Song | PanelAlias>;
 	continuation: string;
 	clickTrackingParams: string;
 	currentMixId: string;
 } {
 	const currentMix = current.playlistId;
-	let idx = contents.length;
-	for (; idx--; ) {
-		if (
-			Object.prototype.hasOwnProperty.call(
-				contents[idx],
-				"playlistPanelVideoRenderer"
-			)
-		) {
-			contents[idx] = PlaylistPanelVideoRenderer(
-				contents[idx]["playlistPanelVideoRenderer"]
-			) as Song;
-		} else {
-			contents[idx] = false;
-		}
-	}
 	return {
 		currentMixId: currentMix,
 		continuation: continuation,
 		clickTrackingParams: clickTrackingParams,
-		results: contents.filter((v) => v) as Array<Song>
+		results: findAll(
+			map(
+				contents,
+				(item) =>
+					Object.prototype.hasOwnProperty.call(
+						item,
+						"playlistPanelVideoRenderer"
+					) &&
+					(PlaylistPanelVideoRenderer(
+						item["playlistPanelVideoRenderer"]
+					) as Song)
+			),
+			(item) => item
+		)
 	};
 }

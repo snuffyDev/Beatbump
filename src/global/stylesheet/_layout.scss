@@ -6,17 +6,17 @@
 $sections: (
 	bottom: (
 		footer-container,
-		player
+		player,
 	),
 	top: (
-		nav
+		nav,
 	),
 	forms: (
 		select,
 		input,
 		option,
-		suggestions
-	)
+		suggestions,
+	),
 );
 $themes: (dark, dim, midnight, ytm);
 
@@ -46,7 +46,7 @@ $themes: (dark, dim, midnight, ytm);
 }
 
 :root .dark * {
-	color: #f3f3f3;
+	color: hsl(0, 0%, 95%);
 }
 .player {
 	color: #f3f3f3;

@@ -85,8 +85,19 @@
 	class="backdrop"
 	on:click|stopPropagation|self={() => dispatch("close", { showing: false })}
 	on:scroll|preventDefault
-	in:fly|local={{ duration: 800, delay: 400, y: queueHeight, easing: quartOut }}
-	out:fly|local={{ duration: 400, y: listHeight, easing: quartOut }}
+	in:fly|local={{
+		duration: 500,
+		delay: 400,
+		opacity: 1,
+		y: queueHeight,
+		easing: quartOut
+	}}
+	out:fly|local={{
+		duration: 800,
+		y: listHeight,
+		opacity: 1,
+		easing: quartOut
+	}}
 >
 	<div
 		class="listContainer"
@@ -170,18 +181,13 @@
 		border-top: 0.0175rem groove rgba(171, 171, 171, 0.151);
 		border-top-left-radius: inherit;
 		border-top-right-radius: inherit;
-		box-shadow: 0 -0.4rem 0.8rem 0.5rem hsl(0deg 0% 100% / 9%);
-		background: linear-gradient(
-			to bottom,
-			hsl(240, 10%, 10%),
-			hsl(240, 2%, 7%) 50%,
-			hsl(240, 1%, 6%) 90%
-		);
+		box-shadow: 0 -0.4rem 23px -17px hsl(0deg 0% 100% / 100%);
+		background: hsl(240deg 6% 4%);
 		z-index: 1;
-		height: 2rem;
+		height: 2.2em;
 		display: flex;
 		cursor: pointer;
-		padding: 0.12rem;
+		padding: 0.12em;
 		align-items: center;
 	}
 	.empty > * {
@@ -262,7 +268,7 @@
 		width: 100%;
 		padding-left: 0;
 		padding: 0.225rem 0.6rem;
-		padding-bottom: 0.6rem;
+		padding-bottom: 4.125rem;
 		overflow-x: hidden;
 	}
 

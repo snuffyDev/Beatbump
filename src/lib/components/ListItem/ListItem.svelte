@@ -92,20 +92,20 @@
 			action: async () => {
 				let shareData = {
 					title: item.title,
-					text: `Listen to ${item.title} on Beatbump`,
+
 					url: `https://beatbump.ml/listen?id=${item.videoId}`
 				};
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_PLAYLIST")) {
 					shareData = {
 						title: item.title,
-						text: `Listen to ${item.title} on Beatbump`,
+
 						url: `https://beatbump.ml/playlist/${item.endpoint?.browseId}`
 					};
 				}
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ALBUM")) {
 					shareData = {
 						title: item.title,
-						text: `Listen to ${item.title} on Beatbump`,
+
 						url: `https://beatbump.ml/release?id=${item.endpoint?.browseId}`
 					};
 				}
@@ -290,7 +290,7 @@
 		display: grid;
 		align-content: center;
 		grid-template-areas: "m r";
-		grid-template-columns: 1fr auto;
+		grid-template-columns: 1fr 2.125rem;
 
 		-webkit-user-select: none;
 		gap: 0.8rem;
@@ -298,29 +298,31 @@
 		-ms-user-select: none;
 		user-select: none;
 		flex: 0 1 auto;
-		min-height: 3rem;
+		height: 4.5em;
+
 		border-bottom: 0.0001605rem solid hsl(240deg 0% 55% / 34%);
 		width: 100%;
 		padding: 0.8em 1.5em 0.8em 0.8em;
+		transition-property: background-image, background-color;
 		@media screen and (min-width: 640px) {
-			padding: 0.4rem 1.5rem 0.4rem 0.8rem;
+			padding: 0.4em 1.5em 0.4em 0.8em;
 			grid-template-areas: "c m r";
-			grid-template-columns: 2rem 1fr auto;
+			grid-template-columns: 2em 1fr 2.25em;
 		}
 		@media (hover: hover) {
 			&:hover {
 				background: lighten(#57575831, 1%);
-				transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
+				transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.125s;
 			}
 		}
 		&:active:not(.menu) {
 			background: lighten(#212225, 5%);
-			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
+			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.125s;
 		}
 	}
 	.playing {
 		background: lighten(#2122254f, 5%);
-		transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) all 0.125s;
+		transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.125s;
 	}
 
 	.number {

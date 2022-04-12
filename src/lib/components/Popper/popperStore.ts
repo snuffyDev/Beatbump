@@ -1,3 +1,4 @@
+// import { isOpen } from "./PopperButton.svelte";
 import { writable } from "svelte/store";
 
 type PopperStore = {
@@ -25,8 +26,12 @@ function _popperStore() {
 	});
 	return {
 		subscribe,
-		set: (options: PopperStore) => set(options),
-		reset: () =>
+		set: (options: PopperStore) => {
+			isOpen.set(true);
+			set(options);
+		},
+		reset: () => {
+			isOpen.set(false);
 			set({
 				items: [],
 				isOpen: false,
@@ -34,6 +39,9 @@ function _popperStore() {
 				x: undefined,
 				y: undefined,
 				bottom: undefined
-			})
+			});
+		}
 	};
 }
+
+export const isOpen = writable(false);

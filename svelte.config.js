@@ -34,64 +34,64 @@ const config = {
 
 	kit: {
 		adapter: dev ? node() : adapter(),
-		csp: {
-			mode: "nonce",
-			directives: {
-				"base-uri": ["self"],
-				"child-src": ["self"],
-				"connect-src": dev
-					? ["self", "ws://localhost:*", "ws://*", "blob://*", "*"]
-					: [
-							"self",
-							"ws://localhost:*",
-							"https://*.googlevideo.com",
-							"wss://*.peerjs.com",
-							"ws://*.peerjs.com"
-					  ],
-				// 'connect-src': ,
-				"img-src": [
-					"self",
-					"data:",
-					"blob:",
-					"https://*.ytimg.com",
-					"https://*.googleusercontent.com",
-					"https://*.ggpht.com",
-					"https://www.gstatic.com/"
-				],
-				"font-src": ["self", "data:"],
-				"form-action": ["self"],
-				"frame-ancestors": ["self"],
-				"frame-src": ["self"],
-				"manifest-src": ["self"],
-				"media-src": [
-					"self",
-					"data:",
-					"blob://*",
-					"blob:*",
-					"ws://localhost:*",
-					"localhost:*",
-					"https://*.googlevideo.com"
-				],
-				"object-src": ["none"],
-				"style-src": ["self", "unsafe-inline"],
-				"default-src": [
-					"self",
-					rootDomain,
-					`ws://${rootDomain}`,
-					"localhost:*",
-					"https://*.googlevideo.com/",
-					"https://static.cloudflareinsights.com"
-				],
-				"script-src": [
-					"self",
-					"localhost:*",
-					"sha256-jJRyFHbyYyWq0qnPRIobBCZON4vc+P5RXzYgJ5fHVTg=",
-					"report-sample",
-					"https://static.cloudflareinsights.com"
-				],
-				"worker-src": ["self"]
-			}
-		},
+		// csp: {
+		// 	mode: "",
+		// 	directives: {
+		// 		"base-uri": ["self"],
+		// 		"child-src": ["self"],
+		// 		"connect-src": dev
+		// 			? ["self", "ws://localhost:*", "ws://*", "blob://*", "*"]
+		// 			: [
+		// 					"self",
+		// 					"ws://localhost:*",
+		// 					"https://*.googlevideo.com",
+		// 					"wss://*.peerjs.com",
+		// 					"ws://*.peerjs.com"
+		// 			  ],
+		// 		// 'connect-src': ,
+		// 		"img-src": [
+		// 			"self",
+		// 			"data:",
+		// 			"blob:",
+		// 			"https://*.ytimg.com",
+		// 			"https://*.googleusercontent.com",
+		// 			"https://*.ggpht.com",
+		// 			"https://www.gstatic.com/"
+		// 		],
+		// 		"font-src": ["self", "data:"],
+		// 		"form-action": ["self"],
+		// 		"frame-ancestors": ["self"],
+		// 		"frame-src": ["self"],
+		// 		"manifest-src": ["self"],
+		// 		"media-src": [
+		// 			"self",
+		// 			"data:",
+		// 			"blob://*",
+		// 			"blob:*",
+		// 			"ws://localhost:*",
+		// 			"localhost:*",
+		// 			"https://*.googlevideo.com"
+		// 		],
+		// 		"object-src": ["none"],
+		// 		"style-src": ["self", "unsafe-inline"],
+		// 		"default-src": [
+		// 			"self",
+		// 			rootDomain,
+		// 			`ws://${rootDomain}`,
+		// 			"localhost:*",
+		// 			"https://*.googlevideo.com/",
+		// 			"https://static.cloudflareinsights.com"
+		// 		],
+		// 		"script-src": [
+		// 			"self",
+		// 			"localhost:*",
+		// 			"sha256-jJRyFHbyYyWq0qnPRIobBCZON4vc+P5RXzYgJ5fHVTg=",
+		// 			"report-sample",
+		// 			"https://static.cloudflareinsights.com"
+		// 		],
+		// 		"worker-src": ["self"]
+		// 	}
+		// },
 		files: {
 			assets: "static",
 			lib: "src/lib",
@@ -100,6 +100,7 @@ const config = {
 			template: "src/app.html",
 			hooks: "src/hooks"
 		},
+		version: { pollInterval: 600000 },
 		vite: {
 			resolve: {
 				alias: {
@@ -111,10 +112,8 @@ const config = {
 		}
 	},
 	onwarn(warning, defaultHandler) {
-		// don't warn on <marquee> elements, cos they're cool
 		if (warning.code === "css-unused-selector") return;
 
-		// handle all other warnings normally
 		defaultHandler(warning);
 	}
 };

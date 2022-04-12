@@ -26,7 +26,7 @@ export const get: RequestHandler = async ({ url }) => {
 	const pageType = query.get("pt") || "";
 
 	const response = await fetch(
-		`https://music.youtube.com/youtubei/v1/search?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30${
+		`https://music.youtube.com/youtubei/v1/search?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&prettyPrint=false${
 			ctoken !== "" ? "" : `&sp=EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D`
 		}${
 			ctoken !== ""

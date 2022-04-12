@@ -101,6 +101,7 @@
 		width: 100%;
 		overflow-x: auto;
 		padding: 0.8rem;
+		contain: layout;
 		flex-direction: column;
 	}
 	.scroll {
@@ -122,6 +123,7 @@
 		min-width: 12rem;
 		max-width: 15rem;
 		width: 100%;
+		contain: layout;
 		border-radius: 0.8rem;
 		font-family: "Commissioner", sans-serif;
 

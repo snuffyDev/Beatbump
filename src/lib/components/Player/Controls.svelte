@@ -64,10 +64,12 @@
 		max-height: 100%;
 		opacity: 0;
 
-		transition: all ease-in-out 1s;
+		transition:  ease-in-out 1s;
+		transition-property: opacity;
 		&.fade-out {
 			opacity: 1;
-			transition: all ease-in-out 1s;
+			// transition: all ease-in-out 1s;
+			// transition-property: opacity;
 		}
 	}
 	@keyframes loading {

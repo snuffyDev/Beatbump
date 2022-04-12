@@ -1,78 +1,102 @@
 import { MusicTwoRowItemRenderer } from "$lib/parsers";
+import { iter } from "$lib/utils/collections";
 import type { RequestHandler } from "@sveltejs/kit";
 
-export const get: RequestHandler = async ({ url }) => {
+export const get: RequestHandler = async ({ url, clientAddress }) => {
 	const query = url.searchParams;
 
 	const browseId = query.get("browseId") || "";
 	const params = query.get("params");
 	const itct = query.get("itct") || "";
-	// console.log(visitorID)
+	const visitorData = query.get("visitorData");
+	// console.log(url.searchParams);
+	const json = {
+		context: {
+			client: {
+				hl: "en",
+				gl: "US",
+				deviceMake: "",
+				deviceModel: "",
+				visitorData: encodeURIComponent(visitorData),
+				userAgent:
+					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36 Edg/100.0.1185.36",
+				clientName: "WEB_REMIX",
+				clientVersion: "1.20220328.01.00",
+				osName: "Windows",
+				osVersion: "10.0",
+				// originalUrl: "https://music.youtube.com/channel/" + browseId,
+				platform: "DESKTOP",
+				clientFormFactor: "UNKNOWN_FORM_FACTOR",
+				userInterfaceTheme: "USER_INTERFACE_THEME_DARK",
+				timeZone: "America/New_York",
+				browserName: "Edge Chromium",
+				browserVersion: "100.0.4896.36",
+				screenWidthPoints: 1920,
+				screenHeightPoints: 961,
+				screenPixelDensity: 1,
+				screenDensityFloat: 1,
+				utcOffsetMinutes: -new Date().getTimezoneOffset(),
+				musicAppInfo: {
+					pwaInstallabilityStatus: "PWA_INSTALLABILITY_STATUS_CAN_BE_INSTALLED",
+					webDisplayMode: "WEB_DISPLAY_MODE_BROWSER",
+					storeDigitalGoodsApiSupportStatus: {
+						playStoreDigitalGoodsApiSupportStatus:
+							"DIGITAL_GOODS_API_SUPPORT_STATUS_UNSUPPORTED"
+					},
+					musicActivityMasterSwitch:
+						"MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
+					musicLocationMasterSwitch:
+						"MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE"
+				}
+			},
+			user: {
+				lockedSafetyMode: false
+			},
+			request: {
+				useSsl: true,
+				internalExperimentFlags: [
+					{
+						key: "force_music_enable_outertube_tastebuilder_browse",
+						value: "true"
+					},
+					{
+						key: "force_music_enable_outertube_playlist_detail_browse",
+						value: "true"
+					},
+					{
+						key: "force_music_enable_outertube_search_suggestions",
+						value: "true"
+					}
+				],
+				consistencyTokenJars: []
+			},
+			clickTracking: {
+				clickTrackingParams: decodeURIComponent(itct)
+			}
+		},
+		browseId: browseId,
+		params: encodeURIComponent(params)
+	};
 
 	const response = await fetch(
-		"https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30",
+		"https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&prettyPrint=false",
 		{
 			headers: {
-				Accept: "*/*",
-				"Accept-Language": "en-US,en;q=0.5",
+				Host: "music.youtube.com",
+				"User-Agent":
+					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36 Edg/100.0.1185.36",
 				"Content-Type": "application/json",
-				"X-Goog-AuthUser": "0",
 				"x-origin": "https://music.youtube.com",
+				"x-goog-visitor-id": encodeURIComponent(visitorData),
+				referer: "https://music.youtube.com/" + browseId,
 
-				"X-Goog-Visitor-Id": "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D",
-				"x-youtube-client-name": "67",
-				"x-youtube-client-version": "1.20210901.00.00",
-				"x-youtube-device":
-					"cbr=Edge+Chromium&cbrver=93.0.961.38&ceng=WebKit&cengver=537.36&cos=Windows&cosver=10.0&cplatform=DESKTOP&cyear=2011",
-				"x-youtube-page-label": "youtube.music.web.client_20210901_00_RC00",
-				"x-youtube-time-zone": "America/New_York",
-				origin: "https://music.youtube.com",
-				"x-youtube-utc-offset": "-240",
-				referrer: "https://music.youtube.com/channel/" + browseId,
-				referer: "https://music.youtube.com/channel/" + browseId
+				Origin: "https://music.youtube.com"
 			},
-
-			body: JSON.stringify({
-				context: {
-					client: {
-						clientName: "WEB_REMIX",
-						clientVersion: "1.20210901.00.00",
-						hl: "en",
-						gl: "US",
-						experimentIds: [],
-						experimentsToken: "",
-						browserName: "Edge Chromium",
-						browserVersion: "93.0.961.38",
-						osName: "Windows",
-						osVersion: "10.0",
-						platform: "DESKTOP",
-						utcOffsetMinutes: -240,
-						visitorData: "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D",
-						locationInfo: {
-							locationPermissionAuthorizationStatus:
-								"LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED"
-						},
-						musicAppInfo: {
-							musicActivityMasterSwitch:
-								"MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
-							musicLocationMasterSwitch:
-								"MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE",
-							pwaInstallabilityStatus: "PWA_INSTALLABILITY_STATUS_UNKNOWN"
-						}
-					},
-					capabilities: {},
-					request: { internalExperimentFlags: [] },
-					clickTracking: {
-						clickTrackingParams: `${itct}`
-					},
-					activePlayers: {},
-					user: { lockedSafetyMode: false }
-				},
-				browseId: browseId,
-				params: params
-			}),
+			body: JSON.stringify(json),
+			// keepalive: true,
+			// cache: "no-cache",
+			// credentials: "omit",
 			method: "POST"
-			// credentials: 'include'
 		}
 	);
 	const data = await response.json();
@@ -81,32 +105,27 @@ export const get: RequestHandler = async ({ url }) => {
 	if (!response.ok) {
 		return { status: response.status, body: response.statusText };
 	}
-
+	// return { status: 200, body: { json, data } };
 	const grid: {
 		items: any[];
 		header: { gridHeaderRenderer: { title: { runs: [{ text: string }] } } };
 	} =
 		contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content
 			?.sectionListRenderer?.contents[0]?.gridRenderer;
-	const items = [
-		...grid.items.map((data) => {
-			if (data.musicTwoRowItemRenderer) {
-				const parsed = MusicTwoRowItemRenderer(data);
-				return {
-					...parsed
-				};
-			}
-			// console.log(data)
-		})
-	];
-
+	const items = [];
+	// console.log(grid);
+	iter(grid?.items, (item, i) => {
+		if (item?.musicTwoRowItemRenderer) {
+			items.push(MusicTwoRowItemRenderer(item));
+		}
+	});
 	const head = {
 		artist: header?.musicHeaderRenderer?.title?.runs[0]?.text,
-		type: grid.header.gridHeaderRenderer.title.runs[0].text
+		type: grid?.header?.gridHeaderRenderer?.title.runs[0].text
 	};
 
 	return {
-		body: { header: head, contents: [...items] },
+		body: JSON.stringify({ header: head, contents: [...items], json }),
 		status: 200
 	};
 };
