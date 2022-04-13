@@ -1,6 +1,6 @@
 export interface Client {
-	name?: "ANDROID" | "WEB_REMIX";
-	version?: "17.13.3" | "1.20220404.01.00";
+	clientName?: "ANDROID" | "WEB_REMIX";
+	clientVersion?: "17.13.3" | "1.20220404.01.00" | "16.20";
 	utcOffsetMinutes?: number;
 	visitorData?: string;
 	gl?: string;
@@ -21,6 +21,7 @@ export interface Context {
 	user: {
 		lockedSafetyMode: boolean;
 	};
+	captionParams: {};
 }
 
 export enum Endpoints {
@@ -39,12 +40,13 @@ export interface APIEndpoints {
 
 export interface BaseClientConfig {
 	clientName: "ANDROID" | "WEB_REMIX";
-	clientVersion: Client["version"];
+	clientVersion: Client["clientVersion"];
 	visitorData?: string;
 }
 
 export interface ClientConfig extends BaseClientConfig {
 	userAgent?: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36 Edg/100.0.1185.36";
+	originalUrl?: string;
 }
 export type Body<T> = {
 	[Property in keyof T]: T[Property];

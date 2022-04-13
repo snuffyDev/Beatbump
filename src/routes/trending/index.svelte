@@ -50,7 +50,7 @@
 	<div class="breakout">
 		<div class="box-cont">
 			<div class="header">
-				<h1>{carouselItems[2].header.title}</h1>
+				<span class="h2">{carouselItems[2].header.title}</span>
 				<a class="link" href="/explore"><small>See All</small></a>
 			</div>
 			<box>
@@ -111,7 +111,7 @@
 		max-height: 26rem;
 	}
 	.box {
-		margin-bottom: 0.8rem;
+		margin-bottom: 0.8em;
 		cursor: pointer;
 		background: #201e27;
 		display: inline-flex;
@@ -119,17 +119,17 @@
 		flex-direction: row;
 		flex-wrap: nowrap;
 		text-overflow: clip;
-		font-size: 1.1rem;
-		min-width: 12rem;
-		max-width: 15rem;
+		font-size: 1em;
+		min-width: 12em;
+		max-width: 15em;
 		width: 100%;
-		contain: layout;
-		border-radius: 0.8rem;
+		contain: content;
+		border-radius: 0.8em;
 		font-family: "Commissioner", sans-serif;
 
 		align-items: center;
 
-		height: 3.5rem;
+		height: 3.25em;
 		padding: 0 0 0 0.8rem;
 	}
 </style>

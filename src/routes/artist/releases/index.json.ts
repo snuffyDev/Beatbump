@@ -2,14 +2,13 @@ import { MusicTwoRowItemRenderer } from "$lib/parsers";
 import { iter } from "$lib/utils/collections";
 import type { RequestHandler } from "@sveltejs/kit";
 
-export const get: RequestHandler = async ({ url, clientAddress }) => {
+export const get: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;
 
 	const browseId = query.get("browseId") || "";
 	const params = query.get("params");
 	const itct = query.get("itct") || "";
 	const visitorData = query.get("visitorData");
-	// console.log(url.searchParams);
 	const json = {
 		context: {
 			client: {

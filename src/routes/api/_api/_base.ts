@@ -7,4 +7,26 @@ interface ArtistEndpointParams {
 	};
 }
 
-interface NextEndpointParams {}
+interface PlayerEndpointParams {
+	videoId: string;
+	playlistId?: string;
+	playerParams?: string;
+}
+
+interface NextEndpointParams {
+	continuation?: string;
+	params?: string;
+	videoId?: string;
+	playlistSetVideoId?: string;
+	playlistId?: string;
+	watchEndpointMusicConfig?: {
+		musicVideoType?: string | "MUSIC_VIDEO_TYPE_ATV";
+	};
+}
+
+interface PlaylistEndpointParams<T> {
+	browseId: string;
+	continuation?: string;
+	itct?: string;
+	type?: T extends "next" ? true : false;
+}
