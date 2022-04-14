@@ -16,14 +16,14 @@ export const get: RequestHandler = async ({ url }) => {
 	let itct = query.get("itct") || "";
 	itct = decodeURIComponent(itct);
 	ctoken = decodeURIComponent(ctoken);
-	const visitorData = query.get("visitorData");
+	const visitorData = query.get("visitorData") || "";
 	const browseId = "FEmusic_home";
 	let carouselItems = [];
 
 	const response = await buildRequest("home", {
 		context: {
 			client: {
-				visitorData,
+				visitorData: `${visitorData}`,
 				clientName: "WEB_REMIX",
 				clientVersion: "1.20220404.01.00",
 				hl: "en",

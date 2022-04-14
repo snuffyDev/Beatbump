@@ -4,5 +4,6 @@
 	"typescript.enablePromptUseWorkspaceTsdk": true,
 	"eslint.probe": ["javascript", "typescript", "html", "markdown", "svelte"],
 
-	"exportall.config.folderListener": []
+	"exportall.config.folderListener": [],
+	"typescript.tsdk": "node_modules\\typescript\\lib"
 }

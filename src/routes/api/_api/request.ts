@@ -1,4 +1,13 @@
 import { queryParams } from "$lib/utils";
+import {
+	CONTEXT_DEFAULTS,
+	API_BASE_URL,
+	WEB_REMIX_KEY,
+	USER_AGENT,
+	ENDPOINT_NAMES,
+	ANDROID_KEY,
+	API_ORIGIN
+} from "./constants";
 import type { Body, APIEndpoints, Context } from "./types";
 import { Endpoints } from "./types";
 import type {
@@ -12,45 +21,18 @@ import type {
 type Nullable<T> = T | null;
 type IHeaders = Record<string, string>;
 
-const API_BASE_URL = "https://music.youtube.com/youtubei/v1/";
-const API_ORIGIN = "https://music.youtube.com";
-
-const USER_AGENT =
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36 Edg/100.0.1185.36";
-
-const WEB_REMIX_KEY = "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30";
-const ANDROID_KEY = "AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w";
-
-const ENDPOINT_NAMES: APIEndpoints = {
-	playlist: Endpoints.Browse,
-	search: Endpoints.Search,
-	next: Endpoints.Next,
-	home: Endpoints.Browse,
-	player: Endpoints.Player,
-	artist: Endpoints.Browse
-} as const;
-
-const CONTEXT_DEFAULTS: Pick<
-	Context,
-	"client" | "user" | "request" | "captionParams"
-> = {
-	client: {
-		hl: "en",
-		utcOffsetMinutes: -new Date().getTimezoneOffset()
-	},
-	request: {
-		useSsl: true
-	},
-	user: {
-		lockedSafetyMode: false
-	},
-	captionParams: {}
-};
-
+/** Helper function to build a request body
+		consisting of Context and params of type `T` */
 function buildRequestBody<T>(context: Context, params: Body<T>) {
 	return { context, ...params };
 }
 
+/**
+ * Builds a YouTube Music API request.
+ * @param endpoint
+ * @param options
+ * @returns {Promise<Response>} A promise consisting of a Response
+ */
 export function buildRequest<T>(
 	endpoint: keyof APIEndpoints,
 	{
@@ -71,13 +53,11 @@ export function buildRequest<T>(
 	switch (endpoint) {
 		case "artist":
 			return artistRequest(ctx, body as ArtistEndpointParams);
-			break;
 		case "next":
 			// TODO!
 			break;
 		case "player":
 			return playerRequest(ctx, body as PlayerEndpointParams);
-			break;
 		case "playlist":
 			return browseRequest(
 				ctx,
@@ -85,7 +65,6 @@ export function buildRequest<T>(
 				continuation,
 				headers
 			);
-			break;
 		case "home":
 			return browseRequest(
 				ctx,
@@ -103,8 +82,12 @@ export function buildRequest<T>(
 
 function nextRequest<T extends NextEndpointParams>(
 	context: Context,
-	params: T
-) {}
+	params: T,
+	continuation?: Nullable<NextEndpointParams>,
+	headers?: IHeaders
+) {
+	//
+}
 
 function browseRequest<T extends PlaylistEndpointParams>(
 	context: Context,
@@ -126,6 +109,7 @@ function browseRequest<T>(
 ) {
 	const body = buildRequestBody(context as Context, params);
 
+	// if continuation is defined, querystringify it
 	const request = fetch(
 		API_BASE_URL +
 			Endpoints.Browse +
@@ -134,7 +118,6 @@ function browseRequest<T>(
 			`key=${WEB_REMIX_KEY}`,
 		{
 			headers: Object.assign(
-				{},
 				{
 					Host: "music.youtube.com",
 					"User-Agent": USER_AGENT,

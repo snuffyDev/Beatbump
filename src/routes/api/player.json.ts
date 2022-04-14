@@ -7,8 +7,7 @@ export const get: RequestHandler = async ({ url }) => {
 	const playlistId = query.get("list") || "";
 	const playerParams = query.get("playerParams") || "";
 	try {
-		const response = await buildRequest({
-			endpoint: "player",
+		const response = await buildRequest("player", {
 			context: {
 				client: { clientName: "ANDROID", clientVersion: "17.13.3", hl: "en" }
 			},

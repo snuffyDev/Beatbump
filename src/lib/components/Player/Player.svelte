@@ -36,7 +36,7 @@
 
 	// $: browser && console.log($updateTrack.url, $updateTrack.originalUrl);
 	$: player.src = $updateTrack.url !== null ? $updateTrack.url : "";
-	$: isWebkit = $session.iOS;
+	$: isWebkit = $session.iOS ? browser && navigator.userAgent.match(/i(Pad|Phone|Pod)/g) : false;
 	// $: console.log($list.mix, isWebkit, $session);
 	$: autoId = $key;
 
