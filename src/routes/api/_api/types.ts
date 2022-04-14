@@ -5,6 +5,7 @@ export interface Client {
 	visitorData?: string;
 	gl?: string;
 	readonly hl?: string;
+	originalUrl?: string;
 	userAgent?: string;
 }
 
@@ -31,6 +32,7 @@ export enum Endpoints {
 	Player = "player"
 }
 export interface APIEndpoints {
+	readonly home: Endpoints.Browse;
 	readonly playlist: Endpoints.Browse;
 	readonly search: Endpoints.Search;
 	readonly next: Endpoints.Next;

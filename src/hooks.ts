@@ -4,7 +4,7 @@ import type { GetSession, Handle } from "@sveltejs/kit";
 
 const rootDomain = import.meta.env.VITE_DOMAIN; // or your server IP for dev
 const originURL = import.meta.env.VITE_SITE_URL; // or your server IP for dev
-// installFetch();
+
 const headers = {
 	"X-Frame-Options": "SAMEORIGIN",
 	"Referrer-Policy": "no-referrer",
@@ -17,11 +17,9 @@ const headers = {
 const checkUserAgent = (userAgent: string) =>
 	/i(Phone|Pad|Pod)/i.test(userAgent);
 
-// installFetch();
 export const handle: Handle = async ({ event, resolve }) => {
-	// console.log(event.request.headers.get('User-Agent'));
 	event.locals.iOS = checkUserAgent(event.request.headers.get("User-Agent"));
-	// console.log(event.locals.iOS, event.request.headers.get("User-Agent"));
+
 	const response = await resolve(event);
 	Object.entries(headers).forEach(([key, value]) =>
 		response.headers.set(`${key}`, `${value}`)

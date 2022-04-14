@@ -3,8 +3,7 @@
 	let path;
 
 	export const load: Load = async ({ fetch, stuff }) => {
-	console.time("TIMER")
-	const response = await fetch("/home.json");
+		const response = await fetch("/home.json");
 		const data = await response.json();
 		if (!response.ok) {
 			return {
@@ -15,17 +14,18 @@
 		const {
 			carousels,
 			headerThumbnail = undefined,
-			continuations
+			continuations,
+			visitorData
 		} = await data;
 		path = stuff.page;
-		console.timeEnd("TIMER")
 		return {
 			props: {
 				carousels,
 				headerThumbnail,
-				continuations
-				// data: await data.data
+				continuations,
+				visitorData
 			},
+
 			maxage: 3600,
 			status: 200
 		};
@@ -42,7 +42,7 @@
 	export let carousels;
 	export let headerThumbnail: Array<Thumbnail> = [];
 	export let continuations: NextContinuationData;
-
+	export let visitorData = "";
 	let loading = false;
 	let hasData = false;
 </script>
@@ -85,6 +85,7 @@
 				src={headerThumbnail[0].url}
 				width={headerThumbnail[0].width}
 				height={headerThumbnail[0].height}
+				decoding="sync"
 				class="immer-img"
 				alt="large background header"
 			/>
@@ -111,7 +112,9 @@
 				const response = await fetch(
 					`/home.json?itct=${encodeURIComponent(
 						continuations.clickTrackingParams
-					)}&ctoken=${encodeURIComponent(continuations.continuation)}&type=next`
+					)}&ctoken=${encodeURIComponent(
+						continuations.continuation
+					)}&type=next&visitorData=${visitorData}`
 				);
 				const data = await response.json();
 				// const {continuations, carousels} = data;
@@ -126,10 +129,9 @@
 			}}
 		/>
 
-			<div class="loading" style:opacity={loading ? 1 : 0}>
-				<Loading />
-			</div>
-
+		<div class="loading" style:opacity={loading ? 1 : 0}>
+			<Loading />
+		</div>
 	{/if}
 </main>
 
@@ -139,7 +141,7 @@
 	}
 	.loading {
 		transition: opacity cubic-bezier(0.95, 0.05, 0.795, 0.035) 500ms;
-		opacity:0;
+		opacity: 0;
 		display: flex;
 		position: relative;
 		margin: 0 auto;
@@ -157,7 +159,7 @@
 		left: 0;
 		right: 0;
 
-    contain: layout style paint;
+		contain: layout style paint;
 	}
 	.gradient {
 		position: absolute;

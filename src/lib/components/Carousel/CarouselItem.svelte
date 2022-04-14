@@ -107,7 +107,6 @@
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST")) {
 					shareData = {
 						title: item.title,
-						text: `${item.title} on Beatbump`,
 						url: `https://beatbump.ml/artist/${item.endpoint?.browseId}`
 					};
 				}
@@ -281,7 +280,6 @@
 				on:error={errorHandler}
 				class:img16x9={RATIO_RECT}
 				class:img1x1={RATIO_SQUARE}
-				decoding="sync"
 				width={item.thumbnails[0].width}
 				height={item.thumbnails[0].height}
 				src={item.thumbnails[0]?.placeholder}

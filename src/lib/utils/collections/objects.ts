@@ -36,8 +36,11 @@ export function iterObj<T extends IObject<T>, K extends keyof T>(
 
 	let idx = -1;
 	for (; ++idx < length; ) {
-		const item: [string, T[K]] = [keys[idx], object[keys[idx]]];
-		cb(item, idx, object);
+		cb.apply(this, [
+			[keys[idx], object[keys[idx]]] as [string, T[K]],
+			idx,
+			object
+		]);
 	}
 }
 /**

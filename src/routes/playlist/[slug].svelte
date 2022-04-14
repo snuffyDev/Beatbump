@@ -10,7 +10,8 @@
 			tracks = [],
 			header = {},
 			continuations = {},
-			carouselContinuations
+			carouselContinuations,
+			visitorData
 		} = await data;
 		if (!response.ok) {
 			return {
@@ -21,7 +22,7 @@
 		return {
 			props: {
 				tracks: tracks,
-
+				visitorData,
 				continuations: continuations,
 				carouselContinuations,
 				header: header,
@@ -67,9 +68,10 @@
 	export let id: string;
 	export let continuations;
 	export let carouselContinuations;
+	export let visitorData = "";
 	export let key;
-	let ctoken = continuations?.continuation || "";
-	let itct = continuations?.clickTrackingParams || "";
+	$: ctoken = continuations?.continuation || "";
+	$: itct = continuations?.clickTrackingParams || "";
 	let width;
 	let pageTitle = header?.title;
 	let description;
@@ -84,8 +86,19 @@
 
 	setContext(ctx, { pageId: id });
 	// $: browser &&
-	// $: browser &&
-	// $: console.log(header, carouselContinuations, tracks, continuations, id);
+	$: browser &&
+		console.log(
+			visitorData,
+			header,
+			carouselContinuations,
+			tracks,
+			continuations,
+			id,
+			{
+				ctoken,
+				itct
+			}
+		);
 
 	pageTitle =
 		pageTitle.length > 64
@@ -133,7 +146,13 @@
 				"/api/playlist.json" +
 					"?ref=" +
 					id +
-					`${ctoken ? `&ctoken=${encodeURIComponent(ctoken)}` : ""}` +
+					"&visitorData=" +
+					visitorData +
+					`${
+						ctoken
+							? `&ctoken=${encodeURIComponent(encodeURIComponent(ctoken))}`
+							: ""
+					}` +
 					"&itct=" +
 					itct
 			);

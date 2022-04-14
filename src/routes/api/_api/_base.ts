@@ -24,9 +24,23 @@ interface NextEndpointParams {
 	};
 }
 
-interface PlaylistEndpointParams<T> {
+interface PlaylistEndpointContinuation {
+	continuation?: string;
+	ctoken?: string;
+	itct?: string;
+	type?: "next";
+}
+interface PlaylistEndpointParams {
 	browseId: string;
 	continuation?: string;
 	itct?: string;
-	type?: T extends "next" ? true : false;
+	type?: "next";
 }
+
+export type {
+	ArtistEndpointParams,
+	NextEndpointParams,
+	PlaylistEndpointParams,
+	PlaylistEndpointContinuation,
+	PlayerEndpointParams
+};

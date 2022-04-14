@@ -16,17 +16,13 @@ function lazy(
 		);
 	}
 
-	// Handle Intersection
-	function handleIntersect() {
-		node.setAttribute("src", data.src);
-	}
-
 	if (IntersectionObserver) {
 		const intersectionObserver = new IntersectionObserver(
 			(entries) => {
 				entries.forEach((entry, i) => {
+					const target = entry.target as HTMLImageElement;
 					if (entry.isIntersecting && once === true) {
-						frame = requestAnimationFrame(handleIntersect);
+						target.src = data.src;
 						once = false;
 						intersectionObserver.unobserve(node);
 					}

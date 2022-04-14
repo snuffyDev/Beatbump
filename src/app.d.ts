@@ -11,5 +11,6 @@ declare namespace App {
 
 	interface Stuff {
 		path?: string;
+		page?: string;
 	}
 }

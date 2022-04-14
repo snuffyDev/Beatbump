@@ -1,3 +1,4 @@
+import { buildRequest } from "$api/_api/request";
 import {
 	MoodsAndGenresItem,
 	MusicResponsiveListItemRenderer,
@@ -15,79 +16,35 @@ export const get: RequestHandler = async ({ url }) => {
 	let itct = query.get("itct") || "";
 	itct = decodeURIComponent(itct);
 	ctoken = decodeURIComponent(ctoken);
+	const visitorData = query.get("visitorData");
 	const browseId = "FEmusic_home";
 	let carouselItems = [];
-	const BASE_URL = "https://music.youtube.com/youtubei/v1/browse";
-	const params =
-		itct !== ""
-			? `?ctoken=${ctoken}&continuation=${ctoken}&type=next&itct=${itct}&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&prettyPrint=false`
-			: "?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&prettyPrint=false";
-	const response = await fetch(BASE_URL + params, {
-		headers: {
-			accept: "*/*",
-			"accept-language": "en-US,en;q=0.9",
-			"cache-control": "no-cache",
-			"content-type": "application/json",
-			pragma: "no-cache",
-			"sec-ch-ua":
-				'"Microsoft Edge";v="95", "Chromium";v="95", ";Not A Brand";v="99"',
-			"sec-ch-ua-mobile": "?0",
-			"sec-ch-ua-platform": '"Windows"',
-			"sec-fetch-dest": "empty",
-			"sec-fetch-mode": "same-origin",
-			"sec-fetch-site": "same-origin",
-			"X-Goog-Visitor-id": "CgttaVFvdVdoLVdzSSiViqSMBg%3D%3D",
-			"X-Youtube-Client-Name": "67",
-			"X-Youtube-Client-Version": "1.20211101.00.00",
-			Referer: "https://music.youtube.com/",
-			Origin: "https://music.youtube.com",
-			"x-origin": "https://music.youtube.com",
 
-			"Referrer-Policy": "strict-origin-when-cross-origin"
-		},
-		body: JSON.stringify({
-			browseId: ctoken !== "" ? browseId : "",
-
-			context: {
-				client: {
-					clientName: "WEB_REMIX",
-					clientVersion: "1.20211025.00.00",
-					visitorData: "CgttaVFvdVdoLVdzSSiViqSMBg%3D%3D",
-					originalUrl: "https://music.youtube.com/",
-					userAgent:
-						"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36 Edg/95.0.1020.40,gzip(gfe)",
-					utcOffsetMinutes: -new Date().getTimezoneOffset()
-				},
-				user: {
-					lockedSafetyMode: false
-				},
-				capabilities: {},
-				request: {
-					internalExperimentFlags: [
-						{
-							key: "force_music_enable_outertube_tastebuilder_browse",
-							value: "true"
-						},
-						{
-							key: "force_music_enable_outertube_playlist_detail_browse",
-							value: "true"
-						},
-						{
-							key: "force_music_enable_outertube_search_suggestions",
-							value: "true"
-						}
-					],
-					sessionIndex: {}
-				}
+	const response = await buildRequest("home", {
+		context: {
+			client: {
+				visitorData,
+				clientName: "WEB_REMIX",
+				clientVersion: "1.20220404.01.00",
+				hl: "en",
+				userAgent:
+					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36 Edg/95.0.1020.40,gzip(gfe)"
 			}
-		}),
-		method: "POST"
+		},
+		params: { browseId: ctoken !== "" ? browseId : "" },
+		continuation: ctoken !== "" && {
+			ctoken,
+			continuation: ctoken,
+			type: "next",
+			itct
+		}
 	});
 
 	if (!response.ok) {
 		return { status: response.status, body: response.statusText };
 	}
 	const data = await response.json();
+	const _visitorData = data?.responseContext?.visitorData;
 	if (!ctoken) {
 		const _contents =
 			data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
@@ -115,6 +72,7 @@ export const get: RequestHandler = async ({ url }) => {
 			body: {
 				carousels: carouselItems,
 				headerThumbnail,
+				visitorData: _visitorData,
 				continuations: nextContinuationData
 			},
 			status: 200

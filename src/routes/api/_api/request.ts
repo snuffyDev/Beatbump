@@ -1,6 +1,17 @@
+import { queryParams } from "$lib/utils";
 import type { Body, APIEndpoints, Context } from "./types";
 import { Endpoints } from "./types";
-// import fetch from "node-fetch";
+import type {
+	ArtistEndpointParams,
+	PlayerEndpointParams,
+	PlaylistEndpointParams,
+	NextEndpointParams,
+	PlaylistEndpointContinuation
+} from "./_base";
+
+type Nullable<T> = T | null;
+type IHeaders = Record<string, string>;
+
 const API_BASE_URL = "https://music.youtube.com/youtubei/v1/";
 const API_ORIGIN = "https://music.youtube.com";
 
@@ -14,6 +25,7 @@ const ENDPOINT_NAMES: APIEndpoints = {
 	playlist: Endpoints.Browse,
 	search: Endpoints.Search,
 	next: Endpoints.Next,
+	home: Endpoints.Browse,
 	player: Endpoints.Player,
 	artist: Endpoints.Browse
 } as const;
@@ -39,15 +51,20 @@ function buildRequestBody<T>(context: Context, params: Body<T>) {
 	return { context, ...params };
 }
 
-export function buildRequest<T>({
-	endpoint,
-	context,
-	params
-}: {
-	endpoint: keyof APIEndpoints;
-	context: Partial<Context>;
-	params: T;
-}): Promise<Response> {
+export function buildRequest<T>(
+	endpoint: keyof APIEndpoints,
+	{
+		context,
+		params,
+		continuation,
+		headers = {}
+	}: {
+		context: Partial<Context>;
+		params: T;
+		continuation?: Nullable<PlaylistEndpointContinuation>;
+		headers?: IHeaders;
+	}
+): Promise<Response> {
 	const ctx = { ...CONTEXT_DEFAULTS, ...context };
 	const body = params as unknown;
 
@@ -62,8 +79,20 @@ export function buildRequest<T>({
 			return playerRequest(ctx, body as PlayerEndpointParams);
 			break;
 		case "playlist":
-			// TODO!
+			return browseRequest(
+				ctx,
+				body as PlaylistEndpointParams,
+				continuation,
+				headers
+			);
 			break;
+		case "home":
+			return browseRequest(
+				ctx,
+				body as PlaylistEndpointParams,
+				continuation,
+				headers
+			);
 		case "search":
 			// TODO!
 			break;
@@ -72,31 +101,50 @@ export function buildRequest<T>({
 	}
 }
 
-function browseRequest<T extends PlaylistEndpointParams<T>>(
+function nextRequest<T extends NextEndpointParams>(
 	context: Context,
 	params: T
+) {}
+
+function browseRequest<T extends PlaylistEndpointParams>(
+	context: Context,
+	params: T,
+	continuation?: Nullable<PlaylistEndpointContinuation>,
+	headers?: IHeaders
 );
 function browseRequest<T extends ArtistEndpointParams>(
 	context: Context,
-	params: T
+	params: T,
+	continuation?: Nullable<PlaylistEndpointContinuation>,
+	headers?: IHeaders
 );
-function browseRequest<T>(context: Context, params: T) {
+function browseRequest<T>(
+	context: Context,
+	params: T,
+	continuation?: Nullable<PlaylistEndpointContinuation>,
+	headers: IHeaders = {}
+) {
 	const body = buildRequestBody(context as Context, params);
-	// params
-	const request = fetch(
-		API_BASE_URL + Endpoints.Browse + `?key=${WEB_REMIX_KEY}`,
-		{
-			headers: {
-				Host: "music.youtube.com",
-				"User-Agent": USER_AGENT,
-				"Content-Type": "application/json",
-				"x-origin": "https://music.youtube.com",
-				"x-goog-visitor-id": encodeURIComponent(
-					context["client"]["visitorData"]
-				),
 
-				Origin: "https://music.youtube.com"
-			},
+	const request = fetch(
+		API_BASE_URL +
+			Endpoints.Browse +
+			"?" +
+			(continuation ? queryParams(continuation) + "&" : "") +
+			`key=${WEB_REMIX_KEY}`,
+		{
+			headers: Object.assign(
+				{},
+				{
+					Host: "music.youtube.com",
+					"User-Agent": USER_AGENT,
+					"Content-Type": "application/json; charset=utf-8",
+					"x-origin": "https://music.youtube.com",
+					"x-goog-visitor-id": context["client"]["visitorData"] || "",
+					Origin: "https://music.youtube.com"
+				},
+				headers
+			),
 			body: JSON.stringify(body),
 			method: "POST"
 		}
@@ -109,10 +157,7 @@ function playerRequest<T extends PlayerEndpointParams>(
 	params: T
 ) {
 	const body = buildRequestBody(context as Context, params);
-	// console.log(
-	// 	body,
-	// 	API_BASE_URL + ENDPOINT_NAMES.player + `?key=${ANDROID_KEY}`
-	// );
+
 	const request = fetch(
 		API_BASE_URL + ENDPOINT_NAMES.player + `?key=${ANDROID_KEY}`,
 		{

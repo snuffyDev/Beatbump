@@ -8,7 +8,11 @@ import type { NextContinuationData } from "$lib/types";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { map } from "$lib/utils/collections";
 import type { RequestHandler } from "@sveltejs/kit";
-
+import { buildRequest } from "./_api/request";
+import type {
+	PlaylistEndpointContinuation,
+	PlaylistEndpointParams
+} from "./_api/_base";
 export const get: RequestHandler = async ({ url }) => {
 	console.time("playlist");
 	const query = url.searchParams;
@@ -16,45 +20,43 @@ export const get: RequestHandler = async ({ url }) => {
 	const itct = query.get("itct") || "";
 	const ctoken = query.get("ctoken") || "";
 	const referrer = query.get("ref") || "";
+	const visitorData = query.get("visitorData") || "";
 	// console.log(browseId, ctoken)
-
+	const params: PlaylistEndpointParams = {
+		browseId
+	};
 	if (ctoken !== "") {
-		return getPlaylistContinuation(browseId, referrer, ctoken, itct);
+		return getPlaylistContinuation(
+			params,
+			{ ctoken, continuation: ctoken, itct, type: "next" },
+			referrer.slice(2),
+			visitorData
+		);
 	}
 	return getPlaylist(browseId, referrer);
 };
-async function getPlaylistContinuation(browseId, referrer, ctoken, itct) {
-	const response = await fetch(
-		`https://music.youtube.com/youtubei/v1/browse?ctoken=${ctoken}&prettyPrint=false` +
-			`&continuation=${ctoken}&type=next&itct=${itct}&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30`,
-		{
-			method: "POST",
-			body: JSON.stringify({
-				context: {
-					client: {
-						clientName: "WEB_REMIX",
-						clientVersion: "1.20211025.00.00",
-						visitorData: "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D"
-					},
-					user: {
-						lockedSafetyMode: false
-					}
-				}
-			}),
-			headers: {
-				"Content-Type": "application/json; charset=utf-8",
-
-				"X-Goog-AuthUser": "0",
-				Origin: "https://music.youtube.com",
-				"x-origin": "https://music.youtube.com",
-
-				"X-Goog-Visitor-Id": "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D",
-				referer:
-					"https://music.youtube.com/playlist?list=" + referrer.slice(2) ||
-					browseId
+async function getPlaylistContinuation(
+	params: PlaylistEndpointParams,
+	continuation: PlaylistEndpointContinuation,
+	id?: string,
+	visitorData?: string
+) {
+	const response = await buildRequest("playlist", {
+		context: {
+			client: {
+				clientName: "WEB_REMIX",
+				clientVersion: "1.20220404.01.00",
+				hl: "en",
+				visitorData: visitorData,
+				originalUrl: "https://music.youtube.com/playlist?list=" + id
 			}
-		}
-	);
+		},
+		headers: {
+			referer: "https://music.youtube.com/playlist?list=" + id
+		},
+		params: {},
+		continuation
+	});
 	if (!response.ok) {
 		return { status: response.status, body: response.statusText };
 	}
@@ -66,11 +68,11 @@ async function getPlaylistContinuation(browseId, referrer, ctoken, itct) {
 		} = {}
 	} = await data;
 	// console.log(data, contents, continuations)
+
 	let Tracks = [];
 	let Carousel;
-	const cont: NextContinuationData = continuations
-		? continuations[0]?.nextContinuationData
-		: null;
+	const cont: NextContinuationData =
+		continuations.length !== 0 ? continuations[0]?.nextContinuationData : null;
 	if (
 		data?.continuationContents?.sectionListContinuation?.contents[0]
 			?.musicCarouselShelfRenderer
@@ -83,7 +85,7 @@ async function getPlaylistContinuation(browseId, referrer, ctoken, itct) {
 		// console.log(Carousel, contents[0])
 		// console.log(referrer.slice(1))
 	} else {
-		Tracks = parseTrack(contents, referrer.slice(2));
+		Tracks = parseTrack(contents, id);
 	}
 	return {
 		status: 200,
@@ -163,7 +165,7 @@ async function getPlaylist(browseId, referrer) {
 		const { musicDetailHeaderRenderer: detailHeader = {} } = data?.header;
 		musicDetailHeaderRenderer = detailHeader;
 	}
-
+	const visitorData = data?.responseContext?.visitorData;
 	const contents =
 			data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
 				?.content?.sectionListRenderer?.contents[0]?.musicPlaylistShelfRenderer
@@ -175,8 +177,8 @@ async function getPlaylist(browseId, referrer) {
 		continuations =
 			data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
 				?.content?.sectionListRenderer?.contents[0]?.musicPlaylistShelfRenderer
-				.continuations;
-	const _continue =
+				?.continuations;
+	const _carouselContinuation =
 		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
 			?.content?.sectionListRenderer?.continuations || null;
 
@@ -184,10 +186,9 @@ async function getPlaylist(browseId, referrer) {
 	const cont: NextContinuationData = data?.contents
 		?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content
 		?.sectionListRenderer?.continuations
-		? data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
-				?.content?.sectionListRenderer?.continuations[0]?.nextContinuationData
-			? continuations !== undefined && continuations[0]?.nextContinuationData
-			: _continue !== null && _continue[0]?.nextContinuationData
+		? continuations instanceof Array && continuations[0]?.nextContinuationData
+			? continuations[0]?.nextContinuationData
+			: _carouselContinuation[0]?.nextContinuationData
 		: null;
 
 	const getHeader = () => {
@@ -251,7 +252,9 @@ async function getPlaylist(browseId, referrer) {
 		body: JSON.stringify({
 			continuations: cont,
 			tracks,
-			carouselContinuations: _continue && _continue[0].nextContinuationData,
+			visitorData,
+			carouselContinuations:
+				_carouselContinuation && _carouselContinuation[0].nextContinuationData,
 			header: musicDetailHeaderRenderer
 		})
 	};

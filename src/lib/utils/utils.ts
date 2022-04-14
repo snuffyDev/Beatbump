@@ -6,6 +6,7 @@ import {
 	preferWebM,
 	updateTrack
 } from "$lib/stores/stores";
+import { map } from "./collections";
 
 // notifications
 export const notify = (
@@ -130,12 +131,10 @@ function handleError() {
 }
 
 export const queryParams = (params: Record<any, any>): string =>
-	Object.keys(params)
-		.map((k) => {
-			if (params[k] == undefined) return;
-			return k + "=" + params[k];
-		})
-		.join("&");
+	map(Object.keys(params), (k) => {
+		if (params[k] == undefined) return;
+		return k + "=" + params[k];
+	}).join("&");
 // parse array object input for child
 
 export const pb = (input: string, query: string, justOne = false): any => {
