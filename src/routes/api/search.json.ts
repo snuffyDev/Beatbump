@@ -30,7 +30,7 @@ export const get: RequestHandler = async ({ url }) => {
 			ctoken !== "" ? "" : `&sp=EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D`
 		}${
 			ctoken !== ""
-				? `&ctoken=${ctoken}&continuation=${ctoken}&itct=${itct}&type='next'`
+				? `&ctoken=${ctoken}&continuation=${ctoken}&itct=${itct}&type=next`
 				: ""
 		}`,
 		{

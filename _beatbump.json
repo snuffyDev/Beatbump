@@ -4,7 +4,8 @@
 	"properties": {
 		"environment": {
 			"description": "Deployment configuration (Node, Cloudflare Workers, Vercel, etc..)",
-			"properties": {}
+			"type": "string",
+			"enum": ["node", "workers", "vercel", "netlify"]
 		}
 	}
 }

@@ -150,7 +150,8 @@ export const MusicTwoRowItemRenderer = (ctx: {
 export const MusicResponsiveListItemRenderer = (
 	ctx: { musicResponsiveListItemRenderer },
 	playlistSetVideoId?: boolean,
-	playlistId?: string
+	playlistId?: string,
+	type?: string
 ): IListItemRenderer => {
 	let {
 		thumbnail: {
@@ -291,13 +292,14 @@ export const MusicResponsiveListItemRenderer = (
 			playlistId
 		});
 	}
+
 	Object.assign(Item, {
 		musicVideoType:
 			ctx.musicResponsiveListItemRenderer?.flexColumns[0]
 				?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]
 				?.navigationEndpoint?.watchEndpoint?.watchEndpointMusicSupportedConfigs
 				?.watchEndpointMusicConfig?.musicVideoType,
-
+		type: type !== undefined ? type : "",
 		playerParams:
 			ctx.musicResponsiveListItemRenderer?.flexColumns[0]
 				?.musicResponsiveListItemFlexColumnRenderer.text?.runs[0]

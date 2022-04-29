@@ -23,6 +23,11 @@ interface NextEndpointParams {
 		musicVideoType?: string | "MUSIC_VIDEO_TYPE_ATV";
 	};
 }
+interface SearchEndpointParams extends PlaylistEndpointContinuation {
+	browseId: string;
+	query: string;
+	params?: string;
+}
 
 interface PlaylistEndpointContinuation {
 	continuation?: string;
@@ -42,5 +47,6 @@ export type {
 	NextEndpointParams,
 	PlaylistEndpointParams,
 	PlaylistEndpointContinuation,
-	PlayerEndpointParams
+	PlayerEndpointParams,
+	SearchEndpointParams
 };

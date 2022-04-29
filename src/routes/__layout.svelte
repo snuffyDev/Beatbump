@@ -24,6 +24,7 @@
 	import "@fontsource/commissioner/500.css";
 	import "@fontsource/commissioner/600.css";
 	import "@fontsource/commissioner/700.css";
+	import GroupSessionManager from "$lib/components/GroupSessionManager";
 
 	export let key;
 	let main;
@@ -40,7 +41,7 @@
 
 <Nav {key} />
 <Popper />
-
+<GroupSessionManager />
 <div
 	class="wrapper"
 	class:no-scroll={key.includes("/search/") ? true : false}

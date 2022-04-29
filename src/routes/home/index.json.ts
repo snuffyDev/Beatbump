@@ -18,7 +18,7 @@ export const get: RequestHandler = async ({ url }) => {
 	ctoken = decodeURIComponent(ctoken);
 	const visitorData = query.get("visitorData") || "";
 	const browseId = "FEmusic_home";
-	let carouselItems = [];
+	const carouselItems = [];
 
 	const response = await buildRequest("home", {
 		context: {

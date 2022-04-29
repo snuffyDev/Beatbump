@@ -60,24 +60,23 @@ export function map<T>(array: Array<T>, cb: ItemCallback<T>): T[] {
 	return newArray;
 }
 
-export function filterMap<T>(
+export function filterMap<T, S extends T>(
 	array: Array<T>,
 	cb: ItemCallback<T>,
-	predicate: (item: T) => boolean
-  ): T[] {
+	predicate: (item: T) => item is S
+): T[] {
 	let idx = -1;
 	const length = array.length;
 	const result: T[] = [];
 	for (; ++idx < length; ) {
-	  const res = cb(array[idx], idx, array);
-	  const passes = predicate(res);
-	  if (!passes) {
-		continue;
-	  }
-	  result[idx] = res;
+		const res = cb(array[idx], idx, array);
+		if (!predicate(res as T)) {
+			continue;
+		}
+		result[idx] = res as T;
 	}
 	return result;
-  }
+}
 
 export function rmUndef<T>(array: Array<T>): T[] {
 	let idx = -1;

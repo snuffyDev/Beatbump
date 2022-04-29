@@ -5,16 +5,17 @@
 	import Icon from "$components/Icon/Icon.svelte";
 	import { page } from "$app/stores";
 	import { onMount } from "svelte";
-import { loop, type Task } from "$lib/utils/loop";
-import debounce from "$lib/js/debounce";
-import { noop } from "svelte/internal";
+	import { loop } from "$lib/utils/loop";
+	import type { Task } from "$lib/utils/loop";
+	import debounce from "$lib/js/debounce";
+	import { noop } from "svelte/internal";
 
 	export let header: CarouselHeader;
 	export let items = [];
 	export let type = "";
 	export let kind = "normal";
 	export let isBrowseEndpoint;
-	export let visitorData = '';
+	export let visitorData = "";
 	let arr = [];
 	let moreOnLeft, moreOnRight;
 	if (items.length > 3) {
@@ -41,8 +42,8 @@ import { noop } from "svelte/internal";
 	let task: Task = undefined;
 	let lastScrollPositions = {
 		left: 0,
-		right: 0,
-	}
+		right: 0
+	};
 	let running = false;
 	onMount(() => {
 		let frame;
@@ -59,18 +60,24 @@ import { noop } from "svelte/internal";
 		// carousel !== undefined && start()
 		function scrollHandler() {
 			if (!carousel) return;
-					const scrollLeft = carousel.scrollLeft;
-					const scrollWidth = carousel.scrollWidth;
-					if (scrollLeft === lastScrollPositions.left || lastScrollPositions.right === scrollWidth - carousel.clientWidth - 15) {noop()};
+			const scrollLeft = carousel.scrollLeft;
+			const scrollWidth = carousel.scrollWidth;
+			if (
+				scrollLeft === lastScrollPositions.left ||
+				lastScrollPositions.right === scrollWidth - carousel.clientWidth - 15
+			) {
+				noop();
+			}
 
-					debounce(()=>{
-						moreOnLeft = carousel.scrollLeft < 15 ? false : true
-						lastScrollPositions.left = scrollLeft;
-						 moreOnRight = carousel.scrollLeft < carousel.scrollWidth - carousel.clientWidth - 15
-							? true
-							: false;
-							lastScrollPositions.right = scrollWidth - scrollLeft - 15;
-					}, 150)();
+			debounce(() => {
+				moreOnLeft = carousel.scrollLeft < 15 ? false : true;
+				lastScrollPositions.left = scrollLeft;
+				moreOnRight =
+					carousel.scrollLeft < carousel.scrollWidth - carousel.clientWidth - 15
+						? true
+						: false;
+				lastScrollPositions.right = scrollWidth - scrollLeft - 15;
+			}, 150)();
 			cancelAnimationFrame(frame);
 		}
 		frame = requestAnimationFrame(scrollHandler);

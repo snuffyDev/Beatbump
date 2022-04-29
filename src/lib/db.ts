@@ -3,6 +3,7 @@ import { writable } from "svelte/store";
 
 import type { Item } from "./types";
 import { notify } from "./utils";
+import { mod } from "./utils/id";
 export type IDBPlaylist = {
 	name?: string;
 	description?: string;
@@ -14,17 +15,6 @@ export type IDBPlaylist = {
 };
 type IDBRequestTarget = Event & {
 	target: EventTarget & { result: IDBRequest & IDBCursorWithValue };
-};
-const mod = {
-	charset: "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict",
-	generate: (size = 16) => {
-		let id = "";
-		let i = size;
-		while (i--) {
-			id += mod.charset[(Math.random() * mod.charset.length) | 0];
-		}
-		return id;
-	}
 };
 
 let db: IDBDatabase;

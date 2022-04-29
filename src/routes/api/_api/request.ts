@@ -15,7 +15,8 @@ import type {
 	PlayerEndpointParams,
 	PlaylistEndpointParams,
 	NextEndpointParams,
-	PlaylistEndpointContinuation
+	PlaylistEndpointContinuation,
+	SearchEndpointParams
 } from "./_base";
 
 type Nullable<T> = T | null;
@@ -87,6 +88,35 @@ function nextRequest<T extends NextEndpointParams>(
 	headers?: IHeaders
 ) {
 	//
+}
+
+function searchRequest<T extends SearchEndpointParams>(
+	context: Context,
+	params: T,
+	continuation?: Nullable<SearchEndpointParams>
+) {
+	const test = new URLSearchParams();
+	const body = buildRequestBody(context, params);
+	const request = fetch(
+		API_BASE_URL +
+			ENDPOINT_NAMES.search +
+			"?" +
+			(continuation
+				? queryParams(continuation) + `&sp=EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D&`
+				: "") +
+			`key=${WEB_REMIX_KEY}`,
+		{
+			body: JSON.stringify(body),
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json; charset=utf-8",
+				Origin: "https://music.youtube.com",
+				"User-Agent":
+					"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+			}
+		}
+	);
+	return request;
 }
 
 function browseRequest<T extends PlaylistEndpointParams>(
