@@ -244,6 +244,14 @@ function parseSearchResult(data, cont, filter?) {
 	let didYouMean
 	let ctx
 
+	// Fix EU reponse formatting
+	for (let i = 0; i < data.length; i++){
+		if (data[i].hasOwnProperty('itemSectionRenderer'))
+		{
+			data.splice(i, 1);
+		}
+	}
+
 	if (cont) {
 		ctx = [data]
 	} else {
