@@ -1,16 +1,17 @@
-<img align="right" src="/.repo/images/logo-header.png" width="128px" height="128px" />
+<img align="right" src=".repo/images/logo-header.png" width="128px" height="128px" />
 
 # Beatbump
 
-Beatbump is an alternative frontend for YouTube Music created using Svelte/SvelteKit, and powered by Cloudflare Workers.
+A privacy-respecting alternative frontend for YouTube Music. Built with SvelteKit, official instance hosted with Cloudflare Workers.
 
-**Live Site**: https://beatbump.ml/
+> NOTE: Beatbump is going through a major rewrite, so errors, bugs, and other problems may happen at random.
 
-> Currently, Beatbump is undergoing a major rewrite/code cleanup in a separate branch. To see the latest changes, switch over to the rewrite branch.
+<div align="center">
 
-| <img src="/.repo/images/artistpagegif.gif" width="640" height="auto"/> | <img src="/.repo/images/pwa.jpg" width="320" height="auto"/> | <img src="/.repo/images/trending.jpeg" width="640" height="auto"/> |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------ |
+| <img src=".repo/images/playlist.jpeg" width=""/> | <img src=".repo/images/m_artist.png" width="" height="auto"/> | <img src=".repo/images/m_queue.png" width=""/> |
+| ------------------------------------------------ | ------------------------------------------------------------- | ---------------------------------------------- |
 
+</div>
 <p align="center">
 	  <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">
     <img alt="License: AGPLv3" src="https://shields.io/badge/License-AGPL%20v3-blue.svg">
@@ -20,39 +21,49 @@ Beatbump is an alternative frontend for YouTube Music created using Svelte/Svelt
   </a>
 </p>
 
-## Features
+## Why Beatbump?
 
-- Autoplay/Automix
-- No Ads
-- Music playback in background on mobile
-- Search for songs, playlists, and videos
-  - Note: all content is audio-only.
-- View Artist pages for your favorite content
-- Personal Library
-  - Stored locally on your device
-  - Hear a song you like? Save it for later by adding it to your favorites!
-  - Synchronize your library across your devices!
-  - Custom Playlists
+Beatbump is a fully-featured music listening experience, while helping to ease your privacy concerns associated with other platforms.
+
+Some of Beatbump's features includes:
+
+- Automix for continued listening
+- No ads
+- Background play on mobile devices\*
+- Search for artists, playlists, songs, and albums
+  - Note that all playback is audio only (for now)
+- Local playlist management
+  - Stored in-browser with IndexedDB
+  - Can save songs individually under 'Favorites'
+  - Peer-to-Peer data synchronization (using WebRTC)
+- Group Sessions
+  - Achieved using a WebRTC [mesh](https://en.wikipedia.org/wiki/Mesh_networking)
 - Uses a custom wrapper around the YouTube Music API
-- Multiple themes
 
-## Privacy
+...and so much more!
 
-All data is stored locally on your device. Data synchronization is done using PeerJS, which uses WebRTC for a peer-to-peer connection between browsers.
+> [1] iOS updates may break this from time to time, but works as of iOS 15.6
 
-### Extensions
+## Repo Structure
 
-Privacy is something you shouldn't have to think about. Using the browser extension LibRedirect, you can automatically redirect YouTube Music links to Beatbump. For more information, please visit the [LibRedirect Repo](https://github.com/libredirect/libredirect).
+| Directory                     | Description                                           |
+| ----------------------------- | ----------------------------------------------------- |
+| `app`                         | Beatbump web app                                      |
+| `packages/hls-proxy-rewriter` | Proxy server used for Beatbump's music playback (WIP) |
 
-## Development
+## Donations
 
-### Contributing
+Want to support Beatbump financially to aid with future development/hosting?
 
-At the present moment, for stability reasons, Pull Requests generally will not be accepted. This will change soon once the current code overhaul is completed, or nearly completed.
+[Donate with PayPal!](https://www.paypal.com/donate/?hosted_button_id=E6YRHKS2H2KP2)
 
-### Deploying Beatbump
+Donations of any amount are very much appreciated, so thank you if you choose to donate!
 
-You can find the documentation [here](https://snuffydev.github.io/Beatbump/#/) for setup information.
+_(Other ways to donate coming soon!)_
+
+## Docker
+
+Official Docker support coming soon! (Currently attempting to fix Docker installation)
 
 ### Project Inspirations
 

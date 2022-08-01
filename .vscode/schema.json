@@ -1,0 +1,96 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"$id": "beatbump",
+
+	"type": "object",
+	"properties": {
+		"environment": {
+			"description": "Deployment configuration",
+			"type": "object",
+			"properties": {
+				"adapter": {
+					"description": "The adapter to use for production deployments (Node, Cloudflare Workers, Vercel, etc..)",
+					"type": "string",
+					"oneOf": [
+						{
+							"const": "node",
+							"description": "For a standard Node.js server"
+						},
+						{ "const": "cloudflare-workers", "description": "For deploying on Cloudflare Workers" },
+						{ "const": "vercel", "description": "For deploying on Vercel" },
+						{ "const": "netlify", "description": "For deploying on Netlify" }
+					]
+				},
+				"proxy_streams": {
+					"type": "boolean",
+					"default": false,
+					"description": "Proxy requests for songs if client is region-restricted (NOT IMPLEMENTED)",
+					
+				}
+			}
+		},
+		"platform": {
+			"description": "Platform specific configuration\nThis will get passed onto the adapter (if applicable)",
+			"type": "object",
+			"properties": {
+				"vercel": {
+					"type": "object",
+					"description": "",
+					"properties": {
+						"edge": {
+							"type": "boolean",
+							"default": false
+						},
+						"split": {
+							"type": "boolean",
+							"default": false
+						},
+						"external": {
+							"type": "array",
+							"items": { "type": "string" },
+							"default": false
+						}
+					}
+				},
+				"netlify": {
+					"type": "object",
+					"description": "",
+					"properties": {
+						"edge": {
+							"type": "boolean",
+							"default": false
+						},
+						"split": {
+							"type": "boolean",
+							"default": false
+						}
+					}
+				},
+				"node": {
+					"type": "object",
+					"description": "",
+					"properties": {
+						"envPrefix": {
+							"type": "string",
+							"default": ""
+						},
+						"out": {
+							"type": "string",
+							"default": ""
+						},
+						"precompress": {
+							"type": "boolean",
+							"default": false
+						}
+					}
+				}
+			}
+		},
+		"port": {
+			"description": "The port that SvelteKit should listen for requests on.\nThis property is required for the Node adapter and is unused on others.",
+			"type": "integer",
+
+			"default": 3000
+		}
+	}
+}

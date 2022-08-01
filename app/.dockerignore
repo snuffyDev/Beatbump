@@ -1,0 +1,7 @@
+node_modules
+npm-debug.log
+workers-site
+dist
+.vercel
+.vercel_build_output
+.cloudflare

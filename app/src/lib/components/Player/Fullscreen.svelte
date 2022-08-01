@@ -1,0 +1,581 @@
+<script lang="ts">
+	import { navigating, session } from "$app/stores";
+	import { AudioPlayer } from "$lib/player";
+	import { immersiveQueue, isPagePlaying, playerLoading } from "$lib/stores";
+	import { queue, currentTrack } from "$lib/stores/list";
+	import ListItem from "../ListItem/ListItem.svelte";
+	import Loading from "../Loading/Loading.svelte";
+	import Tabs from "../Tabs";
+	import TrackList from "../TrackList";
+	import { fullscreenStore } from "./channel";
+	import Controls from "./Controls.svelte";
+	import { pan } from "$lib/actions/gestures/handlers";
+	import { tweened } from "svelte/motion";
+	import { cubicOut } from "svelte/easing";
+	import { draggable } from "$lib/actions/draggable";
+	import { groupSession } from "$lib/stores/sessions";
+	import ProgressBar from "./ProgressBar";
+	import { CTX_ListItem } from "$lib/contexts";
+	const { paused } = AudioPlayer;
+
+	$: state = fullscreenStore;
+	$: loading = $playerLoading;
+	$: data = $currentTrack;
+	$: heightCalc = -windowHeight + 140;
+	$: queueOpen = true;
+	let active = "UpNext";
+	const tabs = [
+		{
+			id: "UpNext",
+			text: "Up Next",
+			action: () => {
+				active = tabs[0].id;
+			},
+		},
+		{
+			id: "Related",
+			text: "Related",
+			action: () => {
+				active = tabs[1].id;
+			},
+		},
+	];
+	const motion = tweened(0, {
+		duration: 180,
+		easing: cubicOut,
+	});
+	const queueTween = tweened(0, {
+		duration: 180,
+		easing: cubicOut,
+	});
+
+	let windowHeight = 0,
+		queueHeight = 0,
+		sliding = false,
+		innerWidth = 800;
+
+	CTX_ListItem.set({ page: "queue" });
+
+	$: $navigating !== null &&
+		(() => {
+			fullscreenStore.set("closed");
+			$motion = 0;
+			$queueTween = 0;
+		})();
+	function onDragStart(kind, { detail }) {
+		sliding = true;
+	}
+
+	function release(kind: number, detail) {
+		if (sliding) {
+			if (Math.sign(detail.deltaY) < 0) {
+				open(kind, detail);
+			} else {
+				close(kind, detail);
+			}
+			sliding = false;
+		}
+	}
+	function trackMovement(kind: number, detail) {
+		if (kind === 1) {
+			motion.set(Math.min(48, Math.max(heightCalc, detail.clientY - 8)), { duration: 180 });
+		} else {
+			queueTween.set(0 - (detail.clientY * 0.7 + detail.clientY * 0.3) / windowHeight, { duration: 180 });
+		}
+	}
+	function open(kind: number, detail) {
+		const step = detail.deltaY / queueHeight;
+		const miss = detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : 1 - step;
+		const distance = miss * windowHeight;
+		if (kind === 1) {
+			motion.update(
+				() => {
+					return heightCalc;
+				},
+				{
+					duration: Math.min(distance / Math.abs(detail.velocityY), 640),
+				},
+			);
+		} else {
+			queueTween.update(
+				(_) => {
+					return 0;
+				},
+				{ duration: Math.min(distance / Math.abs(detail.velocityY), 640) },
+			);
+		}
+	}
+	function close(kind: number, detail) {
+		const step = detail.deltaY / queueHeight;
+		const miss = detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : step;
+		const distance = miss * windowHeight;
+		if (kind === 1) {
+			motion.set(0, {
+				duration: Math.min(distance / Math.abs(detail.velocityY), 640),
+			});
+		} else {
+			queueTween.update(
+				(_) => {
+					return windowHeight;
+				},
+				{ duration: Math.min(distance / Math.abs(detail.velocityY), 640) },
+			);
+			fullscreenStore.set("closed");
+		}
+		sliding = false;
+	}
+	$: thumbnail = data?.thumbnails.at(-1) ?? data?.thumbnail;
+</script>
+
+<svelte:window bind:innerWidth />
+{#if $queue.length}
+	<div
+		class="backdrop"
+		class:mobile={$session.Android || $session.iOS}
+		bind:clientHeight={windowHeight}
+		style="background-color: {$state === 'open' ? 'hsla(0,0%,0%,40%)' : '#0000'} !important;"
+		style:pointer-events={$state === "open" ? "all" : "none"}
+	>
+		<div
+			class:tr-open={$state === "open"}
+			class:tr-close={$state === "closed"}
+			class="fullscreen-player-popup"
+			style="top: 0; transform: translate3d(0, {$state === 'open'
+				? $queueTween === 0
+					? '0vh'
+					: `clamp(0%, calc(50% + ${$queueTween * -150}%), 100%)`
+				: '100vh'}, 0); opacity: {$state === 'open' ? '1' : '0'};"
+		>
+			<div
+				class="column container"
+				use:pan
+				on:pan={(event) => {
+					if ($session.Android !== true && $session.iOS !== true) return;
+					const { detail } = event;
+					// if (Math.abs(detail.velocityY))
+					trackMovement(0, detail);
+				}}
+				on:panend={(event) => {
+					if ($session.Android !== true && $session.iOS !== true) return;
+					const { detail } = event;
+					const direction = Math.sign(detail.deltaY) === -1 ? "up" : "down";
+
+					if (direction === "down") {
+						close(0, detail);
+					} else {
+						open(0, detail);
+					}
+				}}
+			>
+				{#if $immersiveQueue}
+					<div class="immersive">
+						<img
+							id="img"
+							loading="eager"
+							decoding="sync"
+							style="aspect-ratio: {thumbnail.width} / {thumbnail.height};"
+							width={thumbnail.width}
+							height={thumbnail.height}
+							src={thumbnail ? thumbnail.url : data?.thumbnail}
+							alt="thumbnail"
+						/>
+					</div>
+				{/if}
+				<div class="album-art" style="width: {innerWidth > 640 ? (queueOpen ? 55 : 95) : '100'}vw;">
+					<div class="img-container">
+						{#if loading}
+							<Loading size="3em" />
+						{/if}
+						<div class="thumbnail">
+							<img
+								id="img"
+								loading="lazy"
+								style="aspect-ratio: {thumbnail.width} / {thumbnail.height};"
+								width={thumbnail.width}
+								height={thumbnail.height}
+								src={thumbnail ? thumbnail.url : data?.thumbnail}
+								alt="thumbnail"
+							/>
+						</div>
+					</div>
+				</div>
+				{#if $session.Android || $session.iOS}
+					<div class="container controls">
+						<div class="container text-shadow" style="text-align:center; overflow:hidden;">
+							<span class="h5">{data?.title}</span>
+							<span class="h6"
+								>{data?.artistInfo && data?.artistInfo.artist.at(0) ? data?.artistInfo.artist.at(0).text : ""}</span
+							>
+						</div>
+						<div class="container" style="margin-bottom: 1em; max-width: 75vw; margin-inline: auto;">
+							<ProgressBar />
+						</div>
+						<Controls
+							sizes={{ main: "2.75em", skip: "1.75em" }}
+							bind:isPaused={$paused}
+							bind:loading={$playerLoading}
+							on:play={() => AudioPlayer.play()}
+							isQueue={true}
+							pause={() => AudioPlayer.pause()}
+							nextBtn={() => {
+								if ($queue.length === 0) return;
+								AudioPlayer.next(true, groupSession.hasActiveSession ? true : false);
+								// AudioPlayer.updateTime($durationStore);
+							}}
+							prevBtn={() => AudioPlayer.previous(true)}
+						/>
+					</div>
+				{/if}
+			</div>
+
+			<div
+				class="handle vertical"
+				style="transform: translate3d({queueOpen ? 53.5 : 91.5}vw, 0px, 0) !important;"
+				on:click={() => {
+					queueOpen = !queueOpen;
+				}}
+			>
+				<hr class="vertical" />
+			</div>
+			<div
+				class="column container tracklist"
+				bind:clientHeight={queueHeight}
+				style={innerWidth < 640
+					? `transform: translate3d(0, ${$motion}px, 0); top: ${
+							windowHeight - 65
+					  }px; bottom:0; padding-bottom: calc(6em);`
+					: `transform: translate3d(${queueOpen ? 55 : 93}vw, 0px, 0) !important;`}
+			>
+				<div
+					use:draggable
+					on:dragstart|capture|stopPropagation={(e) => onDragStart(1, e)}
+					on:dragmove|capture|stopPropagation={(e) => trackMovement(1, e.detail)}
+					on:dragend|capture|stopPropagation={(e) => release(1, e.detail)}
+					class="handle horz"
+				>
+					<hr class="horz" />
+					<span />
+				</div>
+				<Tabs {tabs} {active} />
+				<div class="scroller">
+					<TrackList items={$queue} hasData={true} let:index let:item>
+						<ListItem
+							{item}
+							idx={index}
+							on:setPageIsPlaying={() => {
+								if (isPagePlaying.has("player-queue")) return;
+								isPagePlaying.add("player-queue");
+							}}
+						/>
+					</TrackList>
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<style lang="scss">
+	.controls {
+		gap: 1em;
+	}
+	.text-shadow {
+		text-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.692), -0.1em -0.1em 0.2em rgba(0, 0, 0, 0.418);
+	}
+	.scroller {
+		overflow-y: auto;
+		// overflow-x: hidden;
+		// background-color: rgb(18, 17, 24);
+		overscroll-behavior: contain;
+		// display: flex;
+		overflow-y: auto;
+		overflow-x: hidden;
+		// background-color: rgb(18, 17, 24);
+		overscroll-behavior: contain;
+		height: inherit;
+		-webkit-overflow-scrolling: touch;
+		touch-action: none;
+	}
+
+	.immersive {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		isolation: isolate;
+		touch-action: none;
+		pointer-events: none;
+		overscroll-behavior: contain;
+
+		// backdrop-filter: saturate(-0.5) blur(80%);
+		&::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			z-index: 1;
+			// background: rgb(180, 180, 180);
+			// backdrop-filter: blur(30em);
+			// backdrop-filter: blur(5em) brightness(2) contrast(0.8) saturate(0.8);
+			// mix-blend-mode: darken;
+			touch-action: none;
+			overscroll-behavior: contain;
+		}
+		img {
+			object-fit: cover;
+			height: 100%;
+			overscroll-behavior: contain;
+
+			min-width: 100vw;
+			transform: scale(1.5);
+			// box-shadow: 0 0.5px 1rem 1rem #000;
+			filter: brightness(0.6) opacity(0.6) contrast(1) saturate(1.1) blur(1em) grayscale(0.3) sepia(0.2);
+			touch-action: none;
+		}
+	}
+	.tracklist {
+		position: absolute;
+		// inset: 0;
+		bottom: 0;
+		will-change: transform;
+		height: 100%;
+		min-height: 0;
+		background: var(--bottom-bg);
+		overscroll-behavior: contain;
+		// touch-action: pan-y;
+		touch-action: none;
+		border-top-left-radius: $sm-radius;
+		border-top-right-radius: $sm-radius;
+		contain: content;
+		@media screen and (min-width: 640px) and (hover: hover) {
+			position: absolute;
+			left: 0;
+			width: 45vw;
+			max-height: 100%;
+			// transform: unset !important;
+			height: 100% !important;
+			// will-change: unset !important;
+			transition: transform cubic-bezier(0.25, 0.46, 0.45, 0.94) 400ms;
+			top: unset !important;
+			border-top-left-radius: unset !important;
+			border-top-right-radius: unset !important;
+			// transition: unset !important;
+		}
+	}
+	.fullscreen-player-popup {
+		position: absolute;
+		top: 0;
+		height: 100%;
+		width: 100%;
+		// pointer-events: none;
+		z-index: 1;
+		grid-area: m;
+		background: var(--base-bg);
+		display: flex;
+		isolation: isolate;
+		touch-action: none;
+
+		opacity: 0;
+		transform: translate3d(0, 0vh, 0);
+		will-change: transform;
+		overscroll-behavior: contain;
+
+		overflow: hidden;
+		contain: strict;
+
+		@media screen and (min-width: 600px) {
+			// gap: 1em;
+			flex-direction: row;
+		}
+	}
+	.tr-open {
+		transition: transform 300ms cubic-bezier(0.165, 0.84, 0.44, 1), opacity 400ms cubic-bezier(0.165, 0.84, 0.44, 1);
+	}
+	.tr-close {
+		transition: transform 300ms cubic-bezier(0.645, 0.045, 0.355, 1), opacity 400ms cubic-bezier(0.6, 0.04, 0.98, 0.335);
+	}
+	hr {
+		touch-action: none;
+
+		&.horz::before {
+			position: absolute;
+			inset: 0;
+			content: "";
+			margin: auto;
+			width: 25%;
+			color: hsl(0deg 0% 80%);
+			background: rgba(206, 206, 206, 0.308);
+			height: 0.45em;
+			border-radius: 3.6667em;
+
+			line-height: inherit;
+			z-index: 5;
+		}
+		&.vertical::before {
+			position: absolute;
+			inset: 0;
+			opacity: 0;
+			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) 200ms opacity;
+			content: "";
+			margin: auto;
+			height: 15%;
+			color: hsl(0deg 0% 80%);
+			background: rgba(206, 206, 206, 0.308);
+			width: 0.45em;
+			line-height: inherit;
+			border-radius: 3.6667em;
+			z-index: 100;
+			transition-delay: 400ms;
+		}
+		&.vertical:hover::before {
+			opacity: 1;
+			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) 200ms opacity;
+		}
+		overscroll-behavior: contain;
+		width: 100%;
+		border: none;
+		position: relative;
+		&.vertical {
+			height: 100%;
+		}
+		// z-index: 100;
+	}
+	.mobile {
+		// position: absolute !important;
+		// height: 100% !important;
+		touch-action: none;
+
+		min-height: 100% !important;
+		margin-top: unset !important;
+	}
+	.backdrop {
+		overscroll-behavior: contain;
+
+		grid-area: m;
+		position: fixed;
+		isolation: isolate;
+		display: grid;
+		pointer-events: all;
+		background-color: #0000;
+		inset: 0;
+		z-index: 151;
+		transition: background-color 1200ms cubic-bezier(0.445, 0.05, 0.55, 0.95);
+		// transition-delay: 225ms;
+		margin-top: var(--top-bar-height);
+		height: calc(100% - calc(var(--top-bar-height) + var(--player-bar-height)));
+		touch-action: none;
+
+		max-height: 100vh;
+
+		contain: strict;
+		touch-action: none;
+		// bottom: 0;
+	}
+	.album-art {
+		margin-top: 1.5em;
+		overscroll-behavior: contain;
+		height: 100%;
+		display: grid;
+		place-items: center;
+		margin-bottom: 1em;
+		width: 55vw;
+
+		justify-content: center;
+		max-width: 100%;
+		@media screen and (max-width: 640px) {
+			max-height: 28vh;
+			margin-bottom: 1em;
+			width: 100%;
+		}
+	}
+	.img-container {
+		display: grid;
+		place-items: center;
+		width: 100%;
+		overscroll-behavior: contain;
+		max-width: 100%;
+		min-height: 0;
+		max-height: inherit;
+		position: relative;
+		max-width: 100%;
+
+		width: 100%;
+		overscroll-behavior: contain;
+		max-height: inherit;
+		// position: absolute;
+		// max-width:100%;
+
+		// padding-top: 56.75%;
+	}
+	.thumbnail {
+		position: relative;
+		overscroll-behavior: contain;
+		max-height: inherit;
+		height: 100%;
+		min-height: 20vh;
+		width: 100%;
+
+		max-height: inherit;
+		// position: absolute;
+		img {
+			touch-action: none;
+			max-width: inherit;
+			max-height: inherit;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+			overscroll-behavior: contain;
+			filter: drop-shadow(0px 0px 12px rgba(0, 0, 0, 0.16));
+		}
+	}
+
+	button {
+		position: absolute;
+		top: 0;
+		right: 0;
+		z-index: 100;
+		// margin: 0.5em;
+	}
+	.horz {
+		width: 100%;
+		// border-top: 0.0175rem groove rgba(171, 171, 171, 0.151);
+		border-top-left-radius: $sm-radius;
+		border-top-right-radius: $sm-radius;
+		height: 2.5em;
+		padding-bottom: 0.0606em;
+
+		align-content: center;
+
+		top: 0;
+		left: 0;
+		@media screen and (min-width: 639px) and (hover: hover) {
+			display: none !important;
+			visibility: none !important;
+		}
+	}
+	.handle {
+		overscroll-behavior: contain;
+
+		// box-shadow: 0 -0.4rem 23px -17px hsl(0deg 0% 100% / 100%);
+		z-index: 1;
+		display: grid;
+		cursor: pointer;
+		padding: 0.12em;
+		align-items: center;
+		touch-action: none;
+	}
+	.handle.vertical {
+		@media screen and (max-width: 639px) and (hover: hover) {
+			display: none;
+			visibility: none;
+		}
+		left: 0;
+		position: absolute;
+		transition: transform cubic-bezier(0.25, 0.46, 0.45, 0.94) 400ms;
+
+		@media screen and (min-width: 640px) and (hover: hover) {
+			place-items: center;
+			width: 2.5em;
+			height: 100%;
+			padding-right: 0.0606em;
+			place-items: center;
+		}
+	}
+</style>

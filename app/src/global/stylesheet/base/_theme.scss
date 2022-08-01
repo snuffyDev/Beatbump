@@ -1,0 +1,76 @@
+$sections: (
+	bottom: (
+		footer-container,
+		player,
+	),
+	top: (
+		nav,
+	),
+	form: (
+		select,
+		input,
+		option,
+		suggestions,
+	),
+);
+$themes: (
+	YTM: (
+		"bottom": linear-gradient(0deg, #121018 28%, #18171e 100%),
+		"base": #010102,
+		"top": #010102,
+		"form": #1b1922,
+		"side": #0e0c13,
+	),
+	Dark: (
+		"bottom": linear-gradient(0deg, #121216 28%, #1a1a20 100%),
+		"base": #010102,
+		"top": linear-gradient(0deg, #101014 28%, #17171d 100%),
+		"form": #1c1f20,
+		"side": #15191d,
+	),
+	Dim: (
+		"bottom": #141820,
+		"base": #010102,
+		"top": #141820,
+		"form": #1c1f20,
+		"side": #0f1116,
+	),
+	Midnight: (
+		"base": #010102,
+		"top": hsl(267, 41%, 6%),
+		"side": #15131f,
+		"bottom": linear-gradient(0deg, #12131c 32%, #191a26 100%),
+		"form": #1b1922,
+	),
+);
+$theme-name: (Dark, Dim, Midnight, YTM);
+$section-names: (base, top, side, bottom, form);
+
+:root {
+	--mobile-popper-bg: unset;
+}
+html {
+	@each $section in $section-names {
+		@each $theme in $theme-name {
+			--#{$theme}-#{$section}: #{map-get($themes, $theme, $section)};
+		}
+	}
+	@each $theme in $theme-name {
+		&.#{$theme} {
+			--mobile-popper-bg: #{map-get($themes, $theme, "side")};
+			--form-bg: #{map-get($themes, $theme, "form")};
+			--disabled-form-bg: #{scale-color(map-get($themes, $theme, "form"), $lightness: 17%, $alpha: -25%)};
+			--disabled-form-fg: #{scale-color(map-get($themes, $theme, "form"), $lightness: 60%)};
+			--bottom-bg: #{map-get($themes, $theme, "bottom")};
+			--top-bg: #{map-get($themes, $theme, "top")};
+			--base-bg: #{map-get($themes, $theme, "base")};
+			background: var(--base-bg);
+
+			@each $section, $elm in $sections {
+				.#{$elm} {
+					background: #{var(--#{$section}-bg)};
+				}
+			}
+		}
+	}
+}

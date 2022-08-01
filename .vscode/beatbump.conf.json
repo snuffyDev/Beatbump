@@ -1,0 +1,23 @@
+{
+	"environment": {
+		"adapter": "node",
+		"proxy_streams": false
+	},
+	"platform": {
+		"vercel": {
+			"external": [],
+			"edge": false,
+			"split": false
+		},
+		"netlify": {
+			"edge": false,
+			"split": false
+		},
+		"node": {
+			"envPrefix": "",
+			"out": "",
+			"precompress": false
+		}
+	},
+	"port": 3000
+}

@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"esModuleInterop": true,
+		"baseUrl": "../scripts",
+		"resolveJsonModule": true,
+		"rootDir": "../scripts",
+		"importsNotUsedAsValues": "error",
+		"isolatedModules": true,
+		"preserveValueImports": true,
+		"moduleResolution": "Node",
+		"module": "esnext",
+		"lib": ["ES2022", "ESNext"],
+		"target": "esnext"
+	},
+	"files": ["./build", "./logger"],
+	"ts-node": {
+		"moduleTypes": { "esm": ["*.ts"] }
+	},
+	"exclude": ["../node_modules/**"]
+}

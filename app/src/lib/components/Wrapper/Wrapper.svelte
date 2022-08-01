@@ -1,0 +1,26 @@
+<script lang="ts">
+	import { fade } from "svelte/transition";
+	export let main: HTMLElement;
+	export let key;
+	$: if (key) catchUp();
+	async function catchUp() {
+		if (import.meta.env.SSR) return;
+		if (main) main.scrollTop = 0;
+	}
+</script>
+
+{#key key}
+	<div class="app-content-p" in:fade={{ duration: 250, delay: 250 }} out:fade={{ duration: 250 }}>
+		<slot />
+	</div>
+{/key}
+
+<style>
+	div {
+		/* display: block; */
+		/* position: relative; */
+		inset: 0;
+		position: absolute;
+		/* isolation: isolate; */
+	}
+</style>

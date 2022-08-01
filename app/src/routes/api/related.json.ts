@@ -1,0 +1,72 @@
+import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
+import type { Item, Song } from "$lib/types";
+import type { RequestHandler } from "@sveltejs/kit";
+import { buildRequest } from "./_api/request";
+type ResponseBody = {
+	browseId: string;
+	params: string;
+	pageType: string;
+};
+export const GET: RequestHandler = async ({ url }) => {
+	try {
+		const carousels = [];
+		const description = {};
+		const browseId = url.searchParams.get("browseId");
+
+		const response = await buildRequest("related", {
+			context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
+			params: {
+				browseId: browseId,
+				params: undefined,
+				browseEndpointContextMusicConfig: {
+					browseEndpointContextMusicConfig: { pageType: "MUSIC_PAGE_TYPE_TRACK_RELATED" },
+				},
+			},
+		});
+		const data = await response.json();
+		const contents = Array.isArray(data?.contents?.sectionListRenderer?.contents)
+			? (data?.contents?.sectionListRenderer?.contents as Array<any>)
+			: [];
+		let pos = contents.length;
+		while (--pos > -1) {
+			const section = contents[pos];
+			if (section?.musicCarouselShelfRenderer) {
+				const carousel: { header?: { text: string }; items?: Item[] } = {};
+				const items = [];
+				let idx = section?.musicCarouselShelfRenderer?.contents?.length;
+				while (--idx > -1) {
+					const item = section?.musicCarouselShelfRenderer?.contents[idx];
+					if (item?.musicTwoRowItemRenderer) {
+						items.unshift(MusicTwoRowItemRenderer(item));
+					}
+					if (item?.musicResponsiveListItemRenderer) {
+						items.unshift(MusicResponsiveListItemRenderer(item));
+					}
+				}
+				carousel.items = items;
+				carousel.header = {
+					text: section?.musicCarouselShelfRenderer?.header?.musicCarouselShelfBasicHeaderRenderer?.title?.runs[0]
+						?.text,
+				};
+				carousels.push(carousel);
+			}
+			if (section?.musicDescriptionShelfRenderer) {
+				description.header = section?.musicDescriptionShelfRenderer?.header?.runs[0]?.text;
+				description.description = section?.musicDescriptionShelfRenderer?.description?.runs[0]?.text;
+			}
+		}
+		return {
+			status: 200,
+			body: {
+				carousels,
+				description,
+			},
+		};
+	} catch (err) {
+		console.error(err);
+		return {
+			status: 500,
+			body: null,
+		};
+	}
+};

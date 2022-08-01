@@ -1,12 +1,14 @@
 {
 	"tabWidth": 2,
 	"useTabs": true,
-	"trailingComma": "none",
+	"trailingComma": "all",
 	"singleQuote": false,
 	"semi": true,
-	"printWidth": 80,
+	"printWidth": 120,
+	"proseWrap": "always",
 	"bracketSpacing": true,
-
-	"svelteBracketNewLine": true,
+	"quoteProps": "as-needed",
+	"singleAttributePerLine": true,
+	"arrowParens": "always",
 	"svelteSortOrder": "scripts-markup-styles"
 }

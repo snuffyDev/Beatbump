@@ -1,0 +1,19 @@
+{
+	"objects": {
+		"View Artist": { "text": "View Artist", "icon": "artist" },
+		"Add to Queue": { "text": "Add to Queue", "icon": "queue" },
+		"Play Next": { "text": "Play Next", "icon": "queue" },
+		"Favorite": { "text": "Favorite", "icon": "heart" },
+		"Start Group Session": { "text": "Start Group Session", "icon": "users" },
+		"Share": { "text": "Share", "icon": "share" },
+		"Go to album": { "text": "Go to album", "icon": "album" },
+		"Invite Group Session": { "text": "Invite Group Session", "icon": "send" },
+		"View Playlist": { "text": "View Playlist", "icon": "list" },
+		"Play Song Radio": { "text": "Play Song Radio", "icon": "radio" },
+		"Remove from Playlist": { "text": "Remove from Playlist", "icon": "x" },
+		"Add to Playlist": { "text": "Add to Playlist", "icon": "playlist-add" },
+		"Add to Favorites": { "text": "Add to Favorites", "icon": "heart" },
+		"Share Group Session": { "text": "Share Group Session", "icon": "share" },
+		"Shuffle": { "text": "Shuffle", "icon": "shuffle" }
+	}
+}

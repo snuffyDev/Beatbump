@@ -1,0 +1,14 @@
+.svelte/**
+static/**
+node_modules/**
+/build/**
+/functions/**
+.svelte-kit/**
+/public/**
+/dist/**
+/workers-site/**
+.cloudflare/**
+.vercel/**
+.vercel_build_output/**
+.vscode/**
+docs/**

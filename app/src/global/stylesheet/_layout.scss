@@ -1,0 +1,49 @@
+.no-scroll {
+	overflow: hidden;
+	overflow-y: hidden;
+}
+
+$sections: (
+	bottom: (
+		footer-container,
+		player,
+	),
+	top: (
+		nav,
+	),
+	forms: (
+		select,
+		input,
+		option,
+		suggestions,
+	),
+);
+$themes: (dark, dim, midnight, ytm);
+
+.footer-container {
+	width: 100%;
+	max-width: 100%;
+	isolation: isolate;
+	z-index: 25;
+	@media screen and (min-width: 640px) {
+		z-index: 152;
+	}
+}
+
+.footer-container {
+	bottom: 0;
+	display: block;
+	width: 100%;
+	position: absolute;
+	height: var(--player-bar-height);
+	min-width: 100%;
+	display: flex;
+	min-width: 100%;
+}
+
+:root .dark * {
+	color: hsl(0, 0%, 95%);
+}
+.player {
+	color: #f3f3f3;
+}

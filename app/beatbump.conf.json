@@ -1,0 +1,20 @@
+{
+	"environment": {
+		"adapter": "cloudflare-workers",
+		"proxy_streams": false
+	},
+	"platform": {
+		"netlify": {
+			"edge": false,
+			"split": false
+		},
+		"node": {
+			"precompress": false
+		},
+		"vercel": {
+			"edge": false,
+			"split": false
+		}
+	},
+	"port": 3000
+}

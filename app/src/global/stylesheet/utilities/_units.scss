@@ -1,0 +1,308 @@
+// ____________________________________________________________________________
+//
+//    Unit Conversion v.2.1.1
+// ____________________________________________________________________________
+//
+//   Function               Input units
+//
+//   Absolute length
+//   px(input);             px, pt, pc, in, mm, cm, em, rem, number
+//   pt(input);             px, pt, pc, in, mm, cm, em, rem, number
+//   pc(input);             px, pt, pc, in, mm, cm, em, rem, number
+//   in(input);             px, pt, pc, in, mm, cm, em, rem, number
+//   mm(input);             px, pt, pc, in, mm, cm, em, rem, number
+//   cm(input);             px, pt, pc, in, mm, cm, em, rem, number
+//
+//   Relative length
+//   em(input);             px, pt, pc, in, mm, cm, em, rem, number
+//   rem(input);            px, pt, pc, in, mm, cm, em, rem, number
+//   ex(input);             ex, number
+//   ch(input);             ch, number
+//   vw(input);             vw, number
+//   vh(input);             vh, number
+//   vmin(input);           vmin, number
+//   vmax(input);           vmax, number
+//
+//   Angle
+//   deg(input);            deg, rad, grad, turn, number
+//   rad(input);            deg, rad, grad, turn, number
+//   grad(input);           deg, rad, grad, turn, number
+//   turn(input);           deg, rad, grad, turn, number
+//
+//   Resolution
+//   dpi(input);            dpi, dpcm, dppx, number
+//   dpcm(input);           dpi, dpcm, dppx, number
+//   dppx(input);           dpi, dpcm, dppx, number
+//
+//   Time
+//   s(input);              s, ms, number
+//   ms(input);             s, ms, number
+//
+//   Frequency
+//   hz(input);             hz, khz, number
+//   khz(input);            hz, khz, number
+//
+//   String
+//   str(input);            anything not null
+//
+//   Number, int and uint
+//   num(input);            px, pt, pc, in, mm, cm, em, rem, ex, ch,
+//                          vw, vh, vmin, vmax, deg, rad, grad, turn,
+//                          dpi, dpcm, dppx, s, ms, hz, khz, number
+//   int(input);            as number
+//   uint(input);           as number
+//
+//   Aliases
+//   string(input);
+//   number(input);
+//
+// ____________________________________________________________________________
+
+// Base font size in pixel for converting em and rem to absolute lengths.
+$base-font-size: 16px !default;
+
+// Absolute lengths
+@function px($input) {
+	@return to-unit(px, $input);
+}
+@function pt($input) {
+	@return to-unit(pt, $input);
+}
+@function pc($input) {
+	@return to-unit(pc, $input);
+}
+@function in($input) {
+	@return to-unit(in, $input);
+}
+@function mm($input) {
+	@return to-unit(mm, $input);
+}
+@function cm($input) {
+	@return to-unit(cm, $input);
+}
+@function q($input) {
+	@return to-unit(q, $input);
+}
+
+// Angles
+@function deg($input) {
+	@return to-unit(deg, $input);
+}
+@function rad($input) {
+	@return to-unit(rad, $input);
+}
+@function grad($input) {
+	@return to-unit(grad, $input);
+}
+@function turn($input) {
+	@return to-unit(turn, $input);
+}
+
+// Resolution
+@function dpi($input) {
+	@return to-unit(dpi, $input);
+}
+@function dpcm($input) {
+	@return to-unit(dpcm, $input);
+}
+@function dppx($input) {
+	@return to-unit(dppx, $input);
+}
+
+// Time
+@function ms($input) {
+	@return to-unit(ms, $input);
+}
+@function s($input) {
+	@return to-unit(s, $input);
+}
+
+// Frequencies
+@function hz($input) {
+	@return to-unit(hz, $input);
+}
+@function khz($input) {
+	@return to-unit(khz, $input);
+}
+
+// Relative lengths
+@function em($input...) {
+	$em: to-unit(em, nth($input, 1));
+	// Adjust for compounds (visual size)
+	@if length($input) > 1 {
+		@for $i from 2 through length($input) {
+			$em: $em / num(em(nth($input, $i)));
+		}
+	}
+	@return $em;
+}
+@function rem($input) {
+	@return to-unit(rem, num(em($input)));
+}
+
+// Inconvertible relative lengths – depends on font
+@function ex($input) {
+	@return to-unit(ex, $input);
+}
+@function ch($input) {
+	@return to-unit(ch, $input);
+}
+
+// Viewport
+@function vw($input) {
+	@return to-unit(vw, $input);
+}
+@function vh($input) {
+	@return to-unit(vh, $input);
+}
+@function vmin($input) {
+	@return to-unit(vmin, $input);
+}
+@function vmax($input) {
+	@return to-unit(vmax, $input);
+}
+
+// Strings and numbers
+@function str($input) {
+	@return #{$input};
+}
+@function num($input) {
+	@if type-of($input) != number {
+		@error 'Could not convert `#{$input}` - must be `type-of number`';
+		@return null;
+	}
+	@return $input/($input * 0+1);
+}
+@function int($input) {
+	$num: num($input);
+	@return if($num<0, ceil($num), floor($num));
+}
+@function uint($input) {
+	@return abs(int($input));
+}
+
+// Aliases
+@function string($input) {
+	@return str($input);
+}
+@function number($input) {
+	@return num($input);
+}
+
+// Conversion function
+@function to-unit($unit, $input) {
+	// Test against valid CSS units
+	$to-unit: map-get(
+		(
+			px: 0px,
+			pt: 0pt,
+			pc: 0pc,
+			in: 0in,
+			mm: 0mm,
+			cm: 0cm,
+			q: 0Q,
+			// absolute length
+			em: 0em,
+			rem: 0rem,
+			ch: 0ch,
+			ex: 0ex,
+			// relative length - font based
+			vw: 0vw,
+			vh: 0vh,
+			vmin: 0vmin,
+			vmax: 0vmax,
+			// relative length - viewport based
+			deg: 0deg,
+			turn: 0turn,
+			grad: 0grad,
+			rad: 0rad,
+			// angle
+			s: 0s,
+			ms: 0ms,
+			// time
+			hz: 0Hz,
+			khz: 0kHz,
+			// frequency
+			dpi: 0dpi,
+			dpcm: 0dpcm,
+			dppx: 0dppx,
+			// resolution
+			pct: 0%,
+			percent: 0%,
+			num: 0,
+			number: 0 // percent or number,,
+		),
+		$unit
+	);
+
+	// Error handling – wrong $unit
+	// Incomparable units are caught in convertion
+	@if not $to-unit {
+		@error 'Could not convert to `#{$unit}` – must be a valid CSS unit';
+		@return null;
+	}
+
+	// Number/incomparable conversion
+	@if index(num number ex ch vw vh vmin vmax, $unit) {
+		$value: num($input);
+	}
+
+	// EM/REM convertion using px as base
+	@if index(em rem, unit($input)) {
+		$input: 0px + num($input) * $base-font-size/1px;
+	}
+	@if index(em rem, $unit) and not unitless($input) {
+		$input: 0px + $input;
+		$input: num($input) * 1px / $base-font-size;
+	}
+
+	// Bug fix – resolution units seems to be flipped
+	@if index(dpi dpcm dppx, $unit) {
+		$units: (
+			dppx: 0dppx,
+			dpcm: 0dpcm,
+			dpi: 0dpi,
+		);
+		$input-unit: map-get($units, unit($input));
+		$input: if(1dppx < 95dpi, num($input-unit + (num($input) + $to-unit)), $input);
+	}
+
+	// Convert
+	@return $to-unit + $input;
+}
+
+//  Convert number to ratio
+//  ratio(1.7777778) =>   16/9
+@function ratio($x, $y: null) {
+	@if not $y {
+		$n: $x;
+		$y: 1;
+		@while $y < 10 {
+			$x: $n * 10 - ((10 - $y) * $n);
+			@if $x == round($x) {
+				@return #{$x}/#{$y};
+			} @else {
+				$y: $y + 1;
+			}
+		}
+		$x: round($n * 1000000);
+		$y: 1000000;
+		@while $x % 10 == 0 {
+			$x: $x/10;
+			$y: $y/10;
+		}
+		@while $x % 5 == 0 {
+			$x: $x/5;
+			$y: $y/5;
+		}
+		@while $x % 2 == 0 {
+			$x: $x/2;
+			$y: $y/2;
+		}
+		@return #{$x}/#{$y};
+	} @else if $x == round($x) and $y == round($y) {
+		@return #{$x}/#{$y};
+	}
+	@warn 'X and Y must be integers';
+	@return false;
+}

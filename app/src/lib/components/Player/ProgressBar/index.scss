@@ -1,0 +1,63 @@
+.progress-bar {
+	// position: absolute;
+	// top: 50%;
+	// left: 50%;
+	// right: 0;
+	// transform: translate(-50%, -50%);
+	// bottom: 0;
+	width: 100%;
+	will-change: visibility;
+	contain: paint;
+	isolation: isolate;
+	background-clip: content-box;
+	background-color: rgb(84, 84, 88);
+	border: #0000 solid 0.3em;
+	border-radius: 333333em;
+	height: calc(0.25rem + 10px);
+}
+.hover {
+	background-color: #edecec66;
+	padding: inherit;
+	inset: 0;
+
+	position: absolute;
+	padding: 0;
+	z-index: 5;
+	width: 100%;
+	cursor: pointer;
+	will-change: transform;
+	transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) 0ms transform;
+	transform-origin: 0% 50%;
+	overflow: hidden;
+	border-radius: 333333em;
+	isolation: isolate;
+}
+.progress-container {
+	position: relative;
+}
+progress {
+	display: block;
+	width: 100%;
+	height: inherit;
+	top: 0;
+	cursor: pointer;
+	margin: 0;
+	-moz-appearance: none;
+	appearance: none;
+	background: #0000;
+	outline: none;
+	border: transparent;
+	padding: 0;
+	// inset: 0;
+}
+
+progress::-webkit-progress-bar {
+	background-color: rgb(84, 84, 88);
+}
+progress::-moz-progress-bar {
+	background-color: #f3f3f3;
+	color: white;
+}
+progress::-webkit-progress-value {
+	background-color: rgb(255, 255, 255);
+}

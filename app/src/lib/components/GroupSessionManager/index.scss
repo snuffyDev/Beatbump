@@ -1,0 +1,52 @@
+.groupSessionManager-frame {
+	> * {
+		color: var(--color-light) !important;
+	}
+	position: relative;
+	background-color: lightgreen;
+	font-size: 1em;
+	top: -100%;
+	left: 0;
+	right: 0;
+	z-index: -1;
+	// padding: 0.7em;
+	border-top-left-radius: 3vw;
+	border-top-right-radius: 3vw;
+}
+
+.groupSessionManager-handle {
+	width: 100%;
+
+	border-bottom: 0.0175rem groove rgba(171, 171, 171, 0.151);
+	border-top: 0.0175rem groove rgba(171, 171, 171, 0.151);
+	border-top-left-radius: inherit;
+	border-top-right-radius: inherit;
+	box-shadow: 0 -0.4rem 23px -17px hsl(0deg 0% 100% / 100%);
+	background: rgba(10, 10, 11, 0.473);
+	z-index: 1;
+	height: 1.8em;
+	display: flex;
+	cursor: pointer;
+	padding: 0.12em;
+	align-items: center;
+}
+
+hr {
+	&::before {
+		position: absolute;
+		inset: 0;
+		content: "";
+		margin: 0 auto;
+		width: 35%;
+		color: hsl(240deg 6% 4%);
+		background: hsl(240deg 6% 4%);
+		height: 0.25em;
+		border-radius: 999998999em;
+
+		line-height: 1.2;
+		z-index: 5;
+	}
+	width: 90%;
+	border: none;
+	position: relative;
+}

@@ -21,3 +21,8 @@ package-lock.json
 package-lock.json
 .sveltegen.json
 .vscode/settings.json
+app/Dockerfile
+.vercel_build_output
+.vercel
+.cloudflare
+.netlify

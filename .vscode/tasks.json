@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "app:dev",
+			"problemMatcher": [],
+			"label": "npm: app:dev",
+			"detail": "npm run dev -w beatbump/app"
+		}
+	]
+}
