@@ -14,27 +14,30 @@ export function pan(node: HTMLElement) {
 		onStart(event) {
 			if (!canFireEvent) {
 				canFireEvent = true;
+				event.stopPropagation();
+
+				const { top, height, parent_top } = boundingRect(node);
+				initialRect.top = top;
+				initialRect.height = height;
+				initialRect.parentTop = parent_top;
+				updateDetail(event, detail);
+
+				detail.startY = detail.clientY = event.clientY;
+
+				detail.startTime = detail.timeStamp = event.timeStamp;
+				dispatch(node, "panstart", detail);
 				timer = setTimeout(() => {
-					event.stopPropagation();
-
-					const { top, height, parent_top } = boundingRect(node);
-					initialRect.top = top;
-					initialRect.height = height;
-					initialRect.parentTop = parent_top;
-					updateDetail(event, detail);
-
-					detail.startY = detail.clientY = event.clientY;
-
-					detail.startTime = detail.timeStamp = event.timeStamp;
-				}, 525);
-				addListener(window, "pointermove", handlers.onMove);
-				addListener(window, "pointerup", handlers.onEnd);
+					addListener(window, "pointermove", handlers.onMove);
+					addListener(window, "pointerup", handlers.onEnd);
+				}, 180);
 			}
 		},
 		onMove(event) {
 			if (canFireEvent === false) {
 				clearTimeout(timer);
+				return;
 			}
+
 			event.stopPropagation();
 			calculateVelocity(event, detail);
 
@@ -43,9 +46,10 @@ export function pan(node: HTMLElement) {
 		onEnd(event) {
 			if (canFireEvent === false) {
 				clearTimeout(timer);
+				return;
 			}
 			event.stopPropagation();
-
+			detail.deltaY = detail.clientY - detail.startY;
 			calculateVelocity(event, detail);
 
 			dispatch(node, "panend", detail);
@@ -54,7 +58,7 @@ export function pan(node: HTMLElement) {
 			removeListener(window, "pointerup", handlers.onEnd);
 		},
 	};
-	return setHandlers(node, handlers, true);
+	return setHandlers(node, { handlers, capture: false });
 }
 
 export function draggable(node: HTMLElement) {
@@ -102,5 +106,5 @@ export function draggable(node: HTMLElement) {
 			// event.preventDefault();
 		},
 	};
-	return setHandlers(node, handlers);
+	return setHandlers(node, { handlers, capture: true });
 }

@@ -63,8 +63,23 @@ _(Other ways to donate coming soon!)_
 
 ## Docker
 
-Official Docker support coming soon! (Currently attempting to fix Docker installation)
+> Note: Still figuring out how to use Docker! Got a suggestion? Open an issue, thanks!
 
-### Project Inspirations
+[DockerHub](https://hub.docker.com/r/snuffydev/beatbump)
+
+### docker-compose (production)
+The quickest way to host a Beatbump instance is with [Docker](https://www.docker.com/get-started). Once you have it installed, you can run:
+
+```
+docker-compose up
+```
+
+The app will now be accessible from `https://localhost:443  /  http://localhost:3000`.
+
+### docker-compose (development)
+
+
+(More details coming soon!)
+## Project Inspirations
 
 - [Invidious](https://github.com/iv-org/invidious) - a privacy focused alternative YouTube front end.

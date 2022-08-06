@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as db from "$lib/_db";
+	import * as db from "$lib/db";
 
 	import { showAddToPlaylistPopper } from "$lib/stores/stores";
 	import List from "./List.svelte";

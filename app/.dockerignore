@@ -1,7 +1,9 @@
-node_modules
+node_modules/
 npm-debug.log
-workers-site
-dist
-.vercel
-.vercel_build_output
-.cloudflare
+workers-site/
+dist/
+.vercel/
+.vercel_build_output/
+.cloudflare/
+.netlify/
+.svelte-kit/

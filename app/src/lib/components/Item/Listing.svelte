@@ -9,7 +9,7 @@
 	import { goto } from "$app/navigation";
 	import list, { queue, queuePosition, currentTrack } from "$lib/stores/list";
 	import type { Item } from "$lib/types";
-	import * as db from "$lib/_db";
+	import * as db from "$lib/db";
 	import { browser } from "$app/env";
 	import { createEventDispatcher } from "svelte";
 	import { PopperButton, PopperStore } from "../Popper";

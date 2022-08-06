@@ -16,9 +16,10 @@
 	import { groupSession } from "$lib/stores/sessions";
 	import ProgressBar from "./ProgressBar";
 	import { CTX_ListItem } from "$lib/contexts";
+	import { notify } from "$lib/utils";
 	const { paused } = AudioPlayer;
 
-	$: state = fullscreenStore;
+	$: state = $fullscreenStore;
 	$: loading = $playerLoading;
 	$: data = $currentTrack;
 	$: heightCalc = -windowHeight + 140;
@@ -120,7 +121,6 @@
 				},
 				{ duration: Math.min(distance / Math.abs(detail.velocityY), 640) },
 			);
-			fullscreenStore.set("closed");
 		}
 		sliding = false;
 	}
@@ -133,18 +133,18 @@
 		class="backdrop"
 		class:mobile={$session.Android || $session.iOS}
 		bind:clientHeight={windowHeight}
-		style="background-color: {$state === 'open' ? 'hsla(0,0%,0%,40%)' : '#0000'} !important;"
-		style:pointer-events={$state === "open" ? "all" : "none"}
+		style:pointer-events={state === "open" ? "all" : "none"}
+		style="background-color: {state === 'open' ? 'hsla(0,0%,0%,40%)' : '#0000'} !important;"
 	>
 		<div
-			class:tr-open={$state === "open"}
-			class:tr-close={$state === "closed"}
+			class:tr-open={state === "open"}
+			class:tr-close={state === "closed"}
 			class="fullscreen-player-popup"
-			style="top: 0; transform: translate3d(0, {$state === 'open'
+			style="top: 0; transform: translate3d(0, {state === 'open'
 				? $queueTween === 0
 					? '0vh'
-					: `clamp(0%, calc(50% + ${$queueTween * -150}%), 100%)`
-				: '100vh'}, 0); opacity: {$state === 'open' ? '1' : '0'};"
+					: `clamp(0px, calc(${$queueTween * -50}px), 100vh)`
+				: '100vh'}, 0); opacity: {state === 'open' ? '1' : '0'};"
 		>
 			<div
 				class="column container"
@@ -152,16 +152,18 @@
 				on:pan={(event) => {
 					if ($session.Android !== true && $session.iOS !== true) return;
 					const { detail } = event;
-					// if (Math.abs(detail.velocityY))
+					if (Math.abs(detail.deltaY) < 105) return;
 					trackMovement(0, detail);
 				}}
 				on:panend={(event) => {
 					if ($session.Android !== true && $session.iOS !== true) return;
 					const { detail } = event;
 					const direction = Math.sign(detail.deltaY) === -1 ? "up" : "down";
-
+					// notify(`${detail.deltaY} : ${detail.velocityY}`, "success");
+					if (Math.abs(detail.deltaY) < 105) return;
 					if (direction === "down") {
 						close(0, detail);
+						fullscreenStore.set("closed");
 					} else {
 						open(0, detail);
 					}
@@ -293,7 +295,7 @@
 		overscroll-behavior: contain;
 		height: inherit;
 		-webkit-overflow-scrolling: touch;
-		touch-action: none;
+		// touch-action: none;
 	}
 
 	.immersive {
@@ -339,8 +341,8 @@
 		min-height: 0;
 		background: var(--bottom-bg);
 		overscroll-behavior: contain;
-		// touch-action: pan-y;
-		touch-action: none;
+		touch-action: pan-y;
+		// touch-action: none;
 		border-top-left-radius: $sm-radius;
 		border-top-right-radius: $sm-radius;
 		contain: content;

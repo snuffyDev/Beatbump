@@ -1,6 +1,6 @@
 import { getContext, hasContext, setContext } from "svelte";
 import type { Dict } from "../types/utilities";
-import type { Maybe } from ".";
+import type { Maybe } from "./collections/array";
 
 export interface IContext<T> {
 	key: string | Dict<unknown>;

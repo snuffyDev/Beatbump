@@ -1,6 +1,6 @@
 import type { Song } from "$lib/types";
 import type { IPlaylistPanelVideoRenderer } from "../types/playlistPanelVideoRenderer";
-import { PlaylistPanelVideoRenderer } from ".";
+import { PlaylistPanelVideoRenderer } from "./items/playlistPanelVideoRenderer";
 import { filterMap } from "$lib/utils/collections";
 
 type PanelAlias = { playlistPanelVideoRenderer: IPlaylistPanelVideoRenderer };

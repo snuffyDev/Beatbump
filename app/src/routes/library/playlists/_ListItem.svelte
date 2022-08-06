@@ -16,7 +16,7 @@
 	import type { Item } from "$lib/types";
 	import PopperButton from "$lib/components/Popper/PopperButton.svelte";
 	import { notify } from "$lib/utils";
-	import * as db from "$lib/_db";
+	import * as db from "$lib/db";
 	import { goto } from "$app/navigation";
 	const { pageId } = getContext(ctx);
 	const dispatch = createEventDispatcher();

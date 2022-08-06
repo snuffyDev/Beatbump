@@ -1,5 +1,7 @@
 // /* eslint-disable no-undef */
-import adapter from "@sveltejs/adapter-cloudflare-workers";
+import adapterCfw from "@sveltejs/adapter-cloudflare-workers";
+import vercel from "@sveltejs/adapter-vercel";
+import netlify from "@sveltejs/adapter-netlify";
 import node from "@sveltejs/adapter-node";
 import path from "path";
 import sveltePreprocess from "svelte-preprocess";
@@ -8,6 +10,15 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const dev = process.env["NODE_ENV"] === "development";
+const ENV_ADAPTER = process.env["BB_ADAPTER"] ?? "cloudflare-workers";
+const adapters = {
+	"cloudflare-workers": adapterCfw(),
+	vercel: vercel(),
+	netlify: netlify({ edge: false, split: false }),
+	node: node({ precompress: false }),
+};
+
+const adapter = adapters[ENV_ADAPTER];
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	preprocess: sveltePreprocess({
@@ -23,7 +34,7 @@ const config = {
 	}),
 
 	kit: {
-		adapter: dev ? node() : adapter(),
+		adapter: dev ? node() : adapter,
 		alias: {
 			$stores: path.resolve("./src/lib/stores"),
 			$api: path.resolve("./src/routes/api"),

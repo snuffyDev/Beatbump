@@ -3,7 +3,7 @@
 
 	import Listing from "$lib/components/Item/Listing.svelte";
 
-	import * as db from "$lib/_db";
+	import * as db from "$lib/db";
 
 	import { onMount, setContext } from "svelte";
 	let value;

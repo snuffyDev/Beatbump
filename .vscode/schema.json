@@ -24,8 +24,7 @@
 				"proxy_streams": {
 					"type": "boolean",
 					"default": false,
-					"description": "Proxy requests for songs if client is region-restricted (NOT IMPLEMENTED)",
-					
+					"description": "Proxy requests for songs if client is region-restricted (NOT IMPLEMENTED)"
 				}
 			}
 		},

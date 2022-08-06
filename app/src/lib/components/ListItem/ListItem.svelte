@@ -14,7 +14,7 @@
 	import { fullscreenStore } from "../Player/channel";
 	import PopperButton from "../Popper/PopperButton.svelte";
 	import { goto } from "$app/navigation";
-	import * as db from "$lib/_db";
+	import * as db from "$lib/db";
 	import SessionListService from "$lib/stores/list";
 	import list from "$lib/stores/list";
 	import { AudioPlayer, updateGroupPosition } from "$lib/player";

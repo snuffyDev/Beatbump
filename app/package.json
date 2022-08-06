@@ -1,8 +1,9 @@
 {
-	"name": "@beatbump/app",
+	"name": "beatbump-app",
 	"version": "2.2.0",
 	"scripts": {
 		"dev": "npm run sync && vite dev --host",
+		"bb:build": "node ./scripts/build.cjs build",
 		"deploy": "wrangler publish",
 		"build": "vite build",
 		"sync": "svelte-kit sync",
@@ -12,6 +13,7 @@
 	},
 	"devDependencies": {
 		"@babel/core": "^7.18.6",
+		"@snuffydev/fast-cli": "^0.0.1",
 		"@sveltejs/adapter-cloudflare": "next",
 		"@sveltejs/adapter-cloudflare-workers": "next",
 		"@sveltejs/adapter-netlify": "next",
@@ -30,6 +32,8 @@
 		"dotenv": "^16.0.1",
 		"eslint": "^8.19.0",
 		"eslint-config-prettier": "^8.5.0",
+		"eslint-import-resolver-typescript": "^3.4.0",
+		"eslint-plugin-import": "^2.26.0",
 		"eslint-plugin-svelte3": "^4.0.0",
 		"hls.js": "^1.1.5",
 		"node-fetch": "^3.2.8",

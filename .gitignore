@@ -16,12 +16,11 @@ src/lib/_parsers.ts
 src/lib/components/Player/_Player.svelte
 .gitignore
 src/routes/trending/test/index.json.ts
-src/routes/trending/test/index.svelte
+src/routes/trending/test/index.sveltegen
 package-lock.json
 package-lock.json
 .sveltegen.json
 .vscode/settings.json
-app/Dockerfile
 .vercel_build_output
 .vercel
 .cloudflare

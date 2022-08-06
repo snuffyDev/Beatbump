@@ -9,7 +9,7 @@
 	import Listing from "$lib/components/Item/Listing.svelte";
 	import CreatePlaylist from "$lib/components/PlaylistPopper/CreatePlaylist.svelte";
 	// import type { Item } from '$lib/types'
-	import * as db from "$lib/_db";
+	import * as db from "$lib/db";
 
 	import { onMount, setContext } from "svelte";
 	import Grid from "./_components/Grid/Grid.svelte";

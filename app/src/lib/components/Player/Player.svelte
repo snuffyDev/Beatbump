@@ -4,7 +4,7 @@
 	import Icon from "$components/Icon/Icon.svelte";
 	import { clickOutside } from "$lib/actions/clickOutside";
 	import { IMAGE_NOT_FOUND } from "$lib/constants";
-	import * as db from "$lib/_db";
+	import * as db from "$lib/db";
 	import { AudioPlayer } from "$lib/player";
 	import { groupSession } from "$lib/stores";
 	import list, { currentTrack, queue, queuePosition } from "$lib/stores/list";

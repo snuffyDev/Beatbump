@@ -11,7 +11,7 @@
 	import { fullscreenStore } from "../Player/channel";
 	import PopperButton from "../Popper/PopperButton.svelte";
 	import { goto } from "$app/navigation";
-	import { setNewFavorite, deleteSongFromPlaylist } from "$lib/_db";
+	import { setNewFavorite, deleteSongFromPlaylist } from "$lib/db";
 	import SessionListService, { queuePosition, queue } from "$lib/stores/list";
 	import { AudioPlayer, updateGroupPosition } from "$lib/player";
 	import { CTX_ListItem } from "$lib/contexts";

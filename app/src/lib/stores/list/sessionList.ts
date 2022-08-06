@@ -1,8 +1,11 @@
 import { parseNextItem } from "$lib/parsers";
 import type { Item } from "$lib/types";
-import { addToQueue, getSrc, Mutex, notify, splice, type ResponseBody } from "$lib/utils";
+import { addToQueue, getSrc, notify, type ResponseBody } from "$lib/utils";
+import { Mutex } from "$lib/utils/mutex";
+import { splice } from "$lib/utils/collections/array";
 import { writable, get } from "svelte/store";
-import { playerLoading, currentTitle, groupSession, filterAutoPlay } from "..";
+import { playerLoading, currentTitle, filterAutoPlay } from "../stores";
+import { groupSession } from "../sessions";
 import type { ISessionListService, ISessionListProvider } from "./types.list";
 import { fetchNext, split, filterList } from "./utils.list";
 

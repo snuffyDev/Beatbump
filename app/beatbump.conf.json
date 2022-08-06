@@ -1,6 +1,6 @@
 {
 	"environment": {
-		"adapter": "cloudflare-workers",
+		"adapter": "node",
 		"proxy_streams": false
 	},
 	"platform": {
@@ -15,6 +15,5 @@
 			"edge": false,
 			"split": false
 		}
-	},
-	"port": 3000
+	}
 }

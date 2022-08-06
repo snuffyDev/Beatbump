@@ -9,6 +9,8 @@ import type { Adapter, BeatbumpSchema, Platforms } from "./build.types";
 import type { SvelteConfig, SvelteConfigJSON } from "./svelte.types";
 
 const require = req(import.meta.url);
+console.log(test);
+
 const beatbump_config_path = path.resolve("./beatbump.conf.json");
 const default_config = path.resolve("./scripts/.internals/svelte.config.json");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -100,10 +102,15 @@ async function main() {
 		if (!adapter_installed) Logger.info("Error installing config.");
 
 		/// run the build
-		spawnSync("npx", ["vite", "build"], { stdio: "inherit", env: process.env, cwd: rootPath, shell: true });
+		spawnSync("npx", ["vite", "build"], {
+			stdio: "inherit",
+			env: { ...process.env, BB_ADAPTER: adapter },
+			cwd: rootPath,
+			shell: true,
+		});
 		Logger.info(`Finished build`);
 	} catch (err) {
 		Logger.err(err);
 	}
 }
-main();
+// main();

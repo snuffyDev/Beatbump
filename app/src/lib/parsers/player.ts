@@ -69,8 +69,6 @@ const parseProxyRedir = (url: string) => {
 import type { Dict } from "$lib/types/utilities";
 import { map } from "$lib/utils";
 import { buildDashManifest, type IFormat } from "$lib/utils/buildDashManifest";
-import { buildXML, type XMLNode, type XMLRoot } from "$lib/utils/xmlBuilder";
-import { settings } from "$stores/settings";
 
 export interface PlayerFormats {
 	hls: string;
@@ -105,15 +103,13 @@ export function sort(data: Dict<any>, WebM = false, dash = true): PlayerFormats 
 		if ((item.itag as number) < 139 && item.itag > 251) continue;
 		if (WebM === true && item.itag === 251)
 			arr.push({
-				original_url:
-					item.url.replace(/https:\/\/(.*?)\//, "https://yt-hls-rewriter.onrender.com/") + ("&host=" + host),
+				original_url: item.url,
 				url: parseProxyRedir(item.url),
 				mimeType: "webm",
 			});
 		if (item.itag === 140)
 			arr.push({
-				original_url:
-					item.url.replace(/https:\/\/(.*?)\//, "https://yt-hls-rewriter.onrender.com/") + ("&host=" + host),
+				original_url: item.url,
 				url: parseProxyRedir(item.url),
 				mimeType: "mp4",
 			});

@@ -1,5 +1,6 @@
-import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
-import type { CarouselHeader, ICarousel, Item, Song, Thumbnail } from "$lib/types";
+import { MusicResponsiveListItemRenderer } from "$lib/parsers/items/musicResponsiveListItemRenderer";
+import { MusicTwoRowItemRenderer } from "$lib/parsers/items/musicTwoRowItemRenderer";
+import type { CarouselHeader, Item, Thumbnail } from "$lib/types";
 import type { IMusicResponsiveListItemRenderer } from "$lib/types/internals";
 import { iter } from "$lib/utils/collections";
 

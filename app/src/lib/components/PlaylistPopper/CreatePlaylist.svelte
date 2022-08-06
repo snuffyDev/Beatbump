@@ -2,7 +2,7 @@
 	import { browser } from "$app/env";
 	import { goto } from "$app/navigation";
 	import { page } from "$app/stores";
-	import * as db from "$lib/_db";
+	import * as db from "$lib/db";
 
 	import { showAddToPlaylistPopper } from "$lib/stores/stores";
 

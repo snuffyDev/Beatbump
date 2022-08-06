@@ -178,7 +178,7 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 		}
 
 		this._player.volume = 0.5;
-		this._player.autoplay = false;
+		this._player.autoplay = true;
 		this._player.preload = "metadata";
 
 		this._durationUnsubscriber = this._durationStore.subscribe((value) => {

@@ -1,7 +1,6 @@
 import { dev } from "$app/env";
 
 import type { GetSession, Handle } from "@sveltejs/kit";
-// import { installFetch } from "@sveltejs/kit/install-fetch";
 
 const rootDomain = import.meta.env.VITE_DOMAIN; // or your server IP for dev
 const originURL = import.meta.env.VITE_SITE_URL; // or your server IP for dev
@@ -38,3 +37,6 @@ export const getSession: GetSession = (event) => {
 		  }
 		: {};
 };
+
+//#NODE process.on('SIGINT', function () { process.exit(); }); // Ctrl+C
+//#NODE process.on('SIGTERM', function () { process.exit(); }); // docker stop

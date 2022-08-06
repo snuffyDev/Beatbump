@@ -2,7 +2,7 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import Loading from "$components/Loading/Loading.svelte";
-	import { setNewFavorite } from "$lib/_db";
+	import { setNewFavorite } from "$lib/db";
 	import { groupSession } from "$lib/stores";
 	import list from "$lib/stores/list";
 	import type { CarouselItem, Item } from "$lib/types";

@@ -14,8 +14,8 @@
 
 <script lang="ts">
 	import InfoBox from "$lib/components/Layouts/InfoBox.svelte";
-	import type { IDBPlaylist } from "$lib/_db";
-	import * as db from "$lib/_db";
+	import type { IDBPlaylist } from "$lib/db";
+	import * as db from "$lib/db";
 	import List from "./_List.svelte";
 	import { isPagePlaying } from "$lib/stores/stores";
 	import list from "$lib/stores/list";
