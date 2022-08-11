@@ -13,7 +13,7 @@ import { Logger } from "./utils/logger";
 import { Mutex } from "./utils/mutex";
 import { WritableStore } from "./utils/stores";
 import { getSrc, type ResponseBody } from "./utils/utils";
-import HLS from "hls.js";
+import type HLS from "hls.js";
 import { settings } from "./stores";
 
 export interface IAudioPlayer {
@@ -113,6 +113,9 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 	// #region Properties (21)
 
 	private _HLS: HLS;
+	private _HLSModule: typeof HLS;
+	// private _DashModule: typeof DashJS;
+	// private _DashJS: DashJS.MediaPlayerClass;
 	private __srcUrl: string;
 	private __tick: boolean = false;
 	private __unsubscriber: Unsubscriber;
@@ -150,32 +153,17 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 		this._isWebkit = /i(Phone|Pad|Pod)/i.test(navigator.userAgent);
 
 		this._player = new Audio();
-		if (get(settings)?.playback?.Stream === "HLS" && HLS.isSupported()) {
-			this.isHLSPlayer = true;
-			this._HLS = new HLS({
-				lowLatencyMode: true,
-				enableWorker: true,
+		// const setup = async () => {
+		// 	if (browser) {
+		// 		const module = await import("dashjs");
 
-				manifestLoadingMaxRetry: 2,
-				backBufferLength: 90,
-			});
-			this._HLS.attachMedia(this._player);
-			this._HLS.on(HLS.Events.MEDIA_ATTACHED, () => {
-				this._HLS.loadSource(this._src.value);
-			});
-			this._HLS.on(HLS.Events.ERROR, (event, data) => {
-				const type = data.type;
-				switch (type) {
-					case HLS.ErrorTypes.MEDIA_ERROR:
-						this._HLS.recoverMediaError();
-						break;
-					case HLS.ErrorTypes.NETWORK_ERROR:
-						this._HLS.startLoad();
-						break;
-					default:
-				}
-			});
-		}
+		// 		this._DashModule = module;
+
+		// 		this._DashJS = module.MediaPlayer().create();
+		// 		this._DashJS.initialize(this._player, "", true);
+		// 	}
+		// };
+		// setup();
 
 		this._player.volume = 0.5;
 		this._player.autoplay = true;
@@ -409,7 +397,38 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 	// #endregion Public Methods (10)
 
 	// #region Private Methods (5)
+	private async loadHLSModule() {
+		return import("hls.js").then((module) => {
+			return module.default;
+		});
+	}
+	private async createHLSPlayer(source?: string) {
+		if (!this._HLSModule) this._HLSModule = await this.loadHLSModule();
+		if (!this._HLSModule.isSupported()) return;
+		if (this._HLS) this._HLS.destroy();
+		this._HLS = new this._HLSModule({
+			lowLatencyMode: true,
+			enableWorker: true,
 
+			backBufferLength: 90,
+		});
+		this._HLS.attachMedia(this._player);
+		this._HLS.on(this._HLSModule.Events.MEDIA_ATTACHED, () => {
+			this._HLS.loadSource(source);
+		});
+		this._HLS.on(this._HLSModule.Events.ERROR, (event, data) => {
+			const type = data.type;
+			switch (type) {
+				case this._HLSModule.ErrorTypes.MEDIA_ERROR:
+					this._HLS.recoverMediaError();
+					break;
+				case this._HLSModule.ErrorTypes.NETWORK_ERROR:
+					this._HLS.startLoad();
+					break;
+				default:
+			}
+		});
+	}
 	private async getNextSongInQueue(position: number, shouldAutoplay = true): Promise<Nullable<ResponseBody>> {
 		const sessionList = this.currentSessionList();
 
@@ -526,35 +545,17 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 		this._nextTrackURL = null;
 	}
 
-	private setup() {
+	private async setup() {
 		if (!browser) return;
+		if (get(settings)?.playback?.Stream === "HLS") {
+			this._HLSModule = await this.loadHLSModule();
 
-		this.__unsubscriber = this._src.subscribe((value) => {
-			if (this._HLS && HLS.isSupported()) {
-				this._HLS.destroy();
-				this._HLS = new HLS({
-					lowLatencyMode: true,
-					enableWorker: true,
-
-					manifestLoadingMaxRetry: 2,
-					backBufferLength: 90,
-				});
-				this._HLS.attachMedia(this._player);
-				this._HLS.on(HLS.Events.MEDIA_ATTACHED, () => {
-					this._HLS.loadSource(value);
-				});
-				this._HLS.on(HLS.Events.ERROR, (event, data) => {
-					const type = data.type;
-					switch (type) {
-						case HLS.ErrorTypes.MEDIA_ERROR:
-							this._HLS.recoverMediaError();
-							break;
-						case HLS.ErrorTypes.NETWORK_ERROR:
-							this._HLS.startLoad();
-							break;
-						default:
-					}
-				});
+			this.isHLSPlayer = true;
+		}
+		this.__unsubscriber = this._src.subscribe(async (value) => {
+			if (!this._HLSModule) this._HLSModule = await this.loadHLSModule();
+			if (this.isHLSPlayer) {
+				this.createHLSPlayer(value);
 			} else {
 				this._player.src = value;
 				this._player.load();

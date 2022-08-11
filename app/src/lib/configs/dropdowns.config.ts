@@ -6,7 +6,7 @@ type DropdownItem = {
 	action: (...args) => void;
 };
 type Dropdown = DropdownItem[];
-type Labels =
+type Label =
 	| "View Artist"
 	| "Add to Queue"
 	| "Play Next"
@@ -20,15 +20,18 @@ type Labels =
 	| "Remove From Favorites"
 	| "View Playlist"
 	| "Play Song Radio"
-	| "Remove From Playlist"
 	| "Add to Favorites"
+	| "Remove From Playlist"
 	| "Shuffle"
+	| "Up Next"
+	| "Related"
 	| "Start Playlist"
 	| "Edit Playlist"
 	| "Start Radio"
 	| "Play Album"
+	| "Invite Group Session"
 	| "Album Radio";
-const DROPDOWN_TEXTS: Labels[] = [
+const DROPDOWN_TEXTS: Label[] = [
 	"View Artist",
 	"Add to Queue",
 	"Play Next",
@@ -86,7 +89,7 @@ const DROPDOWN_ICONS: Icons[] = [
 	"dots",
 ];
 
-const DROPDOWN_ITEMS = {
+const DROPDOWN_ITEMS: Partial<Record<Label, Partial<DropdownItem>>> = {
 	"View Artist": { text: "View Artist", icon: "artist" },
 	"Add to Queue": { text: "Add to Queue", icon: "queue" },
 	"Play Next": { text: "Play Next", icon: "queue" },
@@ -97,13 +100,12 @@ const DROPDOWN_ITEMS = {
 	"Invite Group Session": { text: "Invite Group Session", icon: "send" },
 	"View Playlist": { text: "View Playlist", icon: "list" },
 	"Play Song Radio": { text: "Play Song Radio", icon: "radio" },
-	"Remove from Playlist": { text: "Remove from Playlist", icon: "x" },
+	"Remove From Playlist": { text: "Remove from Playlist", icon: "x" },
 	"Add to Playlist": { text: "Add to Playlist", icon: "playlist-add" },
 	"Add to Favorites": { text: "Add to Favorites", icon: "heart" },
 	"Share Group Session": { text: "Share Group Session", icon: "share" },
 	Shuffle: { text: "Shuffle", icon: "shuffle" },
+	"Shuffle Playlist": { text: "Shuffle", icon: "shuffle" },
 };
 
-type Label = keyof typeof DROPDOWN_ITEMS;
-
-const l: Label = "";
+function buildDropdown() {}

@@ -3,45 +3,105 @@
 </script>
 
 <script lang="ts">
-	import { browser } from "$app/env";
-	import { session } from "$app/stores";
 	import Header from "$components/Layouts/Header.svelte";
-	import type { TabItem } from "$lib/components/Tabs";
-	import Tabs from "$lib/components/Tabs";
-	import { settings, SettingsSchema } from "$stores/settings";
+	import { settings, SettingsSchema, type Theme } from "$stores/settings";
+	const themes: Theme[] = ["Dark", "Dim", "Midnight", "YTM"];
 
 	// const tabs:TabItem[] = [{id:""}]
 </script>
 
 <Header title="Settings" url="/settings" desc="Configure your app settings" />
 <main>
-	{#if browser}
-		{#each Object.entries(SettingsSchema) as [sectionKey, section]}
-			{@const category = sectionKey[0].toUpperCase() + sectionKey.slice(1)}
-			<section>
-				<span class="h5">{category}</span>
-				{#each Object.entries(section).filter( ([key, _]) => (!$session.iOS ? key === key : key !== "Prefer WebM Audio"), ) as [key, value]}
-					{@const id = key.replace(" ", "")}
-					<div class="setting">
-						<label for={id} class="s-text">{key}: </label>
-						{#if value[1] === null}
-							<input type="checkbox" bind:checked={$settings[sectionKey][key]} {id} />
-						{:else if value[0] === 3}
-							<a href={value[1]}>{value[1]}</a>
-						{:else if Array.isArray(value[1])}
-							<div class="select">
-								<select disabled={key === "Quality"} bind:value={$settings[sectionKey][key]} {id}>
-									{#each value[1] as entry}
-										<option value={entry} selected={$settings[sectionKey][key] === entry}>{entry}</option>
-									{/each}
-								</select>
-							</div>
-						{/if}
-					</div>
+	<section>
+		<span class="h5">Appearance</span>
+		<div class="setting">
+			<label for="theme">
+				Theme
+			</label>
+			<div class="select">
+
+				<select name="theme" id="theme" bind:value={$settings['appearance']['Theme']}>
+					{#each themes as theme}
+						<option value="{theme}" selected={$settings['appearance']['Theme'] === theme}>{theme}</option>
+					{/each}
+				</select>
+			</div>
+		</div>
+		<div class="setting">
+			<label for="immersive-queue">
+				Immersive Queue
+			</label>
+			<input type="checkbox" name="immersive-queue" id="immersive-queue" bind:checked={$settings['appearance']['Immersive Queue']}/>
+		</div>
+
+	</section>
+	<section>
+		<span class="h5">Playback</span>
+		<div class="setting">
+			<label for="dedupe">
+				Dedupe Automix
+			</label>
+			<input name="dedupe" id="dedupe" type="checkbox" bind:value={$settings['playback']['Dedupe Automix']}/>
+
+		</div>
+		<div class="setting">
+			<label for="quality">
+				Quality
+			</label>
+			<div class="select">
+				<select name="quality" disabled id="quality" bind:value={$settings['playback']['Quality']}>
+					{#each ["Normal", "High"] as option}
+						<option value="{option}" selected={$settings['playback']['Quality'] === option}>{option}</option>
+					{/each}
+				</select>
+			</div>
+		</div>
+		<div class="setting">
+			<label for="stream">
+				Stream
+				<i> (reload Beatbump after setting)</i>
+
+			</label>
+			<div class="select">
+				<select name="stream" id="stream" bind:value={$settings['playback']['Stream']}>
+					{#each ["HTTP", "HLS"] as option}
+						<option value="{option}" selected={$settings['playback']['Stream'] === option}>{option}</option>
+					{/each}
+				</select>
+			</div>
+		</div>
+
+	</section>
+	<!-- <section>
+		<span class="h5">Network</span>
+		<div class="setting">
+			<label for="proxy">
+				Stream Proxy Server
+			</label>
+			<select name="proxy" id="proxy" bind:value={$settings['network']['Proxy']}>
+				{#each ["HTTP", "HLS"] as option}
+					<option value="{option}" selected={$settings['playback']['Stream'] === option}>{option}</option>
 				{/each}
-			</section>
-		{/each}
-	{/if}
+			</select>
+		</div>
+	</section> -->
+	<section>
+		<span class="h5">Search</span>
+		<div class="setting">
+			<label for="preserve">
+				Preserve
+			</label>
+			<div class="select">
+				<select name="preserve" disabled id="preserve" bind:value={$settings['search']['Preserve']}>
+					{#each ["Category", "Query", "Category + Query", "None"] as option}
+						<option value="{option}" selected={$settings['playback']['Stream'] === option}>{option}</option>
+					{/each}
+				</select>
+			</div>
+		</div>
+
+	</section>
+
 </main>
 
 <style lang="scss">

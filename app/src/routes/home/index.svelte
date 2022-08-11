@@ -82,9 +82,9 @@
 	{/if}
 </div>
 <main>
-	{#each carousels as carousel (carousel)}
+	{#each carousels as carousel}
 		<Carousel
-			items={carousel.results}
+			items={carousel.items}
 			header={carousel.header}
 			type="home"
 			kind={carousel.header?.type}
@@ -106,11 +106,11 @@
 				const data = await response.json();
 				// const {continuations, carousels} = data;
 				if (data.continuations !== {}) {
-					window.queueMicrotask(() => {
+					window.requestAnimationFrame(() => {
 						continuations = data.continuations;
 						carousels = [...carousels, ...data.carousels];
+						loading = false;
 					});
-					loading = false;
 					return hasData;
 				}
 				hasData = data.continuations === {};
@@ -130,14 +130,20 @@
 		position: absolute;
 		bottom: 0;
 		margin-bottom: 5rem;
-		will-change: contents;
+		will-change: visibility;
 		contain: content;
 	}
 	.loading {
 		transition: opacity cubic-bezier(0.95, 0.05, 0.795, 0.035) 500ms;
 		opacity: 0;
 		display: flex;
-		position: relative;
+		position: absolute;
+		// inset:0;
+		bottom:0;
+		left: 0;
+		right: 0;
+		max-height: 5em;
+		z-index:100;
 		margin: 0 auto;
 		padding-block: 2.5rem;
 	}

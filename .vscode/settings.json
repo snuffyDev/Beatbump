@@ -4,7 +4,8 @@
 	"editor.formatOnSave": true,
 	"deno.enable": false,
 	"npm.autoDetect": "on",
-
+"npm.enableRunFromFolder": true,
+"npm-intellisense.recursivePackageJsonLookup": true,
 	"json.schemas": [
 		{
 			"url": "./.vscode/schema.json",

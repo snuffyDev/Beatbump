@@ -17,6 +17,7 @@ const ENDPOINT_NAMES: APIEndpoints = {
 	player: Endpoints.Player,
 	artist: Endpoints.Browse,
 	related: Endpoints.Browse,
+	browse: Endpoints.Browse,
 } as const;
 
 const CONTEXT_DEFAULTS: Pick<Context, "client" | "user" | "request" | "captionParams"> = {

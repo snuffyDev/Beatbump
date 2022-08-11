@@ -1,10 +1,11 @@
 import { MusicResponsiveListItemRenderer } from "$lib/parsers";
-import { iter } from "$lib/utils";
+import { iter, type Maybe } from "$lib/utils";
 import { buildRequest } from "./_api/request";
-import type { NextContinuationData } from "$lib/types";
+import type { Item, NextContinuationData } from "$lib/types";
 import type { IMusicResponsiveListItemRenderer } from "$lib/types/internals";
 import type { RequestHandler } from "@sveltejs/kit";
 import type { SearchEndpointParams } from "./_api/_base";
+import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 
 export type SearchFilter = "video" | "community_playlist" | "featured_playlist" | "all_playlist" | "song" | "artist";
 
@@ -70,7 +71,8 @@ export const GET: RequestHandler = async ({ url }) => {
 };
 
 function parseContinuation(contents: Record<string, any>, filter: string & SearchFilter) {
-	const continuation = Array.isArray(contents?.continuations) && contents?.continuations[0]?.nextContinuationData;
+	const continuation: Maybe<Partial<NextContinuationData>> =
+		Array.isArray(contents?.continuations) && contents?.continuations[0]?.nextContinuationData;
 	const type = filter.includes("playlist") ? "playlist" : filter;
 
 	const results = parseResults(contents.contents, type);
@@ -92,11 +94,11 @@ function parseContents(
 	}[] = [],
 	filter: SearchFilter,
 ) {
-	const results = [];
+	const results: IListItemRenderer[] = [];
+	const continuation: Maybe<Partial<NextContinuationData>> = {};
 
 	let len = contents.length;
 	const type = filter.includes("playlist") ? "playlist" : filter;
-	const continuation = {};
 	while (--len > -1) {
 		const section = contents[len];
 
@@ -122,7 +124,7 @@ function parseContents(
 }
 
 function parseResults(items: any[], type: string) {
-	const results = [];
+	const results: IListItemRenderer[] = [];
 	let idx = items.length;
 	while (--idx > -1) {
 		const entry = items[idx];

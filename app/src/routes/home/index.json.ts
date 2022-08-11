@@ -157,6 +157,6 @@ function parseCarousel({
 }) {
 	return {
 		header: parseHeader(musicCarouselShelfRenderer?.header ?? musicImmersiveCarouselShelfRenderer?.header),
-		results: parseBody(musicCarouselShelfRenderer?.contents ?? musicImmersiveCarouselShelfRenderer?.contents),
+		items: parseBody(musicCarouselShelfRenderer?.contents ?? musicImmersiveCarouselShelfRenderer?.contents),
 	};
 }

@@ -162,7 +162,7 @@
 	bind:this={parent}
 	class="m-item"
 	tabindex="0"
-	class:isPlaying={isPagePlaying.has($SPage.params.slug) && $queue.length > 0 && $queuePosition === idx}
+	class:isPlaying={isPagePlaying.has($SPage.params.slug) && $queue?.length > 0 && $queuePosition === idx}
 	on:click={handleClick}
 	on:pointerenter={(e) => {
 		isHovering = true;
@@ -198,7 +198,7 @@
 		</span>
 	</div>
 	<div class="metadata">
-		{#if item.thumbnails.length !== 0}
+		{#if item.thumbnails && item.thumbnails.length !== 0}
 			<div class="thumbnail">
 				<img
 					loading="lazy"

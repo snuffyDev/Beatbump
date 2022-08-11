@@ -28,7 +28,8 @@ function buildElement(node: XMLNode): string {
 	if (node.name) element += node.name;
 	if (node.attrs) element += buildAttrs(node.attrs);
 	element += node.nodes || node.text ? ">" : "/>";
-	if (node.text) element += `${node.text}`;
+	if (node.text)
+		element += `${node.text}`.replace(/&amp;/g, "&").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); // desanitize to avoid double sanitization;
 	if (node.nodes) element += buildElements(node.nodes);
 	if (node.nodes || node.text) element += `</${node.name}>`;
 	return element;

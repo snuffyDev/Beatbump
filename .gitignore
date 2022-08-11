@@ -25,3 +25,4 @@ package-lock.json
 .vercel
 .cloudflare
 .netlify
+packages/proxy-server/rust/target/

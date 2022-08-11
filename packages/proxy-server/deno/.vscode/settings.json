@@ -1,0 +1,5 @@
+{
+	"deno.enable": true,
+	"deno.suggest.autoImports": true,
+	"deno.suggest.imports.autoDiscover": true
+}

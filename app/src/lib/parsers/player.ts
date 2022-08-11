@@ -71,20 +71,30 @@ import { map } from "$lib/utils";
 import { buildDashManifest, type IFormat } from "$lib/utils/buildDashManifest";
 
 export interface PlayerFormats {
-	hls: string;
-	streams: { url: string; original_url: string; mimeType: string }[];
+	hls?: string;
+	dash?: string;
+	streams?: { url: string; original_url: string; mimeType: string }[];
 }
 export function sort(data: Dict<any>, WebM = false, dash = true): PlayerFormats {
 	if (dash === true) {
-		const formats = map(data?.streamingData?.adaptiveFormats as Array<IFormat>, (item) => ({
-			...item,
-			url: item.url.replace(/https:\/\/(.*?)\//, "https://yt-hls-rewriter.onrender.com/") + ("?host=" + host),
-		}));
+		const formats = map(data?.streamingData?.adaptiveFormats as Array<IFormat>, (item) => {
+			const url = new URL(item.url);
+			const host = url.host;
+			url.host = "yt-hls-rewriter.onrender.com";
+			url.searchParams.set("host", host);
+			return {
+				...item,
+				url: url.toString(),
+			};
+		});
 		const length = data?.videoDetails?.lengthSeconds;
 
 		const manifest = buildDashManifest(formats, length);
 		console.log(manifest);
-		return manifest;
+		return {
+			dash: manifest,
+			streams: formats.map((item) => ({ url: item.url, original_url: item.url, mimeType: item.mimeType })),
+		};
 	}
 	const host = data?.playerConfig?.hlsProxyConfig?.hlsChunkHost;
 	const formats = data?.streamingData?.adaptiveFormats as Array<any>;

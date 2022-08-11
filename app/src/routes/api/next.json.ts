@@ -18,6 +18,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	const clickTracking = query.get("clickParams") || undefined;
 	const setVideoId = query.get("playlistSetVideoId") || undefined;
 	const type = query.get("configType") || undefined;
+
 	const response = await buildRequest("next", {
 		context: {
 			clickTracking: {
@@ -45,7 +46,18 @@ export const GET: RequestHandler = async ({ url }) => {
 	/* For when you are NOT listening to a song.
 	 ********************************************/
 	if (!ctoken) {
-		return parseNextBody(data);
+		const res = parseNextBody(data);
+		Object.assign(res.body, {
+			params: {
+				continuation: ctoken,
+				videoId,
+				index: idx,
+				playlistSetVideoId: setVideoId,
+				playlistId,
+				params: params ? params : itct,
+			},
+		});
+		return res;
 	}
 	return {
 		status: 200,

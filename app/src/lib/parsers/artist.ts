@@ -67,9 +67,9 @@ export function ArtistPageParser({
 			carousels.push(carousel);
 		}
 	});
-
+	const artistHeader = parseArtistHeader(header);
 	return {
-		header: parseArtistHeader(header),
+		header: artistHeader,
 		body: {
 			carousels,
 			songs,

@@ -14,57 +14,54 @@
 
 <script lang="ts">
 	import type { CarouselHeader } from "$lib/types";
+	import type { CarouselItem as Item } from "$lib/types";
 
 	import CarouselItem from "./CarouselItem.svelte";
 	import Icon from "$components/Icon/Icon.svelte";
 	import { page } from "$app/stores";
 	import { onDestroy, onMount } from "svelte";
 	import observer from "./observer";
-	import debounce from "$lib/utils/debounce";
-	import { noop } from "svelte/internal";
 	import { browser } from "$app/env";
 
 	export let header: CarouselHeader;
-	export let items = [];
+	export let items: Item[] = [];
 	export let type = "";
 	export let kind = "normal";
 	export let isBrowseEndpoint;
 	export let visitorData = "";
-	let arr = [];
+
 	let moreOnLeft, moreOnRight;
-	if (items.length > 3) {
-		arr = splitArray(items, 4);
-	} else {
-		arr = [[...items]];
-	}
-	let idx = 0;
-	let group = [];
+
+	let clientWidth;
 	let carousel: HTMLDivElement = undefined;
-	let lastScrollPositions = {
+
+	let frame;
+	let hasScrollWidth = false;
+	const scrollPositions = {
 		left: 0,
+		width: -1,
 		right: 0,
 	};
-	let frame;
-	function scrollHandler(target: HTMLDivElement) {
-		const scrollLeft = target.scrollLeft;
-		const scrollWidth = target.scrollWidth;
-		if (
-			scrollLeft === lastScrollPositions.left ||
-			lastScrollPositions.right === scrollWidth - target.clientWidth - 15
-		) {
-			noop();
+	function scrollHandler() {
+		if (!hasScrollWidth && scrollPositions.width < 0) {
+			hasScrollWidth = true;
+			scrollPositions.width = carousel.scrollWidth;
 		}
-		moreOnLeft = target.scrollLeft < 15 ? false : true;
-		lastScrollPositions.left = scrollLeft;
-		moreOnRight = target.scrollLeft < scrollWidth - target.clientWidth - 15 ? true : false;
-		lastScrollPositions.right = scrollWidth - scrollLeft - 15;
+		const scrollLeft = carousel.scrollLeft;
+
+		moreOnLeft = scrollLeft < 15 ? false : true;
+		scrollPositions.left = scrollLeft;
+
+		moreOnRight = scrollPositions.left < scrollPositions.width - clientWidth - 15 ? true : false;
+		scrollPositions.right = scrollPositions.width - scrollLeft - 15;
 	}
 	function onScroll(event) {
-		frame = requestAnimationFrame(() => scrollHandler(event?.target));
+		if (frame) cancelAnimationFrame(frame);
+		frame = requestAnimationFrame(scrollHandler);
 	}
 	onMount(() => {
 		if (carousel) {
-			scrollHandler(carousel);
+			scrollHandler();
 		}
 	});
 	onDestroy(() => {
@@ -72,7 +69,6 @@
 			cancelAnimationFrame(frame);
 			carousel = null;
 			frame = null;
-			idx = null;
 		}
 	});
 	const isArtistPage = $page.url.pathname.includes("/artist/");
@@ -109,12 +105,8 @@
 		class="left"
 		class:showMoreBtn={!moreOnLeft}
 		on:click={() => {
-			if (!arr || idx == 0) return;
-			idx--;
-			let child = group[idx].children;
-			let rect = child[0].getBoundingClientRect();
-
-			carousel.scrollLeft += rect.left;
+			if (!items || scrollPositions.left <= 25) return;
+			carousel.scrollLeft -= Math.ceil((scrollPositions.width / items.length) * 2);
 		}}
 	>
 		<Icon name="chevron-left" size="1.5em" />
@@ -124,32 +116,25 @@
 		class="right"
 		class:showMoreBtn={!moreOnRight}
 		on:click={() => {
-			if (!arr || idx == group.length - 1) return;
-			idx++;
-			let child = group[idx].children;
-			let rect = child[0].getBoundingClientRect();
-			carousel.scrollLeft += rect.left;
+			if (!items || scrollPositions.right <= 25) return;
+			carousel.scrollLeft += Math.ceil((scrollPositions.width / items.length) * 2);
 		}}
 	>
 		<Icon name="chevron-right" size="1.5em" />
 	</div>
 
-	<div class="scroll" id="scrollItem" on:scroll={onScroll} bind:this={carousel} use:observer>
-		{#each arr as item, index}
-			<div class="c-group" bind:this={group[index]}>
-				{#each item as item, i}
-					{#if type == "trending"}
-						<!-- {JSON.stringify(item[1], title, thumbnail, subtitle)} -->
-						<CarouselItem type="trending" {kind} aspectRatio={item.aspectRatio} {item} {isBrowseEndpoint} index={i} />
-					{:else if type == "artist" || type == "home"}
-						<CarouselItem {type} {kind} aspectRatio={item.aspectRatio} {isBrowseEndpoint} {item} index={i} />
-					{:else if type == "new"}
-						<!-- content here -->
-						<CarouselItem type="new" aspectRatio={item.aspectRatio} {item} index={i} />
-					{/if}
-				{/each}
-			</div>
-		{/each}
+	<div class="scroll" id="scrollItem" on:scroll={onScroll} bind:clientWidth bind:this={carousel} use:observer>
+		<div class="c-group">
+			{#each items as item, index}
+				{#if type == "trending"}
+					<CarouselItem type="trending" {kind} aspectRatio={item.aspectRatio} {item} {isBrowseEndpoint} {index} />
+				{:else if type == "artist" || type == "home"}
+					<CarouselItem {type} {kind} aspectRatio={item.aspectRatio} {isBrowseEndpoint} {item} {index} />
+				{:else if type == "new"}
+					<CarouselItem type="new" aspectRatio={item.aspectRatio} {item} {index} />
+				{/if}
+			{/each}
+		</div>
 	</div>
 </div>
 
@@ -193,12 +178,12 @@
 		pointer-events: all;
 		cursor: pointer;
 		will-change: opacity, visibility;
-		background-color: hsl(0deg 0% 91% / 79%);
-		// border: rgba(0, 0, 0, 0.171) 0.01px solid;
-		transition: linear 75ms background-color;
+		background-color: hsl(0deg 0% 88% / 95%);
+		border: rgba(0, 0, 0, 0.171) 0.33px solid;
+		transition: background-color 200ms cubic-bezier(0.22, 0.61, 0.36, 1);
+		box-shadow: 0 0 8px -4px hsl(0deg 0% 0% / 20%);
 		height: 3rem;
-		box-shadow: 0 0 0.12em 0.1em #11111141;
-		color: #111111b0;
+		color: hsla(0, 0%, 18%, 1);
 		border-radius: 50%;
 		opacity: 1;
 		padding: 0;
@@ -210,11 +195,12 @@
 		contain: strict;
 		&:hover {
 			background-color: rgb(233, 233, 233);
+			box-shadow: -1px -1px 8px -12px hsl(0deg 0% 0% / 20%) inset, 1px 1px 10px -6px hsl(0deg 0% 0% / 10%) inset;
 			color: #111111e0;
 		}
 		&:active {
 			background-color: rgb(223, 223, 223);
-			box-shadow: 0 0 0.12em 0.1em #11111141, 0 0 0.1em 0.125em #7a7a7a85 inset;
+			box-shadow: 0 0 12px -9px hsl(0deg 0% 7% / 88%) inset, inset -2px -2px 5px -9px hsl(0deg 0% 8% / 92%);
 		}
 		@media screen and (max-width: 640px) {
 			display: none !important;

@@ -6,6 +6,7 @@ import { settings, type UserSettings } from "$lib/stores/settings";
 import { get } from "svelte/store";
 import { findFirst, map } from "./collections";
 import { browser } from "$app/env";
+
 let userSettings: UserSettings;
 if (browser) {
 	settings.subscribe((value) => {
@@ -89,7 +90,12 @@ export const getSrc = async (
 
 	const formats = sort(res, webM, false);
 	currentId.set(videoId);
-	console.log(formats);
+
+	// formats.dash = "data:application/dash+xml;charset=utf-8;base64," + btoa(formats.dash);
+
+	// if (shouldAutoplay) updatePlayerSrc({ url: formats.dash, original_url: formats.dash });
+	// return { body: { url: formats.dash, original_url: formats.dash } };
+	// return;
 	const src = setTrack(formats, webM, shouldAutoplay);
 
 	return src;

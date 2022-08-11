@@ -4,7 +4,7 @@ import { get, writable } from "svelte/store";
 import { WritableStore } from "$lib/utils";
 import { noop } from "$lib/utils/noop";
 
-type Theme = "Dark" | "Dim" | "Midnight" | "YTM";
+export type Theme = "Dark" | "Dim" | "Midnight" | "YTM";
 enum Kind {
 	Toggle = 0,
 	Multi = 1,
@@ -51,7 +51,7 @@ export const SettingsSchema = {
 		Stream: [Kind.Multi, ["HTTP", "HLS"]],
 	},
 	network: {
-		"HLS Stream Proxy": [Kind.Text, "https://yt-hls-rewriter.onrender.com"],
+		"HLS Stream Proxy": [Kind.Text, "(WIP)"],
 	},
 	search: {
 		Preserve: [Kind.Multi, ["Category", "Query", "Category + Query", "None"]],
@@ -103,7 +103,7 @@ function _settings() {
 	} else {
 		list = stored;
 	}
-
+	// list = { ...list, playback: { ...list.playback, Stream: "HLS" } };
 	const store = writable<UserSettings>(list);
 	const { subscribe, update } = store;
 	function save(settings: UserSettings) {

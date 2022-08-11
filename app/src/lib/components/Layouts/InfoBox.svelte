@@ -62,7 +62,7 @@
 				</span>
 			{/key}
 		{:else if type == "release"}
-			<p>
+			<p class="secondary">
 				{#each artist as artist, i}
 					{#if artist.channelId}
 						<a sveltekit:prefetch href={`/artist/${artist.channelId}`}>{artist.name}</a>

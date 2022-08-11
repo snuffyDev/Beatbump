@@ -178,8 +178,9 @@
 		} else {
 			await list.initAutoMixSession({
 				videoId: item.videoId,
-				playlistId: parentPlaylistId,
-				keyId: page === "artist" ? 0 : idx,
+				playlistId: parentPlaylistId ??  item.playlistId,
+
+				keyId: idx,
 				config: { playerParams: item?.playerParams, type: item?.musicVideoType },
 			});
 		}
@@ -214,6 +215,7 @@
 			<div class="thumbnail">
 				<img
 					decoding="async"
+					loading="lazy"
 					src={item.thumbnails[0]?.url}
 					width={item.thumbnails[0]?.width}
 					height={item.thumbnails[0]?.height}

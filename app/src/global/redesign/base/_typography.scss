@@ -1,0 +1,59 @@
+@use "./variables" as v;
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+.subheading {
+	font-family: "CommissionerVariable", sans-serif;
+
+	line-height: 1.2;
+	font-weight: 500;
+	margin: 0.3125em 0 1.38rem;
+}
+
+h1,
+.h1 {
+	font-size: 2.488rem;
+	font-weight: 700;
+	letter-spacing: -0.03em;
+}
+
+h2,
+.h2 {
+	font-size: 2.074rem;
+	font-weight: 700;
+}
+
+h3,
+.h3 {
+	font-size: 1.728em;
+}
+
+h4,
+.h4 {
+	font-size: 1.44em;
+}
+
+h5,
+.h5 {
+	font-size: 1.2em;
+}
+
+h6,
+.h6 {
+	font-size: 1em;
+}
+
+p {
+	margin: 0 0 v.$sm-spacing;
+	font-size: 1em;
+}

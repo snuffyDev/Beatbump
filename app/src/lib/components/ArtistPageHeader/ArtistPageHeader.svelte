@@ -12,22 +12,30 @@
 	let y = 0;
 	let wrapper: HTMLElement;
 	let isExpanded = false;
-	let scroll: DOMRect | {} = {};
+	let timestamp = 0;
+
 	let opacity = 0;
 	let img: HTMLImageElement;
-	let timestamp = 0;
-	const handler = () => {
-		if (browser && container !== undefined) {
-			scroll = container.getBoundingClientRect();
-			const calc = -scroll.top / window.innerHeight;
-			y = window.innerWidth < 500 ? Math.min(Math.max(calc, 0), 1) * 325 : Math.min(Math.max(calc, 0), 1) * 116;
-		}
-	};
-	$: isExpanded && handler();
+
 	let descClientHeight = undefined;
 	let descOffsetHeight = undefined;
 	let desc: HTMLElement = undefined;
+
 	$: descIsOverflow = descClientHeight < descOffsetHeight ? false : true;
+
+	const handler = () => {
+		if (!browser && !container) return;
+
+		  const scroll = container.getBoundingClientRect();
+			const calc = -scroll.top / window.innerHeight;
+			y = window.innerWidth < 500 ? Math.min(Math.max(calc, 0), 1) * 325 : Math.min(Math.max(calc, 0), 1) * 116;
+
+	};
+
+	function onScroll(event: UIEvent){
+		cancelAnimationFrame(timestamp)
+		timestamp = requestAnimationFrame(handler)
+	}
 	onMount(() => {
 		let start;
 		if (img) {
@@ -40,10 +48,10 @@
 			descOffsetHeight = desc.scrollHeight;
 		}
 		wrapper = document.getElementById("wrapper");
-		wrapper.addEventListener("scroll", () => (timestamp = requestAnimationFrame(handler)), { passive: true });
+		wrapper.addEventListener("scroll", onScroll, { passive: true });
 		return () => {
-			wrapper.removeEventListener("scroll", () => (timestamp = requestAnimationFrame(handler)), true);
-			cancelAnimationFrame(timestamp);
+			if (timestamp) cancelAnimationFrame(timestamp);
+			wrapper.removeEventListener("scroll", onScroll);
 		};
 	});
 	// $: console.log(header)
@@ -128,7 +136,7 @@
 					<div class="description" bind:this={desc} class:expanded={isExpanded}>
 						{description}
 					</div>
-					<div class="show-more" class:hidden={descIsOverflow} on:click={() => (isExpanded = !isExpanded)}>
+					<div class="show-more" class:hidden={descIsOverflow} on:click={() => {isExpanded = !isExpanded; handler();}}>
 						<span class="btn-text">Show {isExpanded ? "Less" : "More"}</span>
 					</div>
 				{/if}

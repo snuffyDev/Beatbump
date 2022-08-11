@@ -1,11 +1,11 @@
-<!-- <svelte:options immutable={true} /> -->
+<svelte:options immutable={true} />
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import Loading from "$components/Loading/Loading.svelte";
 	import { setNewFavorite } from "$lib/db";
 	import { groupSession } from "$lib/stores";
 	import list from "$lib/stores/list";
-	import type { CarouselItem, Item } from "$lib/types";
+	import type { Item } from "$lib/types";
 	import { Logger, notify } from "$lib/utils";
 	import { currentTitle, showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
 	import { ENV_SITE_URL } from "./../../../env";
@@ -15,7 +15,7 @@
 	import { browser } from "$app/env";
 	import { IsoBase64 } from "$lib/utils/buffer";
 	export let index;
-	export let item: CarouselItem;
+	export let item: Item & {idx?: number};
 	export let type = "";
 	export let kind = "";
 	export let aspectRatio;
@@ -276,6 +276,7 @@
 	let active;
 	$: isArtistKind = kind === "Fans might also like";
 	// $: active = windowWidth < 640 ? true : false
+	// $: console.log(item.thumbnails)
 </script>
 
 <!-- <svelte:window bind:innerWidth={windowWidth} /> -->
@@ -318,16 +319,14 @@
 			{/if}
 			<img
 				alt="thumbnail"
-				decoding="auto"
-				loading="lazy"
-				data-loaded="false"
+				decoding="async"
 				on:error={errorHandler}
 				class:img16x9={RATIO_RECT}
 				class:img1x1={RATIO_SQUARE}
 				width={srcImg.width}
 				height={srcImg.height}
 				src={srcImg.placeholder}
-				data-src={srcImg.url}
+				data-src={srcImg.width < 100 ? srcImg.url.replace(/=w\d+?-h\d+?/gm, '=w240-h240'): srcImg.url}
 			/>
 		</div>
 		<div class="item-menu">
@@ -382,7 +381,7 @@
 			-webkit-box-orient: vertical;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			margin-bottom: 0.333em;
+			margin-bottom: 0.325em;
 		}
 	}
 	.item1x1 {
@@ -398,7 +397,7 @@
 		// padding-top: 100% !important;
 
 		aspect-ratio: 1/1 !important;
-		width: clamp(11em, 13em, 18em) !important;
+		width: clamp(12em, 14em, 18em) !important;
 	}
 	.img16x9 {
 		// padding-top: 56.25% !important;
@@ -421,11 +420,11 @@
 		font-size: 1em;
 		line-height: 1.25;
 		font-weight: 400 !important;
-		margin-bottom: 0.777em;
 		display: inline;
 	}
 	article {
 		padding: 1em;
+		margin-bottom:1em;
 		min-width: 12em;
 		scroll-snap-align: start;
 		// padding-right: 1rem;

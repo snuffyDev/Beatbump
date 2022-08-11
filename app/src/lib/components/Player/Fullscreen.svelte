@@ -24,6 +24,7 @@
 	$: data = $currentTrack;
 	$: heightCalc = -windowHeight + 140;
 	$: queueOpen = true;
+	let titleWidth = 320
 	let active = "UpNext";
 	const tabs = [
 		{
@@ -203,9 +204,9 @@
 				</div>
 				{#if $session.Android || $session.iOS}
 					<div class="container controls">
-						<div class="container text-shadow" style="text-align:center; overflow:hidden;">
-							<span class="h5">{data?.title}</span>
-							<span class="h6"
+						<div class="container text-shadow" style="overflow:hidden;">
+							<div class="marquee"><span class="marquee-wrapper" style="animation-play-state: {state === 'open' && (titleWidth > innerWidth)? 'running' :'paused'}; {(state === 'closed' || titleWidth < innerWidth) ? 'animation: none; transform: unset;' : ''}"><span bind:clientWidth="{titleWidth}" class="h5 marquee-text">{data?.title}</span></span></div>
+							<span class="h6" style="text-align:center; "
 								>{data?.artistInfo && data?.artistInfo.artist.at(0) ? data?.artistInfo.artist.at(0).text : ""}</span
 							>
 						</div>
@@ -277,6 +278,52 @@
 {/if}
 
 <style lang="scss">
+	.marquee {
+		position:relative;
+		overflow:hidden;
+		max-width:calc(100% - 4em);
+		margin:0 auto;
+		--max-width:calc(100% - 4em);
+		--offset: 10vw;
+		--move-initial: calc(-10vw + var(--offset));
+    --move-final: calc(calc(-100% + 80vw) + var(--offset));
+
+			--text-initial: calc(10vw);
+			--text-final: calc(var(--text-initial) * 100vw);
+	}
+	.marquee-wrapper {
+		width: fit-content;
+    display: flex;
+    position: relative;
+    transform: translate3d(var(--move-initial), 0, 0);
+    animation: marquee linear infinite forwards;
+		animation-delay: 2s;
+		animation-duration: 9s;
+    // animation-play-state: running;
+		// box-shadow:  inset (-40px) 0 40px (-16px) transparent;
+
+	}
+	.marquee-text {
+		padding: 0 1em;
+		white-space: nowrap;
+	}
+
+	@keyframes marquee {
+    0% {
+        transform: translate3d(var(--move-initial), 0, 0);
+			}
+			25% {
+
+				transform: translate3d(var(--move-initial), 0, 0);
+		}
+		75% {
+			transform: translate3d(var(--move-final), 0, 0);
+
+		}
+    100% {
+        transform: translate3d(var(--move-final), 0, 0);
+    }
+}
 	.controls {
 		gap: 1em;
 	}
