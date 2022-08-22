@@ -1,40 +1,39 @@
 <script context="module" lang="ts">
-	import type { Load } from "@sveltejs/kit";
+	// import type { Load } from "@sveltejs/kit";
 
-	let path;
-	export const load: Load = async ({ url, params, fetch, stuff }) => {
-		const slug = params.slug;
-		const filter = url.searchParams.get("filter") || "";
-		path = stuff.page;
-		// console.log(filter, page, slug)
-		const apiUrl = `/api/search.json?q=${encodeURIComponent(slug)}${
-			filter !== "" ? `&filter=${encodeURIComponent(filter)}` : ""
-		}`;
-		const response = await fetch(apiUrl);
-		const data = await response.json();
-		const { results = [], continuation = {}, didYouMean, error } = await data;
+	// let path;
+	// export const load: Load = async ({ url, params, fetch, stuff }) => {
+	// 	const slug = params.slug;
+	// 	const filter = url.searchParams.get("filter") || "";
+	// 	path = stuff.page;
+	// 	// console.log(filter, page, slug)
+	// 	const apiUrl = `/api/search.json?q=${encodeURIComponent(slug)}${
+	// 		filter !== "" ? `&filter=${encodeURIComponent(filter)}` : ""
+	// 	}`;
+	// 	const response = await fetch(apiUrl);
+	// 	const data = await response.json();
+	// 	const { results = [], continuation = {}, didYouMean, error } = await data;
 
-		if (response.ok) {
-			return {
-				props: {
-					filter: filter,
-					contents: results,
-					continuation: continuation,
-					didYouMean: didYouMean,
-					error,
-				},
-				status: 200,
-			};
-		}
-	};
+	// 	if (response.ok) {
+	// 		return {
+	// 			props: {
+	// 				filter: filter,
+	// 				contents: results,
+	// 				continuation: continuation,
+	// 				didYouMean: didYouMean,
+	// 				error,
+	// 			},
+	// 			status: 200,
+	// 		};
+	// 	}
+	// };
 </script>
 
 <script lang="ts">
-	export let continuation: NextContinuationData;
-	export let contents;
-	export let didYouMean;
-	export let error;
-	export let filter;
+	import type { PageData } from "./$types";
+
+	export let data: PageData;
+	let { continuation, contents, didYouMean, error, filter, path } = data;
 
 	import { page } from "$app/stores";
 	import { invalidate } from "$app/navigation";

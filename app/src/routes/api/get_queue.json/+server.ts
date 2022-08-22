@@ -67,7 +67,10 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	if (!response.ok) {
 		// NOT res.status >= 200 && res.status < 300
-		return { status: response.status, body: response.statusText };
+
+		// Suggestion (check for correctness before using):
+		return new Response(response.statusText, { status: response.status });
+		// return { status: response.status, body: response.statusText };
 	}
 	const data = await response.json();
 	const queueDatas: any[] = data?.queueDatas || [];
@@ -83,12 +86,10 @@ export const GET: RequestHandler = async ({ url }) => {
 			queueDatas[idx] = PlaylistPanelVideoRenderer(queueDatas[idx]?.content?.playlistPanelVideoRenderer);
 		}
 		//
-		return {
-			status: 200,
-			body: JSON.stringify(queueDatas as Song[]),
+		return new Response(JSON.stringify(queueDatas as Song[]), {
 			headers: {
 				"content-type": "application/json",
 			},
-		};
+		});
 	}
 };

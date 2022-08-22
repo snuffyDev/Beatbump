@@ -8,7 +8,7 @@ import { findFirst, map } from "./collections";
 import { browser } from "$app/env";
 
 let userSettings: UserSettings;
-if (browser) {
+if (browser && settings) {
 	settings.subscribe((value) => {
 		userSettings = value;
 	});
@@ -121,11 +121,16 @@ function handleError() {
 		error: true,
 	};
 }
-export const queryParams = (params: Record<any, any>): string => {
-	const result = [];
-	for (const key in params) {
-		if (!params[key]) continue;
-		result.push(`${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`);
-	}
-	return result.join("&");
-};
+// export const queryParams = (params: Record<any, any>): string => {
+// 	const result = [];
+// 	for (const key in params) {
+// 		if (!params[key]) continue;
+// 		result.push(`${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`);
+// 	}
+// 	return result.join("&");
+// };
+export const queryParams = (params: Record<any, any>): string =>
+	map(Object.keys(params), (k) => {
+		if (params[k] === undefined) return;
+		return k + "=" + params[k];
+	}).join("&");

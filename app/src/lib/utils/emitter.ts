@@ -44,7 +44,7 @@ export class EventEmitter implements IEventEmitter {
 	}
 
 	public dispose(): void {
-		this._eventQueue.delete({});
+		if (this._eventQueue !== null) this._eventQueue.delete(this.__target);
 		this._eventQueue = null;
 	}
 

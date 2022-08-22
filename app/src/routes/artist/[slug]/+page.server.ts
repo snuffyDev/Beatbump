@@ -1,9 +1,9 @@
-import { buildRequest } from "../api/_api/request";
-import type { RequestHandler } from "@sveltejs/kit";
+import { buildRequest } from "../../api/_api/request";
+import { error, type PageServerLoad } from "@sveltejs/kit";
 import { ArtistPageParser } from "$lib/parsers/artist";
 import type { JSONValue } from "@sveltejs/kit/types/private";
 
-export const GET: RequestHandler = async ({ params }) => {
+export const load: PageServerLoad = async ({ params }) => {
 	const response = await buildRequest("artist", {
 		context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
 		params: {
@@ -12,18 +12,10 @@ export const GET: RequestHandler = async ({ params }) => {
 		},
 	});
 	const data = await response.json();
-	if (!response.ok)
-		return {
-			status: 500,
-			body: response.statusText,
-		};
+	if (!response.ok) throw error(500, response.statusText);
 	const page = parseResponse(data);
 
-	return {
-		status: 200,
-		headers: { "content-type": "application/json" },
-		body: page as JSONValue,
-	};
+	return page;
 };
 function parseResponse(data) {
 	const header = data?.header;

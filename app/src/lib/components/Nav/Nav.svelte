@@ -207,7 +207,7 @@
 		border-bottom: 0.0625rem hsl(0deg 0% 12%) solid;
 	}
 	.x-button {
-		position: absolute;
+		position: absolute !important;
 		top: 0.8em;
 		right: 1em;
 	}

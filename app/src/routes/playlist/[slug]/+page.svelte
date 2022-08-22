@@ -1,40 +1,6 @@
-<script context="module" lang="ts">
-	import type { Load } from "@sveltejs/kit";
-	export const load: Load = async ({ params, fetch, url }) => {
-		const { slug } = params;
-		const response = await fetch(`/api/playlist.json?list=${params.slug}`);
-		const data = await response.json();
-
-		// console.log(data);
-		const { tracks = [], header = {}, continuations = {}, carouselContinuations, visitorData } = await data;
-		if (!response.ok) {
-			return {
-				error: Error(response.statusText),
-				status: response.status,
-			};
-		}
-		return {
-			props: {
-				tracks: tracks,
-				visitorData,
-				continuations: continuations,
-				carouselContinuations,
-				header: header,
-				id: slug,
-				key: url.pathname,
-			},
-			stuff: {
-				path: url.pathname,
-			},
-			cache: { maxage: 3600 },
-			status: 200,
-		};
-	};
-</script>
-
 <script lang="ts">
 	import ListItem from "$lib/components/ListItem/ListItem.svelte";
-	import List from "./_List.svelte";
+	import List from "../_List.svelte";
 	import list from "$lib/stores/list";
 	import { ctxKey, isPagePlaying, showAddToPlaylistPopper } from "$lib/stores/stores";
 
@@ -49,22 +15,27 @@
 	import { browser } from "$app/env";
 	import { CTX_ListItem } from "$lib/contexts";
 	import type { NextContinuationData } from "$lib/types";
+	import type { PageData } from './$types';
 
-	export let tracks: IListItemRenderer[];
-	export let header: HeaderType = {
-		thumbnails: [],
-		description: "",
-		playlistId: "",
-		secondSubtitle: [],
-		subtitles: [],
-		title: "",
-	};
-	// export let data
-	export let id: string;
-	export let continuations: Maybe<NextContinuationData>;
-	export let carouselContinuations: Maybe<NextContinuationData>;
-	export let visitorData = "";
-	export let key: string;
+	export let data: PageData;
+
+	const {
+		tracks = [],
+		header = {
+			thumbnails: [],
+			description: "",
+			playlistId: "",
+			secondSubtitle: [],
+			subtitles: [],
+			title: "",
+		},
+		id = "",
+		continuations,
+		carouselContinuations,
+		visitorData,
+		key,
+	} = data;
+
 	$: ctoken = continuations?.continuation || "";
 	$: itct = continuations?.clickTrackingParams || "";
 	let width = 640;

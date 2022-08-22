@@ -116,6 +116,7 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 	private _HLSModule: typeof HLS;
 	// private _DashModule: typeof DashJS;
 	// private _DashJS: DashJS.MediaPlayerClass;
+	private _isDisposed = false;
 	private __srcUrl: string;
 	/** Prevents the player from calling `this.next()` again
 	 *  until the previous invocation has finished.
@@ -173,7 +174,7 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 		this._player.preload = "metadata";
 
 		this._durationUnsubscriber = this._durationStore.subscribe((value) => {
-			this._duration = this._isWebkit && !this.isHLSPlayer ? value : value / 2;
+			this._duration = this._isWebkit && !this.isHLSPlayer ? value / 2 : value;
 		});
 		this._currentTimeUnsubscriber = this._currentTimeStore.subscribe((value) => {
 			this._currentTime = value;
@@ -252,6 +253,7 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 
 	public override dispose(): void {
 		if (!browser) return;
+		if (this._isDisposed) return;
 		for (const [name, obj] of events.entries()) {
 			if (obj["options"]) {
 				this._player.removeEventListener(name, obj.cb, obj?.options);
@@ -551,7 +553,7 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 
 	private async setup() {
 		if (!browser) return;
-		if (get(settings)?.playback?.Stream === "HLS" && !this.isWebkit) {
+		if (browser && !!settings && get(settings)?.playback?.Stream === "HLS" && !this.isWebkit) {
 			this._HLSModule = await this.loadHLSModule();
 			if (this._HLSModule.isSupported()) {
 				this.isHLSPlayer = true;

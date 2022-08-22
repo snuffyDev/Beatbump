@@ -90,7 +90,7 @@ export function buildRequest<
  */
 function nextRequest<T extends NextEndpointParams>(context: Context, params: T) {
 	const body = buildRequestBody(context, params);
-	const request = fetch(API_BASE_URL + ENDPOINT_NAMES.next, {
+	const request = fetch(API_BASE_URL + ENDPOINT_NAMES.next + "?key=" + WEB_REMIX_KEY, {
 		body: JSON.stringify(body),
 		method: "POST",
 		headers: {
@@ -99,7 +99,8 @@ function nextRequest<T extends NextEndpointParams>(context: Context, params: T) 
 			"x-origin": "https://music.youtube.com",
 
 			"X-Goog-Visitor-Id": `${context?.client?.visitorData}`,
-			"User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+			"User-Agent":
+				"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.0.1293.54,gzip(gfe)",
 		},
 	});
 	return request;

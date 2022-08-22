@@ -1,3 +1,5 @@
+
+// @migration task: Check imports
 import { buildRequest } from "$api/_api/request";
 import type { RequestHandler } from "@sveltejs/kit";
 
@@ -38,8 +40,5 @@ export const GET: RequestHandler = async ({ url }) => {
 		];
 	}
 
-	return {
-		status: 200,
-		body: JSON.stringify(sections),
-	};
+	return new Response(JSON.stringify(sections));
 };

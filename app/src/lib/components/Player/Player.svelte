@@ -19,6 +19,7 @@
 	import keyboardHandler from "./keyboardHandler";
 	import ProgressBar from "./ProgressBar";
 	import { session } from "$app/stores";
+	import { page } from "$app/stores";
 
 	const { paused } = AudioPlayer;
 	let volume = 0.5;
@@ -179,7 +180,7 @@
 		{/if}
 	</div>
 	<div class="player-controls" style:display={innerWidth < 640 ? "none" : "flex"}>
-		{#if !$session.iOS && !$session.Android}
+		{#if !$page.data.iOS && !$page.data.Android}
 			<Controls
 				bind:isPaused={isPlaying}
 				bind:loading={$playerLoading}

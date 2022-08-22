@@ -1,40 +1,19 @@
-<script context="module" lang="ts">
-	import type { Load } from "@sveltejs/kit";
-	export const load: Load = async ({ params, fetch, url }) => {
-		// const params = url.searchParams.get('params')
-		const response = await fetch(
-			`/trending/new/${params.slug}.json` +
-				`${url.searchParams.get("params") ? `?params=${url.searchParams.get("params")}` : ""}` +
-				`${url.searchParams.get("itct") ? `&itct=${encodeURIComponent(url.searchParams.get("itct"))}` : ""}`,
-		);
-		const { sections = [], header = "", title = [] || "" } = await response.json();
-		// console.log(sections, header, title)
-		if (response.ok) {
-			return {
-				props: {
-					sections,
-					header,
-					title,
-				},
-				status: 200,
-			};
-		}
-	};
-</script>
-
 <script lang="ts">
 	import type { Sections } from "$lib/types/components/sections";
-	export let sections: Sections;
-
-	export let header;
-	// export let data
-	export let title: string;
+	import type { PageData } from "./$types";
 
 	import Header from "$lib/components/Layouts/Header.svelte";
-	import { Grid, GridItem } from "$lib/components/Grid";
+	import { Grid } from "$lib/components/Grid";
 	import { page } from "$app/stores";
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
 	import CarouselItem from "$lib/components/Carousel/CarouselItem.svelte";
+
+	export let data: PageData;
+
+	let sections: Sections = data.sections;
+
+	let header = data.header;
+	let title: string = data.title;
 </script>
 
 <Header title={title ? title.replace(",", " ") : ""} url={$page.url.pathname} desc="The latest in music" />

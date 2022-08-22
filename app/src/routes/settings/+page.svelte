@@ -1,7 +1,3 @@
-<script context="module" lang="ts">
-	export const prerender = false;
-</script>
-
 <script lang="ts">
 	import Header from "$components/Layouts/Header.svelte";
 	import { settings, SettingsSchema, type Theme } from "$stores/settings";

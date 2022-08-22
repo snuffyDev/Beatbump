@@ -88,7 +88,8 @@
 		z-index: 200;
 		background: var(--top-bg);
 		width: 100%;
-		max-width: clamp(28vw, 75%, 95%);
+
+		width: clamp(28vw, 35vw, 78vw);
 		/* max-height: 44vh; */
 		border-radius: $xs-radius;
 		height: auto;
@@ -114,7 +115,8 @@
 		}
 		@media only screen and (max-width: 640px) {
 			left: 0;
-			width: 100%;
+
+			width: clamp(68%, 78%, 95%);
 			right: 0;
 		}
 		// padding: 0.4em;

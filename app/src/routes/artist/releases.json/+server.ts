@@ -1,3 +1,6 @@
+import { json as json$1 } from '@sveltejs/kit';
+
+// @migration task: Check imports
 import { MusicTwoRowItemRenderer } from "$lib/parsers";
 import { iter } from "$lib/utils/collections";
 import type { RequestHandler } from "@sveltejs/kit";
@@ -98,6 +101,9 @@ export const GET: RequestHandler = async ({ url }) => {
 	const header = data?.header;
 	const contents = data?.contents;
 	if (!response.ok) {
+		throw new Error("@migration task: Migrate this return statement (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292701)");
+		// Suggestion (check for correctness before using):
+		// return new Response(response.statusText, { status: response.status });
 		return { status: response.status, body: response.statusText };
 	}
 
@@ -121,8 +127,5 @@ export const GET: RequestHandler = async ({ url }) => {
 		type: grid?.header?.gridHeaderRenderer?.title.runs[0].text,
 	};
 
-	return {
-		body: { header: head, contents: items },
-		status: 200,
-	};
+	return json$1({ header: head, contents: items });
 };

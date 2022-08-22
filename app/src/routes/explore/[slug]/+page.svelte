@@ -1,32 +1,16 @@
-<script context="module" lang="ts">
-	import type { Load } from "@sveltejs/kit";
-
-	export const load: Load = async ({ url, params, fetch, stuff }) => {
-		const response = await fetch(`/explore/${params.slug}.json`);
-		const { sections, header, type } = await response.json();
-
-		let path = url.pathname;
-		return {
-			props: {
-				sections,
-				header,
-				type,
-				path,
-			},
-			status: 200,
-		};
-	};
-</script>
-
 <script lang="ts">
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
 	import { Grid, GridItem } from "$lib/components/Grid";
 	import Header from "$lib/components/Layouts/Header.svelte";
 	import CarouselItem from "$components/Carousel/CarouselItem.svelte";
-	export let sections;
-	export let path;
-	export let header;
-	export let type;
+	import type { PageData } from "./$types";
+
+	export let data: PageData;
+	let sections = data?.sections;
+	let path = data?.path;
+	let header = data?.header;
+	let type = data?.type;
+	$: console.log(data);
 </script>
 
 <Header

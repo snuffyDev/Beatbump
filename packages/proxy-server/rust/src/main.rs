@@ -7,6 +7,7 @@ use async_recursion::async_recursion;
 
 use futures::future::{BoxFuture, FutureExt};
 use hyper::body::{self};
+use hyper::header::{self};
 use hyper::server::conn::Http;
 use hyper::service::service_fn;
 use hyper::{Body, Request};
@@ -66,33 +67,27 @@ async fn send_request(url: &str, host: &str) -> Result<Response<Body>, hyper::Er
     let res = client.request(req).await?;
     println!("Response: {}", res.status());
     println!("Headers: {:#?}\n", res.headers());
-    /// A https://xxxx-xxxx.googlevideo.com/videoplayback?xxxxx
-    /// URL should return a 206 or 302 Response code.
-    /// 302 - "Found" should have a "Location" HTTP header.
-    /// TODO! figure out why this doesn't work ???
-    if res.headers().contains_key("Location") {
-        println!(
-            "HAS LOCATION! {}",
-            res.headers().get("Location").unwrap().to_str().unwrap()
-        );
-
-        let redirect_location = res
+    // A https://xxxx-xxxx.googlevideo.com/videoplayback?xxxxx
+    // URL should return a 206 or 302 Response code.
+    // 302 - "Found" should have a "Location" HTTP header.
+    // TODO! figure out why this doesn't work ???
+    if res.headers().contains_key(header::LOCATION) {
+        let location = res
             .headers()
-            .get("Location")
-            .expect("location header not found")
+            .get(header::LOCATION)
+            .expect("Error getting Location")
             .to_str()
             .unwrap()
             .parse::<Uri>()
             .unwrap();
+        println!("HAS LOCATION! {:#?}", &location);
 
-        let path = &*redirect_location.path_and_query().unwrap().as_str();
+        let path = &*location.path_and_query().unwrap().as_str();
         let redir_url = format!("127.0.0.1:33125{}", &path);
-        return Ok(send_request(&redir_url, &redirect_location.host().unwrap())
-            .await
-            .expect("Error With Location Request"));
+        return Ok(send_request(&redir_url, &location.host().unwrap()).await?);
     };
 
-    Ok(Response::new(res.into_body()))
+    Ok(res)
 }
 
 async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
@@ -136,7 +131,8 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
             )
             .to_string();
             let result = send_request(&url, &host).await?;
-            Ok(result)
+            let response = Response::builder().body(result.into_body()).unwrap();
+            Ok(response)
         }
         (&Method::GET, "api") => {
             let url = format!("https://manifest.googlevideo.com{}", &req.uri().path());

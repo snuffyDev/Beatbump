@@ -1,9 +1,10 @@
+import { error, json as json$1 } from "@sveltejs/kit";
 import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 import type { Item, Song } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import type { RequestHandler } from "@sveltejs/kit";
-import { buildRequest } from "./_api/request";
+import { buildRequest } from "../_api/request";
 type ResponseBody = {
 	browseId: string;
 	params: string;
@@ -61,18 +62,13 @@ export const GET: RequestHandler = async ({ url }) => {
 				description.description = section?.musicDescriptionShelfRenderer?.description?.runs[0]?.text;
 			}
 		}
-		return {
-			status: 200,
-			body: {
-				carousels,
-				description,
-			},
-		};
+		return json$1({
+			carousels,
+			description,
+		});
 	} catch (err) {
 		console.error(err);
-		return {
-			status: 500,
-			body: null,
-		};
+
+		throw error(500, err);
 	}
 };

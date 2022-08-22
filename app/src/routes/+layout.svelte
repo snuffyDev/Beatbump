@@ -1,15 +1,3 @@
-<script context="module" lang="ts">
-	import type { Load } from "@sveltejs/kit";
-	export const load: Load = async ({ url }) => {
-		return {
-			props: {
-				key: url.pathname,
-			},
-			stuff: { page: url.pathname },
-		};
-	};
-</script>
-
 <script lang="ts">
 	import Nav from "$components/Nav/Nav.svelte";
 	import Player from "$lib/components/Player/Player.svelte";
@@ -31,8 +19,9 @@
 	import { fullscreenStore } from "$lib/components/Player/channel";
 	import { groupSession } from "$lib/stores";
 	import { AudioPlayer } from "$lib/player";
-	export let key = "";
-
+	import { page } from "$app/stores";
+	// export let  = "";
+	$: key = $page.data.key;
 	let main: HTMLElement;
 	$: isSearch = key.includes("/search");
 	// $: console.log(key);
@@ -56,7 +45,7 @@
 	}}
 />
 <Nav {key} />
-<Popper />
+<Popper {main} />
 <div class="wrapper app-content-m" {hasplayer} bind:this={main} class:no-scroll={isSearch || isFullscreen} id="wrapper">
 	<Wrapper {key} {main}>
 		<slot />

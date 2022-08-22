@@ -1,35 +1,11 @@
-<script context="module" lang="ts">
-	import type { Load } from "@sveltejs/kit";
-
-	let path;
-
-	export const load: Load = async ({ fetch, stuff }) => {
-		const response = await fetch("/trending.json?q=browse");
-		const data = await response.json();
-		if (!response.ok) {
-			return {
-				status: response.status,
-				error: Error(`Error: ${response.statusText}`),
-			};
-		}
-		const { carouselItems } = data;
-		path = stuff.page;
-		return {
-			props: {
-				carouselItems,
-			},
-			cache: { maxage: 3600 },
-			status: 200,
-		};
-	};
-</script>
-
 <script lang="ts">
-	export let carouselItems: ICarousel;
+	import type { PageData } from "./$types";
 	import Carousel from "$components/Carousel/Carousel.svelte";
-	import type { ICarousel } from "$lib/types";
 	import Header from "$lib/components/Layouts/Header.svelte";
-	// $: !import.meta.env.SSR && console.log(carouselItems);
+
+	export let data: PageData;
+
+	const { carouselItems, page: path } = data;
 </script>
 
 <Header title="Trending" url={path} desc="The latest trending songs and releases" />

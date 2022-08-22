@@ -1,32 +1,32 @@
 <script context="module" lang="ts">
-	import type { Load } from "@sveltejs/kit";
-	let path;
-	export const load: Load = async ({ stuff, url, fetch }) => {
-		path = stuff.page;
-		const browseId = url.searchParams.get("id") || "";
-		const pt = url.searchParams.get("type") || "";
-		const response = await fetch(
-			`/api/main.json?q=&endpoint=browse${browseId ? `&browseId=${browseId}` : ""}${pt ? `&pt=${pt}` : ""}`,
-		);
-		const data = await response.json();
-		if (!response.ok) {
-			return {
-				props: {
-					status: response.status,
-					msg: response.body,
-				},
-			};
-		}
+	// import type { Load } from "@sveltejs/kit";
+	// let path;
+	// export const load: Load = async ({ stuff, url, fetch }) => {
+	// 	path = stuff.page;
+	// 	const browseId = url.searchParams.get("id") || "";
+	// 	const pt = url.searchParams.get("type") || "";
+	// 	const response = await fetch(
+	// 		`/api/main.json?q=&endpoint=browse${browseId ? `&browseId=${browseId}` : ""}${pt ? `&pt=${pt}` : ""}`,
+	// 	);
+	// 	const data = await response.json();
+	// 	if (!response.ok) {
+	// 		return {
+	// 			props: {
+	// 				status: response.status,
+	// 				msg: response.body,
+	// 			},
+	// 		};
+	// 	}
 
-		return {
-			props: {
-				data: data,
-				id: browseId,
-			},
-			cache: { maxage: 3600 },
-			status: 200,
-		};
-	};
+	// 	return {
+	// 		props: {
+	// 			data: data,
+	// 			id: browseId,
+	// 		},
+	// 		cache: { maxage: 3600 },
+	// 		status: 200,
+	// 	};
+	// };
 </script>
 
 <script lang="ts">
@@ -40,12 +40,15 @@
 	import Header from "$lib/components/Layouts/Header.svelte";
 	import { groupSession } from "$lib/stores";
 	import { CTX_ListItem } from "$lib/contexts";
-	export let data;
-	export let id;
+	import type { PageData } from "./$types";
+	export let data: PageData;
+
+	let { data: data$1, id, path } = data;
+
 	$: id = $page.url.searchParams.get("id");
-	const promise = parsePageContents(data);
+	const promise = parsePageContents(data$1);
 	let { items, releaseInfo } = promise;
-	$: console.log(items);
+	// $: console.log(items);
 	const setId = () => isPagePlaying.add(id);
 	const playAlbum = () => {
 		setId();
@@ -78,7 +81,7 @@
 
 <Header
 	title={releaseInfo.title}
-	desc={`${releaseInfo.title} by ${releaseInfo.artist.name} on Beatbump`}
+	desc={`${releaseInfo.title} by ${releaseInfo?.artist?.name || releaseInfo?.artist[0]?.name} on Beatbump`}
 	url={path + `?id=${id}`}
 	image={thumbnail}
 />

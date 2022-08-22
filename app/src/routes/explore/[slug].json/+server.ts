@@ -1,3 +1,6 @@
+import { json as json$1 } from "@sveltejs/kit";
+
+// @migration task: Check imports
 import { buildRequest } from "$api/_api/request";
 import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 import type { CarouselHeader, CarouselItem } from "$lib/types";
@@ -35,14 +38,14 @@ export const GET: RequestHandler = async ({ url, params }) => {
 	if (carousels.length !== 0) {
 		sections = carousels.map(({ musicCarouselShelfRenderer }, i) => parseCarousel({ musicCarouselShelfRenderer }));
 		if (sections.length !== 0) {
-			return {
-				body: {
+			return json$1({ sections, header: text, type: "carousel" });
+			return new Response(
+				JSON.stringify({
 					sections,
 					header: text,
 					type: "carousel",
-				},
-				status: 200,
-			};
+				}),
+			);
 		}
 	} else {
 		sections = grids.map(({ gridRenderer = {} }) => {
@@ -53,14 +56,11 @@ export const GET: RequestHandler = async ({ url, params }) => {
 				title: header?.gridHeaderRenderer?.title?.runs[0]?.text,
 			};
 		});
-		return {
-			body: {
-				sections,
-				header: text,
-				type: "grid",
-			},
-			status: 200,
-		};
+		return json$1({
+			sections,
+			header: text,
+			type: "grid",
+		});
 	}
 };
 function parseHeader(header: any[]): CarouselHeader[] {

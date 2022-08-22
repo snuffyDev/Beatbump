@@ -18,6 +18,7 @@
 	import { CTX_ListItem } from "$lib/contexts";
 	import { notify } from "$lib/utils";
 	import { requestFrameSingle } from "$lib/utils/raf";
+	import { page } from "$app/stores";
 	const { paused } = AudioPlayer;
 
 	$: state = $fullscreenStore;
@@ -127,14 +128,19 @@
 		}
 		sliding = false;
 	}
-	$: thumbnail = data?.thumbnails.at(-1) ?? data?.thumbnail;
+	$: thumbnail = (data && Array.isArray(data.thumbnails) && data?.thumbnails.at(-1)) ?? {
+		width: 0,
+		height: 0,
+		url: "",
+		placeholder: "",
+	};
 </script>
 
 <svelte:window bind:innerWidth />
 {#if $queue.length}
 	<div
 		class="backdrop"
-		class:mobile={$session.Android || $session.iOS}
+		class:mobile={$page.data.Android || $page.data.iOS}
 		bind:clientHeight={windowHeight}
 		style:pointer-events={state === "open" ? "all" : "none"}
 		style="background-color: {state === 'open' ? 'hsla(0,0%,0%,40%)' : '#0000'} !important;"
@@ -153,13 +159,13 @@
 				class="column container"
 				use:pan
 				on:pan={(event) => {
-					if ($session.Android !== true && $session.iOS !== true) return;
+					if ($page.data.Android !== true && $page.data.iOS !== true) return;
 					const { detail } = event;
 					if (Math.abs(detail.deltaY) < 105) return;
 					trackMovement(0, detail);
 				}}
 				on:panend={(event) => {
-					if ($session.Android !== true && $session.iOS !== true) return;
+					if ($page.data.Android !== true && $page.data.iOS !== true) return;
 					const { detail } = event;
 					const direction = Math.sign(detail.deltaY) === -1 ? "up" : "down";
 					// notify(`${detail.deltaY} : ${detail.velocityY}`, "success");
@@ -178,10 +184,10 @@
 							id="img"
 							loading="eager"
 							decoding="sync"
-							style="aspect-ratio: {thumbnail.width} / {thumbnail.height};"
-							width={thumbnail.width}
-							height={thumbnail.height}
-							src={thumbnail ? thumbnail.url : data?.thumbnail}
+							style="aspect-ratio: {thumbnail?.width} / {thumbnail?.height};"
+							width={thumbnail?.width}
+							height={thumbnail?.height}
+							src={thumbnail ? thumbnail?.url : ""}
 							alt="thumbnail"
 						/>
 					</div>
@@ -195,16 +201,16 @@
 							<img
 								id="img"
 								loading="lazy"
-								style="aspect-ratio: {thumbnail.width} / {thumbnail.height};"
-								width={thumbnail.width}
-								height={thumbnail.height}
-								src={thumbnail ? thumbnail.url : data?.thumbnail}
+								style="aspect-ratio: {thumbnail?.width} / {thumbnail?.height};"
+								width={thumbnail?.width}
+								height={thumbnail?.height}
+								src={thumbnail ? thumbnail?.url : data?.thumbnail}
 								alt="thumbnail"
 							/>
 						</div>
 					</div>
 				</div>
-				{#if $session.Android || $session.iOS}
+				{#if $page.data.Android || $page.data.iOS}
 					<div class="container controls">
 						<div class="container text-shadow" style="overflow:hidden;">
 							<div class="marquee">

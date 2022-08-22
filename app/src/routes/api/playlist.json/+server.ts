@@ -4,9 +4,9 @@ import type { CarouselHeader, CarouselItem } from "$lib/types";
 import type { NextContinuationData } from "$lib/types";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { map } from "$lib/utils/collections";
-import type { RequestHandler } from "@sveltejs/kit";
-import { buildRequest } from "./_api/request";
-import type { PlaylistEndpointContinuation, PlaylistEndpointParams } from "./_api/_base";
+import { error, json, type RequestHandler } from "@sveltejs/kit";
+import { buildRequest } from "../_api/request";
+import type { PlaylistEndpointContinuation, PlaylistEndpointParams } from "../_api/_base";
 export const GET: RequestHandler = async ({ url }) => {
 	try {
 		const query = url.searchParams;
@@ -22,17 +22,15 @@ export const GET: RequestHandler = async ({ url }) => {
 		if (ctoken !== "") {
 			return getPlaylistContinuation(
 				params,
-				{ ctoken, continuation: ctoken, itct, type: "next" },
+				{ ctoken: decodeURIComponent(ctoken), continuation: decodeURIComponent(ctoken), itct, type: "next" },
 				referrer.slice(2),
 				visitorData,
 			);
 		}
+
 		return getPlaylist(browseId, referrer);
 	} catch (err) {
-		return {
-			status: 500,
-			headers: { statusText: `${err}` },
-		};
+		return new Response(undefined, { status: 500, headers: { statusText: `${err}` } });
 	}
 };
 async function getPlaylistContinuation(
@@ -58,7 +56,7 @@ async function getPlaylistContinuation(
 		continuation,
 	});
 	if (!response.ok) {
-		return { status: response.status, body: response.statusText };
+		throw error(response.status, response.statusText);
 	}
 
 	const data = await response.json();
@@ -77,14 +75,11 @@ async function getPlaylistContinuation(
 	} else {
 		tracks = parseTrack(contents, id);
 	}
-	return {
-		status: 200,
-		body: JSON.stringify({
-			continuations: cont,
-			tracks: tracks.length !== 0 && tracks,
-			carousel: carousel,
-		}),
-	};
+	return json({
+		continuations: cont,
+		tracks: tracks.length !== 0 && tracks,
+		carousel: carousel,
+	});
 }
 async function getPlaylist(browseId, referrer) {
 	const response = await fetch(
@@ -215,16 +210,13 @@ async function getPlaylist(browseId, referrer) {
 
 	const tracks = parseTrack(contents, playlistId ?? browseId.slice(2));
 	// console.timeEnd("playlist");
-	return {
-		status: 200,
-		body: JSON.stringify({
-			continuations: cont,
-			tracks,
-			visitorData,
-			carouselContinuations: _carouselContinuation && _carouselContinuation[0].nextContinuationData,
-			header: musicDetailHeaderRenderer,
-		}),
-	};
+	return json({
+		continuations: cont,
+		tracks,
+		visitorData,
+		carouselContinuations: _carouselContinuation && _carouselContinuation[0].nextContinuationData,
+		header: musicDetailHeaderRenderer,
+	});
 }
 function parseTrack(contents = [], playlistId?: string): Array<IListItemRenderer> {
 	let idx = contents.length;

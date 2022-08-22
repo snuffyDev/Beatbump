@@ -1,48 +1,22 @@
-<script context="module" lang="ts">
-	import type { Load } from "@sveltejs/kit";
-	let path;
 
-	export const load: Load = async ({ fetch, stuff }) => {
-		// console.time("startLoad");
-		const response = await fetch("/home.json");
-		const data = await response.json();
-		if (!response.ok) {
-			return {
-				status: response.status,
-				error: new Error(`Error: ${response.statusText}`),
-			};
-		}
-		// console.timeEnd("startLoad");
-		const { carousels, headerThumbnail = undefined, continuations, visitorData } = data;
-		path = stuff.page;
-		return {
-			props: {
-				carousels,
-				headerThumbnail,
-				continuations,
-				visitorData,
-			},
 
-			cache: { maxage: 3600 },
-			status: 200,
-		};
-	};
-</script>
 
 <script lang="ts">
+
+
 	import viewport from "$lib/actions/viewport";
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
 	import Header from "$lib/components/Layouts/Header.svelte";
 	import Loading from "$lib/components/Loading/Loading.svelte";
 	import type { NextContinuationData, Thumbnail } from "$lib/types";
+	import type { PageData } from './$types';
 
-	export let carousels;
-	export let headerThumbnail: Array<Thumbnail> = [];
-	export let continuations: NextContinuationData;
-	export let visitorData = "";
+	export let data: PageData;
+
+	let { carousels, headerThumbnail, continuations, visitorData, path } = data;
+
 	let loading = false;
 	let hasData = false;
-	// $: console.log(data);
 </script>
 
 <svelte:head>
@@ -110,7 +84,7 @@
 					window.requestAnimationFrame(() => {
 						carousels = [...carousels, ...data.carousels];
 					});
-						loading = false;
+					loading = false;
 					return hasData;
 				}
 				hasData = data.continuations === {};
@@ -139,11 +113,11 @@
 		display: flex;
 		position: absolute;
 		// inset:0;
-		bottom:0;
+		bottom: 0;
 		left: 0;
 		right: 0;
 		max-height: 5em;
-		z-index:100;
+		z-index: 100;
 		margin: 0 auto;
 		padding-block: 2.5rem;
 		will-change: visibility;

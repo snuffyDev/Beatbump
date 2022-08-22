@@ -1,10 +1,11 @@
+// @migration task: Check imports
 import { buildRequest } from "$api/_api/request";
 import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 
 import type { CarouselHeader } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
-import type { RequestHandler } from "@sveltejs/kit";
+import { error, type RequestHandler } from "@sveltejs/kit";
 import { iter, map } from "$lib/utils/collections/array";
 
 export const GET: RequestHandler = async () => {
@@ -16,7 +17,10 @@ export const GET: RequestHandler = async () => {
 	});
 
 	if (!response.ok) {
-		return { status: response.status, body: response.statusText };
+		// Suggestion (check for correctness before using):
+		// return new Response(response.statusText, { status: response.status });
+		throw error(response.status, response.statusText);
+		// return { status: response.status, body: response.statusText };
 	}
 
 	const data = await response.json();
@@ -35,10 +39,7 @@ export const GET: RequestHandler = async () => {
 		}),
 	);
 	// console.log(carouselItems[2].results[2]);
-	return {
-		body: JSON.stringify({ carouselItems }),
-		status: 200,
-	};
+	return new Response(JSON.stringify({ carouselItems }));
 };
 
 function parseHeader({ musicCarouselShelfBasicHeaderRenderer }): CarouselHeader {

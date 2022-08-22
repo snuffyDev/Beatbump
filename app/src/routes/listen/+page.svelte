@@ -1,51 +1,15 @@
-<script context="module" lang="ts">
-	import type { Load } from "@sveltejs/kit";
-	export const load: Load = async ({ url, params, fetch }) => {
-		const id = url.searchParams.get("id");
-		const playlist = url.searchParams.get("list") || undefined;
-		// const meta = await get('player', { videoId: id })
-		// const data = await meta.body
-
-		if (!id) {
-			return { redirect: "/trending", status: 301 };
-		}
-		const metadata = await fetch(
-			`/api/player.json?videoId=${id ? id : ""}${playlist ? `&playlistId=${playlist}` : ""}`,
-		);
-		const list = await fetch(`/api/next.json?videoId=${id ? id : ""}${playlist ? `&playlistId=${playlist}` : ""}`);
-		const listData = await list.json();
-
-		const data = await metadata.json();
-		const { videoDetails: { title = "", videoId = "", thumbnail: { thumbnails = [] } = {} } = {} } = data;
-
-		return {
-			props: {
-				title,
-				thumbnails,
-				videoId,
-				playlist,
-				related: listData,
-				data,
-			},
-			status: 200,
-		};
-	};
-</script>
-
 <script>
-	export let videoId;
-	export let playlist;
-	export let thumbnails = [];
-	export let title;
-	export let related;
-	export let data;
 	import { goto } from "$app/navigation";
 	import Icon from "$lib/components/Icon/Icon.svelte";
 	import Listing from "$lib/components/Item/Listing.svelte";
 	import list from "$lib/stores/list";
 	import { ENV_SITE_URL } from "../../env";
+	import type { PageData } from "./$types";
 
-	// $: console.log(related)
+	export let data: PageData;
+	const { videoId, playlist, thumbnails = [], title, related, data: data$1 } = data;
+
+	// $: console.log(data);
 	// $: console.log({ videoId, playlist, thumbnails, title, related, data });
 </script>
 

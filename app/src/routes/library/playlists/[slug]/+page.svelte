@@ -1,22 +1,26 @@
 <script context="module" lang="ts">
-	import type { Load } from "@sveltejs/kit";
-	import { onMount, setContext, tick } from "svelte";
-	export const load: Load = async ({ params }) => {
-		const playlistName = params.slug;
-		return {
-			props: {
-				playlistName,
-			},
-			status: 200,
-		};
-	};
+	throw new Error("@migration task: Check code was safely removed (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292722)");
+
+	// import type { Load } from "@sveltejs/kit";
+	// import { onMount, setContext, tick } from "svelte";
+	// export const load: Load = async ({ params }) => {
+	// 	const playlistName = params.slug;
+	// 	return {
+	// 		props: {
+	// 			playlistName,
+	// 		},
+	// 		status: 200,
+	// 	};
+	// };
 </script>
 
 <script lang="ts">
+	throw new Error("@migration task: Add data prop (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292707)");
+
 	import InfoBox from "$lib/components/Layouts/InfoBox.svelte";
 	import type { IDBPlaylist } from "$lib/db";
 	import * as db from "$lib/db";
-	import List from "./_List.svelte";
+	import List from "../_List.svelte";
 	import { isPagePlaying } from "$lib/stores/stores";
 	import list from "$lib/stores/list";
 	import { filter, getSrc } from "$lib/utils";
@@ -26,7 +30,7 @@
 	import ListInfoBar from "$lib/components/ListInfoBar";
 	import LocalListItem from "$lib/components/ListItem/LocalListItem.svelte";
 	import { CTX_ListItem } from "$lib/contexts";
-	import Search from "./_Search.svelte";
+	import Search from "../_Search.svelte";
 	export let playlistName;
 
 	CTX_ListItem.set({ page: "library" });

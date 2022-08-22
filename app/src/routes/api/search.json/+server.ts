@@ -1,10 +1,11 @@
+import { error, json, json as json$1 } from "@sveltejs/kit";
 import { MusicResponsiveListItemRenderer } from "$lib/parsers";
 import { iter, type Maybe } from "$lib/utils";
-import { buildRequest } from "./_api/request";
+import { buildRequest } from "../_api/request";
 import type { Item, NextContinuationData } from "$lib/types";
 import type { IMusicResponsiveListItemRenderer } from "$lib/types/internals";
 import type { RequestHandler } from "@sveltejs/kit";
-import type { SearchEndpointParams } from "./_api/_base";
+import type { SearchEndpointParams } from "../_api/_base";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 
 export type SearchFilter = "video" | "community_playlist" | "featured_playlist" | "all_playlist" | "song" | "artist";
@@ -40,10 +41,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			continuation: ctoken !== "" ? { continuation: ctoken, ctoken, itct: `${itct}`, type: "next" } : null,
 		});
 		if (!response.ok) {
-			return {
-				status: response.status,
-				body: response.statusText,
-			};
+			throw error(500, response.statusText);
 		}
 		const data = await response.json();
 
@@ -58,15 +56,9 @@ export const GET: RequestHandler = async ({ url }) => {
 				? parseContinuation(continuationContents, filter as SearchFilter)
 				: parseContents(contents, filter as SearchFilter);
 
-		return {
-			status: 200,
-			body: results,
-		};
+		return json(results);
 	} catch (err) {
-		return {
-			status: 500,
-			body: err,
-		};
+		throw error(500, err);
 	}
 };
 
@@ -143,7 +135,7 @@ function parseResults(items: any[], type: string) {
 		}
 		if (type === "song") {
 			Object.assign(item, {
-				album: item.subtitle.at(-3).pageType && item.subtitle.at(-3).pageType.includes("ALBUM") && item.subtitle.at(-3),
+				album: item.subtitle.at(-3).pageType?.includes("ALBUM") && item.subtitle.at(-3),
 			});
 		}
 		results.unshift(item);

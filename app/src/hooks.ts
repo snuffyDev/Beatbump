@@ -1,6 +1,6 @@
 import { dev } from "$app/env";
 
-import type { GetSession, Handle } from "@sveltejs/kit";
+import type { Handle } from "@sveltejs/kit";
 
 const rootDomain = import.meta.env.VITE_DOMAIN; // or your server IP for dev
 const originURL = import.meta.env.VITE_SITE_URL; // or your server IP for dev
@@ -27,15 +27,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 		response.headers.set(`${key}`, `${headers[key]}`);
 	}
 	return response;
-};
-
-export const getSession: GetSession = (event) => {
-	return event.locals.iOS
-		? {
-				iOS: event.locals.iOS,
-				Android: event.locals.Android,
-		  }
-		: {};
 };
 
 //#NODE process.on('SIGINT', function () { process.exit(); }); // Ctrl+C

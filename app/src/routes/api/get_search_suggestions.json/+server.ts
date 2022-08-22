@@ -1,3 +1,4 @@
+import { json as json$1 } from "@sveltejs/kit";
 import type { RequestHandler } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ url }) => {
@@ -72,6 +73,6 @@ export const GET: RequestHandler = async ({ url }) => {
 		};
 	});
 	if (results) {
-		return { body: results, status: 200 };
+		return json$1(results);
 	}
 };

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
-	import ArtistPageHeader from "../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte";
+	import ArtistPageHeader from "../../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte";
 	import { page } from "$app/stores";
 
 	import ListItem from "$lib/components/ListItem/ListItem.svelte";
@@ -9,10 +9,11 @@
 
 	import type { ArtistPage, IArtistPageHeader, ArtistPageBody } from "$lib/parsers/artist";
 	import { CTX_ListItem } from "$lib/contexts";
+	import type { PageData } from "./$types";
 
-	export let body: ArtistPageBody;
-	export let header: IArtistPageHeader;
-	export let visitorData: string;
+	export let data: PageData;
+	const { body, header, visitorData } = data;
+
 	let carousels: ArtistPageBody["carousels"] = body["carousels"] ?? [];
 	let songs = body["songs"] ?? {};
 

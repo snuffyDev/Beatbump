@@ -59,7 +59,7 @@ export function fetchNext({
 	};
 	const options = Object.fromEntries(
 		Object.entries(obj)
-			.filter(([_, v]) => v)
+			.filter(([_, v]) => v != (null || undefined))
 			.map(([key, value]) => [key, encodeURIComponent(value)]),
 	);
 

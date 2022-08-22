@@ -1,7 +1,3 @@
-<script context="module" lang="ts">
-	// export const ssr = false
-</script>
-
 <script lang="ts">
 	import { browser } from "$app/env";
 	import Icon from "$lib/components/Icon/Icon.svelte";

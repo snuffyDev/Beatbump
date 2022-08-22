@@ -1,3 +1,4 @@
+import { json as json$1 } from '@sveltejs/kit';
 import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 import type { CarouselHeader } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
@@ -87,10 +88,7 @@ export const GET: RequestHandler = async ({ params }) => {
 		return wordParts.join(" ");
 	};
 	// console.log(sections)
-	return {
-		body: { title: getTitle(), sections, header: text },
-		status: 200,
-	};
+	return json$1({ title: getTitle(), sections, header: text });
 };
 
 function parseHeader({ musicCarouselShelfBasicHeaderRenderer }): CarouselHeader {

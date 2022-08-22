@@ -3,6 +3,7 @@ import type { IPlaylistPanelVideoRenderer } from "$lib/types/playlistPanelVideoR
 import { map } from "$lib/utils";
 
 export function PlaylistPanelVideoRenderer(ctx: IPlaylistPanelVideoRenderer): Song {
+	// console.log(ctx.menu.menuRenderer.items);
 	const Item = {
 		subtitle: map(ctx?.shortBylineText?.runs, (item, idx) => {
 			if (ctx?.longBylineText?.runs[idx]?.navigationEndpoint !== undefined) {

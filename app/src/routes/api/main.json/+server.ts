@@ -78,8 +78,5 @@ export const GET: RequestHandler = async ({ url }) => {
 	// }
 	const data = await response.json();
 
-	return {
-		status: 200,
-		body: JSON.stringify(data),
-	};
+	return new Response(JSON.stringify(data));
 };

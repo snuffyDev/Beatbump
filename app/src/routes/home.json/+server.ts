@@ -1,3 +1,4 @@
+// @migration task: Check imports
 import { buildRequest } from "$api/_api/request";
 import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 
@@ -6,7 +7,7 @@ import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import type { Dict } from "$lib/types/utilities";
 import { iter } from "$lib/utils/collections/array";
-import type { RequestHandler } from "@sveltejs/kit";
+import { error, json, type RequestHandler } from "@sveltejs/kit";
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;
 
@@ -39,13 +40,14 @@ export const GET: RequestHandler = async ({ url }) => {
 	});
 
 	if (!response.ok) {
-		return { status: response.status, body: response.statusText };
+		throw error(response.status, response.statusText);
 	}
 
 	const data = await response.json();
 	const _visitorData = data.responseContext?.visitorData;
 	if (ctoken === "") {
 		const result = baseResponse(data, _visitorData);
+
 		return result;
 	}
 	const sectionListContinuation = data?.continuationContents?.sectionListContinuation;
@@ -62,13 +64,12 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 	}
 
-	return {
-		body: JSON.stringify({
+	return new Response(
+		JSON.stringify({
 			carousels: carouselItems,
 			continuations: nextContinuationData,
 		}),
-		status: 200,
-	};
+	);
 };
 
 function baseResponse(data: Dict<any>, _visitorData: string) {
@@ -94,15 +95,12 @@ function baseResponse(data: Dict<any>, _visitorData: string) {
 		}
 	}
 	// '';
-	return {
-		body: {
-			carousels: carouselItems,
-			headerThumbnail,
-			visitorData: _visitorData,
-			continuations: nextContinuationData,
-		},
-		status: 200,
-	};
+	return json({
+		carousels: carouselItems,
+		headerThumbnail,
+		visitorData: _visitorData,
+		continuations: nextContinuationData,
+	});
 }
 
 function parseHeader({ musicCarouselShelfBasicHeaderRenderer }): CarouselHeader {
