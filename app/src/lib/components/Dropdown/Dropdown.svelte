@@ -7,30 +7,26 @@
 	import { PopperStore } from "../Popper";
 	import DropdownItem from "./DropdownItem.svelte";
 
+	export let main: HTMLElement;
 	$: items = $PopperStore?.items;
 	$: type = $PopperStore?.type;
 
-	$: isHidden = $PopperStore?.items.length !== 0;
-
+	$: isShowing = $PopperStore?.items.length !== 0;
+	let frame;
 	function onClose() {
 		// popper = null;
 		if ($PopperStore.srcNode !== undefined) {
 			$PopperStore.srcNode.focus();
 		}
-		PopperStore.set({
-			items: [],
-			isOpen: false,
-			type,
-			x: undefined,
-			y: undefined,
-			bottom: undefined,
-		});
+		PopperStore.reset();
 	}
 	let width;
 	let viewport_height;
 	let viewport_width;
 	let popperHeight;
 	let popper: HTMLElement = undefined;
+	let lastScrollPosY;
+	let lastScrollTime;
 	export function slide(node: Element, { delay = 0, duration = 400, easing = cubicOut } = {}) {
 		const style = getComputedStyle(node);
 		const opacity = +style.opacity;
@@ -99,11 +95,27 @@
 			onClose();
 		}
 	}
+
+	function handleScroll(event: Event) {
+		const target = event.target as HTMLElement;
+		if (frame) cancelAnimationFrame(frame);
+		frame = requestAnimationFrame(() => {
+			if (isShowing) {
+				const scrollTop = target.scrollTop;
+				const diff = lastScrollPosY - scrollTop;
+				if (Math.abs(diff) > 5) {
+					isShowing = false;
+					onClose();
+				}
+			}
+			lastScrollPosY = target.scrollTop;
+		});
+	}
 </script>
 
-<svelte:window bind:innerHeight={viewport_height} bind:innerWidth={viewport_width} />
+<svelte:window bind:innerHeight={viewport_height} bind:innerWidth={viewport_width} on:scroll|capture={handleScroll} />
 
-{#if isHidden}
+{#if isShowing}
 	<div
 		use:clickOutside
 		use:focusState

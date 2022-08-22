@@ -22,7 +22,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
 		return {
 			status: 200,
-			body: data,
+			body: JSON.stringify(data),
 		};
 	} catch (error) {
 		console.error(error);

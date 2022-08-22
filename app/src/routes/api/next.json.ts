@@ -12,7 +12,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	const visitorData = query.get("visitorData") || "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D";
 	const itct = query.get("itct") || "";
 	const videoId = query.get("videoId") || "";
-	const playlistId = query.get("playlistId") || "";
+	const playlistId = query.get("playlistId") || "RDAMVM" + videoId;
 	const ctoken = query.get("ctoken") || undefined;
 	const idx = parseInt(query.get("index")) || 0;
 	const clickTracking = query.get("clickParams") || undefined;
@@ -47,16 +47,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	 ********************************************/
 	if (!ctoken) {
 		const res = parseNextBody(data);
-		Object.assign(res.body, {
-			params: {
-				continuation: ctoken,
-				videoId,
-				index: idx,
-				playlistSetVideoId: setVideoId,
-				playlistId,
-				params: params ? params : itct,
-			},
-		});
+
 		return res;
 	}
 	return {
@@ -68,17 +59,12 @@ export const GET: RequestHandler = async ({ url }) => {
 
 function parseNextBody(data) {
 	try {
-		const related =
-			data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs &&
-			data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs[2]
-				?.tabRenderer?.endpoint?.browseEndpoint;
+		const tabs =
+			data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs;
+		const related = Array.isArray(tabs) && tabs[2]?.tabRenderer?.endpoint?.browseEndpoint;
 		const contents =
-			Array.isArray(
-				data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer
-					?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.contents,
-			) &&
-			(data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer
-				?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.contents as Array<any>);
+			Array.isArray(tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.contents) &&
+			(tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.contents as Array<any>);
 		const clickTrackingParams =
 				(Array.isArray(contents) &&
 					contents[contents.length - 1]?.playlistPanelVideoRenderer?.navigationEndpoint?.clickTrackingParams) ||
@@ -102,11 +88,11 @@ function parseNextBody(data) {
 			visitorData,
 		);
 		// console.log(visitorData);
-		return { body: { ...parsed, related, data }, status: 200 };
+		return { body: Object.assign(parsed, { related }), status: 200, headers: { "Content-Type": "application/json" } };
 	} catch (err) {
 		console.error(err);
 		console.error(data);
-		return { body: data, status: 201 };
+		return { body: data, status: 500 };
 		// throw new Error(err);
 	}
 }

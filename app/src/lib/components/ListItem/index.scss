@@ -6,6 +6,7 @@
 	justify-content: space-between;
 	align-content: center;
 	touch-action: auto;
+	line-height: 1.5;
 	@media screen and (min-width: 640px) {
 		display: grid;
 		flex: none;
@@ -45,7 +46,7 @@
 	overflow: hidden;
 	white-space: nowrap;
 	display: block;
-	max-width: calc(100%);
+	max-width: calc(100% - 5ch);
 	@media screen and (min-width: 640px) {
 		max-width: calc(100vw - 80vmin);
 	}

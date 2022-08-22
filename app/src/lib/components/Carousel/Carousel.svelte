@@ -1,17 +1,3 @@
-<script context="module" lang="ts">
-	function splitArray(arr, chunk) {
-		const temp = [];
-		let i = 0;
-
-		while (i < arr.length) {
-			temp.push(arr.slice(i, chunk + i));
-			i += chunk;
-		}
-
-		return temp;
-	}
-</script>
-
 <script lang="ts">
 	import type { CarouselHeader } from "$lib/types";
 	import type { CarouselItem as Item } from "$lib/types";
@@ -83,7 +69,7 @@
 		header?.browseId && isArtistPage ? urls.artist : header.browseId?.includes("VLP") ? urls.playlist : urls.trending;
 </script>
 
-<div class="header">
+<div class="header resp-content-width">
 	{#if header?.subheading}
 		<p class="subheading">{header?.subheading}</p>
 	{/if}
@@ -124,17 +110,15 @@
 	</div>
 
 	<div class="scroll" id="scrollItem" on:scroll={onScroll} bind:clientWidth bind:this={carousel} use:observer>
-		<div class="c-group">
-			{#each items as item, index}
-				{#if type == "trending"}
-					<CarouselItem type="trending" {kind} aspectRatio={item.aspectRatio} {item} {isBrowseEndpoint} {index} />
-				{:else if type == "artist" || type == "home"}
-					<CarouselItem {type} {kind} aspectRatio={item.aspectRatio} {isBrowseEndpoint} {item} {index} />
-				{:else if type == "new"}
-					<CarouselItem type="new" aspectRatio={item.aspectRatio} {item} {index} />
-				{/if}
-			{/each}
-		</div>
+		{#each items as item, index}
+			{#if type == "trending"}
+				<CarouselItem type="trending" {kind} aspectRatio={item.aspectRatio} {item} {isBrowseEndpoint} {index} />
+			{:else if type == "artist" || type == "home"}
+				<CarouselItem {type} {kind} aspectRatio={item.aspectRatio} {isBrowseEndpoint} {item} {index} />
+			{:else if type == "new"}
+				<CarouselItem type="new" aspectRatio={item.aspectRatio} {item} {index} />
+			{/if}
+		{/each}
 	</div>
 </div>
 
@@ -144,12 +128,15 @@
 	// 	margin-top: 0.125em;
 	// }
 	.subheading {
-		margin-bottom: 0;
+		// margin-bottom: 0;
 		color: rgb(175, 175, 175);
 		font-weight: 500;
 	}
 	.c-group {
 		display: flex;
+		// grid-auto-columns: 1fr;
+
+		// grid-auto-flow: column;
 		scroll-snap-align: start;
 		align-items: flex-start;
 		// visibility: hidden;
@@ -160,13 +147,6 @@
 			position: absolute;
 
 			padding-top: calc(100% * 2 / 3);
-		}
-		&:last-child {
-			padding-right: 0.5rem;
-		}
-		&:first-child {
-			// padding-left: 0.5rem;
-			visibility: visible;
 		}
 	}
 	.left,
@@ -217,11 +197,14 @@
 		-webkit-overflow-scrolling: touch;
 		position: relative;
 
-		margin-bottom: 3.3339em;
+		margin-bottom: 2.88em;
 
 		border-radius: var(--sm-radius);
 
 		contain: layout style;
+		@media screen and (min-width: 720px) {
+			margin-bottom: 2.3339em;
+		}
 	}
 	.showMoreBtn {
 		pointer-events: none;
@@ -229,12 +212,14 @@
 		visibility: hidden;
 	}
 	.scroll {
-		background: hsla(255, 21%, 30%, 0.2);
+		// background: hsla(255, 21%, 30%, 0);
 		contain: layout paint style;
 		height: auto;
+		// display: flex;
+		// flex-direction: row;
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: 1fr;
+		grid-auto-flow: dense column;
+		grid-auto-columns: min-content;
 		overflow-x: scroll;
 		overflow-y: visible;
 		width: auto;
@@ -269,6 +254,13 @@
 			scrollbar-width: 0;
 			border: 0 solid #b8b8b800;
 			background-clip: content-box;
+		}
+		&:last-child {
+			padding-right: 0.5rem;
+		}
+		&:first-child {
+			// padding-left: 0.5rem;
+			visibility: visible;
 		}
 	}
 </style>

@@ -90,17 +90,20 @@ body {
 	user-select: none;
 	-webkit-tap-highlight-color: transparent !important;
 	-webkit-font-smoothing: antialiased;
-	--player-bar-height: clamp(4.75rem, 5rem, 5.5rem);
-	--top-bar-height: clamp(3.75rem, 4rem, 4.5rem);
+	--player-bar-height: clamp(5rem, 5.6rem, 5.95rem);
+	--top-bar-height: clamp(3.9rem, 4.175rem, 4.625rem);
 	text-rendering: auto;
 	// --top-bar-height: calc(min(16, var(--base-font-size)));
 	@media screen and (min-width: 40rem) and (max-width: 115.375rem) {
+		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
 		--base-font-size: 0.875rem;
 	}
 	@media screen and (min-width: 115.375rem) and (max-width: 134rem) {
+		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
 		--base-font-size: 1rem;
 	}
 	@media screen and (min-width: 134.75rem) {
+		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
 		--base-font-size: 1.125rem;
 	}
 }
@@ -159,6 +162,7 @@ html {
 	max-width: 100%;
 	overscroll-behavior: contain;
 	isolation: isolate;
+	contain: paint;
 }
 @media (prefers-reduced-motion: reduce) {
 	*,
@@ -180,8 +184,11 @@ main {
 	margin: 0 auto;
 	position: relative;
 	@include v.content-spacing($type: "padding");
-	@include v.content-width();
 	overscroll-behavior: contain;
+	@media screen and (min-width: 720px) {
+		@include v.content-width();
+	}
+	contain: paint;
 }
 .backdrop {
 	position: fixed;
@@ -191,6 +198,7 @@ main {
 	background-color: #00000063;
 	width: 100%;
 	height: 100%;
+	contain: paint;
 }
 .wrapper {
 	overflow: hidden;
@@ -241,4 +249,9 @@ main {
 	&.row {
 		flex-direction: row;
 	}
+}
+
+.resp-content-width {
+	margin: 0 auto;
+	@include v.content-width(!important);
 }

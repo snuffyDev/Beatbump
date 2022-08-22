@@ -46,7 +46,7 @@
 	import { ENV_SITE_URL } from "../../env";
 
 	// $: console.log(related)
-	$: console.log({ videoId, playlist, thumbnails, title, related, data });
+	// $: console.log({ videoId, playlist, thumbnails, title, related, data });
 </script>
 
 <svelte:head>

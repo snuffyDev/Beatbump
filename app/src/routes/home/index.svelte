@@ -106,11 +106,11 @@
 				const data = await response.json();
 				// const {continuations, carousels} = data;
 				if (data.continuations !== {}) {
+					continuations = data.continuations;
 					window.requestAnimationFrame(() => {
-						continuations = data.continuations;
 						carousels = [...carousels, ...data.carousels];
-						loading = false;
 					});
+						loading = false;
 					return hasData;
 				}
 				hasData = data.continuations === {};
@@ -130,8 +130,8 @@
 		position: absolute;
 		bottom: 0;
 		margin-bottom: 5rem;
-		will-change: visibility;
 		contain: content;
+		will-change: visibility;
 	}
 	.loading {
 		transition: opacity cubic-bezier(0.95, 0.05, 0.795, 0.035) 500ms;
@@ -146,6 +146,7 @@
 		z-index:100;
 		margin: 0 auto;
 		padding-block: 2.5rem;
+		will-change: visibility;
 	}
 	.immersive-thumbnail {
 		position: fixed;

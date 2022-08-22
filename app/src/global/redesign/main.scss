@@ -1,0 +1,8 @@
+
+@function z-index($layer){
+
+}
+
+div {
+	z-index: z-index("what");
+}

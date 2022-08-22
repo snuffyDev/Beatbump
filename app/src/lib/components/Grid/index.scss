@@ -1,22 +1,24 @@
 // @use "../../../global/stylesheet/base/typography" as type;
 .grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(14em, 1fr));
 	grid-gap: 0.5em;
 	justify-content: center;
 	// place-items: center;
 	margin: 0 auto;
 }
 .grid-container {
-	margin: 0 auto;
+	margin-block-start: 0;
+	margin-block-end: 1.5em;
+	margin-inline: auto;
 }
 @media screen and (min-width: 37rem) and (max-width: 48rem) {
 	.grid {
-		grid-gap: 1em;
+		// grid-gap: 1em;
 	}
 }
 @media screen and (min-width: 48rem) {
 	.grid {
-		grid-gap: 1.2em;
+		// grid-gap: 1.2em;
 	}
 }

@@ -174,11 +174,16 @@
 			dispatch("initLocalPlaylist", { idx });
 		} else if (page === "release") {
 			list.updatePosition(idx);
-			await list.initPlaylistSession({ playlistId: item.playlistId, index: item.index });
+			await list.initAutoMixSession({
+				playlistId: item.playlistId ?? parentPlaylistId,
+				keyId: item.index,
+				videoId: item?.videoId,
+			});
+			await list.getMoreLikeThis({ playlistId: item.playlistId ?? parentPlaylistId });
 		} else {
 			await list.initAutoMixSession({
 				videoId: item.videoId,
-				playlistId: parentPlaylistId ??  item.playlistId,
+				playlistId: parentPlaylistId ?? item.playlistId,
 
 				keyId: idx,
 				config: { playerParams: item?.playerParams, type: item?.musicVideoType },

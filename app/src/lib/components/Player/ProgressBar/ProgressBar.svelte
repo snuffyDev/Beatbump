@@ -50,6 +50,7 @@
 	<div
 		class="progress-bar"
 		transition:fade
+		on:click|stopPropagation|capture={() => {}}
 		on:pointerdown|stopPropagation|capture={seekAudio}
 		on:touchstart={() => {
 			isTouchDrag = true;

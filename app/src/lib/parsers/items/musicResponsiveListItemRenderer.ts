@@ -1,43 +1,40 @@
 import type { Thumbnail } from "$lib/types";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
-import { map, filterMap, iter } from "$lib/utils";
 import { thumbnailTransformer } from "../utils.parsers";
-import type { IMusicResponsiveListItemRenderer } from "$lib/types/internals";
+import type { IMusicResponsiveListItemRenderer, PurpleRun } from "$lib/types/internals";
 
 export function MusicResponsiveListItemRenderer(
 	ctx: { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer },
 	playlistSetVideoId?: boolean,
 	playlistId?: string,
-	type?: string,
+	type: string | undefined = undefined,
 ): IListItemRenderer {
-	let { thumbnail: { musicThumbnailRenderer: { thumbnail: { thumbnails = [] } = {} } = {} } = {} } =
-		ctx.musicResponsiveListItemRenderer;
-	thumbnails = map(thumbnails as Thumbnail[], (item) => {
-		const { url, placeholder } = thumbnailTransformer(item.url);
-		Object.assign(item, { url, placeholder });
-		return item;
-	});
+	const thumbnails = ctx.musicResponsiveListItemRenderer.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails || [];
+	for (let idx = 0; idx < thumbnails.length; idx++) {
+		const item = thumbnails[idx];
+		const newThumbnail = thumbnailTransformer(item.url);
+		Object.assign(thumbnails[idx], newThumbnail);
+	}
 	const item = ctx.musicResponsiveListItemRenderer;
 	const flexColumns = Array.isArray(item.flexColumns) && item.flexColumns;
+	const subtitleRuns = flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs;
+	const flexCol0 = flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0] || ({} as PurpleRun);
 	const subtitles =
-		Array.isArray(flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs) &&
+		Array.isArray(subtitleRuns) &&
 		(() => {
-			let arr: any[] = [];
-			let length = flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.length;
-			for (; length--; ) {
-				arr[length] =
-					flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[length]?.navigationEndpoint !==
-					undefined
+			const length = subtitleRuns.length;
+			let arr: any[] = Array(length);
+			for (let idx = 0; idx < length; idx++) {
+				arr[idx] =
+					subtitleRuns[idx]?.navigationEndpoint !== undefined
 						? {
-								text: flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[length].text,
-								browseId:
-									flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[length].navigationEndpoint
-										?.browseEndpoint?.browseId,
+								text: subtitleRuns[idx].text,
+								browseId: subtitleRuns[idx].navigationEndpoint?.browseEndpoint?.browseId,
 								pageType:
-									flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[length]?.navigationEndpoint
-										?.browseEndpoint?.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig?.pageType,
+									subtitleRuns[idx]?.navigationEndpoint?.browseEndpoint?.browseEndpointContextSupportedConfigs
+										?.browseEndpointContextMusicConfig?.pageType,
 						  }
-						: flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[length];
+						: subtitleRuns[idx];
 			}
 			return arr;
 		})();
@@ -46,28 +43,23 @@ export function MusicResponsiveListItemRenderer(
 		artistInfo: {
 			artist: [subtitles[0]],
 		},
-		explicit: item.badges ? true : false,
-		title: flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]?.text,
+		explicit: "badges" in item ? true : false,
+		title: flexCol0.text,
 		aspectRatio: item.flexColumnDisplayStyle,
-		playerParams:
-			flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]?.navigationEndpoint?.watchEndpoint
-				?.playerParams,
+		playerParams: flexCol0.navigationEndpoint?.watchEndpoint?.playerParams,
 		musicVideoType:
-			flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]?.navigationEndpoint?.watchEndpoint
-				?.watchEndpointMusicConfig?.musicVideoType,
-		videoId:
-			flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]?.navigationEndpoint?.watchEndpoint
-				?.videoId || "",
-		playlistId: flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]?.navigationEndpoint
-			?.watchEndpoint?.playlistId
-			? flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]?.navigationEndpoint?.watchEndpoint
-					?.playlistId
+			flexCol0.navigationEndpoint?.watchEndpoint?.watchEndpointMusicConfig?.musicVideoType ??
+			flexCol0.navigationEndpoint?.watchEndpoint?.watchEndpointMusicSupportedConfigs?.watchEndpointMusicConfig
+				?.musicVideoType,
+		videoId: flexCol0.navigationEndpoint?.watchEndpoint?.videoId || "",
+		playlistId: flexCol0.navigationEndpoint?.watchEndpoint?.playlistId
+			? flexCol0?.navigationEndpoint?.watchEndpoint?.playlistId
 			: item.menu?.menuRenderer.items[0].menuNavigationItemRenderer?.navigationEndpoint?.watchEndpoint?.playlistId
 			? item.menu?.menuRenderer?.items[0]?.menuNavigationItemRenderer.navigationEndpoint?.watchEndpoint?.playlistId
 			: item?.watchEndpoint,
 		thumbnails: thumbnails as (Thumbnail & { placeholder: string })[],
 		length:
-			item?.fixedColumns && item.fixedColumns[0]?.musicResponsiveListItemFixedColumnRenderer?.text?.runs?.length
+			'fixedColumns' in item && item.fixedColumns[0]?.musicResponsiveListItemFixedColumnRenderer?.text?.runs?.length
 				? item.fixedColumns[0]?.musicResponsiveListItemFixedColumnRenderer?.text?.runs[0]?.text
 				: undefined,
 	};
@@ -82,15 +74,9 @@ export function MusicResponsiveListItemRenderer(
 	}
 
 	Object.assign(Item, {
-		musicVideoType:
-			flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]?.navigationEndpoint?.watchEndpoint
-				?.watchEndpointMusicSupportedConfigs?.watchEndpointMusicConfig?.musicVideoType,
-		type: type !== undefined ? type : "",
+		type: type,
 		playerParams:
-			flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer.text?.runs[0]?.navigationEndpoint?.watchEndpoint
-				?.playerParams ||
-			flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0]?.navigationEndpoint?.watchEndpoint
-				?.params,
+			flexCol0?.navigationEndpoint?.watchEndpoint?.playerParams || flexCol0?.navigationEndpoint?.watchEndpoint?.params,
 	});
 	return Item;
 }

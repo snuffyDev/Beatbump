@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Dropdown from "../Dropdown/Dropdown.svelte";
 	import MobilePopper from "./MobilePopper.svelte";
-
+	export let main: HTMLElement;
 	const poppers = [
 		{
 			name: "mobile",
@@ -15,4 +15,4 @@
 
 <svelte:window bind:innerWidth={width} />
 
-<svelte:component this={popper.component} />
+<svelte:component this={popper.component} {main} />

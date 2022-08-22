@@ -31,6 +31,7 @@
 					nodeIsOpen = false;
 				}
 				nodeIsOpen = PopperStore.reset();
+				$isOpen = false;
 				return;
 			}
 			const rect = node.getBoundingClientRect();
@@ -51,46 +52,7 @@
 				metadata,
 				bottom,
 			});
-			return;
 		}
-		function handleScroll(event: UIEvent) {
-			if (!isOpen) return;
-			const rect = node.getBoundingClientRect();
-			y = rect.top;
-			if (y > initY + 50 || y < initY - 50) {
-				nodeIsOpen = PopperStore.reset();
-			}
-			// timer = log
-			// console.log(x, y, bottom)
-			// PopperStore.reset()
-		}
-		const throttleScroll = throttle(handleScroll, 120);
-		const throttleResize = throttle(handleResize, 120);
-		function handleResize(event: UIEvent) {
-			const log = requestAnimationFrame(() => {
-				const rect = node.getBoundingClientRect();
-				x = rect.left;
-				y = rect.top;
-				bottom = rect.bottom;
-				PopperStore.set({
-					items,
-					isOpen: true,
-					direction: "normal",
-					type,
-					x,
-					y,
-					metadata,
-					bottom,
-				});
-				return;
-			});
-			timer = log;
-			if (timer) cancelAnimationFrame(timer);
-
-			// console.log(timer)
-			nodeIsOpen = PopperStore.reset();
-		}
-
 		node.addEventListener("click", handleClick, {
 			passive: true,
 			capture: true,
@@ -103,11 +65,6 @@
 			},
 			{ capture: true },
 		);
-		window.addEventListener("resize", () => throttleResize());
-		window.addEventListener("scroll", () => throttleScroll(), {
-			capture: true,
-			passive: true,
-		});
 		return {
 			destroy() {
 				if (timer) cancelAnimationFrame(timer);
@@ -120,8 +77,6 @@
 					},
 					true,
 				);
-				window.removeEventListener("resize", handleResize);
-				window.removeEventListener("scroll", handleScroll, true);
 			},
 		};
 	}

@@ -1,7 +1,11 @@
 mod hls;
 
+use futures::Future;
 use hls::modify_hls_body;
 
+use async_recursion::async_recursion;
+
+use futures::future::{BoxFuture, FutureExt};
 use hyper::body::{self};
 use hyper::server::conn::Http;
 use hyper::service::service_fn;
@@ -9,6 +13,7 @@ use hyper::{Body, Request};
 use hyper::{Client, Method, Response, StatusCode, Uri};
 use hyper_tls::HttpsConnector;
 use std::net::SocketAddr;
+// use std::pin::Pin;
 use tokio::net::TcpListener;
 
 use std::collections::HashMap;
@@ -30,12 +35,15 @@ static HEADER_BLACKLIST: [&str; 7] = [
 ];
 
 // Sends a HTTP request
-async fn send_request(uri_path: &str, host: &str) -> Result<Response<Body>, hyper::Error> {
+// fn send_request(url: &str) -> BoxFuture<'_, Result<Response<Body>, hyper::Error>> {
+#[async_recursion]
+async fn send_request(url: &str, host: &str) -> Result<Response<Body>, hyper::Error> {
     let https = HttpsConnector::new();
-    let url = format!("https://{}{}", host, uri_path)
-        .parse::<Uri>()
-        .unwrap();
-    let host = url.host().expect("uri has no host");
+    let req_url = &*url;
+    let req_uri = req_url.parse::<Uri>().unwrap();
+
+    // let origin = format!("https://{}", host).as_str();
+    println!("Host: {} || URL: {}", &host, &req_url);
 
     let client = Client::builder()
         .pool_max_idle_per_host(0)
@@ -45,12 +53,9 @@ async fn send_request(uri_path: &str, host: &str) -> Result<Response<Body>, hype
         .build::<_, Body>(https);
 
     let req = Request::builder()
-        .uri(url)
+        .uri(req_url)
         .method("GET")
-        .header(
-            "Origin",
-            format!("{}://{}", url.scheme_str().unwrap(), host),
-        )
+        .header("Origin", format!("https://{}", host))
         .body(Body::empty())
         .map_err(|err| {
             println!("{}", err.to_string());
@@ -59,9 +64,34 @@ async fn send_request(uri_path: &str, host: &str) -> Result<Response<Body>, hype
         .unwrap();
 
     let res = client.request(req).await?;
-		if res.headers().contains_key("Location") {
-			send_request()
-		};
+    println!("Response: {}", res.status());
+    println!("Headers: {:#?}\n", res.headers());
+    /// A https://xxxx-xxxx.googlevideo.com/videoplayback?xxxxx
+    /// URL should return a 206 or 302 Response code.
+    /// 302 - "Found" should have a "Location" HTTP header.
+    /// TODO! figure out why this doesn't work ???
+    if res.headers().contains_key("Location") {
+        println!(
+            "HAS LOCATION! {}",
+            res.headers().get("Location").unwrap().to_str().unwrap()
+        );
+
+        let redirect_location = res
+            .headers()
+            .get("Location")
+            .expect("location header not found")
+            .to_str()
+            .unwrap()
+            .parse::<Uri>()
+            .unwrap();
+
+        let path = &*redirect_location.path_and_query().unwrap().as_str();
+        let redir_url = format!("127.0.0.1:33125{}", &path);
+        return Ok(send_request(&redir_url, &redirect_location.host().unwrap())
+            .await
+            .expect("Error With Location Request"));
+    };
+
     Ok(Response::new(res.into_body()))
 }
 
@@ -69,31 +99,59 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
     let mut response = Response::new(Body::empty());
 
     let path = req.uri().path();
+    // Split the URL Path by "/", and returns each str slice
     let parts: Vec<&str> = path.split("/").collect();
-    let query = if let Some(q) = req.uri().query() {
-        q
-    } else {
-        ""
-    };
-    let query_map = form_urlencoded::parse(query.as_bytes())
-        .into_owned()
-        .collect::<HashMap<String, String>>();
-    let host = if let Some(h) = query_map.get("host") {
-        h.as_str()
+
+    let query = if let Some(q) = req.uri().path_and_query() {
+        q.to_string()
     } else {
         return Ok(Response::builder()
             .status(StatusCode::BAD_REQUEST)
             .body("No host parameter provided".into())
             .unwrap());
     };
+    // Collect all the URL Search Params into a HashMap
+    let query_map = form_urlencoded::parse(query.as_bytes())
+        .into_owned()
+        .collect::<HashMap<String, String>>();
+
+    // Get the URL Search Param `&host=`
+    let host = if let Some(h) = query_map.get("host") {
+        h.as_str()
+    } else {
+        // If `&host=` is not found, return a 400 Bad Request Response
+        return Ok(Response::builder()
+            .status(StatusCode::BAD_REQUEST)
+            .body("No host parameter provided".into())
+            .unwrap());
+    };
+    // Matches Request Method and the first URL Path section
     match (req.method(), parts[1]) {
-        (&Method::GET, "videoplayback") => Ok(send_request(path, &host).await?),
+        (&Method::GET, "videoplayback") => {
+            let url = format!(
+                "https://{}{}{}",
+                &host,
+                &path,
+                &req.uri().path_and_query().unwrap().query().unwrap()
+            )
+            .to_string();
+            let result = send_request(&url, &host).await?;
+            Ok(result)
+        }
         (&Method::GET, "api") => {
-            let res = send_request(path, "manifest.googlevideo.com").await?;
+            let url = format!("https://manifest.googlevideo.com{}", &req.uri().path());
+
+            let res = send_request(&url, &host).await?;
+
+            // Collect the inital Response body into bytes,
+            // Then turn it into a string
             let body = body::to_bytes(res.into_body()).await?.clone();
             let body_str = String::from_utf8(body.to_vec()).unwrap();
+
+            // Modify the HLS Manifest body
             let result = modify_hls_body(&body_str, &host).await.unwrap();
 
+            // Build a new Response with the modified HLS Manifest
             let result_response = Response::builder().body(result.into()).unwrap();
 
             Ok(result_response)

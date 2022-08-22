@@ -7,6 +7,7 @@
 	import Search from "$components/Search/Search.svelte";
 	import { tooltip } from "$lib/actions/tooltip";
 	import { clickOutside } from "$lib/actions/clickOutside";
+	import { ripple } from "$lib/actions/ripple";
 	import { circIn } from "svelte/easing";
 	import { fade } from "svelte/transition";
 	import Settings from "./Settings.svelte";
@@ -33,15 +34,16 @@
 <nav class="nav">
 	<div class="logo">
 		{#if !key.includes("home")}
-			<div
-				class="logo"
-				style="
-			cursor: pointer;
-			"
-				on:click={navBack}
+			<button
+				on:click={() => {
+					$fullscreenStore && fullscreenStore.set("closed");
+					navBack();
+				}}
+				class="nav-icon icon-btn no-style"
+				aria-label="Back"
 			>
-				<Icon name="chevron-left" size="1.5rem" />
-			</div>
+				<Icon name="chevron-left" size="1.6125em" />
+			</button>
 			<a
 				href={`/home`}
 				on:click={() => {
@@ -49,7 +51,7 @@
 				}}
 				class="logo-back no-style"
 			>
-				<img style="margin-left:1.5rem;" width="32" height="32" src="/logo.svg" alt="logo" title="Beatbump Home" />
+				<img style="margin-left:1em;" width="32" height="32" src="/logo.svg" alt="logo" title="Beatbump Home" />
 			</a>
 		{:else}
 			<a href={`/home`} class="no-style">
@@ -80,8 +82,7 @@
 			aria-label="Home"
 			class:active={key.includes("home")}
 		>
-			<!-- <div class="nav-text">Home</div> -->
-			<Icon name="home" --stroke={key.includes("home") ? "#fff" : "#BCBCBE"} size="1.5rem" />
+			<Icon name="home" --stroke={key.includes("home") ? "#fff" : "#BCBCBE"} size="1.6125em" />
 		</button>
 
 		<button
@@ -95,7 +96,7 @@
 			aria-label="Trending"
 			class:active={key.includes("trending")}
 		>
-			<Icon name="trending" --stroke={key.includes("trending") ? "#fff" : "#BCBCBE"} size="1.5rem" />
+			<Icon name="trending" --stroke={key.includes("trending") ? "#fff" : "#BCBCBE"} size="1.6125em" />
 		</button>
 		<button
 			use:tooltip
@@ -108,8 +109,7 @@
 			class="nav-icon icon-btn no-style"
 			class:active={key.includes("library")}
 		>
-			<!-- <div class="nav-text">Library</div> -->
-			<Icon name="folder" --stroke={key.includes("library") ? "#fff" : "#BCBCBE"} size="1.5rem" />
+			<Icon name="folder" --stroke={key.includes("library") ? "#fff" : "#BCBCBE"} size="1.6125em" />
 		</button>
 	</div>
 
@@ -121,9 +121,9 @@
 					hidden = !hidden;
 				}}
 				class="nav-search"
-				transition:fade={{ duration: 75, easing: circIn }}
+				in:fade={{ delay: 200, duration: 200, easing: circIn }}
+				out:fade={{ duration: 200, easing: circIn }}
 			>
-				<!-- class:hidden={width > 640 || hidden}> -->
 				<Search
 					{filter}
 					{query}
@@ -146,26 +146,21 @@
 					class="icon-btn x-button"
 					aria-label="close"
 				>
-					<Icon name="x" size="1.5rem" />
+					<Icon name="x" size="1.6125em" />
 				</button>
 			</div>
-			<div
-				class="backdrop"
-				style:z-index={1}
-				style:background={"linear-gradient(    to bottom,    hsla(0, 0%, 0%, 0.96) 0%,    hsla(0, 0%, 0.72%, 0.918) 4.9%,    hsla(0, 0%, 1.39%, 0.879) 9.9%,    hsla(0, 0%, 2.01%, 0.843) 15.1%,    hsla(0, 0%, 2.59%, 0.809) 20.5%,    hsla(0, 0%, 3.12%, 0.778) 26.1%,    hsla(0, 0%, 3.6%, 0.75) 32%,    hsla(0, 0%, 4.04%, 0.725) 38.2%,    hsla(0, 0%, 4.43%, 0.702) 44.6%,    hsla(0, 0%, 4.78%, 0.681) 51.4%,    hsla(0, 0%, 5.08%, 0.663) 58.5%,    hsla(0, 0%, 5.35%, 0.648) 66%,    hsla(0, 0%, 5.57%, 0.635) 73.9%,    hsla(0, 0%, 5.75%, 0.624) 82.1%,    hsla(0, 0%, 5.9%, 0.616) 90.8%,    hsla(0, 0%, 6%, 0.61) 100%  )"}
-				transition:fade={{ duration: 75, easing: circIn }}
-			/>
+			<div class="backdrop" style:z-index={1} transition:fade={{ duration: 400, easing: circIn }} />
 		{/if}
 
 		<button
-			class="nav-item icon-btn nav-item__search"
+			class="icon-btn nav-item__search"
 			on:click={() => {
 				shown = !shown;
 				hidden = !hidden;
 			}}
 			aria-label="Search"
 		>
-			<Icon name="search" size="1.5rem" />
+			<Icon name="search" size="1.6125em" />
 		</button>
 		<div
 			use:clickOutside
@@ -174,16 +169,14 @@
 			}}
 			style="display:contents; background:inherit;"
 		>
-			<!-- <Settings bind:isSettingsOpen /> -->
 			<button
 				aria-label="Settings"
-				class="nav-item icon-btn btn-settings"
+				class="icon-btn btn-settings"
 				on:click|stopPropagation={() => {
 					goto("/settings");
-					// isSettingsOpen = !isSettingsOpen;
 				}}
 			>
-				<Icon name="settings" size="1.5rem" />
+				<Icon name="settings" size="1.6125em" />
 			</button>
 		</div>
 	</div>
@@ -193,7 +186,7 @@
 	nav {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
-		padding: 1rem;
+		padding-inline: 0.75em;
 
 		position: fixed;
 		top: 0;
@@ -252,8 +245,7 @@
 	}
 	.items {
 		grid-area: r;
-		/* align-self: center; */
-		/* justify-self: end; */
+
 		display: inline-flex;
 		margin-left: auto;
 		.nav-item {
@@ -264,41 +256,83 @@
 		}
 	}
 
+	.backdrop {
+		background: linear-gradient(
+			to bottom,
+			hsla(0, 0%, 3%, 0.94) 0%,
+			hsla(0, 0%, 2.96%, 0.937) 3.3%,
+			hsla(0, 0%, 2.86%, 0.927) 7.1%,
+			hsla(0, 0%, 2.69%, 0.911) 11.4%,
+			hsla(0, 0%, 2.48%, 0.892) 16.2%,
+			hsla(0, 0%, 2.24%, 0.869) 21.5%,
+			hsla(0, 0%, 1.96%, 0.843) 27.3%,
+			hsla(0, 0%, 1.67%, 0.816) 33.6%,
+			hsla(0, 0%, 1.37%, 0.788) 40.3%,
+			hsla(0, 0%, 1.08%, 0.761) 47.5%,
+			hsla(0, 0%, 0.8%, 0.735) 55.2%,
+			hsla(0, 0%, 0.55%, 0.712) 63.3%,
+			hsla(0, 0%, 0.34%, 0.691) 71.8%,
+			hsla(0, 0%, 0.16%, 0.675) 80.8%,
+			hsla(0, 0%, 0.05%, 0.665) 90.2%,
+			hsla(0, 0%, 0%, 0.66) 100%
+		) !important;
+	}
+
 	button.icon-btn {
+		border-radius: 50%;
+
+		background: #0000;
+
+		isolation: isolate;
+		position: relative;
 		&::before {
-			position: absolute;
 			content: "";
-			// z-index: -1;
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
-			height: 100%;
-			width: 100%;
+			position: absolute;
 			border-radius: 50%;
+
+			overflow: hidden;
+			background: rgba(255, 255, 255, 0.2) radial-gradient(circle, rgba(255, 255, 255, 0.4) 1%, #0000 1%) center/15000%;
+
+			z-index: 1;
+			box-shadow: -2px -2px 22px -4px rgba(0, 0, 0, 0.208) inset, -2px -2px 33px -12px rgba(0, 0, 0, 0.308) inset,
+				2px 2px 33px -12px rgba(0, 0, 0, 0.308) inset;
+
+			width: 100%;
+			height: 100%;
+
+			margin-top: -50%;
+			margin-left: -50%;
+
+			top: 50%;
+			left: 50%;
+			transition-duration: 700ms;
+			// transform: scale(1);
+			transition-timing-function: linear;
+			transition-property: background-color, opacity, box-shadow;
 			opacity: 0;
-			transition: color linear 100ms, background linear 500ms !important;
-
-			background-position: center;
-			padding: 8pt;
-
-			background-size: 50%;
-			background: rgba(84, 84, 84, 0) radial-gradient(circle, hsl(0deg 0% 0% / 0%) 1%, hsl(0deg 0% 33% / 16%) 0) 500%/15000% !important;
-			transition: background 0.8s;
+		}
+		&:hover::after {
 		}
 		@media (hover: hover) {
-			&:hover::before {
-				// background: ;
-				background-size: 150%;
-				background: hsl(0deg 0% 33% / 8%) radial-gradient(circle, hsl(0deg 0% 0% / 0%) 1%, hsl(0deg 0% 33% / 16%) 0)
-					500%/15000% !important;
-				opacity: 1;
+			&:hover:not(:active):not(:focus-visible)::before {
+				opacity: 0.2;
+
+				box-shadow: -2px -2px 22px -8px rgba(0, 0, 0, 0.208) inset, -2px -2px 26px -12px rgba(0, 0, 0, 0.308) inset,
+					2px 2px 33px -14px rgba(0, 0, 0, 0.308) inset;
+
+				background-color: rgba(255, 255, 255, 0.2) !important;
+				// transform: scale(1);
 			}
 		}
-		&:active::before {
-			background-size: 100%;
-			background-color: #7272723f;
-			transition: background 0;
+
+		&:active:hover::before {
+			opacity: 0.7;
+			transition: 0s !important;
+			box-shadow: -2px -2px 22px -4px rgba(0, 0, 0, 0.208) inset, -2px -2px 33px -12px rgba(0, 0, 0, 0.308) inset,
+				2px 2px 33px -12px rgba(0, 0, 0, 0.308) inset;
+
+			background-size: 150%;
+			// transform: scale(1);
 		}
 	}
 </style>

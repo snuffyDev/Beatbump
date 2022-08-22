@@ -9,7 +9,7 @@
 </script>
 
 {#if options.length !== 0}
-	<div class="sort">
+	<div class="sort resp-content-width">
 		<Select {options} bind:value on:change />
 	</div>
 {/if}

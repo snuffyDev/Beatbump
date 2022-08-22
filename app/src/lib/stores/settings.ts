@@ -101,6 +101,7 @@ function _settings() {
 		localStorage.clear();
 		localStorage.setItem("settings", JSON.stringify(list));
 	} else {
+		if (!stored.network["HLS Stream Proxy"]) stored.network['HLS Stream Proxy'] = "https://yt-hls-rewriter.onrender.com";
 		list = stored;
 	}
 	// list = { ...list, playback: { ...list.playback, Stream: "HLS" } };

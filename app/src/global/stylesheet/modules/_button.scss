@@ -144,13 +144,17 @@ button.outlined {
 	}
 }
 button.icon-btn {
-	display: inline-flex;
+	display: flex;
 	flex-wrap: nowrap;
 	position: relative;
 	cursor: pointer;
-	padding: 8pt;
+	// padding: 8pt;
+	place-items: center;
 	place-content: center;
-	max-width: 44pt;
+	// width: clamp(24px, 24px, 48pt);
+	// height: clamp(24pt, 24px, 48pt);
+	width: 44px;
+	height: 44px;
 	border: none;
 	background-color: hsl(0deg 0% 0% / 0%);
 	color: var(--color-dark);

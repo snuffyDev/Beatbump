@@ -22,6 +22,7 @@
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
 	import { Grid, GridItem } from "$lib/components/Grid";
 	import Header from "$lib/components/Layouts/Header.svelte";
+	import CarouselItem from "$components/Carousel/CarouselItem.svelte";
 	export let sections;
 	export let path;
 	export let header;
@@ -39,8 +40,16 @@
 	</div>
 	{#each [...sections] as section}
 		{#if type == "grid"}
-			<Grid heading={section.title} items={section.section} let:item>
-				<GridItem slot="item" {item} />
+			<Grid heading={section.title} items={section.section} let:item let:index>
+				<CarouselItem
+					index
+					aspectRatio={item.aspectRatio}
+					{item}
+					kind="isPlaylist"
+					type="home"
+					isBrowseEndpoint={true}
+					slot="item"
+				/>
 			</Grid>
 		{:else}
 			<!-- {@debug section} -->

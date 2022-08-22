@@ -29,7 +29,7 @@ export function pan(node: HTMLElement) {
 				timer = setTimeout(() => {
 					addListener(window, "pointermove", handlers.onMove);
 					addListener(window, "pointerup", handlers.onEnd);
-				}, 180);
+				}, 120);
 			}
 		},
 		onMove(event) {

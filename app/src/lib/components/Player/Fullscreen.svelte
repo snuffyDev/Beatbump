@@ -17,6 +17,7 @@
 	import ProgressBar from "./ProgressBar";
 	import { CTX_ListItem } from "$lib/contexts";
 	import { notify } from "$lib/utils";
+	import { requestFrameSingle } from "$lib/utils/raf";
 	const { paused } = AudioPlayer;
 
 	$: state = $fullscreenStore;
@@ -24,8 +25,9 @@
 	$: data = $currentTrack;
 	$: heightCalc = -windowHeight + 140;
 	$: queueOpen = true;
-	let titleWidth = 320
+	let titleWidth = 320;
 	let active = "UpNext";
+	let frame: number;
 	const tabs = [
 		{
 			id: "UpNext",
@@ -205,7 +207,16 @@
 				{#if $session.Android || $session.iOS}
 					<div class="container controls">
 						<div class="container text-shadow" style="overflow:hidden;">
-							<div class="marquee"><span class="marquee-wrapper" style="animation-play-state: {state === 'open' && (titleWidth > innerWidth)? 'running' :'paused'}; {(state === 'closed' || titleWidth < innerWidth) ? 'animation: none; transform: unset;' : ''}"><span bind:clientWidth="{titleWidth}" class="h5 marquee-text">{data?.title}</span></span></div>
+							<div class="marquee">
+								<span
+									class="marquee-wrapper"
+									style="animation-play-state: {state === 'open' && titleWidth > innerWidth
+										? 'running'
+										: 'paused'}; {state === 'closed' || titleWidth < innerWidth
+										? 'animation: none; transform: unset;'
+										: ''}"><span bind:clientWidth={titleWidth} class="h5 marquee-text">{data?.title}</span></span
+								>
+							</div>
 							<span class="h6" style="text-align:center; "
 								>{data?.artistInfo && data?.artistInfo.artist.at(0) ? data?.artistInfo.artist.at(0).text : ""}</span
 							>
@@ -235,7 +246,9 @@
 				class="handle vertical"
 				style="transform: translate3d({queueOpen ? 53.5 : 91.5}vw, 0px, 0) !important;"
 				on:click={() => {
-					queueOpen = !queueOpen;
+					requestFrameSingle(() => {
+						queueOpen = !queueOpen;
+					});
 				}}
 			>
 				<hr class="vertical" />
@@ -246,7 +259,7 @@
 				style={innerWidth < 640
 					? `transform: translate3d(0, ${$motion}px, 0); top: ${
 							windowHeight - 65
-					  }px; bottom:0; padding-bottom: calc(6em);`
+					  }px; bottom:0; padding-bottom: calc(6.5em);`
 					: `transform: translate3d(${queueOpen ? 55 : 93}vw, 0px, 0) !important;`}
 			>
 				<div
@@ -279,29 +292,28 @@
 
 <style lang="scss">
 	.marquee {
-		position:relative;
-		overflow:hidden;
-		max-width:calc(100% - 4em);
-		margin:0 auto;
-		--max-width:calc(100% - 4em);
+		position: relative;
+		overflow: hidden;
+		max-width: calc(100% - 4em);
+		margin: 0 auto;
+		--max-width: calc(100% - 4em);
 		--offset: 10vw;
 		--move-initial: calc(-10vw + var(--offset));
-    --move-final: calc(calc(-100% + 80vw) + var(--offset));
+		--move-final: calc(calc(-100% + 80vw) + var(--offset));
 
-			--text-initial: calc(10vw);
-			--text-final: calc(var(--text-initial) * 100vw);
+		--text-initial: calc(10vw);
+		--text-final: calc(var(--text-initial) * 100vw);
 	}
 	.marquee-wrapper {
 		width: fit-content;
-    display: flex;
-    position: relative;
-    transform: translate3d(var(--move-initial), 0, 0);
-    animation: marquee linear infinite forwards;
+		display: flex;
+		position: relative;
+		transform: translate3d(var(--move-initial), 0, 0);
+		animation: marquee linear infinite forwards;
 		animation-delay: 2s;
 		animation-duration: 9s;
-    // animation-play-state: running;
+		// animation-play-state: running;
 		// box-shadow:  inset (-40px) 0 40px (-16px) transparent;
-
 	}
 	.marquee-text {
 		padding: 0 1em;
@@ -309,21 +321,19 @@
 	}
 
 	@keyframes marquee {
-    0% {
-        transform: translate3d(var(--move-initial), 0, 0);
-			}
-			25% {
-
-				transform: translate3d(var(--move-initial), 0, 0);
+		0% {
+			transform: translate3d(var(--move-initial), 0, 0);
+		}
+		25% {
+			transform: translate3d(var(--move-initial), 0, 0);
 		}
 		75% {
 			transform: translate3d(var(--move-final), 0, 0);
-
 		}
-    100% {
-        transform: translate3d(var(--move-final), 0, 0);
-    }
-}
+		100% {
+			transform: translate3d(var(--move-final), 0, 0);
+		}
+	}
 	.controls {
 		gap: 1em;
 	}

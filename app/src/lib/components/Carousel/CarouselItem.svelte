@@ -1,4 +1,5 @@
 <svelte:options immutable={true} />
+
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import Loading from "$components/Loading/Loading.svelte";
@@ -15,7 +16,7 @@
 	import { browser } from "$app/env";
 	import { IsoBase64 } from "$lib/utils/buffer";
 	export let index;
-	export let item: Item & {idx?: number};
+	export let item: Item & { idx?: number };
 	export let type = "";
 	export let kind = "";
 	export let aspectRatio;
@@ -297,11 +298,11 @@
 	}}
 	on:click|stopPropagation={(e) => clickHandler(e, index)}
 >
+	<!-- on:mouseover={() => (active = true)}
+on:mouseout={() => (active = false)} -->
 	<section
 		class="item-thumbnail"
-		on:mouseover={() => (active = true)}
 		on:focus
-		on:mouseout={() => (active = false)}
 		class:img16x9={RATIO_RECT ? true : false}
 		class:img1x1={RATIO_SQUARE ? true : false}
 		on:blur
@@ -319,14 +320,15 @@
 			{/if}
 			<img
 				alt="thumbnail"
-				decoding="async"
+				decoding="sync"
+				loading="lazy"
 				on:error={errorHandler}
 				class:img16x9={RATIO_RECT}
 				class:img1x1={RATIO_SQUARE}
 				width={srcImg.width}
 				height={srcImg.height}
 				src={srcImg.placeholder}
-				data-src={srcImg.width < 100 ? srcImg.url.replace(/=w\d+?-h\d+?/gm, '=w240-h240'): srcImg.url}
+				data-src={srcImg.width < 100 ? srcImg.url.replace(/=w\d+-h\d+-/gm, "=w240-h240-") : srcImg.url}
 			/>
 		</div>
 		<div class="item-menu">
@@ -386,23 +388,32 @@
 	}
 	.item1x1 {
 		// padding-top: 100% !important;
-		width: 100%;
-		max-width: 18em !important;
+		// width: 100%;
+		// min-width: em;
+		// width: clamp(13.5em, 14.75em, 18em);
+		// max-width: 18em !important;
 		position: relative;
 	}
 	.item16x9 {
-		width: 100%;
+		// width: 100%;
+		// width: 100%;
+		// width: clamp(13.5em, 25em, 26em);
+		// max-width: 18em !important;
 	}
 	.img1x1 {
 		// padding-top: 100% !important;
-
+		// width: 100%;
+		// min-width: 100%;
 		aspect-ratio: 1/1 !important;
-		width: clamp(12em, 14em, 18em) !important;
+		height: 14em;
+		// width: clamp();
 	}
 	.img16x9 {
 		// padding-top: 56.25% !important;
-		max-width: 100%;
-		width: 21em;
+		// max-width: 100%;
+		// width: 23em;
+		min-width: 100%;
+		height: 14em;
 		aspect-ratio: 16/9 !important;
 		// width: clamp(13rem, 22rem, 22rem) !important;
 	}
@@ -423,9 +434,9 @@
 		display: inline;
 	}
 	article {
-		padding: 1em;
-		margin-bottom:1em;
-		min-width: 12em;
+		padding: 0.75em;
+		margin-bottom: 1em;
+		min-width: 100%;
 		scroll-snap-align: start;
 		// padding-right: 1rem;
 
@@ -436,12 +447,22 @@
 		// 	content: '';
 		// 	padding-top: calc(100% * 2 / 3);
 		// }
+		@media (hover: hover) {
+			&:hover {
+				.image::before {
+					// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
+					background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
+					opacity: 0.7;
+					z-index: 1;
+				}
+			}
+		}
 	}
 	.image {
 		width: 100%;
 		// height: 100%;
-		height: auto;
-
+		// height: 100%;
+		min-height: 100%;
 		position: relative;
 		cursor: pointer;
 		user-select: none;
@@ -472,13 +493,13 @@
 		// padding-top: 100%;
 
 		img {
-			width: inherit;
+			// width: inherit;
 			height: inherit;
 			aspect-ratio: inherit;
 			user-select: none;
 			contain: content;
 			object-fit: cover;
-			min-width: 100%;
+			// min-width: 100%;
 			// min-height: 100%;
 		}
 		@media screen and (max-width: 640px) {
@@ -491,12 +512,6 @@
 		}
 	}
 	.active {
-		&::before {
-			// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
-			background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
-			opacity: 0.7;
-			z-index: 1;
-		}
 	}
 
 	.item {

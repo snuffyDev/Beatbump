@@ -40,7 +40,6 @@
 				slot="item"
 				style={`border-left: 0.4286rem solid ${item.color}`}
 				class="box"
-				sveltekit:prefetch
 				href={`/explore/${item.endpoint.params}`}
 			>
 				{item.text}
@@ -60,7 +59,7 @@
 		flex-wrap: nowrap;
 		text-overflow: clip;
 		font-size: 100%;
-		min-width: 13rem;
+		min-width: 12rem;
 		max-width: 20rem;
 		border-radius: 0.8rem;
 		width: 100%;

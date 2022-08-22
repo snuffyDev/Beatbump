@@ -1,28 +1,47 @@
+@use "../base/variables" as *;
+
 .header {
 	display: block;
 	font-weight: 600;
 	// margin-bottom: 1.33333em;
-	padding-top: 0.66667em;
+	margin: 0 auto;
+	padding-block: 0.66667em;
 	justify-content: flex-start;
 	align-items: baseline;
 	/* white-space: pre; */
-	max-width: 100%;
+
+	@include content-width();
+	margin-bottom: 1.38rem;
 	h1,
 	h2,
 	.h1,
 	.h2 {
 		margin-right: 0.175em;
-		// margin-bottom: 0;
+		margin-block: 0;
 		// white-space: pre;
 		display: inline-block;
 	}
+	.subheading {
+		margin-bottom: 0.5em;
+	}
 	a {
-		margin: 0 0 1.38rem;
 		display: inline-block;
+		position: relative;
+		vertical-align: middle;
+		&::before {
+			content: "";
+
+			position: absolute;
+
+			display: block;
+
+			padding-block-end: 1em;
+			inset: -0.2125em;
+		}
 	}
 	a small {
 		$color: rgb(175, 175, 175);
-		font-size: 0.95rem;
+		font-size: 0.975em;
 		font-weight: 700;
 		font-variant-caps: all-petite-caps;
 		letter-spacing: 0.05rem;

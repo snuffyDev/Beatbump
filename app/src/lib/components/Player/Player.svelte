@@ -136,14 +136,21 @@
 
 <svelte:window bind:innerWidth />
 <!-- <Fullscreen /> -->
-<div class="player" use:keyboardHandler={{ shortcut }}>
-	<div class="now-playing" style="align-items:center; gap:0.85em; font-size:0.85em;">
+<div
+	class="player"
+	on:click={(e) => {
+		fullscreenStore.toggle();
+	}}
+	use:keyboardHandler={{ shortcut }}
+>
+	<div class="now-playing" style="align-items:center;">
 		{#if $queue.length !== 0}
 			<img
 				width="64"
 				height="64"
 				on:error|capture={handleImageError}
-				src={$currentTrack.thumbnails[0]?.url ?? IMAGE_NOT_FOUND}
+				src={$currentTrack.thumbnails?.[0]?.url ?? IMAGE_NOT_FOUND}
+				alt="{$currentTrack.title} thumbnail image"
 			/>
 			<div
 				class="container"
@@ -163,6 +170,7 @@
 				on:error={(event) => handleImageError(event)}
 				style="object-fit:scale-down; background: #000;"
 				src={IMAGE_NOT_FOUND}
+				alt=""
 			/>
 			<div class="container" style="gap:0.20125em;">
 				<span>Not Playing</span>
@@ -204,7 +212,7 @@
 					on:pointerover={() => {
 						volumeHover = true;
 					}}
-					on:click={() => (volumeHover = !volumeHover)}
+					on:click|capture|stopPropagation={() => (volumeHover = !volumeHover)}
 				>
 					<Icon color="white" name="volume" size="1.625em" />
 				</div>
@@ -214,7 +222,8 @@
 							<input
 								class="volume"
 								type="range"
-								on:input={() => {
+								on:click|capture|stopPropagation={() => {}}
+								on:input|capture|stopPropagation={() => {
 									AudioPlayer.volume = volume;
 								}}
 								bind:value={volume}
@@ -228,14 +237,9 @@
 			</div>
 			<div style="background:inherit;">
 				<div
-					on:click={() => {
+					on:click|capture|stopPropagation={() => {
 						if (!$queue) return;
-						if ($fullscreenStore === "open") {
-							fullscreenStore.set("closed");
-						} else {
-							// showing = true;
-							fullscreenStore.set("open");
-						}
+						fullscreenStore.toggle();
 					}}
 					class="listButton player-btn"
 				>
@@ -254,6 +258,14 @@
 	.now-playing {
 		display: flex;
 		grid-area: n;
+		line-height: 1.7;
+		font-size: 0.95em;
+		gap: 0.95em;
+		@media screen and (min-width: 720px) {
+			line-height: 1.6;
+			font-size: 0.875em;
+			gap: 0.875em;
+		}
 		.container {
 			visibility: visible;
 			display: flex;
@@ -263,8 +275,8 @@
 	.now-playing img {
 		object-fit: contain;
 		background: #000;
-		max-height: 4.25em;
-		max-width: 4.25em;
+		max-height: 4.25rem;
+		max-width: 4.25rem;
 		width: 100%;
 	}
 	.player-controls {
@@ -295,6 +307,9 @@
 		max-height: 8em;
 		max-width: 8em;
 		padding: 0.8em;
+	}
+	.listButton {
+		visibility: hidden !important;
 	}
 	.player {
 		background-color: inherit;
@@ -348,6 +363,11 @@
 		justify-content: end;
 		.container {
 			width: auto;
+		}
+	}
+	@media screen and (min-width: 720px) {
+		.listButton {
+			visibility: visible !important;
 		}
 	}
 </style>

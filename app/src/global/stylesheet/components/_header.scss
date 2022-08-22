@@ -37,3 +37,10 @@
 		z-index: -1;
 	}
 }
+
+@media screen and (max-width: 719px) {
+	.nav-search .x-button.icon-btn {
+		display: none !important;
+		visibility: none !important;
+	}
+}

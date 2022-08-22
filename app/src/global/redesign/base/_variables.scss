@@ -1,4 +1,5 @@
 @use "sass:math" as m;
+
 // GLOBAL VARIABLES (SCSS)
 
 $size-base: 0.75rem;
@@ -25,14 +26,24 @@ $secondary-font-family: "CommissionerVariable", sans-serif;
 
 $line-height: 1.5;
 
-$content-width-mobile: 95vw;
+$z-index: (
+	"most-behind": -250,
+	"behind": -125,
+	"least-behind": -125,
+	"below-root": -1,
+	"default": 0,
+	"least-forward": 125,
+	"forward": 250,
+	"most-forward": 500,
+);
+$content-width-mobile: calc(100vw - 2.25rem);
 
 $content-width-md: calc(100vw - 0.5625rem - 14rem);
-$content-width-lg: 82em;
-$content-width-xl: 87.5em;
+$content-width-lg: 82rem;
+$content-width-xl: 87.5rem;
 
 @mixin content-spacing($type: "padding") {
-	#{$type}: 2em 0.66667vw 5vh 0.66667vw;
+	#{$type}: 1em 0 5vh;
 	#{$type}-bottom: 3.3125vh !important;
 	@media only screen and (min-width: 1080px) and (max-width: 1366px) {
 		#{$type}: 4vh 2rem 0 2rem;
@@ -45,15 +56,16 @@ $content-width-xl: 87.5em;
 		#{$type}: 3vh 2rem 0 2rem;
 	}
 }
-@mixin content-width {
-	max-width: $content-width-mobile;
+
+@mixin content-width($important: "") {
+	max-width: $content-width-mobile #{$important};
 	@media only screen and (min-width: 1080px) and (max-width: 1366px) {
-		max-width: $content-width-md;
+		max-width: $content-width-md #{$important};
 	}
 	@media only screen and (min-width: 1367px) and (max-width: 1600px) {
-		max-width: $content-width-lg;
+		max-width: $content-width-lg #{$important};
 	}
 	@media only screen and (min-width: 1601px) {
-		max-width: $content-width-xl;
+		max-width: $content-width-xl #{$important};
 	}
 }

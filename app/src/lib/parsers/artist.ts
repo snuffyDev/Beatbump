@@ -47,9 +47,8 @@ export function ArtistPageParser({
 	items?: any[];
 	visitorData?: string;
 }): ArtistPage {
-	header = header?.musicImmersiveHeaderRenderer
-		? header?.musicImmersiveHeaderRenderer
-		: header?.musicVisualHeaderRenderer;
+	header =
+		"musicImmersiveHeaderRenderer" in header ? header.musicImmersiveHeaderRenderer : header?.musicVisualHeaderRenderer;
 
 	const songs: { items?: IMusicResponsiveListItemRenderer[]; header?: Record<string, unknown> } = {};
 	const carousels = [];

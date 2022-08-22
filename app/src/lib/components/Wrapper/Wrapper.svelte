@@ -10,7 +10,7 @@
 </script>
 
 {#key key}
-	<div class="app-content-p" in:fade={{ duration: 250, delay: 250 }} out:fade={{ duration: 250 }}>
+	<div class="app-content-p" in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
 		<slot />
 	</div>
 {/key}
@@ -19,6 +19,8 @@
 	div {
 		/* display: block; */
 		/* position: relative; */
+		/* contain: content; */
+		will-change: opacity, visibility;
 		inset: 0;
 		position: absolute;
 		/* isolation: isolate; */

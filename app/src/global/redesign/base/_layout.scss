@@ -90,17 +90,20 @@ body {
 	user-select: none;
 	-webkit-tap-highlight-color: transparent !important;
 	-webkit-font-smoothing: antialiased;
-	--player-bar-height: clamp(4.75rem, 5rem, 5.5rem);
-	--top-bar-height: clamp(3.75rem, 4rem, 4.5rem);
+	--player-bar-height: clamp(5rem, 5.6rem, 5.95rem);
+	--top-bar-height: clamp(3.9rem, 4.175rem, 4.625rem);
 	text-rendering: auto;
 	// --top-bar-height: calc(min(16, var(--base-font-size)));
 	@media screen and (min-width: 40rem) and (max-width: 115.375rem) {
+		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
 		--base-font-size: 0.875rem;
 	}
 	@media screen and (min-width: 115.375rem) and (max-width: 134rem) {
+		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
 		--base-font-size: 1rem;
 	}
 	@media screen and (min-width: 134.75rem) {
+		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
 		--base-font-size: 1.125rem;
 	}
 }
@@ -155,37 +158,16 @@ html {
 	font-size: var(--base-font-size);
 }
 #app {
-	// grid-template-rows: 4rem 32fr;
 	position: fixed;
 	height: 100%;
 	width: 100%;
 	line-height: 1.4;
 	inset: 0;
-	// display: grid;
-	// grid-template-areas:
-	// 	"n n n n"
-	// 	"m m m m"
-	// 	"f f f f";
 	max-width: 100%;
 	overscroll-behavior: contain;
 	isolation: isolate;
 }
-@media (prefers-reduced-motion: reduce) {
-	*,
-	::before,
-	::after {
-		-webkit-animation-delay: -1ms !important;
-		animation-delay: -1ms !important;
-		-webkit-animation-duration: 1ms !important;
-		animation-duration: 1ms !important;
-		-webkit-animation-iteration-count: 1 !important;
-		animation-iteration-count: 1 !important;
-		background-attachment: initial !important;
-		scroll-behavior: auto !important;
-		transition-delay: 0s !important;
-		transition-duration: 0s !important;
-	}
-}
+
 main {
 	margin: 0 auto;
 	position: relative;
@@ -215,10 +197,6 @@ main {
 	// min-height: 100vh;
 	isolation: isolate;
 }
-.app-content-p {
-	// padding-block-start: calc(var(--top-bar-height) + 0px);
-	// padding-block-end: calc(var(--player-bar-height) + 4px);
-}
 .app-content-m {
 	margin-block-start: calc(var(--top-bar-height) + 0px);
 	will-change: margin-block-end;
@@ -226,18 +204,6 @@ main {
 		will-change: unset;
 		margin-block-end: calc(var(--player-bar-height) + 0px);
 	}
-}
-.hidden {
-	display: none !important;
-	visibility: hidden !important;
-}
-.no-scroll {
-	overflow: hidden !important;
-	overflow-y: hidden !important;
-}
-.soft-no-scroll {
-	overflow: hidden !important;
-	overflow-y: scroll !important;
 }
 
 .container {

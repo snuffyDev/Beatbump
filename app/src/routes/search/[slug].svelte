@@ -47,7 +47,7 @@
 	import { writable } from "svelte/store";
 	const search = writable<Array<Item>>();
 	$: !error && search.set(contents);
-	$: console.log(contents);
+	// $: console.log(contents);
 	let title;
 	let songTitle = title || $page.params.slug;
 	title = songTitle;

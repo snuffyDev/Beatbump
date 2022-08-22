@@ -53,9 +53,9 @@ export interface IEventHandler {
 
 type SrcDict = { original_url: string; url: string };
 
+// AudioPlayer Class Events
 const events: Map<string, { cb: Callback<keyof HTMLElementEventMap>; options?: AddEventListenerOptions | boolean }> =
 	new Map();
-const mutex = new Mutex();
 
 const setPosition = () => {
 	if ("mediaSession" in navigator) {
@@ -117,6 +117,9 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 	// private _DashModule: typeof DashJS;
 	// private _DashJS: DashJS.MediaPlayerClass;
 	private __srcUrl: string;
+	/** Prevents the player from calling `this.next()` again
+	 *  until the previous invocation has finished.
+	 */
 	private __tick: boolean = false;
 	private __unsubscriber: Unsubscriber;
 	private _currentTime: number = 0;
@@ -247,7 +250,7 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 
 	// #region Public Methods (10)
 
-	public _dispose(): void {
+	public override dispose(): void {
 		if (!browser) return;
 		for (const [name, obj] of events.entries()) {
 			if (obj["options"]) {
@@ -261,6 +264,7 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 		this._currentTimeUnsubscriber();
 		this._durationUnsubscriber();
 		this.__unsubscriber();
+		super.dispose();
 	}
 
 	public async next(userInitiated = false, broadcast = false): Promise<void> {
@@ -404,7 +408,7 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 	}
 	private async createHLSPlayer(source?: string) {
 		if (!this._HLSModule) this._HLSModule = await this.loadHLSModule();
-		if (!this._HLSModule.isSupported()) return;
+		if (this._HLSModule.isSupported() !== true) return;
 		if (this._HLS) this._HLS.destroy();
 		this._HLS = new this._HLSModule({
 			lowLatencyMode: true,
@@ -534,7 +538,7 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 		} else {
 			const position = SessionListService.updatePosition("next");
 
-			this.getNextSongInQueue(position + 1, false).then((value) => {
+			this.getNextSongInQueue(position, false).then((value) => {
 				this._nextTrackURL = value;
 				this.updateSrc(value);
 				return value;
@@ -547,13 +551,14 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 
 	private async setup() {
 		if (!browser) return;
-		if (get(settings)?.playback?.Stream === "HLS") {
+		if (get(settings)?.playback?.Stream === "HLS" && !this.isWebkit) {
 			this._HLSModule = await this.loadHLSModule();
-
-			this.isHLSPlayer = true;
+			if (this._HLSModule.isSupported()) {
+				this.isHLSPlayer = true;
+			}
 		}
 		this.__unsubscriber = this._src.subscribe(async (value) => {
-			if (!this._HLSModule) this._HLSModule = await this.loadHLSModule();
+			if (this.isHLSPlayer && !this._HLSModule) this._HLSModule = await this.loadHLSModule();
 			if (this.isHLSPlayer) {
 				this.createHLSPlayer(value);
 			} else {
@@ -614,7 +619,7 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 			this.play();
 		});
 
-		this.onEvent("loadedmetadata", async () => {
+		this.onEvent("loadedmetadata", () => {
 			this._hasNextSrc = false;
 			this._nextTrackURL = null;
 			this._durationStore.set(this._player.duration);

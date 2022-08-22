@@ -88,7 +88,7 @@ export const getSrc = async (
 		}`,
 	).then((res) => res.json());
 
-	const formats = sort(res, webM, false);
+	const formats = sort({ data: res, WebM: webM, dash: false });
 	currentId.set(videoId);
 
 	// formats.dash = "data:application/dash+xml;charset=utf-8;base64," + btoa(formats.dash);
@@ -106,7 +106,7 @@ function setTrack(formats: PlayerFormats, webM, shouldAutoplay) {
 	if (userSettings?.playback?.Stream === "HLS") format = { original_url: formats?.hls, url: formats.hls };
 	else format = formats.streams[0];
 	// AudioPlayer.dispatch('play', { original_url: formats[0].original_url, url: parsedURL });
-	if (shouldAutoplay) updatePlayerSrc({ original_url: format.original_url, url: format.original_url });
+	if (shouldAutoplay) updatePlayerSrc({ original_url: format.original_url, url: format.url });
 	return {
 		body: { original_url: format.original_url, url: format.url },
 		error: false,

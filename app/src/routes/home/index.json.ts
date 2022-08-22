@@ -4,6 +4,7 @@ import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRen
 import type { CarouselHeader } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+import type { Dict } from "$lib/types/utilities";
 import { iter } from "$lib/utils/collections/array";
 import type { RequestHandler } from "@sveltejs/kit";
 export const GET: RequestHandler = async ({ url }) => {
@@ -16,7 +17,6 @@ export const GET: RequestHandler = async ({ url }) => {
 	const visitorData = query.get("visitorData") || "";
 	const browseId = "FEmusic_home";
 	const carouselItems = [];
-	let headerThumbnail;
 
 	const response = await buildRequest("home", {
 		context: {
@@ -29,7 +29,7 @@ export const GET: RequestHandler = async ({ url }) => {
 					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36 Edg/95.0.1020.40,gzip(gfe)",
 			},
 		},
-		params: { browseId: !ctoken ? browseId : "" },
+		params: { browseId: ctoken === "" ? browseId : "" },
 		continuation: ctoken !== "" && {
 			ctoken,
 			continuation: ctoken,
@@ -43,61 +43,67 @@ export const GET: RequestHandler = async ({ url }) => {
 	}
 
 	const data = await response.json();
-	const _visitorData = data?.responseContext?.visitorData;
-
-	if (!ctoken) {
-		const sectionListRenderer =
-			data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer;
-		const _contents = sectionListRenderer?.contents;
-		const nextContinuationData = sectionListRenderer?.continuations[0]?.nextContinuationData;
-		let idx = _contents.length;
-		while (--idx > -1) {
-			const item = _contents[idx];
-			if (item.musicCarouselShelfRenderer) {
-				carouselItems.unshift(parseCarousel(item));
-			}
-			if (item?.musicImmersiveCarouselShelfRenderer) {
-				headerThumbnail =
-					item?.musicImmersiveCarouselShelfRenderer?.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail?.thumbnails.slice(
-						0,
-					);
-				carouselItems.unshift(parseCarousel(item));
-			}
-		}
-		// '';
-		return {
-			body: {
-				carousels: carouselItems,
-				headerThumbnail,
-				visitorData: _visitorData,
-				continuations: nextContinuationData,
-			},
-			status: 200,
-		};
-	} else {
-		const sectionListContinuation = data?.continuationContents?.sectionListContinuation;
-		const contents = sectionListContinuation?.contents;
-		const nextContinuationData = Array.isArray(sectionListContinuation?.continuations)
-			? sectionListContinuation?.continuations[0]?.nextContinuationData
-			: {};
-
-		let idx = contents.length;
-		while (--idx > -1) {
-			const item = contents[idx];
-			if (item?.musicCarouselShelfRenderer) {
-				carouselItems.unshift(parseCarousel(item));
-			}
-		}
-
-		return {
-			body: {
-				carousels: carouselItems,
-				continuations: nextContinuationData,
-			},
-			status: 200,
-		};
+	const _visitorData = data.responseContext?.visitorData;
+	if (ctoken === "") {
+		const result = baseResponse(data, _visitorData);
+		return result;
 	}
+	const sectionListContinuation = data?.continuationContents?.sectionListContinuation;
+	const contents = sectionListContinuation?.contents;
+	const nextContinuationData = Array.isArray(sectionListContinuation?.continuations)
+		? sectionListContinuation?.continuations[0]?.nextContinuationData
+		: {};
+
+	let idx = contents.length;
+	while (--idx > -1) {
+		const item = contents[idx];
+		if ("musicCarouselShelfRenderer" in item) {
+			carouselItems.unshift(parseCarousel(item));
+		}
+	}
+
+	return {
+		body: JSON.stringify({
+			carousels: carouselItems,
+			continuations: nextContinuationData,
+		}),
+		status: 200,
+	};
 };
+
+function baseResponse(data: Dict<any>, _visitorData: string) {
+	const carouselItems = [];
+	let headerThumbnail = [];
+	const sectionListRenderer =
+		data.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer;
+	const _contents = sectionListRenderer?.contents || [];
+	const nextContinuationData = sectionListRenderer.continuations[0]?.nextContinuationData;
+	const length = _contents.length;
+	let idx = -1;
+	while (++idx < length) {
+		const item = _contents[idx] || {};
+		if ("musicCarouselShelfRenderer" in item) {
+			const carousel = parseCarousel(item);
+			carouselItems[idx] = carousel;
+		}
+		if ("musicImmersiveCarouselShelfRenderer" in item) {
+			headerThumbnail =
+				item?.musicImmersiveCarouselShelfRenderer?.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail
+					?.thumbnails || [];
+			carouselItems[idx] = parseCarousel(item);
+		}
+	}
+	// '';
+	return {
+		body: {
+			carousels: carouselItems,
+			headerThumbnail,
+			visitorData: _visitorData,
+			continuations: nextContinuationData,
+		},
+		status: 200,
+	};
+}
 
 function parseHeader({ musicCarouselShelfBasicHeaderRenderer }): CarouselHeader {
 	if (musicCarouselShelfBasicHeaderRenderer) {
@@ -133,18 +139,22 @@ function parseBody(contents: Array<any> = []):
 			};
 	  }[] {
 	const items: unknown[] = [];
+	let idx = -1;
+	const length = contents.length;
 
-	iter(contents, (item, index) => {
-		if (item?.musicTwoRowItemRenderer) {
-			items[index] = MusicTwoRowItemRenderer(item);
+	while (++idx < length) {
+		const item = contents[idx] || {};
+		if ("musicTwoRowItemRenderer" in item) {
+			items[idx] = MusicTwoRowItemRenderer(item);
 		}
-		if (item?.musicResponsiveListItemRenderer) {
-			items[index] = MusicResponsiveListItemRenderer(item);
+		if ("musicResponsiveListItemRenderer" in item) {
+			items[idx] = MusicResponsiveListItemRenderer(item);
 		}
-		if (item?.musicNavigationButtonRenderer) {
-			items[index] = MoodsAndGenresItem(item);
+		if ("musicNavigationButtonRenderer" in item) {
+			items[idx] = MoodsAndGenresItem(item);
 		}
-	});
+	}
+
 	return items as any[];
 }
 

@@ -32,7 +32,7 @@
 
 <svelte:window bind:innerWidth={width} />
 
-<div class="box">
+<div class="box resp-content-width">
 	<div class="img">
 		<img src={thumbnail} loading="lazy" width="512" height="512" style="--img-height: 512;" alt="album" />
 	</div>

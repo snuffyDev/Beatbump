@@ -218,7 +218,7 @@
 			videoId = data.videoId ? data.videoId : "";
 			playlistId = data?.playlistId ? data?.playlistId : data.shuffle?.playlistId ? data.shuffle?.playlistId : "";
 			if (data.type == "playlist") {
-				console.log(data);
+				// console.log(data);
 				await list.initPlaylistSession({ playlistId, index: 0 });
 			} else {
 				await list.initAutoMixSession({

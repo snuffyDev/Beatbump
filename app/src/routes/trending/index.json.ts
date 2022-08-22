@@ -26,7 +26,7 @@ export const GET: RequestHandler = async () => {
 	/// Get only the musicCarouselShelfRenderer's
 	let idx = contents.length;
 	while (--idx > -1) {
-		if (contents[idx].musicCarouselShelfRenderer) carouselItems.unshift(contents[idx]);
+		if ("musicCarouselShelfRenderer" in contents[idx]) carouselItems.unshift(contents[idx]);
 	}
 	/// Parse the carouselItems
 	carouselItems = map(carouselItems, (item, index) =>
@@ -36,7 +36,7 @@ export const GET: RequestHandler = async () => {
 	);
 	// console.log(carouselItems[2].results[2]);
 	return {
-		body: { carouselItems },
+		body: JSON.stringify({ carouselItems }),
 		status: 200,
 	};
 };
@@ -63,7 +63,7 @@ function parseHeader({ musicCarouselShelfBasicHeaderRenderer }): CarouselHeader 
 	}
 }
 
-function parseBody(contents: Record<string, any> = []):
+function parseBody(contents: Record<string, any>[] = []):
 	| ICarouselTwoRowItem[]
 	| IListItemRenderer[]
 	| {
@@ -76,13 +76,13 @@ function parseBody(contents: Record<string, any> = []):
 	  }[] {
 	const items: any[] = [];
 	iter(contents as any[], (item, idx) => {
-		if (item.musicTwoRowItemRenderer) {
+		if ("musicTwoRowItemRenderer" in item) {
 			items[idx] = MusicTwoRowItemRenderer(item);
 		}
-		if (item.musicResponsiveListItemRenderer) {
+		if ("musicResponsiveListItemRenderer" in item) {
 			items[idx] = MusicResponsiveListItemRenderer(item);
 		}
-		if (item.musicNavigationButtonRenderer) {
+		if ("musicNavigationButtonRenderer" in item) {
 			items[idx] = MoodsAndGenresItem(item);
 		}
 	});

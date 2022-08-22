@@ -70,11 +70,12 @@ export const GET: RequestHandler = async ({ url }) => {
 		return { status: response.status, body: response.statusText };
 	}
 	const data = await response.json();
-	const { queueDatas = [] } = await data;
+	const queueDatas: any[] = data?.queueDatas || [];
 	// return {
 	// 	body: JSON.stringify(queueDatas),
 	// 	status: 200
 	// };
+
 	if (Array.isArray(queueDatas)) {
 		const length = queueDatas.length;
 		let idx = -1;
@@ -84,7 +85,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		//
 		return {
 			status: 200,
-			body: queueDatas,
+			body: JSON.stringify(queueDatas as Song[]),
 			headers: {
 				"content-type": "application/json",
 			},

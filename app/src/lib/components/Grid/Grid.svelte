@@ -4,13 +4,13 @@
 	export let heading = "";
 </script>
 
-<div class="grid-container">
+<div class="grid-container resp-content-width">
 	<div class="header">
 		<span class="h2">{heading}</span>
 	</div>
 	<div class="grid" use:observer>
 		{#each items as item, i (item)}
-			<slot name="item" {item} {i} />
+			<slot name="item" {item} index={i} />
 		{/each}
 	</div>
 </div>

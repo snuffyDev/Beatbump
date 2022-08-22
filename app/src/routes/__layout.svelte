@@ -16,20 +16,21 @@
 	import Wrapper from "$lib/components/Wrapper/Wrapper.svelte";
 	import Alert from "$lib/components/Alert/Alert.svelte";
 	import { showAddToPlaylistPopper } from "$stores/stores";
-	import { onMount } from "svelte";
+
 	import { Popper } from "$lib/components/Popper";
-	import { settings } from "$lib/stores/settings";
+
 	import PlaylistPopper from "$lib/components/PlaylistPopper";
 	import "@fontsource/commissioner/variable.css";
 
 	import "../global/stylesheet/_layout.scss";
 	import "../global/stylesheet/main.scss";
-	import GroupSessionManager from "$lib/components/GroupSessionManager";
+
 	import { queue } from "$lib/stores/list";
 	import Fullscreen from "$lib/components/Player/Fullscreen.svelte";
 	import GroupSessionCreator from "$lib/components/GroupSessionCreator";
 	import { fullscreenStore } from "$lib/components/Player/channel";
 	import { groupSession } from "$lib/stores";
+	import { AudioPlayer } from "$lib/player";
 	export let key = "";
 
 	let main: HTMLElement;
@@ -51,6 +52,7 @@
 		if (groupSession.initialized && groupSession.hasActiveSession) {
 			groupSession.disconnect();
 		}
+		AudioPlayer.dispose();
 	}}
 />
 <Nav {key} />

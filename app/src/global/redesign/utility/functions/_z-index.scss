@@ -1,0 +1,7 @@
+@use "../../base/variables" as v;
+
+@function z-index($layer) {
+	@if map-has-key(v.$z-index, $layer) {
+		@return map-get(v.$z-index, $layer);
+	}
+}

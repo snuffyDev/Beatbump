@@ -15,7 +15,7 @@ const adapters = {
 	"cloudflare-workers": adapterCfw(),
 	vercel: vercel(),
 	netlify: netlify({ edge: false, split: false }),
-	node: node({ precompress: false }),
+	node: node({"precompress":false}),
 };
 
 const adapter = adapters[ENV_ADAPTER];

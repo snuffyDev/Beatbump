@@ -75,7 +75,17 @@ export interface PlayerFormats {
 	dash?: string;
 	streams?: { url: string; original_url: string; mimeType: string }[];
 }
-export function sort(data: Dict<any>, WebM = false, dash = true): PlayerFormats {
+export function sort({
+	data = {},
+	WebM = false,
+	dash = false,
+	proxyUrl = "",
+}: {
+	data: Dict<any>;
+	WebM?: boolean;
+	dash?: boolean;
+	proxyUrl?: string;
+}): PlayerFormats {
 	if (dash === true) {
 		const formats = map(data?.streamingData?.adaptiveFormats as Array<IFormat>, (item) => {
 			const url = new URL(item.url);
@@ -96,12 +106,13 @@ export function sort(data: Dict<any>, WebM = false, dash = true): PlayerFormats 
 			streams: formats.map((item) => ({ url: item.url, original_url: item.url, mimeType: item.mimeType })),
 		};
 	}
+
 	const host = data?.playerConfig?.hlsProxyConfig?.hlsChunkHost;
 	const formats = data?.streamingData?.adaptiveFormats as Array<any>;
 	const hls =
 		(data?.streamingData?.hlsManifestUrl as string).replace(
 			/https:\/\/(.*?)\//,
-			"https://yt-hls-rewriter.onrender.com/",
+			proxyUrl !== "" ? proxyUrl : "https://yt-hls-rewriter.onrender.com/",
 		) +
 		("?host=" + host);
 
@@ -120,7 +131,7 @@ export function sort(data: Dict<any>, WebM = false, dash = true): PlayerFormats 
 		if (item.itag === 140)
 			arr.push({
 				original_url: item.url,
-				url: parseProxyRedir(item.url),
+				url: item.url,
 				mimeType: "mp4",
 			});
 		// 	arr.push();

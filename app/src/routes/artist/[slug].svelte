@@ -22,6 +22,7 @@
 	let innerWidth = 640;
 
 	CTX_ListItem.set({ page: "artist", innerWidth });
+	// $: console.log(body)
 </script>
 
 <Header
@@ -35,7 +36,7 @@
 <main>
 	<div class="artist-body">
 		{#if songs?.items?.length > 0}
-			<section class="song-list">
+			<section class="song-list resp-content-width">
 				<div class="header">
 					<span class="h2">Songs</span>
 					<a style="white-space:pre; display: inline-block;" href={`/playlist/${songs?.header?.browseId}`}
