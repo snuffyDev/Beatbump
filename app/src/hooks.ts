@@ -19,8 +19,9 @@ const checkUserAgent = (userAgent: string) =>
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const UA = event.request.headers.get("User-Agent");
-	event.locals.iOS = checkUserAgent(UA) === "iOS";
-	event.locals.Android = checkUserAgent(UA) === "Android";
+	const agentType = checkUserAgent(UA);
+	event.locals.iOS = agentType === "iOS";
+	event.locals.Android = agentType === "Android";
 
 	const response = await resolve(event);
 	for (const key in headers) {
