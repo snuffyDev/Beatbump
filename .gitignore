@@ -17,4 +17,11 @@ wrangler.toml
 .vercel
 .cloudflare
 .netlify
+
+/app/.svelte-kit/build
+/app/.svelte-kit/cloudflare-workers-tmp
+/app/.svelte-kit/generated
+/app/.svelte-kit/output
+/app/.svelte-kit/runtime
+/app/.svelte-kit/types
 packages/proxy-server/rust/target/

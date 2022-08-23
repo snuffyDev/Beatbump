@@ -1,6 +1,6 @@
 import type { PageLoad } from "./$types";
 let path;
-// throw new Error("@migration task: Migrate the load function input (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292693)");
+
 export const load = async ({ url, fetch }: Parameters<PageLoad>[0]) => {
 	path = url.pathname;
 	const browseId = url.searchParams.get("id") || "";
