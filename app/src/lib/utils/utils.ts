@@ -88,7 +88,12 @@ export const getSrc = async (
 		}`,
 	).then((res) => res.json());
 
-	const formats = sort({ data: res, WebM: webM, dash: false });
+	const formats = sort({
+		data: res,
+		WebM: webM,
+		dash: false,
+		proxyUrl: userSettings?.network["HLS Stream Proxy"] ?? "",
+	});
 	currentId.set(videoId);
 
 	// formats.dash = "data:application/dash+xml;charset=utf-8;base64," + btoa(formats.dash);
