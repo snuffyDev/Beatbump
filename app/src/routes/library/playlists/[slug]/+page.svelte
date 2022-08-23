@@ -13,7 +13,7 @@
 	import LocalListItem from "$lib/components/ListItem/LocalListItem.svelte";
 	import { CTX_ListItem } from "$lib/contexts";
 	import Search from "../_Search.svelte";
-	import { onMount } from "svelte";
+	import { onMount, tick } from "svelte";
 	export let data;
 
 	const { playlistName } = data;

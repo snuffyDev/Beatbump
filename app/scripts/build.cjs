@@ -73,9 +73,8 @@ cli
 			/// so we abort
 			if (!adapter_installed) console.info("Error installing config.");
 			let hooks_ts;
+			const hooks_path = path.resolve(root, "./src/hooks.ts") || path.resolve(".", "../src/hooks.ts");
 			if (adapter === "node") {
-				const hooks_path = path.resolve(root, "./src/hooks.ts") || path.resolve(".", "../src/hooks.ts");
-
 				hooks_ts = fs.readFileSync(hooks_path, { encoding: "utf-8" });
 				let modified_hooks_ts = hooks_ts.replace(/\/\/#NODE /gm, "");
 				fs.writeFileSync(hooks_path, modified_hooks_ts, { encoding: "utf-8" });
