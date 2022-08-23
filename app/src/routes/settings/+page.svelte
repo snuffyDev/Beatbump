@@ -69,7 +69,7 @@
 				<input
 					type="text"
 					placeholder="https://yt-hls-rewriter.onrender.com"
-					value={$settings["network"]["HLS Stream Proxy"]}
+					bind:value={$settings["network"]["HLS Stream Proxy"]}
 				/>
 			</div>
 		</div>
