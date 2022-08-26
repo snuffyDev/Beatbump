@@ -7,6 +7,7 @@ import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { error, type RequestHandler } from "@sveltejs/kit";
 import { iter, map } from "$lib/utils/collections/array";
+import type { IMusicResponsiveListItemRenderer, IMusicTwoRowItemRenderer } from "$lib/types/internals";
 
 export const GET: RequestHandler = async () => {
 	let carouselItems = [];
@@ -17,10 +18,7 @@ export const GET: RequestHandler = async () => {
 	});
 
 	if (!response.ok) {
-		// Suggestion (check for correctness before using):
-		// return new Response(response.statusText, { status: response.status });
 		throw error(response.status, response.statusText);
-		// return { status: response.status, body: response.statusText };
 	}
 
 	const data = await response.json();
@@ -76,12 +74,14 @@ function parseBody(contents: Record<string, any>[] = []):
 			};
 	  }[] {
 	const items: any[] = [];
-	iter(contents as any[], (item, idx) => {
+	iter(contents, (item, idx) => {
 		if ("musicTwoRowItemRenderer" in item) {
-			items[idx] = MusicTwoRowItemRenderer(item);
+			items[idx] = MusicTwoRowItemRenderer(item as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer });
 		}
 		if ("musicResponsiveListItemRenderer" in item) {
-			items[idx] = MusicResponsiveListItemRenderer(item);
+			items[idx] = MusicResponsiveListItemRenderer(
+				item as { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer },
+			);
 		}
 		if ("musicNavigationButtonRenderer" in item) {
 			items[idx] = MoodsAndGenresItem(item);

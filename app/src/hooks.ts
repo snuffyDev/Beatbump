@@ -30,5 +30,5 @@ export const handle: Handle = async ({ event, resolve }) => {
 	return response;
 };
 
-process.on('SIGINT', function () { process.exit(); }); // Ctrl+C
-process.on('SIGTERM', function () { process.exit(); }); // docker stop
+//#NODE process.on('SIGINT', function () { process.exit(); }); // Ctrl+C
+//#NODE process.on('SIGTERM', function () { process.exit(); }); // docker stop

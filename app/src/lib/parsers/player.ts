@@ -9,63 +9,6 @@ const parseProxyRedir = (url: string) => {
 	return url;
 };
 
-// export const sort = (data: Dict<any>, WebM = false) => {
-// 	try {
-// 		const json = data;
-// 		if (json["playabilityStatus"]["status"].includes("ERROR")) {
-// 			return [{ url: null, error: json.playabilityStatus.status }];
-// 		}
-// 		const streamingData = json.streamingData;
-// 		const arr = [];
-// 		if (streamingData["dashManifestUrl"]) {
-// 			streamingData["formats"].map((format) => {
-// 				if (
-// 					format.audioChannels === 2 &&
-// 					format.audioQuality.includes("AUDIO_QUALITY_MEDIUM") &&
-// 					format.mimeType.includes("mp4")
-// 				) {
-// 					arr.push(format);
-// 				}
-// 			});
-// 			if (arr.length !== 0) {
-// 				// console.log('0!!!!')
-// 				return arr.map((format) => {
-// 					return {
-// 						url: format.url,
-// 						mimeType: format.mimeType,
-// 					};
-// 				});
-// 			}
-
-// 			return [{ url: null, mimeType: null }];
-// 		}
-// 		const formatParent = (streamingData["adaptiveFormats"] as unknown) as Array<Dict<any>>;
-// 		// console.log(formatParent);
-// 		const mp4Formats = { 139: 'LOW', 140: 'MEDIUM' };
-// 		const webMFormats = { 249: "LOW", 250: "LOW", 251: "MEDIUM" };
-// 		const length = formatParent.length;
-// 		let idx = -1;
-// 		while (++idx < length) {
-// 			const item = formatParent[idx];
-
-// 			if ((item.itag as number) < 139 && item.itag > 251) continue;
-// 			if (WebM === true && item.itag === 251) arr.push({ original_url: item.url, url: parseProxyRedir(item.url), mimeType: 'webm' });
-// 			if (item.itag === 140) arr.push({ original_url: item.url, url: parseProxyRedir(item.url), mimeType: 'mp4' });
-// 			// 	arr.push();
-// 		}
-
-// 		if (arr.length !== 0) {
-// 			return arr;
-// 		}
-
-// 		return [{ url: null, mimeType: null }];
-// 	} catch (e) {
-// 		console.log("Fetch error", e);
-
-// 		return null;
-// 	}
-// };
-
 import type { Dict } from "$lib/types/utilities";
 import { map } from "$lib/utils";
 import { buildDashManifest, type IFormat } from "$lib/utils/buildDashManifest";

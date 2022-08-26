@@ -345,3 +345,32 @@ export function getPlaylists(): Promise<IDBPlaylist[]> {
 			return results;
 		});
 }
+interface ExportDBResult {
+	favorites?: Item[];
+	playlists?: IDBPlaylist[];
+}
+export async function exportDB() {
+	if (!browser) return;
+	try {
+		const result: ExportDBResult = {};
+		const [playlists, favorites] = await Promise.all([getPlaylists(), getFavorites()]);
+		result.favorites = favorites ?? undefined;
+		result.playlists = playlists ?? undefined;
+		const file = new Blob([JSON.stringify(result)], { type: "application/json" });
+		const url = URL.createObjectURL(file);
+
+		const linkElm = document.createElement("a");
+		linkElm.setAttribute("href", url);
+		linkElm.download = `beatbump-db${generateId(9, "normal")}.json`;
+		document.body.appendChild(linkElm);
+		linkElm.click();
+		document.body.removeChild(linkElm);
+		URL.revokeObjectURL(url);
+	} catch (err) {
+		notify("Error exporting data: " + err, "error");
+	}
+}
+
+export async function importDB() {
+	//TODO! implement this
+}

@@ -2,9 +2,6 @@
 	import Header from "$components/Layouts/Header.svelte";
 	import { settings, SettingsSchema, type Theme } from "$stores/settings";
 	const themes: Theme[] = ["Dark", "Dim", "Midnight", "YTM"];
-
-	// const tabs:TabItem[] = [{id:""}]
-	let proxyInputValue = $settings["playback"]["Proxy"];
 </script>
 
 <Header title="Settings" url="/settings" desc="Configure your app settings" />
@@ -79,7 +76,7 @@
 		<div class="setting">
 			<label for="preserve"> Preserve </label>
 			<div class="select">
-				<select name="preserve" disabled id="preserve" bind:value={$settings["search"]["Preserve"]}>
+				<select name="preserve" id="preserve" bind:value={$settings["search"]["Preserve"]}>
 					{#each ["Category", "Query", "Category + Query", "None"] as option}
 						<option value={option} selected={$settings["playback"]["Stream"] === option}>{option}</option>
 					{/each}
