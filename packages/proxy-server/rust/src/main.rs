@@ -1,20 +1,19 @@
 mod hls;
 
-use futures::Future;
 use hls::modify_hls_body;
 
 use async_recursion::async_recursion;
 
-use futures::future::{BoxFuture, FutureExt};
 use hyper::body::{self};
+
 use hyper::header::{self};
 use hyper::server::conn::Http;
 use hyper::service::service_fn;
 use hyper::{Body, Request};
-use hyper::{Client, Method, Response, StatusCode, Uri};
+use hyper::{Client, Method, Response, StatusCode};
 use hyper_tls::HttpsConnector;
 use std::net::SocketAddr;
-// use std::pin::Pin;
+
 use tokio::net::TcpListener;
 
 use std::collections::HashMap;
@@ -36,15 +35,11 @@ static HEADER_BLACKLIST: [&str; 7] = [
 ];
 
 // Sends a HTTP request
-// fn send_request(url: &str) -> BoxFuture<'_, Result<Response<Body>, hyper::Error>> {
+
 #[async_recursion]
 async fn send_request(url: &str, host: &str) -> Result<Response<Body>, hyper::Error> {
     let https = HttpsConnector::new();
     let req_url = &*url;
-    let req_uri = req_url.parse::<Uri>().unwrap();
-
-    // let origin = format!("https://{}", host).as_str();
-    println!("Host: {} || URL: {}", &host, &req_url);
 
     let client = Client::builder()
         .pool_max_idle_per_host(0)
@@ -56,7 +51,7 @@ async fn send_request(url: &str, host: &str) -> Result<Response<Body>, hyper::Er
     let req = Request::builder()
         .uri(req_url)
         .method("GET")
-        .header("Origin", format!("https://{}", host))
+        .header("Origin", format!("https://{}", &host))
         .body(Body::empty())
         .map_err(|err| {
             println!("{}", err.to_string());
@@ -65,26 +60,19 @@ async fn send_request(url: &str, host: &str) -> Result<Response<Body>, hyper::Er
         .unwrap();
 
     let res = client.request(req).await?;
-    println!("Response: {}", res.status());
-    println!("Headers: {:#?}\n", res.headers());
+
     // A https://xxxx-xxxx.googlevideo.com/videoplayback?xxxxx
     // URL should return a 206 or 302 Response code.
     // 302 - "Found" should have a "Location" HTTP header.
-    // TODO! figure out why this doesn't work ???
     if res.headers().contains_key(header::LOCATION) {
         let location = res
             .headers()
             .get(header::LOCATION)
             .expect("Error getting Location")
             .to_str()
-            .unwrap()
-            .parse::<Uri>()
             .unwrap();
-        println!("HAS LOCATION! {:#?}", &location);
 
-        let path = &*location.path_and_query().unwrap().as_str();
-        let redir_url = format!("127.0.0.1:33125{}", &path);
-        return Ok(send_request(&redir_url, &location.host().unwrap()).await?);
+        return Ok(send_request(&location, "music.youtube.com").await?);
     };
 
     Ok(res)
@@ -124,14 +112,16 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
     match (req.method(), parts[1]) {
         (&Method::GET, "videoplayback") => {
             let url = format!(
-                "https://{}{}{}",
+                "https://{}{}?{}",
                 &host,
                 &path,
                 &req.uri().path_and_query().unwrap().query().unwrap()
             )
             .to_string();
+
             let result = send_request(&url, &host).await?;
             let response = Response::builder().body(result.into_body()).unwrap();
+
             Ok(response)
         }
         (&Method::GET, "api") => {
@@ -141,11 +131,13 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
 
             // Collect the inital Response body into bytes,
             // Then turn it into a string
-            let body = body::to_bytes(res.into_body()).await?.clone();
+            let body = body::to_bytes(res.into_body()).await?;
             let body_str = String::from_utf8(body.to_vec()).unwrap();
 
             // Modify the HLS Manifest body
-            let result = modify_hls_body(&body_str, &host).await.unwrap();
+            let result = modify_hls_body(&body_str, &host)
+                .await
+                .expect("Could not modify HLS body.");
 
             // Build a new Response with the modified HLS Manifest
             let result_response = Response::builder().body(result.into()).unwrap();

@@ -172,7 +172,7 @@ export function setMultipleFavorites(items: Item[]): Promise<void> {
 	});
 }
 
-export function setMultiplePlaylists(items: Item[] = []): Promise<void> {
+export function setMultiplePlaylists(items: IDBPlaylist[] = []): Promise<void> {
 	return db.transaction("playlists", "readwrite", (store) => {
 		try {
 			iter(items, (item) => store.put(item));
@@ -371,6 +371,15 @@ export async function exportDB() {
 	}
 }
 
-export async function importDB() {
+export async function importDB(data: File) {
+	try {
+		const jsonString = await data.text();
+		const json = JSON.parse(jsonString) as ExportDBResult;
+		if (!json.favorites && !json.playlists) throw new Error("Provided file is not a valid DB JSON object");
+		if (json.favorites) await setMultipleFavorites(json.favorites);
+		if (json.playlists) await setMultiplePlaylists(json.playlists);
+	} catch (err) {
+		notify("Error importing data: " + err, "error");
+	}
 	//TODO! implement this
 }
