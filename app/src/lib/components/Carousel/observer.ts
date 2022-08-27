@@ -11,6 +11,7 @@ export default function observer(node: HTMLElement) {
 						const target = entry.target as HTMLImageElement;
 						if (entry.isIntersecting) {
 							// target.dataset.loaded = "true";
+							target.loading = "eager";
 							target.src = target.dataset.src;
 							observer.unobserve(node);
 						}

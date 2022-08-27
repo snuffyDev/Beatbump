@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { navigating, session } from "$app/stores";
+	import { navigating } from "$app/stores";
 	import { AudioPlayer } from "$lib/player";
 	import { immersiveQueue, isPagePlaying, playerLoading } from "$lib/stores";
 	import { queue, currentTrack } from "$lib/stores/list";

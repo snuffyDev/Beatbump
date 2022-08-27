@@ -157,6 +157,7 @@
 			on:click={() => {
 				shown = !shown;
 				hidden = !hidden;
+				fullscreenStore.set("closed");
 			}}
 			aria-label="Search"
 		>
@@ -200,7 +201,7 @@
 		align-content: center;
 		align-items: center;
 		touch-action: none;
-		z-index: 150;
+		z-index: 152;
 		background-color: var(--top-bg);
 		isolation: isolate;
 		justify-content: space-between;

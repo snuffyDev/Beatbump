@@ -6,6 +6,7 @@ import { settings, type UserSettings } from "$lib/stores/settings";
 import { get } from "svelte/store";
 import { findFirst, map } from "./collections";
 import { browser } from "$app/env";
+import type { Song } from "$lib/types";
 
 let userSettings: UserSettings;
 if (browser && settings) {
@@ -61,13 +62,18 @@ function format(seconds) {
 }
 
 // Fetches a song length for adding to queue
-export const addToQueue = async (videoId: string): Promise<string> => {
-	const url = `/api/player.json${videoId ? `?videoId=${videoId}` : ""}`;
-	const data = await fetch(url, { headers: { accept: "application/json" } })
-		.then((json) => json.json())
-		.catch((err) => console.log(err));
-	const length = format(data.videoDetails.lengthSeconds);
-	return length;
+export const addToQueue = async (videoId: string): Promise<Song> => {
+	try {
+		const url = `/api/get_queue.json${videoId ? `?videoIds=${videoId}` : ""}`;
+		const data = (await fetch(url, { headers: { accept: "application/json" } })
+			.then((json) => json.json())
+			.catch((err) => console.log(err))) as Song[];
+
+		if (Array.isArray(data)) return data[0];
+	} catch (err) {
+		console.error(err);
+		notify(err, "error");
+	}
 };
 
 export type ResponseBody = { original_url: string; url: string };
@@ -81,29 +87,34 @@ export const getSrc = async (
 	body: ResponseBody;
 	error?: boolean;
 }> => {
-	const webM = userSettings?.playback["Prefer WebM Audio"];
-	const res = await fetch(
-		`/api/player.json?videoId=${videoId}${playlistId ? `&playlistId=${playlistId}` : ""}${
-			params ? `&playerParams=${params}` : ""
-		}`,
-	).then((res) => res.json());
+	try {
+		const webM = userSettings?.playback["Prefer WebM Audio"];
+		const res = await fetch(
+			`/api/player.json?videoId=${videoId}${playlistId ? `&playlistId=${playlistId}` : ""}${
+				params ? `&playerParams=${params}` : ""
+			}`,
+		).then((res) => res.json());
 
-	const formats = sort({
-		data: res,
-		WebM: webM,
-		dash: false,
-		proxyUrl: userSettings?.network["HLS Stream Proxy"] ?? "",
-	});
-	currentId.set(videoId);
+		const formats = sort({
+			data: res,
+			WebM: webM,
+			dash: false,
+			proxyUrl: userSettings?.network["HLS Stream Proxy"] ?? "",
+		});
+		currentId.set(videoId);
 
-	// formats.dash = "data:application/dash+xml;charset=utf-8;base64," + btoa(formats.dash);
+		// formats.dash = "data:application/dash+xml;charset=utf-8;base64," + btoa(formats.dash);
 
-	// if (shouldAutoplay) updatePlayerSrc({ url: formats.dash, original_url: formats.dash });
-	// return { body: { url: formats.dash, original_url: formats.dash } };
-	// return;
-	const src = setTrack(formats, webM, shouldAutoplay);
+		// if (shouldAutoplay) updatePlayerSrc({ url: formats.dash, original_url: formats.dash });
+		// return { body: { url: formats.dash, original_url: formats.dash } };
+		// return;
+		const src = setTrack(formats, webM, shouldAutoplay);
 
-	return src;
+		return src;
+	} catch (err) {
+		console.error(err);
+		notify(err, "error");
+	}
 };
 
 function setTrack(formats: PlayerFormats, webM, shouldAutoplay) {

@@ -270,17 +270,18 @@
 			}),
 		];
 	}
-	let node: HTMLElement;
+
 	let srcImg = Array.isArray(item?.thumbnails)
 		? item?.thumbnails.at(0)
 		: { width: 0, height: 0, url: "", placeholder: "" };
+
 	let active;
+
 	$: isArtistKind = kind === "Fans might also like";
-	// $: active = windowWidth < 640 ? true : false
-	// $: console.log(item.thumbnails)
+
 </script>
 
-<!-- <svelte:window bind:innerWidth={windowWidth} /> -->
+
 <article
 	class:item16x9={RATIO_RECT ? true : false}
 	class:item1x1={RATIO_SQUARE ? true : false}
@@ -296,10 +297,7 @@
 			direction: "right",
 		});
 	}}
-	on:click|stopPropagation={(e) => clickHandler(e, index)}
->
-	<!-- on:mouseover={() => (active = true)}
-on:mouseout={() => (active = false)} -->
+	on:click|stopPropagation={(e) => clickHandler(e, index)}>
 	<section
 		class="item-thumbnail"
 		on:focus

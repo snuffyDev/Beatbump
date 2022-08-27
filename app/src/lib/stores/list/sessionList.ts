@@ -311,13 +311,10 @@ function _sessionListService() {
 				return;
 			}
 			try {
-				const lengthOfCurrentItem = await addToQueue(item.videoId);
-				const nextItem = parseNextItem(item, lengthOfCurrentItem);
+				const itemToAdd = await addToQueue(item.videoId);
 
-				// const itemRemoved = mix.splice(key+1, 1, nextItem);
-				// mix.splice(index, 1);
 				// eslint-disable-next-line no-self-assign
-				splice(mix, key + 1, 0, nextItem);
+				splice(mix, key + 1, 0, itemToAdd);
 
 				notify(`${item.title} will play next!`, "success");
 				commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });

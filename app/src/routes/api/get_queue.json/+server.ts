@@ -5,6 +5,8 @@ import type { RequestHandler } from "@sveltejs/kit";
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;
 	const playlistId = query.get("playlistId") || "";
+	const _videoIds = query.get("videoIds") || "";
+	const videoIds: string[] | undefined = _videoIds.length !== 0 ? _videoIds.split(",") : undefined;
 	const response = await fetch(
 		`https://music.youtube.com/youtubei/v1/music/get_queue?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&prettyPrint=false`,
 		{
@@ -54,7 +56,7 @@ export const GET: RequestHandler = async ({ url }) => {
 					},
 					activePlayers: {},
 				},
-
+				videoIds: videoIds,
 				playlistId: `${playlistId}`,
 			}),
 			headers: {
