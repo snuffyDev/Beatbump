@@ -80,6 +80,13 @@ The app will now be accessible from `https://localhost:443  /  http://localhost:
 
 
 (More details coming soon!)
+
+## Documentation
+
+You can find (temporary, incomplete, and in-progress) API documentation here: https://beatbump-docs.vercel.app/
+
+> It's recommended (and appreciated) to host your own instance of Beatbump for public projects that want to use the data -- especially if you anticipate you will be making a large amount of requests. Thanks! 
+
 ## Project Inspirations
 
 - [Invidious](https://github.com/iv-org/invidious) - a privacy focused alternative YouTube front end.
