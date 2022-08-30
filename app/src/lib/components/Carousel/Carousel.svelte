@@ -189,9 +189,15 @@
 	}
 	.left {
 		left: -1.5em;
+		@media screen and (min-width: 640px) and (max-width: 1000px) {
+			left: 0;
+		}
 	}
 	.right {
 		right: -1.5em;
+		@media screen and (min-width: 640px) and (max-width: 1000px) {
+			right: 0;
+		}
 	}
 	.section {
 		-webkit-overflow-scrolling: touch;

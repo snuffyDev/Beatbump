@@ -1,4 +1,5 @@
 {
+	"extends": "../tsconfig.json",
 	"compilerOptions": {
 		"esModuleInterop": true,
 		"baseUrl": "../scripts",
@@ -10,11 +11,12 @@
 		"moduleResolution": "Node",
 		"module": "esnext",
 		"lib": ["ES2022", "ESNext"],
-		"target": "esnext"
+		"target": "esnext",
+		"types": ["node"]
 	},
 	"files": ["./build", "./logger"],
 	"ts-node": {
-		"moduleTypes": { "esm": ["*.ts"] }
+		"moduleTypes": { "esm": ["*.ts", "*.mts"] }
 	},
 	"exclude": ["../node_modules/**"]
 }

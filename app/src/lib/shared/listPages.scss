@@ -38,7 +38,6 @@ $width: 1fr;
 	@media screen and (min-width: 286px) and (max-width: 512px) {
 		margin-top: 0rem;
 		justify-self: center;
-		// justify-items: ;
 	}
 }
 .editable {
@@ -51,16 +50,11 @@ $width: 1fr;
 	}
 	&:focus-visible,
 	&:focus-within {
-		// position: absolute;
 		top: 0;
 		right: 0;
 		bottom: 0;
 		left: 0;
-		// padding: 0.5rem 2rem;
-		// width: 100%;
-		// height: 100%;
-		// background: #0000;
-		// outline: #f1f1f1 1px solid;
+
 		background: #1a192b96;
 		border-radius: var(--xs-radius);
 	}
@@ -69,7 +63,6 @@ $width: 1fr;
 	margin: 0 0 0.25em 0;
 
 	&.description {
-		// margin: 0.25em 0 0.5em 0;
 		max-width: 68ch;
 		font-size: 1rem;
 		@media (pointer: coarse) {
@@ -84,21 +77,18 @@ $width: 1fr;
 	word-wrap: unset;
 	display: flex;
 	flex-direction: column;
-	// : center;
+
 	text-align: center;
-	// white-space: nowrap;
-	// white-space: nowrap;
+
 	margin-bottom: 0.333em;
 
-	@media screen and (min-width: 640px) {
+	@media screen and (min-width: 512.98px) {
 		text-align: inherit;
 
 		align-self: flex-end;
 	}
 }
 .info-title {
-	// display: grid;
-	// width: 100%;
 	margin-bottom: 0.666em;
 }
 .box-title {
@@ -109,15 +99,13 @@ $width: 1fr;
 
 	text-overflow: ellipsis;
 	display: block;
-	// max-width: 90%;
-	// line-break: strict;
+
 	margin: 0 0 0.2rem;
 
 	word-break: keep-all;
 
 	text-overflow: ellipsis;
-	// white-space: nowrap;
-	// overflow: hidden;
+
 	text-align: center;
 
 	@media screen and (min-width: 512px) {
@@ -135,7 +123,7 @@ small {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	-webkit-user-select: none;
-	// border-color:
+
 	will-change: contents, width;
 	background-color: #37455200;
 	border-color: #1f1f1f;
@@ -149,15 +137,14 @@ small {
 		"img"
 		"metadata"
 		"buttons";
-	// margin-inline: 0.8em;
+
 	user-select: none;
 	width: auto;
-	// @include v.content-spacing($type: "margin");
+
 	-webkit-margin-after: 1.3333em;
 	margin-block-end: 1.3333em;
 	max-width: 100%;
 	overflow-wrap: break-word;
-	// white-space: nowrap;
 
 	@media screen and (min-width: 286px) and (max-width: 512px) {
 		grid-template-columns: 1fr;
@@ -221,13 +208,9 @@ hr {
 	/* margin-left: auto; */
 	will-change: contents, width;
 
-	// transition: all cubic-bezier(0.645, 0.045, 0.355, 1) 0.25s;
-	// margin-right: auto;
 	padding-left: 1.5rem;
 	@media screen and (max-width: 500px) {
-		// margin-right: 0.5rem;
 		padding-left: 0.5rem;
-		// font-size: 1.5rem;
 	}
 	/* float: revert;*/
 }
@@ -246,16 +229,13 @@ hr {
 }
 .subtitle-group {
 	margin-bottom: 1rem;
-	// font-size: 1.075em;
 }
 @media screen and (min-width: 720px) and (max-width: 896px) {
 	.img {
-		// margin-right: auto;
 	}
 	.info {
 		/* margin-right: auto; */
 		padding-left: 1.5rem;
-		// padding-top: .5rem;
 	}
 	.box {
 		flex-direction: row;

@@ -316,7 +316,7 @@ function _sessionListService() {
 				// eslint-disable-next-line no-self-assign
 				splice(mix, key + 1, 0, itemToAdd);
 
-				notify(`${item.title} will play next!`, "success");
+				// notify(`${item.title} will play next!`, "success");
 				commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
 			} catch (err) {
 				console.error(err);

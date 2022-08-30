@@ -4,11 +4,11 @@
 	export let heading = "";
 </script>
 
-<div class="grid-container resp-content-width">
-	<div class="header">
+<div class="grid-container">
+	<div class="header resp-content-width">
 		<span class="h2">{heading}</span>
 	</div>
-	<div class="grid" use:observer>
+	<div class="grid resp-content-width" use:observer>
 		{#each items as item, i (item)}
 			<slot name="item" {item} index={i} />
 		{/each}

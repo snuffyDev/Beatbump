@@ -1,0 +1,28 @@
+@use "./variables" as vars;
+:root {
+	--base-spacing: 0.75rem;
+	--base-font-size: 0.75rem;
+	--base-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+		"Open Sans", "Helvetica Neue", sans-serif;
+
+	--secondary-font-family: "CommissionerVariable", sans-serif;
+	--secondary-font-color: rgb(175, 175, 175);
+
+	--color-dark: hsl(0deg 0% 98%);
+	--color-light: #111113;
+	--color-med: #202024;
+
+	--sm-spacing: #{vars.$sm-spacing};
+	--md-spacing: #{vars.$md-spacing};
+	--lg-spacing: #{vars.$lg-spacing};
+	--xl-spacing: #{vars.$xl-spacing};
+
+	--base-radius: #{vars.$base-radius};
+	--xs-radius: #{vars.$xs-radius};
+	--sm-radius: #{vars.$sm-radius};
+	--md-radius: #{vars.$md-radius};
+	--lg-radius: #{vars.$lg-radius};
+	--xl-radius: #{vars.$xl-radius};
+
+	--max-width: 85.375rem;
+}

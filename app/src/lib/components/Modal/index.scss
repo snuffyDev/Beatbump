@@ -1,6 +1,6 @@
 .modal {
 	position: absolute;
-	// gap: 0.8rem;
+
 	padding: 0.8rem;
 	z-index: 100;
 	background: var(--mobile-popper-bg);
@@ -28,11 +28,7 @@
 }
 
 .modal-container {
-	// max-width: 53.333333rem;
-	// margin: 0 auto;
 	display: flex;
 	flex-direction: column;
 	overflow-y: auto;
-	// margin:0 auto;
-	// width
 }

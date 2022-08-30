@@ -7,9 +7,9 @@ $focus-background: #aaa;
 $focus-color: #1c1c1c;
 %active {
 	color: $focus-color;
-	// background: $focus-background !important;
+
 	border-color: $focus-color !important;
-	// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
+
 	outline: 0;
 	text-decoration: none;
 	cursor: pointer;
@@ -54,15 +54,13 @@ $focus-color: #1c1c1c;
 	&:focus-within,
 	&:active,
 	&.active {
-		// background: #f1f1f1 !important;
-		// color: color.scale($focus-color, $lightness: 0%) !important 	;
 		border-color: $focus-color !important;
 		background: color.scale($focus-background, $lightness: 25%) !important;
 
 		color: $focus-color;
-		// background: $focus-background !important;
+
 		border-color: $focus-color !important;
-		// box-shadow: 0 0 0.5rem 0.15rem rgba(0, 0, 0, 0.164) inset;
+
 		outline: 0;
 		text-decoration: none;
 		cursor: pointer;
@@ -82,14 +80,12 @@ $focus-color: #1c1c1c;
 		background: color.scale($focus-background, $lightness: 15%) !important;
 	}
 }
-// Main Button
+
 button:not(.icon-btn),
 .button {
 	@extend %button-base;
 }
 
-// Button Types
-////////////////////////////////
 button.small {
 	@extend %button-base;
 	max-width: -webkit-fit-content;
@@ -139,7 +135,7 @@ button.outlined {
 	}
 	&:active {
 		background: rgba(255, 255, 255, 0.096) !important;
-		// background-color: transparentize(#fff, 0.3) !important;
+
 		border-color: rgba(255, 255, 255, 0.667) !important;
 	}
 }
@@ -148,11 +144,10 @@ button.icon-btn {
 	flex-wrap: nowrap;
 	position: relative;
 	cursor: pointer;
-	// padding: 8pt;
+
 	place-items: center;
 	place-content: center;
-	// width: clamp(24px, 24px, 48pt);
-	// height: clamp(24pt, 24px, 48pt);
+
 	width: 44px;
 	height: 44px;
 	border: none;

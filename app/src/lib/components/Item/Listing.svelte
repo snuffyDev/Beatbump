@@ -44,7 +44,7 @@
 				});
 
 				await tick();
-				goto(`/artist/${data.artistInfo.artist[0].browseId}`);
+				goto(`/artist/${data?.artistInfo ? data.artistInfo.artist[0].browseId : data?.subtitle[0].browseId}`);
 			},
 		},
 		{
@@ -283,13 +283,13 @@
 					</p>
 				{:else}
 					<p class="text-artist">
-						{#each data?.artistInfo.artist as artist, i}
+						{#each data?.artistInfo?.artist || data?.subtitle as artist, i}
 							<a
 								sveltekit:prefetch
 								on:click|preventDefault={() => goto(`/artist/${artist?.browseId}`)}
 								href={`/artist/${artist?.browseId}`}>{artist.text}</a
 							>
-							{#if i !== data?.artistInfo.artist.length - 1}
+							{#if i !== (data?.artistInfo?.artist || data?.subtitle).length - 1}
 								<span> & </span>
 							{/if}
 						{/each}

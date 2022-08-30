@@ -19,9 +19,10 @@
 	import { notify } from "$lib/utils";
 	import { requestFrameSingle } from "$lib/utils/raf";
 	import { page } from "$app/stores";
+	import { isMobileMQ } from "$stores/window";
 	const { paused } = AudioPlayer;
+	export let state: "open" | "closed";
 
-	$: state = $fullscreenStore;
 	$: loading = $playerLoading;
 	$: data = $currentTrack;
 	$: heightCalc = -windowHeight + 140;
@@ -192,7 +193,7 @@
 						/>
 					</div>
 				{/if}
-				<div class="album-art" style="width: {innerWidth > 640 ? (queueOpen ? 55 : 95) : '100'}vw;">
+				<div class="album-art" style="width: {!$isMobileMQ ? (queueOpen ? 55 : 95) : '100'}vw;">
 					<div class="img-container">
 						{#if loading}
 							<Loading size="3em" />
@@ -210,7 +211,7 @@
 						</div>
 					</div>
 				</div>
-				{#if $page.data.Android || $page.data.iOS}
+				{#if $isMobileMQ}
 					<div class="container controls">
 						<div class="container text-shadow" style="overflow:hidden;">
 							<div class="marquee">
@@ -262,7 +263,7 @@
 			<div
 				class="column container tracklist"
 				bind:clientHeight={queueHeight}
-				style={innerWidth < 640
+				style={$isMobileMQ
 					? `transform: translate3d(0, ${$motion}px, 0); top: ${
 							windowHeight - 65
 					  }px; bottom:0; padding-bottom: calc(6.5em);`

@@ -1,10 +1,4 @@
 .progress-bar {
-	// position: absolute;
-	// top: 50%;
-	// left: 50%;
-	// right: 0;
-	// transform: translate(-50%, -50%);
-	// bottom: 0;
 	width: 100%;
 	will-change: visibility;
 	contain: paint;
@@ -48,7 +42,6 @@ progress {
 	outline: none;
 	border: transparent;
 	padding: 0;
-	// inset: 0;
 }
 
 progress::-webkit-progress-bar {

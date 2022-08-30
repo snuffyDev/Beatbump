@@ -1,0 +1,69 @@
+$breakpoint-widths: (
+	xs: 0,
+	sm: 576px,
+	md: 768px,
+	lg: 992px,
+	xl: 1200px,
+	xxl: 1440px,
+);
+
+@function min-breakpoint($name, $breakpoints: $breakpoint-widths) {
+	$min: map-get($breakpoints, $name);
+	@return if($min != 0, $min, null);
+}
+@function max-breakpoint($name, $breakpoints: $breakpoint-widths) {
+	$max: map-get($breakpoints, $name);
+
+	@return if($max and $max > 0, $max - 0.02, null);
+}
+@function between-breakpoint($name, $breakpoints: $breakpoint-widths, $breakpoint-names: map-keys($breakpoints)) {
+	$idx: index($breakpoint-names, $name);
+	@if not $idx {
+		@error "No breakpoint found";
+	}
+
+	@return if($idx < length($breakpoint-names), nth($breakpoint-names, $idx + 1), null);
+}
+
+@mixin media-query-up($name, $breakpoints: $breakpoint-widths) {
+	$min: min-breakpoint($name, $breakpoints);
+
+	@if $min {
+		@media screen and (min-width: $min) {
+			@content;
+		}
+	} @else {
+		@content;
+	}
+}
+@mixin media-query-down($name, $breakpoints: $breakpoint-widths) {
+	$max: max-breakpoint($name, $breakpoints);
+
+	@if $max {
+		@media screen and (max-width: $max) {
+			@content;
+		}
+	} @else {
+		@content;
+	}
+}
+
+@mixin media-query($name, $breakpoints: $breakpoint-widths) {
+	$min: min-breakpoint($name, $breakpoints);
+	$between: between-breakpoint($name, $breakpoints);
+	$max: max-breakpoint($between, $breakpoints);
+
+	@if $min != null and $max != null {
+		@media screen and (min-width: $min) and (max-width: $max) {
+			@content;
+		}
+	} @else if $max == null {
+		@include media-query-up($min) {
+			@content;
+		}
+	} @else if $min == null {
+		@include media-query-down($max) {
+			@content;
+		}
+	}
+}

@@ -1,0 +1,28 @@
+@use "./../base/variables" as v;
+
+.tooltip {
+	position: absolute;
+	display: block;
+	pointer-events: none;
+
+	opacity: 0;
+	will-change: opacity, transform;
+	transition: opacity linear 150ms;
+
+	transform: translate(calc(var(--tt-pos-x)), var(--tt-pos-y));
+	transform-origin: center;
+
+	border: 1px solid #323232;
+	box-shadow: 0px 0px 1px #323232;
+	background: #121212;
+	font-size: v.$size-1;
+	border-radius: 0.25em;
+	padding: 0.3em;
+	font-weight: 500;
+	min-width: 1em;
+	max-width: 20em;
+	text-transform: capitalize;
+	width: max-content;
+
+	z-index: 500;
+}

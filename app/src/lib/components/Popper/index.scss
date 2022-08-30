@@ -1,7 +1,7 @@
 .popper {
 	display: flex;
 	flex-direction: column;
-	// grid-template-rows: 0.5fr 1fr;
+
 	touch-action: none;
 	gap: 0.85em;
 	color: #fff !important;
@@ -12,7 +12,7 @@
 .drag-wrapper {
 	position: fixed;
 	inset: 0;
-	// pointer-events: none;
+
 	background: rgba(255, 255, 255, 0);
 	z-index: 500;
 	touch-action: none;
@@ -22,7 +22,7 @@
 .backdrop {
 	position: fixed;
 	inset: 0;
-	// background: rgba(255, 255, 255, 0);
+
 	touch-action: none;
 	min-height: 100%;
 	max-height: 100%;
@@ -71,7 +71,6 @@ hr {
 	touch-action: none;
 
 	padding: 0.4rem;
-	// z-index: 5;
 }
 .m-row {
 	touch-action: none;
@@ -91,7 +90,7 @@ hr {
 }
 .m-metadata {
 	display: flex;
-	// grid-template-columns: auto 1fr;
+
 	max-height: 8rem;
 	height: auto;
 	position: relative;
@@ -130,25 +129,13 @@ hr {
 	img {
 		width: 100%;
 		max-width: 100%;
-		// height: auto;
+
 		min-height: 0;
 		height: inherit;
 		/* max-height: inherit; */
 		border-radius: var(--md-radius);
 		-o-object-fit: contain;
 		object-fit: scale-down;
-		// position: absolute;
-		// inset: 0;
-		// aspect-ratio: 1/1 auto;
-		// width: 100%;
-		// max-width: 12rem;
-		// height: auto;
-		// max-height: inherit;
-		// border-radius: var(--md-radius);
-		// -o-object-fit: contain;
-		// object-fit: contain;
-		// position: inherit;
-		// // vertical-align: text-top;
 	}
 }
 .metatext {
@@ -165,7 +152,7 @@ hr {
 	.title {
 		font-family: var(--secondary-font-family);
 	}
-	// letter-spacing: 0.02em;
+
 	.artist {
 		font-variant-caps: all-petite-caps;
 		font-size: 0.95rem;
@@ -185,11 +172,11 @@ svg,
 
 	position: absolute;
 	z-index: 500;
-	// isolation: isolate;
+
 	left: 0;
-	// bottom: 0%;
+
 	right: 0;
-	// top: 0;
+
 	margin: 0 auto;
 	min-width: 0;
 	contain: layout;
@@ -203,7 +190,6 @@ svg,
 	border-top-right-radius: var(--xl-radius);
 	background-color: var(--mobile-popper-bg);
 	padding: 1.75rem 0.8rem 0.8rem;
-	// transition: transform cubic-bezier(0.895, 0.03, 0.685, 0.22) 175ms;
 }
 .handle {
 	touch-action: none;

@@ -58,7 +58,7 @@
 />
 <GroupSessionCreator />
 <Alert />
-<Fullscreen />
+<Fullscreen state={isFullscreen ? "open" : "closed"} />
 <footer class="footer-container" class:show-player={hasplayer}>
 	<!-- <GroupSessionManager /> -->
 	<Player />

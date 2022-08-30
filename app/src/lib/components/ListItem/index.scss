@@ -14,9 +14,6 @@
 		grid-template-areas: "left middle right";
 		grid-template-columns: 1.5em 1fr 2.45em;
 	}
-	// > * {
-	// 	outline: 1px red solid;
-	// }
 }
 .isPlaying {
 	background: scale-color(#57575831, $lightness: 35%);
@@ -58,9 +55,9 @@
 	/* padding-right: 1.8rem; */
 	grid-area: middle;
 	flex-direction: row;
-	// flex: none;
+
 	gap: 0.95em;
-	// font-size: 0.95em;
+
 	align-items: center;
 	width: 100%;
 	max-width: calc(100% - 2.45em);
@@ -72,12 +69,11 @@
 
 	width: 100%;
 	max-width: calc(100% - 4.45em);
-	// margin-left: 1.5em;
 }
 
 .artists {
 	font-family: "CommissionerVariable", sans-serif;
-	// font-weight: 425;
+
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
@@ -102,7 +98,7 @@
 	min-height: 4.25em;
 	/* margin-right: 1rem; */
 	max-height: 4.25em;
-	// width: 100%;
+
 	border-radius: var(--xs-radius);
 	@media screen and (min-width: 640px) {
 		margin-left: 1em;
@@ -111,10 +107,9 @@
 img {
 	width: 100%;
 	height: 100%;
-	// width: auto;
-	// height: auto;
+
 	position: relative;
-	// border-radius: initial;
+
 	aspect-ratio: 1/1;
 	object-fit: contain;
 }

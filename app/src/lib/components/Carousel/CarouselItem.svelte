@@ -53,7 +53,7 @@
 			icon: "queue",
 			action: function action() {
 				list.setTrackWillPlayNext(item, $list.mix.length);
-				notify(`${item.title} will play next!`, "success");
+				notify(`${item.title} has been added to your queue!`, "success");
 			},
 		},
 
@@ -104,7 +104,7 @@
 						const shareData = {
 							title: `Join ${groupSession.client.displayName}'s Beatbump Session`,
 
-							url: `${import.meta.env.DEV ? "localhost:5000" : ENV_SITE_URL}/session?token=${encodeURIComponent(
+							url: `${import.meta.env.DEV ? "localhost:5173" : ENV_SITE_URL}/session?token=${encodeURIComponent(
 								IsoBase64.toBase64(
 									JSON.stringify({
 										clientId: groupSession.client.clientId,
@@ -278,9 +278,7 @@
 	let active;
 
 	$: isArtistKind = kind === "Fans might also like";
-
 </script>
-
 
 <article
 	class:item16x9={RATIO_RECT ? true : false}
@@ -297,7 +295,8 @@
 			direction: "right",
 		});
 	}}
-	on:click|stopPropagation={(e) => clickHandler(e, index)}>
+	on:click|stopPropagation={(e) => clickHandler(e, index)}
+>
 	<section
 		class="item-thumbnail"
 		on:focus

@@ -4,7 +4,7 @@
 </script>
 
 <script lang="ts">
-	import { ctxKey, groupSession, isPagePlaying, queue, showAddToPlaylistPopper } from "$lib/stores";
+	import { ctxKey, groupSession, isMobileMQ, isPagePlaying, queue, showAddToPlaylistPopper } from "$lib/stores";
 	import { page as PageStore, session } from "$app/stores";
 	import type { Item } from "$lib/types";
 	import { notify } from "$lib/utils/utils";
@@ -31,7 +31,6 @@
 	const { page, parentPlaylistId = null } = CTX_ListItem.get();
 
 	let isHovering = false;
-	let width = 640;
 
 	$: isPlaying =
 		(page !== "queue" && page !== "release" ? $isPagePlaying.has($PageStore.params.slug) : true) &&
@@ -44,7 +43,7 @@
 			text: "View Artist",
 			icon: "artist",
 			action: async () => {
-				goto(`/artist/${item.artistInfo.artist[0].browseId}`);
+				goto(`/artist/${item?.artistInfo ? item.artistInfo.artist[0].browseId : item?.subtitle[0].browseId}`);
 				await tick();
 				window.scrollTo({
 					behavior: "smooth",
@@ -193,7 +192,6 @@
 	}
 </script>
 
-<svelte:window bind:innerWidth={width} />
 <article
 	class="m-item"
 	tabindex="0"
@@ -258,7 +256,7 @@
 			</div>
 		</div>
 	</div>
-	{#if isHovering || width < 640}
+	{#if $isMobileMQ || isHovering}
 		<div class="length" tabindex="0" on:focus={() => (isHovering = true)}>
 			<PopperButton tabindex="0" items={DropdownItems} />
 		</div>

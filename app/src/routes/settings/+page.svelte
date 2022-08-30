@@ -9,7 +9,7 @@
 	<section>
 		<span class="h5">Appearance</span>
 		<div class="setting">
-			<label for="theme"> Theme </label>
+			<label for="theme">Theme </label>
 			<div class="select">
 				<select name="theme" id="theme" bind:value={$settings["appearance"]["Theme"]}>
 					{#each themes as theme}
@@ -19,23 +19,26 @@
 			</div>
 		</div>
 		<div class="setting">
-			<label for="immersive-queue"> Immersive Queue </label>
+			<label>Immersive Queue</label>
 			<input
 				type="checkbox"
 				name="immersive-queue"
 				id="immersive-queue"
 				bind:checked={$settings["appearance"]["Immersive Queue"]}
 			/>
+			<label for="immersive-queue" class="switch" />
 		</div>
 	</section>
 	<section>
 		<span class="h5">Playback</span>
 		<div class="setting">
-			<label for="dedupe"> Dedupe Automix </label>
+			<label>Dedupe Automix</label>
+
 			<input name="dedupe" id="dedupe" type="checkbox" bind:value={$settings["playback"]["Dedupe Automix"]} />
+			<label for="dedupe" class="switch" />
 		</div>
 		<div class="setting">
-			<label for="quality"> Quality </label>
+			<label for="quality">Quality</label>
 			<div class="select">
 				<select name="quality" disabled id="quality" bind:value={$settings["playback"]["Quality"]}>
 					{#each ["Normal", "High"] as option}
@@ -62,19 +65,27 @@
 		<span class="h5">Network</span>
 		<div class="setting">
 			<label for="proxy">Audio Proxy Server </label>
-			<div class="input">
-				<input
-					type="text"
-					placeholder="https://yt-hls-rewriter.onrender.com"
-					bind:value={$settings["network"]["HLS Stream Proxy"]}
-				/>
+			<div class="input-container">
+				<div class="input">
+					<input
+						type="text"
+						placeholder="https://yt-hls-rewriter.onrender.com/"
+						bind:value={$settings["network"]["HLS Stream Proxy"]}
+					/>
+				</div>
+				<span
+					class="link"
+					on:click={() => {
+						$settings["network"]["HLS Stream Proxy"] = "https://yt-hls-rewriter.onrender.com/";
+					}}>Reset to default</span
+				>
 			</div>
 		</div>
 	</section>
 	<section>
 		<span class="h5">Search</span>
 		<div class="setting">
-			<label for="preserve"> Preserve </label>
+			<label for="preserve">Preserve </label>
 			<div class="select">
 				<select name="preserve" id="preserve" bind:value={$settings["search"]["Preserve"]}>
 					{#each ["Category", "Query", "Category + Query", "None"] as option}
@@ -87,15 +98,27 @@
 </main>
 
 <style lang="scss">
+	.input-container {
+		min-width: 15ch !important;
+		max-width: 32ch !important;
+		width: 100%;
+	}
+
 	label {
 		display: inline-block;
-		margin-right: auto;
+
 		font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
 			"Open Sans", "Helvetica Neue", sans-serif;
 		font-size: 1em;
 		text-transform: none !important;
 		font-variant: unset;
+		@media screen and (min-width: 40rem) {
+			~ :last-child {
+				margin-left: auto;
+			}
+		}
 	}
+
 	section {
 		display: flex;
 		flex-direction: column;
@@ -110,9 +133,46 @@
 		display: inline-flex;
 		margin-top: 1em;
 		color: inherit;
-		flex-direction: row;
 		vertical-align: top;
-		align-items: center;
 		margin-bottom: 1em;
+		gap: 1em;
+		flex-direction: column;
+		@media screen and (min-width: 40rem) {
+			align-items: center;
+			flex-direction: row;
+		}
+	}
+	.switch {
+		position: relative;
+		display: inline-block;
+		width: 3.5em;
+		height: 1.6125em;
+		cursor: pointer;
+		overflow: hidden;
+		background-color: rgba(109, 109, 109, 0.35);
+		border-radius: 1.25rem;
+		transition: background-color 0.3s;
+	}
+	.switch::after {
+		content: "";
+		position: absolute;
+		width: 1.5em;
+		height: 1.5em;
+		border-radius: 50%;
+		background-color: white;
+		top: 0.06125em;
+		left: 0.06125em;
+		transition: left 0.3s;
+		box-shadow: 0 0 5px 0.5px rgba(0, 0, 0, 0.384);
+	}
+
+	[type="checkbox"]:checked + .switch::after {
+		left: 2em;
+	}
+	[type="checkbox"]:checked + .switch {
+		background-color: #00cd6a;
+	}
+	[type="checkbox"] {
+		display: none;
 	}
 </style>

@@ -10,12 +10,11 @@
 	--color-light: #111113;
 	--color-med: #202024;
 
-	// Spacing
 	--sm-spacing: #{vars.$sm-spacing};
 	--md-spacing: #{vars.$md-spacing};
 	--lg-spacing: #{vars.$lg-spacing};
 	--xl-spacing: #{vars.$xl-spacing};
-	// Border Radius
+
 	--base-radius: 0.5rem;
 	--xs-radius: #{vars.$xs-radius};
 	--sm-radius: #{vars.$sm-radius};

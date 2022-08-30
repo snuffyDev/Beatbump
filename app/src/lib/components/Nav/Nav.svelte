@@ -18,7 +18,7 @@
 	export let key;
 	let isHidden = true;
 	let hidden = isHidden ? true : false;
-	let isSettingsOpen;
+
 	let shown;
 	$: preserve = $preserveSearch;
 	let query = "";
@@ -163,23 +163,17 @@
 		>
 			<Icon name="search" size="1.6125em" />
 		</button>
-		<div
-			use:clickOutside
-			on:click_outside={() => {
-				isSettingsOpen = false;
+
+		<button
+			aria-label="Settings"
+			class="icon-btn btn-settings"
+			on:click={() => {
+				$fullscreenStore && fullscreenStore.set("closed");
+				goto("/settings", {});
 			}}
-			style="display:contents; background:inherit;"
 		>
-			<button
-				aria-label="Settings"
-				class="icon-btn btn-settings"
-				on:click|stopPropagation={() => {
-					goto("/settings");
-				}}
-			>
-				<Icon name="settings" size="1.6125em" />
-			</button>
-		</div>
+			<Icon name="settings" size="1.6125em" />
+		</button>
 	</div>
 </nav>
 
@@ -201,11 +195,14 @@
 		align-content: center;
 		align-items: center;
 		touch-action: none;
-		z-index: 152;
+		z-index: 150;
 		background-color: var(--top-bg);
-		isolation: isolate;
+		// isolation: isolate;
 		justify-content: space-between;
 		border-bottom: 0.0625rem hsl(0deg 0% 12%) solid;
+		@media screen and (min-width: 640px) {
+			z-index: 155;
+		}
 	}
 	.x-button {
 		position: absolute !important;
@@ -284,7 +281,6 @@
 
 		background: #0000;
 
-		isolation: isolate;
 		position: relative;
 		&::before {
 			content: "";

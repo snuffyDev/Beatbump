@@ -1,8 +1,6 @@
 import { browser } from "$app/env";
 import { ENV_DONATION_URL } from "../../env";
 import { get, writable } from "svelte/store";
-import { WritableStore } from "$lib/utils";
-import { noop } from "$lib/utils/noop";
 
 export type Theme = "Dark" | "Dim" | "Midnight" | "YTM";
 enum Kind {
@@ -66,22 +64,24 @@ export const SettingsSchema = {
 let list: UserSettings = {
 	appearance: {
 		Theme: "Dark",
-		"Immersive Queue": false,
+		"Immersive Queue": true,
 	},
 	playback: {
-		"Dedupe Automix": true,
+		"Dedupe Automix": false,
 		Quality: "Normal",
 		"Prefer WebM Audio": false,
 		Stream: "HTTP",
 	},
 	appinfo: { Donate: ENV_DONATION_URL, GitHub: "https://github.com/snuffyDev/Beatbump" },
-	network: { "HLS Stream Proxy": "https://yt-hls-rewriter.onrender.com" },
+	network: { "HLS Stream Proxy": "https://yt-hls-rewriter.onrender.com/" },
 	search: { Preserve: "Category" },
 };
 
 export const settings = _settings();
 function _settings() {
-	if (!browser) return writable(list);
+	if (!browser) {
+		return writable(list);
+	}
 	const stored = JSON.parse(localStorage.getItem("settings")) as UserSettings;
 	// Migrate from previous settings to new ones
 	if (!stored?.appearance && !stored?.playback && !stored?.search) {
@@ -101,7 +101,8 @@ function _settings() {
 		localStorage.clear();
 		localStorage.setItem("settings", JSON.stringify(list));
 	} else {
-		if (!stored.network["HLS Stream Proxy"]) stored.network['HLS Stream Proxy'] = "https://yt-hls-rewriter.onrender.com";
+		if (!stored.network["HLS Stream Proxy"])
+			stored.network["HLS Stream Proxy"] = "https://yt-hls-rewriter.onrender.com/";
 		list = stored;
 	}
 	// list = { ...list, playback: { ...list.playback, Stream: "HLS" } };

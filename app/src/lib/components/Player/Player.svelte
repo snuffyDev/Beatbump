@@ -6,7 +6,7 @@
 	import { IMAGE_NOT_FOUND } from "$lib/constants";
 	import * as db from "$lib/db";
 	import { AudioPlayer } from "$lib/player";
-	import { groupSession } from "$lib/stores";
+	import { groupSession, isMobileMQ } from "$lib/stores";
 	import list, { currentTrack, queue, queuePosition } from "$lib/stores/list";
 	import { IsoBase64 } from "$lib/utils/buffer";
 	import { messenger } from "$lib/utils/emitter";
@@ -179,8 +179,8 @@
 			</div>
 		{/if}
 	</div>
-	<div class="player-controls" style:display={innerWidth < 640 ? "none" : "flex"}>
-		{#if !$page.data.iOS && !$page.data.Android}
+	<div class="player-controls" style:display={$isMobileMQ ? "none" : "flex"}>
+		{#if !$isMobileMQ}
 			<Controls
 				bind:isPaused={isPlaying}
 				bind:loading={$playerLoading}
@@ -298,7 +298,7 @@
 	.volume {
 		position: relative;
 		will-change: visibility, display;
-		@media screen and (max-width: 500px) {
+		@media screen and (max-width: 575.75px) {
 			visibility: hidden;
 			display: none;
 		}

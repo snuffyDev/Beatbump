@@ -15,14 +15,7 @@ html {
 	font-size: 12px;
 	overscroll-behavior: contain;
 }
-// @media (pointer: fine) {
-// 	*:focus-visible:not(input):not(.input):not(select):not(.select):not(.no-style) {
-// 		outline: 0.16666em rgb(113, 175, 255) solid !important;
-// 	}
-// }
-// :focus:not(:focus-visible) {
-// 	outline: none;
-// }
+
 html,
 body {
 	background-color: #010102;
@@ -93,7 +86,7 @@ body {
 	--player-bar-height: clamp(5rem, 5.6rem, 5.95rem);
 	--top-bar-height: clamp(3.9rem, 4.175rem, 4.625rem);
 	text-rendering: auto;
-	// --top-bar-height: calc(min(16, var(--base-font-size)));
+
 	@media screen and (min-width: 40rem) and (max-width: 115.375rem) {
 		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
 		--base-font-size: 0.875rem;
@@ -108,26 +101,25 @@ body {
 	}
 }
 .tooltip {
-	position: absolute;
+	position: fixed;
 	display: block;
 	pointer-events: none;
-	// @include mixins.animation(0, 0.2s, false, fade, normal, both);
+
 	opacity: 0;
 	will-change: opacity, transform;
 	transition: opacity linear 150ms;
-
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+		"Helvetica Neue", sans-serif;
 	transform: translate(calc(var(--tt-pos-x)), var(--tt-pos-y));
 	transform-origin: center;
-	// isolation: isolate;
+
 	border: 1px solid #323232;
 	box-shadow: 0px 0px 1px #323232;
 	background: #121212;
 	font-size: v.$size-1;
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
-		"Helvetica Neue", sans-serif;
 	border-radius: 0.25em;
 	padding: 0.3rem;
-	font-weight: 500;
+	font-weight: 400;
 	min-width: 1rem;
 	max-width: 20rem;
 	text-transform: capitalize;
@@ -136,7 +128,7 @@ body {
 	width: max-content;
 	position: absolute;
 	display: block;
-	z-index: 1000;
+	z-index: 500;
 }
 
 body {
@@ -148,17 +140,12 @@ html {
 	font-size: var(--base-font-size);
 }
 #app {
-	// grid-template-rows: 4rem 32fr;
 	position: fixed;
 	height: 100%;
 	width: 100%;
 	line-height: 1.4;
 	inset: 0;
-	// display: grid;
-	// grid-template-areas:
-	// 	"n n n n"
-	// 	"m m m m"
-	// 	"f f f f";
+
 	max-width: 100%;
 	overscroll-behavior: contain;
 	isolation: isolate;
@@ -185,7 +172,7 @@ main {
 	position: relative;
 	@include v.content-spacing($type: "padding");
 	overscroll-behavior: contain;
-	@media screen and (min-width: 720px) {
+	@media screen and (min-width: 640px) {
 		@include v.content-width();
 	}
 	contain: paint;
@@ -210,12 +197,9 @@ main {
 	position: absolute;
 	inset: 0;
 
-	// min-height: 100vh;
 	isolation: isolate;
 }
 .app-content-p {
-	// padding-block-start: calc(var(--top-bar-height) + 0px);
-	// padding-block-end: calc(var(--player-bar-height) + 4px);
 }
 .app-content-m {
 	margin-block-start: calc(var(--top-bar-height) + 0px);
@@ -239,9 +223,8 @@ main {
 }
 
 .container {
-	// margin: 0 auto;
 	max-width: 112rem;
-	// padding: 0 2rem;
+
 	position: relative;
 	display: flex;
 	width: 100%;

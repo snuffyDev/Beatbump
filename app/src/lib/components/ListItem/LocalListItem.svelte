@@ -31,6 +31,12 @@
 	}>();
 	const { page, parentPlaylistId = null } = CTX_ListItem.get();
 
+	$: isPlaying =
+		(page !== "queue" && page !== "release" ? $isPagePlaying.has($SPage.params.slug) : true) &&
+		$SessionListService.mix.length > 0 &&
+		$SessionListService.position === idx &&
+		$SessionListService.mix[idx]?.videoId === item.videoId;
+
 	let isHovering = false;
 	let width = 640;
 	let DropdownItems = [
@@ -38,7 +44,7 @@
 			text: "View Artist",
 			icon: "artist",
 			action: async () => {
-				goto(`/artist/${item.artistInfo.artist[0].browseId}`);
+				goto(`/artist/${item?.artistInfo ? item.artistInfo.artist[0].browseId : item?.subtitle[0].browseId}`);
 				await tick();
 				window.scrollTo({
 					behavior: "smooth",
@@ -190,22 +196,23 @@
 	}}
 >
 	<div class="index">
-		<span class:hidden={!isHovering}>
+		<span class:hidden={isPlaying !== true && isHovering !== true}>
+			<!--#9990a0-->
 			<Icon name="play-player" color="inherit" size="1.5em" />
 		</span>
-		<span class:hidden={isHovering}>
+		<span class:hidden={isPlaying !== false || isHovering !== false}>
 			{idx + 1}
 		</span>
 	</div>
 	<div class="metadata">
-		{#if item.thumbnails && item.thumbnails.length !== 0}
+		{#if Array.isArray(item?.thumbnails) && item.thumbnails.length !== 0}
 			<div class="thumbnail">
 				<img
-					loading="lazy"
 					decoding="async"
-					src={item.thumbnails[0]?.url}
-					width={item.thumbnails[0]?.width}
-					height={item.thumbnails[0]?.height}
+					loading="lazy"
+					src={item.thumbnails?.[0]?.url}
+					width={item.thumbnails?.[0]?.width}
+					height={item.thumbnails?.[0]?.height}
 					alt="thumbnail"
 				/>
 			</div>
@@ -220,13 +227,14 @@
 				{/if}
 			</span>
 			<div class="artists secondary">
-				{#if item.artistInfo?.artist}
-					{#each item?.artistInfo?.artist as subtitle}
+				{#if Array.isArray(item.subtitle)}
+					{#each item.subtitle as subtitle}
 						{#if subtitle?.browseId}
 							<a
 								class="artist secondary"
 								href={`/artist/${subtitle.browseId}`}
-								on:click={() => {
+								on:click|preventDefault={() => {
+									goto(`/artist/${subtitle.browseId}`);
 									fullscreenStore.set("closed");
 								}}
 								sveltekit:prefetch>{subtitle.text}</a

@@ -29,7 +29,6 @@
 	from {
 		transform: translate(100%, 50%);
 		opacity: 1;
-		// transform: translate(0, 0);
 	}
 }
 @mixin anim($name: "slide-up") {

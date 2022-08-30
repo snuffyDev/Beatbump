@@ -295,6 +295,7 @@
 		-webkit-overflow-scrolling: touch;
 		display: block;
 		overscroll-behavior: contain;
+		will-change: padding;
 	}
 
 	svelte-virtual-list-contents {
