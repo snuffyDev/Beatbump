@@ -22,8 +22,6 @@ jobs:
       - name: Check out the repo
 
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Log in to Docker Hub
         if: github.event_name != 'pull_request'
@@ -42,7 +40,7 @@ jobs:
 
         with:
           images: snuffydev/beatbump
-					tags: |
+          tags: |
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
