@@ -371,6 +371,8 @@
 	@import "../../../global/redesign/utility/mixins/media-query";
 
 	article {
+		--thumbnail-radius: clamp(4px, calc(var(--column-width, 0px) - 32px) * 0.025, 8px);
+
 		padding: 0.75em;
 		margin-bottom: 1em;
 		// min-width: 100%;
@@ -407,9 +409,9 @@
 		text-align: center;
 	}
 	.image.isArtistKind {
-		height: 14em;
+		height: var(--thumbnail-size);
 		// width: 14em;
-		border-radius: 99999em;
+		border-radius: 99999em !important;
 	}
 	a {
 		color: inherit;
@@ -437,6 +439,7 @@
 		// width: 15em;
 	}
 	.item16x9 {
+		width: calc(var(--column-width) * 2.5);
 	}
 	.img1x1 {
 		// width: 100%;
@@ -474,7 +477,7 @@
 		position: relative;
 		cursor: pointer;
 		user-select: none;
-		border-radius: $sm-radius;
+		border-radius: var(--thumbnail-radius);
 		overflow: hidden;
 		display: flex;
 		align-items: center;
@@ -583,8 +586,8 @@
 		top: 0;
 		width: 100%;
 		height: 100%;
-		border-radius: 2px;
 		overflow: hidden;
+		border-radius: var(--thumbnail-radius);
 	}
 	.hidden {
 		display: none !important;

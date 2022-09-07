@@ -120,6 +120,8 @@
 	@include media-query(xl) {
 		--thumbnail-size: 15em;
 	}
+
+	--column-width: calc(var(var(--thumbnail-size)) + 1.25em);
 }
 
 .scroll {

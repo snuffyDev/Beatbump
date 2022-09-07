@@ -2,7 +2,7 @@ version: "3"
 
 services:
   app:
-    image: "snuffydev/beatbump:latest"
+    image: "snuffydev/beatbump:master"
     build:
       context: ./app
       dockerfile: Dockerfile
@@ -11,7 +11,7 @@ services:
     ports:
       - "443:${PORT}"
     environment:
-      PORT: 3000
+      PORT: 33125
       VITE_DOMAIN: "beatbump.ml"
       VITE_SITE_URL: "https://beatbump.ml"
       VITE_DONATION_URL: "https://www.paypal.com/donate/?hosted_button_id=E6YRHKS2H2KP2"
