@@ -46,7 +46,7 @@ jobs:
 
         with:
           context: .
-
+          build-args: PORT=3000
           push: true
 
           tags: ${{ steps.meta.outputs.tags }}
