@@ -22,7 +22,7 @@
 </script>
 
 <div class="list">
-	{#each items as item, i (item)}
+	{#each items as item, i (i)}
 		<div
 			class="item-wrapper"
 			out:send={{ duration: 400, key: i }}
@@ -35,4 +35,7 @@
 </div>
 
 <style lang="scss">
+	.list {
+		contain: paint style;
+	}
 </style>

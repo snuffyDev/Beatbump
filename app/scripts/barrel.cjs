@@ -3,7 +3,7 @@
 const fs = require("fs");
 const _path = require("path");
 
-const BASE_PATH = _path.resolve(__dirname, "../src/lib/stores");
+const BASE_PATH = _path.resolve(__dirname, "../src/lib/utils");
 
 const makePath = (...str) => _path.join(...str);
 const TypeExport = /(?<=export (?:enum|type|interface)[\s]?)(\w+)/gm;

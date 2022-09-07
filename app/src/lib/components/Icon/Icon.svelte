@@ -2,7 +2,8 @@
 
 <script lang="ts">
 	import icons from "./icons";
-	export let name;
+	type IconName<Keys extends keyof typeof icons = keyof typeof icons> = Keys
+	export let name: IconName;
 	export let size = "1.5rem";
 	export let color = "var(--stroke, currentColor)";
 	export let fill = "none";

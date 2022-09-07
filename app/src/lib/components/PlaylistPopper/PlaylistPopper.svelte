@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as db from "$lib/db";
+	import { IDBService } from "$lib/workers/db/service";
 
 	import { showAddToPlaylistPopper } from "$lib/stores/stores";
 	import List from "./List.svelte";
@@ -14,8 +14,7 @@
 	let showConfirmation: { index?: number; state?: boolean };
 	$: playlists = [];
 	const fetchPlaylists = async () => {
-		const promise = await db.getPlaylists();
-		playlists = promise.length !== 0 && [...promise];
+		const promise = await IDBService.sendMessage("get", "playlists");
 	};
 	$: if (isShowing) fetchPlaylists();
 	const dispatch = createEventDispatcher();
@@ -31,7 +30,7 @@
 			showCreatePlaylist = false;
 		}}
 		on:submit={async (e) => {
-			const promise = await db.createNewPlaylist({
+			const promise = await IDBService.sendMessage("create", "playlist", {
 				name: e.detail?.title,
 				description: e.detail?.description,
 				thumbnail:
@@ -61,8 +60,8 @@
 				on:click={async (e) => {
 					showConfirmation = { index: e.detail, state: true };
 					const playlist = playlists[e.detail];
-					const items = [...playlist?.items, Array.isArray(item) ? [...item] : item];
-					const promise = await db.updatePlaylist({
+					const items = [...playlist?.items, Array.isArray(item) ? [...item] : [item]];
+					const promise = await IDBService.sendMessage("update", "playlist", {
 						hideAlert: false,
 						id: playlist.id,
 						items: items,

@@ -38,13 +38,14 @@ type Store = {
 
 const metatags = (): Store => {
 	const { subscribe, set, update } = writable(tags);
+	let origin = "https://beatbump.ml";
 	const desc = (desc) => update((d) => ({ ...d, description: desc, "og:description": desc }));
 	const title = (title) => update((t) => ({ ...t, title: title, "og:title": title }));
 	const url = (url) =>
 		update((u) => ({
 			...u,
-			"og:url": "https://beatbump.ml" + url,
-			url: "https://beatbump.ml" + url,
+			"og:url": origin + url,
+			url: origin + url,
 		}));
 	const image = (image) =>
 		update((i) => ({
@@ -52,7 +53,8 @@ const metatags = (): Store => {
 			image: image,
 			"og:image": image,
 		}));
-	const init = (_title, _url, _desc, _image = "https://beatbump.ml" + "/favicon.png") => {
+	const init = (_origin: string, _title: string, _url: string, _desc: string | undefined, _image = _origin + "/favicon.png") => {
+		_origin && (origin = origin);
 		_title && title(_title);
 		_url && url(_url);
 		_desc && desc(_desc);

@@ -1,18 +1,21 @@
 .m-item {
 	display: flex;
 	height: 5.25em;
-	padding: 0.5em 1em;
+	padding: 0em 1em;
 	cursor: pointer;
 	justify-content: space-between;
 	align-content: center;
 	touch-action: auto;
 	line-height: 1.5;
-	@media screen and (min-width: 640px) {
+	@media screen and (min-width: 720px) {
 		display: grid;
 		flex: none;
 		align-content: center;
 		grid-template-areas: "left middle right";
-		grid-template-columns: 1.5em 1fr 2.45em;
+		grid-template-columns: 1.5em calc(100% - 4.025em) 2.45em;
+	}
+	@supports (content-visibility: auto) {
+		content-visibility: auto;
 	}
 }
 .isPlaying {
@@ -22,7 +25,7 @@
 .index {
 	display: none;
 	visibility: none;
-	@media screen and (min-width: 640px) {
+	@media screen and (min-width: 720px) {
 		width: 1.5em;
 		font-weight: 600;
 		grid-area: left;
@@ -43,9 +46,9 @@
 	overflow: hidden;
 	white-space: nowrap;
 	display: block;
-	max-width: calc(100% - 5ch);
-	@media screen and (min-width: 640px) {
-		max-width: calc(100vw - 80vmin);
+	max-width: calc(100%);
+	@media screen and (min-width: 720px) {
+		max-width: calc(100% - 0.2em);
 	}
 }
 
@@ -56,11 +59,11 @@
 	grid-area: middle;
 	flex-direction: row;
 
-	gap: 0.95em;
+	gap: 0.875em;
 
 	align-items: center;
 	width: 100%;
-	max-width: calc(100% - 2.45em);
+	max-width: calc(100% - 3em);
 }
 .column {
 	display: flex;
@@ -100,7 +103,7 @@
 	max-height: 4.25em;
 
 	border-radius: var(--xs-radius);
-	@media screen and (min-width: 640px) {
+	@media screen and (min-width: 720px) {
 		margin-left: 1em;
 	}
 }

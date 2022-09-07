@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as db from "$lib/db";
+	import { IDBService } from "$lib/workers/db/service";
 
 	export let item = {};
 	export let i;

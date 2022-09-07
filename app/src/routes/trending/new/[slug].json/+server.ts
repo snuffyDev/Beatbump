@@ -88,7 +88,7 @@ export const GET: RequestHandler = async ({ params }) => {
 		return wordParts.join(" ");
 	};
 	// console.log(sections)
-	return json$1({ title: getTitle(), sections, header: text });
+	return json$1({ title: getTitle(), sections, header: text, data });
 };
 
 function parseHeader({ musicCarouselShelfBasicHeaderRenderer }): CarouselHeader {
@@ -117,13 +117,13 @@ function parseBody(contents = []):
 	| ICarouselTwoRowItem[]
 	| IListItemRenderer[]
 	| {
-			text: any;
-			color: string;
-			endpoint: {
-				params: any;
-				browseId: any;
-			};
-	  }[] {
+		text: any;
+		color: string;
+		endpoint: {
+			params: any;
+			browseId: any;
+		};
+	}[] {
 	let items = [];
 	for (let index = 0; index < contents.length; index++) {
 		const element = contents[index];

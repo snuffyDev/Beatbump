@@ -6,16 +6,19 @@ import node from "@sveltejs/adapter-node";
 import path from "path";
 import sveltePreprocess from "svelte-preprocess";
 import dotenv from "dotenv";
+import * as autoprefixer from "autoprefixer";
+import * as cssnano from "cssnano";
 
 dotenv.config();
 
 const dev = process.env["NODE_ENV"] === "development";
 const ENV_ADAPTER = process.env["BB_ADAPTER"] ?? "cloudflare-workers";
+
 const adapters = {
 	"cloudflare-workers": adapterCfw(),
 	vercel: vercel(),
 	netlify: netlify({ edge: false, split: false }),
-	node: node({"precompress":false}),
+	node: node({ precompress: false }),
 };
 
 const adapter = adapters[ENV_ADAPTER];
@@ -30,7 +33,7 @@ const config = {
 			renderSync: true,
 			stripIndent: true,
 		},
-		postcss: true,
+		postcss: { configFilePath: path.resolve("./postcss.config.cjs") },
 	}),
 
 	kit: {

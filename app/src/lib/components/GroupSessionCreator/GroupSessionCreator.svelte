@@ -1,16 +1,17 @@
 <script lang="ts">
 	import { browser } from "$app/env";
+	import { page } from "$app/stores";
 	import { clickOutside } from "$lib/actions/clickOutside";
 
 	import { showGroupSessionCreator } from "$lib/stores";
 
 	import { groupSession } from "$lib/stores/sessions";
 
-	import { IsoBase64 } from "$lib/utils/buffer";
-	import { sanitize } from "$lib/utils/strings";
+	import { IsoBase64 } from "$lib/utils";
+	import { sanitize } from "$lib/utils";
+	import { SITE_ORIGIN_URL } from "$stores/url";
 	import { tick } from "svelte";
 	import { fade } from "svelte/transition";
-	import { ENV_SITE_URL } from "../../../env";
 	import Button from "../Button";
 	let step = 0;
 	let displayName: string = "";
@@ -23,7 +24,7 @@
 		groupSession.init(displayName, "host", { forceSync: checked });
 		await tick();
 		step++;
-		sessionURL = `${import.meta.env.DEV ? "localhost:5000" : ENV_SITE_URL}/session?token=${IsoBase64.toBase64(
+		sessionURL = `${import.meta.env.DEV ? "localhost:5000" : $SITE_ORIGIN_URL}/session?token=${IsoBase64.toBase64(
 			JSON.stringify({
 				clientId: groupSession.client.clientId,
 				displayName: groupSession.client.displayName,

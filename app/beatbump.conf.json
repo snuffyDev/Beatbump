@@ -15,5 +15,6 @@
 			"edge": false,
 			"split": false
 		}
-	}
+	},
+	"port": 3000
 }

@@ -29,7 +29,7 @@ $breakpoint-widths: (
 	$min: min-breakpoint($name, $breakpoints);
 
 	@if $min {
-		@media screen and (min-width: $min) {
+		@media (min-width: $min) {
 			@content;
 		}
 	} @else {
@@ -40,7 +40,7 @@ $breakpoint-widths: (
 	$max: max-breakpoint($name, $breakpoints);
 
 	@if $max {
-		@media screen and (max-width: $max) {
+		@media (max-width: $max) {
 			@content;
 		}
 	} @else {
@@ -54,7 +54,7 @@ $breakpoint-widths: (
 	$max: max-breakpoint($between, $breakpoints);
 
 	@if $min != null and $max != null {
-		@media screen and (min-width: $min) and (max-width: $max) {
+		@media (min-width: $min) and (max-width: $max) {
 			@content;
 		}
 	} @else if $max == null {

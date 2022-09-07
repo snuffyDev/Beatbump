@@ -9,7 +9,7 @@ import { browser } from "$app/env";
 import type { Song } from "$lib/types";
 
 let userSettings: UserSettings;
-if (browser && settings) {
+if (browser && globalThis.self.name !== "IDB" && settings) {
 	settings.subscribe((value) => {
 		userSettings = value;
 	});
@@ -51,12 +51,13 @@ export function shuffle(array: any[], index: number): any[] {
 	array = [...array.slice(0, index), array[index], ...array.slice(index + 1).sort(() => Math.random() - 0.5)];
 	return array;
 }
-function format(seconds) {
+
+export function format(seconds: number) {
 	if (isNaN(seconds)) return "...";
 
 	const minutes = Math.floor(seconds / 60);
 	seconds = Math.floor(seconds % 60);
-	if (seconds < 10) seconds = "0" + seconds;
+	if (seconds < 10) seconds = ("0" + seconds as unknown) as number;
 
 	return `${minutes}:${seconds}`;
 }
@@ -76,7 +77,7 @@ export const addToQueue = async (videoId: string): Promise<Song> => {
 	}
 };
 
-export type ResponseBody = { original_url: string; url: string };
+export type ResponseBody = { original_url: string; url: string; };
 // Get source URLs
 export const getSrc = async (
 	videoId?: string,
@@ -88,27 +89,22 @@ export const getSrc = async (
 	error?: boolean;
 }> => {
 	try {
-		const webM = userSettings?.playback["Prefer WebM Audio"];
+
 		const res = await fetch(
-			`/api/player.json?videoId=${videoId}${playlistId ? `&playlistId=${playlistId}` : ""}${
-				params ? `&playerParams=${params}` : ""
+			`/api/player.json?videoId=${videoId}${playlistId ? `&playlistId=${playlistId}` : ""}${params ? `&playerParams=${params}` : ""
 			}`,
 		).then((res) => res.json());
-
+		if (res && !res?.streamingData && res?.playabilityStatus.status === "UNPLAYABLE") {
+			return handleError();
+		}
 		const formats = sort({
 			data: res,
-			WebM: webM,
-			dash: false,
+			dash: true,
 			proxyUrl: userSettings?.network["HLS Stream Proxy"] ?? "",
 		});
 		currentId.set(videoId);
 
-		// formats.dash = "data:application/dash+xml;charset=utf-8;base64," + btoa(formats.dash);
-
-		// if (shouldAutoplay) updatePlayerSrc({ url: formats.dash, original_url: formats.dash });
-		// return { body: { url: formats.dash, original_url: formats.dash } };
-		// return;
-		const src = setTrack(formats, webM, shouldAutoplay);
+		const src = setTrack(formats, shouldAutoplay);
 
 		return src;
 	} catch (err) {
@@ -117,11 +113,10 @@ export const getSrc = async (
 	}
 };
 
-function setTrack(formats: PlayerFormats, webM, shouldAutoplay) {
+function setTrack(formats: PlayerFormats, shouldAutoplay) {
 	let format;
-	if (userSettings?.playback?.Stream === "HLS") format = { original_url: formats?.hls, url: formats.hls };
-	else format = formats.streams[0];
-	// AudioPlayer.dispatch('play', { original_url: formats[0].original_url, url: parsedURL });
+	if (userSettings?.playback?.Stream === "HLS") { format = { original_url: formats?.hls, url: formats.hls }; }
+	else { format = formats.streams[0]; }
 	if (shouldAutoplay) updatePlayerSrc({ original_url: format.original_url, url: format.url });
 	return {
 		body: { original_url: format.original_url, url: format.url },
@@ -137,16 +132,17 @@ function handleError() {
 		error: true,
 	};
 }
-// export const queryParams = (params: Record<any, any>): string => {
-// 	const result = [];
-// 	for (const key in params) {
-// 		if (!params[key]) continue;
-// 		result.push(`${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`);
-// 	}
-// 	return result.join("&");
-// };
-export const queryParams = (params: Record<any, any>): string =>
-	map(Object.keys(params), (k) => {
-		if (params[k] === undefined) return;
-		return k + "=" + params[k];
-	}).join("&");
+
+export const queryParams = (params: Record<any, any>): string => {
+	const result = [];
+	for (const key in params) {
+		if (!params[key]) continue;
+		result.push(`${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`);
+	}
+	return result.join("&");
+};
+// export const queryParams = (params: Record<any, any>): string =>
+// 	map(Object.keys(params), (k) => {
+// 		if (params[k] === undefined) return;
+// 		return k + "=" + params[k];
+// 	}).join("&");

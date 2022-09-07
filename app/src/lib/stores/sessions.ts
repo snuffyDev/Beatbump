@@ -1,18 +1,17 @@
-import type { Item, JSON, Nullable } from "$lib/types";
-import type Peer from "peerjs";
-import type { DataConnection } from "peerjs";
-import { generateId } from "$lib/utils/id";
 import { browser } from "$app/env";
+import type { Item, JSON, Nullable } from "$lib/types";
+import { every, filter, iter } from "$lib/utils/collections";
 import { Logger } from "$lib/utils/logger";
 import { WritableStore } from "$lib/utils/stores";
-import { every, filter, findFirst, iter } from "$lib/utils/collections";
+import { generateId } from "$lib/utils/strings/id";
+import type Peer from "peerjs";
+import type { DataConnection } from "peerjs";
 import SessionListService, { type ISessionListProvider } from "./list";
 
-import { EventEmitter } from "$lib/utils/emitter";
 import { AudioPlayer } from "$lib/player";
+import { EventEmitter, Mutex } from "$lib/utils/sync";
 import { getSrc, notify } from "$lib/utils/utils";
 import { get } from "svelte/store";
-import { Mutex } from "$lib/utils/mutex";
 
 type BaseKind = "action" | "state" | "status";
 type Kind =
@@ -26,7 +25,6 @@ type Kind =
 type Command = "SEND" | "GET" | "CONNECT" | "DISCONNECT" | "CONFIG" | "PUT" | "PATCH";
 type Status = "OK" | "ERROR";
 
-const mutex = new Mutex();
 /// Client Types
 export type ConnectionState = {
 	finished?: boolean;
@@ -94,7 +92,7 @@ interface GroupSessionController {
 	/** Send a command to connected clients */
 	send(command: Command, type: Kind, data: JSON, metadata?: Client): void;
 	/** Send client state to other clients in session */
-	sendGroupState(clientState: { client: string; state: ConnectionState }): void;
+	sendGroupState(clientState: { client: string; state: ConnectionState; }): void;
 
 	// #endregion Public Methods (6)
 }
@@ -129,20 +127,23 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 	private _settings: Settings;
 	private _type: "host" | "guest";
 	private _unsubscriber: () => void;
-
+	private _lock: Mutex;
 	// #endregion Properties (15)
 
 	// #region Constructors (1)
 
 	constructor() {
 		super({});
-		if (!browser) return;
+		this._lock = new Mutex();
 
 		// Import PeerJS here since importing it normally would
 		// crash during SSR
-		import("peerjs").then((module) => {
-			this._peerJs = module.default;
-		});
+		if (browser) {
+
+			import("peerjs").then((module) => {
+				this._peerJs = module.default;
+			});
+		};
 
 		// Listen to the connectionStates store for
 		// keeping accurate track of state
@@ -212,7 +213,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 	public async addToQueue(item: Item, position: number): Promise<void> {
 		if (!this.initialized && !this.hasActiveSession) return;
 
-		await mutex.do(() => {
+		await this._lock.do(() => {
 			SessionListService.setTrackWillPlayNext(item, position).then(() => {
 				this.send("PUT", "state.update.mix", SessionListService.toJSON(), this.client);
 			});
@@ -320,7 +321,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 		if (metadata.clientId === this.client.clientId) return;
 
 		// Logger.debug([`Processing Message`, command, data, metadata, type]);
-		return mutex.do(() => {
+		return this._lock.do(() => {
 			/** Get a user-defined track  */
 			if (command === "GET" && type === "action.mix.init") {
 				SessionListService.initAutoMixSession({ videoId: data as string });
@@ -380,7 +381,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 			if (command === "PATCH") {
 				/** Gets the next or previous track */
 				if (type === "state.update.position") {
-					const { dir = undefined, position = 0 }: { dir: "<-" | "->" | undefined; position: number } = data as {
+					const { dir = undefined, position = 0 }: { dir: "<-" | "->" | undefined; position: number; } = data as {
 						dir: "<-" | "->" | undefined;
 						position: number;
 					};
@@ -421,7 +422,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 		});
 	}
 
-	public sendGroupState(clientState: { client: string; state: ConnectionState }): void {
+	public sendGroupState(clientState: { client: string; state: ConnectionState; }): void {
 		this._connectionStates.update((u) => ({ ...u, [this.client.clientId]: clientState["state"] }));
 
 		this.send("PATCH", "state", clientState, this.client);
@@ -429,7 +430,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 
 	public setAutoMix(
 		type: "automix" | "playlist",
-		{ videoId = "", playlistId = "" }: { videoId?: string; playlistId?: string },
+		{ videoId = "", playlistId = "" }: { videoId?: string; playlistId?: string; },
 	): Status {
 		return this.initializeHostPlayback("automix", { videoId, playlistId });
 	}
@@ -506,7 +507,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 	/// Client State Handling
 	private initializeHostPlayback(
 		kind: "automix" | "playlist",
-		data: { videoId?: Nullable<string>; playlistId?: Nullable<string> } = { videoId: "", playlistId: "" },
+		data: { videoId?: Nullable<string>; playlistId?: Nullable<string>; } = { videoId: "", playlistId: "" },
 	) {
 		try {
 			if (kind === "automix") {

@@ -1,4 +1,4 @@
-export default function debounce<T>(cb: (...args: T[]) => void, timeout = 500) {
+export function debounce<T>(cb: (...args: T[]) => void, timeout = 500) {
 	let timer;
 	return (...args: T[]) => {
 		clearTimeout(timer);

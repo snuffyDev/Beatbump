@@ -3,18 +3,20 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import Loading from "$components/Loading/Loading.svelte";
-	import { setNewFavorite } from "$lib/db";
 	import { groupSession } from "$lib/stores";
+	import { IDBService } from "$lib/workers/db/service";
+
 	import list from "$lib/stores/list";
 	import type { Item } from "$lib/types";
 	import { Logger, notify } from "$lib/utils";
 	import { currentTitle, showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
-	import { ENV_SITE_URL } from "./../../../env";
+	import { page } from "$app/stores";
 	import { tick } from "svelte";
 	import { PopperButton, PopperStore } from "../Popper";
 	import { browseHandler } from "./functions";
 	import { browser } from "$app/env";
-	import { IsoBase64 } from "$lib/utils/buffer";
+	import { IsoBase64 } from "$lib/utils";
+	import { SITE_ORIGIN_URL } from "$stores/url";
 	export let index;
 	export let item: Item & { idx?: number };
 	export let type = "";
@@ -84,7 +86,7 @@
 			text: "Favorite",
 			icon: "heart",
 			action: () => {
-				setNewFavorite(item);
+				IDBService.sendMessage("create", "favorite", item);
 			},
 		},
 		!groupSession.hasActiveSession
@@ -103,8 +105,7 @@
 						if (!browser) return;
 						const shareData = {
 							title: `Join ${groupSession.client.displayName}'s Beatbump Session`,
-
-							url: `${import.meta.env.DEV ? "localhost:5173" : ENV_SITE_URL}/session?token=${encodeURIComponent(
+							url: `${import.meta.env.DEV ? "localhost:5173" : $SITE_ORIGIN_URL}/session?token=${encodeURIComponent(
 								IsoBase64.toBase64(
 									JSON.stringify({
 										clientId: groupSession.client.clientId,
@@ -139,26 +140,26 @@
 				let shareData = {
 					title: item.title,
 
-					url: `${ENV_SITE_URL}/listen?id=${item.videoId}`,
+					url: `${$SITE_ORIGIN_URL}/listen?id=${item.videoId}`,
 				};
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_PLAYLIST")) {
 					shareData = {
 						title: item.title,
 
-						url: `${ENV_SITE_URL}/playlist/${item.endpoint?.browseId}`,
+						url: `${$SITE_ORIGIN_URL}/playlist/${item.endpoint?.browseId}`,
 					};
 				}
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ALBUM")) {
 					shareData = {
 						title: item.title,
 
-						url: `${ENV_SITE_URL}/release?id=${item.endpoint?.browseId}`,
+						url: `${$SITE_ORIGIN_URL}/release?id=${item.endpoint?.browseId}`,
 					};
 				}
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST")) {
 					shareData = {
 						title: item.title,
-						url: `${ENV_SITE_URL}/artist/${item.endpoint?.browseId}`,
+						url: `${$SITE_ORIGIN_URL}/artist/${item.endpoint?.browseId}`,
 					};
 				}
 				try {
@@ -210,7 +211,7 @@
 		}
 		if (type == "home") {
 			item?.endpoint?.pageType.includes("ARTIST") && goto(`/artist/${item?.endpoint?.browseId}`);
-			// if has videoId, and endpoint type is artist page, and is not Browse type
+
 			!isBrowseEndpoint && item.videoId !== undefined && !item?.endpoint?.pageType.includes("ARTIST")
 				? await list.initAutoMixSession({
 						videoId: item.videoId,
@@ -221,7 +222,7 @@
 		}
 		if (type == "artist") {
 			item?.endpoint?.pageType.includes("ARTIST") && goto(`/artist/${item?.endpoint?.browseId}`);
-			// if has videoId, and endpoint type is artist page, and is not Browse type
+
 			!isBrowseEndpoint && item.videoId !== undefined && !item?.endpoint?.pageType.includes("ARTIST")
 				? await list.initAutoMixSession({
 						videoId: item.videoId,
@@ -233,13 +234,9 @@
 		}
 	};
 
-	// $:console.log(item.thumbnails)
-
 	if (kind === "Singles") {
 		DropdownItems.splice(1, 1);
 		DropdownItems = DropdownItems;
-
-		// console.log(DropdownItems)
 	}
 	if (item?.endpoint?.pageType) {
 		DropdownItems = [
@@ -251,17 +248,27 @@
 		];
 	}
 
-	if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_PLAYLIST")) {
+	if (item.endpoint?.pageType?.match(/MUSIC_PAGE_TYPE_(PLAYLIST|ALBUM)/)) {
 		DropdownItems = [
 			{
-				action: () => list.initPlaylistSession({ playlistId: item.playlistId }),
+				action: () => list.initPlaylistSession({ playlistId: item.playlistId, params: "wAEB8gECKAE%3D" }),
 				icon: "shuffle",
-				text: "Shuffle Playlist",
+				text: "Shuffle Play",
+			},
+			{
+				action: () => list.initPlaylistSession({ playlistId: item.playlistId }),
+				icon: "queue",
+				text: "Play Next",
+			},
+			{
+				action: () => list.initPlaylistSession({ playlistId: "RDAMPL" + item.playlistId, params: "wAEB8gECeAE%3D" }),
+				icon: "radio",
+				text: "Start Radio",
 			},
 			...DropdownItems,
 		];
 	}
-	if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST")) {
+	if (type === "artist" || item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST")) {
 		DropdownItems = [
 			...DropdownItems.filter((item) => {
 				if (!item.text.match(/Favorite|Add to Queue|View Artist|Add to Playlist/gm)) {
@@ -298,39 +305,44 @@
 	on:click|stopPropagation={(e) => clickHandler(e, index)}
 >
 	<section
-		class="item-thumbnail"
-		on:focus
+		class="item-thumbnail-wrapper"
 		class:img16x9={RATIO_RECT ? true : false}
 		class:img1x1={RATIO_SQUARE ? true : false}
-		on:blur
 	>
-		<div
-			class="image"
-			class:active
-			class:isArtistKind
+		<section
+			class="item-thumbnail"
+			on:focus
 			class:img16x9={RATIO_RECT ? true : false}
 			class:img1x1={RATIO_SQUARE ? true : false}
-			tabindex="0"
+			class:isArtistKind
+			on:blur
 		>
-			{#if loading}
-				<Loading />
-			{/if}
-			<img
-				alt="thumbnail"
-				decoding="sync"
-				loading="lazy"
-				on:error={errorHandler}
-				class:img16x9={RATIO_RECT}
-				class:img1x1={RATIO_SQUARE}
-				width={srcImg.width}
-				height={srcImg.height}
-				src={srcImg.placeholder}
-				data-src={srcImg.width < 100 ? srcImg.url.replace(/=w\d+-h\d+-/gm, "=w240-h240-") : srcImg.url}
-			/>
-		</div>
-		<div class="item-menu">
-			<PopperButton tabindex="0" items={DropdownItems} />
-		</div>
+			<div
+				class="image"
+				class:active
+				class:isArtistKind
+				class:img16x9={RATIO_RECT ? true : false}
+				class:img1x1={RATIO_SQUARE ? true : false}
+				tabindex="0"
+			>
+				{#if loading}
+					<Loading />
+				{/if}
+				<img
+					alt="thumbnail"
+					on:error={errorHandler}
+					class:img16x9={RATIO_RECT}
+					class:img1x1={RATIO_SQUARE}
+					width={srcImg.width}
+					height={srcImg.height}
+					src={srcImg.placeholder}
+					data-src={srcImg.width < 100 ? srcImg.url.replace(/=w\d+-h\d+-/gm, "=w240-h240-") : srcImg.url}
+				/>
+			</div>
+			<div class="item-menu">
+				<PopperButton tabindex="0" items={DropdownItems} />
+			</div>
+		</section>
 	</section>
 	<section class="item-title" class:isArtistKind>
 		<span class="h1 link">
@@ -356,10 +368,47 @@
 </article>
 
 <style lang="scss">
+	@import "../../../global/redesign/utility/mixins/media-query";
+
+	article {
+		padding: 0.75em;
+		margin-bottom: 1em;
+		// min-width: 100%;
+
+		scroll-snap-align: start;
+
+		contain: layout paint style;
+
+		@media (hover: hover) {
+			&:hover {
+				.image::before {
+					background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
+					opacity: 0.7;
+					z-index: 1;
+				}
+			}
+		}
+	}
+	.item-thumbnail-wrapper {
+		padding-top: 100%;
+		position: relative;
+		overflow: hidden;
+		display: block;
+		margin-bottom: 0.5em;
+
+		&.img16x9 {
+			padding-top: 56.25%;
+		}
+		&.img1x1 {
+			padding-top: 100%;
+		}
+	}
 	.item-title.isArtistKind {
 		text-align: center;
 	}
 	.image.isArtistKind {
+		height: 14em;
+		// width: 14em;
 		border-radius: 99999em;
 	}
 	a {
@@ -384,35 +433,22 @@
 		}
 	}
 	.item1x1 {
-		// padding-top: 100% !important;
-		// width: 100%;
-		// min-width: em;
-		// width: clamp(13.5em, 14.75em, 18em);
-		// max-width: 18em !important;
 		position: relative;
+		// width: 15em;
 	}
 	.item16x9 {
-		// width: 100%;
-		// width: 100%;
-		// width: clamp(13.5em, 25em, 26em);
-		// max-width: 18em !important;
 	}
 	.img1x1 {
-		// padding-top: 100% !important;
 		// width: 100%;
-		// min-width: 100%;
+
 		aspect-ratio: 1/1 !important;
-		height: 14em;
-		// width: clamp();
+		height: var(--thumbnail-size);
+		width: var(--thumbnail-size);
 	}
 	.img16x9 {
-		// padding-top: 56.25% !important;
-		// max-width: 100%;
-		// width: 23em;
 		min-width: 100%;
-		height: 14em;
+		height: var(--thumbnail-size);
 		aspect-ratio: 16/9 !important;
-		// width: clamp(13rem, 22rem, 22rem) !important;
 	}
 	.subtitles {
 		display: block;
@@ -421,7 +457,7 @@
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		// white-space: nowrap;
+
 		cursor: pointer;
 	}
 	.h1 {
@@ -430,41 +466,20 @@
 		font-weight: 400 !important;
 		display: inline;
 	}
-	article {
-		padding: 0.75em;
-		margin-bottom: 1em;
-		min-width: 100%;
-		scroll-snap-align: start;
-		// padding-right: 1rem;
 
-		contain: layout paint style;
-		// ::before {
-		// 	position: absolute;
-		// 	display: block;
-		// 	content: '';
-		// 	padding-top: calc(100% * 2 / 3);
-		// }
-		@media (hover: hover) {
-			&:hover {
-				.image::before {
-					// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
-					background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
-					opacity: 0.7;
-					z-index: 1;
-				}
-			}
-		}
-	}
 	.image {
 		width: 100%;
-		// height: 100%;
-		// height: 100%;
+
 		min-height: 100%;
 		position: relative;
 		cursor: pointer;
 		user-select: none;
 		border-radius: $sm-radius;
 		overflow: hidden;
+		display: flex;
+		align-items: center;
+		width: 100%;
+		height: 100%;
 
 		&:focus {
 			border: none;
@@ -478,30 +493,28 @@
 			pointer-events: none;
 			transition: background linear 0.1s, opacity linear 0.1s;
 			opacity: 0.1;
-			// z-index: 1;
 		}
 
 		&:active:hover::before {
-			// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
 			background: linear-gradient(rgba(0, 0, 0, 0.589), rgba(0, 0, 0, 0.11));
 			opacity: 1;
 			z-index: 1;
 		}
-		// padding-top: 100%;
 
 		img {
-			// width: inherit;
 			height: inherit;
 			aspect-ratio: inherit;
 			user-select: none;
 			contain: content;
 			object-fit: cover;
-			// min-width: 100%;
-			// min-height: 100%;
+			width: inherit;
+
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
 		}
 		@media screen and (max-width: 640px) {
 			&::before {
-				// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
 				background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
 				opacity: 0.7;
 				z-index: 1;
@@ -513,8 +526,6 @@
 
 	.item {
 		isolation: isolate;
-
-		// cursor: pointer;
 	}
 	.image:hover {
 		+ .item-menu {
@@ -552,7 +563,6 @@
 	@mixin active {
 		> .image {
 			&::before {
-				// transition: all cubic-bezier(0.42, 0.16, 0.58, 0.8) 0.2s !important;
 				background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
 				opacity: 0.7;
 				z-index: 1;
@@ -562,7 +572,6 @@
 	.item-thumbnail {
 		position: relative;
 		cursor: pointer;
-		margin-bottom: 0.5em;
 
 		contain: paint;
 
@@ -570,6 +579,12 @@
 		&:focus-within {
 			@include active;
 		}
+		position: absolute;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		border-radius: 2px;
+		overflow: hidden;
 	}
 	.hidden {
 		display: none !important;

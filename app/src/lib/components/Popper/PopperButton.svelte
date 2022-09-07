@@ -2,8 +2,8 @@
 </script>
 
 <script lang="ts">
-	import debounce from "$lib/utils/debounce";
-	import throttle from "$lib/utils/throttle";
+	import { debounce, throttle } from "$lib/utils/sync";
+
 
 	import Icon from "../Icon/Icon.svelte";
 	import { isOpen } from "./popperStore";

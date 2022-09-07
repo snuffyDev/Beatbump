@@ -73,7 +73,7 @@
 	}
 	@media screen and (min-width: 48rem) {
 		.item {
-			max-width: 16rem;
+			max-width: 15rem;
 		}
 	}
 </style>

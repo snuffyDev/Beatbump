@@ -1,7 +1,7 @@
 import { parseNextItem } from "$lib/parsers";
 import type { Item } from "$lib/types";
 import { addToQueue, getSrc, notify, type ResponseBody } from "$lib/utils";
-import { Mutex } from "$lib/utils/mutex";
+import { Mutex } from "$lib/utils/sync";
 import { splice } from "$lib/utils/collections/array";
 import { writable, get } from "svelte/store";
 import { playerLoading, currentTitle, filterAutoPlay } from "../stores";
@@ -114,7 +114,7 @@ function _sessionListService() {
 			}
 		},
 		async initPlaylistSession(args) {
-			const { playlistId = "", index = 0 } = args;
+			const { playlistId = "", index = 0, params = "" } = args;
 			playerLoading.set(true);
 			// console.log(args, { mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
 			if (mix.length && playlistId === currentMixId && chunkedPlaylistMap.size !== 0) {
@@ -140,16 +140,15 @@ function _sessionListService() {
 				playerLoading.set(false);
 				return await getSrc(mix[index]?.videoId, playlistId);
 			}
-			if (mix.length !== 0) mix = [];
+			if (mix.length !== 0) {
+				position = 0;
+				mix = [];
+			};
 			currentMixType = "playlist";
 			try {
-				console.log("playlist", currentMixType);
-				const data = await fetch(`/api/get_queue.json?playlistId=${playlistId}`).then((data) => data.json());
-				// console.log(data);
-				mix = [...data];
-				mix = [...mix.filter((item) => item.title)];
-				console.log(args, data, mix);
-
+				const data = await fetchNext({ params, playlistId: playlistId, });
+				mix.push(...data.results);
+				mix = mix.filter((item) => item.title);
 				if (mix.length > 50) {
 					console.log(mix);
 
@@ -263,9 +262,12 @@ function _sessionListService() {
 				commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
 				return await src.body;
 			}
-			console.log("other session");
+			console.log("ARGS", { clickTrackingParams, ctoken, itct, key, playlistId, videoId });
 			internalIdx += 24;
-
+			if (!clickTrackingParams && !ctoken) {
+				playlistId = "RDAMPL" + playlistId;
+				itct = "wAEB8gECeAE%3D";
+			}
 			const data = await fetchNext({
 				visitorData,
 				params: itct,

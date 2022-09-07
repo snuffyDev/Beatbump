@@ -1,7 +1,9 @@
 FROM node:18-alpine3.15
 
 WORKDIR /app
-# RUN apk add --update nodejs npm
+
+ARG PORT
+ENV PORT ${PORT}
 # install dependencies
 COPY package.json package-lock.json ./
 
@@ -23,10 +25,7 @@ COPY --from=0 /app/svelte.config.js .
 COPY --from=0 /app/vite.config.ts .
 COPY --from=0 /app/package.json ./
 
-ENV VITE_DOMAIN="localhost"
-ENV VITE_SITE_URL="http://localhost:3000"
-ENV ORIGIN="http://localhost:3000"
-ENV PORT=3000
 
 EXPOSE 3000
+
 CMD [ "node", "./build"]

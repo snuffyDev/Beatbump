@@ -4,20 +4,20 @@ import { iter } from "$lib/utils/collections";
 export default function observer(node: HTMLElement) {
 	if (IntersectionObserver) {
 		const children = node.querySelectorAll("img");
-		const observer = new IntersectionObserver(
-			async (entries: IntersectionObserverEntry[]) => {
-				Promise.resolve().then(() => {
-					iter(entries, (entry) => {
-						const target = entry.target as HTMLImageElement;
-						if (entry.isIntersecting) {
-							// target.dataset.loaded = "true";
-							target.loading = "eager";
-							target.src = target.dataset.src;
-							observer.unobserve(node);
-						}
-					});
-				});
-			},
+
+		const observer = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
+			for (let idx = 0; idx < entries.length; idx++) {
+				const entry = entries[idx];
+				const target = entry.target as HTMLImageElement;
+				if (entry.isIntersecting) {
+
+					target.loading = "eager";
+					target.src = target.dataset.src;
+					observer.unobserve(node);
+				}
+
+			}
+		},
 			{ root: node, threshold: 0, rootMargin: "145px 65px" },
 		);
 

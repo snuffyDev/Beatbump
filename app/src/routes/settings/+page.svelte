@@ -66,11 +66,18 @@
 		<div class="setting">
 			<label for="proxy">Audio Proxy Server </label>
 			<div class="input-container">
-				<div class="input">
+				<div class="input no-btn mb-1">
 					<input
 						type="text"
+						on:input={(e) => {
+							let value = e.currentTarget.value;
+							if (!value.match(/^https?:\/\//gm)) value = "https://" + value;
+							if (!value.endsWith("/")) value = value + "/";
+
+							$settings["network"]["HLS Stream Proxy"] = value;
+						}}
 						placeholder="https://yt-hls-rewriter.onrender.com/"
-						bind:value={$settings["network"]["HLS Stream Proxy"]}
+						value={$settings["network"]["HLS Stream Proxy"]}
 					/>
 				</div>
 				<span
@@ -131,12 +138,18 @@
 
 	.setting {
 		display: inline-flex;
-		margin-top: 1em;
 		color: inherit;
 		vertical-align: top;
-		margin-bottom: 1em;
+
 		gap: 1em;
 		flex-direction: column;
+		margin-block: 1em;
+		&:first-of-type {
+			margin-block-start: 0em;
+		}
+		&:last-of-type {
+			margin-block-end: 2em;
+		}
 		@media screen and (min-width: 40rem) {
 			align-items: center;
 			flex-direction: row;

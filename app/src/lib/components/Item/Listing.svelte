@@ -9,14 +9,16 @@
 	import { goto } from "$app/navigation";
 	import list, { queue, queuePosition, currentTrack } from "$lib/stores/list";
 	import type { Item } from "$lib/types";
-	import * as db from "$lib/db";
+	import { IDBService } from "$lib/workers/db/service";
 	import { browser } from "$app/env";
 	import { createEventDispatcher } from "svelte";
 	import { PopperButton, PopperStore } from "../Popper";
 	import { filter, Logger, notify } from "$lib/utils";
 	import { groupSession } from "$lib/stores";
-	import { ENV_SITE_URL } from "./../../../env";
-	import { IsoBase64 } from "$lib/utils/buffer";
+
+	import { IsoBase64 } from "$lib/utils";
+	import { page } from "$app/stores";
+	import { SITE_ORIGIN_URL } from "$stores/url";
 
 	const dispatch = createEventDispatcher();
 	let isLibrary = hasContext("library") ? true : false;
@@ -97,9 +99,9 @@
 			action: async () => {
 				// console.log(data)
 				if (!browser) return;
-				!isLibrary && (await db.setNewFavorite(data));
+				!isLibrary && IDBService.sendMessage("create", "favorite", data);
 				if (isLibrary) {
-					await db.deleteFavorite(data);
+					await IDBService.sendMessage("delete", "favorite", data);
 					dispatch("update");
 				}
 			},
@@ -121,7 +123,7 @@
 						const shareData = {
 							title: `Join ${groupSession.client.displayName}'s Group Session on Beatbump!`,
 
-							url: `${ENV_SITE_URL}/session?token=${IsoBase64.toBase64(
+							url: `${$SITE_ORIGIN_URL}/session?token=${IsoBase64.toBase64(
 								JSON.stringify({
 									clientId: groupSession.client.clientId,
 									displayName: groupSession.client.displayName,
@@ -148,7 +150,7 @@
 				const shareData = {
 					title: data.title,
 
-					url: `${ENV_SITE_URL}/listen?id=${data.videoId}`,
+					url: `${$SITE_ORIGIN_URL}/listen?id=${data.videoId}`,
 				};
 				try {
 					if (!navigator.canShare) {

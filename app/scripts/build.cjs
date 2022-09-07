@@ -13,7 +13,7 @@ const pkg = JSON.parse(fs.readFileSync(path.resolve(root, "package.json"), { enc
 const json = json_config;
 
 const adapter = json["environment"]["adapter"] ?? "vercel";
-
+const port = json["port"] ?? 3000;
 const svelteConfigPath = path.join(root, "svelte.config.js");
 const originalSvelteConfig = fs.readFileSync(svelteConfigPath, { encoding: "utf-8" });
 
@@ -82,7 +82,7 @@ cli
 			/// run the build
 			child_process.spawnSync("npx", ["vite", "build"], {
 				stdio: "inherit",
-				env: { ...process.env, BB_ADAPTER: adapter },
+				env: { ...process.env, BB_ADAPTER: adapter, PORT: port },
 				cwd: root,
 				shell: true,
 			});

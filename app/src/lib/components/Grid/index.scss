@@ -1,11 +1,33 @@
 .grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(15em, 1fr));
+	grid-template-columns: repeat(var(--grid-column-count), 1fr);
 	grid-gap: 0em;
 	justify-content: center;
-
 	margin: 0 auto;
+	--grid-column-count: 2;
+	--grid-columns: repeat(var(--grid-column-count), 1fr);
+
+	@media screen and (min-width: 460px) and (max-width: 619px) {
+		--grid-column-count: 3;
+	}
+
+	@media screen and (min-width: 620px) and (max-width: 768px) {
+		--grid-column-count: 4;
+	}
+
+	@media screen and (min-width: 769px) and (max-width: 1148px) {
+		--grid-column-count: 5;
+	}
+
+	@media screen and (min-width: 1149px) and (max-width: 1400px) {
+		--grid-column-count: 6;
+	}
+
+	@media screen and (min-width: 1401px) {
+		--grid-column-count: 7;
+	}
 }
+
 .grid-container {
 	margin-block-start: 0;
 	margin-block-end: 1.5em;

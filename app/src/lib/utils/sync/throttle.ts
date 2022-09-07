@@ -1,4 +1,4 @@
-export default function throttle(callback, interval) {
+export function throttle(callback, interval) {
 	let enableCall = true;
 
 	return function (...args) {

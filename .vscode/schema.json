@@ -86,7 +86,7 @@
 			}
 		},
 		"port": {
-			"description": "The port that SvelteKit should listen for requests on.\nThis property is required for the Node adapter and is unused on others.",
+			"description": "The port to use in production for accepting connections.\nThis property is required for the Node adapter (Docker!) and is unused on others.",
 			"type": "integer",
 
 			"default": 3000

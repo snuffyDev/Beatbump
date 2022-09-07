@@ -3,8 +3,9 @@
 	import Icon from "$lib/components/Icon/Icon.svelte";
 	import Listing from "$lib/components/Item/Listing.svelte";
 	import list from "$lib/stores/list";
-	import { ENV_SITE_URL } from "../../env";
+
 	import type { PageData } from "./$types";
+	import { SITE_ORIGIN_URL } from "$stores/url";
 
 	export let data: PageData;
 	const { videoId, playlist, thumbnails = [], title, related, data: data$1 } = data;
@@ -20,7 +21,7 @@
 	<meta property="og:site_name" content="Beatbump" />
 	<meta property="og:image" content={thumbnails[thumbnails.length - 1].url} />
 
-	<meta property="og:url" content={`${ENV_SITE_URL}/listen?id=${videoId}${playlist ? `&list=${playlist}` : ""}`} />
+	<meta property="og:url" content={`${$SITE_ORIGIN_URL}/listen?id=${videoId}${playlist ? `&list=${playlist}` : ""}`} />
 	<title>{title} | Beatbump</title>
 </svelte:head>
 <main>

@@ -5,20 +5,21 @@
 
 <script lang="ts">
 	import { ctxKey, groupSession, isMobileMQ, isPagePlaying, queue, showAddToPlaylistPopper } from "$lib/stores";
-	import { page as PageStore, session } from "$app/stores";
+	import { page as PageStore } from "$app/stores";
 	import type { Item } from "$lib/types";
-	import { notify } from "$lib/utils/utils";
-	import { ENV_SITE_URL } from "../../../env";
+	import { notify } from "$lib/utils";
+
 	import { createEventDispatcher, tick } from "svelte";
 	import Icon from "../Icon/Icon.svelte";
 	import { fullscreenStore } from "../Player/channel";
 	import PopperButton from "../Popper/PopperButton.svelte";
 	import { goto } from "$app/navigation";
-	import * as db from "$lib/db";
+	import { IDBService } from "$lib/workers/db/service";
 	import SessionListService from "$lib/stores/list";
 	import list from "$lib/stores/list";
 	import { AudioPlayer, updateGroupPosition } from "$lib/player";
 	import { CTX_ListItem } from "$lib/contexts";
+	import { SITE_ORIGIN_URL } from "$stores/url";
 	export let item: Item;
 	export let idx: number;
 	interface $$Events {
@@ -78,7 +79,7 @@
 			text: "Favorite",
 			icon: "heart",
 			action: () => {
-				db.setNewFavorite(item);
+				IDBService.sendMessage("create", "favorite", item);
 			},
 		},
 		{
@@ -88,27 +89,27 @@
 				let shareData = {
 					title: item.title,
 
-					url: `${ENV_SITE_URL}/listen?id=${item.videoId}`,
+					url: `${$SITE_ORIGIN_URL}/listen?id=${item.videoId}`,
 				};
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_PLAYLIST")) {
 					shareData = {
 						title: item.title,
 
-						url: `${ENV_SITE_URL}/playlist/${item.endpoint?.browseId}`,
+						url: `${$SITE_ORIGIN_URL}/playlist/${item.endpoint?.browseId}`,
 					};
 				}
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ALBUM")) {
 					shareData = {
 						title: item.title,
 
-						url: `${ENV_SITE_URL}/release?id=${item.endpoint?.browseId}`,
+						url: `${$SITE_ORIGIN_URL}/release?id=${item.endpoint?.browseId}`,
 					};
 				}
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST")) {
 					shareData = {
 						title: item.title,
 						text: `${item.title} on Beatbump`,
-						url: `${ENV_SITE_URL}/artist/${item.endpoint?.browseId}`,
+						url: `${$SITE_ORIGIN_URL}/artist/${item.endpoint?.browseId}`,
 					};
 				}
 				try {
@@ -258,7 +259,7 @@
 	</div>
 	{#if $isMobileMQ || isHovering}
 		<div class="length" tabindex="0" on:focus={() => (isHovering = true)}>
-			<PopperButton tabindex="0" items={DropdownItems} />
+			<PopperButton size={"24px"} tabindex="0" items={DropdownItems} />
 		</div>
 	{:else}
 		<span class="length" class:hidden={!item?.length ? true : false}>{(item?.length?.text ?? item.length) || ""}</span>

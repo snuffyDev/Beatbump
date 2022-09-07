@@ -4,22 +4,22 @@
 	import Icon from "$components/Icon/Icon.svelte";
 	import { clickOutside } from "$lib/actions/clickOutside";
 	import { IMAGE_NOT_FOUND } from "$lib/constants";
-	import * as db from "$lib/db";
+	import { IDBService } from "$lib/workers/db/service";
 	import { AudioPlayer } from "$lib/player";
 	import { groupSession, isMobileMQ } from "$lib/stores";
 	import list, { currentTrack, queue, queuePosition } from "$lib/stores/list";
-	import { IsoBase64 } from "$lib/utils/buffer";
-	import { messenger } from "$lib/utils/emitter";
-	import { notify } from "$lib/utils/utils";
+	import { IsoBase64 } from "$lib/utils";
+	import { messenger } from "$lib/utils/sync";
+	import { notify } from "$lib/utils";
 	import { playerLoading, showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
-	import { ENV_SITE_URL } from "../../../env";
 	import { PopperButton } from "../Popper";
 	import { fullscreenStore } from "./channel";
 	import Controls from "./Controls.svelte";
 	import keyboardHandler from "./keyboardHandler";
 	import ProgressBar from "./ProgressBar";
-	import { session } from "$app/stores";
+
 	import { page } from "$app/stores";
+	import { SITE_ORIGIN_URL } from "$stores/url";
 
 	const { paused } = AudioPlayer;
 	let volume = 0.5;
@@ -60,7 +60,7 @@
 			icon: "heart",
 			action: async () => {
 				if (!browser) return;
-				await db.setNewFavorite($currentTrack);
+				IDBService.sendMessage("create", "favorite", $currentTrack);
 			},
 		},
 		!groupSession.hasActiveSession
@@ -80,7 +80,7 @@
 						const shareData = {
 							title: `Join ${groupSession.client.displayName}'s Beatbump Session`,
 
-							url: `${ENV_SITE_URL}/session?token=${IsoBase64.toBase64(
+							url: `${$SITE_ORIGIN_URL}/session?token=${IsoBase64.toBase64(
 								JSON.stringify({
 									clientId: groupSession.client.clientId,
 									displayName: groupSession.client.displayName,
@@ -264,8 +264,8 @@
 		gap: 0.95em;
 		@media screen and (min-width: 720px) {
 			line-height: 1.6;
-			font-size: 0.875em;
-			gap: 0.875em;
+			font-size: 14px;
+			// gap: 0.875em;
 		}
 		.container {
 			visibility: visible;

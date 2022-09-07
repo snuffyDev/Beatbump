@@ -1,7 +1,7 @@
 <script lang="ts">
 	import InfoBox from "$lib/components/Layouts/InfoBox.svelte";
-	import type { IDBPlaylist } from "$lib/db";
-	import * as db from "$lib/db";
+	import { IDBService } from "$lib/workers/db/service";
+
 	import List from "../_List.svelte";
 	import { isPagePlaying } from "$lib/stores/stores";
 	import list from "$lib/stores/list";
@@ -14,27 +14,32 @@
 	import { CTX_ListItem } from "$lib/contexts";
 	import Search from "../_Search.svelte";
 	import { onMount, tick } from "svelte";
+
+	import type { Item } from "$lib/types";
+	import type { IDBPlaylist } from "$lib/workers/db/types";
 	export let data;
 
 	const { playlistName } = data;
 	CTX_ListItem.set({ page: "library" });
 
-	let items = [];
-	let playlist: IDBPlaylist;
+	let items: Item[] = [];
+	let playlist: IDBPlaylist = undefined;
 	let thumbnail = undefined;
 	let showEditPlaylist;
 	let hasQuery = false;
 	async function getPlaylist() {
-		const promise: IDBPlaylist = await db.getPlaylist(playlistName);
-		playlist = { ...promise };
+		console.log(playlistName);
+		const promise = await IDBService.sendMessage("get", "playlist", playlistName);
+		console.log(promise);
+		playlist = {};
+		Object.assign(playlist, promise);
 		playlist = playlist;
 		console.log(playlist);
-		items = [...playlist.items];
-		thumbnail = playlist.thumbnail;
+		items = playlist.items;
+		thumbnail = playlist?.thumbnail;
 	}
 	onMount(async () => {
 		await getPlaylist();
-		// console.log(playlist);
 	});
 	const drop = async (event, target) => {
 		if (hasQuery) return;
@@ -78,7 +83,7 @@
 				on:close={() => (showEditPlaylist = false)}
 				on:cancel={() => (showEditPlaylist = false)}
 				on:submit={async ({ detail }) => {
-					const promise = await db.updatePlaylist({
+					const promise = await IDBService.sendMessage("update", "playlist", {
 						thumbnail: detail?.thumbnail,
 						id: $page.params.slug,
 						name: detail?.title,
@@ -96,12 +101,12 @@
 			/>
 		{/if}
 		<InfoBox
-			thumbnail={playlist.thumbnail}
+			thumbnail={playlist?.thumbnail}
 			description={playlist?.description}
 			title={playlist?.name}
 			editable={true}
 			type="playlist"
-			subtitles={[playlist?.items.length, playlist?.items.length > 1 ? "Songs" : "Song"]}
+			subtitles={[playlist?.items?.length, playlist?.items?.length > 1 ? "Songs" : "Song"]}
 			buttons={[
 				{
 					icon: "play",
@@ -154,14 +159,14 @@
 					if (hasQuery) return;
 					drop(event, index);
 					await tick();
-					await db.updatePlaylist({
+					await IDBService.sendMessage("update", "playlist", {
 						items: [...items],
 						id: playlistName,
 						hideAlert: true,
 					});
 				}}
 				on:initLocalList={async ({ detail }) => {
-					list.setMix([...items]);
+					list.setMix(items);
 					await getSrc($list.mix[index]?.videoId);
 				}}
 				on:pagePlaying={() => {

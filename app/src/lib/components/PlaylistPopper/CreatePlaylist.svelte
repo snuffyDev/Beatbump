@@ -2,7 +2,7 @@
 	import { browser } from "$app/env";
 	import { goto } from "$app/navigation";
 	import { page } from "$app/stores";
-	import * as db from "$lib/db";
+	import { IDBService } from "$lib/workers/db/service";
 
 	import { showAddToPlaylistPopper } from "$lib/stores/stores";
 
@@ -130,7 +130,7 @@
 				<button
 					class="outlined danger"
 					on:click|preventDefault={async () => {
-						db.deletePlaylist(defaults?.id);
+						IDBService.sendMessage("delete", "playlist", defaults?.id);
 						deletePlaylistRequest = false;
 
 						dispatch("close");
@@ -174,11 +174,11 @@
 	>
 		<div class="input-row">
 			<label for="">Title</label>
-			<div class="input"><input type="text" bind:value={titleValue} /></div>
+			<div class="input no-btn block"><input type="text" bind:value={titleValue} /></div>
 		</div>
 		<div class="input-row">
 			<label for="">Description</label>
-			<div class="input">
+			<div class="input no-btn block">
 				<input type="text" bind:value={descriptionValue} />
 			</div>
 		</div>

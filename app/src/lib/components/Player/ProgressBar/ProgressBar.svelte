@@ -4,6 +4,7 @@
 	import { fade } from "svelte/transition";
 
 	import { AudioPlayer } from "$lib/player";
+	import { format } from "$lib/utils";
 	const { currentTimeStore, durationStore } = AudioPlayer;
 
 	let isTouchDrag = false;
@@ -28,63 +29,65 @@
 	}
 
 	function hover(event, bounds) {
-		const x = event.clientX - event.target.offsetWidth - 32;
+		const x = event.clientX - bounds.left;
 		return Math.min(Math.max(x / event.target.clientWidth, 0), 1);
 	}
 
 	function seekAudio(event: PointerEvent) {
 		if (!songBar && !AudioPlayer.player.src) return;
-		AudioPlayer.isWebkit === true
-			? AudioPlayer.seek(seek(event, songBar.getBoundingClientRect()) * $durationStore)
-			: AudioPlayer.seek(seek(event, songBar.getBoundingClientRect()) * $durationStore);
+
+		AudioPlayer.seek(seek(event, songBar.getBoundingClientRect()) * $durationStore);
 	}
 </script>
 
 <svelte:window on:pointerup={() => (seeking = false)} on:pointermove={trackMouse} />
-<div
-	class="progress-container"
-	on:pointerover={(e) => {
-		hovering = true;
-	}}
->
-	<div
-		class="progress-bar"
-		transition:fade
-		on:click|stopPropagation|capture={() => {}}
-		on:pointerdown|stopPropagation|capture={seekAudio}
-		on:touchstart={() => {
-			isTouchDrag = true;
-		}}
-		on:pointerleave={(event) => {
-			hovering = false;
-		}}
-	>
-		{#if hovering}
-			<div
-				class="hover"
-				in:fade={{ duration: 180, delay: 0, easing: expoIn }}
-				out:fade={{ duration: 240, delay: 120, easing: sineIn }}
-				style="transform:scaleX({hoverWidth});"
-			/>
-		{/if}
-		<progress
+<div class="progress-container">
+	<span class="timestamp secondary">{format($currentTimeStore)}</span>
+	<div class="progress-bar-wrapper">
+		<div
+			class="progress-bar"
+			transition:fade
+			on:pointerover={(e) => {
+				hovering = true;
+			}}
+			on:click|stopPropagation|capture={() => {}}
+			on:pointerdown|stopPropagation|capture={seekAudio}
 			on:touchstart={() => {
 				isTouchDrag = true;
 			}}
-			on:pointerdown={() => {
-				seeking = true;
+			on:pointerleave={(event) => {
 				hovering = false;
 			}}
-			on:pointerup={() => {
-				seeking = false;
-				hovering = false;
-			}}
-			class:isTouchDrag
-			bind:this={songBar}
-			value={$currentTimeStore}
-			max={$durationStore}
-		/>
+		>
+			{#if hovering}
+				<div
+					class="hover"
+					in:fade={{ duration: 180, delay: 0, easing: expoIn }}
+					out:fade={{ duration: 240, delay: 120, easing: sineIn }}
+					style="transform:scaleX({hoverWidth});"
+				/>
+			{/if}
+			<progress
+				on:touchstart={() => {
+					isTouchDrag = true;
+				}}
+				on:pointerdown={() => {
+					seeking = true;
+					hovering = false;
+				}}
+				on:pointerup={() => {
+					seeking = false;
+					hovering = false;
+				}}
+				class:isTouchDrag
+				bind:this={songBar}
+				value={$currentTimeStore}
+				max={$durationStore}
+			/>
+		</div>
 	</div>
+
+	<span class="timestamp secondary">{format($durationStore)}</span>
 </div>
 
 <style src="./index.scss" lang="scss">

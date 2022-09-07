@@ -13,11 +13,13 @@
 <script lang="ts">
 	import type Peer from "peerjs";
 	import Icon from "$lib/components/Icon/Icon.svelte";
-	import * as db from "$lib/db";
+	import { IDBService } from "$lib/workers/db/service";
 	import { alertHandler } from "$lib/stores/stores";
 	import { createEventDispatcher, onMount, tick } from "svelte";
 	import { fade } from "svelte/transition";
 	import type { Item } from "$lib/types";
+	import { notify } from "$lib/utils";
+	import { setMultiplePlaylists } from "$lib/workers/db/db";
 
 	type PeerType = "Sender" | "Receiver";
 
@@ -42,7 +44,7 @@
 		[functionName: string]: Function;
 	} = {
 		Playlists: async () => {
-			const _lists = await db.getPlaylists();
+			const _lists = await IDBService.sendMessage("get", "playlists");
 			const lists = await [..._lists];
 			const returned = lists;
 			if (lists.length !== 0) {
@@ -50,7 +52,7 @@
 			}
 		},
 		Favorites: async () => {
-			const _lists = await db.getFavorites();
+			const _lists = await IDBService.sendMessage("get", "favorites");
 			const lists = await [..._lists];
 			const returned = lists;
 			if (lists.length !== 0) {
@@ -91,22 +93,22 @@
 					console.log(connection);
 					// When data is received from sender,
 					// write the contents to IndexedDB
-					const ArrayOfStores = JSON.parse(data);
+					const ArrayOfStores = JSON.parse(data as string);
 					if (Array.isArray(ArrayOfStores)) {
 						ArrayOfStores.forEach(async (obj) => {
 							if (obj?.type == "Playlists") {
 								const itemList = obj;
-								await db.setMultiplePlaylists([...itemList?.items]);
+								await setMultiplePlaylists([...itemList?.items]);
 							}
 							if (obj?.type == "Favorites") {
 								const itemList = obj;
-								await db.setMultipleFavorites([...itemList?.items]);
+								await setMultiplePlaylists([...itemList?.items]);
 							}
 						});
 						console.log(ArrayOfStores);
 					}
 
-					alertHandler.set({ msg: "Data sync completed!", type: "success" });
+					notify("Data sync completed!", "success");
 					setTimeout(() => {
 						completed = true;
 					}, 1250);
@@ -119,7 +121,7 @@
 					}
 				});
 				conn.on("open", () => {
-					alertHandler.set({ msg: "Connection established!", type: "success" });
+					notify("Connection established!", "success");
 				});
 			});
 		}

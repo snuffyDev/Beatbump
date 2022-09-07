@@ -8,9 +8,9 @@ import SessionListService, { type ISessionListProvider } from "./stores/list";
 import { groupSession, type ConnectionState } from "./stores/sessions";
 import { currentTitle } from "./stores/stores";
 import type { Nullable } from "./types";
-import { EventEmitter, notify, type Maybe } from "./utils";
+import { notify, type Maybe } from "./utils";
 import { Logger } from "./utils/logger";
-import { Mutex } from "./utils/mutex";
+import { Mutex, EventEmitter } from "$lib/utils/sync";
 import { WritableStore } from "./utils/stores";
 import { getSrc, type ResponseBody } from "./utils/utils";
 import type HLS from "hls.js";
@@ -51,10 +51,10 @@ export interface IEventHandler {
 	// #endregion Public Methods (1)
 }
 
-type SrcDict = { original_url: string; url: string };
+type SrcDict = { original_url: string; url: string; };
 
 // AudioPlayer Class Events
-const events: Map<string, { cb: Callback<keyof HTMLElementEventMap>; options?: AddEventListenerOptions | boolean }> =
+const events: Map<string, { cb: Callback<keyof HTMLElementEventMap>; options?: AddEventListenerOptions | boolean; }> =
 	new Map();
 
 const setPosition = () => {
@@ -78,9 +78,8 @@ function metaDataHandler(sessionList: Maybe<ISessionListProvider>) {
 			artwork: [
 				{
 					src: currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].url,
-					sizes: `${currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].width}x${
-						currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].height
-					}`,
+					sizes: `${currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].width}x${currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].height
+						}`,
 					type: "image/jpeg",
 				},
 			],
@@ -104,7 +103,7 @@ function metaDataHandler(sessionList: Maybe<ISessionListProvider>) {
 	}
 }
 
-export const updateGroupState = (opts: { client: string; state: ConnectionState }): void =>
+export const updateGroupState = (opts: { client: string; state: ConnectionState; }): void =>
 	groupSession.sendGroupState(opts);
 export const updateGroupPosition = (dir: "<-" | "->" | undefined, position: number): void =>
 	groupSession.send("PATCH", "state.update.position", { dir, position }, groupSession.client);
@@ -153,7 +152,7 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 	constructor() {
 		super({});
 		if (!browser) return;
-
+		if (('window' in globalThis.self) === false) return;
 		this._isWebkit = /i(Phone|Pad|Pod)/i.test(navigator.userAgent);
 
 		this._player = new Audio();
@@ -392,7 +391,7 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 			return;
 		}
 
-		this.__srcUrl = dict?.original_url;
+		this.__srcUrl = dict?.url;
 		this._src.set(this.__srcUrl);
 	}
 
@@ -481,6 +480,7 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 			.then(({ body, error }) => {
 				if (error === true) {
 					// this.next();
+					this.skip();
 					return error;
 				}
 				return body;

@@ -16,7 +16,7 @@ import { buildDashManifest, type IFormat } from "$lib/utils/buildDashManifest";
 export interface PlayerFormats {
 	hls?: string;
 	dash?: string;
-	streams?: { url: string; original_url: string; mimeType: string }[];
+	streams?: { url: string; original_url: string; mimeType: string; }[];
 }
 export function sort({
 	data = {},
@@ -29,11 +29,13 @@ export function sort({
 	dash?: boolean;
 	proxyUrl?: string;
 }): PlayerFormats {
+	let dash_manifest: string;
 	if (dash === true) {
+		const proxy_url = new URL(proxyUrl);
 		const formats = map(data?.streamingData?.adaptiveFormats as Array<IFormat>, (item) => {
 			const url = new URL(item.url);
 			const host = url.host;
-			url.host = "yt-hls-rewriter.onrender.com";
+			url.host = proxy_url.host ?? "yt-hls-rewriter.onrender.com";
 			url.searchParams.set("host", host);
 			return {
 				...item,
@@ -43,11 +45,11 @@ export function sort({
 		const length = data?.videoDetails?.lengthSeconds;
 
 		const manifest = buildDashManifest(formats, length);
-		console.log(manifest);
-		return {
-			dash: manifest,
-			streams: formats.map((item) => ({ url: item.url, original_url: item.url, mimeType: item.mimeType })),
-		};
+		dash_manifest = "data:application/dash+xml;charset=utf-8;base64," + btoa(manifest);
+		// return {
+		// 	dash: manifest,
+		// 	streams: formats.map((item) => ({ url: item.url, original_url: item.url, mimeType: item.mimeType })),
+		// };
 	}
 
 	const host = data?.playerConfig?.hlsProxyConfig?.hlsChunkHost;
@@ -81,6 +83,7 @@ export function sort({
 	}
 	return {
 		hls,
+		dash: dash_manifest,
 		streams: arr,
 	};
 }

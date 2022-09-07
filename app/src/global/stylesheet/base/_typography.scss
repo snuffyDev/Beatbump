@@ -75,9 +75,6 @@ a:not(.no-style),
 	&.link {
 		font-weight: 500;
 	}
-	&:visited {
-		color: darken($link-color, 5%);
-	}
 	&:active,
 	&:focus,
 	&:hover {

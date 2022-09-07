@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Icon from "$components/Icon/Icon.svelte";
 
-	import debounce from "$lib/utils/debounce";
+	import { debounce } from "$lib/utils/sync";
 	import { createEventDispatcher } from "svelte";
 	let value = "";
 	const dispatch = createEventDispatcher<{ input: { query: string } }>();

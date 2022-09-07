@@ -11,8 +11,8 @@ form {
 
 label {
 	font-weight: 400;
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
-		"Open Sans", "Helvetica Neue", sans-serif;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+		"Helvetica Neue", sans-serif;
 	font-variant-caps: all-small-caps;
 	letter-spacing: -0.02em;
 }
@@ -94,14 +94,15 @@ input[type="search"]::-webkit-search-results-decoration {
 		border-color: rgba(158, 158, 158, 0.658);
 		filter: brightness(1.15);
 	}
-	&:has(input[type="search"]) {
+	[type="search"] {
 		min-width: 15ch;
 		max-width: 80ch;
 	}
-	&:has(input[type="search"]) {
-		display: grid;
-		grid-template-columns: 1fr 31px;
-		grid-template-areas: "start end";
+	display: grid;
+	grid-template-columns: 1fr 31px;
+	grid-template-areas: "start end";
+	&.no-btn {
+		display: block;
 	}
 }
 

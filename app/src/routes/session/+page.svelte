@@ -2,7 +2,7 @@
 	import { groupSession } from "$lib/stores";
 	import Header from "$lib/components/Layouts/Header.svelte";
 	import Button from "$lib/components/Button";
-	import { sanitize } from "$lib/utils/strings";
+	import { sanitize } from "$lib/utils";
 	import type { PageData } from "./$types";
 
 	export let data: PageData;

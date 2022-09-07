@@ -4,18 +4,18 @@
 	import { groupSession, isPagePlaying } from "$lib/stores";
 	import { page as SPage } from "$app/stores";
 	import type { Item } from "$lib/types";
-	import { notify } from "$lib/utils/utils";
-	import { ENV_SITE_URL } from "../../../env";
+	import { notify } from "$lib/utils";
+
 	import { createEventDispatcher, tick } from "svelte";
 	import Icon from "../Icon/Icon.svelte";
 	import { fullscreenStore } from "../Player/channel";
 	import PopperButton from "../Popper/PopperButton.svelte";
 	import { goto } from "$app/navigation";
-	import { setNewFavorite, deleteSongFromPlaylist } from "$lib/db";
+	import { IDBService } from "$lib/workers/db/service";
 	import SessionListService, { queuePosition, queue } from "$lib/stores/list";
 	import { AudioPlayer, updateGroupPosition } from "$lib/player";
 	import { CTX_ListItem } from "$lib/contexts";
-
+	import {SITE_ORIGIN_URL} from '$lib/stores/url'
 	export let item: Item;
 	export let idx: number;
 	export let ctx: Record<string, unknown> = {};
@@ -76,27 +76,27 @@
 				let shareData = {
 					title: item.title,
 
-					url: `${ENV_SITE_URL}/listen?id=${item.videoId}`,
+					url: `${$SITE_ORIGIN_URL}/listen?id=${item.videoId}`,
 				};
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_PLAYLIST")) {
 					shareData = {
 						title: item.title,
 
-						url: `${ENV_SITE_URL}/playlist/${item.endpoint?.browseId}`,
+						url: `${$SITE_ORIGIN_URL}/playlist/${item.endpoint?.browseId}`,
 					};
 				}
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ALBUM")) {
 					shareData = {
 						title: item.title,
 
-						url: `${ENV_SITE_URL}/release?id=${item.endpoint?.browseId}`,
+						url: `${$SITE_ORIGIN_URL}/release?id=${item.endpoint?.browseId}`,
 					};
 				}
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST")) {
 					shareData = {
 						title: item.title,
 						text: `${item.title} on Beatbump`,
-						url: `${ENV_SITE_URL}/artist/${item.endpoint?.browseId}`,
+						url: `${$SITE_ORIGIN_URL}/artist/${item.endpoint?.browseId}`,
 					};
 				}
 				try {
@@ -208,7 +208,6 @@
 		{#if Array.isArray(item?.thumbnails) && item.thumbnails.length !== 0}
 			<div class="thumbnail">
 				<img
-					decoding="async"
 					loading="lazy"
 					src={item.thumbnails?.[0]?.url}
 					width={item.thumbnails?.[0]?.width}

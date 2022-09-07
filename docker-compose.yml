@@ -2,13 +2,16 @@ version: "3"
 
 services:
   app:
-    image: "snuffydev/beatbump:latest"
-    # build: ./app
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      args:
+        - PORT=$PORT
     ports:
-      - "443:3000"
+      - "443:${PORT}"
     environment:
       PORT: 3000
       VITE_DOMAIN: "beatbump.ml"
       VITE_SITE_URL: "https://beatbump.ml"
       VITE_DONATION_URL: "https://www.paypal.com/donate/?hosted_button_id=E6YRHKS2H2KP2"
-      # DOMAIN: "${VITE_DOMAIN}"
+    restart: unless-stopped

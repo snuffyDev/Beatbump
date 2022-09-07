@@ -1,5 +1,5 @@
 // @migration task: Check imports
-import { buildRequest } from "$api/_api/request";
+import { buildRequest } from "../api/_api/request";
 import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 
 import type { CarouselHeader } from "$lib/types";
@@ -129,13 +129,13 @@ function parseBody(contents: Array<any> = []):
 	| ICarouselTwoRowItem[]
 	| IListItemRenderer[]
 	| {
-			text: any;
-			color: string;
-			endpoint: {
-				params: any;
-				browseId: any;
-			};
-	  }[] {
+		text: any;
+		color: string;
+		endpoint: {
+			params: any;
+			browseId: any;
+		};
+	}[] {
 	const items: unknown[] = [];
 	let idx = -1;
 	const length = contents.length;

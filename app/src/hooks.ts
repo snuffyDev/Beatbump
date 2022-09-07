@@ -8,12 +8,11 @@ const originURL = import.meta.env.VITE_SITE_URL; // or your server IP for dev
 const headers = {
 	"X-Frame-Options": "SAMEORIGIN",
 	"Referrer-Policy": "no-referrer",
-	"Access-Control-Allow-Origin": dev ? "*" : originURL,
 	"Permissions-Policy": `accelerometer=(), autoplay="*", camera=(), document-domain=(), encrypted-media=(), fullscreen=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), sync-xhr=(), usb=(), xr-spatial-tracking=(), geolocation=()`,
 	"X-Content-Type-Options": "nosniff",
 	"Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
 };
-// installFetch();
+
 const checkUserAgent = (userAgent: string) =>
 	/i(Phone|Pad|Pod)/i.test(userAgent) ? "iOS" : /Android/i.test(userAgent) ? "Android" : "Other";
 

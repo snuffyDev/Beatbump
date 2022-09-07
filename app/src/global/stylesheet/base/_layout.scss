@@ -12,7 +12,7 @@ html {
 	box-sizing: inherit;
 }
 html {
-	font-size: 12px;
+	font-size: 10px;
 	overscroll-behavior: contain;
 }
 
@@ -89,11 +89,11 @@ body {
 
 	@media screen and (min-width: 40rem) and (max-width: 115.375rem) {
 		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
-		--base-font-size: 0.875rem;
+		--base-font-size: 14px;
 	}
 	@media screen and (min-width: 115.375rem) and (max-width: 134rem) {
 		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
-		--base-font-size: 1rem;
+		--base-font-size: 16px;
 	}
 	@media screen and (min-width: 134.75rem) {
 		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);

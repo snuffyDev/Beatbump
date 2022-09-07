@@ -1,25 +1,23 @@
 <script lang="ts">
-	import Icon from "$lib/components/Icon/Icon.svelte";
-
 	import Listing from "$lib/components/Item/Listing.svelte";
-
-	import * as db from "$lib/db";
-
+	import { IDBService } from "$lib/workers/db/service";
 	import { onMount, setContext } from "svelte";
+
 	let value;
 	let songs = [];
+
 	setContext({}, "library");
+
 	onMount(async () => {
-		songs = await db.getFavorites();
+		songs = await IDBService.sendMessage("get", "favorites");
 	});
-	// $: console.log(value, songs)
 
 	let options = [
 		{
 			label: "Unsorted",
 			params: "nosort",
-			action: () => {
-				// console.log('nosort', songs)
+			action: async () => {
+				songs = await IDBService.sendMessage("get", "favorites");
 			},
 		},
 		{
@@ -27,7 +25,6 @@
 			params: "az",
 			action: () => {
 				songs = [...songs.sort((a, b) => a.title.localeCompare(b.title))];
-				// console.log('az', songs)
 			},
 		},
 		{
@@ -35,7 +32,6 @@
 			params: "za",
 			action: () => {
 				songs = [...songs.sort((a, b) => b.title.localeCompare(a.title))];
-				// console.log('za', songs)
 			},
 		},
 	];
@@ -45,11 +41,6 @@
 	<h1>Your Songs</h1>
 	<section>
 		<div class="filter">
-			<!-- <div class="ctx-item">
-				<button on:click={() => {}}
-					><Icon name="play" size="1.25em" /> Play All</button
-				>
-			</div> -->
 			<div class="ctx-item">
 				<label for="select">Sort</label>
 				<div class="select">

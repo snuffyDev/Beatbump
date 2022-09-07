@@ -2,7 +2,7 @@
 	import { goto } from "$app/navigation";
 	import Icon from "$lib/components/Icon/Icon.svelte";
 	import { preserveSearch } from "$lib/stores";
-	import debounce from "$lib/utils/debounce";
+	import { debounce } from "$lib/utils/sync";
 	import { createEventDispatcher } from "svelte";
 	import { fullscreenStore } from "../Player/channel";
 	import { searchFilter } from "./options";
@@ -17,9 +17,7 @@
 	async function handleSubmit() {
 		dispatch("submitted", { submitted: true, filter, query });
 		fullscreenStore.set("closed");
-		let url = `/search/${encodeURIComponent(encodeURIComponent(query))}${
-			filter !== undefined ? `?filter=${filter}` : ""
-		}`;
+		let url = `/search/${encodeURIComponent(query)}${filter !== undefined ? `?filter=${filter}` : ""}`;
 		goto(url);
 	}
 	const typeahead = debounce(async () => {

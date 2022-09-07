@@ -17,7 +17,7 @@
 	import ProgressBar from "./ProgressBar";
 	import { CTX_ListItem } from "$lib/contexts";
 	import { notify } from "$lib/utils";
-	import { requestFrameSingle } from "$lib/utils/raf";
+	import { requestFrameSingle } from "$lib/utils";
 	import { page } from "$app/stores";
 	import { isMobileMQ } from "$stores/window";
 	const { paused } = AudioPlayer;
@@ -371,16 +371,12 @@
 		pointer-events: none;
 		overscroll-behavior: contain;
 
-		// backdrop-filter: saturate(-0.5) blur(80%);
 		&::after {
 			content: "";
 			position: absolute;
 			inset: 0;
 			z-index: 1;
-			// background: rgb(180, 180, 180);
-			// backdrop-filter: blur(30em);
-			// backdrop-filter: blur(5em) brightness(2) contrast(0.8) saturate(0.8);
-			// mix-blend-mode: darken;
+
 			touch-action: none;
 			overscroll-behavior: contain;
 		}
@@ -391,14 +387,14 @@
 
 			min-width: 100vw;
 			transform: scale(1.5);
-			// box-shadow: 0 0.5px 1rem 1rem #000;
+
 			filter: brightness(0.6) opacity(0.6) contrast(1) saturate(1.1) blur(1em) grayscale(0.3) sepia(0.2);
 			touch-action: none;
 		}
 	}
 	.tracklist {
 		position: absolute;
-		// inset: 0;
+
 		bottom: 0;
 		will-change: transform;
 		height: 100%;
@@ -406,11 +402,11 @@
 		background: var(--bottom-bg);
 		overscroll-behavior: contain;
 		touch-action: pan-y;
-		// touch-action: none;
+
 		border-top-left-radius: $sm-radius;
 		border-top-right-radius: $sm-radius;
 		contain: content;
-		@media screen and (min-width: 640px) and (hover: hover) {
+		@media screen and (min-width: 720px) and (hover: hover) {
 			position: absolute;
 			left: 0;
 			width: 45vw;
@@ -442,11 +438,11 @@
 		transform: translate3d(0, 0vh, 0);
 		will-change: transform;
 		overscroll-behavior: contain;
-
+		content-visibility: auto;
 		overflow: hidden;
 		contain: strict;
 
-		@media screen and (min-width: 600px) {
+		@media screen and (min-width: 720px) {
 			// gap: 1em;
 			flex-direction: row;
 		}
@@ -545,7 +541,8 @@
 
 		justify-content: center;
 		max-width: 100%;
-		@media screen and (max-width: 640px) {
+		max-height: 35vh;
+		@media screen and (max-width: 719px) {
 			max-height: 28vh;
 			margin-bottom: 1em;
 			width: 100%;
@@ -611,7 +608,7 @@
 
 		top: 0;
 		left: 0;
-		@media screen and (min-width: 639px) and (hover: hover) {
+		@media screen and (min-width: 720px) and (hover: hover) {
 			display: none !important;
 			visibility: none !important;
 		}
@@ -628,7 +625,7 @@
 		touch-action: none;
 	}
 	.handle.vertical {
-		@media screen and (max-width: 639px) and (hover: hover) {
+		@media screen and (max-width: 719px) and (hover: hover) {
 			display: none;
 			visibility: none;
 		}
@@ -636,7 +633,7 @@
 		position: absolute;
 		transition: transform cubic-bezier(0.25, 0.46, 0.45, 0.94) 400ms;
 
-		@media screen and (min-width: 640px) and (hover: hover) {
+		@media screen and (min-width: 720px) and (hover: hover) {
 			place-items: center;
 			width: 2.5em;
 			height: 100%;

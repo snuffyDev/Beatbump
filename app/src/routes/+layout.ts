@@ -3,6 +3,7 @@ export const load: LayoutLoad = async ({ url, data }) => {
 	return {
 		key: url.pathname,
 		page: url.pathname,
+		origin: url.origin,
 		...data,
 	};
 };

@@ -14,6 +14,7 @@
 
 	let header = data.header;
 	let title: string = data.title;
+	// $: console.log(data);
 </script>
 
 <Header title={title ? title.replace(",", " ") : ""} url={$page.url.pathname} desc="The latest in music" />
