@@ -22,8 +22,11 @@ jobs:
       - name: Check out the repo
 
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
 
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
 
@@ -39,6 +42,11 @@ jobs:
 
         with:
           images: snuffydev/beatbump
+					tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
 
       - name: Build and push Docker image
 
@@ -48,7 +56,7 @@ jobs:
           context: ./app
 
           build-args: PORT=3000
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
 
           tags: ${{ steps.meta.outputs.tags }}
 
