@@ -30,6 +30,8 @@ export function sort({
 	proxyUrl?: string;
 }): PlayerFormats {
 	let dash_manifest: string;
+
+
 	if (dash === true) {
 		const proxy_url = new URL(proxyUrl);
 		const formats = map(data?.streamingData?.adaptiveFormats as Array<IFormat>, (item) => {
@@ -46,10 +48,7 @@ export function sort({
 
 		const manifest = buildDashManifest(formats, length);
 		dash_manifest = "data:application/dash+xml;charset=utf-8;base64," + btoa(manifest);
-		// return {
-		// 	dash: manifest,
-		// 	streams: formats.map((item) => ({ url: item.url, original_url: item.url, mimeType: item.mimeType })),
-		// };
+
 	}
 
 	const host = data?.playerConfig?.hlsProxyConfig?.hlsChunkHost;

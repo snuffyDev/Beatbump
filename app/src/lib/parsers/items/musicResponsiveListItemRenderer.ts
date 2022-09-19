@@ -1,6 +1,6 @@
 import type { Thumbnail } from "$lib/types";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
-import { thumbnailTransformer } from "../utils.parsers";
+import { subtitle, thumbnailTransformer } from "../utils.parsers";
 import type { IMusicResponsiveListItemRenderer, PurpleRun } from "$lib/types/internals";
 
 export function MusicResponsiveListItemRenderer(
@@ -19,25 +19,8 @@ export function MusicResponsiveListItemRenderer(
 	const flexColumns = Array.isArray(item.flexColumns) && item.flexColumns;
 	const subtitleRuns = flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs;
 	const flexCol0 = flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0] || ({} as PurpleRun);
-	const subtitles =
-		Array.isArray(subtitleRuns) &&
-		(() => {
-			const length = subtitleRuns.length;
-			let arr: any[] = Array(length);
-			for (let idx = 0; idx < length; idx++) {
-				arr[idx] =
-					subtitleRuns[idx]?.navigationEndpoint !== undefined
-						? {
-								text: subtitleRuns[idx].text,
-								browseId: subtitleRuns[idx].navigationEndpoint?.browseEndpoint?.browseId,
-								pageType:
-									subtitleRuns[idx]?.navigationEndpoint?.browseEndpoint?.browseEndpointContextSupportedConfigs
-										?.browseEndpointContextMusicConfig?.pageType,
-						  }
-						: subtitleRuns[idx];
-			}
-			return arr;
-		})();
+	const subtitles = Array.isArray(subtitleRuns) && subtitle(subtitleRuns);
+
 	const Item: IListItemRenderer = {
 		subtitle: subtitles,
 		artistInfo: {
@@ -46,7 +29,6 @@ export function MusicResponsiveListItemRenderer(
 		explicit: "badges" in item ? true : false,
 		title: flexCol0.text,
 		aspectRatio: item.flexColumnDisplayStyle,
-		playerParams: flexCol0.navigationEndpoint?.watchEndpoint?.playerParams,
 		musicVideoType:
 			flexCol0.navigationEndpoint?.watchEndpoint?.watchEndpointMusicConfig?.musicVideoType ??
 			flexCol0.navigationEndpoint?.watchEndpoint?.watchEndpointMusicSupportedConfigs?.watchEndpointMusicConfig
@@ -59,9 +41,12 @@ export function MusicResponsiveListItemRenderer(
 			: item?.watchEndpoint,
 		thumbnails: thumbnails as (Thumbnail & { placeholder: string })[],
 		length:
-			'fixedColumns' in item && item.fixedColumns[0]?.musicResponsiveListItemFixedColumnRenderer?.text?.runs?.length
+			"fixedColumns" in item && item.fixedColumns[0]?.musicResponsiveListItemFixedColumnRenderer?.text?.runs?.length
 				? item.fixedColumns[0]?.musicResponsiveListItemFixedColumnRenderer?.text?.runs[0]?.text
 				: undefined,
+		type: type,
+		playerParams:
+			flexCol0?.navigationEndpoint?.watchEndpoint?.playerParams || flexCol0?.navigationEndpoint?.watchEndpoint?.params,
 	};
 	if (Item !== undefined && playlistSetVideoId) {
 		Object.assign(Item, {
@@ -72,11 +57,21 @@ export function MusicResponsiveListItemRenderer(
 			playlistId,
 		});
 	}
+	if (Array.isArray(Item.subtitle) && Item.subtitle[0].text === "Artist") {
+		Object.assign(Item, {
+			artistInfo: {
+				artist: [
+					{
+						pageType:
+							item.navigationEndpoint?.browseEndpoint?.browseEndpointContextSupportedConfigs
+								?.browseEndpointContextMusicConfig?.pageType,
+						browseId: item?.navigationEndpoint?.browseEndpoint?.browseId,
+					},
+				],
+			},
+		});
+	}
 
-	Object.assign(Item, {
-		type: type,
-		playerParams:
-			flexCol0?.navigationEndpoint?.watchEndpoint?.playerParams || flexCol0?.navigationEndpoint?.watchEndpoint?.params,
-	});
+	Object.assign(Item, {});
 	return Item;
 }

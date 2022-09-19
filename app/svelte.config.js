@@ -22,6 +22,7 @@ const adapters = {
 };
 
 const adapter = adapters[ENV_ADAPTER];
+
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	preprocess: sveltePreprocess({
@@ -29,7 +30,7 @@ const config = {
 
 		scss: {
 			includePaths: ["src"],
-			prependData: '@import "src/global/stylesheet/base/_variables.scss";',
+			prependData: '@use "src/global/stylesheet/base/variables" as *;',
 			renderSync: true,
 			stripIndent: true,
 		},

@@ -3,6 +3,7 @@ import { ENV_DONATION_URL } from "../../env";
 import { get, writable } from "svelte/store";
 
 export type Theme = "Dark" | "Dim" | "Midnight" | "YTM";
+export type StreamType = "HTTP" | "HLS";
 enum Kind {
 	Toggle = 0,
 	Multi = 1,
@@ -20,7 +21,7 @@ interface Playback {
 	"Prefer WebM Audio"?: boolean;
 	"Dedupe Automix"?: boolean;
 	Quality?: "Normal" | "Low";
-	Stream?: "HTTP" | "HLS";
+	Stream?: StreamType;
 }
 interface Network {
 	"HLS Stream Proxy": string;

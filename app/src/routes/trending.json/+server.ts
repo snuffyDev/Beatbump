@@ -2,13 +2,19 @@
 import { buildRequest } from "$api/_api/request";
 import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 
-import type { CarouselHeader } from "$lib/types";
+import type { ICarousel, CarouselHeader } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { error, type RequestHandler } from "@sveltejs/kit";
-import { iter, map } from "$lib/utils/collections/array";
 import type { IMusicResponsiveListItemRenderer, IMusicTwoRowItemRenderer } from "$lib/types/internals";
 
+/**
+ * @root "/"
+ * @description Returns the Trending page for Beatbump.
+ * @endpoint trending.json
+ * @method GET
+ * @returns {{carouselItems: ICarousel[]}}
+ */
 export const GET: RequestHandler = async () => {
 	let carouselItems = [];
 
@@ -30,12 +36,12 @@ export const GET: RequestHandler = async () => {
 	while (--idx > -1) {
 		if ("musicCarouselShelfRenderer" in contents[idx]) carouselItems.unshift(contents[idx]);
 	}
+
 	/// Parse the carouselItems
-	carouselItems = map(carouselItems, (item, index) =>
-		parseCarousel({
-			musicCarouselShelfRenderer: item.musicCarouselShelfRenderer,
-		}),
-	);
+	let pos = carouselItems.length;
+	while (--pos > -1) {
+		carouselItems[pos] = parseCarousel({ musicCarouselShelfRenderer: carouselItems[pos].musicCarouselShelfRenderer });
+	}
 	// console.log(carouselItems[2].results[2]);
 	return new Response(JSON.stringify({ carouselItems }));
 };
@@ -74,7 +80,10 @@ function parseBody(contents: Record<string, any>[] = []):
 			};
 	  }[] {
 	const items: any[] = [];
-	iter(contents, (item, idx) => {
+	const length = contents.length;
+	let idx = -1;
+	while (++idx < length) {
+		const item = contents[idx];
 		if ("musicTwoRowItemRenderer" in item) {
 			items[idx] = MusicTwoRowItemRenderer(item as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer });
 		}
@@ -86,8 +95,7 @@ function parseBody(contents: Record<string, any>[] = []):
 		if ("musicNavigationButtonRenderer" in item) {
 			items[idx] = MoodsAndGenresItem(item);
 		}
-	});
-
+	}
 	return items;
 }
 

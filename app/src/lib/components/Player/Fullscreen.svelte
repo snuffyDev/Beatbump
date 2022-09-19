@@ -129,7 +129,7 @@
 		}
 		sliding = false;
 	}
-	$: thumbnail = (data && Array.isArray(data.thumbnails) && data?.thumbnails.at(-1)) ?? {
+	$: thumbnail = (data && Array.isArray(data?.thumbnails) && data?.thumbnails.at(-1)) ?? {
 		width: 0,
 		height: 0,
 		url: "",
@@ -436,11 +436,12 @@
 
 		opacity: 0;
 		transform: translate3d(0, 0vh, 0);
-		will-change: transform;
+		will-change: transform, opacity;
 		overscroll-behavior: contain;
 		content-visibility: auto;
 		overflow: hidden;
 		contain: strict;
+		// transition: transform 400ms cubic-bezier(0.83, 0, 0.17, 1), opacity 400ms cubic-bezier(0.16, 1, 0.3, 1);
 
 		@media screen and (min-width: 720px) {
 			// gap: 1em;
@@ -448,10 +449,11 @@
 		}
 	}
 	.tr-open {
-		transition: transform 300ms cubic-bezier(0.165, 0.84, 0.44, 1), opacity 400ms cubic-bezier(0.165, 0.84, 0.44, 1);
+		transition: transform 400ms cubic-bezier(0.165, 0.84, 0.44, 1), opacity 400ms cubic-bezier(0.165, 0.84, 0.44, 1);
 	}
 	.tr-close {
-		transition: transform 300ms cubic-bezier(0.645, 0.045, 0.355, 1), opacity 400ms cubic-bezier(0.6, 0.04, 0.98, 0.335);
+		transition: transform 400ms cubic-bezier(0.83, 0, 0.17, 1),
+			opacity 800ms cubic-bezier(0.895, 0.03, 0.685, 0.22) 400ms;
 	}
 	hr {
 		touch-action: none;
@@ -528,6 +530,8 @@
 
 		contain: strict;
 		touch-action: none;
+		will-change: opacity;
+
 		// bottom: 0;
 	}
 	.album-art {
@@ -541,11 +545,10 @@
 
 		justify-content: center;
 		max-width: 100%;
-		max-height: 35vh;
 		@media screen and (max-width: 719px) {
-			max-height: 28vh;
 			margin-bottom: 1em;
 			width: 100%;
+			height: unset;
 		}
 	}
 	.img-container {
@@ -555,17 +558,17 @@
 		overscroll-behavior: contain;
 		max-width: 100%;
 		min-height: 0;
-		max-height: inherit;
+
 		position: relative;
 		max-width: 100%;
 
 		width: 100%;
 		overscroll-behavior: contain;
-		max-height: inherit;
-		// position: absolute;
-		// max-width:100%;
 
-		// padding-top: 56.75%;
+		max-height: 35vh;
+		@media screen and (max-width: 719px) {
+			max-height: 28vh;
+		}
 	}
 	.thumbnail {
 		position: relative;

@@ -1,0 +1,43 @@
+.show-more {
+	display: inline-flex;
+	font-size: 1em;
+	font-family: system-ui;
+	cursor: pointer;
+	color: rgb(175, 175, 175);
+	font-variant: all-small-caps;
+	align-items: center;
+	font-weight: 600;
+	margin-bottom: 1.7rem;
+	font-weight: 600;
+	line-height: 1;
+	&:hover {
+		color: rgb(194, 194, 194);
+		text-decoration: underline 0.05rem solid;
+	}
+}
+.description {
+	--line-height: 1.4;
+
+	--lines: 3;
+	font-size: 1rem;
+	line-height: var(--line-height);
+	font-weight: 400;
+	color: #fff;
+	display: block;
+	visibility: visible;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	white-space: normal;
+	letter-spacing: -0.0125rem;
+	white-space: normal;
+	max-height: calc(var(--lines) * 1rem * var(--line-height));
+	margin-bottom: 0.8rem;
+	&.expanded {
+		--lines: 12;
+		--max-lines: var(--lines);
+		-webkit-line-clamp: var(--max-lines);
+		max-height: calc(var(--max-lines) * 1rem * var(--line-height));
+	}
+}

@@ -57,7 +57,7 @@ export function format(seconds: number) {
 
 	const minutes = Math.floor(seconds / 60);
 	seconds = Math.floor(seconds % 60);
-	if (seconds < 10) seconds = ("0" + seconds as unknown) as number;
+	if (seconds < 10) seconds = ("0" + seconds) as unknown as number;
 
 	return `${minutes}:${seconds}`;
 }
@@ -77,7 +77,7 @@ export const addToQueue = async (videoId: string): Promise<Song> => {
 	}
 };
 
-export type ResponseBody = { original_url: string; url: string; };
+export type ResponseBody = { original_url: string; url: string };
 // Get source URLs
 export const getSrc = async (
 	videoId?: string,
@@ -89,9 +89,9 @@ export const getSrc = async (
 	error?: boolean;
 }> => {
 	try {
-
 		const res = await fetch(
-			`/api/player.json?videoId=${videoId}${playlistId ? `&playlistId=${playlistId}` : ""}${params ? `&playerParams=${params}` : ""
+			`/api/player.json?videoId=${videoId}${playlistId ? `&playlistId=${playlistId}` : ""}${
+				params ? `&playerParams=${params}` : ""
 			}`,
 		).then((res) => res.json());
 		if (res && !res?.streamingData && res?.playabilityStatus.status === "UNPLAYABLE") {
@@ -99,7 +99,7 @@ export const getSrc = async (
 		}
 		const formats = sort({
 			data: res,
-			dash: true,
+			dash: false,
 			proxyUrl: userSettings?.network["HLS Stream Proxy"] ?? "",
 		});
 		currentId.set(videoId);
@@ -115,8 +115,11 @@ export const getSrc = async (
 
 function setTrack(formats: PlayerFormats, shouldAutoplay) {
 	let format;
-	if (userSettings?.playback?.Stream === "HLS") { format = { original_url: formats?.hls, url: formats.hls }; }
-	else { format = formats.streams[0]; }
+	if (userSettings?.playback?.Stream === "HLS") {
+		format = { original_url: formats?.hls, url: formats.hls };
+	} else {
+		format = formats.streams[0];
+	}
 	if (shouldAutoplay) updatePlayerSrc({ original_url: format.original_url, url: format.url });
 	return {
 		body: { original_url: format.original_url, url: format.url },

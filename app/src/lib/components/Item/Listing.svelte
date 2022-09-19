@@ -25,14 +25,11 @@
 	let videoId = "";
 	let playlistId = "";
 	let isHidden: boolean = false;
-	let explicit;
+	let isArtist = Array.isArray(data?.subtitle) && data.subtitle[0]?.text === "Artist";
 	let clicked;
-	let artist;
+
 	let hidden = clicked ? true : false;
 	let loading = false;
-	onMount(() => {
-		itemHandler();
-	});
 
 	let DropdownItems = [
 		{
@@ -63,7 +60,7 @@
 		},
 		{
 			text: "Play Next",
-			icon: "queue",
+			icon: "list-music",
 			action: () =>
 				groupSession.hasActiveSession
 					? groupSession.addToQueue(data, $queuePosition)
@@ -71,7 +68,7 @@
 		},
 		{
 			text: "Add to Queue",
-			icon: "queue",
+			icon: "list-music",
 			action: () =>
 				groupSession.hasActiveSession
 					? groupSession.addToQueue(data, $queue.length)
@@ -80,7 +77,7 @@
 
 		{
 			text: "Add to Playlist",
-			icon: "playlist-add",
+			icon: "list-plus",
 			action: async () => {
 				if (data?.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
 					// console.log('PLAYLIST')
@@ -166,10 +163,10 @@
 			},
 		},
 	];
-	if (data.type == "artist") {
+	if (isArtist) {
 		DropdownItems = [...DropdownItems.filter((item) => !item.text.includes("Add to Playlist"))];
 	}
-	if (data.type == "playlist") {
+	if (data.type === "playlist") {
 		DropdownItems.splice(1, 1, {
 			text: "View Playlist",
 			icon: "list",
@@ -186,22 +183,16 @@
 		DropdownItems.pop();
 		DropdownItems = [...DropdownItems.filter((item) => !item.text.includes("Favorite"))];
 	}
-	if (data.type == "video") {
+	if (data.type === "video") {
 		DropdownItems = DropdownItems.filter((d) => {
-			if (d.text == "View Artist") return;
+			if (d.text === "View Artist") return;
 		});
 	}
-	const itemHandler = () => {
-		explicit = data.explicit;
 
-		if (data.type !== "playlist") {
-			artist = data?.artistInfo?.artist;
-		}
-	};
 	if (data?.album?.browseId === undefined) {
 		DropdownItems = filter(DropdownItems, (d) => d.text !== "Go to album");
 	}
-	if (data?.artistInfo?.artist[0].browseId === undefined) {
+	if (isArtist) {
 		DropdownItems = filter(DropdownItems, (d) => d.text !== "View Artist");
 	}
 	const clickHandler = async (event) => {
@@ -211,15 +202,15 @@
 		)
 			return;
 		// console.log(event.target)
-		if (data.type == "artist") {
-			goto(`/artist/${data.artistInfo.artist}`);
+		if (isArtist) {
+			goto(`/artist/${data.artistInfo.artist[0].browseId}`);
 			return;
 		}
 		try {
 			loading = true;
 			videoId = data.videoId ? data.videoId : "";
 			playlistId = data?.playlistId ? data?.playlistId : data.shuffle?.playlistId ? data.shuffle?.playlistId : "";
-			if (data.type == "playlist") {
+			if (data.type === "playlist") {
 				// console.log(data);
 				await list.initPlaylistSession({ playlistId, index: 0 });
 			} else {
@@ -255,7 +246,7 @@
 >
 	<div class="innercard">
 		<div class="itemWrapper" on:click|stopPropagation={clickHandler}>
-			<div class="img-container" class:artist-img={data.type === "artist"}>
+			<div class="img-container" class:artist-img={isArtist}>
 				{#if loading}
 					<Loading size="3em" />
 				{/if}
@@ -271,42 +262,40 @@
 				</div>
 			</div>
 			<div class="title">
-				<span class="text-title"
-					>{data.title}
-					<span class="explicit" class:hidden={!data.explicit}> E </span></span
-				>
-				{#if data.type == "artist"}
+				<p class="text-title">
+					{data.title}
+					<span class="explicit" class:hidden={!data.explicit}> E </span>
+				</p>
+				{#if data.type === "artists"}
 					<p class="artist-stats">
-						Artist &CenterDot; {data?.length?.text}
+						{#each data.subtitle as subtitle}
+							{subtitle.text}
+						{/each}
 					</p>
-				{:else if data.type == "playlist"}
+				{:else if data.type === "playlist"}
 					<p class="text-artist">
 						{data.type == "playlist" ? `${data.metaData}` : ""}
 					</p>
 				{:else}
-					<p class="text-artist">
-						{#each data?.artistInfo?.artist || data?.subtitle as artist, i}
-							<a
-								sveltekit:prefetch
-								on:click|preventDefault={() => goto(`/artist/${artist?.browseId}`)}
-								href={`/artist/${artist?.browseId}`}>{artist.text}</a
-							>
-							{#if i !== (data?.artistInfo?.artist || data?.subtitle).length - 1}
-								<span> & </span>
+					<p class="text-artist secondary">
+						{#each data?.subtitle as artist, i}
+							{#if !artist.pageType}
+								{artist.text}
+							{:else if artist.pageType.includes("ALBUM")}
+								<a
+									on:click|preventDefault={() => goto(`/release/${artist?.browseId}`)}
+									href={`/release/${artist?.browseId}`}>{artist.text}</a
+								>
+							{:else}
+								<a
+									sveltekit:prefetch
+									on:click|preventDefault={() => goto(`/artist/${artist?.browseId}`)}
+									href={`/artist/${artist?.browseId}`}>{artist.text}</a
+								>
 							{/if}
 						{/each}
 					</p>
 				{/if}
-				<span class="album">
-					{#if data.album?.browseId}<Icon name="album" size="1em" /><a
-							sveltekit:prefetch
-							on:click|preventDefault={() => {
-								goto(`/release?id=${data?.album?.browseId}`);
-							}}
-							href={`/release?id=${data?.album?.browseId}`}>{data.album.text}</a
-						>
-					{/if}
-				</span>
 			</div>
 		</div>
 
@@ -329,6 +318,7 @@
 </div>
 
 <style lang="scss">
+	@use "../../../global/stylesheet/base/mixins";
 	.menu {
 		padding-right: 0.6em;
 	}
@@ -361,15 +351,16 @@
 		margin: 0.2rem 0;
 	}
 	.container:not(.menu) {
+		cursor: pointer;
 		display: flex;
 		flex: 1 1 auto;
-		border-bottom: 0.0714rem solid hsla(0, 0%, 66.7%, 0.24);
 		width: 100%;
 		flex-direction: row;
 		flex-wrap: nowrap;
 		background: transparent;
 		transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) background 0.125s;
 		max-width: unset !important;
+		contain: paint;
 		&:active,
 		&:hover {
 			background: lighten(#3c3d4159, 3%);
@@ -379,6 +370,8 @@
 
 	.text-artist {
 		font-size: 0.925em;
+		margin-top: 0;
+		@include mixins.trim(2);
 	}
 	.text-title {
 		font-size: 1em;
@@ -459,6 +452,9 @@
 		white-space: nowrap;
 		display: block;
 		max-width: calc(100vw - 2ch) !important;
+	}
+	a {
+		color: inherit;
 	}
 	@media (min-width: 640px) {
 		.container:active:not(.menu) {

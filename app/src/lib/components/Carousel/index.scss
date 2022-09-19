@@ -121,7 +121,7 @@
 		--thumbnail-size: 15em;
 	}
 
-	--column-width: calc(var(var(--thumbnail-size)) + 1.25em);
+	--column-width: calc(var(--thumbnail-size) + 1.25em);
 }
 
 .scroll {

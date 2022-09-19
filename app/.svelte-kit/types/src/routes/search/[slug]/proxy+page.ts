@@ -1,27 +1,26 @@
+import type { SearchFilter } from "$api/search.json/+server";
+import type { NextContinuationData } from "$lib/types";
+import type { MusicShelf } from "$lib/types/musicShelf";
 import type { PageLoad } from "./$types";
 
-let path;
 
-export const load = async ({ url, params, fetch }: Parameters<PageLoad>[0]) => {
+export interface SearchResponse {
+	results?: MusicShelf[];
+	continuation?: NextContinuationData;
+	filter: SearchFilter;
+	type?: "next" | undefined;
+}
+export const load = async ({ url, params, fetch }: Parameters<PageLoad>[0]): Promise<SearchResponse> => {
 	const slug = params.slug;
 	const filter = url.searchParams.get("filter") || "";
-	path = url.pathname;
-	// console.log(filter, page, slug)
-	const apiUrl = `/api/search.json?q=${encodeURIComponent(slug)}${
-		filter !== "" ? `&filter=${encodeURIComponent(filter)}` : ""
-	}`;
+
+	const apiUrl = `/api/search.json?q=${slug}${filter !== "" ? `&filter=${encodeURIComponent(filter)}` : ""
+		}`;
 	const response = await fetch(apiUrl);
-	const data = await response.json();
-	const { results = [], continuation = {}, didYouMean, error } = await data;
+	const data = await response.json() as SearchResponse;
+	Object.assign(data, { filter });
 
 	if (response.ok) {
-		return {
-			filter: filter,
-			contents: results,
-			continuation: continuation,
-			didYouMean: didYouMean,
-			error,
-			path,
-		};
+		return data;
 	}
 };

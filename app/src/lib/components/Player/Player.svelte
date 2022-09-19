@@ -50,7 +50,7 @@
 		},
 		{
 			text: "Add to Playlist",
-			icon: "playlist-add",
+			icon: "list-plus",
 			action: async () => {
 				showAddToPlaylistPopper.set({ state: true, item: $currentTrack });
 			},
@@ -150,19 +150,18 @@
 				width="64"
 				height="64"
 				on:error|capture={handleImageError}
-				src={$currentTrack.thumbnails?.[0]?.url ?? IMAGE_NOT_FOUND}
-				alt="{$currentTrack.title} thumbnail image"
+				src={$currentTrack?.thumbnails?.[0]?.url ?? IMAGE_NOT_FOUND}
+				alt="{$currentTrack?.title} thumbnail image"
 			/>
 			<div
 				class="container"
 				style="
-    gap: 0.20125em;
     font-weight: 400;
     font-family: 'CommissionerVariable';
     letter-spacing: -0.02em;"
 			>
-				<span>{$currentTrack?.title}</span>
-				<div>{$currentTrack.artistInfo?.artist[0]?.text}</div>
+				<span class="now-playing-title">{$currentTrack?.title}</span>
+				<span class="now-playing-artist">{$currentTrack.artistInfo?.artist[0]?.text}</span>
 			</div>
 		{:else}
 			<img
@@ -224,8 +223,10 @@
 								class="volume"
 								type="range"
 								on:click|capture|stopPropagation={() => {}}
-								on:input|capture|stopPropagation={() => {
-									AudioPlayer.volume = volume;
+								on:input|capture|stopPropagation={(e) => {
+									let linear = e.target.value / 1;
+									let sqrt = Math.pow(linear, 1.2);
+									AudioPlayer.volume = sqrt;
 								}}
 								bind:value={volume}
 								min="0"
@@ -272,6 +273,21 @@
 			display: flex;
 			// }
 		}
+	}
+	:where(.now-playing) title {
+		display: block;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		max-width: calc(100% - 0.2em);
+		overflow: hidden;
+
+		font-size: small;
+	}
+	.now-playing-artist {
+		display:block;
+		font-size: 12px;
+	color: rgba(255, 255, 255, 0.7) !important;
+
 	}
 	.now-playing img {
 		object-fit: contain;
@@ -328,6 +344,17 @@
 		border-radius: 0.6rem;
 		isolation: isolate;
 		z-index: 100;
+		&::before {
+			content: "";
+			position: absolute;
+			width: 100%;
+			// bottom: 0;
+			// inset: 0;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			height: 5rem;
+		}
 	}
 	.volume-slider {
 		height: 100%;

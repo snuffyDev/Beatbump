@@ -17,7 +17,7 @@
 	async function handleSubmit() {
 		dispatch("submitted", { submitted: true, filter, query });
 		fullscreenStore.set("closed");
-		let url = `/search/${encodeURIComponent(query)}${filter !== undefined ? `?filter=${filter}` : ""}`;
+		let url = `/search/${query}${filter !== undefined ? `?filter=${filter}` : ""}`;
 		goto(url);
 	}
 	const typeahead = debounce(async () => {

@@ -1,4 +1,4 @@
-import { error, json, json as json$1 } from "@sveltejs/kit";
+import { error, json, json as json$1, type RequestEvent } from "@sveltejs/kit";
 import { MusicResponsiveListItemRenderer } from "$lib/parsers";
 import { iter, type Maybe } from "$lib/utils";
 import { buildRequest } from "../_api/request";
@@ -7,28 +7,38 @@ import type { IMusicResponsiveListItemRenderer } from "$lib/types/internals";
 import type { RequestHandler } from "@sveltejs/kit";
 import type { SearchEndpointParams } from "../_api/_base";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+import type { MusicShelf } from "$lib/types/musicShelf";
+import type { IResponse } from "$lib/types/response";
 
-export type SearchFilter = "video" | "community_playlist" | "featured_playlist" | "all_playlist" | "song" | "artist";
+export type SearchFilter =
+	| "all"
+	| "videos"
+	| "community_playlists"
+	| "featured_playlists"
+	| "all_playlists"
+	| "songs"
+	| "artists";
 
 const Filters = {
-	song: "EgWKAQIIAWoKEAMQBBAJEAoQBQ%3D%3D",
-	video: "EgWKAQIQAWoKEAMQBBAJEAoQBQ%3D%3D",
-	album: "EgWKAQIYAWoKEAMQBBAJEAoQBQ%3D%3D",
-	artist: "EgWKAQIgAWoKEAMQBBAJEAoQBQ%3D%3D",
-	community_playlist: "EgeKAQQoAEABagwQDhAKEAkQAxAEEAU%3D",
-	featured_playlist: "EgeKAQQoADgBagwQDhAKEAMQBBAJEAU%3D",
+	all: "",
+	songs: "EgWKAQIIAWoKEAMQBBAJEAoQBQ%3D%3D",
+	videos: "EgWKAQIQAWoKEAMQBBAJEAoQBQ%3D%3D",
+	albums: "EgWKAQIYAWoKEAMQBBAJEAoQBQ%3D%3D",
+	artists: "EgWKAQIgAWoKEAMQBBAJEAoQBQ%3D%3D",
+	community_playlists: "EgeKAQQoAEABagwQDhAKEAkQAxAEEAU%3D",
+	featured_playlists: "EgeKAQQoADgBagwQDhAKEAMQBBAJEAU%3D",
 	all_playlists: "EgWKAQIoAWoKEAMQBBAKEAUQCQ%3D%3D",
 } as const;
 
 export const GET: RequestHandler = async ({ url }) => {
 	const queryParam = url.searchParams;
-	const q = queryParam.get("q") || "";
-	const filter: SearchFilter | string = (queryParam.get("filter") as SearchFilter) || "";
+	const q = queryParam.get("q") ?? "";
+	const filter: SearchFilter | string = (queryParam.get("filter") as SearchFilter) ?? undefined;
 
-	const ctoken = queryParam.get("ctoken") || "";
-	const itct = queryParam.get("itct") || "";
+	const ctoken = queryParam.get("ctoken") ?? "";
+	const itct = queryParam.get("itct") ?? "";
 
-	const rawFilterParam = Filters[filter] ?? Filters.song;
+	const rawFilterParam = Filters[filter] ?? undefined;
 	try {
 		const response = await buildRequest<SearchEndpointParams>("search", {
 			context: {
@@ -37,8 +47,12 @@ export const GET: RequestHandler = async ({ url }) => {
 					clientVersion: "1.20220404.01.00",
 				},
 			},
-			params: { browseId: "", query: decodeURIComponent(q), params: filter !== "" ? `${rawFilterParam}` : "" },
-			continuation: ctoken !== "" ? { continuation: ctoken, ctoken, itct: `${itct}`, type: "next" } : null,
+			params: {
+				browseId: "",
+				query: decodeURIComponent(q),
+				params: filter !== "all" ? `${rawFilterParam}` : undefined,
+			},
+			continuation: ctoken !== "" ? { continuation: ctoken, ctoken, itct: `${itct}`, type: "next" } : undefined,
 		});
 		if (!response.ok) {
 			throw error(500, response.statusText);
@@ -56,7 +70,7 @@ export const GET: RequestHandler = async ({ url }) => {
 				? parseContinuation(continuationContents, filter as SearchFilter)
 				: parseContents(contents, filter as SearchFilter);
 
-		return json(results);
+		return json(Object.assign(results, { data }));
 	} catch (err) {
 		throw error(500, err);
 	}
@@ -65,13 +79,14 @@ export const GET: RequestHandler = async ({ url }) => {
 function parseContinuation(contents: Record<string, any>, filter: string & SearchFilter) {
 	const continuation: Maybe<Partial<NextContinuationData>> =
 		Array.isArray(contents?.continuations) && contents?.continuations[0]?.nextContinuationData;
-	const type = filter.includes("playlist") ? "playlist" : filter;
+	const type = filter.includes("playlists") ? "playlists" : filter;
 
 	const results = parseResults(contents.contents, type);
 
 	return {
 		continuation,
 		results,
+		type: "next",
 	};
 }
 
@@ -82,16 +97,19 @@ function parseContents(
 		musicShelfRenderer?: {
 			continuations?: [{ nextContinuationData: NextContinuationData }];
 			contents?: { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer }[];
+
+			title?: { runs: [{ text: string }] };
 		};
 	}[] = [],
 	filter: SearchFilter,
 ) {
-	const results: IListItemRenderer[] = [];
+	const results: MusicShelf[] = [];
 	const continuation: Maybe<Partial<NextContinuationData>> = {};
 
 	let len = contents.length;
-	const type = filter.includes("playlist") ? "playlist" : filter;
+	const type = filter.includes("playlists") ? "playlists" : filter;
 	while (--len > -1) {
+		const shelf: MusicShelf = { contents: [], header: { title: "" } };
 		const section = contents[len];
 
 		/// PR: https://github.com/snuffyDev/Beatbump/pull/83
@@ -109,8 +127,12 @@ function parseContents(
 		// If the section has an array at the property `contents` - parse it.
 		if (items) {
 			const _results = parseResults(items, type);
-			Object.assign(results, _results);
+			shelf.contents = _results;
 		}
+		if (musicShelf.title) {
+			shelf.header.title = musicShelf.title?.runs[0]?.text;
+		}
+		results.unshift(shelf);
 	}
 	return { results, continuation };
 }
@@ -122,7 +144,7 @@ function parseResults(items: any[], type: string) {
 		const entry = items[idx];
 		const item = MusicResponsiveListItemRenderer(entry);
 		Object.assign(item, { type: type });
-		if (type === "playlist") {
+		if (type === "playlists") {
 			let metaData = "";
 			iter(item.subtitle, (subtitle) => (metaData += subtitle.text));
 			Object.assign(item, {
@@ -133,7 +155,7 @@ function parseResults(items: any[], type: string) {
 						?.navigationEndpoint?.watchPlaylistEndpoint?.playlistId,
 			});
 		}
-		if (type === "song") {
+		if (type === "songs") {
 			Object.assign(item, {
 				album: item.subtitle.at(-3).pageType?.includes("ALBUM") && item.subtitle.at(-3),
 			});

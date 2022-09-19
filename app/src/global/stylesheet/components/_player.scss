@@ -89,8 +89,8 @@
 }
 .player {
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
-	grid-template-areas: "n m r r";
+	grid-template-columns: 1.25fr 1.1fr 1.25fr;
+	grid-template-areas: "n m r";
 	padding-inline: 1em;
 	max-width: 100%;
 	min-width: calc(100% - 40px);

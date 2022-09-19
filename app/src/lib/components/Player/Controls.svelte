@@ -30,7 +30,6 @@
 		</div>
 		<div
 			class="player-btn player-title"
-			class:isQueue
 			on:click|stopPropagation|capture={(e) => {
 				if (!$SessionListService.mix) return;
 				if (isPaused) {
@@ -45,9 +44,9 @@
 			{#if loading}
 				<div class="player-spinner" class:fade-out={loading ? true : false} />
 			{:else if isPaused}
-				<Icon fill={isQueue ? "#000" : "none"} color="white" name="play-player" size={sizes.main} />
+				<Icon fill={isQueue ? "#FFF" : "none"} color="white" name="play" size={sizes.main} />
 			{:else}
-				<Icon fill={isQueue ? "#000" : "none"} color="white" name="pause" size={sizes.main} />
+				<Icon fill={isQueue ? "#FFF" : "none"} color="white" name="pause" size={sizes.main} />
 			{/if}
 		</div>
 		<div class="player-btn" on:click|stopPropagation|capture={nextBtn}>
@@ -69,14 +68,7 @@
 		// margin-bottom: 0.1275em;
 		margin-bottom: 0.2em;
 	}
-	.isQueue::after {
-		border-radius: 999999em;
-		background: #fff;
-		content: "";
-		position: absolute;
-		z-index: -1;
-		inset: 0;
-	}
+
 	.player-spinner {
 		align-items: center;
 		justify-content: center;

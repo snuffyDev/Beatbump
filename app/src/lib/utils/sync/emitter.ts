@@ -1,19 +1,20 @@
 import type { JSON } from "$lib/types";
 
 export type EventType = string;
-export type EventCallback<T = unknown> = (payload?: T | T[]) => void;
+export type EventCallback<T = unknown> = (payload?: T) => void;
 export type EventListeners<
 	Events extends Record<string, unknown>,
 	Name extends keyof Events = keyof Events & string,
-> = Map<Name, EventCallback<Events[Name]>[]>;
+	> = Map<Name, EventCallback<Events[Name]>[]>;
+type KeyOf<T> = keyof T & string;
 
-export interface IEventEmitter {
-	dispatch<T>(type: EventType, ...args: T[]): void;
-	off(type: EventType, cb: EventCallback): void;
-	on(type: EventType, cb: EventCallback): void;
+export interface IEventEmitter<T> {
+	dispatch<Name extends KeyOf<T> = KeyOf<T>>(type: Name, args?: T[Name]): void;
+	off<Name extends KeyOf<T> = KeyOf<T>>(type: Name, cb: EventCallback<T[Name]>): void;
+	on<Name extends KeyOf<T> = KeyOf<T>>(type: Name, cb: EventCallback<T[Name]>): void;
 }
 
-export class EventEmitter implements IEventEmitter {
+export class EventEmitter<Events extends Record<string, any> = any> implements IEventEmitter<Events> {
 	private __target: object;
 	private _eventQueue = new WeakMap<object, EventListeners<any>>();
 
@@ -21,9 +22,9 @@ export class EventEmitter implements IEventEmitter {
 		this.__target = target;
 	}
 
-	dispatch<Events extends Record<string, unknown> = any, Name extends keyof Events = keyof Events>(
-		type: string,
-		...args: any[]
+	dispatch<Name extends KeyOf<Events> = KeyOf<Events>>(
+		type: Name,
+		args?: Events[Name]
 	): void {
 		const queue = this._eventQueue.get(this.__target);
 
@@ -38,7 +39,7 @@ export class EventEmitter implements IEventEmitter {
 		const length = listeners.length;
 		let idx = -1;
 
-		for (; ++idx < length; ) {
+		for (; ++idx < length;) {
 			listeners[idx](args);
 		}
 	}
@@ -48,7 +49,7 @@ export class EventEmitter implements IEventEmitter {
 		this._eventQueue = null;
 	}
 
-	public off(type?: string, cb?: EventCallback): void {
+	public off<Name extends KeyOf<Events> = KeyOf<Events>>(type: Name, cb: EventCallback<Events[Name]>): void {
 		const listeners = this._eventQueue.get(this.__target);
 		if (!listeners) return;
 		if (type === undefined) {
@@ -63,26 +64,29 @@ export class EventEmitter implements IEventEmitter {
 		}
 	}
 
-	public on<T extends any = any[] & any>(type: string, cb: EventCallback<T>): void {
+	public on<Name extends KeyOf<Events> = KeyOf<Events>>(type: Name, cb: EventCallback<Events[Name]>): void {
 		if (!this.__target) return;
 		const queue = this._eventQueue.get(this.__target) ?? (new Map() as EventListeners<any>);
 
 		const listeners = queue.get(type) ?? [];
 		queue.set(type, listeners.concat(cb));
-		// console.log(listeners instanceof Array, listeners);
+
 		this._eventQueue.set(this.__target, queue);
 	}
 
-	public once<Events extends Record<string, unknown> = any, Type extends keyof Events = keyof Events>(
-		name: Type,
-		cb: EventCallback<Events[Type]>,
+	public once<Name extends KeyOf<Events> = KeyOf<Events>>(
+		name: Name,
+		cb: EventCallback<Events[Name]>,
 	) {
+
 		if (!this.__target) return;
-		const doOnce = (data: Events[Type]) => {
-			this.off(name as string, doOnce);
+
+		const doOnce = (data: Events[Name]) => {
+			this.off(name, doOnce);
 			cb(data);
 		};
-		this.on(name as string, doOnce);
+
+		this.on(name, doOnce);
 	}
 }
 

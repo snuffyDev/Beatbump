@@ -15,6 +15,7 @@ import { WritableStore } from "./utils/stores";
 import { getSrc, type ResponseBody } from "./utils/utils";
 import type HLS from "hls.js";
 import { settings } from "./stores";
+import type { StreamType } from "$stores/settings";
 
 export interface IAudioPlayer {
 	// #region Properties (6)
@@ -51,10 +52,10 @@ export interface IEventHandler {
 	// #endregion Public Methods (1)
 }
 
-type SrcDict = { original_url: string; url: string; };
+type SrcDict = { original_url: string; url: string };
 
 // AudioPlayer Class Events
-const events: Map<string, { cb: Callback<keyof HTMLElementEventMap>; options?: AddEventListenerOptions | boolean; }> =
+const events: Map<string, { cb: Callback<keyof HTMLElementEventMap>; options?: AddEventListenerOptions | boolean }> =
 	new Map();
 
 const setPosition = () => {
@@ -78,8 +79,9 @@ function metaDataHandler(sessionList: Maybe<ISessionListProvider>) {
 			artwork: [
 				{
 					src: currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].url,
-					sizes: `${currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].width}x${currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].height
-						}`,
+					sizes: `${currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].width}x${
+						currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].height
+					}`,
 					type: "image/jpeg",
 				},
 			],
@@ -103,12 +105,20 @@ function metaDataHandler(sessionList: Maybe<ISessionListProvider>) {
 	}
 }
 
-export const updateGroupState = (opts: { client: string; state: ConnectionState; }): void =>
+export const updateGroupState = (opts: { client: string; state: ConnectionState }): void =>
 	groupSession.sendGroupState(opts);
 export const updateGroupPosition = (dir: "<-" | "->" | undefined, position: number): void =>
 	groupSession.send("PATCH", "state.update.position", { dir, position }, groupSession.client);
 
-class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandler {
+interface AudioPlayerEvents {
+	"update:stream_type": { type: StreamType };
+	play: SrcDict;
+	playing: undefined;
+}
+
+const e: AudioPlayerEvents = {};
+
+class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioPlayer, IEventHandler {
 	// #region Properties (21)
 
 	private _HLS: HLS;
@@ -152,7 +162,7 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 	constructor() {
 		super({});
 		if (!browser) return;
-		if (('window' in globalThis.self) === false) return;
+		if ("window" in globalThis.self === false) return;
 		this._isWebkit = /i(Phone|Pad|Pod)/i.test(navigator.userAgent);
 
 		this._player = new Audio();
@@ -440,13 +450,15 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 		if (position >= sessionList.mix.length - 1) {
 			if (groupSession.initialized && groupSession.hasActiveSession && groupSession.client.role !== "host") {
 				const response = await this.getTrackSrc(position, shouldAutoplay);
-				return response as true;
+				return response as ResponseBody;
 			}
+
 			/// Check if track is a single or if there's no continuation set
 			if (sessionList.currentMixType !== "playlist" && !sessionList.continuation && !sessionList.clickTrackingParams) {
 				const response = await this.handleAutoSuggestion(sessionList.position);
 				return response;
 			}
+
 			/// If track has continuation (automix), get next section of queue list
 			return SessionListService.getSessionContinuation({
 				itct: sessionList.mix[position]?.itct,
@@ -553,17 +565,22 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 
 	private async setup() {
 		if (!browser) return;
-		if (browser && !!settings && get(settings)?.playback?.Stream === "HLS" && !this.isWebkit) {
+		if (browser && !!settings && !this.isWebkit && get(settings)?.playback?.Stream === "HLS") {
 			this._HLSModule = await this.loadHLSModule();
-			if (this._HLSModule.isSupported()) {
+			if (this._HLSModule.isSupported() && get(settings)?.playback?.Stream === "HLS") {
 				this.isHLSPlayer = true;
+				console.log(this);
 			}
 		}
 		this.__unsubscriber = this._src.subscribe(async (value) => {
 			if (this.isHLSPlayer && !this._HLSModule) this._HLSModule = await this.loadHLSModule();
 			if (this.isHLSPlayer) {
+				console.log(this);
 				this.createHLSPlayer(value);
 			} else {
+				if (this._HLS) {
+					this._HLS.destroy();
+				}
 				this._player.src = value;
 				this._player.load();
 			}
@@ -574,6 +591,24 @@ class BaseAudioPlayer extends EventEmitter implements IAudioPlayer, IEventHandle
 				// this._player.load();
 				this._player.autoplay = true;
 				this.play();
+			}
+		});
+
+		this.on("update:stream_type", async ({ type }) => {
+			console.log(this, type);
+			if (type === "HLS" && !this.isWebkit) {
+				if (!this._HLSModule) {
+					this._HLSModule = await this.loadHLSModule();
+				}
+				if (this._HLSModule.isSupported()) {
+					this.isHLSPlayer = true;
+				}
+			}
+			if (type === "HTTP") {
+				if (this.isHLSPlayer) {
+					this.isHLSPlayer = false;
+					if (this._HLS) this._HLS.destroy();
+				}
 			}
 		});
 

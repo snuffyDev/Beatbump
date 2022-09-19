@@ -62,7 +62,7 @@
 		},
 		{
 			text: "Add to Playlist",
-			icon: "playlist-add",
+			icon: "list-plus",
 			action: async () => {
 				if (item.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
 					const response = await fetch("/api/get_queue.json?playlistId=" + item.playlistId);
@@ -208,7 +208,7 @@
 	<div class="index">
 		<span class:hidden={isPlaying !== true && isHovering !== true}>
 			<!--#9990a0-->
-			<Icon name="play-player" color="inherit" size="1.5em" />
+			<Icon name="play" color="inherit" size="1.5em" />
 		</span>
 		<span class:hidden={isPlaying !== false || isHovering !== false}>
 			{idx + 1}
@@ -259,7 +259,7 @@
 	</div>
 	{#if $isMobileMQ || isHovering}
 		<div class="length" tabindex="0" on:focus={() => (isHovering = true)}>
-			<PopperButton size={"24px"} tabindex="0" items={DropdownItems} />
+			<PopperButton tabindex="0" items={DropdownItems} />
 		</div>
 	{:else}
 		<span class="length" class:hidden={!item?.length ? true : false}>{(item?.length?.text ?? item.length) || ""}</span>

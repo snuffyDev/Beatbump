@@ -119,18 +119,18 @@ function _sessionListService() {
 			// console.log(args, { mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
 			if (mix.length && playlistId === currentMixId && chunkedPlaylistMap.size !== 0) {
 				if (index < chunkedPlaylistMap.get(0).length) {
-					console.log("index < chunked0", index, chunkedPlaylistMap);
+					// console.log("index < chunked0", index, chunkedPlaylistMap);
 					mix = Array.from(chunkedPlaylistMap.get(0));
 				} else {
 					const temp = [];
 					chunkedPlaylistMap.forEach((value, key) => {
 						if (index > value.length) {
-							console.log("index < value.length", index, key, value);
+							// console.log("index < value.length", index, key, value);
 							mix.push(...Array.from(chunkedPlaylistMap.get(key)));
 						}
 						if (index < value.length - 1 && index > chunkedPlaylistMap[key - 1].length) {
 							mix = [...temp, Array.from(chunkedPlaylistMap.get(index))];
-							console.log("index < value.length - 1", index, key, value, mix);
+							// console.log("index < value.length - 1", index, key, value, mix);
 						}
 					});
 					if (groupSession?.initialized && groupSession?.hasActiveSession) {
@@ -142,15 +142,17 @@ function _sessionListService() {
 			}
 			if (mix.length !== 0) {
 				position = 0;
+				internalIdx = 0;
+
 				mix = [];
-			};
+			}
 			currentMixType = "playlist";
 			try {
-				const data = await fetchNext({ params, playlistId: playlistId, });
+				const data = await fetchNext({ params, playlistId: playlistId });
 				mix.push(...data.results);
 				mix = mix.filter((item) => item.title);
 				if (mix.length > 50) {
-					console.log(mix);
+					// console.log(mix);
 
 					chunkedListOriginalLen = mix.length;
 					for (const [key, value] of split(mix, 50).entries()) {
@@ -160,18 +162,18 @@ function _sessionListService() {
 					}
 					// mix = Array.from(chunkedPlaylistMap)
 					if (index < chunkedPlaylistMap.get(0).length) {
-						console.log("index < chunked0", index, chunkedPlaylistMap);
+						// console.log("index < chunked0", index, chunkedPlaylistMap);
 						mix = Array.from(chunkedPlaylistMap.get(0));
 					} else {
 						const temp = [];
 						chunkedPlaylistMap.forEach((value, key) => {
 							if (index > value.length) {
-								console.log("index < value.length", index, key, value);
+								// console.log("index < value.length", index, key, value);
 								temp.push(Array.from(chunkedPlaylistMap.get(key)));
 							}
 							if (index < value.length - 1 && index > chunkedPlaylistMap[key - 1].length) {
 								mix = [...temp, Array.from(chunkedPlaylistMap.get(index))];
-								console.log("index < value.length - 1", index, key, value, mix);
+								// console.log("index < value.length - 1", index, key, value, mix);
 							}
 						});
 					}
@@ -218,7 +220,7 @@ function _sessionListService() {
 				/** notify('Error: No track videoId was provided!', 'error'); **/ return;
 			}
 			playerLoading.set(true);
-			console.log(playlistId, currentMixId);
+			// console.log(playlistId, currentMixId);
 			const response = await fetchNext({
 				params: "wAEB8gECeAE%3D",
 				playlistId: "RDAMPL" + (playlistId !== null ? playlistId : currentMixId),
@@ -252,7 +254,7 @@ function _sessionListService() {
 		}): Promise<ResponseBody> {
 			playerLoading.set(true);
 			if (currentMixType === "playlist" && chunkedPlaylistMap.size && mix.length < chunkedListOriginalLen - 1) {
-				console.log("playlist session", chunkedPlaylistMap, currentMixType);
+				// console.log("playlist session", chunkedPlaylistMap, currentMixType);
 				chunkedPlaylistCurrentIdx++;
 
 				const src = await getSrc(mix[mix.length - 1].videoId);
@@ -262,25 +264,26 @@ function _sessionListService() {
 				commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
 				return await src.body;
 			}
-			console.log("ARGS", { clickTrackingParams, ctoken, itct, key, playlistId, videoId });
+			// console.log("ARGS", { clickTrackingParams, ctoken, itct, key, playlistId, videoId });
 			internalIdx += 24;
 			if (!clickTrackingParams && !ctoken) {
 				playlistId = "RDAMPL" + playlistId;
 				itct = "wAEB8gECeAE%3D";
 			}
 			const data = await fetchNext({
-				visitorData,
-				params: itct,
+				visitorData: decodeURIComponent(visitorData),
+				params: "OAHyAQIIAQ==",
 				playlistSetVideoId: mix[position]?.playlistSetVideoId,
-				// index: internalIdx,
+				index: internalIdx,
 				videoId,
 				playlistId,
 				ctoken,
 				clickTracking: clickTrackingParams,
 			}).catch((err) => console.error(err));
+			(data?.results as any[]).shift();
 			mix.push(...data.results);
 			mix = get(filterAutoPlay) ? filterList(mix) : mix;
-			visitorData = data["visitorData"];
+			visitorData = data["visitorData"] ?? visitorData;
 
 			continuation = data.continuation;
 			currentMixId = data.currentMixId;

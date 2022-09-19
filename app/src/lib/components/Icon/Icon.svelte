@@ -1,15 +1,13 @@
 <svelte:options namespace="svg" />
 
 <script lang="ts">
-	import icons from "./icons";
-	type IconName<Keys extends keyof typeof icons = keyof typeof icons> = Keys
-	export let name: IconName;
+	import type { Icons } from "./icons";
+
+	export let name: Icons;
 	export let size = "1.5rem";
 	export let color = "var(--stroke, currentColor)";
 	export let fill = "none";
 	export let style = "";
-
-	let displayIcon = icons[name];
 </script>
 
 <svg
@@ -20,7 +18,7 @@
 	stroke-linecap="round"
 	stroke-linejoin="round"
 	style="width: {size}; height:{size}; {style}; transition: stroke linear 50ms;"
-	viewBox="0 0 24 24">{@html displayIcon}</svg
+	viewBox="0 0 24 24"><use href="/icons.svg#{name}" /></svg
 >
 
 <style>

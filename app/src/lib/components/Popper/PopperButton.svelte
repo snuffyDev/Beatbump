@@ -2,9 +2,6 @@
 </script>
 
 <script lang="ts">
-	import { debounce, throttle } from "$lib/utils/sync";
-
-
 	import Icon from "../Icon/Icon.svelte";
 	import { isOpen } from "./popperStore";
 
@@ -12,7 +9,7 @@
 	export let items = [];
 	export let type = "";
 	export let metadata = {};
-	export let size = "1.5rem";
+	export let size = "1.5em";
 	export let tabindex: string | number = "0";
 	let nodeIsOpen = false;
 	function Popper(node: HTMLElement) {
@@ -27,31 +24,29 @@
 			// console.log(event)
 			event.stopImmediatePropagation();
 			if ($isOpen) {
-				if (nodeIsOpen) {
-					nodeIsOpen = false;
-				}
 				nodeIsOpen = PopperStore.reset();
 				$isOpen = false;
 				return;
+			} else {
+				const rect = node.getBoundingClientRect();
+				nodeIsOpen = true;
+				x = rect.left;
+				y = rect.top;
+				initY = rect.top;
+				bottom = rect.bottom;
+				isOpen.set(true);
+				PopperStore.set({
+					items,
+					srcNode: node,
+					direction: "normal",
+					isOpen: true,
+					type,
+					x,
+					y,
+					metadata,
+					bottom,
+				});
 			}
-			const rect = node.getBoundingClientRect();
-			nodeIsOpen = true;
-			x = rect.left;
-			y = rect.top;
-			initY = rect.top;
-			bottom = rect.bottom;
-			isOpen.set(true);
-			PopperStore.set({
-				items,
-				srcNode: node,
-				direction: "normal",
-				isOpen: true,
-				type,
-				x,
-				y,
-				metadata,
-				bottom,
-			});
 		}
 		node.addEventListener("click", handleClick, {
 			passive: true,

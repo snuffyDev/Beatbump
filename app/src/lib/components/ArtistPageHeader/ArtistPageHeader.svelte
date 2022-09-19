@@ -4,6 +4,8 @@
 	import { onMount } from "svelte";
 	import type { ArtistPage } from "$lib/parsers";
 	import { browser } from "$app/env";
+	import Description from "./Description";
+	import { isDesktopMQ } from "$stores/window";
 
 	export let header: ArtistPage["header"];
 	export let thumbnail = [];
@@ -17,24 +19,17 @@
 	let opacity = 0;
 	let img: HTMLImageElement;
 
-	let descClientHeight = undefined;
-	let descOffsetHeight = undefined;
-	let desc: HTMLElement = undefined;
-
-	$: descIsOverflow = descClientHeight < descOffsetHeight ? false : true;
-
 	const handler = () => {
 		if (!browser && !container) return;
 
-		  const scroll = container.getBoundingClientRect();
-			const calc = -scroll.top / window.innerHeight;
-			y = window.innerWidth < 500 ? Math.min(Math.max(calc, 0), 1) * 325 : Math.min(Math.max(calc, 0), 1) * 116;
-
+		const scroll = container.getBoundingClientRect();
+		const calc = -scroll.top / window.innerHeight;
+		y = window.innerWidth < 500 ? Math.min(Math.max(calc, 0), 1) * 325 : Math.min(Math.max(calc, 0), 1) * 116;
 	};
 
-	function onScroll(event: UIEvent){
-		cancelAnimationFrame(timestamp)
-		timestamp = requestAnimationFrame(handler)
+	function onScroll(event: UIEvent) {
+		cancelAnimationFrame(timestamp);
+		timestamp = requestAnimationFrame(handler);
 	}
 	onMount(() => {
 		let start;
@@ -43,10 +38,7 @@
 				opacity = 1;
 			});
 		}
-		if (desc) {
-			descClientHeight = desc.clientHeight;
-			descOffsetHeight = desc.scrollHeight;
-		}
+
 		wrapper = document.getElementById("wrapper");
 		wrapper.addEventListener("scroll", onScroll, { passive: true });
 		return () => {
@@ -54,7 +46,6 @@
 			wrapper.removeEventListener("scroll", onScroll);
 		};
 	});
-	// $: console.log(header)
 </script>
 
 <div class="artist-header">
@@ -132,13 +123,13 @@
 					</picture>
 				{/if}
 				<div class="name">{header?.name}</div>
-				{#if description}
-					<div class="description" bind:this={desc} class:expanded={isExpanded}>
+				{#if $isDesktopMQ && description}
+					<Description
 						{description}
-					</div>
-					<div class="show-more" class:hidden={descIsOverflow} on:click={() => {isExpanded = !isExpanded; handler();}}>
-						<span class="btn-text">Show {isExpanded ? "Less" : "More"}</span>
-					</div>
+						on:update={(e) => {
+							isExpanded = e.detail;
+						}}
+					/>
 				{/if}
 				<div class="btn-wrpr">
 					{#if header?.buttons.radio !== null}
@@ -169,69 +160,20 @@
 
 <!--  -->
 <style lang="scss">
+	@import "./index.scss";
 	.hidden {
 		display: none !important;
-	}
-	.show-more {
-		display: inline-flex;
-		font-size: 1em;
-		font-family: system-ui;
-		cursor: pointer;
-		color: rgb(175, 175, 175);
-		font-variant: all-small-caps;
-		align-items: center;
-		font-weight: 600;
-		margin-bottom: 1.7rem;
-		font-weight: 600;
-		line-height: 1;
-		&:hover {
-			color: rgb(194, 194, 194);
-			text-decoration: underline 0.05rem solid;
-		}
-		@media screen and (max-width: 53.333333rem) {
-			display: none !important;
-			visibility: none !important;
-		}
-	}
-	.description {
-		--line-height: 1.4;
-		display: none;
-		visibility: hidden;
-		@media screen and (min-width: 53.333333rem) {
-			--lines: 3;
-			font-size: 1rem;
-			line-height: var(--line-height);
-			font-weight: 400;
-			color: #fff;
-			display: block;
-			visibility: visible;
-			display: -webkit-box;
-			-webkit-line-clamp: 3;
-			-webkit-box-orient: vertical;
-			overflow: hidden;
-			white-space: normal;
-			letter-spacing: -0.0125rem;
-			white-space: normal;
-			max-height: calc(var(--lines) * 1rem * var(--line-height));
-			margin-bottom: 0.8rem;
-			&.expanded {
-				--lines: 12;
-				--max-lines: var(--lines);
-				-webkit-line-clamp: var(--max-lines);
-				max-height: calc(var(--max-lines) * 1rem * var(--line-height));
-			}
-		}
 	}
 
 	.modal {
 		position: absolute;
 		top: 0%;
-		// transform: translate(25%, 0%);
+
 		right: 0;
 		left: 0%;
 		bottom: 0;
 		width: 80%;
-		// height: 90%;
+
 		align-self: center;
 
 		max-height: 100%;
@@ -241,13 +183,13 @@
 		z-index: 5;
 		height: 80%;
 		border-radius: var(--md-radius);
-		// backdrop-filter: blur(1rem);
+
 		background: var(--color-med);
 	}
 	.modal-wrapper {
 		position: fixed;
 		top: 0%;
-		// transform: translate(25%, 0%);
+
 		right: 0;
 		left: 0%;
 		bottom: 0;
@@ -272,20 +214,17 @@
 	}
 	.artist-header {
 		display: block;
-		// margin-bottom: 0.5rem;
-		// height: 100%;
+
 		position: relative;
-		// max-height: 50vh;
+
 		@media only screen and (min-width: 640px) {
-			// max-height: 75vh;
 		}
 	}
 	.artist-thumbnail {
 		display: block;
 		position: relative;
 		height: 100%;
-		/* min-height: 13rem; */
-		/* max-height: 30rem; */
+
 		padding-top: 16vh;
 		overflow: hidden;
 		transition: background-color 0.8s cubic-bezier(0.19, 0, 0.7, 1);
@@ -297,7 +236,6 @@
 		@media only screen and (min-width: 1601px) {
 			padding-top: 33vh;
 		}
-		// box-shadow: 0 0 0.5rem 0.5rem #000;
 
 		&::before {
 			position: absolute;
@@ -327,11 +265,6 @@
 			height: 100%;
 			z-index: -5;
 			content: "";
-			// background-image: linear-gradient(
-			// 	1turn,
-			// 	var(--midnight-base),
-			// 	transparent
-			// );
 		}
 
 		top: 0;
@@ -339,30 +272,26 @@
 	.header-thumbnail {
 		z-index: -1;
 		top: 0;
-		/* left: 0; */
-		/* right: 0; */
-		/* bottom: 0; */
+
 		width: 100%;
 		height: 100%;
-		/* max-width: 100%; */
+
 		max-height: 100%;
 		-o-object-fit: cover;
 		object-fit: cover;
 		position: absolute;
 		transition: opacity 0.75s linear;
-		// transition: all 5000ms cubic-bezier(0.455, 0.03, 0.515, 0.955);
+
 		overflow: hidden;
-		/* transform: scale(1.1); */
+
 		border-radius: 0;
 		-o-object-position: top;
 		object-position: top;
-		/* max-height: inherit;*/
 	}
 	.artist-content {
 		position: relative;
 		z-index: 1;
 
-		// padding-left: 3.5rem;
 		@include content-spacing($type: "padding");
 		@include content-width();
 		padding-bottom: 0 !important;
@@ -391,26 +320,19 @@
 				padding-bottom: 1rem;
 
 				@media (min-width: 320px) and (max-width: 499px) {
-					// padding: 0.8em 0 0.8rem 0.5rem;
 				}
 				@media (min-width: 500px) and (max-width: 640px) {
-					// padding: 0.8em 0 0.8rem 1.8rem;
 				}
 				@media screen and (min-width: 642px) and (max-width: 839px) {
 					font-size: 2rem;
-
-					// padding: 0.8em 0 0.8rem 2rem;
 				}
 				@media screen and (min-width: 840px) and (max-width: 960px) {
 					font-size: 3.5rem;
 
 					inline-size: 100%;
 					overflow-wrap: break-word;
-
-					// padding: 0 2rem 0.8rem 2rem;
 				}
 				@media screen and (min-width: 961px) {
-					// padding: 0 2rem 0.8rem 2rem;
 					font-size: 4.5rem;
 				}
 			}
@@ -426,21 +348,4 @@
 			max-width: $content-width-xl;
 		}
 	}
-	// .btn-wrpr {
-	// 	@media (min-width: 320px) and (max-width: 499px) {
-	// 		padding: 0 0 0.8rem 0.5rem;
-	// 	}
-	// 	@media (min-width: 500px) and (max-width: 640px) {
-	// 		padding: 0 0 0.8rem 1.8rem;
-	// 	}
-	// 	@media screen and (min-width: 642px) and (max-width: 839px) {
-	// 		padding: 0 0 0.8rem 2rem;
-	// 	}
-	// 	@media screen and (min-width: 840px) and (max-width: 960px) {
-	// 		padding: 0 2rem 0.8rem 2rem;
-	// 	}
-	// 	@media screen and (min-width: 961px) {
-	// 		padding: 0 2rem 0.8rem 2rem;
-	// 	}
-	// }
 </style>

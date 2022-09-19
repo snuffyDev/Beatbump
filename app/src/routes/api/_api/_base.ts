@@ -21,9 +21,11 @@ interface NextEndpointParams {
 	params?: string;
 	videoId?: string;
 	playlistSetVideoId?: string;
+	isAudioOnly: boolean;
+	enablePersistentPlaylistPanel: boolean;
 	playlistId?: string;
+	tunerSettingValue: "AUTOMIX_SETTING_NORMAL";
 	watchEndpointMusicSupportedConfigs: {
-		tunerSettingValue: "AUTOMIX_SETTING_NORMAL";
 		watchEndpointMusicConfig?: {
 			musicVideoType?: string | "MUSIC_VIDEO_TYPE_ATV";
 		};

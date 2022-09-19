@@ -7,7 +7,7 @@
 	import { IDBService } from "$lib/workers/db/service";
 
 	import list from "$lib/stores/list";
-	import type { Item } from "$lib/types";
+	import type { CarouselItem, Item } from "$lib/types";
 	import { Logger, notify } from "$lib/utils";
 	import { currentTitle, showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
 	import { page } from "$app/stores";
@@ -18,7 +18,7 @@
 	import { IsoBase64 } from "$lib/utils";
 	import { SITE_ORIGIN_URL } from "$stores/url";
 	export let index;
-	export let item: Item & { idx?: number };
+	export let item: CarouselItem;
 	export let type = "";
 	export let kind = "";
 	export let aspectRatio;
@@ -52,7 +52,7 @@
 		},
 		{
 			text: "Add to Queue",
-			icon: "queue",
+			icon: "list-music",
 			action: function action() {
 				list.setTrackWillPlayNext(item, $list.mix.length);
 				notify(`${item.title} has been added to your queue!`, "success");
@@ -61,7 +61,7 @@
 
 		{
 			text: "Play Next",
-			icon: "queue",
+			icon: "list-music",
 			action: function () {
 				list.setTrackWillPlayNext(item, $list.position);
 				notify(`${item.title} will play next!`, "success");
@@ -69,7 +69,7 @@
 		},
 		{
 			text: "Add to Playlist",
-			icon: "playlist-add",
+			icon: "list-plus",
 			action: async () => {
 				if (item.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
 					const response = await fetch("/api/get_queue.json?playlistId=" + item.playlistId);
@@ -257,7 +257,7 @@
 			},
 			{
 				action: () => list.initPlaylistSession({ playlistId: item.playlistId }),
-				icon: "queue",
+				icon: "list-music",
 				text: "Play Next",
 			},
 			{
@@ -331,6 +331,7 @@
 				<img
 					alt="thumbnail"
 					on:error={errorHandler}
+					loading={$page.data.iOS ? "eager" : "lazy"}
 					class:img16x9={RATIO_RECT}
 					class:img1x1={RATIO_SQUARE}
 					width={srcImg.width}
@@ -378,6 +379,7 @@
 		// min-width: 100%;
 
 		scroll-snap-align: start;
+		width: var(--column-width);
 
 		contain: layout paint style;
 
@@ -409,8 +411,9 @@
 		text-align: center;
 	}
 	.image.isArtistKind {
+		width: var(--thumbnail-size);
 		height: var(--thumbnail-size);
-		// width: 14em;
+
 		border-radius: 99999em !important;
 	}
 	a {

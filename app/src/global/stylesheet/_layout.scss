@@ -35,7 +35,7 @@ $themes: (dark, dim, midnight, ytm);
 	display: block;
 	width: 100%;
 	position: fixed;
-	contain: layout paint;
+	contain: layout;
 	height: var(--player-bar-height);
 	min-width: 100%;
 	display: flex;

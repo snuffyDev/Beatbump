@@ -10,9 +10,6 @@
 	import PlaylistPopper from "$lib/components/PlaylistPopper";
 	import "@fontsource/commissioner/variable.css";
 
-	import "../global/stylesheet/_layout.scss";
-	import "../global/stylesheet/main.scss";
-
 	import { queue } from "$lib/stores/list";
 	import Fullscreen from "$lib/components/Player/Fullscreen.svelte";
 	import GroupSessionCreator from "$lib/components/GroupSessionCreator";
@@ -20,11 +17,11 @@
 	import { groupSession } from "$lib/stores";
 	import { AudioPlayer } from "$lib/player";
 	import { page } from "$app/stores";
-	// export let  = "";
+	import { afterNavigate } from "$app/navigation";
+
 	$: key = $page.data.key;
 	let main: HTMLElement;
-	$: isSearch = key.includes("/search");
-	// $: console.log(key);
+
 	let isFullscreen = false;
 	$: $fullscreenStore === "open"
 		? setTimeout(() => {
@@ -34,6 +31,11 @@
 				isFullscreen = false;
 		  }, 0);
 	$: hasplayer = $queue.length !== 0;
+	afterNavigate(() => {
+		if (import.meta.env.SSR) return;
+		if (main) main.scrollTop = 0;
+	});
+	// $: console.log($queue);
 </script>
 
 <svelte:window
@@ -46,7 +48,7 @@
 />
 <Nav {key} />
 <Popper {main} />
-<div class="wrapper app-content-m" {hasplayer} bind:this={main} class:no-scroll={isSearch || isFullscreen} id="wrapper">
+<div class="wrapper app-content-m" {hasplayer} bind:this={main} id="wrapper">
 	<Wrapper {key} {main}>
 		<slot />
 	</Wrapper>
@@ -64,7 +66,9 @@
 	<Player />
 </footer>
 
-<style lang="scss">
+<style lang="scss" global>
+	@use "../global/stylesheet/layout" as *;
+	@use "../global/stylesheet/main" as *;
 	.footer-container {
 		transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 350ms, opacity cubic-bezier(0.165, 0.84, 0.44, 1) 350ms;
 		opacity: 0;

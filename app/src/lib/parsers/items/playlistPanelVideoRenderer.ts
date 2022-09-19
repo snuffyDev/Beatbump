@@ -30,7 +30,8 @@ export function PlaylistPanelVideoRenderer(ctx: IPlaylistPanelVideoRenderer): So
 		},
 		videoId: ctx?.navigationEndpoint?.watchEndpoint?.videoId,
 		playlistId: ctx?.navigationEndpoint?.watchEndpoint?.playlistId,
-		playlistSetVideoId: ctx?.navigationEndpoint?.watchEndpoint?.playlistSetVideoId ?? undefined,
+		playlistSetVideoId:
+			(ctx?.navigationEndpoint?.watchEndpoint?.playlistSetVideoId ?? ctx?.playlistSetVideoId) || undefined,
 		playerParams: ctx?.navigationEndpoint?.watchEndpoint?.playerParams,
 		itct: ctx?.navigationEndpoint?.watchEndpoint?.params,
 		index: ctx?.navigationEndpoint?.watchEndpoint?.index,

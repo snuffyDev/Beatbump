@@ -40,3 +40,24 @@
 		animation-iteration-count: infinite;
 	}
 }
+
+@mixin trim($numLines: null) {
+	@if $numLines !=null {
+		--line-height: 1.4;
+
+		display: -webkit-box;
+		-webkit-line-clamp: $numLines;
+		-webkit-box-orient: vertical;
+		max-height: calc(1rem * $numLines);
+		--lines: #{$numLines};
+		--max-lines: var(--lines);
+		-webkit-line-clamp: var(--max-lines);
+		max-height: calc(var(--max-lines) * 1rem * var(--line-height));
+		overflow: hidden;
+	} @else {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+	}
+}

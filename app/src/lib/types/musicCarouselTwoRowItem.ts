@@ -18,7 +18,7 @@ export interface ITwoRowSquareItemRenderer extends ITwoRowItemRenderer {
 	thumbnails: Array<Thumbnail>;
 	aspectRatio: string;
 	playlistId: string;
-	endpoint: Endpoint;
+	endpoint?: Endpoint;
 	subtitle: Subtitle[];
 }
 
@@ -28,7 +28,7 @@ interface Endpoint {
 }
 
 interface Subtitle {
-	text: string;
+	text?: string;
 	navigationEndpoint?: NavigationEndpoint;
 }
 

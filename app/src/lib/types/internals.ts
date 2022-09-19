@@ -90,6 +90,7 @@ export interface WatchEndpoint {
 	videoId: string;
 	playlistId: string;
 	loggingContext: LoggingContext;
+	playerParams?: string;
 	watchEndpointMusicSupportedConfigs: WatchEndpointMusicSupportedConfigs;
 	params?: string;
 }

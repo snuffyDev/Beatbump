@@ -10,6 +10,9 @@
 	import type { ArtistPage, IArtistPageHeader, ArtistPageBody } from "$lib/parsers/artist";
 	import { CTX_ListItem } from "$lib/contexts";
 	import type { PageData } from "./$types";
+	import { isMobileMQ } from "$stores/window";
+	import { onMount } from "svelte";
+	import Description from "$components/ArtistPageHeader/Description";
 
 	export let data: PageData;
 	const { body, header, visitorData } = data;
@@ -68,10 +71,14 @@
 				</Carousel>
 			{/if}
 		{/each}
+		{#if $isMobileMQ && header?.description}
+			<Description class="resp-content-width" description={header.description} />
+		{/if}
 	</div>
 </main>
 
 <style lang="scss">
+	@import "../../../lib/components/ArtistPageHeader/index.scss";
 	.song-list {
 		margin-bottom: 3.3339em;
 	}

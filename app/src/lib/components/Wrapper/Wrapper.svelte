@@ -2,11 +2,6 @@
 	import { fade } from "svelte/transition";
 	export let main: HTMLElement;
 	export let key;
-	$: if (key) catchUp();
-	async function catchUp() {
-		if (import.meta.env.SSR) return;
-		if (main) main.scrollTop = 0;
-	}
 </script>
 
 {#key key}

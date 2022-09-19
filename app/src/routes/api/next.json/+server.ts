@@ -1,7 +1,7 @@
 /* eslint-disable no-inner-declarations */
 import { parseContents } from "$lib/parsers/next";
 
-import { error, type RequestHandler } from "@sveltejs/kit";
+import { error, json, type RequestHandler } from "@sveltejs/kit";
 
 import { buildRequest } from "../_api/request";
 
@@ -26,7 +26,10 @@ export const GET: RequestHandler = async ({ url }) => {
 			client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00", visitorData },
 		},
 		params: {
-			continuation: ctoken,
+			enablePersistentPlaylistPanel: true,
+			isAudioOnly: true,
+			tunerSettingValue: "AUTOMIX_SETTING_NORMAL",
+			continuation: decodeURIComponent(decodeURIComponent(ctoken)),
 			videoId,
 			index: idx,
 			playlistSetVideoId: setVideoId,
@@ -46,14 +49,10 @@ export const GET: RequestHandler = async ({ url }) => {
 	if (!ctoken) {
 		const res = parseNextBody(data);
 
-		return new Response(JSON.stringify(res), {
-			headers: { "Content-Type": "application/json" },
-		});
+		return json(res);
 	}
 
-	return new Response(JSON.stringify(parseNextBodyContinuation(data)), {
-		headers: { "Content-Type": "application/json" },
-	});
+	return json(parseNextBodyContinuation(data));
 };
 
 function parseNextBody(data) {
@@ -111,8 +110,8 @@ function parseNextBodyContinuation(data) {
 		} = {},
 	} = data;
 
-	const clickTrackingParams =
-		contents[contents.length - 1]?.playlistPanelVideoRenderer?.navigationEndpoint?.clickTrackingParams;
+	const clickTrackingParams = (contents as any[]).at(-1)?.playlistPanelVideoRenderer?.navigationEndpoint
+		?.clickTrackingParams;
 
 	const visitorData = responseContext?.visitorData;
 	const parsed = parseContents(contents, continuation, clickTrackingParams, rest, visitorData);

@@ -1,3 +1,5 @@
+import type { PurpleRun } from "$lib/types/internals";
+
 export function thumbnailTransformer(url: string): {
 	placeholder?: string;
 	url?: string;
@@ -23,4 +25,27 @@ export function thumbnailTransformer(url: string): {
 	);
 
 	return output;
+}
+
+export function subtitle(items: PurpleRun[]) {
+	const length = items.length;
+	const subtitles = Array(length);
+
+	let idx = -1;
+	while (++idx < length) {
+		const item = items[idx];
+		if (item.navigationEndpoint === undefined) {
+			subtitles[idx] = item;
+			continue;
+		}
+
+		subtitles[idx] = {
+			text: item.text,
+			browseId: item.navigationEndpoint.browseEndpoint?.browseId,
+			pageType:
+				item.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig
+					?.pageType,
+		};
+	}
+	return subtitles;
 }

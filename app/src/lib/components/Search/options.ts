@@ -1,4 +1,5 @@
 export const searchFilter = [
+	{ label: "All", params: "all"},
 	{ label: "Songs", params: "song" },
 	{ label: "Videos", params: "video" },
 	{ label: "Artists", params: "artist" },

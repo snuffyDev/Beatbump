@@ -1,7 +1,13 @@
 <script lang="ts">
 	import Header from "$components/Layouts/Header.svelte";
+	import { AudioPlayer } from "$lib/player";
 	import { settings, SettingsSchema, type Theme } from "$stores/settings";
 	const themes: Theme[] = ["Dark", "Dim", "Midnight", "YTM"];
+
+	function handleStreamSelect() {
+		console.log("settings");
+		AudioPlayer.dispatch("update:stream_type", { type: $settings.playback.Stream });
+	}
 </script>
 
 <Header title="Settings" url="/settings" desc="Configure your app settings" />
@@ -53,7 +59,7 @@
 				<i> (reload Beatbump after setting)</i>
 			</label>
 			<div class="select">
-				<select name="stream" id="stream" bind:value={$settings["playback"]["Stream"]}>
+				<select name="stream" id="stream" bind:value={$settings["playback"]["Stream"]} on:change={handleStreamSelect}>
 					{#each ["HTTP", "HLS"] as option}
 						<option value={option} selected={$settings["playback"]["Stream"] === option}>{option}</option>
 					{/each}

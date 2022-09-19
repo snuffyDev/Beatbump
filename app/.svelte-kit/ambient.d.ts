@@ -8,7 +8,6 @@ declare module '$env/static/public' {
 declare module '$env/static/private' {
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
-	export const APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL: string;
 	export const CHROME_CRASHPAD_PIPE_NAME: string;
 	export const COLOR: string;
 	export const COLORTERM: string;
@@ -65,6 +64,7 @@ declare module '$env/static/private' {
 	export const OS: string;
 	export const Path: string;
 	export const PATHEXT: string;
+	export const PNPM_HOME: string;
 	export const PORT: string;
 	export const POWERSHELL_DISTRIBUTION_CHANNEL: string;
 	export const PROCESSOR_ARCHITECTURE: string;
@@ -97,7 +97,4 @@ declare module '$env/static/private' {
 	export const VSCODE_GIT_IPC_HANDLE: string;
 	export const VSCODE_INJECTION: string;
 	export const windir: string;
-	export const WSLENV: string;
-	export const WT_PROFILE_ID: string;
-	export const WT_SESSION: string;
 }

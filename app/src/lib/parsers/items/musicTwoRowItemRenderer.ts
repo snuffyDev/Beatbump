@@ -1,12 +1,12 @@
 import type { IMusicTwoRowItemRenderer, SubtitleRun } from "$lib/types/internals";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
-import { thumbnailTransformer } from "../utils.parsers";
+import { subtitle, thumbnailTransformer } from "../utils.parsers";
 
 export const MusicTwoRowItemRenderer = (ctx: {
 	musicTwoRowItemRenderer: IMusicTwoRowItemRenderer & unknown;
 }): ICarouselTwoRowItem => {
 	const musicTwoRowItemRenderer = ctx.musicTwoRowItemRenderer;
-	const thumbnails = musicTwoRowItemRenderer?.thumbnailRenderer?.musicThumbnailRenderer?.thumbnail?.thumbnails || [];
+	const thumbnails = musicTwoRowItemRenderer.thumbnailRenderer?.musicThumbnailRenderer?.thumbnail?.thumbnails || [];
 
 	for (let idx = 0; idx < thumbnails.length; idx++) {
 		const item = thumbnails[idx];
@@ -42,28 +42,8 @@ export const MusicTwoRowItemRenderer = (ctx: {
 			: undefined,
 
 		subtitle:
-			(musicTwoRowItemRenderer.subtitle?.runs as Array<SubtitleRun>) &&
-			musicTwoRowItemRenderer.subtitle?.runs?.length !== 0 &&
-			(() => {
-				const items = musicTwoRowItemRenderer.subtitle?.runs as any[];
-				for (let idx = 0; idx < items.length; idx++) {
-					const item = items[idx];
-					if (
-						item?.navigationEndpoint?.browseEndpoint?.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig?.pageType.includes(
-							"ARTIST",
-						)
-					) {
-						items[idx] = {
-							text: item.text,
-							browseId: item.navigationEndpoint?.browseEndpoint?.browseId,
-							pageType:
-								item.navigationEndpoint?.browseEndpoint?.browseEndpointContextSupportedConfigs
-									?.browseEndpointContextMusicConfig?.pageType,
-						};
-					}
-				}
-				return items as any[];
-			})(),
+			Array.isArray(musicTwoRowItemRenderer.subtitle?.runs as Array<SubtitleRun>) &&
+			subtitle(musicTwoRowItemRenderer.subtitle.runs),
 	};
 
 	return Item;

@@ -1,3 +1,5 @@
+export type Icons = "album" | "chevron-left" | "chevron-right" | "clock" | "download" | "edit" | "folder" | "frown" | "heart" | "home" | "image" | "import" | "list" | "minus" | "music" | "pause" | "play" | "radio" | "search" | "send" | "settings" | "share" | "shuffle" | "skip-back" | "skip-forward" | "upload" | "user" | "users" | "dots" | "queue" | "trending" | "volume" | "x";
+
 export default {
 	clock: `<circle cx="12" cy="12" r="10" />
 	<path d="M12 6v6l4 2" />

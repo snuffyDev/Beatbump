@@ -1,42 +1,8 @@
-<script context="module" lang="ts">
-	// import type { Load } from "@sveltejs/kit";
-
-	// let path;
-	// export const load: Load = async ({ url, params, fetch, stuff }) => {
-	// 	const slug = params.slug;
-	// 	const filter = url.searchParams.get("filter") || "";
-	// 	path = stuff.page;
-	// 	// console.log(filter, page, slug)
-	// 	const apiUrl = `/api/search.json?q=${encodeURIComponent(slug)}${
-	// 		filter !== "" ? `&filter=${encodeURIComponent(filter)}` : ""
-	// 	}`;
-	// 	const response = await fetch(apiUrl);
-	// 	const data = await response.json();
-	// 	const { results = [], continuation = {}, didYouMean, error } = await data;
-
-	// 	if (response.ok) {
-	// 		return {
-	// 			props: {
-	// 				filter: filter,
-	// 				contents: results,
-	// 				continuation: continuation,
-	// 				didYouMean: didYouMean,
-	// 				error,
-	// 			},
-	// 			status: 200,
-	// 		};
-	// 	}
-	// };
-</script>
-
 <script lang="ts">
 	import type { PageData } from "./$types";
 
-	export let data: PageData;
-	let { continuation, contents, didYouMean, error, filter, path } = data;
-
 	import { page } from "$app/stores";
-	import { invalidate } from "$app/navigation";
+	import { afterNavigate, goto, invalidate } from "$app/navigation";
 	import Listing from "$components/Item/Listing.svelte";
 	import type { Item, NextContinuationData } from "$lib/types";
 	import VirtualList from "$lib/components/SearchList/VirtualList.svelte";
@@ -44,14 +10,17 @@
 	import Header from "$lib/components/Layouts/Header.svelte";
 
 	import { writable } from "svelte/store";
-	const search = writable<Array<Item>>();
-	$: !error && search.set(contents);
-	// $: console.log(contents);
-	let title;
-	let songTitle = title || $page.params.slug;
-	title = songTitle;
-	let ctoken = continuation.continuation;
-	let itct = continuation.clickTrackingParams;
+	import type { MusicShelf } from "$lib/types/musicShelf";
+
+	export let data: PageData;
+	$: data = data;
+	let { results, continuation, filter } = data;
+	$: filter = filter;
+	$: results = results;
+	const search = writable<Item[]>();
+	$: results && filter !== "all" && search.set(results[0].contents);
+	let ctoken = continuation?.continuation;
+	let itct = continuation?.clickTrackingParams;
 	let isLoading = false;
 	let hasData = false;
 
@@ -60,21 +29,15 @@
 		try {
 			isLoading = true;
 			const response = await fetch(
-				`/api/search.json?q=` +
-					`&filter=` +
-					filter +
-					`&itct=${itct}${continuation.continuation ? `&ctoken=${ctoken}` : ""}`,
+				`/api/search.json?q=` + `&filter=` + filter + `&itct=${itct}${ctoken ? `&ctoken=${ctoken}` : ""}`,
 			);
 			const newPage = await response.json();
-			const res = await newPage;
+			const res: PageData = await newPage;
 
-			if (newPage?.error) {
-				error = newPage?.error;
-			}
 			if (res.continuation.continuation) {
 				ctoken = res.continuation.continuation;
 				itct = res.continuation.clickTrackingParams;
-				search.update((u) => [...u, ...res.results]);
+				search.update((u) => [...u, ...(res.results as unknown as Item[])]);
 				isLoading = false;
 				hasData = newPage.length === 0;
 				return hasData;
@@ -88,113 +51,85 @@
 			};
 		}
 	}
-	let items;
-	$: !error && (items = $search);
-	// $: console.log(items)
+	// $: console.log(results);
+	afterNavigate(async ({ from, to }) => {
+		if (to.pathname.includes("/search")) {
+			results = data.results;
+			filter = data.filter;
+			ctoken = data?.continuation?.continuation;
+			itct = data?.continuation?.clickTrackingParams;
+			// await invalidate();
+		}
+	});
 </script>
 
 <!-- {JSON.stringify(results)} -->
-<Header title="Search" desc={`Search results for ${decodeURIComponent(songTitle)}`} url={path + `?filter=${filter}`} />
-<main class="parent">
-	{#if error}
-		<section class="searchHeader">
-			<p>
-				{error} for <em>'{decodeURIComponent(songTitle)}'</em>
-			</p>
-		</section>
-	{:else}
-		<section class="searchHeader">
-			<div class="text">
-				<p>All Results for...</p>
-				{#key songTitle}
-					<em>'{decodeURIComponent(songTitle)}'</em>
-				{/key}
-				{#if didYouMean}
-					<p>
-						Did you mean: <em class="link"
-							><a
-								sveltekit:prefetch
-								on:click={() => {
-									invalidate(`/search/${$page.url.pathname}?filter=${$page.url.searchParams.get("filter")}`);
-								}}
-								href={`/search/${didYouMean.term}?filter=${didYouMean.endpoint.params}`}>{didYouMean.term}?</a
-							></em
+<Header title="Search" desc={`Search results for ${decodeURIComponent($page.params.slug)}`} url={$page.url.pathname} />
+<main class="parent" class:max-height={filter !== "all"}>
+	{#key data}
+		{#each results as result}
+			<div class="container music-shelf resp-content-width" class:max-height={filter !== "all"}>
+				<span class="h3">{result.header.title}</span>
+				{#if filter !== "all"}
+					<div class="music-shelf-list">
+						<VirtualList
+							on:endList={() => {
+								paginate();
+							}}
+							bind:isLoading
+							bind:hasData
+							height="calc(100% - 2.75em)"
+							items={$search}
+							let:item
 						>
-					</p>
+							<Listing data={item} />
+						</VirtualList>
+					</div>
+				{:else}
+					<div class="music-shelf-list">
+						{#each result.contents as item}
+							<Listing data={item} />
+						{/each}
+					</div>
+					{#if result.contents.length !== 1}
+						<div class="show-more">
+							<a
+								href={`${$page.params.slug}?filter=${result.header.title.replace(/\s/g, "_").toLowerCase()}`}
+								class="link secondary">Show All</a
+							>
+						</div>
+					{/if}
 				{/if}
 			</div>
-		</section>
-		<VirtualList
-			on:endList={() => {
-				paginate();
-			}}
-			bind:isLoading
-			bind:hasData
-			height=" calc(100% - 6rem)"
-			{items}
-			let:item
-		>
-			<Listing data={item} />
-		</VirtualList>
-	{/if}
+		{/each}
+	{/key}
 </main>
 
-<style scoped lang="scss">
+<style lang="scss">
 	.parent {
 		width: 100%;
+		// max-height: 100%;
+	}
+	.h3 {
+		font-weight: 600;
+	}
+	.max-height {
 		height: 100%;
 	}
-	@media (min-width: 640px) {
-		.l-container {
-			overflow-x: hidden;
-		}
-		.parent {
-			width: calc(100% - 40px);
-		}
-	}
-	main {
-		padding-top: 0;
-		padding-bottom: 0 !important;
-	}
-	.end {
-		position: relative;
+	.music-shelf {
+		margin-bottom: 3.333em;
+		margin-top: 0.666em;
+		max-height: 100%;
 		display: flex;
-		justify-content: center;
-		padding: 1.5rem 0;
-		overflow: hidden;
-		margin: 0;
-		h5,
-		em {
-			margin: 0;
-		}
+		// overflow-y: auto;
 	}
-	button {
-		margin-bottom: 0.8rem;
-	}
-	.searchHeader {
-		padding: 0.8rem 0 0.8rem 0;
-		font-family: "CommissionerVariable", sans-serif;
-		margin-left: auto;
-		display: flex;
-		// flex-direction: row;
+	.music-shelf-list {
+		max-height: 100%;
+		height: 100%;
 
-		// white-space: pre;
-		font-size: 1em;
-		margin: 0;
-		// font-weight: 500;
-		.text {
-			display: flex;
-			flex-direction: column;
-			line-height: 2.5;
-		}
-		h5 {
-			font-size: $size-3;
-		}
-		p {
-			font-size: $size-1;
-		}
-		em {
-			font-size: 1.1em;
-		}
+		margin-bottom: 1.333em;
+	}
+	.link {
+		text-transform: uppercase;
 	}
 </style>

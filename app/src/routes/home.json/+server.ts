@@ -82,14 +82,14 @@ function baseResponse(data: Dict<any>, _visitorData: string) {
 	const length = _contents.length;
 	let idx = -1;
 	while (++idx < length) {
-		const item = _contents[idx] || {};
+		const item = _contents[idx] ?? {};
 		if ("musicCarouselShelfRenderer" in item) {
 			const carousel = parseCarousel(item);
 			carouselItems[idx] = carousel;
 		}
 		if ("musicImmersiveCarouselShelfRenderer" in item) {
 			headerThumbnail =
-				item?.musicImmersiveCarouselShelfRenderer?.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail
+				item.musicImmersiveCarouselShelfRenderer.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail
 					?.thumbnails || [];
 			carouselItems[idx] = parseCarousel(item);
 		}
