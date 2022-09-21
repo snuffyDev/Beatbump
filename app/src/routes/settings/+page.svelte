@@ -163,9 +163,10 @@
 	}
 	.switch {
 		position: relative;
-		display: inline-block;
-		width: 3.5em;
-		height: 1.6125em;
+		display: inline-flex;
+		align-items: center;
+		width: 3.8125em;
+		height: 2em;
 		cursor: pointer;
 		overflow: hidden;
 		background-color: rgba(109, 109, 109, 0.35);
@@ -173,14 +174,15 @@
 		transition: background-color 0.3s;
 	}
 	.switch::after {
+		--size: calc(2em - (2px * 2));
 		content: "";
 		position: absolute;
-		width: 1.5em;
-		height: 1.5em;
-		border-radius: 50%;
+		width: var(--size);
+		height: var(--size);
+		border-radius: 9999em;
 		background-color: white;
-		top: 0.06125em;
-		left: 0.06125em;
+		// top: 0.06125em;
+		left: 0.125em;
 		transition: left 0.3s;
 		box-shadow: 0 0 5px 0.5px rgba(0, 0, 0, 0.384);
 	}

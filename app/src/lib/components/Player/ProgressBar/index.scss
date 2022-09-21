@@ -1,19 +1,15 @@
 .progress-bar {
 	width: 100%;
 	will-change: visibility;
-	contain: content;
+	contain: paint;
 	overflow: hidden;
 	isolation: isolate;
 	background-clip: content-box;
-	background-color: rgb(84, 84, 88);
+	background-color: rgb(60, 60, 66);
 	border: #0000 solid calc(var(--height) / 3);
 	border-radius: calc(var(--height) / 2);
 	height: var(--height);
 	position: absolute;
-
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
 }
 .hover {
 	background-color: #edecec66;
@@ -64,6 +60,8 @@ progress {
 	padding: 0;
 	position: absolute;
 	inset: 0;
+	overflow: hidden;
+	// border-radius: inherit;
 }
 
 progress::-webkit-progress-bar {

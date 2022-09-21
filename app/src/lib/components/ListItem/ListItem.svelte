@@ -129,7 +129,7 @@
 	async function handleClick(event: MouseEvent) {
 		const target = event.target as HTMLElement;
 		if (target && target.nodeName === "A") return;
-
+		console.log(idx);
 		/// Are we on the 'Queue' screen ?
 		if (page === "queue") {
 			/// Do we have a group session?
@@ -161,10 +161,8 @@
 				}
 				list.updatePosition(idx - 1);
 				await tick();
-				// AudioPlayer.skip();
-				// AudioPlayer.next(true, true);
-				AudioPlayer.next(true, false);
-				// AudioPlayer.skip();
+
+				AudioPlayer.next(false, false);
 			}
 		} else if (page === "playlist") {
 			list.updatePosition(idx);

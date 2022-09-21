@@ -280,8 +280,9 @@ function _sessionListService() {
 				ctoken,
 				clickTracking: clickTrackingParams,
 			}).catch((err) => console.error(err));
-			(data?.results as any[]).shift();
-			mix.push(...data.results);
+			const results = data?.results as any[];
+			mix.push(...results);
+			// position += 1;
 			mix = get(filterAutoPlay) ? filterList(mix) : mix;
 			visitorData = data["visitorData"] ?? visitorData;
 

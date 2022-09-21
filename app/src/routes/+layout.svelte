@@ -18,6 +18,7 @@
 	import { AudioPlayer } from "$lib/player";
 	import { page } from "$app/stores";
 	import { afterNavigate } from "$app/navigation";
+	import SessionListService from "$stores/list/sessionList";
 
 	$: key = $page.data.key;
 	let main: HTMLElement;
@@ -35,7 +36,7 @@
 		if (import.meta.env.SSR) return;
 		if (main) main.scrollTop = 0;
 	});
-	// $: console.log($queue);
+	$: console.log($queue, $SessionListService);
 </script>
 
 <svelte:window

@@ -30,7 +30,7 @@
 
 	function hover(event, bounds) {
 		const x = event.clientX - bounds.left;
-		return Math.min(Math.max(x / event.target.clientWidth, 0), 1);
+		return Math.min(Math.max(x / bounds.width, 0), 1);
 	}
 
 	function seekAudio(event: PointerEvent) {
@@ -69,7 +69,8 @@
 			{/if}
 			<progress
 				on:touchstart={() => {
-					isTouchDrag = true;
+					seeking = true;
+					hovering = false;
 				}}
 				on:pointerdown={() => {
 					seeking = true;

@@ -145,7 +145,10 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	private _paused: WritableStore<boolean> = new WritableStore(true);
 	private _player: HTMLAudioElement = undefined;
 	private _remainingTime: number = 0;
+	playerType: "NATIVE" | "HLS.JS" | "UNSUPPORTED" = undefined;
 	private _src: WritableStore<string> = new WritableStore("");
+	private _worksWithHLSjs = new WritableStore(false);
+	private _streamType: "HTTP" | "HLS";
 	private currentSessionList = () => get(SessionListService);
 
 	private isHLSPlayer = false;
@@ -183,7 +186,8 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		this._player.preload = "metadata";
 
 		this._durationUnsubscriber = this._durationStore.subscribe((value) => {
-			this._duration = this._isWebkit && !this.isHLSPlayer ? value / 2 : value;
+			this._duration = value;
+			// notify(`${this._duration}`, "error");]
 		});
 		this._currentTimeUnsubscriber = this._currentTimeStore.subscribe((value) => {
 			this._currentTime = value;
@@ -304,7 +308,10 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			canAllPlay[1]();
 		}
 		const response = await this.getNextSongInQueue(position);
-		if (response === null) return;
+		if (response === null) {
+			console.error("RESPONSE ERROR", new Error(`[err] ${response}`));
+			return;
+		}
 		this.updateSrc(response);
 		this.__tick = false;
 	}
@@ -389,7 +396,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	}
 
 	public skip(): void {
-		this._player.currentTime = (this._player.duration - 1) * 2;
+		this.currentTimeStore.set((this._player.duration - 1) * 2);
 	}
 
 	public updateSrc(dict: SrcDict | Promise<SrcDict>): void {
@@ -418,6 +425,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		});
 	}
 	private async createHLSPlayer(source?: string) {
+		if (this.playerType === "NATIVE") return;
 		if (!this._HLSModule) this._HLSModule = await this.loadHLSModule();
 		if (this._HLSModule.isSupported() !== true) return;
 		if (this._HLS) this._HLS.destroy();
@@ -482,7 +490,6 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			return response;
 		} catch (error) {
 			// this.getTrackSrc(position + 1);
-			this.__tick = false;
 		}
 	}
 
@@ -563,19 +570,32 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		this._nextTrackURL = null;
 	}
 
-	private async setup() {
-		if (!browser) return;
-		if (browser && !!settings && !this.isWebkit && get(settings)?.playback?.Stream === "HLS") {
-			this._HLSModule = await this.loadHLSModule();
-			if (this._HLSModule.isSupported() && get(settings)?.playback?.Stream === "HLS") {
+	private async canUseHLSjs() {
+		const streamSetting = get(settings)?.playback?.Stream === "HLS";
+		if (streamSetting === true) this._streamType = "HLS";
+		else this._streamType = "HTTP";
+		if (this.isWebkit && streamSetting) {
+			this.isHLSPlayer = true;
+
+			return "NATIVE";
+		}
+		if (streamSetting) {
+			if (!this._HLSModule) this._HLSModule = await this.loadHLSModule();
+			if (this._HLSModule.isSupported()) {
 				this.isHLSPlayer = true;
-				console.log(this);
+				return "HLS.JS";
 			}
 		}
+		this.isHLSPlayer = false;
+		return "UNSUPPORTED";
+	}
+
+	private async setup() {
+		if (!browser) return;
+		this.playerType = await this.canUseHLSjs();
 		this.__unsubscriber = this._src.subscribe(async (value) => {
-			if (this.isHLSPlayer && !this._HLSModule) this._HLSModule = await this.loadHLSModule();
-			if (this.isHLSPlayer) {
-				console.log(this);
+			if (this.playerType === "HLS.JS" && !this._HLSModule) this._HLSModule = await this.loadHLSModule();
+			if (this.isHLSPlayer && this.playerType === "HLS.JS") {
 				this.createHLSPlayer(value);
 			} else {
 				if (this._HLS) {
@@ -595,8 +615,9 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		});
 
 		this.on("update:stream_type", async ({ type }) => {
-			console.log(this, type);
-			if (type === "HLS" && !this.isWebkit) {
+			if (type === "HLS") {
+				this.playerType = await this.canUseHLSjs();
+				if (this.playerType !== "HLS.JS") return;
 				if (!this._HLSModule) {
 					this._HLSModule = await this.loadHLSModule();
 				}
@@ -605,8 +626,9 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 				}
 			}
 			if (type === "HTTP") {
+				this._streamType = "HTTP";
+				this.isHLSPlayer = false;
 				if (this.isHLSPlayer) {
-					this.isHLSPlayer = false;
 					if (this._HLS) this._HLS.destroy();
 				}
 			}
@@ -674,7 +696,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 
 		this._player.addEventListener("timeupdate", async () => {
 			this._currentTimeStore.set(this._player.currentTime);
-			this._durationStore.set(this._player.duration);
+			this._durationStore.set(this._isWebkit && !this.isHLSPlayer ? this._player.duration / 2 : this._player.duration);
 
 			if (
 				!this._hasNextSrc && this.isWebkit && !this.isHLSPlayer
@@ -694,7 +716,8 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 				 due to the length of a song being doubled on iOS,
 				 we have to cut the time in half. Doesn't effect other devices.
 			*/
-			if (this._isWebkit && !this.isHLSPlayer && this._player.currentTime * 2 >= this._duration && !this.__tick) {
+
+			if (this._isWebkit && this.isHLSPlayer === false && this._currentTime >= this._duration - 2) {
 				this.next();
 			}
 		});
