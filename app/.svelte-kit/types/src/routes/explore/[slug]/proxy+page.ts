@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { PageLoad } from "./$types";
 
 export const load = async ({ url, params, routeId, fetch }: Parameters<PageLoad>[0]) => {

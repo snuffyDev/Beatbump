@@ -3,7 +3,6 @@ import type { NextContinuationData } from "$lib/types";
 import type { MusicShelf } from "$lib/types/musicShelf";
 import type { PageLoad } from "./$types";
 
-
 export interface SearchResponse {
 	results?: MusicShelf[];
 	continuation?: NextContinuationData;
@@ -14,10 +13,9 @@ export const load: PageLoad = async ({ url, params, fetch }): Promise<SearchResp
 	const slug = params.slug;
 	const filter = url.searchParams.get("filter") || "";
 
-	const apiUrl = `/api/search.json?q=${slug}${filter !== "" ? `&filter=${encodeURIComponent(filter)}` : ""
-		}`;
+	const apiUrl = `/api/search.json?q=${slug}${filter !== "" ? `&filter=${encodeURIComponent(filter)}` : ""}`;
 	const response = await fetch(apiUrl);
-	const data = await response.json() as SearchResponse;
+	const data = (await response.json()) as SearchResponse;
 	Object.assign(data, { filter });
 
 	if (response.ok) {

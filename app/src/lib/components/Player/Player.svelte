@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { browser } from "$app/env";
+	import { browser } from "$app/environment";
 	import { goto } from "$app/navigation";
 	import Icon from "$components/Icon/Icon.svelte";
 	import { clickOutside } from "$lib/actions/clickOutside";
@@ -178,7 +178,7 @@
 			</div>
 		{/if}
 	</div>
-	<div class="player-controls" style:display={$isMobileMQ ? "none" : "flex"}>
+	<div class="player-controls" style:display={$isMobileMQ ? "none" : "block"}>
 		{#if !$isMobileMQ}
 			<Controls
 				bind:isPaused={isPlaying}
@@ -284,10 +284,9 @@
 		font-size: small;
 	}
 	.now-playing-artist {
-		display:block;
+		display: block;
 		font-size: 12px;
-	color: rgba(255, 255, 255, 0.7) !important;
-
+		color: rgba(255, 255, 255, 0.7) !important;
 	}
 	.now-playing img {
 		object-fit: contain;
@@ -299,8 +298,7 @@
 	.player-controls {
 		// display: flex;
 		// place-self: center;
-		width: auto;
-		flex-direction: column;
+
 		width: 100%;
 	}
 	row {
@@ -320,11 +318,6 @@
 		}
 	}
 
-	.player-btn {
-		max-height: 8em;
-		max-width: 8em;
-		padding: 0.8em;
-	}
 	.listButton {
 		visibility: hidden !important;
 	}

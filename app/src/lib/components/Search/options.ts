@@ -1,15 +1,15 @@
 export const searchFilter = [
-	{ label: "All", params: "all"},
-	{ label: "Songs", params: "song" },
-	{ label: "Videos", params: "video" },
-	{ label: "Artists", params: "artist" },
+	{ label: "All", params: "all" },
+	{ label: "Songs", params: "songs" },
+	{ label: "Videos", params: "videos" },
+	{ label: "Artists", params: "artists" },
 	{ label: "All Playlists", params: "all_playlists" },
 	{
 		label: "Featured Playlists",
-		params: "featured_playlist",
+		params: "featured_playlists",
 	},
 	{
 		label: "Community Playlists",
-		params: "community_playlist",
+		params: "community_playlists",
 	},
 ];

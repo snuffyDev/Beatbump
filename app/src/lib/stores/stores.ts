@@ -1,4 +1,4 @@
-import { browser } from "$app/env";
+import { browser } from "$app/environment";
 import type { Item } from "$lib/types";
 import { filter } from "$lib/utils/collections";
 import type { Writable } from "svelte/store";

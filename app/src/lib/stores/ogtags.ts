@@ -53,7 +53,13 @@ const metatags = (): Store => {
 			image: image,
 			"og:image": image,
 		}));
-	const init = (_origin: string, _title: string, _url: string, _desc: string | undefined, _image = _origin + "/favicon.png") => {
+	const init = (
+		_origin: string,
+		_title: string,
+		_url: string,
+		_desc: string | undefined,
+		_image = _origin + "/favicon.png",
+	) => {
 		_origin && (origin = origin);
 		_title && title(_title);
 		_url && url(_url);

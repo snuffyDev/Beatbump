@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { PageLoad } from "./$types";
 import { onMount, setContext, tick } from "svelte";
 export const load = async ({ params }: Parameters<PageLoad>[0]) => {

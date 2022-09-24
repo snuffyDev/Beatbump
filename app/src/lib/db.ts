@@ -1,21 +1,23 @@
-const browser = typeof globalThis !== 'undefined';
+const browser = typeof globalThis !== "undefined";
 
 import type { Item } from "./types";
 import { notify } from "./utils/utils";
 import { generateId } from "./utils/strings";
 import { getPlaylists, getFavorites, setMultipleFavorites, setMultiplePlaylists } from "./workers/db/db";
 import { IDBService } from "./workers/db/service";
-import type { IDBPlaylist, IDBPlaylistInternal, IDBRequestTarget, IDBStoreKeys, IObjectStores } from './workers/db/types';
-
+import type {
+	IDBPlaylist,
+	IDBPlaylistInternal,
+	IDBRequestTarget,
+	IDBStoreKeys,
+	IObjectStores,
+} from "./workers/db/types";
 
 const MIGRATION_DATA: { [key in IDBStoreKeys]?: IDBPlaylistInternal[] } = {};
 
-
-
 export class IDB {
 	private $$: Promise<IDBDatabase> | undefined;
-	constructor(private DB_NAME: string, private DB_VER: number = 1) {
-	}
+	constructor(private DB_NAME: string, private DB_VER: number = 1) {}
 
 	private init(): void {
 		if (this.$$) {
@@ -113,7 +115,6 @@ export async function importDB(data: File) {
 		const jsonString = await data.text();
 		const json = JSON.parse(jsonString) as ExportDBResult;
 		if (!json.favorites && !json.playlists) throw new Error("Provided file is not a valid DB JSON object");
-
 
 		Promise.allSettled([await setMultiplePlaylists(json?.playlists), await setMultipleFavorites(json?.favorites)]).then(
 			() => {

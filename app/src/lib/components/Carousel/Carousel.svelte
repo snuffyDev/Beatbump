@@ -7,7 +7,7 @@
 	import { page } from "$app/stores";
 	import { onDestroy, onMount } from "svelte";
 	import observer from "./observer";
-	import { browser } from "$app/env";
+	import { browser } from "$app/environment";
 
 	export let header: CarouselHeader;
 	export let items: Item[] = [];

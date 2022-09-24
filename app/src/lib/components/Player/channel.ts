@@ -3,7 +3,6 @@ import { writable } from "svelte/store";
 export const fullscreenStore = _fullscreenStore();
 
 function _fullscreenStore() {
-
 	const { subscribe, set, update } = writable<"open" | "closed">("closed");
 
 	return {
@@ -11,7 +10,7 @@ function _fullscreenStore() {
 		set,
 		update,
 		toggle() {
-			update((state) => state !== 'open' ? 'open' : 'closed');
-		}
+			update((state) => (state !== "open" ? "open" : "closed"));
+		},
 	};
 }

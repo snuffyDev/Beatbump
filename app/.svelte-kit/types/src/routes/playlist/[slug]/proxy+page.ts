@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { NextContinuationData } from "$lib/types";
 import type { Header } from "$lib/types/playlist";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";

@@ -22,14 +22,14 @@ export interface ISessionListService {
 		keyId?: number;
 		playlistSetVideoId?: string;
 		clickTracking?: string;
-		config?: { playerParams?: string; type?: string; };
+		config?: { playerParams?: string; type?: string };
 	}): Promise<void>;
 	/** Initializes a new playlist session */
 	initPlaylistSession(args: {
 		playlistId: string;
 		index?: number;
 		params?: string | undefined;
-	}): Promise<{ body: { original_url: string; url: string; }; error?: boolean; }>;
+	}): Promise<{ body: { original_url: string; url: string }; error?: boolean }>;
 
 	/** Continues current automix session by fetching the next batch of songs */
 	getSessionContinuation(args: {
@@ -45,7 +45,7 @@ export interface ISessionListService {
 	 * Fetches a set of similar songs and appends them to the current
 	 * automix session
 	 */
-	getMoreLikeThis(args?: { playlistId?: Nullable<string>; }): Promise<void>;
+	getMoreLikeThis(args?: { playlistId?: Nullable<string> }): Promise<void>;
 
 	/** Sets the item passed to the function to play next */
 	setTrackWillPlayNext(item: Item, key: number): Promise<void>;

@@ -1,6 +1,6 @@
 // Credit: https://github.com/sveltejs/svelte/blob/master/src/runtime/internal/loop.ts
 
-import { browser } from "$app/env";
+import { browser } from "$app/environment";
 
 const raf = browser
 	? requestAnimationFrame

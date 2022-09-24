@@ -15,7 +15,7 @@
 	import SessionListService, { queuePosition, queue } from "$lib/stores/list";
 	import { AudioPlayer, updateGroupPosition } from "$lib/player";
 	import { CTX_ListItem } from "$lib/contexts";
-	import {SITE_ORIGIN_URL} from '$lib/stores/url'
+	import { SITE_ORIGIN_URL } from "$lib/stores/url";
 	export let item: Item;
 	export let idx: number;
 	export let ctx: Record<string, unknown> = {};
@@ -235,8 +235,7 @@
 								on:click|preventDefault={() => {
 									goto(`/artist/${subtitle.browseId}`);
 									fullscreenStore.set("closed");
-								}}
-								sveltekit:prefetch>{subtitle.text}</a
+								}}>{subtitle.text}</a
 							>
 						{:else}
 							<span>{subtitle.text} </span>

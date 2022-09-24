@@ -1,4 +1,3 @@
-
 // @migration task: Check imports
 import { buildRequest } from "$api/_api/request";
 import type { RequestHandler } from "@sveltejs/kit";

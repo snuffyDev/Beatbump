@@ -1,15 +1,10 @@
-
-
-
 <script lang="ts">
-
-
 	import viewport from "$lib/actions/viewport";
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
 	import Header from "$lib/components/Layouts/Header.svelte";
 	import Loading from "$lib/components/Loading/Loading.svelte";
 	import type { NextContinuationData, Thumbnail } from "$lib/types";
-	import type { PageData } from './$types';
+	import type { PageData } from "./$types";
 
 	export let data: PageData;
 

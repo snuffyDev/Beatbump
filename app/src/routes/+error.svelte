@@ -1,5 +1,5 @@
 <script>
-	import { dev } from "$app/env";
+	import { dev } from "$app/environment";
 
 	import { goto } from "$app/navigation";
 	import { navigating } from "$app/stores";
@@ -25,7 +25,7 @@
 </script>
 
 <main>
-	<a sveltekit:prefetch href="/" class="logolink">
+	<a href="/" class="logolink">
 		<div class="logo">
 			<img src="/logo.svg" width="128" height="128" alt="logo" />
 		</div>

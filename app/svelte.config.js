@@ -6,8 +6,6 @@ import node from "@sveltejs/adapter-node";
 import path from "path";
 import sveltePreprocess from "svelte-preprocess";
 import dotenv from "dotenv";
-import * as autoprefixer from "autoprefixer";
-import * as cssnano from "cssnano";
 
 dotenv.config();
 
@@ -30,7 +28,7 @@ const config = {
 
 		scss: {
 			includePaths: ["src"],
-			prependData: '@use "src/global/stylesheet/base/variables" as *;',
+			prependData: '@use "./src/global/stylesheet/base/_variables.scss" as *;',
 			renderSync: true,
 			stripIndent: true,
 		},
@@ -39,6 +37,7 @@ const config = {
 
 	kit: {
 		adapter: dev ? node() : adapter,
+
 		alias: {
 			$stores: path.resolve("./src/lib/stores"),
 			$api: path.resolve("./src/routes/api"),
@@ -50,8 +49,9 @@ const config = {
 			lib: "src/lib",
 			routes: "src/routes",
 			serviceWorker: "src/service-worker",
-			template: "src/app.html",
-			hooks: "src/hooks",
+			appTemplate: "src/app.html",
+			hooks: "src/hooks.server",
+			// hooks: { server: "src/hooks.server" },
 		},
 		version: { pollInterval: 600000 },
 	},

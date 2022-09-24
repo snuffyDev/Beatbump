@@ -100,6 +100,7 @@
 		const target = event.target as HTMLElement;
 		if (frame) cancelAnimationFrame(frame);
 		frame = requestAnimationFrame(() => {
+			if (target.scrollTop === lastScrollPosY) return;
 			if (isShowing) {
 				const scrollTop = target.scrollTop;
 				const diff = lastScrollPosY - scrollTop;

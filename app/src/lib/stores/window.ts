@@ -1,4 +1,4 @@
-import { browser } from "$app/env";
+import { browser } from "$app/environment";
 import { readable, type StartStopNotifier, type Subscriber } from "svelte/store";
 
 function mediaQuery(query: string): StartStopNotifier<boolean> {

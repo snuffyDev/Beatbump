@@ -8,7 +8,9 @@ node_modules/**
 /dist/**
 /workers-site/**
 .cloudflare/**
+.netlify/**
 .vercel/**
 .vercel_build_output/**
 .vscode/**
 docs/**
+worker-iife.js

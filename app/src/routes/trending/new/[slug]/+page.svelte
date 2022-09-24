@@ -97,7 +97,7 @@
 		cursor: pointer;
 	}
 
-	@media screen and (min-width: 25rem) and (max-width: 37rem) {
+	@media screen and (min-width: 25em) and (max-width: 37em) {
 		.grid {
 			grid-template-columns: repeat(2, 1fr);
 		}
@@ -105,7 +105,7 @@
 			max-width: 14rem;
 		}
 	}
-	@media screen and (min-width: 37rem) and (max-width: 48rem) {
+	@media screen and (min-width: 37em) and (max-width: 48em) {
 		.item {
 			max-width: 13rem;
 		}
@@ -114,7 +114,7 @@
 			grid-gap: 1rem;
 		}
 	}
-	@media screen and (min-width: 48rem) {
+	@media screen and (min-width: 48em) {
 		.item {
 			max-width: 14rem;
 		}

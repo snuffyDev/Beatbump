@@ -8,7 +8,7 @@ export class Mutex {
 	private _queue: MutexEntry[] = [];
 	private _currentEntry: Maybe<() => void>;
 	private _value = 1;
-	constructor() { }
+	constructor() {}
 	get Locked() {
 		return this._value <= 0;
 	}

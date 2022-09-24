@@ -3,7 +3,7 @@ import type { IPlaylistPanelVideoRenderer } from "../types/playlistPanelVideoRen
 import { PlaylistPanelVideoRenderer } from "./items/playlistPanelVideoRenderer";
 import { filterMap } from "$lib/utils/collections";
 
-type PanelAlias = { playlistPanelVideoRenderer: IPlaylistPanelVideoRenderer; };
+type PanelAlias = { playlistPanelVideoRenderer: IPlaylistPanelVideoRenderer };
 
 function parseItem(item: Song | PanelAlias) {
 	if ((item as Record<string, any>)?.playlistPanelVideoRenderer) {

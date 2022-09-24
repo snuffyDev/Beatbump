@@ -14,8 +14,8 @@ export interface Methods {
 }
 
 export interface IObjectStores {
-	playlists: { keyPath: "id"; };
-	favorites: { keyPath: "videoId" | "id"; };
+	playlists: { keyPath: "id" };
+	favorites: { keyPath: "videoId" | "id" };
 }
 export interface IDBPlaylist {
 	name?: string;
@@ -31,12 +31,12 @@ export interface IDBPlaylistInternal extends IDBPlaylist {
 }
 
 export type IDBRequestTarget = Event & {
-	target: EventTarget & { result: IDBRequest & IDBCursorWithValue; };
+	target: EventTarget & { result: IDBRequest & IDBCursorWithValue };
 };
 export type IDBStoreKeys = "playlists" | "favorites";
 
 export interface IDBMessage<T = unknown> {
 	error?: boolean;
-	data?: T,
+	data?: T;
 	message?: string;
 }

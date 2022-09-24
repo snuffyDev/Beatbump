@@ -20,12 +20,12 @@
 	flex-direction: column;
 }
 
-@media screen and (min-width: 37rem) and (max-width: 48rem) {
+@media screen and (min-width: 37em) and (max-width: 48em) {
 	.grid {
 		grid-gap: 1rem;
 	}
 }
-@media screen and (min-width: 48rem) {
+@media screen and (min-width: 48em) {
 	.grid {
 		grid-gap: 1.2rem;
 	}

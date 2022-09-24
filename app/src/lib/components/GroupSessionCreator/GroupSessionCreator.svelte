@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { browser } from "$app/env";
+	import { browser } from "$app/environment";
 	import { page } from "$app/stores";
 	import { clickOutside } from "$lib/actions/clickOutside";
 

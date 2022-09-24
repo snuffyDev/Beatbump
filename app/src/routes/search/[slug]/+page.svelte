@@ -53,7 +53,7 @@
 	}
 	// $: console.log(results);
 	afterNavigate(async ({ from, to }) => {
-		if (to.pathname.includes("/search")) {
+		if (to.url.pathname.includes("/search")) {
 			results = data.results;
 			filter = data.filter;
 			ctoken = data?.continuation?.continuation;
@@ -74,7 +74,7 @@
 					<div class="music-shelf-list">
 						<VirtualList
 							on:endList={() => {
-								paginate();
+								queueMicrotask(paginate);
 							}}
 							bind:isLoading
 							bind:hasData

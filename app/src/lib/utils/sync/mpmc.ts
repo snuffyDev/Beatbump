@@ -1,7 +1,6 @@
 export type Result<T> = T;
 export type SyncResult<T> = T | Error;
 export type Receiver<T> = {
-
 	get state(): State;
 
 	subscribe: (cb: Subscriber<T>) => Result<() => void>;
@@ -63,7 +62,7 @@ export function mpmc<T = unknown>(): [Sender<T>, Receiver<T>] {
 			// Clean up subscribers before clearing
 			for (const callback of subscribers.values()) {
 				const unsubFn = callback("CLOSED");
-				if (typeof unsubFn === 'function') {
+				if (typeof unsubFn === "function") {
 					unsubFn();
 				}
 			}
@@ -98,13 +97,15 @@ export function mpmc<T = unknown>(): [Sender<T>, Receiver<T>] {
 	function _sender() {
 		const close = () => {
 			try {
-				if (state === "CLOSED") { throw new Error("Cannot close an already closed channel!"); };
+				if (state === "CLOSED") {
+					throw new Error("Cannot close an already closed channel!");
+				}
 
 				// Clean-up subscribers, notify of channel closure,
 				// and run any returned functions
 				for (const callback of subscribers.values()) {
 					const unsubFn = callback("CLOSED");
-					if (typeof unsubFn === 'function') {
+					if (typeof unsubFn === "function") {
 						unsubFn();
 					}
 				}
@@ -124,9 +125,12 @@ export function mpmc<T = unknown>(): [Sender<T>, Receiver<T>] {
 				return state;
 			},
 			close,
-			send: (data: T) => {P
+			send: (data: T) => {
+				P;
 				try {
-					if (state === "CLOSED") { throw new Error("Cannot send on a closed channel!"); };
+					if (state === "CLOSED") {
+						throw new Error("Cannot send on a closed channel!");
+					}
 					for (const callback of subscribers.values()) {
 						callback(data);
 					}

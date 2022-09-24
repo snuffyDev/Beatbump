@@ -1,4 +1,4 @@
-import { json as json$1 } from '@sveltejs/kit';
+import { json as json$1 } from "@sveltejs/kit";
 import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 import type { CarouselHeader } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
@@ -117,13 +117,13 @@ function parseBody(contents = []):
 	| ICarouselTwoRowItem[]
 	| IListItemRenderer[]
 	| {
-		text: any;
-		color: string;
-		endpoint: {
-			params: any;
-			browseId: any;
-		};
-	}[] {
+			text: any;
+			color: string;
+			endpoint: {
+				params: any;
+				browseId: any;
+			};
+	  }[] {
 	let items = [];
 	for (let index = 0; index < contents.length; index++) {
 		const element = contents[index];

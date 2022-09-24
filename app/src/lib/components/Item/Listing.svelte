@@ -10,7 +10,7 @@
 	import list, { queue, queuePosition, currentTrack } from "$lib/stores/list";
 	import type { Item } from "$lib/types";
 	import { IDBService } from "$lib/workers/db/service";
-	import { browser } from "$app/env";
+	import { browser } from "$app/environment";
 	import { createEventDispatcher } from "svelte";
 	import { PopperButton, PopperStore } from "../Popper";
 	import { filter, Logger, notify } from "$lib/utils";
@@ -288,7 +288,6 @@
 								>
 							{:else}
 								<a
-									sveltekit:prefetch
 									on:click|preventDefault={() => goto(`/artist/${artist?.browseId}`)}
 									href={`/artist/${artist?.browseId}`}>{artist.text}</a
 								>

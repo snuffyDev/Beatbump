@@ -1,4 +1,4 @@
-import { browser } from "$app/env";
+import { browser } from "$app/environment";
 import { ENV_DONATION_URL } from "../../env";
 import { get, writable } from "svelte/store";
 
@@ -83,7 +83,7 @@ function _settings() {
 	if (!browser) {
 		return writable(list);
 	}
-	if ('localStorage' in self === false) return;
+	if ("localStorage" in self === false) return;
 	const stored = JSON.parse(localStorage.getItem("settings")) as UserSettings;
 	// Migrate from previous settings to new ones
 	if (!stored?.appearance && !stored?.playback && !stored?.search) {

@@ -162,7 +162,7 @@
 				list.updatePosition(idx - 1);
 				await tick();
 
-				AudioPlayer.next(false, false);
+				AudioPlayer.next(true, false);
 			}
 		} else if (page === "playlist") {
 			list.updatePosition(idx);
@@ -244,8 +244,7 @@
 								on:click|preventDefault={() => {
 									goto(`/artist/${subtitle.browseId}`);
 									fullscreenStore.set("closed");
-								}}
-								sveltekit:prefetch>{subtitle.text}</a
+								}}>{subtitle.text}</a
 							>
 						{:else}
 							<span>{subtitle.text} </span>

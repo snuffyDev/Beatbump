@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
 import { IsoBase64 } from "$lib/utils/buffer";

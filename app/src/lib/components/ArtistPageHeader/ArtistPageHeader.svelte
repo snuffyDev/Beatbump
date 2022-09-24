@@ -3,7 +3,7 @@
 	import Icon from "$lib/components/Icon/Icon.svelte";
 	import { onMount } from "svelte";
 	import type { ArtistPage } from "$lib/parsers";
-	import { browser } from "$app/env";
+	import { browser } from "$app/environment";
 	import Description from "./Description";
 	import { isDesktopMQ } from "$stores/window";
 

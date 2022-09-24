@@ -1,4 +1,5 @@
 @use "./mixins";
+@use "sass:math" as math;
 @use "./variables" as v;
 html {
 	box-sizing: border-box;
@@ -83,20 +84,20 @@ body {
 	user-select: none;
 	-webkit-tap-highlight-color: transparent !important;
 	-webkit-font-smoothing: antialiased;
-	--player-bar-height: clamp(5rem, 5.6rem, 5.95rem);
-	--top-bar-height: clamp(3.9rem, 4.175rem, 4.625rem);
+	--player-bar-height: #{math.round(math.clamp(4.5rem, 5rem, 7rem))};
+	--top-bar-height: #{math.clamp(3.9em, 4.175em, 4.625em)};
 	text-rendering: auto;
 
-	@media screen and (min-width: 40rem) and (max-width: 115.375rem) {
-		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
-		--base-font-size: 14px;
+	@media screen and (min-width: 40em) and (max-width: 96em) {
+		--top-bar-height: #{math.clamp(3.8rem, 4rem, 4.75rem)};
+		--base-font-size: 0.875rem;
 	}
-	@media screen and (min-width: 115.375rem) and (max-width: 134rem) {
-		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
-		--base-font-size: 16px;
+	@media screen and (min-width: 96em) and (max-width: 134em) {
+		--top-bar-height: #{math.clamp(3.8rem, 4rem, 4.75rem)};
+		--base-font-size: 1rem;
 	}
-	@media screen and (min-width: 134.75rem) {
-		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
+	@media screen and (min-width: 134.75em) {
+		--top-bar-height: #{math.clamp(3.8rem, 4rem, 4.75rem)};
 		--base-font-size: 1.125rem;
 	}
 }
@@ -143,7 +144,7 @@ html {
 	position: fixed;
 	height: 100%;
 	width: 100%;
-	line-height: 1.4;
+	line-height: 1.3;
 	inset: 0;
 
 	max-width: 100%;

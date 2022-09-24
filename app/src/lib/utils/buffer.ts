@@ -1,4 +1,4 @@
-import { browser } from "$app/env";
+import { browser } from "$app/environment";
 
 export type BufferEncoding = "utf8" | "utf-8" | "base64";
 

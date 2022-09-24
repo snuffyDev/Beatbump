@@ -17,7 +17,6 @@ export interface IListItemRenderer {
 	playlistId: string;
 	thumbnails: Array<Thumbnail>;
 	type?: string;
-
 }
 
 interface Subtitle {

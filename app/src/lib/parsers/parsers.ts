@@ -47,7 +47,7 @@ export const MoodsAndGenresItem = (
 } => {
 	return {
 		text: ctx.musicNavigationButtonRenderer?.buttonText.runs[0].text,
-		color: ('00000000' + (ctx.musicNavigationButtonRenderer?.solid.leftStripeColor & 0xffffff).toString(16)).slice(-6),
+		color: ("00000000" + (ctx.musicNavigationButtonRenderer?.solid.leftStripeColor & 0xffffff).toString(16)).slice(-6),
 
 		endpoint: {
 			params: ctx.musicNavigationButtonRenderer?.clickCommand.browseEndpoint.params,

@@ -14,7 +14,7 @@
 	import { tick } from "svelte";
 	import { PopperButton, PopperStore } from "../Popper";
 	import { browseHandler } from "./functions";
-	import { browser } from "$app/env";
+	import { browser } from "$app/environment";
 	import { IsoBase64 } from "$lib/utils";
 	import { SITE_ORIGIN_URL } from "$stores/url";
 	export let index;
@@ -486,6 +486,7 @@
 		align-items: center;
 		width: 100%;
 		height: 100%;
+		contain: paint;
 
 		&:focus {
 			border: none;
@@ -495,16 +496,16 @@
 			position: absolute;
 			content: "";
 			inset: 0;
-			background: linear-gradient(rgba(0, 0, 0, 0.502), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
+			background-image: linear-gradient(rgba(0, 0, 0, 0.502), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
 			pointer-events: none;
-			transition: background linear 0.1s, opacity linear 0.1s;
+			transition: background-image linear 0.1s, opacity linear 0.1s;
 			opacity: 0.1;
+			z-index: 1;
 		}
 
 		&:active:hover::before {
-			background: linear-gradient(rgba(0, 0, 0, 0.589), rgba(0, 0, 0, 0.11));
+			background-image: linear-gradient(rgba(0, 0, 0, 0.589), rgba(0, 0, 0, 0.11));
 			opacity: 1;
-			z-index: 1;
 		}
 
 		img {

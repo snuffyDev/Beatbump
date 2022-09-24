@@ -5,7 +5,7 @@ export type EventCallback<T = unknown> = (payload?: T) => void;
 export type EventListeners<
 	Events extends Record<string, unknown>,
 	Name extends keyof Events = keyof Events & string,
-	> = Map<Name, EventCallback<Events[Name]>[]>;
+> = Map<Name, EventCallback<Events[Name]>[]>;
 type KeyOf<T> = keyof T & string;
 
 export interface IEventEmitter<T> {
@@ -22,10 +22,7 @@ export class EventEmitter<Events extends Record<string, any> = any> implements I
 		this.__target = target;
 	}
 
-	dispatch<Name extends KeyOf<Events> = KeyOf<Events>>(
-		type: Name,
-		args?: Events[Name]
-	): void {
+	dispatch<Name extends KeyOf<Events> = KeyOf<Events>>(type: Name, args?: Events[Name]): void {
 		const queue = this._eventQueue.get(this.__target);
 
 		if (!queue) {
@@ -39,7 +36,7 @@ export class EventEmitter<Events extends Record<string, any> = any> implements I
 		const length = listeners.length;
 		let idx = -1;
 
-		for (; ++idx < length;) {
+		for (; ++idx < length; ) {
 			listeners[idx](args);
 		}
 	}
@@ -74,11 +71,7 @@ export class EventEmitter<Events extends Record<string, any> = any> implements I
 		this._eventQueue.set(this.__target, queue);
 	}
 
-	public once<Name extends KeyOf<Events> = KeyOf<Events>>(
-		name: Name,
-		cb: EventCallback<Events[Name]>,
-	) {
-
+	public once<Name extends KeyOf<Events> = KeyOf<Events>>(name: Name, cb: EventCallback<Events[Name]>) {
 		if (!this.__target) return;
 
 		const doOnce = (data: Events[Name]) => {

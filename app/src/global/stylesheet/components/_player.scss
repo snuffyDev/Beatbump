@@ -20,9 +20,10 @@
 	cursor: pointer;
 	display: inline-flex;
 	height: auto;
-	max-height: 2em;
-	max-width: 2em;
-	margin: 0 2pt;
+	max-height: 8em;
+	max-width: 8em;
+	margin: 0 0.1em;
+	padding: 0.8em;
 
 	position: relative;
 	width: auto;
@@ -74,11 +75,6 @@
 	flex-wrap: nowrap;
 
 	flex-direction: column;
-}
-.player-controls {
-	display: flex;
-	place-self: center;
-	width: auto;
 }
 
 .buttons {

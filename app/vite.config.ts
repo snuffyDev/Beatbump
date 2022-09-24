@@ -9,21 +9,25 @@ const version_fmt = `${version.getUTCFullYear()}.${version.getMonth().toString()
 const config: UserConfig = {
 	plugins: [sveltekit()],
 	legacy: {},
-	optimizeDeps: { esbuildOptions: {}, exclude: [''] },
+	optimizeDeps: { esbuildOptions: {}, exclude: [""] },
 
 	build: {
 		minify: "esbuild",
 		cssTarget: ["chrome58", "edge16", "firefox57", "safari11"],
 		dynamicImportVarsOptions: {},
-		target: '',
-		rollupOptions: {}
-	}, define: {
-		"process.env.APP_VERSION": JSON.stringify(version_fmt)
+		target: "",
+		rollupOptions: {},
+	},
+	define: {
+		"process.env.APP_VERSION": JSON.stringify(version_fmt),
 	},
 	experimental: {},
 	esbuild: { treeShaking: true, minifyWhitespace: true, minifyIdentifiers: true, minifySyntax: true },
-	css: {}, worker: {
-		plugins: [], format: 'es', rollupOptions: { treeshake: {}, output: {} }
-	}
+	css: {},
+	worker: {
+		plugins: [],
+		format: "es",
+		rollupOptions: { treeshake: {}, output: {} },
+	},
 };
 export default config;

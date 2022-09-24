@@ -5,7 +5,7 @@ import { alertHandler, currentId, preferWebM } from "$lib/stores/stores";
 import { settings, type UserSettings } from "$lib/stores/settings";
 import { get } from "svelte/store";
 import { findFirst, map } from "./collections";
-import { browser } from "$app/env";
+import { browser } from "$app/environment";
 import type { Song } from "$lib/types";
 
 let userSettings: UserSettings;

@@ -89,8 +89,8 @@ function baseResponse(data: Dict<any>, _visitorData: string) {
 		}
 		if ("musicImmersiveCarouselShelfRenderer" in item) {
 			headerThumbnail =
-				item.musicImmersiveCarouselShelfRenderer.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail
-					?.thumbnails || [];
+				item.musicImmersiveCarouselShelfRenderer.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail?.thumbnails ||
+				[];
 			carouselItems[idx] = parseCarousel(item);
 		}
 	}
@@ -129,13 +129,13 @@ function parseBody(contents: Array<any> = []):
 	| ICarouselTwoRowItem[]
 	| IListItemRenderer[]
 	| {
-		text: any;
-		color: string;
-		endpoint: {
-			params: any;
-			browseId: any;
-		};
-	}[] {
+			text: any;
+			color: string;
+			endpoint: {
+				params: any;
+				browseId: any;
+			};
+	  }[] {
 	const items: unknown[] = [];
 	let idx = -1;
 	const length = contents.length;

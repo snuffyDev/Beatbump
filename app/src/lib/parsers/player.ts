@@ -16,7 +16,7 @@ import { buildDashManifest, type IFormat } from "$lib/utils/buildDashManifest";
 export interface PlayerFormats {
 	hls?: string;
 	dash?: string;
-	streams?: { url: string; original_url: string; mimeType: string; }[];
+	streams?: { url: string; original_url: string; mimeType: string }[];
 }
 export function sort({
 	data = {},
@@ -30,7 +30,6 @@ export function sort({
 	proxyUrl?: string;
 }): PlayerFormats {
 	let dash_manifest: string;
-
 
 	if (dash === true) {
 		const proxy_url = new URL(proxyUrl);
@@ -48,7 +47,6 @@ export function sort({
 
 		const manifest = buildDashManifest(formats, length);
 		dash_manifest = "data:application/dash+xml;charset=utf-8;base64," + btoa(manifest);
-
 	}
 
 	const host = data?.playerConfig?.hlsProxyConfig?.hlsChunkHost;

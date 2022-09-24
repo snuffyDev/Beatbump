@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { PageLoad } from "./$types";
 let path;
 

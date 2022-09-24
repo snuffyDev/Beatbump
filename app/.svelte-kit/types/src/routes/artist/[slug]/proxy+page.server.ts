@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { buildRequest } from "../../api/_api/request";
 import { error, type PageServerLoad } from "@sveltejs/kit";
 import { ArtistPageParser } from "$lib/parsers/artist";

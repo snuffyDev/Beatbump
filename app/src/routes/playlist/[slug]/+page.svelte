@@ -12,10 +12,10 @@
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
 	import ListInfoBar from "$lib/components/ListInfoBar";
 	import { notify, type Maybe } from "$lib/utils";
-	import { browser } from "$app/env";
+	import { browser } from "$app/environment";
 	import { CTX_ListItem } from "$lib/contexts";
 	import type { NextContinuationData } from "$lib/types";
-	import type { PageData } from './$types';
+	import type { PageData } from "./$types";
 
 	export let data: PageData;
 

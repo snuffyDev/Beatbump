@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { browser } from "$app/env";
+	import { browser } from "$app/environment";
 	import Modal from "$components/Modal";
 	import Icon from "$lib/components/Icon/Icon.svelte";
 
@@ -136,7 +136,7 @@
 		<section>
 			<div class="header">
 				<h2>Your Songs</h2>
-				<a sveltekit:prefetch href="/library/songs"
+				<a href="/library/songs"
 					>{#if favorites?.length > 0}<small>See All</small>{/if}</a
 				>
 			</div>

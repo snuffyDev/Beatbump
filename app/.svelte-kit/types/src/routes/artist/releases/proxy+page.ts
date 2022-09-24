@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { CarouselItem } from "$lib/types";
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";

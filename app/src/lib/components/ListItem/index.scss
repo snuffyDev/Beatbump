@@ -12,7 +12,7 @@
 		flex: none;
 		align-content: center;
 		grid-template-areas: "left middle right";
-		grid-template-columns: 1.5em calc(100% - 4.025em) 2.45em;
+		grid-template-columns: 2.25em calc(100% - 4.8em) 2.45em;
 	}
 	@supports (content-visibility: auto) {
 		content-visibility: auto;

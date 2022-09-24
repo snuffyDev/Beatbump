@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
-import { browser } from "$app/env";
+import { browser } from "$app/environment";
 import { cubicOut } from "svelte/easing";
 import { tweened } from "svelte/motion";
 import type { Unsubscriber } from "svelte/store";
@@ -16,6 +16,7 @@ import { getSrc, type ResponseBody } from "./utils/utils";
 import type HLS from "hls.js";
 import { settings } from "./stores";
 import type { StreamType } from "$stores/settings";
+import { tick } from "svelte";
 
 export interface IAudioPlayer {
 	// #region Properties (6)
@@ -145,6 +146,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	private _paused: WritableStore<boolean> = new WritableStore(true);
 	private _player: HTMLAudioElement = undefined;
 	private _remainingTime: number = 0;
+	private _repeat: "track" | "playlist" | "off" = "off";
 	playerType: "NATIVE" | "HLS.JS" | "UNSUPPORTED" = undefined;
 	private _src: WritableStore<string> = new WritableStore("");
 	private _worksWithHLSjs = new WritableStore(false);
@@ -283,12 +285,20 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	}
 
 	public async next(userInitiated = false, broadcast = false): Promise<void> {
+		if (this._repeat === "track" && userInitiated === false) return;
 		if (this.__tick === true) return;
 		this.__tick = true;
 
-		const canAllPlay = groupSession.allCanPlay();
 		const sessionList = this.currentSessionList();
+		const canAllPlay = groupSession.allCanPlay();
 		let position = sessionList.position;
+
+		if (this._repeat === "playlist" && sessionList.position === sessionList.mix.length - 1) {
+			this.handleRepeat(sessionList);
+			this.__tick = false;
+			return;
+		}
+
 		/**
 		 *  if both `userInitiated` and `broadcast` are true, it means
 		 *  a group session is available and to update it & local state
@@ -415,7 +425,13 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	public updateTime(time: number): void {
 		this._currentTimeStore.set(time);
 	}
+	public repeat(state: "off" | "track" | "playlist") {
+		if (state === "track") {
+			this._player.loop = true;
+		} else this._player.loop = false;
 
+		this._repeat = state;
+	}
 	// #endregion Public Methods (10)
 
 	// #region Private Methods (5)
@@ -521,11 +537,24 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			if (hasProperty(value)) return value;
 		});
 	}
-
-	private async onEnded() {
-		this._player.defaultMuted = true;
-		const currentList = this.currentSessionList();
+	private async handleRepeat(currentList: ISessionListProvider) {
 		if (currentList.position === currentList.mix.length - 1) {
+			SessionListService.updatePosition(1);
+			await tick();
+			this.previous(false);
+		}
+		this.__tick = false;
+	}
+	private async onEnded() {
+		if (this._repeat === "track") return;
+		const currentList = this.currentSessionList();
+		const isLastSong = currentList.position === currentList.mix.length - 1;
+		if (this._repeat === "playlist" && isLastSong) {
+			await this.handleRepeat(currentList);
+			return;
+		}
+
+		if (isLastSong) {
 			this.next();
 			return;
 		}
@@ -549,11 +578,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			});
 			return;
 		}
-		if (
-			this._hasNextSrc === true &&
-			this._nextTrackURL &&
-			Object.prototype.hasOwnProperty.call(this._nextTrackURL, "url")
-		) {
+		if (this._hasNextSrc === true && this._nextTrackURL && this._nextTrackURL?.url) {
 			SessionListService.updatePosition("next");
 			this.updateSrc(this._nextTrackURL);
 		} else {
@@ -679,6 +704,8 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		});
 
 		this.onEvent("loadedmetadata", () => {
+			this.__tick = false;
+
 			this._hasNextSrc = false;
 			this._nextTrackURL = null;
 			this._durationStore.set(this._player.duration);

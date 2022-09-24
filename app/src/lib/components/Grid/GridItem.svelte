@@ -43,7 +43,6 @@
 					<span>{sub.text}</span>
 				{:else}
 					<a
-						sveltekit:prefetch
 						on:click|stopPropagation|preventDefault={() => {
 							goto("/artist/" + sub?.browseId);
 						}}
@@ -85,12 +84,12 @@
 		font-size: 1.1em;
 		letter-spacing: -0.02em;
 	}
-	@media screen and (min-width: 37rem) and (max-width: 48rem) {
+	@media screen and (min-width: 37em) and (max-width: 48em) {
 		.item {
 			max-width: 13rem;
 		}
 	}
-	@media screen and (min-width: 48rem) {
+	@media screen and (min-width: 48em) {
 		.item {
 			max-width: 14rem;
 		}

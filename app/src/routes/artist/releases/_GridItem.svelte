@@ -49,17 +49,17 @@
 		letter-spacing: -0.02em;
 		margin-bottom: 0.5em;
 	}
-	@media screen and (min-width: 25rem) and (max-width: 37rem) {
+	@media screen and (min-width: 25em) and (max-width: 37em) {
 		.item {
 			max-width: 14rem;
 		}
 	}
-	@media screen and (min-width: 37rem) and (max-width: 48rem) {
+	@media screen and (min-width: 37em) and (max-width: 48em) {
 		.item {
 			max-width: 13rem;
 		}
 	}
-	@media screen and (min-width: 48rem) {
+	@media screen and (min-width: 48em) {
 		.item {
 			max-width: 14rem;
 		}

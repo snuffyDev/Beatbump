@@ -65,7 +65,7 @@
 			<p class="secondary">
 				{#each artist as artist, i}
 					{#if artist.channelId}
-						<a sveltekit:prefetch href={`/artist/${artist.channelId}`}>{artist.name}</a>
+						<a href={`/artist/${artist.channelId}`}>{artist.name}</a>
 					{:else}
 						<span>{artist.name}</span>
 						<!-- {#if i !== artist.length - 1}

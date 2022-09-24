@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { browser } from "$app/env";
+	import { browser } from "$app/environment";
 
 	import drag from "$lib/actions/drag";
 	import list from "$lib/stores/list";

@@ -10,8 +10,8 @@ type IsObject<T> = T extends object ? (T extends any[] ? false : true) : false;
 
 type IMergedObject<T, U> = IsObject<T> & IsObject<U> extends true
 	? {
-		[K in keyof T]: K extends keyof U ? IMergedObject<T[K], U[K]> : T[K];
-	} & U
+			[K in keyof T]: K extends keyof U ? IMergedObject<T[K], U[K]> : T[K];
+	  } & U
 	: U;
 
 type VoidCallback<T extends IObject<T>, K extends keyof T> = (item: [string, T[K]], index: number, object: T) => void;
@@ -27,7 +27,7 @@ export function iterObj<T extends IObject<T>, K extends keyof T>(object: T, cb: 
 	const length = keys.length;
 
 	let idx = -1;
-	for (; ++idx < length;) {
+	for (; ++idx < length; ) {
 		cb.apply(this, [[keys[idx], object[keys[idx]]] as [string, T[K]], idx, object]);
 	}
 }
@@ -42,7 +42,7 @@ export function mergeObjects<Target, Source>(target: Target, source: Source): IM
 	const keys: Array<string> = Object.keys(source);
 	const length = keys.length;
 	let idx = -1;
-	for (; ++idx < length;) {
+	for (; ++idx < length; ) {
 		const key = keys[idx];
 		target[key] = source[key];
 		if (target[key] === undefined) delete target[key];
@@ -55,7 +55,7 @@ export function mergeObjectsRec<Target, Source>(target: Target, source: Source):
 		const keys: Array<string> = Object.keys(b);
 		const length = keys.length;
 		let idx = -1;
-		for (; ++idx < length;) {
+		for (; ++idx < length; ) {
 			const key = keys[idx];
 			if (b[key] instanceof Array && (a[key] as []) instanceof Array) {
 				// eslint-disable-next-line prefer-spread

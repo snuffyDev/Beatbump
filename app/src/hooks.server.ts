@@ -1,9 +1,6 @@
-import { dev } from "$app/env";
+import { dev } from "$app/environment";
 
 import type { Handle } from "@sveltejs/kit";
-
-const rootDomain = import.meta.env.VITE_DOMAIN; // or your server IP for dev
-const originURL = import.meta.env.VITE_SITE_URL; // or your server IP for dev
 
 const headers = {
 	"X-Frame-Options": "SAMEORIGIN",

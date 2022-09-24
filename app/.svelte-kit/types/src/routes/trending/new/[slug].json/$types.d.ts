@@ -1,6 +1,7 @@
 import type * as Kit from '@sveltejs/kit';
 
-interface RouteParams extends Partial<Record<string, string>> { slug: string }
+type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
+type RouteParams = { slug: string }
 
 export type RequestHandler = Kit.RequestHandler<RouteParams>;
 export type RequestEvent = Kit.RequestEvent<RouteParams>;

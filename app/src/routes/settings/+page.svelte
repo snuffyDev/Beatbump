@@ -125,7 +125,7 @@
 		font-size: 1em;
 		text-transform: none !important;
 		font-variant: unset;
-		@media screen and (min-width: 40rem) {
+		@media screen and (min-width: 40em) {
 			~ :last-child {
 				margin-left: auto;
 			}
@@ -156,7 +156,7 @@
 		&:last-of-type {
 			margin-block-end: 2em;
 		}
-		@media screen and (min-width: 40rem) {
+		@media screen and (min-width: 40em) {
 			align-items: center;
 			flex-direction: row;
 		}

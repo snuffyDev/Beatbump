@@ -1,4 +1,4 @@
-import { browser } from "$app/env";
+import { browser } from "$app/environment";
 import type { Item, JSON, Nullable } from "$lib/types";
 import { every, filter, iter } from "$lib/utils/collections";
 import { Logger } from "$lib/utils/logger";
@@ -92,7 +92,7 @@ interface GroupSessionController {
 	/** Send a command to connected clients */
 	send(command: Command, type: Kind, data: JSON, metadata?: Client): void;
 	/** Send client state to other clients in session */
-	sendGroupState(clientState: { client: string; state: ConnectionState; }): void;
+	sendGroupState(clientState: { client: string; state: ConnectionState }): void;
 
 	// #endregion Public Methods (6)
 }
@@ -139,11 +139,10 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 		// Import PeerJS here since importing it normally would
 		// crash during SSR
 		if (browser) {
-
 			import("peerjs").then((module) => {
 				this._peerJs = module.default;
 			});
-		};
+		}
 
 		// Listen to the connectionStates store for
 		// keeping accurate track of state
@@ -381,7 +380,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 			if (command === "PATCH") {
 				/** Gets the next or previous track */
 				if (type === "state.update.position") {
-					const { dir = undefined, position = 0 }: { dir: "<-" | "->" | undefined; position: number; } = data as {
+					const { dir = undefined, position = 0 }: { dir: "<-" | "->" | undefined; position: number } = data as {
 						dir: "<-" | "->" | undefined;
 						position: number;
 					};
@@ -422,7 +421,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 		});
 	}
 
-	public sendGroupState(clientState: { client: string; state: ConnectionState; }): void {
+	public sendGroupState(clientState: { client: string; state: ConnectionState }): void {
 		this._connectionStates.update((u) => ({ ...u, [this.client.clientId]: clientState["state"] }));
 
 		this.send("PATCH", "state", clientState, this.client);
@@ -430,7 +429,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 
 	public setAutoMix(
 		type: "automix" | "playlist",
-		{ videoId = "", playlistId = "" }: { videoId?: string; playlistId?: string; },
+		{ videoId = "", playlistId = "" }: { videoId?: string; playlistId?: string },
 	): Status {
 		return this.initializeHostPlayback("automix", { videoId, playlistId });
 	}
@@ -507,7 +506,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 	/// Client State Handling
 	private initializeHostPlayback(
 		kind: "automix" | "playlist",
-		data: { videoId?: Nullable<string>; playlistId?: Nullable<string>; } = { videoId: "", playlistId: "" },
+		data: { videoId?: Nullable<string>; playlistId?: Nullable<string> } = { videoId: "", playlistId: "" },
 	) {
 		try {
 			if (kind === "automix") {
