@@ -63,8 +63,8 @@
 	});
 </script>
 
-<!-- {JSON.stringify(results)} -->
 <Header title="Search" desc={`Search results for ${decodeURIComponent($page.params.slug)}`} url={$page.url.pathname} />
+
 <main class="parent" class:max-height={filter !== "all"}>
 	{#key data}
 		{#each results as result}
@@ -106,10 +106,6 @@
 </main>
 
 <style lang="scss">
-	.parent {
-		width: 100%;
-		// max-height: 100%;
-	}
 	.h3 {
 		font-weight: 600;
 	}
@@ -121,7 +117,6 @@
 		margin-top: 0.666em;
 		max-height: 100%;
 		display: flex;
-		// overflow-y: auto;
 	}
 	.music-shelf-list {
 		max-height: 100%;

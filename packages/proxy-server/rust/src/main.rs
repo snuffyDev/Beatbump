@@ -120,7 +120,10 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
             .to_string();
 
             let result = send_request(&url, &host).await?;
-            let response = Response::builder().body(result.into_body()).unwrap();
+            let response = Response::builder()
+                .header("Access-Control-Allow-Origin", "*")
+                .body(result.into_body())
+                .unwrap();
 
             Ok(response)
         }
@@ -140,7 +143,10 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
                 .expect("Could not modify HLS body.");
 
             // Build a new Response with the modified HLS Manifest
-            let result_response = Response::builder().body(result.into()).unwrap();
+            let result_response = Response::builder()
+                .header("Access-Control-Allow-Origin", "*")
+                .body(result.into())
+                .unwrap();
 
             Ok(result_response)
         }

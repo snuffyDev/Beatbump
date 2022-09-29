@@ -1,8 +1,7 @@
 import type { PageLoad } from "./$types";
-let path;
 
 export const load: PageLoad = async ({ url, fetch }) => {
-	path = url.pathname;
+	const path = url.pathname;
 	const browseId = url.searchParams.get("id") || "";
 	const pt = url.searchParams.get("type") || "";
 	const response = await fetch(
