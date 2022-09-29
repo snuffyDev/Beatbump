@@ -1,9 +1,8 @@
 // @ts-nocheck
 import type { PageLoad } from "./$types";
-let path;
 
 export const load = async ({ url, fetch }: Parameters<PageLoad>[0]) => {
-	path = url.pathname;
+	const path = url.pathname;
 	const browseId = url.searchParams.get("id") || "";
 	const pt = url.searchParams.get("type") || "";
 	const response = await fetch(

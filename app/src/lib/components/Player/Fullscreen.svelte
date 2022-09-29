@@ -16,20 +16,22 @@
 	import { groupSession } from "$lib/stores/sessions";
 	import ProgressBar from "./ProgressBar";
 	import { CTX_ListItem } from "$lib/contexts";
-	import { notify } from "$lib/utils";
 	import { requestFrameSingle } from "$lib/utils";
 	import { page } from "$app/stores";
 	import { isMobileMQ } from "$stores/window";
-	const { paused } = AudioPlayer;
+
 	export let state: "open" | "closed";
+
+	const { paused } = AudioPlayer;
 
 	$: loading = $playerLoading;
 	$: data = $currentTrack;
 	$: heightCalc = -windowHeight + 140;
 	$: queueOpen = true;
+
 	let titleWidth = 320;
 	let active = "UpNext";
-	let frame: number;
+
 	const tabs = [
 		{
 			id: "UpNext",
@@ -141,7 +143,7 @@
 {#if $queue.length}
 	<div
 		class="backdrop"
-		class:mobile={$page.data.Android || $page.data.iOS}
+		class:mobile={$isMobileMQ}
 		bind:clientHeight={windowHeight}
 		style:pointer-events={state === "open" ? "all" : "none"}
 		style="background-color: {state === 'open' ? 'hsla(0,0%,0%,40%)' : '#0000'} !important;"
@@ -530,7 +532,7 @@
 
 		contain: strict;
 		touch-action: none;
-		will-change: opacity;
+		will-change: transform, opacity;
 
 		// bottom: 0;
 	}

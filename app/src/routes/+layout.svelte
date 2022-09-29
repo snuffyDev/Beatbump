@@ -36,7 +36,7 @@
 		if (import.meta.env.SSR) return;
 		if (main) main.scrollTop = 0;
 	});
-	$: console.log($queue, $SessionListService);
+	// $: console.log($queue, $SessionListService);
 </script>
 
 <svelte:window
