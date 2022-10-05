@@ -5,8 +5,8 @@ import type { NextContinuationData } from "$lib/types";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { map } from "$lib/utils/collections";
 import { error, json, type RequestHandler } from "@sveltejs/kit";
-import { buildRequest } from "../_api/request";
-import type { PlaylistEndpointContinuation, PlaylistEndpointParams } from "../_api/_base";
+import { buildRequest } from "$api/request";
+import type { PlaylistEndpointContinuation, PlaylistEndpointParams } from "$api/_base";
 export const GET: RequestHandler = async ({ url }) => {
 	try {
 		const query = url.searchParams;

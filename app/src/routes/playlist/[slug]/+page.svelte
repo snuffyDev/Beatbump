@@ -61,7 +61,7 @@
 	const getCarousel = async () => {
 		if (!carouselContinuations) return;
 		const response = await fetch(
-			"/api/playlist.json" +
+			"/api/v1/playlist.json" +
 				"?ref=" +
 				id +
 				`${carouselContinuations ? `&ctoken=${encodeURIComponent(carouselContinuations?.continuation)}` : ""}` +
@@ -85,7 +85,7 @@
 		try {
 			isLoading = true;
 			const response = await fetch(
-				"/api/playlist.json" +
+				"/api/v1/playlist.json" +
 					"?ref=" +
 					id +
 					"&visitorData=" +
@@ -277,7 +277,7 @@
 				notify(`${pageTitle} added to queue!`, "success");
 			}}
 			on:playlistAdd={async () => {
-				const response = await fetch("/api/get_queue.json?playlistId=" + header?.playlistId);
+				const response = await fetch("/api/v1/get_queue.json?playlistId=" + header?.playlistId);
 				const data = await response.json();
 				const items = data;
 				showAddToPlaylistPopper.set({ state: true, item: [...items] });

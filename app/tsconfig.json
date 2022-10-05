@@ -5,7 +5,7 @@
 		"paths": {
 			"$components/*": ["./src/lib/components/*"],
 			"$stores/*": ["./src/lib/stores/*"],
-			"$api/*": ["./src/routes/api/*"],
+			"$api/*": ["./src/routes/api/_lib/*"],
 			"$lib": ["./src/lib"],
 			"$lib/*": ["./src/lib/*"],
 			"$env": ["./src/env.ts"],
@@ -16,5 +16,5 @@
 		"compilerOptions": { "allowSyntheticDefaultImports": true, "resolveJsonModule": true },
 		"moduleTypes": {}
 	},
-	"exclude": ["scripts/**/*.*"]
+	"exclude": ["scripts/**/*.*", "node_modules/**"]
 }

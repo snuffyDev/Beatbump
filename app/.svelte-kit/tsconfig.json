@@ -9,10 +9,10 @@
 				"src/lib/stores/*"
 			],
 			"$api": [
-				"src/routes/api"
+				"src/routes/api/_lib"
 			],
 			"$api/*": [
-				"src/routes/api/*"
+				"src/routes/api/_lib/*"
 			],
 			"$components": [
 				"src/lib/components"

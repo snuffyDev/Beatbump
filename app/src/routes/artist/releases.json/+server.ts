@@ -1,10 +1,8 @@
 import { json as json$1 } from "@sveltejs/kit";
 
-// @migration task: Check imports
 import { MusicTwoRowItemRenderer } from "$lib/parsers";
 import { iter } from "$lib/utils/collections";
-import type { RequestHandler } from "@sveltejs/kit";
-
+import type { RequestHandler } from "./$types";
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;
 

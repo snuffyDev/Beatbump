@@ -47,6 +47,12 @@ export function MusicResponsiveListItemRenderer(
 		type: type,
 		playerParams:
 			flexCol0?.navigationEndpoint?.watchEndpoint?.playerParams || flexCol0?.navigationEndpoint?.watchEndpoint?.params,
+		clickTrackingParams:
+			item.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
+				?.clickTrackingParams,
+		loggingContext:
+			item.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
+				?.watchEndpoint?.loggingContext,
 	};
 	if (Item !== undefined && playlistSetVideoId) {
 		Object.assign(Item, {

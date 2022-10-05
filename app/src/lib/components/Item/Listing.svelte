@@ -81,7 +81,7 @@
 			action: async () => {
 				if (data?.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
 					// console.log('PLAYLIST')
-					const response = await fetch("/api/get_queue.json?playlistId=" + data?.playlistId);
+					const response = await fetch("/api/v1/get_queue.json?playlistId=" + data?.playlistId);
 					const _data = await response.json();
 					const items: Item[] = _data;
 					showAddToPlaylistPopper.set({ state: true, item: [...items] });
@@ -166,7 +166,7 @@
 	if (isArtist) {
 		DropdownItems = [...DropdownItems.filter((item) => !item.text.includes("Add to Playlist"))];
 	}
-	if (data.type === "playlist") {
+	if (data.type === "playlists") {
 		DropdownItems.splice(1, 1, {
 			text: "View Playlist",
 			icon: "list",
@@ -183,7 +183,7 @@
 		DropdownItems.pop();
 		DropdownItems = [...DropdownItems.filter((item) => !item.text.includes("Favorite"))];
 	}
-	if (data.type === "video") {
+	if (data.type === "videos") {
 		DropdownItems = DropdownItems.filter((d) => {
 			if (d.text === "View Artist") return;
 		});
@@ -208,10 +208,10 @@
 		}
 		try {
 			loading = true;
+			console.log(data);
 			videoId = data.videoId ? data.videoId : "";
 			playlistId = data?.playlistId ? data?.playlistId : data.shuffle?.playlistId ? data.shuffle?.playlistId : "";
-			if (data.type === "playlist") {
-				// console.log(data);
+			if (data.type === "playlist" || data.type === "albums") {
 				await list.initPlaylistSession({ playlistId, index: 0 });
 			} else {
 				await list.initAutoMixSession({

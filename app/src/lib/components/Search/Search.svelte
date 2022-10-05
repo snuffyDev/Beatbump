@@ -22,7 +22,7 @@
 	}
 	const typeahead = debounce(async () => {
 		if (query == "" || undefined) return (results = []);
-		const response = await fetch("/api/get_search_suggestions.json?q=" + encodeURIComponent(query));
+		const response = await fetch("/api/v1/get_search_suggestions.json?q=" + encodeURIComponent(query));
 		results = await response.json();
 	}, 250);
 </script>

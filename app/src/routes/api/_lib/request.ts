@@ -96,8 +96,9 @@ function nextRequest<T extends NextEndpointParams>(context: Context, params: T) 
 		headers: {
 			"Content-Type": "application/json; charset=utf-8",
 			Origin: "https://music.youtube.com",
-			"x-origin": "https://music.youtube.com",
 
+			"x-youtube-client-name": "67",
+			"x-youtube-client-version": "1.20220928.01.00",
 			"X-Goog-Visitor-Id": `${context?.client?.visitorData}`,
 			"User-Agent":
 				"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.0.1293.54,gzip(gfe)",

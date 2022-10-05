@@ -1,9 +1,9 @@
 import type { RequestHandler } from "@sveltejs/kit";
-import { buildRequest } from "../_api/request";
+import { buildRequest } from "$api/request";
 import { error, json } from "@sveltejs/kit";
 
 /**
- * @root "/api/"
+ * @root "/api/v1/"
  * @description Will return the player data for the provided videoId.\nThe stream URLs can be found in the streamingData object in the JSON response.
  * @endpoint player.json
  * @method GET

@@ -58,6 +58,38 @@ function _sessionListService() {
 	const commitChanges = ({ clickTrackingParams, mix, continuation, currentMixId, position, currentMixType }) =>
 		_set({ clickTrackingParams, mix, continuation, currentMixId, position, currentMixType });
 
+	async function getMoreLikeThis({ playlistId } = { playlistId: null }) {
+		// if (autoMixPreview.length) {
+		// 	mix.push(...autoMixPreview);
+		// }
+		if (!mix.length) {
+			/** notify('Error: No track videoId was provided!', 'error'); **/ return;
+		}
+		playerLoading.set(true);
+		// console.log(playlistId, currentMixId);
+		const response = await fetchNext({
+			params: "wAEB8gECeAE%3D",
+			playlistId: "RDAMPL" + (playlistId !== null ? playlistId : currentMixId),
+		});
+		const data = await response;
+		// console.log(data)
+		data.results.shift();
+		mix.push(...data.results);
+		continuation = data.continuation;
+		commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
+
+		if (groupSession?.initialized && groupSession?.hasActiveSession) {
+			groupSession.updateGuestTrackQueue({
+				mix,
+				clickTrackingParams,
+				currentMixId,
+				continuation,
+				position,
+				currentMixType,
+			});
+		}
+		playerLoading.set(false);
+	}
 	return {
 		subscribe,
 		set: _set,
@@ -71,6 +103,7 @@ function _sessionListService() {
 			keyId = 0,
 			playlistId,
 			playlistSetVideoId,
+			loggingContext = { vssLoggingContext: { serializedContextData: "" } },
 			videoId,
 			config: { playerParams = "", type = "" } = {},
 		}) {
@@ -86,7 +119,7 @@ function _sessionListService() {
 					params: playerParams ? playerParams : "",
 					videoId,
 					playlistId: playlistId ? playlistId : "",
-
+					loggingContext: loggingContext.vssLoggingContext.serializedContextData,
 					playlistSetVideoId: playlistSetVideoId ? playlistSetVideoId : "",
 					clickTracking,
 					configType: type,
@@ -114,72 +147,34 @@ function _sessionListService() {
 			}
 		},
 		async initPlaylistSession(args) {
-			const { playlistId = "", index = 0, params = "" } = args;
+			const {
+				playlistId = "",
+				index = 0,
+				clickTrackingParams = "",
+				params = "",
+				videoId = "",
+				playlistSetVideoId = "",
+			} = args;
 			playerLoading.set(true);
-			// console.log(args, { mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
-			if (mix.length && playlistId === currentMixId && chunkedPlaylistMap.size !== 0) {
-				if (index < chunkedPlaylistMap.get(0).length) {
-					// console.log("index < chunked0", index, chunkedPlaylistMap);
-					mix = Array.from(chunkedPlaylistMap.get(0));
-				} else {
-					const temp = [];
-					chunkedPlaylistMap.forEach((value, key) => {
-						if (index > value.length) {
-							// console.log("index < value.length", index, key, value);
-							mix.push(...Array.from(chunkedPlaylistMap.get(key)));
-						}
-						if (index < value.length - 1 && index > chunkedPlaylistMap[key - 1].length) {
-							mix = [...temp, Array.from(chunkedPlaylistMap.get(index))];
-							// console.log("index < value.length - 1", index, key, value, mix);
-						}
-					});
-					if (groupSession?.initialized && groupSession?.hasActiveSession) {
-						groupSession.expAutoMix({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
-					}
-				}
-				playerLoading.set(false);
-				return await getSrc(mix[index]?.videoId, playlistId);
-			}
-			if (mix.length !== 0) {
-				position = 0;
+
+			if (currentMixType !== "playlist" || currentMixId !== playlistId) {
+				position = typeof index === "number" ? index : 0;
 				internalIdx = 0;
 
 				mix = [];
 			}
 			currentMixType = "playlist";
 			try {
-				const data = await fetchNext({ params, playlistId: playlistId });
+				const data = await fetchNext({
+					params,
+					playlistId: playlistId,
+					clickTracking: clickTrackingParams,
+					playlistSetVideoId: playlistSetVideoId,
+					videoId,
+				});
 				mix.push(...data.results);
-				mix = mix.filter((item) => item.title);
-				if (mix.length > 50) {
-					// console.log(mix);
-
-					chunkedListOriginalLen = mix.length;
-					for (const [key, value] of split(mix, 50).entries()) {
-						// console.log(key, value)
-						chunkedPlaylistMap.set(key, value);
-						// console.log(chunkedPlaylistMap)
-					}
-					// mix = Array.from(chunkedPlaylistMap)
-					if (index < chunkedPlaylistMap.get(0).length) {
-						// console.log("index < chunked0", index, chunkedPlaylistMap);
-						mix = Array.from(chunkedPlaylistMap.get(0));
-					} else {
-						const temp = [];
-						chunkedPlaylistMap.forEach((value, key) => {
-							if (index > value.length) {
-								// console.log("index < value.length", index, key, value);
-								temp.push(Array.from(chunkedPlaylistMap.get(key)));
-							}
-							if (index < value.length - 1 && index > chunkedPlaylistMap[key - 1].length) {
-								mix = [...temp, Array.from(chunkedPlaylistMap.get(index))];
-								// console.log("index < value.length - 1", index, key, value, mix);
-							}
-						});
-					}
-				}
-
 				playerLoading.set(false);
+
 				commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
 				currentMixId = playlistId;
 				if (groupSession?.initialized && groupSession?.hasActiveSession) {
@@ -212,38 +207,7 @@ function _sessionListService() {
 				groupSession.send("PUT", "state.set.mix", JSON.stringify(guard), groupSession.client);
 			}
 		},
-		async getMoreLikeThis({ playlistId } = { playlistId: null }) {
-			// if (autoMixPreview.length) {
-			// 	mix.push(...autoMixPreview);
-			// }
-			if (!mix.length) {
-				/** notify('Error: No track videoId was provided!', 'error'); **/ return;
-			}
-			playerLoading.set(true);
-			// console.log(playlistId, currentMixId);
-			const response = await fetchNext({
-				params: "wAEB8gECeAE%3D",
-				playlistId: "RDAMPL" + (playlistId !== null ? playlistId : currentMixId),
-			});
-			const data = await response;
-			// console.log(data)
-			data.results.shift();
-			mix.push(...data.results);
-			continuation = data.continuation;
-			commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
-
-			if (groupSession?.initialized && groupSession?.hasActiveSession) {
-				groupSession.updateGuestTrackQueue({
-					mix,
-					clickTrackingParams,
-					currentMixId,
-					continuation,
-					position,
-					currentMixType,
-				});
-			}
-			playerLoading.set(false);
-		},
+		getMoreLikeThis,
 		async getSessionContinuation({
 			clickTrackingParams,
 			ctoken,
@@ -264,22 +228,26 @@ function _sessionListService() {
 				commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
 				return await src.body;
 			}
-			// console.log("ARGS", { clickTrackingParams, ctoken, itct, key, playlistId, videoId });
-			internalIdx += 24;
+			console.log("ARGS", { key, playlistId });
+
 			if (!clickTrackingParams && !ctoken) {
 				playlistId = "RDAMPL" + playlistId;
 				itct = "wAEB8gECeAE%3D";
 			}
+
 			const data = await fetchNext({
-				visitorData: decodeURIComponent(visitorData),
+				visitorData: visitorData,
 				params: "OAHyAQIIAQ==",
 				playlistSetVideoId: mix[position]?.playlistSetVideoId,
-				index: internalIdx,
+				index: mix.length,
 				videoId,
 				playlistId,
 				ctoken,
 				clickTracking: clickTrackingParams,
-			}).catch((err) => console.error(err));
+			}).then((res) => {
+				if (res.results.length === 0) getMoreLikeThis({ playlistId });
+				return res;
+			});
 			const results = data?.results as any[];
 			mix.push(...results);
 			// position += 1;
@@ -290,8 +258,9 @@ function _sessionListService() {
 			currentMixId = data.currentMixId;
 			clickTrackingParams = data.clickTrackingParams;
 
-			playerLoading.set(false);
 			commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
+
+			playerLoading.set(false);
 
 			// mixListIndex.set(key);
 			const src = await getSrc(mix[key].videoId);

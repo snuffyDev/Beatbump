@@ -1,22 +1,22 @@
 /* eslint-disable no-inner-declarations */
 import { parseContents } from "$lib/parsers/next";
 
-import { error, json, type RequestHandler } from "@sveltejs/kit";
+import { error, json } from "@sveltejs/kit";
 
-import { buildRequest } from "../_api/request";
+import { buildRequest } from "$api/request";
+import type { RequestHandler } from "./$types";
 
-/** @type {import('.svelte-kit/types/src/routes/api/next.json').RequestHandler} */
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;
 	const params = query.get("params") || undefined;
-	const visitorData = query.get("visitorData") || "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D";
-	const itct = query.get("itct") || "";
+	const visitorData = query.get("visitorData") || "CgtlV0xyWk92dWZ5Zyilgu6ZBg%3D%3D";
+	const loggingContext = query.get("loggingContext") || "";
 	const videoId = query.get("videoId") || "";
-	const playlistId = query.get("playlistId") || "RDAMVM" + videoId;
-	const ctoken = query.get("ctoken") || undefined;
-	const idx = parseInt(query.get("index")) || 0;
+	const playlistId = query.get("playlistId") || "RDAMVM" + (videoId ?? "");
+	const continuation = query.has("ctoken") ? decodeURIComponent(decodeURIComponent(query.get("ctoken"))) : undefined;
+	const index = parseInt(query.get("index")) || undefined;
 	const clickTracking = query.get("clickTracking") || undefined;
-	const setVideoId = query.get("playlistSetVideoId") || undefined;
+	const playlistSetVideoId = query.get("playlistSetVideoId") || undefined;
 
 	const response = await buildRequest("next", {
 		context: {
@@ -26,18 +26,23 @@ export const GET: RequestHandler = async ({ url }) => {
 			client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00", visitorData },
 		},
 		params: {
+			loggingContext: {
+				vssLogingContext: {
+					serializedContextData: loggingContext ?? undefined,
+				},
+			},
 			enablePersistentPlaylistPanel: true,
 			isAudioOnly: true,
 			tunerSettingValue: "AUTOMIX_SETTING_NORMAL",
-			continuation: decodeURIComponent(decodeURIComponent(ctoken)),
+			continuation,
 			videoId,
-			index: idx,
-			playlistSetVideoId: setVideoId,
+			index,
+			playlistSetVideoId,
 			playlistId,
-			params: params ? params : itct,
+			params: params ?? "",
 		},
+		headers: {},
 	});
-
 	if (!response.ok) {
 		throw error(500, response.statusText);
 	}
@@ -46,7 +51,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	/* For when you are NOT listening to a song.
 	 ********************************************/
-	if (!ctoken) {
+	if (!continuation) {
 		const res = parseNextBody(data);
 
 		return json(res);

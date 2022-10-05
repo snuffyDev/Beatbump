@@ -22,50 +22,24 @@ export function filterList(list) {
 	);
 }
 
-export function fetchNext({
-	params = undefined,
-	videoId = undefined,
-	itct = undefined,
-	playlistId = undefined,
-	ctoken = undefined,
-	playlistSetVideoId = undefined,
-	clickTracking = undefined,
-	visitorData = "",
-	index = 0,
-	configType = undefined,
-}: {
-	itct?: string;
-	params?: string;
-	videoId?: string;
-	playlistId?: string;
-	ctoken?: string;
-	index?: number;
-	playlistSetVideoId?: string;
-	clickTracking?: string;
-	configType?: string;
-	visitorData?: string;
-}) {
-	const obj = {
-		itct,
-		params,
-		videoId,
-		playlistId,
-		ctoken,
-		playlistSetVideoId,
-		clickTracking,
-		visitorData,
-		index,
-		configType,
-	};
-	const options = Object.fromEntries(
-		Object.entries(obj)
-			.filter(([_, v]) => v != (null || undefined))
-			.map(([key, value]) => [key, encodeURIComponent(value)]),
-	);
-
-	const _params = queryParams(options);
+export function fetchNext(
+	obj: {
+		itct?: string;
+		params?: string;
+		videoId?: string;
+		playlistId?: string;
+		ctoken?: string;
+		loggingContext?: string;
+		index?: number;
+		playlistSetVideoId?: string;
+		clickTracking?: string;
+		configType?: string;
+		visitorData?: string;
+	} = {},
+) {
+	const _params = queryParams(obj);
 	// console.log(options, _params)
-	return fetch("/api/next.json?" + _params, {
+	return fetch("/api/v1/next.json?" + _params, {
 		headers: { accept: "application/json" },
 	})
 		.then((json) => json.json())

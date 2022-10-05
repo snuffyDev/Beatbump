@@ -1,7 +1,6 @@
 import { json as json$1 } from "@sveltejs/kit";
 
-// @migration task: Check imports
-import { buildRequest } from "$api/_api/request";
+import { buildRequest } from "$api/request";
 import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 import type { CarouselHeader, CarouselItem } from "$lib/types";
 import type { RequestHandler } from "@sveltejs/kit";

@@ -1,23 +1,14 @@
-import { error, json, json as json$1, type RequestEvent } from "@sveltejs/kit";
+import { error, json } from "@sveltejs/kit";
 import { MusicResponsiveListItemRenderer } from "$lib/parsers";
 import { iter, type Maybe } from "$lib/utils";
-import { buildRequest } from "../_api/request";
+import { buildRequest } from "$api/request";
 import type { Item, NextContinuationData } from "$lib/types";
 import type { IMusicResponsiveListItemRenderer } from "$lib/types/internals";
-import type { RequestHandler } from "@sveltejs/kit";
-import type { SearchEndpointParams } from "../_api/_base";
+import type { RequestHandler } from "./$types";
+import type { SearchEndpointParams } from "$api/_base";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import type { MusicShelf } from "$lib/types/musicShelf";
-import type { IResponse } from "$lib/types/response";
-
-export type SearchFilter =
-	| "all"
-	| "videos"
-	| "community_playlists"
-	| "featured_playlists"
-	| "all_playlists"
-	| "songs"
-	| "artists";
+import type { SearchFilter } from "$lib/types/api/search";
 
 const Filters = {
 	all: "",
@@ -144,7 +135,7 @@ function parseResults(items: any[], type: string) {
 		const entry = items[idx];
 		const item = MusicResponsiveListItemRenderer(entry);
 		Object.assign(item, { type: type });
-		if (type === "playlists") {
+		if (type === "playlists" || type === "albums") {
 			let metaData = "";
 			iter(item.subtitle, (subtitle) => (metaData += subtitle.text));
 			Object.assign(item, {

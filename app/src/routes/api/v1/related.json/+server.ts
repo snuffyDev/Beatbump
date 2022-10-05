@@ -4,7 +4,7 @@ import type { Item, Song } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import type { RequestHandler } from "@sveltejs/kit";
-import { buildRequest } from "../_api/request";
+import { buildRequest } from "$api/request";
 type ResponseBody = {
 	browseId: string;
 	params: string;

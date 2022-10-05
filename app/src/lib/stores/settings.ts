@@ -78,7 +78,19 @@ let list: UserSettings = {
 	search: { Preserve: "Category" },
 };
 
+const PWA_THEME_COLORS = {
+	YTM: "#010102",
+	Dark: "#17171d",
+	Dim: "#141820",
+	Midnight: "#0f0916",
+};
+
+const setTopBarTheme = (theme: Appearance["Theme"]) => {
+	document.querySelector<HTMLMetaElement>("meta[name='theme-color']").content = PWA_THEME_COLORS[theme];
+};
+
 export const settings = _settings();
+
 function _settings() {
 	if (!browser) {
 		return writable(list);
@@ -91,29 +103,35 @@ function _settings() {
 		//@ts-expect-error it's correct, the compilers lying
 		list.appearance.Theme =
 			theme !== null
-				? theme === "ytm"
-					? "YTM"
-					: theme.slice(0).toUpperCase() + theme.slice(1)
+				? theme !== "ytm"
+					? theme.slice(0).toUpperCase() + theme.slice(1)
+					: "YTM"
 				: list.appearance.Theme;
+
 		list.playback["Prefer WebM Audio"] =
 			(Boolean(localStorage.getItem("preferWebM")) as Playback["Prefer WebM Audio"]) ??
 			list.playback["Prefer WebM Audio"];
+
 		list.playback["Dedupe Automix"] =
 			(Boolean(localStorage.getItem("theme")) as Playback["Dedupe Automix"]) ?? list.playback["Dedupe Automix"];
+
 		localStorage.clear();
 		localStorage.setItem("settings", JSON.stringify(list));
 	} else {
-		if (!stored.network["HLS Stream Proxy"])
+		if (!stored.network["HLS Stream Proxy"]) {
 			stored.network["HLS Stream Proxy"] = "https://yt-hls-rewriter.onrender.com/";
+		}
 		list = stored;
 	}
-	// list = { ...list, playback: { ...list.playback, Stream: "HLS" } };
+
 	const store = writable<UserSettings>(list);
-	const { subscribe, update } = store;
+
+	const { subscribe, update, set } = store;
+
+	setTopBarTheme(list.appearance.Theme);
 	function save(settings: UserSettings) {
 		themeSet(settings.appearance.Theme as Theme);
 
-		list = settings;
 		localStorage.setItem("settings", JSON.stringify(list));
 	}
 	function change<
@@ -141,21 +159,17 @@ function _settings() {
 			return get(store);
 		},
 		set: (settings: UserSettings) => {
+			list = settings;
 			save(settings);
 
-			update((prev) => {
-				if (prev.appearance.Theme !== settings.appearance.Theme) {
-					themeSet(settings.appearance.Theme);
-				}
-				return { ...prev, ...settings };
-			});
+			set(settings);
 		},
 	};
 }
+
 function themeSet(theme: Appearance["Theme"]) {
 	if (!browser) return;
 	const root = document.documentElement;
 	const currentTheme = root.classList.item(0);
-
 	root.classList.replace(currentTheme, theme);
 }

@@ -25,3 +25,13 @@ wrangler.toml
 /app/.svelte-kit/runtime
 /app/.svelte-kit/types
 packages/proxy-server/rust/target/
+app/.svelte-kit/types/src/routes
+app/.svelte-kit/types/src/routes/artist/[slug]/proxy+page.server.ts
+app/.svelte-kit/types/src/routes/artist/releases.json/$types.d.ts
+app/.svelte-kit/types/src/routes/explore/[slug].json/$types.d.ts
+app/.svelte-kit/types/src/routes/explore.json/$types.d.ts
+app/.svelte-kit/types/src/routes/home.json/$types.d.ts
+app/.svelte-kit/types/src/routes/listen/proxy+page.ts
+app/.svelte-kit/types/src/routes/playlist/[slug]/proxy+page.ts
+app/.svelte-kit/types/src/routes/release/proxy+page.ts
+app/.svelte-kit/types/src/routes/search/[slug]/proxy+page.ts

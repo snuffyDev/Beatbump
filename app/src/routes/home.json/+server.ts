@@ -1,13 +1,12 @@
-// @migration task: Check imports
-import { buildRequest } from "../api/_api/request";
+import { buildRequest } from "$api/request";
 import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 
 import type { CarouselHeader } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import type { Dict } from "$lib/types/utilities";
-import { iter } from "$lib/utils/collections/array";
 import { error, json, type RequestHandler } from "@sveltejs/kit";
+
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;
 
@@ -16,6 +15,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	itct = decodeURIComponent(itct);
 	ctoken = decodeURIComponent(ctoken);
 	const visitorData = query.get("visitorData") || "";
+	// console.log(visitorData);
 	const browseId = "FEmusic_home";
 	const carouselItems = [];
 
@@ -163,8 +163,8 @@ function parseCarousel({
 	musicImmersiveCarouselShelfRenderer?: Record<string, any>;
 	musicCarouselShelfRenderer?: Record<string, any>;
 }) {
-	return {
-		header: parseHeader(musicCarouselShelfRenderer?.header ?? musicImmersiveCarouselShelfRenderer?.header),
-		items: parseBody(musicCarouselShelfRenderer?.contents ?? musicImmersiveCarouselShelfRenderer?.contents),
-	};
+	const carousel = musicCarouselShelfRenderer ?? musicImmersiveCarouselShelfRenderer;
+	const header = parseHeader(carousel?.header);
+	const items = parseBody(carousel?.contents);
+	return { header, items };
 }

@@ -266,9 +266,9 @@
 				class="column container tracklist"
 				bind:clientHeight={queueHeight}
 				style={$isMobileMQ
-					? `transform: translate3d(0, ${$motion}px, 0); top: ${
-							windowHeight - 65
-					  }px; bottom:0; padding-bottom: calc(6.5em);`
+					? `transform: translate3d(0, ${$motion}px, 0); top: ${windowHeight - 65}px; bottom:0; ${
+							sliding ? "will-change: scroll-position, transform;" : ""
+					  } padding-bottom: calc(6.5em);`
 					: `transform: translate3d(${queueOpen ? 55 : 93}vw, 0px, 0) !important;`}
 			>
 				<div
@@ -353,9 +353,12 @@
 		overflow-y: auto;
 		// overflow-x: hidden;
 		// background-color: rgb(18, 17, 24);
-		overscroll-behavior: contain;
+		overscroll-behavior: none;
+		// contain: paint;
+
 		// display: flex;
 		overflow-y: auto;
+		// touch-action: pan-y;
 		overflow-x: hidden;
 		// background-color: rgb(18, 17, 24);
 		overscroll-behavior: contain;
@@ -398,16 +401,17 @@
 		position: absolute;
 
 		bottom: 0;
-		will-change: transform;
+
 		height: 100%;
 		min-height: 0;
 		background: var(--bottom-bg);
 		overscroll-behavior: contain;
 		touch-action: pan-y;
+		// content-visibility: auto;
 
 		border-top-left-radius: $sm-radius;
 		border-top-right-radius: $sm-radius;
-		contain: content;
+		contain: paint;
 		@media screen and (min-width: 720px) and (hover: hover) {
 			position: absolute;
 			left: 0;
@@ -454,7 +458,7 @@
 		transition: transform 400ms cubic-bezier(0.165, 0.84, 0.44, 1), opacity 400ms cubic-bezier(0.165, 0.84, 0.44, 1);
 	}
 	.tr-close {
-		transition: transform 400ms cubic-bezier(0.83, 0, 0.17, 1),
+		transition: transform 400ms cubic-bezier(0.895, 0.03, 0.685, 0.22),
 			opacity 800ms cubic-bezier(0.895, 0.03, 0.685, 0.22) 400ms;
 	}
 	hr {
@@ -606,7 +610,7 @@
 		// border-top: 0.0175rem groove rgba(171, 171, 171, 0.151);
 		border-top-left-radius: $sm-radius;
 		border-top-right-radius: $sm-radius;
-		height: 2.5em;
+		height: 2.75em;
 		padding-bottom: 0.0606em;
 
 		align-content: center;

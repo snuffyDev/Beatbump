@@ -65,7 +65,7 @@ export function format(seconds: number) {
 // Fetches a song length for adding to queue
 export const addToQueue = async (videoId: string): Promise<Song> => {
 	try {
-		const url = `/api/get_queue.json${videoId ? `?videoIds=${videoId}` : ""}`;
+		const url = `/api/v1/get_queue.json${videoId ? `?videoIds=${videoId}` : ""}`;
 		const data = (await fetch(url, { headers: { accept: "application/json" } })
 			.then((json) => json.json())
 			.catch((err) => console.log(err))) as Song[];
@@ -90,7 +90,7 @@ export const getSrc = async (
 }> => {
 	try {
 		const res = await fetch(
-			`/api/player.json?videoId=${videoId}${playlistId ? `&playlistId=${playlistId}` : ""}${
+			`/api/v1/player.json?videoId=${videoId}${playlistId ? `&playlistId=${playlistId}` : ""}${
 				params ? `&playerParams=${params}` : ""
 			}`,
 		).then((res) => res.json());
@@ -139,7 +139,7 @@ function handleError() {
 export const queryParams = (params: Record<any, any>): string => {
 	const result = [];
 	for (const key in params) {
-		if (!params[key]) continue;
+		if (typeof params[key] !== "number" && !params[key]) continue;
 		result.push(`${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`);
 	}
 	return result.join("&");

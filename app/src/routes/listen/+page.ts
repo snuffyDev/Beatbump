@@ -11,10 +11,10 @@ export const load: PageLoad = async ({ url, params, fetch }) => {
 	}
 
 	const [data, list] = await Promise.all([
-		fetch(`/api/player.json?videoId=${id ? id : ""}${playlist ? `&playlistId=${playlist}` : ""}`).then((res) =>
+		fetch(`/api/v1/player.json?videoId=${id ? id : ""}${playlist ? `&playlistId=${playlist}` : ""}`).then((res) =>
 			res.json(),
 		),
-		fetch(`/api/next.json?videoId=${id ? id : ""}${playlist ? `&playlistId=${playlist}` : ""}`).then((res) =>
+		fetch(`/api/v1/next.json?videoId=${id ? id : ""}${playlist ? `&playlistId=${playlist}` : ""}`).then((res) =>
 			res.json(),
 		),
 	]);

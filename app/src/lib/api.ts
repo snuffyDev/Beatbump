@@ -14,7 +14,7 @@ export async function api(fetch: Fetch, params?: RequestParams): Promise<APIResp
 	// Turn Object's Key-Value pairs into string
 	const urlParams = queryParams(params);
 	// Make fetch call
-	const response = await fetch(`/api/api.json`, {
+	const response = await fetch(`/api/v1/api.json`, {
 		method: "POST",
 		body: urlParams,
 

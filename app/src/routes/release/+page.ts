@@ -5,7 +5,7 @@ export const load: PageLoad = async ({ url, fetch }) => {
 	const browseId = url.searchParams.get("id") || "";
 	const pt = url.searchParams.get("type") || "";
 	const response = await fetch(
-		`/api/main.json?q=&endpoint=browse${browseId ? `&browseId=${browseId}` : ""}${pt ? `&pt=${pt}` : ""}`,
+		`/api/v1/main.json?q=&endpoint=browse${browseId ? `&browseId=${browseId}` : ""}${pt ? `&pt=${pt}` : ""}`,
 	);
 	const data = await response.json();
 	if (!response.ok) {

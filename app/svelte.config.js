@@ -40,7 +40,7 @@ const config = {
 
 		alias: {
 			$stores: path.resolve("./src/lib/stores"),
-			$api: path.resolve("./src/routes/api"),
+			$api: path.resolve("./src/routes/api/_lib"),
 			$components: path.resolve("./src/lib/components"),
 			$env: path.resolve("./src/env.ts"),
 		},

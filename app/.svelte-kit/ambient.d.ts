@@ -37,8 +37,6 @@ declare module '$env/static/private' {
 	export const ComSpec: string;
 	export const DriverData: string;
 	export const EDITOR: string;
-	export const FPS_BROWSER_APP_PROFILE_STRING: string;
-	export const FPS_BROWSER_USER_PROFILE_STRING: string;
 	export const GIT_ASKPASS: string;
 	export const HAXEPATH: string;
 	export const HOME: string;
@@ -50,9 +48,7 @@ declare module '$env/static/private' {
 	export const LOGONSERVER: string;
 	export const NEKO_INSTPATH: string;
 	export const NODE: string;
-	export const NODE_ENV: string;
 	export const NODE_EXE: string;
-	export const NODE_EXTRA_CA_CERTS: string;
 	export const NPM_CLI_JS: string;
 	export const npm_command: string;
 	export const npm_config_cache: string;
@@ -155,8 +151,6 @@ declare module '$env/dynamic/private' {
 		ComSpec: string;
 		DriverData: string;
 		EDITOR: string;
-		FPS_BROWSER_APP_PROFILE_STRING: string;
-		FPS_BROWSER_USER_PROFILE_STRING: string;
 		GIT_ASKPASS: string;
 		HAXEPATH: string;
 		HOME: string;
@@ -168,9 +162,7 @@ declare module '$env/dynamic/private' {
 		LOGONSERVER: string;
 		NEKO_INSTPATH: string;
 		NODE: string;
-		NODE_ENV: string;
 		NODE_EXE: string;
-		NODE_EXTRA_CA_CERTS: string;
 		NPM_CLI_JS: string;
 		npm_command: string;
 		npm_config_cache: string;

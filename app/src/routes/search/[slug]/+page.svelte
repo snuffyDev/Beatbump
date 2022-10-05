@@ -29,7 +29,7 @@
 		try {
 			isLoading = true;
 			const response = await fetch(
-				`/api/search.json?q=` + `&filter=` + filter + `&itct=${itct}${ctoken ? `&ctoken=${ctoken}` : ""}`,
+				`/api/v1/search.json?q=` + `&filter=` + filter + `&itct=${itct}${ctoken ? `&ctoken=${ctoken}` : ""}`,
 			);
 			const newPage = await response.json();
 			const res: PageData = await newPage;

@@ -72,7 +72,7 @@
 			icon: "list-plus",
 			action: async () => {
 				if (item.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
-					const response = await fetch("/api/get_queue.json?playlistId=" + item.playlistId);
+					const response = await fetch("/api/v1/get_queue.json?playlistId=" + item.playlistId);
 					const data = await response.json();
 					const items: Item[] = data;
 					showAddToPlaylistPopper.set({ state: true, item: [...items] });

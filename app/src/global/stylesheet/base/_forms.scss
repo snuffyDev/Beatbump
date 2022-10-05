@@ -104,6 +104,13 @@ input[type="search"]::-webkit-search-results-decoration {
 	&.no-btn {
 		display: block;
 	}
+	> input[type="text"] {
+		-webkit-appearance: none;
+		background: #0000;
+		border: none;
+		appearance: none;
+		width: inherit;
+	}
 }
 
 input[type="search"] {

@@ -21,6 +21,7 @@ const config: UserConfig = {
 	define: {
 		"process.env.APP_VERSION": JSON.stringify(version_fmt),
 	},
+
 	experimental: {},
 	esbuild: { treeShaking: true, minifyWhitespace: true, minifyIdentifiers: true, minifySyntax: true },
 	css: {},

@@ -65,7 +65,7 @@
 			icon: "list-plus",
 			action: async () => {
 				if (item.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
-					const response = await fetch("/api/get_queue.json?playlistId=" + item.playlistId);
+					const response = await fetch("/api/v1/get_queue.json?playlistId=" + item.playlistId);
 					const data = await response.json();
 					const items: Item[] = data;
 					showAddToPlaylistPopper.set({ state: true, item: [...items] });
@@ -129,7 +129,7 @@
 	async function handleClick(event: MouseEvent) {
 		const target = event.target as HTMLElement;
 		if (target && target.nodeName === "A") return;
-		console.log(idx);
+		console.log(item, idx, parentPlaylistId);
 		/// Are we on the 'Queue' screen ?
 		if (page === "queue") {
 			/// Do we have a group session?
@@ -166,7 +166,15 @@
 			}
 		} else if (page === "playlist") {
 			list.updatePosition(idx);
-			await list.initPlaylistSession({ playlistId: item.playlistId, index: idx });
+			await tick();
+			await list.initPlaylistSession({
+				playlistId: item.playlistId,
+				clickTrackingParams: item?.clickTrackingParams,
+				index: idx,
+				params: item?.playerParams,
+				playlistSetVideoId: item?.playlistSetVideoId,
+				videoId: item?.videoId,
+			});
 		} else if (page === "library") {
 			list.updatePosition(idx);
 			dispatch("initLocalPlaylist", { idx });
@@ -181,9 +189,11 @@
 		} else {
 			await list.initAutoMixSession({
 				videoId: item.videoId,
-				playlistId: parentPlaylistId ?? item.playlistId,
-
+				playlistId: item.playlistId ?? parentPlaylistId,
+				playlistSetVideoId: item?.playlistSetVideoId,
 				keyId: idx,
+				clickTracking: item?.clickTrackingParams ?? undefined,
+				loggingContext: item?.loggingContext,
 				config: { playerParams: item?.playerParams, type: item?.musicVideoType },
 			});
 		}

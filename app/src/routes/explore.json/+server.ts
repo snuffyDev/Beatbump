@@ -1,5 +1,4 @@
-// @migration task: Check imports
-import { buildRequest } from "$api/_api/request";
+import { buildRequest } from "$api/request";
 import type { RequestHandler } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ url }) => {

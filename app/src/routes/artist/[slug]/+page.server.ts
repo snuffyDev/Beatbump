@@ -1,7 +1,7 @@
-import { buildRequest } from "../../api/_api/request";
-import { error, type PageServerLoad } from "@sveltejs/kit";
+import { buildRequest } from "$api/request";
+import { error } from "@sveltejs/kit";
 import { ArtistPageParser } from "$lib/parsers/artist";
-import type { JSONValue } from "@sveltejs/kit/types/private";
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params }) => {
 	const response = await buildRequest("artist", {

@@ -1,4 +1,4 @@
-import { buildRequest } from "$api/_api/request";
+import { buildRequest } from "$api/request";
 import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 
 import type { ICarousel, CarouselHeader } from "$lib/types";
