@@ -146,7 +146,7 @@
 		class:mobile={$isMobileMQ}
 		bind:clientHeight={windowHeight}
 		style:pointer-events={state === "open" ? "all" : "none"}
-		style="background-color: {state === 'open' ? 'hsla(0,0%,0%,40%)' : '#0000'} !important;"
+		style="background-color: {state === 'open' ? 'hsla(0,0%,0%,65%)' : '#0000'} !important;"
 	>
 		<div
 			class:tr-open={state === "open"}
@@ -353,7 +353,7 @@
 		overflow-y: auto;
 		// overflow-x: hidden;
 		// background-color: rgb(18, 17, 24);
-		overscroll-behavior: none;
+		overscroll-behavior: contain;
 		// contain: paint;
 
 		// display: flex;
@@ -401,7 +401,7 @@
 		position: absolute;
 
 		bottom: 0;
-
+		will-change: transform;
 		height: 100%;
 		min-height: 0;
 		background: var(--bottom-bg);
@@ -455,10 +455,11 @@
 		}
 	}
 	.tr-open {
-		transition: transform 400ms cubic-bezier(0.165, 0.84, 0.44, 1), opacity 400ms cubic-bezier(0.165, 0.84, 0.44, 1);
+		transition: transform 400ms 400ms cubic-bezier(0.165, 0.84, 0.44, 1),
+			opacity 200ms cubic-bezier(0.165, 0.84, 0.44, 1);
 	}
 	.tr-close {
-		transition: transform 400ms cubic-bezier(0.895, 0.03, 0.685, 0.22),
+		transition: transform 400ms cubic-bezier(0.215, 0.61, 0.355, 1),
 			opacity 800ms cubic-bezier(0.895, 0.03, 0.685, 0.22) 400ms;
 	}
 	hr {
@@ -526,7 +527,7 @@
 		background-color: #0000;
 		inset: 0;
 		z-index: 151;
-		transition: background-color 1200ms cubic-bezier(0.445, 0.05, 0.55, 0.95);
+		transition: background-color 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 		// transition-delay: 225ms;
 		margin-top: var(--top-bar-height);
 		height: calc(100% - calc(var(--top-bar-height) + var(--player-bar-height)));
