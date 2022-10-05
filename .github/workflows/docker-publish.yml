@@ -51,7 +51,7 @@ jobs:
             type=schedule
             type=ref,event=branch
             type=ref,event=pr
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest,enable=true
             type=edge,enable=true,priority=700,prefix=,suffix=,branch=$repo.default_branch
             type=sha
 
