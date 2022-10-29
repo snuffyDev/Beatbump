@@ -51,6 +51,14 @@ Some of Beatbump's features includes:
 | `app`                         | Beatbump web app                                      |
 | `packages/hls-proxy-rewriter` | Proxy server used for Beatbump's music playback (WIP) |
 
+## Instances
+
+| Instance                           | Region               |
+| ---------------------------------- | -------------------- |
+| [beatbump.ml](https://beatbump.ml)                                                                                                            | Cloudflare (Unknown) |
+| [bb.vern.cc](https://bb.vern.cc)                                                                                                              | Canada               |
+| [bb.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion](http://bb.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion) | Canada               |
+| [vern6inmbjzqpecx4kpkq5sln3cqqrfuxfzh4au3tpxbsfbwbnta.b32.i2p](http://vern6inmbjzqpecx4kpkq5sln3cqqrfuxfzh4au3tpxbsfbwbnta.b32.i2p)           | Canada               |
 ## Donations
 
 Want to support Beatbump financially to aid with future development/hosting?
