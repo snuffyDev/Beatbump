@@ -16,3 +16,10 @@ services:
       VITE_SITE_URL: "https://beatbump.ml"
       VITE_DONATION_URL: "https://www.paypal.com/donate/?hosted_button_id=E6YRHKS2H2KP2"
     restart: unless-stopped
+  proxy:
+    build:
+      context: ./packages/proxy-server/deno
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
