@@ -7,7 +7,7 @@ ENV PORT ${PORT}
 # install dependencies
 COPY package.json package-lock.json ./
 
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # copy local files to image
 COPY . .
