@@ -4,7 +4,7 @@ import type { Item } from "./types";
 import { notify } from "./utils/utils";
 import { generateId } from "./utils/strings";
 import { getPlaylists, getFavorites, setMultipleFavorites, setMultiplePlaylists } from "./workers/db/db";
-import { IDBService } from "./workers/db/service";
+
 import type {
 	IDBPlaylist,
 	IDBPlaylistInternal,

@@ -8,7 +8,7 @@
 	import { tooltip } from "$lib/actions/tooltip";
 	import { clickOutside } from "$lib/actions/clickOutside";
 	import { ripple } from "$lib/actions/ripple";
-	import { circIn } from "svelte/easing";
+	import { circOut } from "svelte/easing";
 	import { fade } from "svelte/transition";
 	import { fullscreenStore } from "../Player/channel";
 	import { preserveSearch } from "$lib/stores";
@@ -113,44 +113,6 @@
 	</div>
 
 	<div class="items">
-		{#if !hidden}
-			<div
-				use:clickOutside
-				on:click_outside={() => {
-					hidden = !hidden;
-				}}
-				class="nav-search"
-				in:fade={{ delay: 200, duration: 200, easing: circIn }}
-				out:fade={{ duration: 200, easing: circIn }}
-			>
-				<Search
-					{filter}
-					{query}
-					type="inline"
-					on:submitted={({ detail }) => {
-						console.log(detail);
-						if (preserve.includes("Category")) {
-							filter = detail?.filter;
-						}
-						if (preserve.includes("Query")) {
-							query = detail?.query;
-						}
-						hidden = !hidden;
-					}}
-				/>
-				<button
-					on:click={() => {
-						hidden = !hidden;
-					}}
-					class="icon-btn x-button"
-					aria-label="close"
-				>
-					<Icon name="x" size="1.6125em" />
-				</button>
-			</div>
-			<div class="backdrop" style:z-index={1} transition:fade={{ duration: 400, easing: circIn }} />
-		{/if}
-
 		<button
 			class="icon-btn nav-item__search"
 			on:click={() => {
@@ -175,6 +137,45 @@
 		</button>
 	</div>
 </nav>
+
+{#if !hidden}
+	<div class="backdrop" on:click|stopPropagation|preventDefault style:z-index={500} transition:fade={{ duration: 400, easing: circOut }}>
+		<div
+			use:clickOutside
+			on:click_outside={() => {
+				hidden = !hidden;
+			}}
+			class="nav-search"
+			in:fade={{ delay: 200, duration: 200, easing: circOut }}
+			out:fade={{ duration: 200, easing: circOut }}
+		>
+			<Search
+				{filter}
+				{query}
+				type="inline"
+				on:submitted={({ detail }) => {
+					console.log(detail);
+					if (preserve.includes("Category")) {
+						filter = detail?.filter;
+					}
+					if (preserve.includes("Query")) {
+						query = detail?.query;
+					}
+					hidden = !hidden;
+				}}
+			/>
+			<button
+				on:click={() => {
+					hidden = !hidden;
+				}}
+				class="icon-btn x-button"
+				aria-label="close"
+			>
+				<Icon name="x" size="1.6125em" />
+			</button>
+		</div>
+	</div>
+{/if}
 
 <style lang="scss">
 	nav {
@@ -331,4 +332,9 @@
 			// transform: scale(1);
 		}
 	}
+	// .nav-search {
+	// 	z-index: 500;
+	// 	position: absolute;
+	// 	inset: 0;
+	// }
 </style>

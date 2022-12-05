@@ -1,10 +1,10 @@
 .grid {
-	--cols: 12rem;
+	--cols: 14em;
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(var(--cols), 1fr));
 	grid-gap: 0.5rem;
 	@media screen and (min-width: 640px) {
-		--cols: 14rem;
+		--cols: 16rem;
 	}
 
 	margin: 0 auto;

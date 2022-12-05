@@ -2,7 +2,7 @@ import { sveltekit } from "@sveltejs/kit/vite";
 import type { UserConfig } from "vite";
 const version = new Date(Date.now());
 const version_fmt = `${version.getUTCFullYear()}.${version.getMonth().toString().padStart(2, "0")}.${version
-	.getDay()
+	.getDate()
 	.toString()
 	.padStart(2, "0")}`;
 /** @type {*} */

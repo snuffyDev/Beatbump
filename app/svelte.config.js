@@ -16,7 +16,7 @@ const adapters = {
 	"cloudflare-workers": adapterCfw(),
 	vercel: vercel(),
 	netlify: netlify({ edge: false, split: false }),
-	node: node({ precompress: false }),
+	node: node({"precompress":false}),
 };
 
 const adapter = adapters[ENV_ADAPTER];
@@ -50,8 +50,7 @@ const config = {
 			routes: "src/routes",
 			serviceWorker: "src/service-worker",
 			appTemplate: "src/app.html",
-			hooks: "src/hooks.server",
-			// hooks: { server: "src/hooks.server" },
+			hooks: { server: "src/hooks.server" },
 		},
 		version: { pollInterval: 600000 },
 	},

@@ -55,7 +55,7 @@
 		left: 0;
 		// flex-direction: column;
 		right: 0;
-		z-index: 500;
+		z-index: 1000;
 		// isolation: isolate;
 		max-height: 60vmin;
 		// align-items: center;

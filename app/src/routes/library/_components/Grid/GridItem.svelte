@@ -63,17 +63,17 @@
 	}
 	@media screen and (min-width: 25em) and (max-width: 37em) {
 		.item {
-			max-width: 13rem;
+			max-width: 14rem;
 		}
 	}
 	@media screen and (min-width: 37em) and (max-width: 48em) {
 		.item {
-			max-width: 14.5rem;
+			max-width: 14.75rem;
 		}
 	}
 	@media screen and (min-width: 48em) {
 		.item {
-			max-width: 15rem;
+			max-width: 16rem;
 		}
 	}
 </style>

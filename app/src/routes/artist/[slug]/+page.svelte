@@ -26,7 +26,7 @@
 	let innerWidth = 640;
 
 	CTX_ListItem.set({ page: "artist", innerWidth });
-	// $: console.log(body)
+	$: console.log(data)
 </script>
 
 <Header

@@ -1,7 +1,7 @@
 .grid {
 	display: grid;
 	grid-template-columns: repeat(var(--grid-column-count), 1fr);
-	grid-gap: 0em;
+	grid-gap: 0.5em;
 	justify-content: center;
 	margin: 0 auto;
 	--grid-column-count: 2;
@@ -16,7 +16,7 @@
 	}
 
 	@media screen and (min-width: 769px) and (max-width: 1148px) {
-		--grid-column-count: 5;
+		--grid-column-count: 4;
 	}
 
 	@media screen and (min-width: 1149px) and (max-width: 1400px) {

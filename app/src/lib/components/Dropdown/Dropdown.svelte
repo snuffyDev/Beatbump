@@ -4,7 +4,7 @@
 	import { cubicOut, quartOut } from "svelte/easing";
 	// import { slide } from 'svelte/transition'
 
-	import { PopperStore } from "../Popper";
+	import { PopperStore, isOpen } from "../Popper/popperStore";
 	import DropdownItem from "./DropdownItem.svelte";
 
 	export let main: HTMLElement;
@@ -125,7 +125,7 @@
 		bind:this={popper}
 		on:mouseleave|stopPropagation={onClose}
 		on:lostfocus={onClose}
-		on:click_outside={onClose}
+		on:click_outside|stopPropagation={onClose}
 		in:slide={{ delay: 125, duration: 125 }}
 		out:slide={{ duration: 125 }}
 		class={type == "player" ? "dd-player" : "dd-menu"}

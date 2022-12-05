@@ -5,7 +5,7 @@ type DropdownItem = {
 	icon: keyof typeof icons;
 	action: (...args) => void;
 };
-type Dropdown = DropdownItem[];
+export type Dropdown = DropdownItem[];
 type Label =
 	| "View Artist"
 	| "Add to Queue"

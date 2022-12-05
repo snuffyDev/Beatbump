@@ -63,7 +63,7 @@
 	{#if Object.keys(continuations).length}
 		<div
 			class="viewport"
-			use:viewport={{ margin: "0px 325px" }}
+			use:viewport={{ margin: "100px 325px" }}
 			on:enterViewport={async () => {
 				if (loading || hasData) return;
 				loading = true;
@@ -74,15 +74,15 @@
 				);
 				const data = await response.json();
 				// const {continuations, carousels} = data;
-				if (data.continuations !== {}) {
+				if (data.continuations) {
 					continuations = data.continuations;
-					window.requestAnimationFrame(() => {
+					queueMicrotask(() => {
 						carousels = [...carousels, ...data.carousels];
 					});
 					loading = false;
 					return hasData;
 				}
-				hasData = data.continuations === {};
+				hasData = data.continuations === undefined;
 				return !loading;
 			}}
 		/>
@@ -95,10 +95,12 @@
 
 <style lang="scss">
 	.viewport {
-		height: 8rem;
+		height: 2em;
 		position: absolute;
 		bottom: 0;
-		margin-bottom: 5rem;
+		margin-top:9rem;
+		margin-bottom: 2rem;
+		padding-block: 3rem;
 		contain: content;
 		will-change: visibility;
 	}

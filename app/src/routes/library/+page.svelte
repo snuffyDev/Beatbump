@@ -91,7 +91,7 @@
 	</Modal>
 {/if}
 
-<main>
+<main class="resp-content-width">
 	<header>
 		<h1>Your Library</h1>
 		<button
@@ -152,10 +152,9 @@
 					{/each}
 				{:else}
 					<div class="container">
-						<h3>
-							<Icon style="vertical-align: text-bottom; margin-right: 0.125em;" name="frown" size="2rem" /> Looks like you
-							don't have any songs in your favorites...
-						</h3>
+						<h4>
+							Empty!
+						</h4>
 						<span class="subheading"><em>Add some songs to keep track of what you love!</em></span>
 					</div>
 				{/if}

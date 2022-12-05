@@ -8,7 +8,7 @@
 	import { AudioPlayer } from "$lib/player";
 	import { groupSession, isMobileMQ } from "$lib/stores";
 	import list, { currentTrack, queue, queuePosition } from "$lib/stores/list";
-	import { IsoBase64 } from "$lib/utils";
+	import { IsoBase64, slide } from "$lib/utils";
 	import { messenger } from "$lib/utils/sync";
 	import { notify } from "$lib/utils";
 	import { playerLoading, showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
@@ -217,7 +217,7 @@
 					<Icon color="white" name="volume" size="1.625em" />
 				</div>
 				{#if volumeHover}
-					<div class="volume-wrapper">
+					<div class="volume-wrapper" transition:slide={{duration: 80, y: 100}}>
 						<div class="volume-slider">
 							<input
 								class="volume"
@@ -263,6 +263,7 @@
 		line-height: 1.7;
 		font-size: 0.95em;
 		gap: 0.95em;
+		will-change: visibility;
 		@media screen and (min-width: 720px) {
 			line-height: 1.6;
 			font-size: 14px;
@@ -271,6 +272,12 @@
 		.container {
 			visibility: visible;
 			display: flex;
+
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	line-clamp: 2;
+	overflow: hidden;
 			// }
 		}
 	}
@@ -281,12 +288,24 @@
 		max-width: calc(100% - 0.2em);
 		overflow: hidden;
 
-		font-size: small;
+		font-size: 12px;
+
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
+	line-clamp: 1;
+	overflow: hidden;
 	}
 	.now-playing-artist {
 		display: block;
 		font-size: 12px;
 		color: rgba(255, 255, 255, 0.7) !important;
+
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	line-clamp: 2;
+	overflow: hidden;
 	}
 	.now-playing img {
 		object-fit: contain;
@@ -329,10 +348,10 @@
 		display: flex;
 
 		position: absolute;
-		bottom: 6.5rem;
+		bottom: 7em;
 		transform: rotate(-90deg);
 		padding: 0 0.4rem;
-		left: calc(calc(100% * -1) + 16px);
+		left: calc(calc(100% * -1) + 2px);
 		height: 1.3rem;
 		border-radius: 0.6rem;
 		isolation: isolate;
@@ -346,11 +365,13 @@
 			top: 50%;
 			left: 50%;
 			transform: translate(-50%, -50%);
-			height: 5rem;
+			height: 2rem;
 		}
 	}
 	.volume-slider {
 		height: 100%;
+		background: var(--dark-bottom);
+
 		display: flex;
 		align-items: center;
 	}

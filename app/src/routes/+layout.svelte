@@ -73,12 +73,12 @@
 	.footer-container {
 		transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 350ms, opacity cubic-bezier(0.165, 0.84, 0.44, 1) 350ms;
 		opacity: 0;
-		will-change: transform;
 		transform: translate3d(0, var(--player-bar-height), 0);
 	}
 	.show-player {
 		opacity: 1;
 		transform: translate3d(0, 0, 0);
+		will-change: transform;
 	}
 	.wrapper {
 		overflow-y: auto;

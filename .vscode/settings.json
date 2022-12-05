@@ -9,8 +9,20 @@
 	"json.schemas": [
 		{
 			"url": "./.vscode/schema.json",
-			"fileMatch": ["/app/beatbump.conf.json"]
+			"fileMatch": [
+				"/app/beatbump.conf.json"
+			]
 		}
 	],
-	"typescript.tsdk": "./app/node_modules\\typescript\\lib"
+	"typescript.format.enable": true,
+	"prettier.enable": true,
+	"prettier.configPath": ".prettierrc",
+	"editor.formatOnSaveMode": "modificationsIfAvailable",
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+	},
+	"[svelte]": {
+		"editor.defaultFormatter": "svelte.svelte-vscode",
+	},
+	"typescript.tsdk": "./app/node_modules/typescript/lib"
 }

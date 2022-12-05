@@ -5,6 +5,5 @@ export const load: LayoutLoad = async ({ url, data }) => {
 		key: url.pathname,
 		page: url.pathname,
 		origin: url.origin,
-		...data,
 	};
 };

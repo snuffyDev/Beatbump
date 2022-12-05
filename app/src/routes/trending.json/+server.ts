@@ -4,7 +4,7 @@ import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRen
 import type { ICarousel, CarouselHeader } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
-import { error, type RequestHandler } from "@sveltejs/kit";
+import { error, type RequestHandler, json } from "@sveltejs/kit";
 import type { IMusicResponsiveListItemRenderer, IMusicTwoRowItemRenderer } from "$lib/types/internals";
 
 /**
@@ -41,8 +41,8 @@ export const GET: RequestHandler = async () => {
 	while (--pos > -1) {
 		carouselItems[pos] = parseCarousel({ musicCarouselShelfRenderer: carouselItems[pos].musicCarouselShelfRenderer });
 	}
-	// console.log(carouselItems[2].results[2]);
-	return new Response(JSON.stringify({ carouselItems }));
+
+	return json({ carouselItems });
 };
 
 function parseHeader({ musicCarouselShelfBasicHeaderRenderer }): CarouselHeader {
@@ -98,19 +98,9 @@ function parseBody(contents: Record<string, any>[] = []):
 	return items;
 }
 
-function parseCarousel(carousel: {
-	musicImmersiveCarouselShelfRenderer?: Record<string, any>;
-	musicCarouselShelfRenderer?: Record<string, any>;
-}) {
+function parseCarousel({ musicCarouselShelfRenderer }: { musicCarouselShelfRenderer?: Record<string, any> }) {
 	return {
-		header: parseHeader(
-			carousel?.musicCarouselShelfRenderer?.header ?? carousel.musicImmersiveCarouselShelfRenderer?.header,
-		),
-		results: parseBody(
-			(Array.isArray(carousel?.musicCarouselShelfRenderer?.contents) &&
-				carousel?.musicCarouselShelfRenderer?.contents) ??
-				(Array.isArray(carousel.musicImmersiveCarouselShelfRenderer?.contents) &&
-					carousel.musicImmersiveCarouselShelfRenderer?.contents),
-		),
+		header: parseHeader(musicCarouselShelfRenderer?.header),
+		results: parseBody(musicCarouselShelfRenderer?.contents),
 	};
 }

@@ -14,7 +14,6 @@
 
 	let header = data.header;
 	let title: string = data.title;
-	// $: console.log(data);
 </script>
 
 <Header title={title ? title.replace(",", " ") : ""} url={$page.url.pathname} desc="The latest in music" />
@@ -78,7 +77,7 @@
 		border-radius: 0.4rem;
 		padding: 0.5rem 0.4rem 0.4rem;
 		position: relative;
-		width: 100%;
+		// width: 100%;
 		cursor: pointer;
 
 		.img {

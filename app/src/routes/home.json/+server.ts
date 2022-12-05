@@ -64,12 +64,10 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 	}
 
-	return new Response(
-		JSON.stringify({
-			carousels: carouselItems,
-			continuations: nextContinuationData,
-		}),
-	);
+	return json({
+		carousels: carouselItems,
+		continuations: nextContinuationData,
+	});
 };
 
 function baseResponse(data: Dict<any>, _visitorData: string) {

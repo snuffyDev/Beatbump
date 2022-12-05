@@ -19,7 +19,7 @@ export const load = async ({
 	key: string;
 }> => {
 	const { slug } = params;
-	const response = await fetch(`/api/playlist.json?list=${slug}`);
+	const response = await fetch(`/api/v1/playlist.json?list=${slug}`);
 	const data = await response.json();
 
 	// console.log(data);

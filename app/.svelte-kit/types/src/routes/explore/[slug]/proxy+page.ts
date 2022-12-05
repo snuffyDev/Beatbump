@@ -1,7 +1,7 @@
 // @ts-nocheck
 import type { PageLoad } from "./$types";
 
-export const load = async ({ url, params, routeId, fetch }: Parameters<PageLoad>[0]) => {
+export const load = async ({ url, params, fetch }: Parameters<PageLoad>[0]) => {
 	const response = await fetch(`/explore/${params.slug}.json`);
 	const { sections, header, type } = await response.json();
 	let path = url.pathname;

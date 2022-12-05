@@ -112,9 +112,9 @@
 	<div class="scroll" id="scrollItem" on:scroll={onScroll} bind:clientWidth bind:this={carousel} use:observer>
 		{#each items as item, index}
 			{#if type == "trending"}
-				<CarouselItem type="trending" {kind} aspectRatio={item.aspectRatio} {item} {isBrowseEndpoint} {index} />
+				<CarouselItem type="trending" {kind} aspectRatio={item.aspectRatio} {item} isBrowseEndpoint={'endpoint' in item} {index} />
 			{:else if type == "artist" || type == "home"}
-				<CarouselItem {type} {kind} aspectRatio={item.aspectRatio} {isBrowseEndpoint} {item} {index} />
+				<CarouselItem {type} {kind} aspectRatio={item.aspectRatio} isBrowseEndpoint={'endpoint' in item} {item} {index} />
 			{:else if type == "new"}
 				<CarouselItem type="new" aspectRatio={item.aspectRatio} {item} {index} />
 			{/if}

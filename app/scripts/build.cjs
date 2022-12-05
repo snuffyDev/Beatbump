@@ -72,7 +72,7 @@ cli
 			/// If installAdapter doesn't return a truthy value, then there was an error
 			/// so we abort
 			if (!adapter_installed) console.info("Error installing config.");
-			let hooks_ts;
+			let hooks_ts = "";
 			const hooks_path = path.resolve(root, "./src/hooks.server.ts") || path.resolve(".", "../src/hooks.server.ts");
 			if (adapter === "node") {
 				hooks_ts = fs.readFileSync(hooks_path, { encoding: "utf-8" });

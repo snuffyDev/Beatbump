@@ -12,8 +12,14 @@ export default function observer(node: HTMLElement) {
 					const target = entry.target as HTMLImageElement;
 					if (entry.isIntersecting) {
 						target.loading = "eager";
-						target.src = target.dataset.src;
-						observer.unobserve(node);
+						target.decode().then(() => {
+
+							target.src = target.dataset.src;
+							observer.unobserve(node);
+						}).catch(()=>{
+							target.src = target.dataset.src;
+							observer.unobserve(node);
+						});
 					}
 				}
 			},

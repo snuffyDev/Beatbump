@@ -17,6 +17,7 @@
 	import { browser } from "$app/environment";
 	import { IsoBase64 } from "$lib/utils";
 	import { SITE_ORIGIN_URL } from "$stores/url";
+  import type { Dropdown } from "$lib/configs/dropdowns.config";
 	export let index;
 	export let item: CarouselItem;
 	export let type = "";
@@ -30,13 +31,13 @@
 		item?.aspectRatio?.includes("16_9")
 			? true
 			: false;
-
+	const ASPECT_RATIO = !RATIO_RECT ? '1x1' : '16x9'
 	const playAlbum = () => {
 		list.initPlaylistSession({ playlistId: item.playlistId });
 		list.updatePosition(0);
 		currentTitle.set(item.title);
 	};
-	let DropdownItems: Array<{ text: string; icon: string; action: () => void }> = [
+	let DropdownItems: Dropdown = [
 		{
 			text: "View Artist",
 			icon: "artist",
@@ -190,8 +191,8 @@
 	};
 	const clickHandler = async (event: Event, index) => {
 		loading = true;
-		if (type == "trending") {
-			//
+
+		if (type === "trending") {
 			isBrowseEndpoint
 				? goto(
 						"/release?type=" +
@@ -209,9 +210,8 @@
 			list.updatePosition(kind === "isPlaylist" ? index : 0);
 			loading = false;
 		}
-		if (type == "home") {
+		if (type === "home") {
 			item?.endpoint?.pageType.includes("ARTIST") && goto(`/artist/${item?.endpoint?.browseId}`);
-
 			!isBrowseEndpoint && item.videoId !== undefined && !item?.endpoint?.pageType.includes("ARTIST")
 				? await list.initAutoMixSession({
 						videoId: item.videoId,
@@ -220,7 +220,7 @@
 				: browseHandler(item.endpoint.pageType, item.endpoint.browseId);
 			loading = false;
 		}
-		if (type == "artist") {
+		if (type === "artist") {
 			item?.endpoint?.pageType.includes("ARTIST") && goto(`/artist/${item?.endpoint?.browseId}`);
 
 			!isBrowseEndpoint && item.videoId !== undefined && !item?.endpoint?.pageType.includes("ARTIST")
@@ -268,10 +268,10 @@
 			...DropdownItems,
 		];
 	}
-	if (type === "artist" || item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST")) {
+	if (type === "artist" || (item.endpoint && item.endpoint.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST"))) {
 		DropdownItems = [
 			...DropdownItems.filter((item) => {
-				if (!item.text.match(/Favorite|Add to Queue|View Artist|Add to Playlist/gm)) {
+				if (!item.text.match(/Favorite|Add to Queue|View Artist/gm)) {
 					return item;
 				}
 			}),
@@ -288,9 +288,7 @@
 </script>
 
 <article
-	class:item16x9={RATIO_RECT ? true : false}
-	class:item1x1={RATIO_SQUARE ? true : false}
-	class="item"
+	class="item item{ASPECT_RATIO}"
 	on:contextmenu={(e) => {
 		e.preventDefault();
 		window.dispatchEvent(new CustomEvent("contextmenu", { detail: "carouselItem" }));
@@ -305,35 +303,27 @@
 	on:click|stopPropagation={(e) => clickHandler(e, index)}
 >
 	<section
-		class="item-thumbnail-wrapper"
-		class:img16x9={RATIO_RECT ? true : false}
-		class:img1x1={RATIO_SQUARE ? true : false}
+		class="item-thumbnail-wrapper img{ASPECT_RATIO}"
 	>
 		<section
-			class="item-thumbnail"
-			on:focus
-			class:img16x9={RATIO_RECT ? true : false}
-			class:img1x1={RATIO_SQUARE ? true : false}
+			class="item-thumbnail img{ASPECT_RATIO}"
 			class:isArtistKind
+			on:focus
 			on:blur
 		>
 			<div
-				class="image"
+				class="image img{ASPECT_RATIO}"
 				class:active
 				class:isArtistKind
-				class:img16x9={RATIO_RECT ? true : false}
-				class:img1x1={RATIO_SQUARE ? true : false}
 				tabindex="0"
 			>
 				{#if loading}
 					<Loading />
 				{/if}
 				<img
-					alt="thumbnail"
+					alt="thumbnail img{ASPECT_RATIO}"
 					on:error={errorHandler}
 					loading={$page.data.iOS ? "eager" : "lazy"}
-					class:img16x9={RATIO_RECT}
-					class:img1x1={RATIO_SQUARE}
 					width={srcImg.width}
 					height={srcImg.height}
 					src={srcImg.placeholder}

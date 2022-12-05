@@ -1,6 +1,8 @@
+import type { BrowseEndpoint } from "./types/internals";
 import type { ICarouselTwoRowItem } from "./types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "./types/musicListItemRenderer";
 import type { PlaylistSearch } from "./types/playlist";
+import type { IMergedObject } from "./types/utilities";
 export interface CarouselHeader {
 	browseId?: string;
 	title?: string;
@@ -20,7 +22,8 @@ export interface ICarousel {
 	results: Array<CarouselItem & MoodsAndGenresItem>;
 	isBrowse?: boolean;
 }
-export type Item = ICarouselTwoRowItem & IListItemRenderer & Song;
+export type Item = IMergedObject<IMergedObject<IListItemRenderer, ICarouselTwoRowItem>, Song>;
+
 
 export interface Album {
 	browseId?: string;
@@ -117,6 +120,7 @@ export type CarouselItem = {
 	explicit?: boolean;
 	params?: string;
 	thumbnails: Array<Thumbnail>;
+	browseEndpoint?: BrowseEndpoint;
 	subtitle?: Subtitle[];
 	playlistSetVideoId?: string;
 	playerParams?: string;

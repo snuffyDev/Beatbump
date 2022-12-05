@@ -1,6 +1,3 @@
-<script lang="ts" context="module">
-</script>
-
 <script lang="ts">
 	import Icon from "../Icon/Icon.svelte";
 	import { isOpen } from "./popperStore";
@@ -8,26 +5,22 @@
 	import { PopperStore } from "./popperStore";
 	export let items = [];
 	export let type = "";
-	export let metadata = {};
+	export let metadata: Partial<{ thumbnail: string; title: string; length?: string; }> = {};
 	export let size = "1.5em";
 	export let tabindex: string | number = "0";
 	let nodeIsOpen = false;
+
+	$: if (nodeIsOpen && $PopperStore.isOpen !== true) {
+		nodeIsOpen = !nodeIsOpen;
+	}
+
 	function Popper(node: HTMLElement) {
 		let x, y, bottom;
 		let timer;
 		let initY;
 		function handleClick(event: MouseEvent & { target: HTMLElement & EventTarget }) {
-			// if (!node.contains(event.target)) {
-			// 	PopperStore.reset()
-			// 	isOpen = false
-			// }
-			// console.log(event)
 			event.stopImmediatePropagation();
-			if ($isOpen) {
-				nodeIsOpen = PopperStore.reset();
-				$isOpen = false;
-				return;
-			} else {
+			if (!nodeIsOpen) {
 				const rect = node.getBoundingClientRect();
 				nodeIsOpen = true;
 				x = rect.left;
@@ -45,7 +38,9 @@
 					y,
 					metadata,
 					bottom,
-				});
+				});				return;
+			} else {
+
 			}
 		}
 		node.addEventListener("click", handleClick, {

@@ -224,14 +224,13 @@
 		display: block;
 		position: relative;
 		height: 100%;
-
-		padding-top: 16vh;
+		padding-top: 33vh;
 		overflow: hidden;
 		transition: background-color 0.8s cubic-bezier(0.19, 0, 0.7, 1);
 		background-color: rgba(0, 0, 0, 0.1);
 
 		@media only screen and (min-width: 1080px) and (max-width: 1600px) {
-			padding-top: 18rem;
+			padding-top: 30vh;
 		}
 		@media only screen and (min-width: 1601px) {
 			padding-top: 33vh;
@@ -275,7 +274,6 @@
 
 		width: 100%;
 		height: 100%;
-
 		max-height: 100%;
 		-o-object-fit: cover;
 		object-fit: cover;

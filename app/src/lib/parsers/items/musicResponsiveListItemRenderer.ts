@@ -20,20 +20,20 @@ export function MusicResponsiveListItemRenderer(
 	const subtitleRuns = flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs;
 	const flexCol0 = flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0] || ({} as PurpleRun);
 	const subtitles = Array.isArray(subtitleRuns) && subtitle(subtitleRuns);
-
+	const isNavigationItem = item.navigationEndpoint?.browseEndpoint;
 	const Item: IListItemRenderer = {
 		subtitle: subtitles,
 		artistInfo: {
 			artist: [subtitles[0]],
 		},
-		explicit: "badges" in item ? true : false,
+		explicit: "badges" in item,
 		title: flexCol0.text,
 		aspectRatio: item.flexColumnDisplayStyle,
 		musicVideoType:
 			flexCol0.navigationEndpoint?.watchEndpoint?.watchEndpointMusicConfig?.musicVideoType ??
 			flexCol0.navigationEndpoint?.watchEndpoint?.watchEndpointMusicSupportedConfigs?.watchEndpointMusicConfig
 				?.musicVideoType,
-		videoId: flexCol0.navigationEndpoint?.watchEndpoint?.videoId || "",
+		videoId: flexCol0.navigationEndpoint?.watchEndpoint?.videoId ?? undefined,
 		playlistId: flexCol0.navigationEndpoint?.watchEndpoint?.playlistId
 			? flexCol0?.navigationEndpoint?.watchEndpoint?.playlistId
 			: item.menu?.menuRenderer.items[0].menuNavigationItemRenderer?.navigationEndpoint?.watchEndpoint?.playlistId
@@ -54,10 +54,11 @@ export function MusicResponsiveListItemRenderer(
 			item.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
 				?.watchEndpoint?.loggingContext,
 	};
+	if (isNavigationItem) Item.endpoint = { browseId: isNavigationItem.browseId, pageType: isNavigationItem.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType}
 	if (Item !== undefined && playlistSetVideoId) {
 		Object.assign(Item, {
 			playlistSetVideoId:
-				item.playlistSetVideoId ||
+				item?.playlistSetVideoId ||
 				item.overlay?.musicItemThumbnailOverlayRenderer.content?.musicPlayButtonRenderer?.playNavigationEndpoint
 					?.watchEndpoint?.playlistSetVideoId,
 			playlistId,

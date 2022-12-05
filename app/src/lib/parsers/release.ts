@@ -1,5 +1,5 @@
 import { MusicResponsiveListItemRenderer } from "$lib/parsers/items/musicResponsiveListItemRenderer";
-import { filter, filterMap, map } from "$lib/utils";
+import { filter, map } from "$lib/utils";
 type Data = {
 	header: {
 		musicDetailHeaderRenderer: {

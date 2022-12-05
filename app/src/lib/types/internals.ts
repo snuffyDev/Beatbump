@@ -17,6 +17,7 @@ export interface IMusicResponsiveListItemRenderer {
 	thumbnail: IMusicResponsiveListItemRendererThumbnail;
 	overlay: Overlay;
 	flexColumns: FlexColumn[];
+	navigationEndpoint?: IMusicTwoRowItemRendererNavigationEndpoint;
 	menu: Menu;
 	playlistItemData: PlaylistItemData | WatchEndpoint | WatchPlaylistEndpoint;
 	flexColumnDisplayStyle: string;

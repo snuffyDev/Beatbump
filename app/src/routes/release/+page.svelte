@@ -1,34 +1,3 @@
-<script context="module" lang="ts">
-	// import type { Load } from "@sveltejs/kit";
-	// let path;
-	// export const load: Load = async ({ stuff, url, fetch }) => {
-	// 	path = stuff.page;
-	// 	const browseId = url.searchParams.get("id") || "";
-	// 	const pt = url.searchParams.get("type") || "";
-	// 	const response = await fetch(
-	// 		`/api/v1/main.json?q=&endpoint=browse${browseId ? `&browseId=${browseId}` : ""}${pt ? `&pt=${pt}` : ""}`,
-	// 	);
-	// 	const data = await response.json();
-	// 	if (!response.ok) {
-	// 		return {
-	// 			props: {
-	// 				status: response.status,
-	// 				msg: response.body,
-	// 			},
-	// 		};
-	// 	}
-
-	// 	return {
-	// 		props: {
-	// 			data: data,
-	// 			id: browseId,
-	// 		},
-	// 		cache: { maxage: 3600 },
-	// 		status: 200,
-	// 	};
-	// };
-</script>
-
 <script lang="ts">
 	import ListItem from "$lib/components/ListItem/ListItem.svelte";
 	import { currentTitle, key } from "$stores/stores";
@@ -100,11 +69,9 @@
 		/>
 		{#each items as item, index}
 			<ListItem
-				page="release"
 				on:setPageIsPlaying={() => setId()}
 				{item}
 				idx={index}
-				parentPlaylistId={releaseInfo?.playlistId}
 			/>
 		{/each}
 	</main>

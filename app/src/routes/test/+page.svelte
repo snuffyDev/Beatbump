@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { mobileLongPress } from "$lib/actions/longtouch";
-	let style = "--progress: 0";
+	import Button from '$lib/components/Button';
+	
+	let style: string = "--progress: 0";
 	let pressing = false;
 </script>
 
 <main>
+	<Button >Wow</Button>
 	<div
 		class="TEST"
 		{style}

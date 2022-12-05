@@ -12,6 +12,10 @@ export interface IListItemRenderer {
 	playerParams?: string;
 	playlistSetVideoId?: string;
 	clickTrackingParams?: string;
+	endpoint?: {
+		browseId: string;
+		pageType: string;
+	};
 	musicVideoType?: string;
 	index?: number;
 	length?: string;

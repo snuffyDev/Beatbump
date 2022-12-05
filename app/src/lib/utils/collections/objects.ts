@@ -1,18 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import { map, reduce } from "./array";
-
-type IObject<T> = {
-	[Property in keyof T]: T[Property];
-};
-
-type IsObject<T> = T extends object ? (T extends any[] ? false : true) : false;
-
-type IMergedObject<T, U> = IsObject<T> & IsObject<U> extends true
-	? {
-			[K in keyof T]: K extends keyof U ? IMergedObject<T[K], U[K]> : T[K];
-	  } & U
-	: U;
+import type { IObject, IMergedObject } from "$lib/types/utilities";
+import { map } from "./array";
 
 type VoidCallback<T extends IObject<T>, K extends keyof T> = (item: [string, T[K]], index: number, object: T) => void;
 

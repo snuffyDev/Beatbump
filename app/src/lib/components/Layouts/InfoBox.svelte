@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Dropdown } from "$lib/configs/dropdowns.config";
 	import { createEventDispatcher, tick } from "svelte";
 	import Button from "../Button";
 	import PopperButton from "../Popper/PopperButton.svelte";
@@ -11,7 +12,7 @@
 	export let artist = undefined;
 	export let editable = false;
 	export let type = "playlist";
-	let DropdownItems = [
+	let DropdownItems: Dropdown = [
 		{
 			text: "Add to Queue",
 			icon: "queue",
@@ -21,7 +22,7 @@
 		},
 		{
 			text: "Add to Playlist",
-			icon: "playlist-add",
+			icon: "list-plus",
 			action: () => dispatch("playlistAdd"),
 		},
 	];

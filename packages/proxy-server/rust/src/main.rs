@@ -4,7 +4,7 @@ use hls::modify_hls_body;
 
 use async_recursion::async_recursion;
 
-use hyper::body::{self};
+use hyper::body::{self, HttpBody};
 
 use hyper::header::{self};
 use hyper::server::conn::Http;
@@ -39,22 +39,22 @@ static HEADER_BLACKLIST: [&str; 7] = [
 #[async_recursion]
 async fn send_request(url: &str, host: &str) -> Result<Response<Body>, hyper::Error> {
     let https = HttpsConnector::new();
-    let req_url = &*url;
+    let req_url = &url;
 
     let client = Client::builder()
         .pool_max_idle_per_host(0)
         .http1_title_case_headers(true)
         .http1_preserve_header_case(true)
-        .http2_keep_alive_interval(Duration::new(20, 0))
+        .http2_keep_alive_interval(Duration::new(20, 0)).http2_keep_alive_timeout(Duration::new(60, 0))
         .build::<_, Body>(https);
 
     let req = Request::builder()
-        .uri(req_url)
+        .uri(req_url.parse::<hyper::Uri>().expect("Error parsing Uri"))
         .method("GET")
         .header("Origin", format!("https://{}", &host))
         .body(Body::empty())
         .map_err(|err| {
-            println!("{}", err.to_string());
+            eprintln!("{}", err.to_string());
             err.to_string()
         })
         .unwrap();
@@ -72,7 +72,7 @@ async fn send_request(url: &str, host: &str) -> Result<Response<Body>, hyper::Er
             .to_str()
             .unwrap();
 
-        return Ok(send_request(&location, "music.youtube.com").await?);
+        return Ok(send_request(&location, &"music.youtube.com").await?);
     };
 
     Ok(res)
@@ -80,12 +80,12 @@ async fn send_request(url: &str, host: &str) -> Result<Response<Body>, hyper::Er
 
 async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let mut response = Response::new(Body::empty());
+    response.headers_mut().insert(hyper::header::ACCESS_CONTROL_ALLOW_ORIGIN, "*".parse::<hyper::http::HeaderValue>().unwrap());
 
-    let path = req.uri().path();
-    // Split the URL Path by "/", and returns each str slice
+    let path = req.uri().path_and_query().unwrap().query().unwrap(); // Split the URL Path by "/", and returns each str slice
     let parts: Vec<&str> = path.split("/").collect();
 
-    let query = if let Some(q) = req.uri().path_and_query() {
+    let query = if let Some(q) = req.uri().path_and_query().unwrap().query() {
         q.to_string()
     } else {
         return Ok(Response::builder()
@@ -108,6 +108,7 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
             .body("No host parameter provided".into())
             .unwrap());
     };
+    
     // Matches Request Method and the first URL Path section
     match (req.method(), parts[1]) {
         (&Method::GET, "videoplayback") => {
@@ -120,11 +121,7 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
             .to_string();
 
             let result = send_request(&url, &host).await?;
-            let response = Response::builder()
-                .header("Access-Control-Allow-Origin", "*")
-                .body(result.into_body())
-                .unwrap();
-
+            *response.body_mut() = result.into_body();
             Ok(response)
         }
         (&Method::GET, "api") => {
@@ -173,7 +170,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
             if let Err(err) = Http::new()
                 .http2_keep_alive_interval(Duration::new(20, 0))
-                .http1_preserve_header_case(true)
+                .http1_preserve_header_case(true).http1_preserve_header_case(true).http1_half_close(true)
                 .http1_title_case_headers(true)
                 .http2_enable_connect_protocol()
                 .serve_connection(stream, service)

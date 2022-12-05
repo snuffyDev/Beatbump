@@ -1,34 +1,26 @@
-/// <reference types="vite-plugin-comlink/client" />
-
 import { browser } from "$app/environment";
 
 import { Mutex } from "$lib/utils/sync";
-import type { Remote } from "comlink";
-import type { Actions, Methods } from "./types";
-
-import * as ComLink from "comlink";
+import type { IDBMessage, Actions, Methods } from "./types";
 import { notify } from "$lib/utils/utils";
-import WorkerURL from "./worker-iife?url";
 
-let worker: Remote<typeof import("./worker")>;
 class IDBService {
-	private worker: typeof worker;
+	private worker: Worker = null;
 	private lock: Mutex;
 	private isReady = false;
 	constructor() {
 		if (!browser) return;
 
 		this.lock = new Mutex();
-		this.setup();
+
+		queueMicrotask(() => this.setup());
 	}
 	async setup() {
 		if (!browser) return;
-		if (worker) return worker;
-		const workerInstance = await ComLink.wrap<typeof import("./worker")>(
-			new Worker(WorkerURL, { name: "IDB", type: "classic" }),
-		);
+		if (this.worker) return this.worker;
+		const workerInstance = await import("./worker?worker").then((res) => res.default);
 		this.isReady = true;
-		return workerInstance;
+		return new workerInstance();
 	}
 	async sendMessage<
 		Action extends Actions = Actions,
@@ -37,32 +29,44 @@ class IDBService {
 			`${Action & string}${Capitalize<Type>}`,
 		Fn extends Methods[Key] = Methods[Key],
 	>(action: Action, type: Type, ...params: Parameters<Fn>): Promise<Awaited<ReturnType<Fn>>["data"]> {
-		if (!browser) return;
+		if (browser === false) {
+			return;
+		}
+		if (this.worker === null) {
+			this.worker = await this.setup();
+		}
+		const that = this;
+		return this.lock.do(async () => {
+			return await new Promise<Awaited<ReturnType<Fn>>["data"]>((resolve, reject) => {
+				// Unfortunately in order to cleanup the event listener after
+				// We have to define `process` here.
+				function process<T extends IDBMessage<Awaited<ReturnType<Fn>>["data"]>>(event: MessageEvent<T>) {
+					const { data } = event;
 
-		return await this.lock.do(async () => {
-			if (!worker) worker = await this.setup();
+					if (data.error) {
+						notify(data.message, "error");
+					}
 
-			try {
-				console.log(worker);
-				///@ts-expect-error This works, don't know why it will come up as an error
-				const response = await worker.tx(action, type, ...params);
-				if (response.error) {
-					notify(response.message, "error");
+					if (data.message) {
+						notify(data.message, "success");
+					}
+
+					if (data.data) {
+						that.worker.onmessage = null;
+						resolve(data.data);
+					}
+
+					that.worker.onmessage = null;
+					resolve(data.data);
 				}
-				if (response.message) {
-					notify(response.message, "success");
-				}
-				if (response.data) {
-					return response.data;
-				}
-			} catch (err) {
-				console.error(err);
-			}
+
+				this.worker.onmessage = process;
+				this.worker.postMessage({ action, type, params });
+			});
 		});
 	}
 }
+
 const service = new IDBService();
-// service.sendMessage('');
-// service.sendMessage('get', "favorites", "2020202").then(res => res[0].);
 
 export { service as IDBService };

@@ -5,12 +5,12 @@ type PopperStore = {
 	items: any[];
 	isOpen?: boolean;
 	type?: "player" | string;
-	metadata?: {
+	metadata?: Partial<{
 		thumbnail: string;
 		// artist: string
 		title: string;
 		length?: string;
-	};
+	}>;
 	x?: number;
 	y?: number;
 	bottom?: number;

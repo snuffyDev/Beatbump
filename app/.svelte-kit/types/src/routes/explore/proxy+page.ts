@@ -9,9 +9,8 @@ export const load = async ({ fetch, url, parent }: Parameters<PageLoad>[0]) => {
 	if (!data.ok) {
 		throw error(500, data.statusText);
 	}
-	const path = await (await parent()).page;
 	return {
 		response,
-		path,
+		path: url.pathname,
 	};
 };

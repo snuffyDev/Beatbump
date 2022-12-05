@@ -14,3 +14,20 @@ lazy_static = "1.4.0"
 regex = "1.6.0"
 tokio = {version = "1.20.1", features = ["full"]}
 url = "2.2.2"
+
+[build]
+rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
+[profile.dev]
+incremental = true
+strip = false
+lto = false
+opt-level = 0
+
+[profile.dev.package."*"]
+opt-level = 0
+incremental = true
+
+[profile.dev.build-override]
+opt-level = 0
+incremental = true

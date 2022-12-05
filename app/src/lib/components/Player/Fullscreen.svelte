@@ -16,7 +16,7 @@
 	import { groupSession } from "$lib/stores/sessions";
 	import ProgressBar from "./ProgressBar";
 	import { CTX_ListItem } from "$lib/contexts";
-	import { requestFrameSingle } from "$lib/utils";
+	import { notify, requestFrameSingle } from "$lib/utils";
 	import { page } from "$app/stores";
 	import { isMobileMQ } from "$stores/window";
 
@@ -162,13 +162,13 @@
 				class="column container"
 				use:pan
 				on:pan={(event) => {
-					if ($page.data.Android !== true && $page.data.iOS !== true) return;
+					if (!$isMobileMQ) return;
 					const { detail } = event;
 					if (Math.abs(detail.deltaY) < 105) return;
 					trackMovement(0, detail);
 				}}
 				on:panend={(event) => {
-					if ($page.data.Android !== true && $page.data.iOS !== true) return;
+					if (!$isMobileMQ) return;
 					const { detail } = event;
 					const direction = Math.sign(detail.deltaY) === -1 ? "up" : "down";
 					// notify(`${detail.deltaY} : ${detail.velocityY}`, "success");
@@ -354,8 +354,7 @@
 		// overflow-x: hidden;
 		// background-color: rgb(18, 17, 24);
 		overscroll-behavior: contain;
-		// contain: paint;
-
+		// contain: paint
 		// display: flex;
 		overflow-y: auto;
 		// touch-action: pan-y;
@@ -385,7 +384,7 @@
 			touch-action: none;
 			overscroll-behavior: contain;
 		}
-		img {
+		> img {
 			object-fit: cover;
 			height: 100%;
 			overscroll-behavior: contain;
@@ -411,7 +410,7 @@
 
 		border-top-left-radius: $sm-radius;
 		border-top-right-radius: $sm-radius;
-		contain: paint;
+		contain: paint layout;
 		@media screen and (min-width: 720px) and (hover: hover) {
 			position: absolute;
 			left: 0;
@@ -438,7 +437,7 @@
 		background: var(--base-bg);
 		display: flex;
 		isolation: isolate;
-		touch-action: none;
+		touch-action: pan-y;
 
 		opacity: 0;
 		transform: translate3d(0, 0vh, 0);
@@ -459,7 +458,7 @@
 			opacity 200ms cubic-bezier(0.165, 0.84, 0.44, 1);
 	}
 	.tr-close {
-		transition: transform 400ms cubic-bezier(0.215, 0.61, 0.355, 1),
+		transition: transform 400ms 0ms cubic-bezier(0.86, 0, 0.07, 1),
 			opacity 800ms cubic-bezier(0.895, 0.03, 0.685, 0.22) 400ms;
 	}
 	hr {
@@ -509,10 +508,6 @@
 		// z-index: 100;
 	}
 	.mobile {
-		// position: absolute !important;
-		// height: 100% !important;
-		touch-action: none;
-
 		min-height: 100% !important;
 		margin-top: unset !important;
 	}
@@ -536,7 +531,7 @@
 		max-height: 100vh;
 
 		contain: strict;
-		touch-action: none;
+		touch-action: pan-y;
 		will-change: transform, opacity;
 
 		// bottom: 0;
