@@ -21,7 +21,7 @@ export interface IListItemRenderer {
 	length?: string;
 	videoId: string;
 	playlistId: string;
-	loggingContext?: { vssLoggingContext?: VssLoggingContext };
+	loggingContext?: { vssLoggingContext: VssLoggingContext };
 	thumbnails: Array<Thumbnail>;
 	type?: string;
 }

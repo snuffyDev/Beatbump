@@ -204,7 +204,7 @@
 				: await list.initAutoMixSession({
 						videoId: item.videoId,
 						playlistId: item.playlistId,
-						loggingContext: item?.loggingContext,
+						loggingContext: item?.loggingContext || null,
 						keyId: kind === "isPlaylist" ? index : 0,
 						config: { type: item?.musicVideoType },
 				  });

@@ -24,7 +24,7 @@ type Nullable<T> = T | null;
 type IHeaders = Record<string, string>;
 
 /** Helper function to build a request body
-		consisting of Context and params of type `T` */
+	consisting of Context and params of type `T` */
 function buildRequestBody<T>(context: Context, params: Body<T>) {
 	return { context, ...params };
 }
@@ -94,10 +94,9 @@ function nextRequest<T extends NextEndpointParams>(context: Context, params: T) 
 			Origin: "https://music.youtube.com",
 
 			"x-youtube-client-name": "67",
-			"x-youtube-client-version": "1.20220928.01.00",
+			"x-youtube-client-version": "1.20221212.01.0",
 			"X-Goog-Visitor-Id": `${context?.client?.visitorData}`,
-			"User-Agent":
-				"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.0.1293.54,gzip(gfe)",
+			"User-Agent": USER_AGENT,
 		},
 	});
 	return request;
@@ -170,6 +169,8 @@ function browseRequest<T = PlayerEndpointParams | ArtistEndpointParams | Related
 					"Content-Type": "application/json; charset=utf-8",
 					"x-origin": "https://music.youtube.com",
 					"x-goog-visitor-id": context["client"]["visitorData"] || "",
+					"x-youtube-client-name": "67",
+					"x-youtube-client-version": "1.20221212.01.0",
 					Origin: "https://music.youtube.com",
 				},
 				headers,

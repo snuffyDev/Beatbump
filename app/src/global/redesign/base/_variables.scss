@@ -43,6 +43,10 @@ $content-width-xl: 87.5rem;
 @mixin content-spacing($type: "padding") {
 	#{$type}: 1em 0 5vh;
 	#{$type}-bottom: 3.3125vh !important;
+	@media only screen and (min-width: 640px) and (max-width: 1079.9px) {
+		#{$type}: 4vh 2rem 0 2rem;
+		#{$type}-bottom: 0.8rem;
+	}
 	@media only screen and (min-width: 1080px) and (max-width: 1366px) {
 		#{$type}: 4vh 2rem 0 2rem;
 		#{$type}-bottom: 0.8rem;

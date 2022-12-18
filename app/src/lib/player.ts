@@ -10,7 +10,7 @@ import { currentTitle } from "./stores/stores";
 import type { Nullable } from "./types";
 import { notify, type Maybe } from "./utils";
 import { Logger } from "./utils/logger";
-import { Mutex, EventEmitter } from "$lib/utils/sync";
+import { EventEmitter } from "$lib/utils/sync";
 import { WritableStore } from "./utils/stores";
 import { getSrc, type ResponseBody } from "./utils/utils";
 import type HLS from "hls.js";
@@ -117,8 +117,9 @@ interface AudioPlayerEvents {
 	playing: undefined;
 }
 
-const e: AudioPlayerEvents = {};
-
+function hasUrl(input: unknown): input is ResponseBody {
+	return (input as ResponseBody).url !== undefined;
+}
 class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioPlayer, IEventHandler {
 	// #region Properties (21)
 
@@ -144,7 +145,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	private _isWebkit: boolean = false;
 	private _nextTrackURL: ResponseBody;
 	private _paused: WritableStore<boolean> = new WritableStore(true);
-	private _player: HTMLAudioElement = undefined;
+	private _player!: HTMLAudioElement;
 	private _remainingTime: number = 0;
 	private _repeat: "track" | "playlist" | "off" = "off";
 	playerType: "NATIVE" | "HLS.JS" | "UNSUPPORTED" = undefined;
@@ -308,8 +309,11 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 
 		if (userInitiated === true && broadcast === true) {
 			position = SessionListService.updatePosition("next");
-			if (position === sessionList.mix.length - 1) updateGroupPosition("->", position - 1);
-			else updateGroupPosition("->", position - 1);
+			if (position === sessionList.mix.length - 1) {
+				updateGroupPosition("->", position - 1);
+			} else {
+				updateGroupPosition("->", position - 1);
+			}
 		} else {
 			position = SessionListService.updatePosition("next");
 		}
@@ -366,7 +370,6 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		if (canPlay !== undefined) {
 			canPlay
 				.then(() => {
-					// this._player.load();
 					this._player.play();
 					this._paused.set(false);
 				})
@@ -400,7 +403,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		if (this.isHLSPlayer) {
 			this._HLS.media.currentTime = time;
 		} else {
-			this._player.currentTime = time;
+			this.player.currentTime = time;
 		}
 		this._currentTimeStore.set(time);
 	}
@@ -425,6 +428,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	public updateTime(time: number): void {
 		this._currentTimeStore.set(time);
 	}
+
 	public repeat(state: "off" | "track" | "playlist") {
 		if (state === "track") {
 			this._player.loop = true;
@@ -440,6 +444,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			return module.default;
 		});
 	}
+
 	private async createHLSPlayer(source?: string) {
 		if (this.playerType === "NATIVE") return;
 		if (!this._HLSModule) this._HLSModule = await this.loadHLSModule();
@@ -488,6 +493,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 				itct: sessionList.mix[position]?.itct,
 				videoId: sessionList.mix[position]?.videoId,
 				playlistId: sessionList.currentMixId,
+				loggingContext: sessionList.mix[position].loggingContext,
 				ctoken: sessionList.continuation,
 				clickTrackingParams: sessionList.clickTrackingParams,
 				key: position,
@@ -497,11 +503,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		try {
 			this.__tick = false;
 			const response = await this.getTrackSrc(position, shouldAutoplay).then((value) => {
-				function hasProperty(input: unknown): input is ResponseBody {
-					return (input as ResponseBody).url !== undefined;
-				}
-
-				if (hasProperty(value)) return value;
+				if (hasUrl(value)) return value;
 			});
 			return response;
 		} catch (error) {
@@ -578,6 +580,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			});
 			return;
 		}
+
 		if (this._hasNextSrc === true && this._nextTrackURL && this._nextTrackURL?.url) {
 			SessionListService.updatePosition("next");
 			this.updateSrc(this._nextTrackURL);
@@ -617,9 +620,12 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 
 	private async setup() {
 		if (!browser) return;
+
 		this.playerType = await this.canUseHLSjs();
+
 		this.__unsubscriber = this._src.subscribe(async (value) => {
 			if (this.playerType === "HLS.JS" && !this._HLSModule) this._HLSModule = await this.loadHLSModule();
+
 			if (this.isHLSPlayer && this.playerType === "HLS.JS") {
 				this.createHLSPlayer(value);
 			} else {
@@ -630,6 +636,8 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 				this._player.load();
 			}
 		});
+
+		// Setup event listeners
 		this.on("play", async (args) => {
 			if (!this._initialized) {
 				await this.updateSrc(args[0]);

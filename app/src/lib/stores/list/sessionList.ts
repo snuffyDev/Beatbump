@@ -129,7 +129,7 @@ function _sessionListService(): ISessionListService {
 			keyId = 0,
 			playlistId,
 			playlistSetVideoId,
-			loggingContext,
+			loggingContext = null,
 			videoId,
 			config: { playerParams = "", type = "" } = {},
 		}) {
@@ -144,7 +144,7 @@ function _sessionListService(): ISessionListService {
 					params: playerParams ? playerParams : "",
 					videoId,
 					playlistId: playlistId ? playlistId : "",
-					loggingContext: loggingContext.vssLoggingContext.serializedContextData,
+					loggingContext: loggingContext ? loggingContext.vssLoggingContext.serializedContextData : undefined,
 					playlistSetVideoId: playlistSetVideoId ? playlistSetVideoId : "",
 					clickTracking,
 					configType: type,
@@ -243,7 +243,7 @@ function _sessionListService(): ISessionListService {
 			}
 		},
 		getMoreLikeThis,
-		async getSessionContinuation({ clickTrackingParams, ctoken, itct, key, playlistId, videoId }) {
+		async getSessionContinuation({ clickTrackingParams, ctoken, itct, key, playlistId, videoId, loggingContext }) {
 			playerLoading.set(true);
 			if (currentMixType === "playlist" && chunkedPlaylistMap.size && mix.length < chunkedListOriginalLen - 1) {
 				chunkedPlaylistCurrentIdx++;

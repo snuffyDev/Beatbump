@@ -73,7 +73,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 function baseResponse(data: Dict<any>, _visitorData: string) {
 	const carouselItems = [];
-	let headerThumbnail = [];
+	let headerThumbnail = data.background?.musicThumbnailRenderer?.thumbnail?.thumbnails ?? [];
 
 	const sectionListRenderer =
 		data.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer;

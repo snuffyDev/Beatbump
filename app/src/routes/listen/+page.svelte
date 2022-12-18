@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
 	import Icon from "$lib/components/Icon/Icon.svelte";
 	import Listing from "$lib/components/Item/Listing.svelte";
 	import list from "$lib/stores/list";
@@ -8,7 +7,7 @@
 	import { SITE_ORIGIN_URL } from "$stores/url";
 
 	export let data: PageData;
-	const { videoId, playlist, thumbnails = [], title, related, data: data$1 } = data;
+	const { videoId, playlist, thumbnails = [], title, related } = data;
 
 	// $: console.log(data);
 	// $: console.log({ videoId, playlist, thumbnails, title, related, data });
