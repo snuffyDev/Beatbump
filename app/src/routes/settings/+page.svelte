@@ -112,14 +112,16 @@
 			<div class="input-container">
 				<div class="input no-btn mb-1">
 					<input
-						type="text"
+						type="url"
 						on:input={(e) => {
 							let value = e.currentTarget.value;
-							if (!value.match(/^https?:\/\//gm)) value = "http://" + value;
-							if (!value.endsWith("/")) value = value + "/";
 
-							$settings["network"]["HLS Stream Proxy"] = value;
+							if (!value.endsWith("/")) value = value + "/";
+							if (value.match(/^https:\/\//i)) {
+								$settings["network"]["HLS Stream Proxy"] = value;
+							}
 						}}
+						pattern="https://.*"
 						placeholder="https://yt-hls-rewriter.onrender.com/"
 						value={$settings["network"]["HLS Stream Proxy"]}
 					/>

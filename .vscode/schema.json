@@ -17,6 +17,10 @@
 							"description": "For a standard Node.js server"
 						},
 						{ "const": "cloudflare-workers", "description": "For deploying on Cloudflare Workers" },
+						{
+							"const": "cloudflare",
+							"description": "For deploying on Cloudflare Pages"
+						},
 						{ "const": "vercel", "description": "For deploying on Vercel" },
 						{ "const": "netlify", "description": "For deploying on Netlify" }
 					]

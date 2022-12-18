@@ -59,9 +59,7 @@ async fn send_request(url: &str, host: &str) -> ResponseResult {
         Err(e) => return ResponseResult::Err(e.to_string()),
     };
 
-    let res = client.request(request).await;
-
-    match res {
+    match client.request(request).await {
         Ok(res) => {
             if let Some(location_header) = res.headers().get(header::LOCATION) {
                 return send_request(&location_header.to_str().unwrap(), host).await;
@@ -80,7 +78,7 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
         "*".parse::<hyper::http::HeaderValue>().unwrap(),
     );
 
-    let path = &*req.uri().path_and_query().unwrap().path(); // Split the URL Path by "/", and returns each str slice
+    let path = req.uri().path_and_query().unwrap().path().to_string(); // Split the URL Path by "/", and returns each str slice
     let parts: Vec<&str> = path.split("/").collect();
 
     let query = req
@@ -161,7 +159,7 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let addr: SocketAddr = "0.0.0.0:3001".parse().unwrap();
+    let addr: SocketAddr = "0.0.0.0:10000".parse().unwrap();
 
     let listener = TcpListener::bind(&addr).await?;
 
@@ -176,7 +174,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             if let Err(err) = Http::new()
                 .http2_keep_alive_timeout(Duration::new(30, 0))
                 .http1_preserve_header_case(true)
-                .http1_half_close(true)
                 .http1_title_case_headers(true)
                 .serve_connection(stream, service)
                 .await

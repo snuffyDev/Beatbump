@@ -21,8 +21,19 @@ openssl-sys = "*"
 # cross compiling to x86_64-unknown-linux-musl.
 vendored = ["openssl-sys/vendored"]
 
+[build]
+rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
 [profile.dev]
 incremental = true
 strip = false
 lto = false
 opt-level = 0
+
+[profile.dev.package."*"]
+opt-level = 0
+incremental = true
+
+[profile.dev.build-override]
+opt-level = 0
+incremental = true

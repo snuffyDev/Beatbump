@@ -48,15 +48,15 @@ cli
 				console.error(`No config file was found. Please create a file named 'beatbump.config.json' at ${rootPath}`);
 				return;
 			}
-			const options = adapter.match(/node|vercel|netlify/g) ? json["platform"][adapter] : null;
+			const options = adapter.match(/node|vercel|netlify|cloudflare(-workers)?/g) ? json["platform"][adapter] : null;
 
 			if (!pkg.devDependencies[`@sveltejs/adapter-${adapter}`]) {
 				console.info(`Adapter @sveltejs/adapter-${adapter} was not found. Installing...`);
 
-				child_process.spawnSync(`npm`, [`i`, `-D`, `@sveltejs/adapter-${adapter}@next`], {
+				child_process.spawnSync(`npm`, [`i`, `-D`, `@sveltejs/adapter-${adapter}@latest`], {
 					stdio: "inherit",
 					env: process.env,
-					cwd: rootPath,
+					cwd: root,
 					shell: true,
 				});
 

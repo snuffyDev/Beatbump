@@ -138,7 +138,8 @@ function handleError() {
 
 export const queryParams = (params: Record<any, any>): string => {
 	const result = [];
-	for (const key in params) {
+	let key = "";
+	for (key in params) {
 		if (typeof params[key] !== "number" && !params[key]) continue;
 		result.push(`${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`);
 	}

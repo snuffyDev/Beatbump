@@ -51,10 +51,10 @@ export const GET: RequestHandler = async ({ url }) => {
 
 		return result;
 	}
-	const sectionListContinuation = data?.continuationContents?.sectionListContinuation;
-	const contents = sectionListContinuation?.contents;
+	const sectionListContinuation = data.continuationContents?.sectionListContinuation;
+	const contents = sectionListContinuation.contents;
 	const nextContinuationData = Array.isArray(sectionListContinuation?.continuations)
-		? sectionListContinuation?.continuations[0]?.nextContinuationData
+		? sectionListContinuation.continuations[0]?.nextContinuationData
 		: {};
 
 	let idx = -1;
@@ -78,7 +78,7 @@ function baseResponse(data: Dict<any>, _visitorData: string) {
 	const sectionListRenderer =
 		data.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer;
 
-	const _contents = sectionListRenderer?.contents || [];
+	const _contents = sectionListRenderer.contents || [];
 	const nextContinuationData = sectionListRenderer.continuations[0]?.nextContinuationData;
 	const length = _contents.length;
 
@@ -87,13 +87,13 @@ function baseResponse(data: Dict<any>, _visitorData: string) {
 		const item = _contents[idx] ?? {};
 		if ("musicCarouselShelfRenderer" in item) {
 			const carousel = parseCarousel(item);
-			carouselItems[idx] = carousel;
+			carouselItems.push(carousel);
 		}
 		if ("musicImmersiveCarouselShelfRenderer" in item) {
 			headerThumbnail =
 				item.musicImmersiveCarouselShelfRenderer.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail?.thumbnails ||
 				[];
-			carouselItems[idx] = parseCarousel(item);
+			carouselItems.push(parseCarousel(item));
 		}
 	}
 
