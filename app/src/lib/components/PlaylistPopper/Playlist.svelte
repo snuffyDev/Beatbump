@@ -14,7 +14,12 @@
 	}}
 >
 	<div class="image">
-		<img src={item?.thumbnail} width="64" height="64" alt="thumbnail" />
+		<img
+			src={item?.thumbnail}
+			width="64"
+			height="64"
+			alt="thumbnail"
+		/>
 	</div>
 	<div class="list-item-body">
 		<p class="title">{item.name}</p>

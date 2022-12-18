@@ -5,7 +5,11 @@
 </script>
 
 {#key key}
-	<div class="app-content-p" in:fade|local={{ duration: 300, delay: 300 }} out:fade|local={{ duration: 300 }}>
+	<div
+		class="app-content-p"
+		in:fade|local={{ duration: 300, delay: 300 }}
+		out:fade|local={{ duration: 300 }}
+	>
 		<slot />
 	</div>
 {/key}

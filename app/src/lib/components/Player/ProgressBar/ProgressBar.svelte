@@ -40,7 +40,10 @@
 	}
 </script>
 
-<svelte:window on:pointerup={() => (seeking = false)} on:pointermove={trackMouse} />
+<svelte:window
+	on:pointerup={() => (seeking = false)}
+	on:pointermove={trackMouse}
+/>
 <div class="progress-container">
 	<span class="timestamp secondary">{format($currentTimeStore)}</span>
 	<div class="progress-bar-wrapper">
@@ -91,5 +94,8 @@
 	<span class="timestamp secondary">{format($durationStore)}</span>
 </div>
 
-<style src="./index.scss" lang="scss">
+<style
+	src="./index.scss"
+	lang="scss"
+>
 </style>

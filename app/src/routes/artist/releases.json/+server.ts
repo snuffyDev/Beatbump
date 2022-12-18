@@ -99,12 +99,9 @@ export const GET: RequestHandler = async ({ url }) => {
 	const header = data?.header;
 	const contents = data?.contents;
 	if (!response.ok) {
-		throw new Error(
-			"@migration task: Migrate this return statement (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292701)",
-		);
 		// Suggestion (check for correctness before using):
 		// return new Response(response.statusText, { status: response.status });
-		return { status: response.status, body: response.statusText };
+		return new Response(response.statusText, { status: response.status });
 	}
 
 	const grid: {

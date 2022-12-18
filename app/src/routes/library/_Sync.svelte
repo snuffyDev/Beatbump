@@ -1,4 +1,7 @@
-<script context="module" lang="ts">
+<script
+	context="module"
+	lang="ts"
+>
 	import { browser } from "$app/environment";
 	let _Peer: typeof Peer;
 	let RTC_module;
@@ -178,18 +181,31 @@
 </script>
 
 <svelte:window on:keydown={keyDownListener} />
-<div class="backdrop" on:click={() => dispatch("close")} transition:fade={{ duration: 150, delay: 150 }} />
+<div
+	class="backdrop"
+	on:click={() => dispatch("close")}
+	transition:fade={{ duration: 150, delay: 150 }}
+/>
 <div class="sync-wrapper">
-	<div class="sync" transition:fade={{ duration: 300, delay: 300 }}>
+	<div
+		class="sync"
+		transition:fade={{ duration: 300, delay: 300 }}
+	>
 		<div
 			class="x-button"
 			on:click={() => {
 				dispatch("close");
 			}}
 		>
-			<Icon name="x" size="1.5rem" />
+			<Icon
+				name="x"
+				size="1.5rem"
+			/>
 		</div>
-		<div class="screen-wrapper" id="sWrapper">
+		<div
+			class="screen-wrapper"
+			id="sWrapper"
+		>
 			{#if stepCounter == 0}
 				<div class="screen">
 					<div class="content">
@@ -202,7 +218,10 @@
 					</div>
 				</div>
 				<div class="next">
-					<button class="nextbtn" on:click={nextStep}>Next Step</button>
+					<button
+						class="nextbtn"
+						on:click={nextStep}>Next Step</button
+					>
 				</div>
 			{:else if stepCounter == 1}
 				<div class="screen">
@@ -221,7 +240,12 @@
 										on:input={() => (check = "sending")}
 										checked={check == "sending"}
 									/>
-									<span class="checkbox-tile"><Icon name="send" size="2em" /><span class="label">Sending</span></span>
+									<span class="checkbox-tile"
+										><Icon
+											name="send"
+											size="2em"
+										/><span class="label">Sending</span></span
+									>
 								</label>
 							</div>
 							<div class="radio">
@@ -233,7 +257,10 @@
 										checked={check == "receiving"}
 									/>
 									<span class="checkbox-tile"
-										><Icon name="import" size="2em" /><span class="label">Receiving</span></span
+										><Icon
+											name="import"
+											size="2em"
+										/><span class="label">Receiving</span></span
 									>
 								</label>
 							</div>
@@ -247,7 +274,12 @@
 								{#each dataType as option}
 									<label>
 										{option}
-										<input type="checkbox" bind:group={kindOfData} value={option} name="dataType" />
+										<input
+											type="checkbox"
+											bind:group={kindOfData}
+											value={option}
+											name="dataType"
+										/>
 									</label>
 								{/each}
 							</div>

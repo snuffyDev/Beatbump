@@ -1,12 +1,14 @@
 import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 
-import type { CarouselHeader, CarouselItem } from "$lib/types";
+import type { CarouselHeader } from "$lib/types";
 import type { NextContinuationData } from "$lib/types";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { map } from "$lib/utils/collections";
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 import { buildRequest } from "$api/request";
 import type { PlaylistEndpointContinuation, PlaylistEndpointParams } from "$api/_base";
+import type { Header, MusicCarouselShelfRenderer } from "$lib/types/innertube/musicCarouselShelfRenderer";
+import type { ITwoRowItemRenderer } from "$lib/types/musicCarouselTwoRowItem";
 export const GET: RequestHandler = async ({ url }) => {
 	try {
 		const query = url.searchParams;
@@ -55,6 +57,7 @@ async function getPlaylistContinuation(
 		params: {},
 		continuation,
 	});
+	if (response === null) throw error(500, { message: "Error fetching playlist" });
 	if (!response.ok) {
 		throw error(response.status, response.statusText);
 	}
@@ -64,24 +67,24 @@ async function getPlaylistContinuation(
 		await data;
 	// console.log(data, contents, continuations)
 
-	let tracks = [];
+	let tracks: (IListItemRenderer | ITwoRowItemRenderer)[] = [];
 	let carousel;
 	const cont: NextContinuationData = continuations.length !== 0 ? continuations[0]?.nextContinuationData : null;
 	if (data?.continuationContents?.sectionListContinuation?.contents[0]?.musicCarouselShelfRenderer) {
-		carousel = parseCarousel({
-			musicCarouselShelfRenderer:
-				data?.continuationContents?.sectionListContinuation?.contents[0]?.musicCarouselShelfRenderer,
-		});
+		carousel = parseCarousel(
+			data?.continuationContents?.sectionListContinuation?.contents[0]?.musicCarouselShelfRenderer,
+		);
 	} else {
 		tracks = parseTrack(contents, id);
 	}
 	return json({
+		_original: data,
 		continuations: cont,
 		tracks: tracks.length !== 0 && tracks,
 		carousel: carousel,
 	});
 }
-async function getPlaylist(browseId, referrer) {
+async function getPlaylist(browseId: string, referrer: string) {
 	const response = await fetch(
 		"https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&prettyPrint=false",
 		{
@@ -136,11 +139,11 @@ async function getPlaylist(browseId, referrer) {
 		},
 	);
 	if (!response.ok) {
-		return { status: response.status, body: response.statusText };
+		throw error(response.status, { message: response.statusText });
 	}
 
 	const data = await response.json();
-	let musicDetailHeaderRenderer = {};
+	let musicDetailHeaderRenderer: Partial<Record<string, any>> = {};
 	if (Object.prototype.hasOwnProperty.call(data, "header")) {
 		const { musicDetailHeaderRenderer: detailHeader = {} } = data?.header;
 		musicDetailHeaderRenderer = detailHeader;
@@ -168,10 +171,9 @@ async function getPlaylist(browseId, referrer) {
 		: null;
 
 	const getHeader = () => {
-		const createArray = (key) =>
+		const createArray = (key: string) =>
 			Array.isArray(musicDetailHeaderRenderer[key]["runs"]) &&
 			(() => {
-				let len = musicDetailHeaderRenderer[key]["runs"].length;
 				const arr = [];
 				for (const { text } of musicDetailHeaderRenderer[key]["runs"]) {
 					arr.push(text);
@@ -211,6 +213,7 @@ async function getPlaylist(browseId, referrer) {
 	const tracks = parseTrack(contents, playlistId ?? browseId.slice(2));
 	// console.timeEnd("playlist");
 	return json({
+		_original: data,
 		continuations: cont,
 		tracks,
 		visitorData,
@@ -226,22 +229,23 @@ function parseTrack(contents = [], playlistId?: string): Array<IListItemRenderer
 	}
 	return tracks;
 }
-function parseHeader(header: any[]): CarouselHeader[] {
-	return map(header, ({ musicCarouselShelfBasicHeaderRenderer } = {}) => ({
+
+function parseHeader(header: Header[]): CarouselHeader[] {
+	return map(header, ({ musicCarouselShelfBasicHeaderRenderer }) => ({
 		title: musicCarouselShelfBasicHeaderRenderer["title"]["runs"][0].text,
 	}));
 }
 
-function parseBody(contents = []): CarouselItem[] {
+function parseBody(contents: MusicCarouselShelfRenderer["contents"] = []): (IListItemRenderer | ITwoRowItemRenderer)[] {
 	const items = [];
 	for (let idx = 0; idx < contents.length; idx++) {
 		const item = contents[idx];
-		if (item.musicTwoRowItemRenderer) items[idx] = MusicTwoRowItemRenderer(item);
-		if (item.musicResponsiveListItemRenderer) items[idx] = MusicResponsiveListItemRenderer(item);
+		if ("musicTwoRowItemRenderer" in item) items[idx] = MusicTwoRowItemRenderer(item);
+		if ("musicResponsiveListItemRenderer" in item) items[idx] = MusicResponsiveListItemRenderer(item);
 	}
 	return items;
 }
-function parseCarousel({ musicCarouselShelfRenderer }) {
+function parseCarousel(musicCarouselShelfRenderer: MusicCarouselShelfRenderer) {
 	return {
 		header: parseHeader([musicCarouselShelfRenderer.header])[0],
 		results: parseBody(musicCarouselShelfRenderer.contents),

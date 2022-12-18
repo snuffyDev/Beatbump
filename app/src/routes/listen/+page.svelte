@@ -15,13 +15,31 @@
 </script>
 
 <svelte:head>
-	<meta property="og:title" content={title} />
-	<meta property="og:type" content="music.song" />
-	<meta property="og:description" content={`Listen to ${title} on Beatbump`} />
-	<meta property="og:site_name" content="Beatbump" />
-	<meta property="og:image" content={thumbnails[thumbnails.length - 1].url} />
+	<meta
+		property="og:title"
+		content={title}
+	/>
+	<meta
+		property="og:type"
+		content="music.song"
+	/>
+	<meta
+		property="og:description"
+		content={`Listen to ${title} on Beatbump`}
+	/>
+	<meta
+		property="og:site_name"
+		content="Beatbump"
+	/>
+	<meta
+		property="og:image"
+		content={thumbnails[thumbnails.length - 1].url}
+	/>
 
-	<meta property="og:url" content={`${$SITE_ORIGIN_URL}/listen?id=${videoId}${playlist ? `&list=${playlist}` : ""}`} />
+	<meta
+		property="og:url"
+		content={`${$SITE_ORIGIN_URL}/listen?id=${videoId}${playlist ? `&list=${playlist}` : ""}`}
+	/>
 	<title>{title} | Beatbump</title>
 </svelte:head>
 <main>
@@ -42,7 +60,12 @@
 						videoId,
 						playlistId: playlist ?? related?.currentMixId,
 					});
-				}}><Icon name="play" size="1.25em" color="black" /><span class="text">Start Listening</span></button
+				}}
+				><Icon
+					name="play"
+					size="1.25em"
+					color="black"
+				/><span class="text">Start Listening</span></button
 			>
 		</div>
 	</header>

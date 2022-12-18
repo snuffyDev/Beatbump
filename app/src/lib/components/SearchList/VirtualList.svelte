@@ -163,14 +163,23 @@
 	>
 		{#each visible as row (row.index)}
 			<svelte-virtual-list-row>
-				<slot item={row.data} index={row.index}>Missing template</slot>
+				<slot
+					item={row.data}
+					index={row.index}>Missing template</slot
+				>
 			</svelte-virtual-list-row>
 		{/each}
 		{#if !hasData}
-			<div use:vp on:enterViewport={() => dispatch("endList")} />
+			<div
+				use:vp
+				on:enterViewport={() => dispatch("endList")}
+			/>
 
 			{#if isLoading}
-				<div class="loading-results" style="padding: 0em;">
+				<div
+					class="loading-results"
+					style="padding: 0em;"
+				>
 					<svg
 						role="img"
 						width="50rem"
@@ -188,7 +197,9 @@
 							class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
 							style="fill: url(&quot;#fill&quot;);"
 						/><defs class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
-							><clipPath id="clip-path" class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
+							><clipPath
+								id="clip-path"
+								class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
 								><rect
 									x="0"
 									y="10%"
@@ -222,7 +233,9 @@
 									height="9"
 									class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
 								/></clipPath
-							><linearGradient id="fill" class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
+							><linearGradient
+								id="fill"
+								class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
 								><stop
 									offset="0.599964"
 									stop-color="#4f4f4f"

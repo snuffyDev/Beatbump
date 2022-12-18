@@ -33,10 +33,19 @@
 	<h2>Join {hostDisplayName}'s Group Session</h2>
 	<p>Please enter a display name below in order to continue with joining.</p>
 	<br />
-	<div class="input"><input type="text" placeholder="Display Name" bind:value={clientDisplayName} /></div>
+	<div class="input">
+		<input
+			type="text"
+			placeholder="Display Name"
+			bind:value={clientDisplayName}
+		/>
+	</div>
 	<br />
 
-	<Button disabled={!clientDisplayName} on:click={joinSession}>Join Session</Button>
+	<Button
+		disabled={!clientDisplayName}
+		on:click={joinSession}>Join Session</Button
+	>
 </main>
 
 <style lang="css">

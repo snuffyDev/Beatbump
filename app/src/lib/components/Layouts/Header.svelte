@@ -15,9 +15,15 @@
 	{#each Object.entries($tagStore) as [property, content]}
 		{#if content}
 			{#if ["title", "description", "image"].includes(property)}
-				<meta name={property} {content} />
+				<meta
+					name={property}
+					{content}
+				/>
 			{:else}
-				<meta {property} {content} />
+				<meta
+					{property}
+					{content}
+				/>
 			{/if}
 		{/if}
 	{/each}

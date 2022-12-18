@@ -10,10 +10,18 @@
 	// $: console.log(response)
 </script>
 
-<Header title="Explore" url={path} desc="Find the perfect playlist that'll match your mood, or fit any occasion." />
+<Header
+	title="Explore"
+	url={path}
+	desc="Find the perfect playlist that'll match your mood, or fit any occasion."
+/>
 <main>
 	{#each response as section}
-		<Grid items={[...section.section]} heading={section.title} let:item>
+		<Grid
+			items={[...section.section]}
+			heading={section.title}
+			let:item
+		>
 			<a
 				slot="item"
 				style={`border-left: 0.4286rem solid ${item.color}`}

@@ -1,4 +1,7 @@
-<svelte:options immutable={true} accessors={true} />
+<svelte:options
+	immutable={true}
+	accessors={true}
+/>
 
 <script lang="ts">
 	import { groupSession, isPagePlaying } from "$lib/stores";
@@ -198,7 +201,11 @@
 	<div class="index">
 		<span class:hidden={isPlaying !== true && isHovering !== true}>
 			<!--#9990a0-->
-			<Icon name="play-player" color="inherit" size="1.5em" />
+			<Icon
+				name="play-player"
+				color="inherit"
+				size="1.5em"
+			/>
 		</span>
 		<span class:hidden={isPlaying !== false || isHovering !== false}>
 			{idx + 1}
@@ -246,13 +253,26 @@
 		</div>
 	</div>
 	{#if isHovering || width < 640}
-		<div class="length" tabindex="0" on:focus={() => (isHovering = true)}>
-			<PopperButton tabindex="0" items={DropdownItems} />
+		<div
+			class="length"
+			tabindex="0"
+			on:focus={() => (isHovering = true)}
+		>
+			<PopperButton
+				tabindex="0"
+				items={DropdownItems}
+			/>
 		</div>
 	{:else}
-		<span class="length" class:hidden={!item?.length ? true : false}>{(item?.length?.text ?? item.length) || ""}</span>
+		<span
+			class="length"
+			class:hidden={!item?.length ? true : false}>{(item?.length?.text ?? item.length) || ""}</span
+		>
 	{/if}
 </article>
 
-<style src="./index.scss" lang="scss">
+<style
+	src="./index.scss"
+	lang="scss"
+>
 </style>

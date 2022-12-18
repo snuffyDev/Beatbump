@@ -85,7 +85,13 @@
 	>
 		<h1 slot="header">Import your data</h1>
 		<div class="container">
-			<input type="file" name="import" id="import" accept=".json" bind:files />
+			<input
+				type="file"
+				name="import"
+				id="import"
+				accept=".json"
+				bind:files
+			/>
 			<p>Import your data using the form above!</p>
 		</div>
 	</Modal>
@@ -98,7 +104,10 @@
 			on:click={() => {
 				showSyncModal = true;
 			}}
-			><Icon name="send" size="1.1em" />
+			><Icon
+				name="send"
+				size="1.1em"
+			/>
 			<span class="btn-text">Sync Your Data</span></button
 		>
 		<div style="margin-block-start: 0.5em;">
@@ -111,7 +120,10 @@
 						console.error(err);
 					}
 				}}
-				><Icon name="upload" size="1.1em" />
+				><Icon
+					name="upload"
+					size="1.1em"
+				/>
 				<span class="btn-text">Export Data</span></Button
 			>
 			<Button
@@ -119,7 +131,10 @@
 				on:click={() => {
 					showImportModal = true;
 				}}
-				><Icon name="download" size="1.1em" />
+				><Icon
+					name="download"
+					size="1.1em"
+				/>
 				<span class="btn-text">Import Data</span></Button
 			>
 		</div>
@@ -152,9 +167,7 @@
 					{/each}
 				{:else}
 					<div class="container">
-						<h4>
-							Empty!
-						</h4>
+						<h4>Empty!</h4>
 						<span class="subheading"><em>Add some songs to keep track of what you love!</em></span>
 					</div>
 				{/if}
@@ -200,7 +213,11 @@
 						style="margin-top:0.75em;"
 						on:click={() => {
 							IDBService.sendMessage("delete", "playlists");
-						}}><Icon name="x" size="1.1em" /><span class="btn-text">Delete All Playlists</span></button
+						}}
+						><Icon
+							name="x"
+							size="1.1em"
+						/><span class="btn-text">Delete All Playlists</span></button
 					></Grid
 				>
 			{:catch err}

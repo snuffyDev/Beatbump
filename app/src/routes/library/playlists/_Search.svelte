@@ -14,9 +14,21 @@
 	}
 </script>
 
-<div role="textbox" aria-activedescendant="searchBox" class="input my-1">
-	<div role="button" aria-label="search button" class="searchBtn" on:click={handleSubmit}>
-		<Icon name="search" size="1rem" />
+<div
+	role="textbox"
+	aria-activedescendant="searchBox"
+	class="input my-1"
+>
+	<div
+		role="button"
+		aria-label="search button"
+		class="searchBtn"
+		on:click={handleSubmit}
+	>
+		<Icon
+			name="search"
+			size="1rem"
+		/>
 	</div>
 	<!-- svelte-ignore a11y-autofocus -->
 	<input

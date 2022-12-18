@@ -1,4 +1,4 @@
-import type { IMusicTwoRowItemRenderer, SubtitleRun } from "$lib/types/internals";
+import type { IMusicTwoRowItemRenderer, SubtitleRun } from "$lib/types/innertube/internals";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import { subtitle, thumbnailTransformer } from "../utils.parsers";
 

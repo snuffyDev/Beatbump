@@ -245,8 +245,14 @@
 	}}
 >
 	<div class="innercard">
-		<div class="itemWrapper" on:click|stopPropagation={clickHandler}>
-			<div class="img-container" class:artist-img={isArtist}>
+		<div
+			class="itemWrapper"
+			on:click|stopPropagation={clickHandler}
+		>
+			<div
+				class="img-container"
+				class:artist-img={isArtist}
+			>
 				{#if loading}
 					<Loading size="3em" />
 				{/if}
@@ -264,7 +270,12 @@
 			<div class="title">
 				<p class="text-title">
 					{data.title}
-					<span class="explicit" class:hidden={!data.explicit}> E </span>
+					<span
+						class="explicit"
+						class:hidden={!data.explicit}
+					>
+						E
+					</span>
 				</p>
 				{#if data.type === "artists"}
 					<p class="artist-stats">

@@ -29,7 +29,10 @@
 </script>
 
 <svelte:window bind:innerHeight={win_height} />
-<div class="alert-container" bind:offsetHeight={height}>
+<div
+	class="alert-container"
+	bind:offsetHeight={height}
+>
 	{#each $alertHandler as notif, idx}
 		<div
 			in:fly={{ y: 150, duration: 250, easing: expoOut }}

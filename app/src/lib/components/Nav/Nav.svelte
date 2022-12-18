@@ -41,7 +41,10 @@
 				class="nav-icon icon-btn no-style"
 				aria-label="Back"
 			>
-				<Icon name="chevron-left" size="1.6125em" />
+				<Icon
+					name="chevron-left"
+					size="1.6125em"
+				/>
 			</button>
 			<a
 				href={`/home`}
@@ -50,10 +53,20 @@
 				}}
 				class="logo-back no-style"
 			>
-				<img style="margin-left:1em;" width="32" height="32" src="/logo.svg" alt="logo" title="Beatbump Home" />
+				<img
+					style="margin-left:1em;"
+					width="32"
+					height="32"
+					src="/logo.svg"
+					alt="logo"
+					title="Beatbump Home"
+				/>
 			</a>
 		{:else}
-			<a href={`/home`} class="no-style">
+			<a
+				href={`/home`}
+				class="no-style"
+			>
 				<img
 					on:click={() => {
 						$fullscreenStore && fullscreenStore.set("closed");
@@ -81,7 +94,11 @@
 			aria-label="Home"
 			class:active={key.includes("home")}
 		>
-			<Icon name="home" --stroke={key.includes("home") ? "#fff" : "#BCBCBE"} size="1.6125em" />
+			<Icon
+				name="home"
+				--stroke={key.includes("home") ? "#fff" : "#BCBCBE"}
+				size="1.6125em"
+			/>
 		</button>
 
 		<button
@@ -95,7 +112,11 @@
 			aria-label="Trending"
 			class:active={key.includes("trending")}
 		>
-			<Icon name="trending" --stroke={key.includes("trending") ? "#fff" : "#BCBCBE"} size="1.6125em" />
+			<Icon
+				name="trending"
+				--stroke={key.includes("trending") ? "#fff" : "#BCBCBE"}
+				size="1.6125em"
+			/>
 		</button>
 		<button
 			use:tooltip
@@ -108,7 +129,11 @@
 			class="nav-icon icon-btn no-style"
 			class:active={key.includes("library")}
 		>
-			<Icon name="folder" --stroke={key.includes("library") ? "#fff" : "#BCBCBE"} size="1.6125em" />
+			<Icon
+				name="folder"
+				--stroke={key.includes("library") ? "#fff" : "#BCBCBE"}
+				size="1.6125em"
+			/>
 		</button>
 	</div>
 
@@ -122,7 +147,10 @@
 			}}
 			aria-label="Search"
 		>
-			<Icon name="search" size="1.6125em" />
+			<Icon
+				name="search"
+				size="1.6125em"
+			/>
 		</button>
 
 		<button
@@ -133,13 +161,21 @@
 				goto("/settings", {});
 			}}
 		>
-			<Icon name="settings" size="1.6125em" />
+			<Icon
+				name="settings"
+				size="1.6125em"
+			/>
 		</button>
 	</div>
 </nav>
 
 {#if !hidden}
-	<div class="backdrop" on:click|stopPropagation|preventDefault style:z-index={500} transition:fade={{ duration: 400, easing: circOut }}>
+	<div
+		class="backdrop"
+		on:click|stopPropagation|preventDefault
+		style:z-index={500}
+		transition:fade={{ duration: 400, easing: circOut }}
+	>
 		<div
 			use:clickOutside
 			on:click_outside={() => {
@@ -171,7 +207,10 @@
 				class="icon-btn x-button"
 				aria-label="close"
 			>
-				<Icon name="x" size="1.6125em" />
+				<Icon
+					name="x"
+					size="1.6125em"
+				/>
 			</button>
 		</div>
 	</div>

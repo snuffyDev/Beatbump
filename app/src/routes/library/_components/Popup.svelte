@@ -23,12 +23,24 @@
 	const dispatch = createEventDispatcher();
 </script>
 
-<div class="backdrop" on:click={() => dispatch("close")} transition:fade={{ duration: 125 }} />
+<div
+	class="backdrop"
+	on:click={() => dispatch("close")}
+	transition:fade={{ duration: 125 }}
+/>
 
-<section class="playlist-modal" transition:fly={{ duration: 250, delay: 125 }}>
+<section
+	class="playlist-modal"
+	transition:fly={{ duration: 250, delay: 125 }}
+>
 	<div class="image">
 		{#if thumbnail}
-			<img src={thumbnail} width="200" height="200" alt="thumbnail" />
+			<img
+				src={thumbnail}
+				width="200"
+				height="200"
+				alt="thumbnail"
+			/>
 		{:else}
 			<img
 				src={"data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIxMDAgLTEzLjA4OSA1MDAgNTAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGZpbGw9IiNhNmE2YTYiIGQ9Ik0xMDAtMTMuMDg5aDUwMHY1MDBIMTAweiIvPjxwYXRoIGQ9Ik0zNjUuMTIzIDMzNy4yMzdoLTMydi03OS41NzZoLTc5LjU3NXYtMzJoNzkuNTc1di03OS41NzVoMzJ2NzkuNTc1SDQ0NC43djMyaC03OS41NzZ6IiBmaWxsPSIjZDhkOGQ4Ii8+PC9zdmc+"}
@@ -39,7 +51,11 @@
 		{/if}
 		<div class="input-row">
 			<label class="file"
-				><input type="file" accept=".jpg,.png,.webp,.jpeg" on:change={readFiles} /><span class="file-button" /></label
+				><input
+					type="file"
+					accept=".jpg,.png,.webp,.jpeg"
+					on:change={readFiles}
+				/><span class="file-button" /></label
 			><!-- WIP -->
 		</div>
 	</div>

@@ -27,11 +27,29 @@
 	}, 250);
 </script>
 
-<form aria-expanded="true" aria-owns="suggestions" role="combobox" class={type} on:submit|preventDefault={handleSubmit}>
+<form
+	aria-expanded="true"
+	aria-owns="suggestions"
+	role="combobox"
+	class={type}
+	on:submit|preventDefault={handleSubmit}
+>
 	<div class="nav-item">
-		<div role="textbox" aria-activedescendant="searchBox" class="input">
-			<div role="button" aria-label="search button" class="searchBtn" on:click={handleSubmit}>
-				<Icon name="search" size="1rem" />
+		<div
+			role="textbox"
+			aria-activedescendant="searchBox"
+			class="input"
+		>
+			<div
+				role="button"
+				aria-label="search button"
+				class="searchBtn"
+				on:click={handleSubmit}
+			>
+				<Icon
+					name="search"
+					size="1rem"
+				/>
 			</div>
 			<!-- svelte-ignore a11y-autofocus -->
 			<input
@@ -52,7 +70,11 @@
 		</div>
 	</div>
 	{#if results.length > 0}
-		<ul role="listbox" id="suggestions" class="suggestions">
+		<ul
+			role="listbox"
+			id="suggestions"
+			class="suggestions"
+		>
 			{#each results as result (result?.id)}
 				<li
 					on:click={() => {
@@ -66,7 +88,10 @@
 		</ul>
 	{/if}
 	<div class="nav-item">
-		<div class="select" class:inline={type == "inline" ? true : false}>
+		<div
+			class="select"
+			class:inline={type == "inline" ? true : false}
+		>
 			<select bind:value={filter}>
 				{#each searchFilter as option (option.params)}
 					<option value={option.params}>{option.label}</option>

@@ -13,4 +13,3 @@ export type IMergedObject<T, U> = IsObject<T> & IsObject<U> extends true
 			[K in keyof T]: K extends keyof U ? IMergedObject<T[K], U[K]> : T[K];
 	  } & U
 	: U;
-

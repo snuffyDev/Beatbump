@@ -1,11 +1,12 @@
 import type { Item } from "$lib/types";
 import type { Nullable } from "$lib/types/utilities";
+import type { ResponseBody } from "$lib/utils/utils";
 import type { Writable } from "svelte/store";
 
 export interface ISessionListProvider {
 	currentMixId: string;
 	continuation: string;
-	clickTrackingParams: string;
+	clickTrackingParams: Nullable<string>;
 	mix: Array<Item>;
 	position: number;
 	currentMixType: "playlist" | "auto" | "local" | string;
@@ -21,15 +22,23 @@ export interface ISessionListService {
 		playlistId?: string;
 		keyId?: number;
 		playlistSetVideoId?: string;
+		loggingContext?: { vssLoggingContext?: { serializedContextData: string } };
 		clickTracking?: string;
 		config?: { playerParams?: string; type?: string };
 	}): Promise<void>;
 	/** Initializes a new playlist session */
 	initPlaylistSession(args: {
 		playlistId: string;
-		index?: number;
+		index: number;
+		clickTrackingParams?: string;
 		params?: string | undefined;
-	}): Promise<{ body: { original_url: string; url: string }; error?: boolean }>;
+		videoId?: string;
+		visitorData?: string;
+		playlistSetVideoId?: string;
+	}): Promise<{
+		body: ResponseBody;
+		error?: boolean | undefined;
+	} | null>;
 
 	/** Continues current automix session by fetching the next batch of songs */
 	getSessionContinuation(args: {
@@ -38,8 +47,9 @@ export interface ISessionListService {
 		playlistId: string;
 		ctoken: string;
 		clickTrackingParams: string;
+		loggingContext: { vssLoggingContext: { serializedContextData: string } };
 		key: number;
-	});
+	}): Promise<ResponseBody>;
 
 	/**
 	 * Fetches a set of similar songs and appends them to the current

@@ -70,7 +70,12 @@
 
 <svelte:window bind:innerHeight={listHeight} />
 {#if items.length !== 0}
-	<div on:click={allowScroll} in:fade={{ duration: 400 }} out:fade={{ duration: 400 * 2 }} class="backdrop" />
+	<div
+		on:click={allowScroll}
+		in:fade={{ duration: 400 }}
+		out:fade={{ duration: 400 * 2 }}
+		class="backdrop"
+	/>
 	<div
 		class="drag"
 		bind:clientHeight={popperClientHeight}
@@ -93,7 +98,10 @@
 			</div>
 			{#if type == "player"}
 				<section class="m-metadata">
-					<div class="image" style="">
+					<div
+						class="image"
+						style=""
+					>
 						<img
 							decoding="async"
 							src={$list.mix[$list.position].thumbnails[0].url}
@@ -118,7 +126,10 @@
 			{#if type == "search" && $PopperStore.metadata?.artist !== undefined && $PopperStore.metadata.artist.length}
 				<section class="m-metadata">
 					<div class="image">
-						<img src={$PopperStore.metadata.thumbnail} alt="" />
+						<img
+							src={$PopperStore.metadata.thumbnail}
+							alt=""
+						/>
 					</div>
 					<div class="metatext">
 						<span class="title">{$PopperStore.metadata.title}</span>
@@ -135,8 +146,15 @@
 			{/if}
 			<ul>
 				{#each items as item}
-					<li on:click={item.action} on:click={allowScroll}>
-						<Icon name={item.icon} color="#f2f2f2" size="1.5em" />
+					<li
+						on:click={item.action}
+						on:click={allowScroll}
+					>
+						<Icon
+							name={item.icon}
+							color="#f2f2f2"
+							size="1.5em"
+						/>
 						<span class="text">{item.text}</span>
 					</li>
 				{/each}
@@ -145,5 +163,8 @@
 	</div>
 {/if}
 
-<style lang="scss" src="./index.scss">
+<style
+	lang="scss"
+	src="./index.scss"
+>
 </style>

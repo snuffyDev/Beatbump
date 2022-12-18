@@ -10,16 +10,27 @@
 	}
 </script>
 
-<Header title="Settings" url="/settings" desc="Configure your app settings" />
+<Header
+	title="Settings"
+	url="/settings"
+	desc="Configure your app settings"
+/>
 <main class="resp-content-width">
 	<section>
 		<span class="h5">Appearance</span>
 		<div class="setting">
 			<label for="theme">Theme </label>
 			<div class="select">
-				<select name="theme" id="theme" bind:value={$settings["appearance"]["Theme"]}>
+				<select
+					name="theme"
+					id="theme"
+					bind:value={$settings["appearance"]["Theme"]}
+				>
 					{#each themes as theme}
-						<option value={theme} selected={$settings["appearance"]["Theme"] === theme}>{theme}</option>
+						<option
+							value={theme}
+							selected={$settings["appearance"]["Theme"] === theme}>{theme}</option
+						>
 					{/each}
 				</select>
 			</div>
@@ -32,7 +43,10 @@
 				id="immersive-queue"
 				bind:checked={$settings["appearance"]["Immersive Queue"]}
 			/>
-			<label for="immersive-queue" class="switch" />
+			<label
+				for="immersive-queue"
+				class="switch"
+			/>
 		</div>
 	</section>
 	<section>
@@ -40,15 +54,31 @@
 		<div class="setting">
 			<label>Dedupe Automix</label>
 
-			<input name="dedupe" id="dedupe" type="checkbox" bind:value={$settings["playback"]["Dedupe Automix"]} />
-			<label for="dedupe" class="switch" />
+			<input
+				name="dedupe"
+				id="dedupe"
+				type="checkbox"
+				bind:value={$settings["playback"]["Dedupe Automix"]}
+			/>
+			<label
+				for="dedupe"
+				class="switch"
+			/>
 		</div>
 		<div class="setting">
 			<label for="quality">Quality</label>
 			<div class="select">
-				<select name="quality" disabled id="quality" bind:value={$settings["playback"]["Quality"]}>
+				<select
+					name="quality"
+					disabled
+					id="quality"
+					bind:value={$settings["playback"]["Quality"]}
+				>
 					{#each ["Normal", "High"] as option}
-						<option value={option} selected={$settings["playback"]["Quality"] === option}>{option}</option>
+						<option
+							value={option}
+							selected={$settings["playback"]["Quality"] === option}>{option}</option
+						>
 					{/each}
 				</select>
 			</div>
@@ -59,9 +89,17 @@
 				<i> (reload Beatbump after setting)</i>
 			</label>
 			<div class="select">
-				<select name="stream" id="stream" bind:value={$settings["playback"]["Stream"]} on:change={handleStreamSelect}>
+				<select
+					name="stream"
+					id="stream"
+					bind:value={$settings["playback"]["Stream"]}
+					on:change={handleStreamSelect}
+				>
 					{#each ["HTTP", "HLS"] as option}
-						<option value={option} selected={$settings["playback"]["Stream"] === option}>{option}</option>
+						<option
+							value={option}
+							selected={$settings["playback"]["Stream"] === option}>{option}</option
+						>
 					{/each}
 				</select>
 			</div>
@@ -77,7 +115,7 @@
 						type="text"
 						on:input={(e) => {
 							let value = e.currentTarget.value;
-							if (!value.match(/^https?:\/\//gm)) value = "https://" + value;
+							if (!value.match(/^https?:\/\//gm)) value = "http://" + value;
 							if (!value.endsWith("/")) value = value + "/";
 
 							$settings["network"]["HLS Stream Proxy"] = value;
@@ -100,9 +138,16 @@
 		<div class="setting">
 			<label for="preserve">Preserve </label>
 			<div class="select">
-				<select name="preserve" id="preserve" bind:value={$settings["search"]["Preserve"]}>
+				<select
+					name="preserve"
+					id="preserve"
+					bind:value={$settings["search"]["Preserve"]}
+				>
 					{#each ["Category", "Query", "Category + Query", "None"] as option}
-						<option value={option} selected={$settings["playback"]["Stream"] === option}>{option}</option>
+						<option
+							value={option}
+							selected={$settings["playback"]["Stream"] === option}>{option}</option
+						>
 					{/each}
 				</select>
 			</div>

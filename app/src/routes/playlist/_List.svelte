@@ -11,13 +11,22 @@
 
 <div class="list">
 	{#each items as item, i}
-		<slot {item} index={i} />
+		<slot
+			{item}
+			index={i}
+		/>
 	{/each}
 	{#if !hasData}
-		<div use:viewport on:enterViewport={() => dispatch("getMore")} />
+		<div
+			use:viewport
+			on:enterViewport={() => dispatch("getMore")}
+		/>
 
 		{#if isLoading}
-			<div class="loading-results" style="padding: 0em;">
+			<div
+				class="loading-results"
+				style="padding: 0em;"
+			>
 				<svg
 					role="img"
 					width="50rem"
@@ -35,7 +44,9 @@
 						class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
 						style="fill: url(&quot;#fill&quot;);"
 					/><defs class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
-						><clipPath id="clip-path" class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
+						><clipPath
+							id="clip-path"
+							class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
 							><rect
 								x="0"
 								y="10%"
@@ -69,7 +80,9 @@
 								height="9"
 								class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
 							/></clipPath
-						><linearGradient id="fill" class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
+						><linearGradient
+							id="fill"
+							class="s-iYjv5-ishYhK s-iYjv5-ishYhK s-iYjv5-ishYhK"
 							><stop
 								offset="0.599964"
 								stop-color="#4f4f4f"

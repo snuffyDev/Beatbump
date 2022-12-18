@@ -2,6 +2,9 @@
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
 		"esModuleInterop": true,
+		"strict": false,
+		"strictFunctionTypes": false,
+		"noUnusedLocals": true,
 		"paths": {
 			"$components/*": ["./src/lib/components/*"],
 			"$stores/*": ["./src/lib/stores/*"],

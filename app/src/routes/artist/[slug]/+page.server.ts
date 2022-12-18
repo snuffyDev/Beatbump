@@ -6,6 +6,7 @@ import type { PageServerLoad } from "./$types";
 export const load: PageServerLoad = async ({ params }) => {
 	const response = await buildRequest("artist", {
 		context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
+		headers: null,
 		params: {
 			browseId: params.slug,
 			browseEndpointContextMusicConfig: { browseEndpointContextMusicConfig: { pageType: "MUSIC_PAGE_TYPE_ARTIST" } },

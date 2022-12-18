@@ -1,34 +1,54 @@
-import { parseNextItem } from "$lib/parsers";
-import type { Item } from "$lib/types";
-import { addToQueue, getSrc, notify, type ResponseBody } from "$lib/utils";
+/**
+ * TODO: clean this module up massively.
+ *
+ * - Use class instead of func impl (...?)
+ *
+ */
+import type { Item, Nullable } from "$lib/types";
+import { addToQueue, getSrc, notify } from "$lib/utils";
 import { Mutex } from "$lib/utils/sync";
 import { splice } from "$lib/utils/collections/array";
 import { writable, get } from "svelte/store";
 import { playerLoading, currentTitle, filterAutoPlay } from "../stores";
 import { groupSession } from "../sessions";
 import type { ISessionListService, ISessionListProvider } from "./types.list";
-import { fetchNext, split, filterList } from "./utils.list";
+import { fetchNext, filterList } from "./utils.list";
 
 const mutex = new Mutex();
 
 const SessionListService: ISessionListService = _sessionListService();
-function _sessionListService() {
+
+interface AutoMixArgs {
+	videoId?: string;
+	playlistId?: string;
+	keyId?: number;
+	playlistSetVideoId?: string;
+	loggingContext: { vssLoggingContext: { serializedContextData: string } };
+	clickTracking?: string;
+	config?: { playerParams?: string; type?: string };
+}
+
+function togglePlayerLoad() {
+	playerLoading.set(true);
+	return () => playerLoading.set(false);
+}
+
+function _sessionListService(): ISessionListService {
 	// default values for the store
 	let mix: Item[] = [],
-		continuation,
-		clickTrackingParams,
-		currentMixId,
+		continuation = "",
+		clickTrackingParams: Nullable<string> = "",
+		currentMixId = "",
 		position = 0,
 		currentMixType: "playlist" | "auto" | string = "",
 		related = "";
 	let visitorData = "";
 
-	let internalIdx = 0;
-	const { update, subscribe } = writable({
+	const { update, subscribe } = writable<ISessionListProvider>({
 		mix,
-		currentMixId: undefined,
-		clickTrackingParams: undefined,
-		continuation: undefined,
+		currentMixId,
+		clickTrackingParams,
+		continuation,
 		position,
 		currentMixType,
 	});
@@ -55,27 +75,33 @@ function _sessionListService() {
 			currentMixType,
 		};
 	};
-	const commitChanges = ({ clickTrackingParams, mix, continuation, currentMixId, position, currentMixType }) =>
-		_set({ clickTrackingParams, mix, continuation, currentMixId, position, currentMixType });
+	const commitChanges = ({
+		clickTrackingParams,
+		mix,
+		continuation,
+		currentMixId,
+		position,
+		currentMixType,
+	}: ISessionListProvider) => _set({ clickTrackingParams, mix, continuation, currentMixId, position, currentMixType });
 
-	async function getMoreLikeThis({ playlistId } = { playlistId: null }) {
-		// if (autoMixPreview.length) {
-		// 	mix.push(...autoMixPreview);
-		// }
+	async function getMoreLikeThis({ playlistId }: { playlistId: Nullable<string> }) {
 		if (!mix.length) {
-			/** notify('Error: No track videoId was provided!', 'error'); **/ return;
+			return;
 		}
 		playerLoading.set(true);
-		// console.log(playlistId, currentMixId);
+
 		const response = await fetchNext({
 			params: "wAEB8gECeAE%3D",
 			playlistId: "RDAMPL" + (playlistId !== null ? playlistId : currentMixId),
 		});
 		const data = await response;
-		// console.log(data)
+
 		data.results.shift();
+
 		mix.push(...data.results);
+
 		continuation = data.continuation;
+
 		commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
 
 		if (groupSession?.initialized && groupSession?.hasActiveSession) {
@@ -103,7 +129,7 @@ function _sessionListService() {
 			keyId = 0,
 			playlistId,
 			playlistSetVideoId,
-			loggingContext = { vssLoggingContext: { serializedContextData: "" } },
+			loggingContext,
 			videoId,
 			config: { playerParams = "", type = "" } = {},
 		}) {
@@ -112,7 +138,6 @@ function _sessionListService() {
 				if (mix.length > 0) {
 					mix = [];
 					clickTrackingParams = null;
-					internalIdx = 0;
 				}
 				currentMixType = "auto";
 				const data = await fetchNext({
@@ -124,11 +149,12 @@ function _sessionListService() {
 					clickTracking,
 					configType: type,
 				});
-				if (!data || (!data["results"] && !data["results"]?.length)) throw new Error("No results!");
-				visitorData = data["visitorData"];
+				if (!data || !Array.isArray(data["results"])) throw new Error("No results!");
 
 				getSrc(videoId ?? data.results[keyId ?? 0].videoId, playlistId, playerParams);
-				currentTitle.set((Array.isArray(data.results) && data.results[keyId ?? 0].title) ?? undefined);
+				visitorData = data["visitorData"];
+
+				currentTitle.set((Array.isArray(data.results) && data.results[keyId ?? 0]?.title) ?? undefined);
 				position = keyId ?? 0;
 				playerLoading.set(false);
 				continuation = data.continuation && data.continuation.length !== 0 && data.continuation;
@@ -147,36 +173,44 @@ function _sessionListService() {
 			}
 		},
 		async initPlaylistSession(args) {
-			const {
+			let {
 				playlistId = "",
 				index = 0,
 				clickTrackingParams = "",
 				params = "",
 				videoId = "",
 				playlistSetVideoId = "",
+				visitorData = "",
 			} = args;
 			playerLoading.set(true);
 
 			if (currentMixType !== "playlist" || currentMixId !== playlistId) {
 				position = typeof index === "number" ? index : 0;
-				internalIdx = 0;
-
-				mix = [];
 			}
+			if (currentMixId !== playlistId) mix = [];
 			currentMixType = "playlist";
 			try {
+				playlistId = playlistId.startsWith("VL") ? playlistId.slice(2) : playlistId;
 				const data = await fetchNext({
 					params,
 					playlistId: playlistId,
 					clickTracking: clickTrackingParams,
+					visitorData,
 					playlistSetVideoId: playlistSetVideoId,
 					videoId,
 				});
+
 				mix.push(...data.results);
+				mix = filterList(mix);
+
 				playerLoading.set(false);
 
-				commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
-				currentMixId = playlistId;
+				continuation = data?.continuation;
+				clickTrackingParams = data?.clickTrackingParams;
+				currentMixId = data?.currentMixId;
+
+				commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position: index, currentMixType });
+
 				if (groupSession?.initialized && groupSession?.hasActiveSession) {
 					groupSession.expAutoMix({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
 				}
@@ -186,6 +220,7 @@ function _sessionListService() {
 
 				playerLoading.set(false);
 				notify("Error starting playback", "error");
+				return null;
 			}
 		},
 		async setMix(mix: Item[], type?: "auto" | "playlist" | "local") {
@@ -208,27 +243,21 @@ function _sessionListService() {
 			}
 		},
 		getMoreLikeThis,
-		async getSessionContinuation({
-			clickTrackingParams,
-			ctoken,
-			itct,
-			key,
-			playlistId,
-			videoId,
-		}): Promise<ResponseBody> {
+		async getSessionContinuation({ clickTrackingParams, ctoken, itct, key, playlistId, videoId }) {
 			playerLoading.set(true);
 			if (currentMixType === "playlist" && chunkedPlaylistMap.size && mix.length < chunkedListOriginalLen - 1) {
-				// console.log("playlist session", chunkedPlaylistMap, currentMixType);
 				chunkedPlaylistCurrentIdx++;
 
 				const src = await getSrc(mix[mix.length - 1].videoId);
-				mix = [...mix, ...Array.from(chunkedPlaylistMap.get(chunkedPlaylistCurrentIdx))];
+
+				mix.push(...Array.from(chunkedPlaylistMap.get(chunkedPlaylistCurrentIdx)!));
 				mix = get(filterAutoPlay) ? [...filterList(mix)] : [...mix];
+
 				playerLoading.set(false);
+
 				commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
 				return await src.body;
 			}
-			console.log("ARGS", { key, playlistId });
 
 			if (!clickTrackingParams && !ctoken) {
 				playlistId = "RDAMPL" + playlistId;
@@ -250,7 +279,7 @@ function _sessionListService() {
 			});
 			const results = data?.results as any[];
 			mix.push(...results);
-			// position += 1;
+
 			mix = get(filterAutoPlay) ? filterList(mix) : mix;
 			visitorData = data["visitorData"] ?? visitorData;
 
@@ -262,7 +291,6 @@ function _sessionListService() {
 
 			playerLoading.set(false);
 
-			// mixListIndex.set(key);
 			const src = await getSrc(mix[key].videoId);
 			if (groupSession?.initialized && groupSession?.hasActiveSession) {
 				groupSession.updateGuestContinuation({
@@ -291,7 +319,6 @@ function _sessionListService() {
 				// eslint-disable-next-line no-self-assign
 				splice(mix, key + 1, 0, itemToAdd);
 
-				// notify(`${item.title} will play next!`, "success");
 				commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
 			} catch (err) {
 				console.error(err);
@@ -345,7 +372,7 @@ function _sessionListService() {
 			return position;
 		},
 		get clickTrackingParams() {
-			return clickTrackingParams;
+			return clickTrackingParams ?? "";
 		},
 		get continuation() {
 			return continuation;
@@ -353,15 +380,10 @@ function _sessionListService() {
 		get currentMixId() {
 			return currentMixId;
 		},
-		updateInternalIdx() {
-			internalIdx += 24;
-		},
 		updatePosition(direction: "next" | "back" | number): number {
-			console.log({ direction });
 			if (typeof direction === "number") {
 				position = direction;
-				// < position ? direction : direction === position ? direction : direction === 0 ? 0 : position + 1;
-				// console.log({ position, direction });
+
 				commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
 				return position;
 			}

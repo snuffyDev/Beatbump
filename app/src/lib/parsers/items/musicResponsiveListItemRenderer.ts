@@ -1,7 +1,7 @@
 import type { Thumbnail } from "$lib/types";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { subtitle, thumbnailTransformer } from "../utils.parsers";
-import type { IMusicResponsiveListItemRenderer, PurpleRun } from "$lib/types/internals";
+import type { IMusicResponsiveListItemRenderer, PurpleRun } from "$lib/types/innertube/internals";
 
 export function MusicResponsiveListItemRenderer(
 	ctx: { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer },
@@ -48,13 +48,19 @@ export function MusicResponsiveListItemRenderer(
 		playerParams:
 			flexCol0?.navigationEndpoint?.watchEndpoint?.playerParams || flexCol0?.navigationEndpoint?.watchEndpoint?.params,
 		clickTrackingParams:
+			flexCol0?.navigationEndpoint?.clickTrackingParams ??
 			item.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
 				?.clickTrackingParams,
 		loggingContext:
 			item.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
 				?.watchEndpoint?.loggingContext,
 	};
-	if (isNavigationItem) Item.endpoint = { browseId: isNavigationItem.browseId, pageType: isNavigationItem.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType}
+
+	if (isNavigationItem)
+		Item.endpoint = {
+			browseId: isNavigationItem.browseId,
+			pageType: isNavigationItem.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType,
+		};
 	if (Item !== undefined && playlistSetVideoId) {
 		Object.assign(Item, {
 			playlistSetVideoId:

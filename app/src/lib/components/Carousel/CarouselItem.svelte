@@ -17,9 +17,10 @@
 	import { browser } from "$app/environment";
 	import { IsoBase64 } from "$lib/utils";
 	import { SITE_ORIGIN_URL } from "$stores/url";
-  import type { Dropdown } from "$lib/configs/dropdowns.config";
+	import type { Dropdown } from "$lib/configs/dropdowns.config";
+	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 	export let index;
-	export let item: CarouselItem;
+	export let item: IListItemRenderer;
 	export let type = "";
 	export let kind = "";
 	export let aspectRatio;
@@ -31,7 +32,7 @@
 		item?.aspectRatio?.includes("16_9")
 			? true
 			: false;
-	const ASPECT_RATIO = !RATIO_RECT ? '1x1' : '16x9'
+	const ASPECT_RATIO = !RATIO_RECT ? "1x1" : "16x9";
 	const playAlbum = () => {
 		list.initPlaylistSession({ playlistId: item.playlistId });
 		list.updatePosition(0);
@@ -191,7 +192,7 @@
 	};
 	const clickHandler = async (event: Event, index) => {
 		loading = true;
-
+		console.log(item);
 		if (type === "trending") {
 			isBrowseEndpoint
 				? goto(
@@ -203,6 +204,7 @@
 				: await list.initAutoMixSession({
 						videoId: item.videoId,
 						playlistId: item.playlistId,
+						loggingContext: item?.loggingContext,
 						keyId: kind === "isPlaylist" ? index : 0,
 						config: { type: item?.musicVideoType },
 				  });
@@ -251,17 +253,18 @@
 	if (item.endpoint?.pageType?.match(/MUSIC_PAGE_TYPE_(PLAYLIST|ALBUM)/)) {
 		DropdownItems = [
 			{
-				action: () => list.initPlaylistSession({ playlistId: item.playlistId, params: "wAEB8gECKAE%3D" }),
+				action: () => list.initPlaylistSession({ playlistId: item.playlistId, params: "wAEB8gECKAE%3D", index: 0 }),
 				icon: "shuffle",
 				text: "Shuffle Play",
 			},
 			{
-				action: () => list.initPlaylistSession({ playlistId: item.playlistId }),
+				action: () => list.initPlaylistSession({ playlistId: item.playlistId, index: 0 }),
 				icon: "list-music",
 				text: "Play Next",
 			},
 			{
-				action: () => list.initPlaylistSession({ playlistId: "RDAMPL" + item.playlistId, params: "wAEB8gECeAE%3D" }),
+				action: () =>
+					list.initPlaylistSession({ playlistId: "RDAMPL" + item.playlistId, params: "wAEB8gECeAE%3D", index: 0 }),
 				icon: "radio",
 				text: "Start Radio",
 			},
@@ -302,9 +305,7 @@
 	}}
 	on:click|stopPropagation={(e) => clickHandler(e, index)}
 >
-	<section
-		class="item-thumbnail-wrapper img{ASPECT_RATIO}"
-	>
+	<section class="item-thumbnail-wrapper img{ASPECT_RATIO}">
 		<section
 			class="item-thumbnail img{ASPECT_RATIO}"
 			class:isArtistKind
@@ -331,11 +332,17 @@
 				/>
 			</div>
 			<div class="item-menu">
-				<PopperButton tabindex="0" items={DropdownItems} />
+				<PopperButton
+					tabindex="0"
+					items={DropdownItems}
+				/>
 			</div>
 		</section>
 	</section>
-	<section class="item-title" class:isArtistKind>
+	<section
+		class="item-title"
+		class:isArtistKind
+	>
 		<span class="h1 link">
 			{item.title}
 		</span>

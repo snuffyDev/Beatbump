@@ -5,7 +5,10 @@
 	export let item;
 </script>
 
-<div class="item" on:click={() => goto("/release?id=" + item.endpoint.browseId)}>
+<div
+	class="item"
+	on:click={() => goto("/release?id=" + item.endpoint.browseId)}
+>
 	<div class="img">
 		<img
 			loading="lazy"

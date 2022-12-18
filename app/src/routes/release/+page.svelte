@@ -21,7 +21,7 @@
 	const setId = () => isPagePlaying.add(id);
 	const playAlbum = () => {
 		setId();
-		list.initPlaylistSession({ playlistId: releaseInfo.playlistId });
+		list.initPlaylistSession({ playlistId: releaseInfo.playlistId, index: 0 });
 		list.updatePosition(0);
 		currentTitle.set($list.mix[0].title);
 	};
@@ -42,7 +42,6 @@
 		currentTitle.set(items[0].title);
 	};
 
-	$: hasList = $list.mix.length > 0;
 	let thumbnail = releaseInfo?.thumbnails[0]?.url.replace(/=(w(\d+))-(h(\d+))/g, "=w512-h512");
 
 	CTX_ListItem.set({ parentPlaylistId: releaseInfo.playlistId, page: "release" });

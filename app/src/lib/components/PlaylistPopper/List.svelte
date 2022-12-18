@@ -7,11 +7,18 @@
 
 <ul>
 	<li>
-		<button on:click={() => dispatch("create")} class="create">Create New Playlist</button>
+		<button
+			on:click={() => dispatch("create")}
+			class="create">Create New Playlist</button
+		>
 	</li>
 	{#if items.length > 0}
 		{#each items as item, i}
-			<Playlist {item} {i} on:click />
+			<Playlist
+				{item}
+				{i}
+				on:click
+			/>
 		{/each}
 	{/if}
 </ul>

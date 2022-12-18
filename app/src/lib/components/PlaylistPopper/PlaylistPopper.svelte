@@ -15,7 +15,7 @@
 	let playlists = [];
 	const fetchPlaylists = async () => {
 		const promise = await IDBService.sendMessage("get", "playlists");
-		console.log(promise)
+		console.log(promise);
 		playlists = promise;
 	};
 	$: if (isShowing) fetchPlaylists();

@@ -16,7 +16,11 @@
 	let title: string = data.title;
 </script>
 
-<Header title={title ? title.replace(",", " ") : ""} url={$page.url.pathname} desc="The latest in music" />
+<Header
+	title={title ? title.replace(",", " ") : ""}
+	url={$page.url.pathname}
+	desc="The latest in music"
+/>
 
 <main>
 	{#if title === "Charts"}
@@ -26,7 +30,11 @@
 	{/if}
 	{#each sections as section, i}
 		{#if section?.type === "grid"}
-			<Grid heading={header} items={section.section} let:item>
+			<Grid
+				heading={header}
+				items={section.section}
+				let:item
+			>
 				<!-- <GridItem slot="item" {item} /> -->
 				<CarouselItem
 					index
@@ -47,7 +55,12 @@
 				isBrowseEndpoint={true}
 			/>
 		{:else}
-			<Carousel header={section.header} items={section.results} type="home" isBrowseEndpoint={false} />
+			<Carousel
+				header={section.header}
+				items={section.results}
+				type="home"
+				isBrowseEndpoint={false}
+			/>
 		{/if}
 	{/each}
 </main>

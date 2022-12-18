@@ -7,11 +7,10 @@
 	import { isPagePlaying } from "$lib/stores/stores";
 	import Header from "$lib/components/Layouts/Header.svelte";
 
-	import type { ArtistPage, IArtistPageHeader, ArtistPageBody } from "$lib/parsers/artist";
+	import type { ArtistPageBody } from "$lib/parsers/artist";
 	import { CTX_ListItem } from "$lib/contexts";
 	import type { PageData } from "./$types";
 	import { isMobileMQ } from "$stores/window";
-	import { onMount } from "svelte";
 	import Description from "$components/ArtistPageHeader/Description";
 
 	export let data: PageData;
@@ -22,11 +21,9 @@
 
 	const id = $page.params.slug;
 
-	const ctx = {};
 	let innerWidth = 640;
 
 	CTX_ListItem.set({ page: "artist", innerWidth });
-	$: console.log(data)
 </script>
 
 <Header
@@ -36,15 +33,20 @@
 	image={header?.thumbnails && header?.thumbnails[0]?.url}
 />
 <svelte:window bind:innerWidth />
-<ArtistPageHeader description={header?.description} {header} thumbnail={header?.thumbnails} />
+<ArtistPageHeader
+	description={header?.description}
+	{header}
+	thumbnail={header?.thumbnails}
+/>
 <main>
 	<div class="artist-body">
 		{#if songs?.items?.length > 0}
 			<section class="song-list resp-content-width">
 				<div class="header">
 					<span class="h2">Songs</span>
-					<a style="white-space:pre; display: inline-block;" href={`/playlist/${songs?.header?.browseId}`}
-						><small>See All</small></a
+					<a
+						style="white-space:pre; display: inline-block;"
+						href={`/playlist/${songs?.header?.browseId}`}><small>See All</small></a
 					>
 				</div>
 				<section class="songs">
@@ -62,17 +64,34 @@
 		{/if}
 		{#each carousels as { contents, header }, i}
 			{#if i === carousels.length - 1}
-				<Carousel {visitorData} items={contents} type="artist" kind={header?.type} isBrowseEndpoint={true} {header}>
+				<Carousel
+					{visitorData}
+					items={contents}
+					type="artist"
+					kind={header?.type}
+					isBrowseEndpoint={true}
+					{header}
+				>
 					>
 				</Carousel>
 			{:else}
-				<Carousel items={contents} {visitorData} type="artist" kind={header?.type} isBrowseEndpoint={false} {header}>
+				<Carousel
+					items={contents}
+					{visitorData}
+					type="artist"
+					kind={header?.type}
+					isBrowseEndpoint={false}
+					{header}
+				>
 					>
 				</Carousel>
 			{/if}
 		{/each}
 		{#if $isMobileMQ && header?.description}
-			<Description class="resp-content-width" description={header.description} />
+			<Description
+				class="resp-content-width"
+				description={header.description}
+			/>
 		{/if}
 	</div>
 </main>

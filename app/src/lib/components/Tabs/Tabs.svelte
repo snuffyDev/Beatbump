@@ -24,9 +24,15 @@
 
 <div class="tab-bar">
 	{#each tabs as tab}
-		<Tab active={active === tab.id} on:click={tab.action}>{tab.text}</Tab>
+		<Tab
+			active={active === tab.id}
+			on:click={tab.action}>{tab.text}</Tab
+		>
 	{/each}
 </div>
 
-<style src="./index.scss" lang="scss">
+<style
+	src="./index.scss"
+	lang="scss"
+>
 </style>

@@ -6,10 +6,14 @@
 	export let data: PageData;
 
 	const { carouselItems, page: path } = data;
-	$: console.log(data)
+	$: console.log(data);
 </script>
 
-<Header title="Trending" url={path} desc="The latest trending songs and releases" />
+<Header
+	title="Trending"
+	url={path}
+	desc="The latest trending songs and releases"
+/>
 <main>
 	<Carousel
 		isBrowseEndpoint={false}
@@ -23,12 +27,19 @@
 		<div class="box-cont">
 			<div class="header">
 				<span class="h2">{carouselItems[1].header.title}</span>
-				<a class="link" href="/explore"><small>See All</small></a>
+				<a
+					class="link"
+					href="/explore"><small>See All</small></a
+				>
 			</div>
 			<box>
 				<div class="scroll">
 					{#each carouselItems[1].results as { color, endpoint = { params: '' }, text }}
-						<a style="border-left: 0.5rem solid #{color}" class="box" href="/explore/{endpoint.params}">{text}</a>
+						<a
+							style="border-left: 0.5rem solid #{color}"
+							class="box"
+							href="/explore/{endpoint.params}">{text}</a
+						>
 					{/each}
 				</div>
 			</box>
@@ -40,7 +51,12 @@
 		type="trending"
 		isBrowseEndpoint={false}
 	/>
-	<Carousel header={carouselItems[0].header} items={carouselItems[0].results} isBrowseEndpoint={true} type="trending" />
+	<Carousel
+		header={carouselItems[0].header}
+		items={carouselItems[0].results}
+		isBrowseEndpoint={true}
+		type="trending"
+	/>
 </main>
 
 <style lang="scss">

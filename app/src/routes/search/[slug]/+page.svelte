@@ -63,12 +63,22 @@
 	});
 </script>
 
-<Header title="Search" desc={`Search results for ${decodeURIComponent($page.params.slug)}`} url={$page.url.pathname} />
+<Header
+	title="Search"
+	desc={`Search results for ${decodeURIComponent($page.params.slug)}`}
+	url={$page.url.pathname}
+/>
 
-<main class="parent" class:max-height={filter !== "all"}>
+<main
+	class="parent"
+	class:max-height={filter !== "all"}
+>
 	{#key data}
 		{#each results as result}
-			<div class="container music-shelf resp-content-width" class:max-height={filter !== "all"}>
+			<div
+				class="container music-shelf resp-content-width"
+				class:max-height={filter !== "all"}
+			>
 				<span class="h3">{result.header.title}</span>
 				{#if filter !== "all"}
 					<div class="music-shelf-list">

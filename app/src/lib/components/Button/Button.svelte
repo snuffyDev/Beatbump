@@ -9,6 +9,14 @@
 	export { className as class };
 </script>
 
-<button {type} class="button {className}" class:outlined {disabled} on:click|preventDefault
-	>{#if icon}<Icon name={icon.name} size={icon.size ?? "1em"} />{/if}<slot /></button
+<button
+	{type}
+	class="button {className}"
+	class:outlined
+	{disabled}
+	on:click|preventDefault
+	>{#if icon}<Icon
+			name={icon.name}
+			size={icon.size ?? "1em"}
+		/>{/if}<slot /></button
 >

@@ -2,8 +2,8 @@ import { error, json } from "@sveltejs/kit";
 import { MusicResponsiveListItemRenderer } from "$lib/parsers";
 import { iter, type Maybe } from "$lib/utils";
 import { buildRequest } from "$api/request";
-import type { Item, NextContinuationData } from "$lib/types";
-import type { IMusicResponsiveListItemRenderer } from "$lib/types/internals";
+import type { NextContinuationData } from "$lib/types";
+import type { IMusicResponsiveListItemRenderer } from "$lib/types/innertube/internals";
 import type { RequestHandler } from "./$types";
 import type { SearchEndpointParams } from "$api/_base";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
@@ -43,10 +43,14 @@ export const GET: RequestHandler = async ({ url }) => {
 				query: decodeURIComponent(q),
 				params: filter !== "all" ? `${rawFilterParam}` : undefined,
 			},
+			headers: null,
 			continuation: ctoken !== "" ? { continuation: ctoken, ctoken, itct: `${itct}`, type: "next" } : undefined,
 		});
+		if (!response) {
+			throw error(500, "Failed to send the search request");
+		}
 		if (!response.ok) {
-			throw error(500, response.statusText);
+			throw error(response.status, response.statusText);
 		}
 		const data = await response.json();
 
@@ -98,7 +102,7 @@ function parseContents(
 	const continuation: Maybe<Partial<NextContinuationData>> = {};
 
 	let len = contents.length;
-	const type = filter.includes("playlists") ? "playlists" : filter;
+
 	while (--len > -1) {
 		const shelf: MusicShelf = { contents: [], header: { title: "" } };
 		const section = contents[len];
@@ -116,12 +120,12 @@ function parseContents(
 			Object.assign(continuation, musicShelf.continuations[0].nextContinuationData);
 
 		// If the section has an array at the property `contents` - parse it.
-		if (items) {
-			const _results = parseResults(items, type);
-			shelf.contents = _results;
-		}
 		if (musicShelf.title) {
 			shelf.header.title = musicShelf.title?.runs[0]?.text;
+		}
+		if (items) {
+			const _results = parseResults(items, shelf.header?.title?.toLowerCase().replace(/\s/gm, "_"));
+			shelf.contents = _results;
 		}
 		results.unshift(shelf);
 	}
@@ -131,13 +135,17 @@ function parseContents(
 function parseResults(items: any[], type: string) {
 	const results: IListItemRenderer[] = [];
 	let idx = items.length;
+
 	while (--idx > -1) {
 		const entry = items[idx];
 		const item = MusicResponsiveListItemRenderer(entry);
+
 		Object.assign(item, { type: type });
-		if (type === "playlists" || type === "albums") {
+
+		if (type.includes("playlists") || type === "albums") {
 			let metaData = "";
 			iter(item.subtitle, (subtitle) => (metaData += subtitle.text));
+
 			Object.assign(item, {
 				metaData: metaData,
 				browseId: entry.musicResponsiveListItemRenderer?.navigationEndpoint?.browseEndpoint?.browseId,
@@ -146,11 +154,13 @@ function parseResults(items: any[], type: string) {
 						?.navigationEndpoint?.watchPlaylistEndpoint?.playlistId,
 			});
 		}
+
 		if (type === "songs") {
 			Object.assign(item, {
 				album: item.subtitle.at(-3).pageType?.includes("ALBUM") && item.subtitle.at(-3),
 			});
 		}
+
 		results.unshift(item);
 	}
 	return results;

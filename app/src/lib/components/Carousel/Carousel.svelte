@@ -77,11 +77,17 @@
 		{header.title}
 	</span>
 	{#if !header.title.includes("Videos") && header.browseId}
-		<a style="white-space:pre; display: inline-block;" {href}>
+		<a
+			style="white-space:pre; display: inline-block;"
+			{href}
+		>
 			<small>See All</small>
 		</a>
 	{:else if isArtistPage && header.title.includes("Videos")}
-		<a style="white-space:pre; display: inline-block;" href={`/playlist/${header?.browseId}`}>
+		<a
+			style="white-space:pre; display: inline-block;"
+			href={`/playlist/${header?.browseId}`}
+		>
 			<small>See All</small>
 		</a>
 	{/if}
@@ -95,7 +101,10 @@
 			carousel.scrollLeft -= Math.ceil((scrollPositions.width / items.length) * 2);
 		}}
 	>
-		<Icon name="chevron-left" size="1.5em" />
+		<Icon
+			name="chevron-left"
+			size="1.5em"
+		/>
 	</div>
 
 	<div
@@ -106,20 +115,52 @@
 			carousel.scrollLeft += Math.ceil((scrollPositions.width / items.length) * 2);
 		}}
 	>
-		<Icon name="chevron-right" size="1.5em" />
+		<Icon
+			name="chevron-right"
+			size="1.5em"
+		/>
 	</div>
 
-	<div class="scroll" id="scrollItem" on:scroll={onScroll} bind:clientWidth bind:this={carousel} use:observer>
+	<div
+		class="scroll"
+		id="scrollItem"
+		on:scroll={onScroll}
+		bind:clientWidth
+		bind:this={carousel}
+		use:observer
+	>
 		{#each items as item, index}
 			{#if type == "trending"}
-				<CarouselItem type="trending" {kind} aspectRatio={item.aspectRatio} {item} isBrowseEndpoint={'endpoint' in item} {index} />
+				<CarouselItem
+					type="trending"
+					{kind}
+					aspectRatio={item.aspectRatio}
+					{item}
+					isBrowseEndpoint={"endpoint" in item}
+					{index}
+				/>
 			{:else if type == "artist" || type == "home"}
-				<CarouselItem {type} {kind} aspectRatio={item.aspectRatio} isBrowseEndpoint={'endpoint' in item} {item} {index} />
+				<CarouselItem
+					{type}
+					{kind}
+					aspectRatio={item.aspectRatio}
+					isBrowseEndpoint={"endpoint" in item}
+					{item}
+					{index}
+				/>
 			{:else if type == "new"}
-				<CarouselItem type="new" aspectRatio={item.aspectRatio} {item} {index} />
+				<CarouselItem
+					type="new"
+					aspectRatio={item.aspectRatio}
+					{item}
+					{index}
+				/>
 			{/if}
 		{/each}
 	</div>
 </div>
 
-<style lang="scss" src="./index.scss"></style>
+<style
+	lang="scss"
+	src="./index.scss"
+></style>

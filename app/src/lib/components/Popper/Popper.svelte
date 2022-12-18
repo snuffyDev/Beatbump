@@ -15,4 +15,7 @@
 
 <svelte:window bind:innerWidth={width} />
 
-<svelte:component this={popper.component} {main} />
+<svelte:component
+	this={popper.component}
+	{main}
+/>

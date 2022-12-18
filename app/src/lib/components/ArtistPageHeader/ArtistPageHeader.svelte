@@ -49,7 +49,10 @@
 </script>
 
 <div class="artist-header">
-	<div class="artist-thumbnail" style="{isExpanded ? 'background-color: rgba(0, 0, 0, 0.4)' : ''};">
+	<div
+		class="artist-thumbnail"
+		style="{isExpanded ? 'background-color: rgba(0, 0, 0, 0.4)' : ''};"
+	>
 		<div
 			bind:this={container}
 			style={`background-image: linear-gradient(1turn, var(--base-bg) ${Math.min(
@@ -62,7 +65,11 @@
 		<picture class="header-thumbnail">
 			{#each thumbnail as img, i (img)}
 				{#if i == 0}
-					<source media="(max-width:{img.width}px)" srcset={img.url} type="image/jpeg" />
+					<source
+						media="(max-width:{img.width}px)"
+						srcset={img.url}
+						type="image/jpeg"
+					/>
 					<source
 						media={`(min-width:${img.width + 1}px) and (max-width:${thumbnail[i + 1].width}px)`}
 						srcset={img.url}
@@ -89,12 +96,19 @@
 			/>
 		</picture>
 		<div class="artist-content">
-			<div class="content-wrapper" class:row={header?.foregroundThumbnails}>
+			<div
+				class="content-wrapper"
+				class:row={header?.foregroundThumbnails}
+			>
 				{#if header?.foregroundThumbnails}
 					<picture>
 						{#each header?.foregroundThumbnails as img, i (img)}
 							{#if i == 0}
-								<source media="(max-width:{img?.width}px)" srcset={img?.url} type="image/jpeg" />
+								<source
+									media="(max-width:{img?.width}px)"
+									srcset={img?.url}
+									type="image/jpeg"
+								/>
 								<source
 									media={`(min-width:${img?.width + 1}px) and (max-width:${
 										header?.foregroundThumbnails[i + 1].width
@@ -139,7 +153,11 @@
 								list.initAutoMixSession({
 									config: { playerParams: header.buttons.radio?.params },
 									playlistId: header.buttons.radio?.playlistId,
-								})}><Icon size="1.25em" name="radio" /><span class="button-text"> Play Radio</span></button
+								})}
+							><Icon
+								size="1.25em"
+								name="radio"
+							/><span class="button-text"> Play Radio</span></button
 						>
 					{/if}
 					{#if header?.buttons.shuffle !== false}
@@ -149,7 +167,11 @@
 									videoId: header.buttons.shuffle?.videoId,
 									config: { playerParams: header.buttons.shuffle?.params },
 									playlistId: header.buttons.shuffle?.playlistId,
-								})}><Icon size="1.25em" name="shuffle" /><span class="button-text"> Shuffle</span></button
+								})}
+							><Icon
+								size="1.25em"
+								name="shuffle"
+							/><span class="button-text"> Shuffle</span></button
 						>
 					{/if}
 				</div>

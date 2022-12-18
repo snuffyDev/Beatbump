@@ -1,7 +1,9 @@
 <svelte:options namespace="svg" />
+
 <script context="module">
-	import icons from './icons.svg'
+	import icons from "./icons.svg";
 </script>
+
 <script lang="ts">
 	import type { Icons } from "./icons";
 	export let name: Icons;

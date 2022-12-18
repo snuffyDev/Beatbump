@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "packages/proxy-server/rust"
+		}
+	],
+	"settings": {
+		"svg.preview.background": "custom",
+		"npm-intellisense.recursivePackageJsonLookup": true,
+		"typescript.format.enable": true,
+		"typescript.tsdk": "Beatbump/app/node_modules/typescript/lib"
+	}
+}

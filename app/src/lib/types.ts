@@ -1,4 +1,4 @@
-import type { BrowseEndpoint } from "./types/internals";
+import type { BrowseEndpoint } from "./types/innertube/internals";
 import type { ICarouselTwoRowItem } from "./types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "./types/musicListItemRenderer";
 import type { PlaylistSearch } from "./types/playlist";
@@ -23,7 +23,6 @@ export interface ICarousel {
 	isBrowse?: boolean;
 }
 export type Item = IMergedObject<IMergedObject<IListItemRenderer, ICarouselTwoRowItem>, Song>;
-
 
 export interface Album {
 	browseId?: string;
@@ -126,12 +125,6 @@ export type CarouselItem = {
 	playerParams?: string;
 	musicVideoType?: string;
 };
-
-interface MusicResponsiveListItemRenderer extends CarouselItem {
-	playlistSetVideoId?: string;
-	playerParams?: string;
-	musicVideoType?: string;
-}
 
 export type ItemEndpoint = {
 	browseId: string;

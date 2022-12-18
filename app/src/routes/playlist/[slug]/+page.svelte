@@ -14,7 +14,6 @@
 	import { notify, type Maybe } from "$lib/utils";
 	import { browser } from "$app/environment";
 	import { CTX_ListItem } from "$lib/contexts";
-	import type { NextContinuationData } from "$lib/types";
 	import type { PageData } from "./$types";
 
 	export let data: PageData;
@@ -39,17 +38,17 @@
 	$: ctoken = continuations?.continuation || "";
 	$: itct = continuations?.clickTrackingParams || "";
 	let width = 640;
-	let pageTitle = header?.title;
-	let description;
+	let pageTitle = header?.title || "";
+	let description: string;
 	let isLoading = false;
 	let hasData = false;
-	let carousel;
+	let carousel: any;
+
 	// initialize playlist page
-	const ctx = {};
 	const trackStore = writable<IListItemRenderer[]>([]);
 	trackStore.set(tracks);
-	// $: console.log(tracks);
-	CTX_ListItem.set({ page: "playlist", innerWidth: width, parentPlaylistId: id });
+
+	CTX_ListItem.set({ page: "playlist", innerWidth: width, parentPlaylistId: id, visitorData: data?.visitorData });
 
 	pageTitle = pageTitle.length > 64 ? pageTitle.substring(0, 64) + "..." : header?.title || "";
 	description =
@@ -217,6 +216,7 @@
 		},
 	];
 	let filter = value ? value : options[0].params;
+	// $: browser && console.log(data);
 </script>
 
 <svelte:window bind:innerWidth={width} />
@@ -310,7 +310,12 @@
 	</List>
 	<footer>
 		{#if carousel}
-			<Carousel header={carousel?.header} items={carousel?.results} type="home" isBrowseEndpoint={false} />
+			<Carousel
+				header={carousel?.header}
+				items={carousel?.results}
+				type="home"
+				isBrowseEndpoint={false}
+			/>
 		{/if}
 	</footer>
 </main>

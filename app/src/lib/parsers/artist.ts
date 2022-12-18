@@ -1,7 +1,9 @@
 import { MusicResponsiveListItemRenderer } from "$lib/parsers/items/musicResponsiveListItemRenderer";
 import { MusicTwoRowItemRenderer } from "$lib/parsers/items/musicTwoRowItemRenderer";
-import type { CarouselHeader, Item, Thumbnail } from "$lib/types";
-import type { IMusicResponsiveListItemRenderer } from "$lib/types/internals";
+import type { CarouselHeader, Thumbnail } from "$lib/types";
+import type { MusicResponsiveListItemRendererItem } from "$lib/types/innertube/internals";
+import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
+import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { iter } from "$lib/utils/collections";
 
 export interface IArtistPageHeader {
@@ -12,7 +14,7 @@ export interface IArtistPageHeader {
 		radio?: {
 			params?: string;
 			playlistId?: string;
-		};
+		} | null;
 	};
 	mixInfo?: {
 		params?: string;
@@ -23,10 +25,10 @@ export interface IArtistPageHeader {
 }
 
 export interface ArtistPageBody {
-	carousels?: { header: CarouselHeader; contents: Item[] }[];
+	carousels?: { header: CarouselHeader; contents: ICarouselTwoRowItem[] }[];
 	songs?: {
 		header?: CarouselHeader;
-		items?: IMusicResponsiveListItemRenderer[];
+		items?: IListItemRenderer[];
 	};
 }
 export interface ArtistPage {
@@ -50,8 +52,9 @@ export function ArtistPageParser({
 	header =
 		"musicImmersiveHeaderRenderer" in header ? header.musicImmersiveHeaderRenderer : header?.musicVisualHeaderRenderer;
 
-	const songs: { items?: IMusicResponsiveListItemRenderer[]; header?: Record<string, unknown> } = {};
-	const carousels = [];
+	const songs: { items?: IListItemRenderer[]; header?: Record<string, unknown> } = {};
+	const carousels: ArtistPageBody["carousels"] = [];
+
 	iter(items, (item, idx) => {
 		if (item["musicShelfRenderer"]) {
 			const contents = parseSongs(item["musicShelfRenderer"]["contents"]);
@@ -77,17 +80,17 @@ export function ArtistPageParser({
 	};
 }
 
-function parseSongs(items = []) {
+function parseSongs(items: unknown[] = []) {
 	iter(items, (item, idx) => {
-		items[idx] = MusicResponsiveListItemRenderer(item);
+		items[idx] = MusicResponsiveListItemRenderer(item as MusicResponsiveListItemRendererItem);
 	});
 
-	return items;
+	return items as IListItemRenderer[];
 }
 
-function parseCarousel(items = [], _header) {
+function parseCarousel(items = [], _header: { [index: string]: any }) {
 	let hasButtonRenderer = false;
-	const contents = [];
+	const contents: ICarouselTwoRowItem[] = [];
 
 	iter(items, (item) => contents.push(MusicTwoRowItemRenderer(item)));
 
@@ -103,12 +106,11 @@ function parseCarousel(items = [], _header) {
 		title: title["text"],
 		endpoint: title["navigationEndpoint"] ?? undefined,
 		itct:
-			(hasButtonRenderer && encodeURIComponent(_header?.moreContentButton?.buttonRenderer?.trackingParams)) ??
+			(hasButtonRenderer && encodeURIComponent(_header?.moreContentButton?.buttonRenderer?.trackingParams)) ||
 			undefined,
 		browseId: hasButtonRenderer ? button["browseId"] : undefined,
 		params: hasButtonRenderer ? button["params"] : undefined,
 		type: title["text"],
-		data: _header,
 	};
 
 	(title = null), (button = null);
@@ -119,7 +121,7 @@ function parseCarousel(items = [], _header) {
 	};
 }
 // Main header parser
-function parseArtistHeader(header: Record<string, unknown>): IArtistPageHeader {
+function parseArtistHeader(header: Record<string, any>): IArtistPageHeader {
 	const hasPlayButton = header["playButton"] ? true : false,
 		hasRadioButton = header["startRadioButton"] ? true : false;
 	return {
@@ -130,18 +132,22 @@ function parseArtistHeader(header: Record<string, unknown>): IArtistPageHeader {
 			: undefined,
 		thumbnails: header["thumbnail"] ? header["thumbnail"]["musicThumbnailRenderer"]["thumbnail"]["thumbnails"] : [],
 		buttons: {
-			radio: hasRadioButton && {
-				params: header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchPlaylistEndpoint"]
-					? header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchPlaylistEndpoint"]["params"]
-					: header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchEndpoint"]
-					? header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchEndpoint"]["params"]
-					: undefined,
-				playlistId: header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchPlaylistEndpoint"]
-					? header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchPlaylistEndpoint"]["playlistId"]
-					: header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchEndpoint"]
-					? header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchEndpoint"]["playlistId"]
-					: undefined,
-			},
+			radio: hasRadioButton
+				? {
+						params: header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchPlaylistEndpoint"]
+							? header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchPlaylistEndpoint"]["params"]
+							: header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchEndpoint"]
+							? header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchEndpoint"]["params"]
+							: undefined,
+						playlistId: header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchPlaylistEndpoint"]
+							? header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchPlaylistEndpoint"][
+									"playlistId"
+							  ]
+							: header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchEndpoint"]
+							? header["startRadioButton"]["buttonRenderer"]["navigationEndpoint"]["watchEndpoint"]["playlistId"]
+							: undefined,
+				  }
+				: null,
 			shuffle: hasPlayButton &&
 				header["playButton"]["buttonRenderer"]["navigationEndpoint"] && {
 					params: header["playButton"]["buttonRenderer"]["navigationEndpoint"]["watchEndpoint"]

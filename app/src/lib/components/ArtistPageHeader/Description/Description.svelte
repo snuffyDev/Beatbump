@@ -27,7 +27,11 @@
 </script>
 
 <div class="description-wrapper {_class}">
-	<div class="description" bind:this={descriptionElm} class:expanded={isExpanded}>
+	<div
+		class="description"
+		bind:this={descriptionElm}
+		class:expanded={isExpanded}
+	>
 		{description}
 	</div>
 	<div
@@ -41,5 +45,8 @@
 	</div>
 </div>
 
-<style src="./index.scss" lang="scss">
+<style
+	src="./index.scss"
+	lang="scss"
+>
 </style>

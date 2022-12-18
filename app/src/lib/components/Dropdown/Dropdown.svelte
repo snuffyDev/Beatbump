@@ -114,7 +114,11 @@
 	}
 </script>
 
-<svelte:window bind:innerHeight={viewport_height} bind:innerWidth={viewport_width} on:scroll|capture={handleScroll} />
+<svelte:window
+	bind:innerHeight={viewport_height}
+	bind:innerWidth={viewport_width}
+	on:scroll|capture={handleScroll}
+/>
 
 {#if isShowing}
 	<div

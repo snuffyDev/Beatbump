@@ -36,11 +36,7 @@ function buildRequestBody<T>(context: Context, params: Body<T>) {
  * @returns {Promise<Response>} A promise consisting of a Response
  */
 export function buildRequest<
-	T extends ArtistEndpointParams | PlayerEndpointParams | PlaylistEndpointParams | NextEndpointParams =
-		| ArtistEndpointParams
-		| PlayerEndpointParams
-		| PlaylistEndpointParams
-		| NextEndpointParams,
+	T extends ArtistEndpointParams | PlayerEndpointParams | PlaylistEndpointParams | NextEndpointParams,
 >(
 	endpoint: keyof APIEndpoints,
 	{
@@ -50,14 +46,14 @@ export function buildRequest<
 		headers = {},
 	}: {
 		context: Partial<Context>;
-		params: T;
+		params: T | {};
 		continuation?: Nullable<PlaylistEndpointContinuation>;
-		headers?: IHeaders;
+		headers: Nullable<IHeaders>;
 	},
-): Promise<Response> {
+): Promise<Response | null> {
 	const ctx = { ...CONTEXT_DEFAULTS, ...context };
 	const body = params;
-
+	if (!headers) headers = {};
 	switch (endpoint) {
 		case "artist":
 			return artistRequest(ctx, body as ArtistEndpointParams);
@@ -76,7 +72,7 @@ export function buildRequest<
 		case "search":
 			return searchRequest(ctx, body as SearchEndpointParams, continuation as SearchEndpointParams);
 		default:
-			break;
+			return Promise.resolve(null);
 	}
 }
 
@@ -143,40 +139,6 @@ function searchRequest<T extends SearchEndpointParams>(
 
 /**
  * Generic browse YouTube Music API request
- * for a Playlist Endpoint
- * @template T extends PlaylistEndpointParams
- * @param {Context} context
- * @param {T} params
- * @param {?Nullable<PlaylistEndpointContinuation>} [continuation]
- * @param {?IHeaders} [headers]
- * @returns
- */
-function browseRequest<T extends PlaylistEndpointParams>(
-	context: Context,
-	params: T,
-	continuation?: Nullable<PlaylistEndpointContinuation>,
-	headers?: IHeaders,
-);
-
-/**
- * Generic browse YouTube Music API request
- * for an Artist Endpoint
- * @template T extends ArtistEndpointParams
- * @param {Context} context
- * @param {T} params
- * @param {?Nullable<PlaylistEndpointContinuation>} [continuation]
- * @param {?IHeaders} [headers]
- * @returns
- */
-function browseRequest<T extends ArtistEndpointParams>(
-	context: Context,
-	params: T,
-	continuation?: Nullable<PlaylistEndpointContinuation>,
-	headers?: IHeaders,
-);
-
-/**
- * Generic browse YouTube Music API request
  *
  * @template T
  * @param {Context} context
@@ -185,13 +147,13 @@ function browseRequest<T extends ArtistEndpointParams>(
  * @param {IHeaders} [headers={}]
  * @returns
  */
-function browseRequest<T>(
+function browseRequest<T = PlayerEndpointParams | ArtistEndpointParams | RelatedEndpointParams>(
 	context: Context,
 	params: T,
 	continuation?: Nullable<PlaylistEndpointContinuation>,
-	headers: IHeaders = {},
-) {
-	const body = buildRequestBody(context as Context, params);
+	headers: Nullable<IHeaders> = {},
+): Promise<Response> {
+	const body = buildRequestBody<T>(context as Context, params);
 
 	// if continuation is defined, querystringify it
 	const request = fetch(

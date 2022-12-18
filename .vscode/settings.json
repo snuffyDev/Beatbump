@@ -19,9 +19,13 @@
 	"prettier.configPath": ".prettierrc",
 	"editor.formatOnSaveMode": "modificationsIfAvailable",
 	"[typescript]": {
+		"editor.formatOnSave": true,
+		"editor.formatOnSaveMode": "file",
 		"editor.defaultFormatter": "esbenp.prettier-vscode",
 	},
 	"[svelte]": {
+		"editor.formatOnSave": true,
+		"editor.formatOnSaveMode": "file",
 		"editor.defaultFormatter": "svelte.svelte-vscode",
 	},
 	"typescript.tsdk": "./app/node_modules/typescript/lib"

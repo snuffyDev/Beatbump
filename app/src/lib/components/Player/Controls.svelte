@@ -63,7 +63,10 @@
 
 <div class="player-controls">
 	<div class="buttons">
-		<div class="player-btn" on:click|stopPropagation|capture={handleShuffle}>
+		<div
+			class="player-btn"
+			on:click|stopPropagation|capture={handleShuffle}
+		>
 			<Icon
 				color="white"
 				style="stroke-width:2; stroke: {isShuffled ? '#fff' : 'hsla(0, 0%, 100%, 0.5)'};"
@@ -73,7 +76,10 @@
 			/>
 		</div>
 		<div class="controls-middle">
-			<div class="player-btn" on:click|stopPropagation|capture={prevBtn}>
+			<div
+				class="player-btn"
+				on:click|stopPropagation|capture={prevBtn}
+			>
 				<Icon
 					color="white"
 					style="stroke-width:2; stroke: white;"
@@ -96,14 +102,30 @@
 				}}
 			>
 				{#if loading}
-					<div class="player-spinner" class:fade-out={loading ? true : false} />
+					<div
+						class="player-spinner"
+						class:fade-out={loading ? true : false}
+					/>
 				{:else if isPaused}
-					<Icon fill={isQueue ? "#FFF" : "none"} color="white" name="play" size={sizes.main} />
+					<Icon
+						fill={isQueue ? "#FFF" : "none"}
+						color="white"
+						name="play"
+						size={sizes.main}
+					/>
 				{:else}
-					<Icon fill={isQueue ? "#FFF" : "none"} color="white" name="pause" size={sizes.main} />
+					<Icon
+						fill={isQueue ? "#FFF" : "none"}
+						color="white"
+						name="pause"
+						size={sizes.main}
+					/>
 				{/if}
 			</div>
-			<div class="player-btn" on:click|stopPropagation|capture={nextBtn}>
+			<div
+				class="player-btn"
+				on:click|stopPropagation|capture={nextBtn}
+			>
 				<Icon
 					color="white"
 					style="stroke-width:2; stroke: white;"
@@ -113,7 +135,10 @@
 				/>
 			</div>
 		</div>
-		<div class="player-btn" on:click|stopPropagation|capture={handleRepeat}>
+		<div
+			class="player-btn"
+			on:click|stopPropagation|capture={handleRepeat}
+		>
 			<Icon
 				color="white"
 				style="stroke-width:2; stroke: hsla(0, 0%, 100%, {repeatAlpha})"

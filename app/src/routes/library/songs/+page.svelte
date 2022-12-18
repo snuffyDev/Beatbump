@@ -44,7 +44,11 @@
 			<div class="ctx-item">
 				<label for="select">Sort</label>
 				<div class="select">
-					<select id="select" bind:value on:change={options[value].action}>
+					<select
+						id="select"
+						bind:value
+						on:change={options[value].action}
+					>
 						{#each options as option, i (option.params)}
 							<option value={i}>{option.label}</option>
 						{/each}

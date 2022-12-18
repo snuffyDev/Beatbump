@@ -5,7 +5,7 @@
 	import { PopperStore } from "./popperStore";
 	export let items = [];
 	export let type = "";
-	export let metadata: Partial<{ thumbnail: string; title: string; length?: string; }> = {};
+	export let metadata: Partial<{ thumbnail: string; title: string; length?: string }> = {};
 	export let size = "1.5em";
 	export let tabindex: string | number = "0";
 	let nodeIsOpen = false;
@@ -38,9 +38,9 @@
 					y,
 					metadata,
 					bottom,
-				});				return;
+				});
+				return;
 			} else {
-
 			}
 		}
 		node.addEventListener("click", handleClick, {
@@ -72,9 +72,23 @@
 	}
 </script>
 
-<div class="dd-button" role="button" aria-label="menu" use:Popper {tabindex}>
-	<svelte:component this={Icon} color="#f2f2f2" {size} name="dots" />
+<div
+	class="dd-button"
+	role="button"
+	aria-label="menu"
+	use:Popper
+	{tabindex}
+>
+	<svelte:component
+		this={Icon}
+		color="#f2f2f2"
+		{size}
+		name="dots"
+	/>
 </div>
 
-<style src="./index.scss" lang="scss">
+<style
+	src="./index.scss"
+	lang="scss"
+>
 </style>

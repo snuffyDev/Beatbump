@@ -1,5 +1,5 @@
 [package]
-name = "proxy"
+name = "bb-proxy"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,26 +8,21 @@ edition = "2021"
 [dependencies]
 async-recursion = "1.0.0"
 futures = "0.3.21"
-hyper = {version = "0.14.20", features = ["full"]}
+hyper = { version = "0.14.20", features = ["full"] }
 hyper-tls = "0.5.0"
 lazy_static = "1.4.0"
 regex = "1.6.0"
-tokio = {version = "1.20.1", features = ["full"]}
+tokio = { version = "1.20.1", features = ["full"] }
 url = "2.2.2"
+openssl-sys = "*"
 
-[build]
-rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+[features]
+# Force openssl-sys to staticly link in the openssl library. Necessary when
+# cross compiling to x86_64-unknown-linux-musl.
+vendored = ["openssl-sys/vendored"]
 
 [profile.dev]
 incremental = true
 strip = false
 lto = false
 opt-level = 0
-
-[profile.dev.package."*"]
-opt-level = 0
-incremental = true
-
-[profile.dev.build-override]
-opt-level = 0
-incremental = true

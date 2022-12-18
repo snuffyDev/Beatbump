@@ -22,11 +22,22 @@
 	}}
 >
 	{#if $playerLoading}
-		<div class="player-spinner" class:fade-out={$playerLoading ? true : false} />
+		<div
+			class="player-spinner"
+			class:fade-out={$playerLoading ? true : false}
+		/>
 	{:else if isPaused}
-		<Icon color="white" name="play-player" size={"1.625em"} />
+		<Icon
+			color="white"
+			name="play-player"
+			size={"1.625em"}
+		/>
 	{:else}
-		<Icon color="white" name="pause" size={"1.625em"} />
+		<Icon
+			color="white"
+			name="pause"
+			size={"1.625em"}
+		/>
 	{/if}
 </div>
 

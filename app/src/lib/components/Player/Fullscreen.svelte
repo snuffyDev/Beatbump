@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { navigating } from "$app/stores";
 	import { AudioPlayer } from "$lib/player";
-	import { immersiveQueue, isPagePlaying, playerLoading } from "$lib/stores";
+	import { immersiveQueue, isMobileMQ, isPagePlaying, playerLoading } from "$lib/stores";
 	import { queue, currentTrack } from "$lib/stores/list";
 	import ListItem from "../ListItem/ListItem.svelte";
 	import Loading from "../Loading/Loading.svelte";
@@ -16,9 +16,7 @@
 	import { groupSession } from "$lib/stores/sessions";
 	import ProgressBar from "./ProgressBar";
 	import { CTX_ListItem } from "$lib/contexts";
-	import { notify, requestFrameSingle } from "$lib/utils";
-	import { page } from "$app/stores";
-	import { isMobileMQ } from "$stores/window";
+	import { requestFrameSingle } from "$lib/utils";
 
 	export let state: "open" | "closed";
 
@@ -195,7 +193,10 @@
 						/>
 					</div>
 				{/if}
-				<div class="album-art" style="width: {!$isMobileMQ ? (queueOpen ? 55 : 95) : '100'}vw;">
+				<div
+					class="album-art"
+					style="width: {!$isMobileMQ ? (queueOpen ? 55 : 95) : '100'}vw;"
+				>
 					<div class="img-container">
 						{#if loading}
 							<Loading size="3em" />
@@ -215,7 +216,10 @@
 				</div>
 				{#if $isMobileMQ}
 					<div class="container controls">
-						<div class="container text-shadow" style="overflow:hidden;">
+						<div
+							class="container text-shadow"
+							style="overflow:hidden;"
+						>
 							<div class="marquee">
 								<span
 									class="marquee-wrapper"
@@ -223,14 +227,23 @@
 										? 'running'
 										: 'paused'}; {state === 'closed' || titleWidth < innerWidth
 										? 'animation: none; transform: unset;'
-										: ''}"><span bind:clientWidth={titleWidth} class="h5 marquee-text">{data?.title}</span></span
+										: ''}"
+									><span
+										bind:clientWidth={titleWidth}
+										class="h5 marquee-text">{data?.title}</span
+									></span
 								>
 							</div>
-							<span class="h6" style="text-align:center; "
+							<span
+								class="h6"
+								style="text-align:center; "
 								>{data?.artistInfo && data?.artistInfo.artist.at(0) ? data?.artistInfo.artist.at(0).text : ""}</span
 							>
 						</div>
-						<div class="container" style="margin-bottom: 1em; max-width: 75vw; margin-inline: auto;">
+						<div
+							class="container"
+							style="margin-bottom: 1em; max-width: 75vw; margin-inline: auto;"
+						>
 							<ProgressBar />
 						</div>
 						<Controls
@@ -281,9 +294,17 @@
 					<hr class="horz" />
 					<span />
 				</div>
-				<Tabs {tabs} {active} />
+				<Tabs
+					{tabs}
+					{active}
+				/>
 				<div class="scroller">
-					<TrackList items={$queue} hasData={true} let:index let:item>
+					<TrackList
+						items={$queue}
+						hasData={true}
+						let:index
+						let:item
+					>
 						<ListItem
 							{item}
 							idx={index}

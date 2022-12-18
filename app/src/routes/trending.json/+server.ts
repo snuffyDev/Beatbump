@@ -1,11 +1,11 @@
 import { buildRequest } from "$api/request";
 import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 
-import type { ICarousel, CarouselHeader } from "$lib/types";
+import type { CarouselHeader } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { error, type RequestHandler, json } from "@sveltejs/kit";
-import type { IMusicResponsiveListItemRenderer, IMusicTwoRowItemRenderer } from "$lib/types/internals";
+import type { IMusicResponsiveListItemRenderer, IMusicTwoRowItemRenderer } from "$lib/types/innertube/internals";
 
 /**
  * @root "/"
@@ -20,6 +20,7 @@ export const GET: RequestHandler = async () => {
 	const response = await buildRequest("home", {
 		context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
 		params: { browseId: "FEmusic_explore" },
+		headers: null,
 	});
 
 	if (!response.ok) {

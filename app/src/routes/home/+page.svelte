@@ -16,7 +16,11 @@
 
 <svelte:head>
 	{#if Array.isArray(headerThumbnail) && headerThumbnail.length !== 0 ? headerThumbnail[0].url : ""}
-		<link rel="preload" as="image" href={headerThumbnail[0].url} />
+		<link
+			rel="preload"
+			as="image"
+			href={headerThumbnail[0].url}
+		/>
 	{/if}
 </svelte:head>
 <Header
@@ -26,12 +30,18 @@
 />
 
 <div class="immersive-thumbnail">
-	<div class="gradient" style="--theme: var(--base-bg);" />
+	<div
+		class="gradient"
+		style="--theme: var(--base-bg);"
+	/>
 	{#if headerThumbnail.length !== 0}
 		<picture>
 			{#each headerThumbnail as thumbnail, i}
 				{#if i === 0}
-					<source media={`(max-width: ${thumbnail?.width}px)`} srcset={thumbnail.url} />
+					<source
+						media={`(max-width: ${thumbnail?.width}px)`}
+						srcset={thumbnail.url}
+					/>
 				{:else}
 					<source
 						media={`(min-width: ${headerThumbnail[i - 1].width + 1}px) and (max-width: ${thumbnail?.width}px)`}
@@ -87,7 +97,10 @@
 			}}
 		/>
 
-		<div class="loading" style:opacity={loading ? 1 : 0}>
+		<div
+			class="loading"
+			style:opacity={loading ? 1 : 0}
+		>
 			<Loading />
 		</div>
 	{/if}
@@ -98,7 +111,7 @@
 		height: 2em;
 		position: absolute;
 		bottom: 0;
-		margin-top:9rem;
+		margin-top: 9rem;
 		margin-bottom: 2rem;
 		padding-block: 3rem;
 		contain: content;

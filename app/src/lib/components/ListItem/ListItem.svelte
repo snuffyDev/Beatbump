@@ -1,10 +1,10 @@
-<svelte:options immutable={true} accessors={true} />
-
-<script context="module" lang="ts">
-</script>
+<svelte:options
+	immutable={true}
+	accessors={true}
+/>
 
 <script lang="ts">
-	import { ctxKey, groupSession, isMobileMQ, isPagePlaying, queue, showAddToPlaylistPopper } from "$lib/stores";
+	import { groupSession, isMobileMQ, isPagePlaying, queue, showAddToPlaylistPopper } from "$lib/stores";
 	import { page as PageStore } from "$app/stores";
 	import type { Item } from "$lib/types";
 	import { notify } from "$lib/utils";
@@ -29,7 +29,7 @@
 	}
 	const dispatch = createEventDispatcher<$$Events>();
 
-	const { page, parentPlaylistId = null } = CTX_ListItem.get();
+	const { page, parentPlaylistId = null, visitorData } = CTX_ListItem.get();
 
 	let isHovering = false;
 
@@ -86,9 +86,12 @@
 			text: "Share",
 			icon: "share",
 			action: async () => {
-				let shareData = {
+				let shareData: {
+					title: string;
+					url: string;
+					text?: string;
+				} = {
 					title: item.title,
-
 					url: `${$SITE_ORIGIN_URL}/listen?id=${item.videoId}`,
 				};
 				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_PLAYLIST")) {
@@ -117,7 +120,7 @@
 						await navigator.clipboard.writeText(shareData.url);
 						notify("Link copied successfully", "success");
 					} else {
-						const share = await navigator.share(shareData);
+						await navigator.share(shareData);
 						notify("Shared successfully", "success");
 					}
 				} catch (error) {
@@ -129,7 +132,7 @@
 	async function handleClick(event: MouseEvent) {
 		const target = event.target as HTMLElement;
 		if (target && target.nodeName === "A") return;
-		console.log(item, idx, parentPlaylistId);
+
 		/// Are we on the 'Queue' screen ?
 		if (page === "queue") {
 			/// Do we have a group session?
@@ -165,13 +168,21 @@
 				AudioPlayer.next(true, false);
 			}
 		} else if (page === "playlist") {
+			if (item.playlistId === $list.currentMixId) {
+				list.updatePosition(idx - 1);
+				await AudioPlayer.next();
+				return;
+			}
 			list.updatePosition(idx);
 			await tick();
+
 			await list.initPlaylistSession({
 				playlistId: item.playlistId,
-				clickTrackingParams: item?.clickTrackingParams,
+				visitorData,
+				clickTrackingParams:
+					(item.playlistId === $list.currentMixId && $queue[idx]?.clickTrackingParams) || item?.clickTrackingParams,
 				index: idx,
-				params: item?.playerParams,
+				params: item?.itct ?? item.playerParams,
 				playlistSetVideoId: item?.playlistSetVideoId,
 				videoId: item?.videoId,
 			});
@@ -179,10 +190,18 @@
 			list.updatePosition(idx);
 			dispatch("initLocalPlaylist", { idx });
 		} else if (page === "release") {
+			if (item.playlistId === $list.currentMixId) {
+				list.updatePosition(idx - 1);
+				await AudioPlayer.next();
+				return;
+			}
 			list.updatePosition(idx);
 			await list.initAutoMixSession({
-				playlistId: item.playlistId ?? parentPlaylistId,
-				keyId: item.index,
+				playlistId: item.playlistId,
+				clickTracking:
+					(item.playlistId === $list.currentMixId && $queue[idx]?.clickTrackingParams) || item?.clickTrackingParams,
+				keyId: idx,
+				loggingContext: item?.loggingContext,
 				videoId: item?.videoId,
 			});
 			await list.getMoreLikeThis({ playlistId: item.playlistId ?? parentPlaylistId });
@@ -216,7 +235,11 @@
 	<div class="index">
 		<span class:hidden={isPlaying !== true && isHovering !== true}>
 			<!--#9990a0-->
-			<Icon name="play" color="inherit" size="1.5em" />
+			<Icon
+				name="play"
+				color="inherit"
+				size="1.5em"
+			/>
 		</span>
 		<span class:hidden={isPlaying !== false || isHovering !== false}>
 			{idx + 1}
@@ -265,13 +288,25 @@
 		</div>
 	</div>
 	{#if $isMobileMQ || isHovering}
-		<div class="length" tabindex="0" on:focus={() => (isHovering = true)}>
-			<PopperButton tabindex="0" items={DropdownItems} />
+		<div
+			class="length"
+			tabindex="0"
+			on:focus={() => (isHovering = true)}
+		>
+			<PopperButton
+				tabindex="0"
+				items={DropdownItems}
+			/>
 		</div>
 	{:else}
-		<span class="length" class:hidden={!item?.length ? true : false}>{(item?.length?.text ?? item.length) || ""}</span>
+		<span
+			class="length"
+			class:hidden={!item?.length ? true : false}>{(item?.length?.text ?? item.length) || ""}</span
+		>
 	{/if}
 </article>
 
-<style src="./index.scss" lang="scss">
-</style>
+<style
+	src="./index.scss"
+	lang="scss"
+></style>

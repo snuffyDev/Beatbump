@@ -1,4 +1,4 @@
-import type { PurpleRun } from "$lib/types/internals";
+import type { PurpleRun } from "$lib/types/innertube/internals";
 
 export function thumbnailTransformer(url: string): {
 	placeholder?: string;

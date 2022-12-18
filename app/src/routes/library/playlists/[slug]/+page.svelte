@@ -28,13 +28,10 @@
 	let showEditPlaylist;
 	let hasQuery = false;
 	async function getPlaylist() {
-		console.log(playlistName);
 		const promise = await IDBService.sendMessage("get", "playlist", playlistName);
-		console.log(promise);
 		playlist = {};
 		Object.assign(playlist, promise);
 		playlist = playlist;
-		console.log(playlist);
 		items = playlist.items;
 		thumbnail = playlist?.thumbnail;
 	}
@@ -67,7 +64,11 @@
 	let hovering: number | boolean = false;
 </script>
 
-<Header desc="Playlist" title="Playlist" url="/library" />
+<Header
+	desc="Playlist"
+	title="Playlist"
+	url="/library"
+/>
 {#if playlist !== undefined}
 	<main>
 		{#if showEditPlaylist}
@@ -149,7 +150,13 @@
 			}}
 		/>
 		<ListInfoBar />
-		<List {items} let:item let:index let:send let:receive>
+		<List
+			{items}
+			let:item
+			let:index
+			let:send
+			let:receive
+		>
 			<LocalListItem
 				on:hovering={({ detail }) => (hovering = detail?.idx)}
 				on:notHovering={() => (hovering = null)}

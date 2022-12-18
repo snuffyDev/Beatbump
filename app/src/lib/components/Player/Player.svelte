@@ -144,7 +144,10 @@
 	}}
 	use:keyboardHandler={{ shortcut }}
 >
-	<div class="now-playing" style="align-items:center;">
+	<div
+		class="now-playing"
+		style="align-items:center;"
+	>
 		{#if $queue.length !== 0}
 			<img
 				width="64"
@@ -161,7 +164,7 @@
     letter-spacing: -0.02em;"
 			>
 				<span class="now-playing-title">{$currentTrack?.title}</span>
-				<span class="now-playing-artist">{$currentTrack.artistInfo?.artist[0]?.text}</span>
+				<span class="now-playing-artist">{$currentTrack?.artistInfo?.artist[0]?.text}</span>
 			</div>
 		{:else}
 			<img
@@ -172,13 +175,19 @@
 				src={IMAGE_NOT_FOUND}
 				alt=""
 			/>
-			<div class="container" style="gap:0.20125em;">
+			<div
+				class="container"
+				style="gap:0.20125em;"
+			>
 				<span>Not Playing</span>
 				<div />
 			</div>
 		{/if}
 	</div>
-	<div class="player-controls" style:display={$isMobileMQ ? "none" : "block"}>
+	<div
+		class="player-controls"
+		style:display={$isMobileMQ ? "none" : "block"}
+	>
 		{#if !$isMobileMQ}
 			<Controls
 				bind:isPaused={isPlaying}
@@ -197,7 +206,10 @@
 	</div>
 
 	<div class="player-right">
-		<div class="container row" style="gap:0.5em;">
+		<div
+			class="container row"
+			style="gap:0.5em;"
+		>
 			<div
 				class="volume "
 				on:pointerleave={() => {
@@ -214,10 +226,17 @@
 					}}
 					on:click|capture|stopPropagation={() => (volumeHover = !volumeHover)}
 				>
-					<Icon color="white" name="volume" size="1.625em" />
+					<Icon
+						color="white"
+						name="volume"
+						size="1.625em"
+					/>
 				</div>
 				{#if volumeHover}
-					<div class="volume-wrapper" transition:slide={{duration: 80, y: 100}}>
+					<div
+						class="volume-wrapper"
+						transition:slide={{ duration: 80, y: 100 }}
+					>
 						<div class="volume-slider">
 							<input
 								class="volume"
@@ -245,11 +264,20 @@
 					}}
 					class="listButton player-btn"
 				>
-					<Icon color="white" name="queue" size="1.625em" />
+					<Icon
+						color="white"
+						name="queue"
+						size="1.625em"
+					/>
 				</div>
 			</div>
 			<div class="menu-container">
-				<PopperButton tabindex="-1" type="player" size="1.625em" items={DropdownItems} />
+				<PopperButton
+					tabindex="-1"
+					type="player"
+					size="1.625em"
+					items={DropdownItems}
+				/>
 			</div>
 		</div>
 	</div>
@@ -273,11 +301,11 @@
 			visibility: visible;
 			display: flex;
 
-	display: -webkit-box;
-	-webkit-line-clamp: 2;
-	-webkit-box-orient: vertical;
-	line-clamp: 2;
-	overflow: hidden;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			line-clamp: 2;
+			overflow: hidden;
 			// }
 		}
 	}
@@ -290,22 +318,22 @@
 
 		font-size: 12px;
 
-	display: -webkit-box;
-	-webkit-line-clamp: 1;
-	-webkit-box-orient: vertical;
-	line-clamp: 1;
-	overflow: hidden;
+		display: -webkit-box;
+		-webkit-line-clamp: 1;
+		-webkit-box-orient: vertical;
+		line-clamp: 1;
+		overflow: hidden;
 	}
 	.now-playing-artist {
 		display: block;
 		font-size: 12px;
 		color: rgba(255, 255, 255, 0.7) !important;
 
-	display: -webkit-box;
-	-webkit-line-clamp: 2;
-	-webkit-box-orient: vertical;
-	line-clamp: 2;
-	overflow: hidden;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		line-clamp: 2;
+		overflow: hidden;
 	}
 	.now-playing img {
 		object-fit: contain;

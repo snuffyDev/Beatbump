@@ -8,12 +8,22 @@
 	<div class="header resp-content-width">
 		<span class="h2">{heading}</span>
 	</div>
-	<div class="grid resp-content-width" use:observer>
+	<div
+		class="grid resp-content-width"
+		use:observer
+	>
 		{#each items as item, i (item)}
-			<slot name="item" {item} index={i} />
+			<slot
+				name="item"
+				{item}
+				index={i}
+			/>
 		{/each}
 	</div>
 </div>
 
-<style src="./index.scss" lang="scss">
+<style
+	src="./index.scss"
+	lang="scss"
+>
 </style>

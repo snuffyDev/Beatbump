@@ -96,7 +96,10 @@
 			deletePlaylistRequest = false;
 		}}
 	>
-		<div class="header" slot="header">
+		<div
+			class="header"
+			slot="header"
+		>
 			<h1>Delete Playlist?</h1>
 			<p>
 				Deleting this playlist will permanently delete all of it's data from your device (thumbnail, title, songs,
@@ -108,7 +111,12 @@
 			<div class="image">
 				<div class="img-container">
 					{#if thumbnail}
-						<img src={thumbnail} width="200" height="200" alt="thumbnail" />
+						<img
+							src={thumbnail}
+							width="200"
+							height="200"
+							alt="thumbnail"
+						/>
 					{:else}
 						<img
 							src={"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjNDI0MjQyIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA1LjU0IDE2Ni43OTQpIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCZxdW90O1NlZ29lIFVJJnF1b3Q7LFJvYm90byxPeHlnZW4sVWJ1bnR1LENhbnRhcmVsbCwmcXVvdDtPcGVuIFNhbnMmcXVvdDssJnF1b3Q7SGVsdmV0aWNhIE5ldWUmcXVvdDssc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNmYWZhZmEiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiA1NC44MzkpIiBkPSJNMCAwaDcydjE0Ni4zMjNIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+"}
@@ -141,11 +149,19 @@
 		</div>
 	</Modal>
 {/if}
-<section class="playlist-modal" transition:fade={{ duration: 250, delay: 125 }}>
+<section
+	class="playlist-modal"
+	transition:fade={{ duration: 250, delay: 125 }}
+>
 	<div class="image">
 		<div class="img-container">
 			{#if thumbnail}
-				<img src={thumbnail} width="200" height="200" alt="thumbnail" />
+				<img
+					src={thumbnail}
+					width="200"
+					height="200"
+					alt="thumbnail"
+				/>
 			{:else}
 				<img
 					src={"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjNDI0MjQyIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA1LjU0IDE2Ni43OTQpIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCZxdW90O1NlZ29lIFVJJnF1b3Q7LFJvYm90byxPeHlnZW4sVWJ1bnR1LENhbnRhcmVsbCwmcXVvdDtPcGVuIFNhbnMmcXVvdDssJnF1b3Q7SGVsdmV0aWNhIE5ldWUmcXVvdDssc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNmYWZhZmEiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiA1NC44MzkpIiBkPSJNMCAwaDcydjE0Ni4zMjNIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+"}
@@ -154,10 +170,18 @@
 					alt="thumbnail"
 				/>
 			{/if}
-			<input type="file" accept=".jpg,.png,.webp,.jpeg" bind:files />
+			<input
+				type="file"
+				accept=".jpg,.png,.webp,.jpeg"
+				bind:files
+			/>
 			<div class="gradient">
 				<div class="icon">
-					<Icon name="upload" size="1.5rem" color="#f2f2f2" />
+					<Icon
+						name="upload"
+						size="1.5rem"
+						color="#f2f2f2"
+					/>
 				</div>
 			</div>
 		</div>
@@ -174,12 +198,20 @@
 	>
 		<div class="input-row">
 			<label for="">Title</label>
-			<div class="input no-btn block"><input type="text" bind:value={titleValue} /></div>
+			<div class="input no-btn block">
+				<input
+					type="text"
+					bind:value={titleValue}
+				/>
+			</div>
 		</div>
 		<div class="input-row">
 			<label for="">Description</label>
 			<div class="input no-btn block">
-				<input type="text" bind:value={descriptionValue} />
+				<input
+					type="text"
+					bind:value={descriptionValue}
+				/>
 			</div>
 		</div>
 		{#if isLocalPlaylist}

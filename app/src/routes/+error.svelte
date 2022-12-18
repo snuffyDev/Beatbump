@@ -25,9 +25,17 @@
 </script>
 
 <main>
-	<a href="/" class="logolink">
+	<a
+		href="/"
+		class="logolink"
+	>
 		<div class="logo">
-			<img src="/logo.svg" width="128" height="128" alt="logo" />
+			<img
+				src="/logo.svg"
+				width="128"
+				height="128"
+				alt="logo"
+			/>
 		</div>
 	</a>
 	<h1>Uh-Oh!</h1>

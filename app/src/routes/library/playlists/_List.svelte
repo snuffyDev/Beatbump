@@ -29,7 +29,13 @@
 			in:receive={{ duration: 400, key: i }}
 			animate:flip={{ duration: 300 }}
 		>
-			<slot {item} {receive} {send} hovering index={i} />
+			<slot
+				{item}
+				{receive}
+				{send}
+				hovering
+				index={i}
+			/>
 		</div>
 	{/each}
 </div>

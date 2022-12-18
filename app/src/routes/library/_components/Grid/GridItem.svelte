@@ -6,9 +6,18 @@
 	export let item;
 </script>
 
-<article class="item" on:click>
+<article
+	class="item"
+	on:click
+>
 	<div class="img">
-		<img width={"200"} height={"200"} loading="lazy" src={item.thumbnail} alt="thumbnail" />
+		<img
+			width={"200"}
+			height={"200"}
+			loading="lazy"
+			src={item.thumbnail}
+			alt="thumbnail"
+		/>
 	</div>
 	<div class="item-text">
 		<div class="item-title">{item.name}</div>

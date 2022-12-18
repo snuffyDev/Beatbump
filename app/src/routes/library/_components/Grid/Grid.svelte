@@ -16,7 +16,10 @@
 	<div class="grid">
 		{#if items.length > 0}
 			{#each items as item, i (item)}
-				<GridItem {item} on:click={() => goto("/library/playlists/" + item.id)} />
+				<GridItem
+					{item}
+					on:click={() => goto("/library/playlists/" + item.id)}
+				/>
 			{/each}
 		{/if}
 		<GridItem
@@ -30,5 +33,8 @@
 	</div>
 </div>
 
-<style src="./index.scss" lang="scss">
+<style
+	src="./index.scss"
+	lang="scss"
+>
 </style>

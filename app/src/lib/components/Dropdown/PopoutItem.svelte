@@ -9,8 +9,16 @@
 	getContext("menu");
 </script>
 
-<div class="popout-item" style="color:{color}" on:click>
-	<Icon name={icon} color="white" size="1.25em" />
+<div
+	class="popout-item"
+	style="color:{color}"
+	on:click
+>
+	<Icon
+		name={icon}
+		color="white"
+		size="1.25em"
+	/>
 	<div class="po-text">{text}</div>
 </div>
 

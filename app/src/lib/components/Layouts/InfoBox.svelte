@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Dropdown } from "$lib/configs/dropdowns.config";
+	import type { Dropdown } from "$lib/configs/dropdowns.config";
 	import { createEventDispatcher, tick } from "svelte";
 	import Button from "../Button";
 	import PopperButton from "../Popper/PopperButton.svelte";
@@ -35,7 +35,14 @@
 
 <div class="box resp-content-width">
 	<div class="img">
-		<img src={thumbnail} loading="lazy" width="512" height="512" style="--img-height: 512;" alt="album" />
+		<img
+			src={thumbnail}
+			loading="lazy"
+			width="512"
+			height="512"
+			style="--img-height: 512;"
+			alt="album"
+		/>
 	</div>
 	<div class="metadata">
 		<div class="info-title">
@@ -48,7 +55,10 @@
 		</div>
 		{#if description && type == "playlist"}
 			{#key description}
-				<p class="secondary subtitle description" class:hidden={width < 640 ? true : false}>
+				<p
+					class="secondary subtitle description"
+					class:hidden={width < 640 ? true : false}
+				>
 					{description}
 				</p>
 				<span class="secondary subtitle-group">

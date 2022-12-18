@@ -34,8 +34,15 @@
 </script>
 
 {#if $showGroupSessionCreator}
-	<div class="backdrop" transition:fade>
-		<div class="groupSessionCreator modal" on:click_outside={() => ($showGroupSessionCreator = false)} use:clickOutside>
+	<div
+		class="backdrop"
+		transition:fade
+	>
+		<div
+			class="groupSessionCreator modal"
+			on:click_outside={() => ($showGroupSessionCreator = false)}
+			use:clickOutside
+		>
 			<div class="modal-container">
 				{#if step === 0}
 					<div class="modal-header">
@@ -46,20 +53,32 @@
 						<form on:submit={handleSubmit}>
 							<div class="container">
 								<p>Enter your display name:</p>
-								<div class="input"><input type="" class="input" bind:value={displayName} /></div>
+								<div class="input">
+									<input
+										type=""
+										class="input"
+										bind:value={displayName}
+									/>
+								</div>
 							</div>
 							<div class="container">
 								<p class="h4 my-2">Settings</p>
 								<div>
 									<p style="display:inline-block;">
 										Force Sync
-										<input type="checkbox" style="vertical-align: middle; margin-left: 1em;" bind:checked />
+										<input
+											type="checkbox"
+											style="vertical-align: middle; margin-left: 1em;"
+											bind:checked
+										/>
 									</p>
 								</div>
 								<br />
 								<div>
-									<Button type="submit" disabled={displayName ? false : true} on:click={handleSubmit}
-										>Create Group Session</Button
+									<Button
+										type="submit"
+										disabled={displayName ? false : true}
+										on:click={handleSubmit}>Create Group Session</Button
 									>
 								</div>
 								<br />
@@ -107,5 +126,8 @@
 	</div>
 {/if}
 
-<style src="./index.scss" lang="scss">
+<style
+	src="./index.scss"
+	lang="scss"
+>
 </style>

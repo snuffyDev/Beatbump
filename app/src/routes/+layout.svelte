@@ -18,6 +18,7 @@
 	import { AudioPlayer } from "$lib/player";
 	import { page } from "$app/stores";
 	import { afterNavigate } from "$app/navigation";
+	import { browser } from "$app/environment";
 	import SessionListService from "$stores/list/sessionList";
 
 	$: key = $page.data.key;
@@ -32,11 +33,11 @@
 				isFullscreen = false;
 		  }, 0);
 	$: hasplayer = $queue.length !== 0;
+
 	afterNavigate(() => {
 		if (import.meta.env.SSR) return;
 		if (main) main.scrollTop = 0;
 	});
-	// $: console.log($queue, $SessionListService);
 </script>
 
 <svelte:window
@@ -49,8 +50,17 @@
 />
 <Nav {key} />
 <Popper {main} />
-<div class="wrapper app-content-m" {hasplayer} bind:this={main} id="wrapper">
-	<Wrapper {key} {main}>
+<div
+	class="wrapper app-content-m"
+	{hasplayer}
+	bind:this={main}
+	style:overflow-y={$page.route.id === "/search/[slug]" && !$page.url.search.includes("all") ? "hidden" : "auto"}
+	id="wrapper"
+>
+	<Wrapper
+		{key}
+		{main}
+	>
 		<slot />
 	</Wrapper>
 </div>
@@ -62,12 +72,18 @@
 <GroupSessionCreator />
 <Alert />
 <Fullscreen state={isFullscreen ? "open" : "closed"} />
-<footer class="footer-container" class:show-player={hasplayer}>
+<footer
+	class="footer-container"
+	class:show-player={hasplayer}
+>
 	<!-- <GroupSessionManager /> -->
 	<Player />
 </footer>
 
-<style lang="scss" global>
+<style
+	lang="scss"
+	global
+>
 	@use "../global/stylesheet/layout" as *;
 	@use "../global/stylesheet/main" as *;
 	.footer-container {
