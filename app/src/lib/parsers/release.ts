@@ -46,10 +46,10 @@ export function parsePageContents(data: Data) {
 	}));
 
 	const releaseInfoParser = () => {
-		const year = data.header?.musicDetailHeaderRenderer.subtitle?.runs.pop();
-		const length = data.header?.musicDetailHeaderRenderer.subtitle?.runs.shift();
+		const year = data.header?.musicDetailHeaderRenderer?.subtitle?.runs.pop();
+		const length = data.header?.musicDetailHeaderRenderer?.subtitle?.runs.shift();
 		const artists = filter(
-			[...data.header?.musicDetailHeaderRenderer.subtitle?.runs],
+			[...data.header?.musicDetailHeaderRenderer?.subtitle?.runs],
 			(item) => !item.text.match(/[\s]?•[\s]?/),
 		).map((item) => ({
 			name: item.text,

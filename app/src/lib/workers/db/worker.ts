@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 import type { Actions, Methods } from "./types";
 import { dbHandler } from "./db";
-import { Logger } from "$lib/utils";
+import { Logger } from "$lib/utils/logger";
 
 const worker = self as unknown as DedicatedWorkerGlobalScope;
 

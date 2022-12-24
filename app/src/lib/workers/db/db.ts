@@ -45,7 +45,7 @@ export function updatePlaylist(entry: IDBPlaylistInternal): Promise<IDBMessage<I
 						return;
 					}
 					resolve({
-						data: event?.target.result as IDBPlaylist,
+						data: event?.target.result.value as IDBPlaylist,
 					});
 				};
 			} catch (error) {

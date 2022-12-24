@@ -45,12 +45,14 @@ export function MusicResponsiveListItemRenderer(
 				? item.fixedColumns[0]?.musicResponsiveListItemFixedColumnRenderer?.text?.runs[0]?.text
 				: undefined,
 		type: type,
+		params:
+			item.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
+				?.watchPlaylistEndpoint?.params ?? undefined,
 		playerParams:
 			flexCol0?.navigationEndpoint?.watchEndpoint?.playerParams || flexCol0?.navigationEndpoint?.watchEndpoint?.params,
 		clickTrackingParams:
-			flexCol0?.navigationEndpoint?.clickTrackingParams ??
 			item.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
-				?.clickTrackingParams,
+				?.clickTrackingParams || flexCol0?.navigationEndpoint?.clickTrackingParams,
 		loggingContext:
 			item.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
 				?.watchEndpoint?.loggingContext,
@@ -85,6 +87,5 @@ export function MusicResponsiveListItemRenderer(
 		});
 	}
 
-	Object.assign(Item, {});
 	return Item;
 }

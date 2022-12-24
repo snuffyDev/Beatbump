@@ -117,11 +117,11 @@
 							let value = e.currentTarget.value;
 
 							if (!value.endsWith("/")) value = value + "/";
-							if (value.match(/^https:\/\//i)) {
+							if (value.match(/^https?:\/\//i)) {
 								$settings["network"]["HLS Stream Proxy"] = value;
 							}
 						}}
-						pattern="https://.*"
+						pattern="http://.*"
 						placeholder="https://yt-hls-rewriter.onrender.com/"
 						value={$settings["network"]["HLS Stream Proxy"]}
 					/>

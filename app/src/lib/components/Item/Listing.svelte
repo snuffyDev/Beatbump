@@ -166,7 +166,7 @@
 	if (isArtist) {
 		DropdownItems = [...DropdownItems.filter((item) => !item.text.includes("Add to Playlist"))];
 	}
-	if (data.type === "playlists") {
+	if (data.type.includes("playlist")) {
 		DropdownItems.splice(1, 1, {
 			text: "View Playlist",
 			icon: "list",
@@ -176,12 +176,12 @@
 					top: 0,
 					left: 0,
 				});
-				goto(`/playlist/${data?.browseId}`);
+				goto(`/playlist/${data?.endpoint?.browseId}`);
 			},
 		});
 		DropdownItems.shift();
 		DropdownItems.pop();
-		DropdownItems = [...DropdownItems.filter((item) => !item.text.includes("Favorite"))];
+		DropdownItems = [...DropdownItems.slice().filter((item) => !item.text.includes("Favorite"))];
 	}
 	if (data.type === "videos") {
 		DropdownItems = DropdownItems.filter((d) => {
@@ -211,8 +211,13 @@
 			console.log(data);
 			videoId = data.videoId ? data.videoId : "";
 			playlistId = data?.playlistId ? data?.playlistId : data.shuffle?.playlistId ? data.shuffle?.playlistId : "";
-			if (data.type === "playlist" || data.type === "albums") {
-				await list.initPlaylistSession({ playlistId, index: 0 });
+			if (data.type.includes("playlist") || data.type === "albums") {
+				await list.initPlaylistSession({
+					playlistId,
+					index: 0,
+					clickTrackingParams: data.clickTrackingParams ?? undefined,
+					params: data.params,
+				});
 			} else {
 				await list.initAutoMixSession({
 					videoId: videoId,

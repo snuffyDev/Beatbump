@@ -48,7 +48,7 @@ export function buildRequest<
 		context: Partial<Context>;
 		params: T | {};
 		continuation?: Nullable<PlaylistEndpointContinuation>;
-		headers: Nullable<IHeaders>;
+		headers?: Nullable<IHeaders>;
 	},
 ): Promise<Response | null> {
 	const ctx = { ...CONTEXT_DEFAULTS, ...context };

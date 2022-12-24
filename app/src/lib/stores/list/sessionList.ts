@@ -266,7 +266,7 @@ function _sessionListService(): ISessionListService {
 
 			const data = await fetchNext({
 				visitorData: visitorData,
-				params: "OAHyAQIIAQ==",
+				params: encodeURIComponent("OAHyAQIIAQ=="),
 				playlistSetVideoId: mix[position]?.playlistSetVideoId,
 				index: mix.length,
 				videoId,

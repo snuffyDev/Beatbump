@@ -530,7 +530,9 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	}
 
 	private async handleAutoSuggestion(position: number): Promise<ResponseBody> {
-		await SessionListService.getMoreLikeThis({ playlistId: this.currentSessionList().currentMixId });
+		const list = this.currentSessionList();
+
+		await SessionListService.getMoreLikeThis({ playlistId: list.currentMixId });
 		return this.getTrackSrc(position).then((value) => {
 			function hasProperty(input: unknown): input is ResponseBody {
 				return (input as ResponseBody).url !== undefined;

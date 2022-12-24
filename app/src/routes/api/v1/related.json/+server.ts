@@ -18,6 +18,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 		const response = await buildRequest("related", {
 			context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
+			headers: null,
 			params: {
 				browseId: browseId,
 				params: undefined,

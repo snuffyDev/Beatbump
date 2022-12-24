@@ -161,7 +161,7 @@
 				on:hovering={({ detail }) => (hovering = detail?.idx)}
 				on:notHovering={() => (hovering = null)}
 				on:dragstart={(event) => dragstart(event, index)}
-				on:update={async (event) => getPlaylist()}
+				on:change={async (event) => getPlaylist()}
 				on:drop={async (event) => {
 					if (hasQuery) return;
 					drop(event, index);
@@ -172,11 +172,12 @@
 						hideAlert: true,
 					});
 				}}
-				on:initLocalList={async ({ detail }) => {
-					list.setMix(items);
-					await getSrc($list.mix[index]?.videoId);
+				on:initLocalPlaylist={async ({ detail }) => {
+					!$isPagePlaying.has(playlistName) && list.setMix(items);
+					await tick();
+					await getSrc($list.mix[detail.idx]?.videoId);
 				}}
-				on:pagePlaying={() => {
+				on:setPageIsPlaying={() => {
 					isPagePlaying.add(playlistName);
 				}}
 				{item}

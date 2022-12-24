@@ -17,7 +17,6 @@ export const GET: RequestHandler = async ({ url }) => {
 	const index = parseInt(query.get("index")) || undefined;
 	const clickTracking = query.get("clickTracking") || undefined;
 	const playlistSetVideoId = query.get("playlistSetVideoId") || undefined;
-
 	const response = await buildRequest("next", {
 		context: {
 			clickTracking: {

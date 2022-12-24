@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { sort, type PlayerFormats } from "$lib/parsers/player";
 import { updatePlayerSrc } from "$lib/player";
-import { alertHandler, currentId, preferWebM } from "$lib/stores/stores";
+import { alertHandler, currentId } from "$lib/stores/stores";
 import { settings, type UserSettings } from "$lib/stores/settings";
-import { get } from "svelte/store";
-import { findFirst, map } from "./collections";
 import { browser } from "$app/environment";
 import type { Song } from "$lib/types";
 

@@ -15,7 +15,6 @@ export const load = async ({ fetch, data: data$1, url }: Parameters<PageLoad>[0]
 	path = url.pathname;
 
 	return {
-		data,
 		carousels,
 		headerThumbnail,
 		continuations,

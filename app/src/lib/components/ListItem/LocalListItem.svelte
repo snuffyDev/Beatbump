@@ -19,6 +19,7 @@
 	import { AudioPlayer, updateGroupPosition } from "$lib/player";
 	import { CTX_ListItem } from "$lib/contexts";
 	import { SITE_ORIGIN_URL } from "$lib/stores/url";
+	import { deleteSongFromPlaylist } from "$lib/workers/db/db";
 	export let item: Item;
 	export let idx: number;
 	export let ctx: Record<string, unknown> = {};
@@ -60,7 +61,7 @@
 			text: "Remove from Playlist",
 			icon: "x",
 			action: async () => {
-				const promise = await deleteSongFromPlaylist(item.videoId, parentPlaylistId);
+				await deleteSongFromPlaylist(parentPlaylistId, item.videoId);
 				// console.log(promise, item, parentPlaylistId);
 				dispatch("change");
 			},
@@ -69,7 +70,7 @@
 			text: "Favorite",
 			icon: "heart",
 			action: () => {
-				setNewFavorite(item);
+				IDBService.sendMessage("create", "favorite", item);
 			},
 		},
 		{
@@ -180,7 +181,7 @@
 		isHovering = false;
 	}}
 	on:pointerenter={(e) => {
-		if (parent && parent.contains(e.target)) isHovering = true;
+		if (parent && parent.contains(e.currentTarget)) isHovering = true;
 	}}
 	draggable={true}
 	on:dragstart
@@ -189,10 +190,10 @@
 	on:dragenter={() => dispatch("hovering", { idx })}
 	on:dragend={() => dispatch("notHovering", null)}
 	on:mouseenter|capture={(e) => {
-		if (parent && parent.contains(e.target)) isHovering = true;
+		if (parent && parent.contains(e.currentTarget)) isHovering = true;
 	}}
 	on:pointerleave={(e) => {
-		if (parent && parent.contains(e.target)) {
+		if (parent && parent.contains(e.currentTarget)) {
 			isHovering = true;
 		}
 		isHovering = false;
@@ -202,7 +203,7 @@
 		<span class:hidden={isPlaying !== true && isHovering !== true}>
 			<!--#9990a0-->
 			<Icon
-				name="play-player"
+				name="play"
 				color="inherit"
 				size="1.5em"
 			/>

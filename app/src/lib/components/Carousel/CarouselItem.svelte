@@ -7,9 +7,9 @@
 	import { IDBService } from "$lib/workers/db/service";
 
 	import list from "$lib/stores/list";
-	import type { CarouselItem, Item } from "$lib/types";
+	import type { Item } from "$lib/types";
 	import { Logger, notify } from "$lib/utils";
-	import { currentTitle, showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
+	import { showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
 	import { page } from "$app/stores";
 	import { tick } from "svelte";
 	import { PopperButton, PopperStore } from "../Popper";
@@ -33,11 +33,6 @@
 			? true
 			: false;
 	const ASPECT_RATIO = !RATIO_RECT ? "1x1" : "16x9";
-	const playAlbum = () => {
-		list.initPlaylistSession({ playlistId: item.playlistId });
-		list.updatePosition(0);
-		currentTitle.set(item.title);
-	};
 	let DropdownItems: Dropdown = [
 		{
 			text: "View Artist",
@@ -241,13 +236,11 @@
 		DropdownItems = DropdownItems;
 	}
 	if (item?.endpoint?.pageType) {
-		DropdownItems = [
-			...DropdownItems.filter((item) => {
-				if (!item.text.match(/Favorite|Add to Queue|Play Next|View Artist/gm)) {
-					return item;
-				}
-			}),
-		];
+		DropdownItems = DropdownItems.filter((item) => {
+			if (!item.text.match(/Favorite|Add to Queue|Play Next|View Artist/gm)) {
+				return item;
+			}
+		});
 	}
 
 	if (item.endpoint?.pageType?.match(/MUSIC_PAGE_TYPE_(PLAYLIST|ALBUM)/)) {

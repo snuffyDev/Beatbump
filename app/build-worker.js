@@ -9,6 +9,7 @@ buildSync({
 	format: "iife",
 	bundle: true,
 	minify: true,
+
 	platform: "browser",
 	outfile: "./src/lib/workers/db/worker-iife.js",
 });

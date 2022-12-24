@@ -1,8 +1,9 @@
 import { browser } from "$app/environment";
 
-import { Mutex } from "$lib/utils/sync";
+import { Mutex } from "$lib/utils/sync/mutex";
 import type { IDBMessage, Actions, Methods } from "./types";
 import { notify } from "$lib/utils/utils";
+import Worker from "./worker?worker";
 
 class IDBService {
 	private worker: Worker = null;
@@ -18,9 +19,9 @@ class IDBService {
 	async setup() {
 		if (!browser) return;
 		if (this.worker) return this.worker;
-		const workerInstance = await import("./worker?worker").then((res) => res.default);
+		const workerInstance = new Worker();
 		this.isReady = true;
-		return new workerInstance();
+		return workerInstance;
 	}
 	async sendMessage<
 		Action extends Actions = Actions,
