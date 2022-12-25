@@ -1,19 +1,17 @@
 <script lang="ts">
 	import ListItem from "$lib/components/ListItem/ListItem.svelte";
-	import List from "../_List.svelte";
 	import list from "$lib/stores/list";
-	import { ctxKey, isPagePlaying, showAddToPlaylistPopper } from "$lib/stores/stores";
+	import { isPagePlaying, showAddToPlaylistPopper } from "$lib/stores/stores";
+	import List from "../_List.svelte";
 
-	import InfoBox from "$lib/components/Layouts/InfoBox.svelte";
-	import { writable } from "svelte/store";
-	import Header from "$lib/components/Layouts/Header.svelte";
-	import type { Header as HeaderType } from "$lib/types/playlist";
-	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
+	import Header from "$lib/components/Layouts/Header.svelte";
+	import InfoBox from "$lib/components/Layouts/InfoBox.svelte";
 	import ListInfoBar from "$lib/components/ListInfoBar";
-	import { notify, type Maybe } from "$lib/utils";
-	import { browser } from "$app/environment";
 	import { CTX_ListItem } from "$lib/contexts";
+	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+	import { notify } from "$lib/utils";
+	import { writable } from "svelte/store";
 	import type { PageData } from "./$types";
 
 	export let data: PageData;
@@ -254,9 +252,10 @@
 				{
 					action: () => {
 						setId();
-						list.initAutoMixSession({
-							playlistId: header.playlistId,
-							config: { playerParams: "wAEB8gECGAE%3D" },
+						list.initPlaylistSession({
+							playlistId: "RDAMPL" + header.playlistId,
+							index: 0,
+							params: "wAEB8gECGAE%3D",
 						});
 					},
 					icon: "play",
@@ -272,7 +271,7 @@
 			]}
 			on:addqueue={() => {
 				setId();
-				list.initPlaylistSession({ playlistId: header.playlistId });
+				list.initPlaylistSession({ playlistId: header.playlistId, index: 0 });
 
 				notify(`${pageTitle} added to queue!`, "success");
 			}}

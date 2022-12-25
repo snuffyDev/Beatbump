@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-extra-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-// import { browser } from "$app/environment";
-import { IDB } from "./../../db";
+const browser = typeof globalThis !== "undefined";
+import type { Maybe, VoidCallback } from "$lib/utils/collections/array";
 import type { Item } from "../../types";
-import { filter, iter } from "../../utils/collections";
-import { generateId } from "../../utils/strings";
 import type {
 	IDBPlaylistInternal,
 	IDBRequestTarget,
@@ -13,9 +11,111 @@ import type {
 	IDBStoreKeys,
 	IDBMessage,
 	Methods,
+	IObjectStores,
 } from "./types";
 
+function iter<T>(array: ArrayLike<T>, cb: VoidCallback<T>): void {
+	const len = array.length;
+	let idx = -1;
+	while (++idx < len) {
+		cb(array[idx], idx, array);
+	}
+	idx = null;
+}
+
+function filter<T, S>(array: Array<T>, predicate: (item: Maybe<T>) => boolean): T[] {
+	let idx = -1,
+		curPos = 0;
+	const result: T[] = [],
+		length = array.length;
+	for (; ++idx < length; ) {
+		if (predicate(array[idx])) {
+			result[curPos] = array[idx] as unknown as T;
+			curPos++;
+		}
+	}
+	return result as T[];
+}
+export class IDB {
+	private $$: Promise<IDBDatabase> | undefined;
+	constructor(private DB_NAME: string, private DB_VER: number = 1) {}
+
+	private init(): void {
+		if (this.$$) {
+			return;
+		}
+		this.$$ = new Promise((resolve, reject) => {
+			const request = indexedDB.open(this.DB_NAME, this.DB_VER);
+
+			request.onerror = () => reject(request.error);
+			request.onsuccess = () => resolve(request.result);
+
+			request.onupgradeneeded = () => {
+				if (request.result.objectStoreNames.contains("playlists")) {
+					const storeTx = request.transaction.objectStore("playlists").getAll();
+					storeTx.onsuccess = (event: IDBRequestTarget) => {
+						if (Array.isArray(event.target.result)) {
+							MIGRATION_DATA.playlists = [...event.target.result];
+							request.result.deleteObjectStore("playlists");
+						}
+						request.result.createObjectStore("playlists", { keyPath: "id" } as IObjectStores["playlists"]);
+					};
+				}
+				if (!request.result.objectStoreNames.contains("favorites")) {
+					request.result.createObjectStore("favorites", {
+						keyPath: "videoId" || "playlistId",
+					});
+				}
+				if (!request.result.objectStoreNames.contains("playlists")) {
+					request.result.createObjectStore("playlists", {
+						keyPath: "id",
+					});
+				}
+			};
+		});
+	}
+	public transaction<K = unknown, T extends (store: IDBObjectStore) => K = (store: IDBObjectStore) => K>(
+		store: IDBStoreKeys,
+		type: IDBTransactionMode,
+		callback: T,
+	): Promise<K | void> {
+		if (!browser) {
+			return;
+		}
+
+		this.init();
+		return (this.$$ as Promise<IDBDatabase>).then(
+			(db) =>
+				new Promise<K | void>((resolve, reject) => {
+					const tx = db.transaction(store, type);
+					tx.oncomplete = () => resolve();
+					tx.onabort = tx.onerror = () => reject(tx.error);
+
+					callback(tx.objectStore(store));
+				}),
+		);
+	}
+}
+
 const MIGRATION_DATA: { [key in IDBStoreKeys]?: IDBPlaylistInternal[] } = {};
+const charsets = {
+	normal: "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict",
+	alternative: "useandom26T198340PX75pxJACKVERYMINDBUSHWOLFGQZbfghjklqvwyzrict",
+};
+const mod = {
+	generate: (size = 16, charset: "normal" | "alternative" = "normal") => {
+		let id = "";
+		let i = size;
+		while (i--) {
+			id += charsets[charset][(Math.random() * charsets[charset].length) | 0];
+		}
+		return id;
+	},
+};
+
+function generateId(size = 16, charset: "normal" | "alternative" = "normal"): string {
+	return mod.generate(size, charset);
+}
 
 const db = new IDB("beatbump", 3);
 

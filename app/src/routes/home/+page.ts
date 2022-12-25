@@ -1,6 +1,5 @@
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
-let path;
 
 export const load: PageLoad = async ({ fetch, data: data$1, url }) => {
 	// console.time("startLoad");
@@ -11,13 +10,12 @@ export const load: PageLoad = async ({ fetch, data: data$1, url }) => {
 	}
 	// console.timeEnd("startLoad");
 	const { carousels, headerThumbnail = undefined, continuations, visitorData } = data;
-	path = url.pathname;
 
 	return {
 		carousels,
 		headerThumbnail,
 		continuations,
 		visitorData,
-		path,
+		path: url.pathname,
 	};
 };

@@ -160,14 +160,16 @@
 			});
 		}
 	}
-	onMount(async () => {
-		if (!_Peer) {
-			const _module = await RTC_module;
-			RTC = _module.default;
-		} else {
-			RTC = _Peer;
-		}
-	});
+	onMount(() =>
+		(async () => {
+			if (!_Peer) {
+				const _module = await RTC_module;
+				RTC = _module.default;
+			} else {
+				RTC = _Peer;
+			}
+		})(),
+	);
 	// $: console.log(RTC, _Peer)
 	function keyDownListener(event: KeyboardEvent) {
 		if (event.key == "Esc" || event.key == "Escape") {

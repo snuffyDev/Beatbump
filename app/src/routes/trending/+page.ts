@@ -1,6 +1,6 @@
-import type { PageLoad } from "./$types";
-import { error } from "@sveltejs/kit";
 import type { ICarousel } from "$lib/types";
+import { error } from "@sveltejs/kit";
+import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ fetch }): Promise<{ carouselItems: ICarousel[] }> => {
 	const response = await fetch("/trending.json?q=browse");

@@ -1,9 +1,8 @@
-import { browser } from "$app/environment";
+import { browser, dev } from "$app/environment";
 
 import { Mutex } from "$lib/utils/sync/mutex";
 import type { IDBMessage, Actions, Methods } from "./types";
 import { notify } from "$lib/utils/utils";
-import Worker from "./worker?worker";
 
 class IDBService {
 	private worker: Worker = null;
@@ -19,7 +18,9 @@ class IDBService {
 	async setup() {
 		if (!browser) return;
 		if (this.worker) return this.worker;
-		const workerInstance = new Worker();
+		const workerInstance = dev
+			? new Worker(new URL("./worker.ts", import.meta.url), { type: "module", name: "idb" })
+			: new Worker(new URL("./worker.ts", import.meta.url), { name: "idb" });
 		this.isReady = true;
 		return workerInstance;
 	}

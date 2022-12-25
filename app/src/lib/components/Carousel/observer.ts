@@ -12,24 +12,20 @@ export default function observer(node: HTMLElement) {
 					const target = entry.target as HTMLImageElement;
 					if (entry.isIntersecting) {
 						target.loading = "eager";
-						target
-							.decode()
-							.then(() => {
-								target.src = target.dataset.src;
-								observer.unobserve(node);
-							})
-							.catch(() => {
-								target.src = target.dataset.src;
-								observer.unobserve(node);
-							});
+						target.decode().finally(() => {
+							target.src = target.dataset.src;
+							observer.unobserve(node);
+						});
 					}
 				}
 			},
 			{ threshold: 0, rootMargin: "95px 80px" },
 		);
 
-		iter(children, (item) => {
-			observer.observe(item);
+		queueMicrotask(() => {
+			iter(children, (item) => {
+				observer.observe(item);
+			});
 		});
 
 		return {

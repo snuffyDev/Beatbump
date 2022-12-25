@@ -52,25 +52,24 @@ export function buildRequest<
 	},
 ): Promise<Response | null> {
 	const ctx = { ...CONTEXT_DEFAULTS, ...context };
-	const body = params;
 	if (!headers) headers = {};
 	switch (endpoint) {
 		case "artist":
-			return artistRequest(ctx, body as ArtistEndpointParams);
+			return artistRequest(ctx, params as ArtistEndpointParams);
 		case "next":
-			return nextRequest(ctx, body as NextEndpointParams);
+			return nextRequest(ctx, params as NextEndpointParams);
 		case "player":
-			return playerRequest(ctx, body as PlayerEndpointParams);
+			return playerRequest(ctx, params as PlayerEndpointParams);
 		case "playlist":
-			return browseRequest(ctx, body as PlaylistEndpointParams, continuation, headers);
+			return browseRequest(ctx, params as PlaylistEndpointParams, continuation, headers);
 		case "related":
-			return browseRequest(ctx, body as RelatedEndpointParams, null, null);
+			return browseRequest(ctx, params as RelatedEndpointParams, null, null);
 		case "browse":
-			return browseRequest(ctx, body as unknown as RelatedEndpointParams, null, null);
+			return browseRequest(ctx, params as unknown as RelatedEndpointParams, null, null);
 		case "home":
-			return browseRequest(ctx, body as PlaylistEndpointParams, continuation, headers);
+			return browseRequest(ctx, params as PlaylistEndpointParams, continuation, headers);
 		case "search":
-			return searchRequest(ctx, body as SearchEndpointParams, continuation as SearchEndpointParams);
+			return searchRequest(ctx, params as SearchEndpointParams, continuation as SearchEndpointParams);
 		default:
 			return Promise.resolve(null);
 	}

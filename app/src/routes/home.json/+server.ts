@@ -38,13 +38,13 @@ export const GET: RequestHandler = async ({ url }) => {
 			type: "next",
 			itct,
 		},
+	}).then((response) => {
+		if (!response.ok) {
+			throw error(response.status, response.statusText);
+		}
+		return response.json();
 	});
-
-	if (!response.ok) {
-		throw error(response.status, response.statusText);
-	}
-
-	const data = await response.json();
+	const data = response;
 	const _visitorData = data.responseContext?.visitorData;
 	if (ctoken === "") {
 		const result = baseResponse(data, _visitorData);
@@ -146,11 +146,9 @@ function parseBody(contents: Array<any> = []):
 		const item = contents[idx] || {};
 		if ("musicTwoRowItemRenderer" in item) {
 			items[idx] = MusicTwoRowItemRenderer(item);
-		}
-		if ("musicResponsiveListItemRenderer" in item) {
+		} else if ("musicResponsiveListItemRenderer" in item) {
 			items[idx] = MusicResponsiveListItemRenderer(item);
-		}
-		if ("musicNavigationButtonRenderer" in item) {
+		} else if ("musicNavigationButtonRenderer" in item) {
 			items[idx] = MoodsAndGenresItem(item);
 		}
 	}
@@ -158,14 +156,11 @@ function parseBody(contents: Array<any> = []):
 	return items as any[];
 }
 
-function parseCarousel({
-	musicImmersiveCarouselShelfRenderer,
-	musicCarouselShelfRenderer,
-}: {
+function parseCarousel(data: {
 	musicImmersiveCarouselShelfRenderer?: Record<string, any>;
 	musicCarouselShelfRenderer?: Record<string, any>;
 }) {
-	const carousel = musicCarouselShelfRenderer ?? musicImmersiveCarouselShelfRenderer;
+	const carousel = data?.musicCarouselShelfRenderer ?? data?.musicImmersiveCarouselShelfRenderer;
 	const header = parseHeader(carousel?.header);
 	const items = parseBody(carousel?.contents);
 	return { header, items };

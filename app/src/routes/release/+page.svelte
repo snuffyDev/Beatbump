@@ -23,7 +23,6 @@
 		setId();
 		list.initPlaylistSession({ playlistId: releaseInfo.playlistId, index: 0 });
 		list.updatePosition(0);
-		currentTitle.set($list.mix[0].title);
 	};
 	const playGroupSession = () => {
 		setId();
@@ -39,7 +38,6 @@
 			playlistId: releaseInfo?.autoMixId,
 			keyId: 0,
 		});
-		currentTitle.set(items[0].title);
 	};
 
 	let thumbnail = releaseInfo?.thumbnails[0]?.url.replace(/=(w(\d+))-(h(\d+))/g, "=w512-h512");

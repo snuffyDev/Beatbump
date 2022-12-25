@@ -8,9 +8,11 @@
 
 	setContext({}, "library");
 
-	onMount(async () => {
-		songs = await IDBService.sendMessage("get", "favorites");
-	});
+	onMount(() =>
+		(async () => {
+			songs = await IDBService.sendMessage("get", "favorites");
+		})(),
+	);
 
 	let options = [
 		{

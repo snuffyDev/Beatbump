@@ -9,13 +9,11 @@ export function MusicResponsiveListItemRenderer(
 	playlistId?: string,
 	type: string | undefined = undefined,
 ): IListItemRenderer {
-	const thumbnails = ctx.musicResponsiveListItemRenderer.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails || [];
-	for (let idx = 0; idx < thumbnails.length; idx++) {
-		const item = thumbnails[idx];
-		const newThumbnail = thumbnailTransformer(item.url);
-		Object.assign(thumbnails[idx], newThumbnail);
-	}
 	const item = ctx.musicResponsiveListItemRenderer;
+	const thumbnails = item.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails || [];
+	for (let idx = 0; idx < thumbnails.length; idx++) {
+		Object.assign(thumbnails[idx], thumbnailTransformer(thumbnails[idx].url));
+	}
 	const flexColumns = Array.isArray(item.flexColumns) && item.flexColumns;
 	const subtitleRuns = flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs;
 	const flexCol0 = flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0] || ({} as PurpleRun);
@@ -38,7 +36,7 @@ export function MusicResponsiveListItemRenderer(
 			? flexCol0?.navigationEndpoint?.watchEndpoint?.playlistId
 			: item.menu?.menuRenderer.items[0].menuNavigationItemRenderer?.navigationEndpoint?.watchEndpoint?.playlistId
 			? item.menu?.menuRenderer?.items[0]?.menuNavigationItemRenderer.navigationEndpoint?.watchEndpoint?.playlistId
-			: item?.watchEndpoint,
+			: item?.watchEndpoint?.playlistId,
 		thumbnails: thumbnails as (Thumbnail & { placeholder: string })[],
 		length:
 			"fixedColumns" in item && item.fixedColumns[0]?.musicResponsiveListItemFixedColumnRenderer?.text?.runs?.length
@@ -63,7 +61,7 @@ export function MusicResponsiveListItemRenderer(
 			browseId: isNavigationItem.browseId,
 			pageType: isNavigationItem.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType,
 		};
-	if (Item !== undefined && playlistSetVideoId) {
+	if (Item !== undefined && playlistSetVideoId ) {
 		Object.assign(Item, {
 			playlistSetVideoId:
 				item?.playlistSetVideoId ||

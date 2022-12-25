@@ -20,7 +20,7 @@ const config: UserConfig = {
 	worker: {
 		plugins: [],
 		format: "es",
-		rollupOptions: { treeshake: {}, output: {} },
+		rollupOptions: { treeshake: { preset: "recommended" }, external: ["hls.js", "peerjs"], output: { format: "iife" } },
 	},
 };
 export default config;

@@ -9,7 +9,6 @@
 	export let data: PageData;
 	const { videoId, playlist, thumbnails = [], title, related } = data;
 
-	// $: console.log(data);
 	// $: console.log({ videoId, playlist, thumbnails, title, related, data });
 </script>
 

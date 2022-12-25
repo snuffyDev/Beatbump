@@ -17,6 +17,7 @@ export interface IListItemRenderer {
 		pageType: string;
 	};
 	musicVideoType?: string;
+	params?: string | undefined;
 	index?: number;
 	length?: string;
 	videoId: string;

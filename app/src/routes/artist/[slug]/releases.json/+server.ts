@@ -3,11 +3,9 @@ import { json as json$1 } from "@sveltejs/kit";
 import { MusicTwoRowItemRenderer } from "$lib/parsers";
 import { iter } from "$lib/utils/collections";
 import type { RequestHandler } from "./$types";
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, params }) => {
 	const query = url.searchParams;
-
-	const browseId = query.get("browseId") || "";
-	const params = query.get("params");
+	const qparams = query.get("params");
 	const itct = query.get("itct") || "";
 	const visitorData = query.get("visitorData");
 	const json = {
@@ -71,8 +69,8 @@ export const GET: RequestHandler = async ({ url }) => {
 				clickTrackingParams: decodeURIComponent(itct),
 			},
 		},
-		browseId: browseId,
-		params: encodeURIComponent(params),
+		browseId: params.slug,
+		params: encodeURIComponent(qparams),
 	};
 
 	const response = await fetch(
@@ -85,7 +83,7 @@ export const GET: RequestHandler = async ({ url }) => {
 				"Content-Type": "application/json",
 				"x-origin": "https://music.youtube.com",
 				"x-goog-visitor-id": encodeURIComponent(visitorData),
-				referer: "https://music.youtube.com/" + browseId,
+				referer: "https://music.youtube.com/" + params.slug,
 
 				Origin: "https://music.youtube.com",
 			},

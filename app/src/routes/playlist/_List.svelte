@@ -1,12 +1,11 @@
 <script lang="ts">
 	import viewport from "$lib/actions/viewport";
-	import ListItem from "$lib/components/ListItem/ListItem.svelte";
 	import { createEventDispatcher } from "svelte";
 
 	export let items = [];
 	export let hasData = false;
 	export let isLoading = false;
-	const dispatch = createEventDispatcher();
+	const dispatch = createEventDispatcher<{ getMore: never }>();
 </script>
 
 <div class="list">

@@ -2,12 +2,11 @@
 	export let data: Item;
 
 	import Loading from "$components/Loading/Loading.svelte";
-	import { hasContext, onMount, tick } from "svelte";
+	import { hasContext, tick } from "svelte";
 
 	import { showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
-	import Icon from "$components/Icon/Icon.svelte";
 	import { goto } from "$app/navigation";
-	import list, { queue, queuePosition, currentTrack } from "$lib/stores/list";
+	import list, { queue, queuePosition } from "$lib/stores/list";
 	import type { Item } from "$lib/types";
 	import { IDBService } from "$lib/workers/db/service";
 	import { browser } from "$app/environment";
@@ -17,7 +16,6 @@
 	import { groupSession } from "$lib/stores";
 
 	import { IsoBase64 } from "$lib/utils";
-	import { page } from "$app/stores";
 	import { SITE_ORIGIN_URL } from "$stores/url";
 
 	const dispatch = createEventDispatcher();
@@ -164,9 +162,9 @@
 		},
 	];
 	if (isArtist) {
-		DropdownItems = [...DropdownItems.filter((item) => !item.text.includes("Add to Playlist"))];
+		DropdownItems = [...DropdownItems.filter((item) => !item.text?.includes("Add to Playlist"))];
 	}
-	if (data.type.includes("playlist")) {
+	if (data.type?.includes("playlist")) {
 		DropdownItems.splice(1, 1, {
 			text: "View Playlist",
 			icon: "list",
@@ -211,7 +209,7 @@
 			console.log(data);
 			videoId = data.videoId ? data.videoId : "";
 			playlistId = data?.playlistId ? data?.playlistId : data.shuffle?.playlistId ? data.shuffle?.playlistId : "";
-			if (data.type.includes("playlist") || data.type === "albums") {
+			if (data.type?.includes("playlist") || data?.type === "albums") {
 				await list.initPlaylistSession({
 					playlistId,
 					index: 0,

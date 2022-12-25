@@ -1,7 +1,6 @@
 /// <reference lib="webworker" />
 import type { Actions, Methods } from "./types";
 import { dbHandler } from "./db";
-import { Logger } from "$lib/utils/logger";
 
 const worker = self as unknown as DedicatedWorkerGlobalScope;
 
@@ -18,7 +17,7 @@ worker.onmessage = async <
 	await dbHandler<Action, Type, Key, Fn>(action, type, ...params)
 		.then((result) => postMessage(result))
 		.catch((err) => {
-			Logger.err(`[DB:TX Error] `, err);
+			console.error(`[DB:TX Error] `, err);
 			return err;
 		});
 };

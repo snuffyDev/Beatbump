@@ -39,26 +39,27 @@ export function mergeObjects<Target, Source>(target: Target, source: Source): IM
 	return target as IMergedObject<Target, Source>;
 }
 
-export function mergeObjectsRec<Target, Source>(target: Target, source: Source): IMergedObject<Target, Source> {
-	const iter = (a, b) => {
-		const keys: Array<string> = Object.keys(b);
-		const length = keys.length;
-		let idx = -1;
-		for (; ++idx < length; ) {
-			const key = keys[idx];
-			if (b[key] instanceof Array && (a[key] as []) instanceof Array) {
-				// eslint-disable-next-line prefer-spread
-				a[key].push.apply(a[key], b[key]);
-			} else if (b[key] instanceof Object && Object.prototype.hasOwnProperty.call(a, key)) {
-				a[key] = iter(b[key], a[key]);
-			} else {
-				a[key] = b[key];
-				if (!a[key]) delete a[key];
-			}
+export function mergeObjectsRec<Target extends Record<string, any>, Source extends Record<string, any>>(
+	target: IObject<Target>,
+	source: IObject<Source>,
+): IMergedObject<Target, Source> {
+	if ((typeof target || typeof source) !== "object") throw new Error("Both provided parameters are not valid objects.");
+	const obj: Record<string, unknown> = Object.assign({}, target);
+	const keys: Array<string> = Object.keys(source);
+	const length = keys.length;
+	let idx = -1;
+	for (; ++idx < length; ) {
+		const key = keys[idx];
+		if (Array.isArray(source[key]) && Array.isArray(target[key])) {
+			obj[key] = [];
+			(obj[key] as unknown[]).push(...(target[key] as any[]), ...(source[key] as any[]));
+		} else if (typeof source[key] === "object" && typeof target[key] === "object" && key in source) {
+			obj[key] = mergeDeep(source[key] as Record<string, unknown>, target[key] as Record<string, unknown>);
+		} else {
+			obj[key] = key in source ? source[key] : obj[key];
 		}
-		return a;
-	};
-	return iter(target, source);
+	}
+	return obj as MergedObject<Target, Source>;
 }
 
 export function sortObj<T extends IObject<T>>(object: T) {

@@ -6,7 +6,6 @@
 	export let data: PageData;
 
 	const { carouselItems, page: path } = data;
-	$: console.log(data);
 </script>
 
 <Header

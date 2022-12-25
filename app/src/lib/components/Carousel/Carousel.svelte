@@ -1,27 +1,28 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
 	import type { CarouselHeader } from "$lib/types";
-	import type { CarouselItem as Item } from "$lib/types";
-
 	import CarouselItem from "./CarouselItem.svelte";
 	import Icon from "$components/Icon/Icon.svelte";
 	import { page } from "$app/stores";
 	import { onDestroy, onMount } from "svelte";
 	import observer from "./observer";
 	import { browser } from "$app/environment";
+	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 
 	export let header: CarouselHeader;
-	export let items: Item[] = [];
+	export let items: IListItemRenderer[] = [];
 	export let type = "";
 	export let kind = "normal";
-	export let isBrowseEndpoint;
+	export let isBrowseEndpoint: boolean;
 	export let visitorData = "";
 
-	let moreOnLeft, moreOnRight;
+	let moreOnLeft: boolean, moreOnRight: boolean;
 
-	let clientWidth;
+	let clientWidth: number;
 	let carousel: HTMLDivElement = undefined;
 
-	let frame;
+	let frame: number;
 	let hasScrollWidth = false;
 	const scrollPositions = {
 		left: 0,
@@ -42,8 +43,10 @@
 		scrollPositions.right = scrollPositions.width - scrollLeft - 15;
 	}
 	function onScroll(event) {
-		if (frame) cancelAnimationFrame(frame);
-		frame = requestAnimationFrame(scrollHandler);
+		queueMicrotask(() => {
+			if (frame) cancelAnimationFrame(frame);
+			frame = requestAnimationFrame(scrollHandler);
+		});
 	}
 	onMount(() => {
 		if (carousel) {
@@ -57,14 +60,16 @@
 			frame = null;
 		}
 	});
+
 	const isArtistPage = $page.url.pathname.includes("/artist/");
 	const urls = {
 		playlist: `/playlist/${header?.browseId}`,
 		trending: `/trending/new/${header?.browseId}${header?.params ? `?params=${header.params}` : ""}${
 			header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ""
 		}`,
-		artist: `/artist/releases?browseId=${header?.browseId}&visitorData=${visitorData}&params=${header?.params}&itct=${header?.itct}`,
+		artist: `${header.browseId}/releases?visitorData=${visitorData}&params=${header?.params}&itct=${header?.itct}`,
 	};
+
 	let href =
 		header?.browseId && isArtistPage ? urls.artist : header.browseId?.includes("VLP") ? urls.playlist : urls.trending;
 </script>
@@ -86,7 +91,7 @@
 	{:else if isArtistPage && header.title.includes("Videos")}
 		<a
 			style="white-space:pre; display: inline-block;"
-			href={`/playlist/${header?.browseId}`}
+			href={urls.playlist}
 		>
 			<small>See All</small>
 		</a>
@@ -130,7 +135,7 @@
 		use:observer
 	>
 		{#each items as item, index}
-			{#if type == "trending"}
+			{#if type === "trending"}
 				<CarouselItem
 					type="trending"
 					{kind}
@@ -139,7 +144,7 @@
 					isBrowseEndpoint={"endpoint" in item}
 					{index}
 				/>
-			{:else if type == "artist" || type == "home"}
+			{:else if type === "artist" || type === "home"}
 				<CarouselItem
 					{type}
 					{kind}
@@ -148,7 +153,7 @@
 					{item}
 					{index}
 				/>
-			{:else if type == "new"}
+			{:else if type === "new"}
 				<CarouselItem
 					type="new"
 					aspectRatio={item.aspectRatio}
