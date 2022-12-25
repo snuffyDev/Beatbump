@@ -51,6 +51,19 @@ Some of Beatbump's features includes:
 | `app`                         | Beatbump web app                                      |
 | `packages/hls-proxy-rewriter` | Proxy server used for Beatbump's music playback (WIP) |
 
+
+## Instances
+
+> Service Uptime Monitoring: https://stats.uptimerobot.com/9PnmRfz6Gm
+
+| Name                         | URL
+| ---                          | ---                                                                       |
+| Beatbump (Official Instance) | https://beatbump.ml                                                       |
+| ~Vern (clearnet)             | https://bb.vern.cc/                                                       |
+| ~Vern (Onion)                | http://bb.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion/ |
+| ~Vern (I2P)                  | http://vern6inmbjzqpecx4kpkq5sln3cqqrfuxfzh4au3tpxbsfbwbnta.b32.i2p/      |
+
+
 ## Donations
 
 Want to support Beatbump financially to aid with future development/hosting?
