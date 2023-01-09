@@ -287,7 +287,9 @@
 					data-src={index >= 3
 						? srcImg.width < 100
 							? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
-							: srcImg.url
+							: srcImg.width < 100
+							? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
+							: null
 						: null}
 				/>
 			</div>
