@@ -283,7 +283,11 @@
 					loading={index >= 3 ? "lazy" : null}
 					width={srcImg.width}
 					height={srcImg.height}
-					src={index >= 3 ? srcImg.placeholder : srcImg.url}
+					src={index >= 3
+						? srcImg.placeholder
+						: srcImg.width < 100
+						? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
+						: srcImg.url}
 					data-src={index >= 3
 						? srcImg.width < 100
 							? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
