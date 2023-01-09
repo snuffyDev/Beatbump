@@ -21,27 +21,25 @@ export const GET: RequestHandler = async () => {
 		context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
 		params: { browseId: "FEmusic_explore" },
 		headers: null,
+	}).then((res) => {
+		if (!res.ok) {
+			throw error(res.status, res.statusText);
+		}
+		return res.json();
 	});
 
-	if (!response.ok) {
-		throw error(response.status, response.statusText);
-	}
-
-	const data = await response.json();
+	const data = await response;
 
 	const contents = data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer
 		?.contents as any[];
-	/// Get only the musicCarouselShelfRenderer's
-	let idx = contents.length;
-	while (--idx > -1) {
-		if ("musicCarouselShelfRenderer" in contents[idx]) carouselItems.unshift(contents[idx]);
-	}
 
-	/// Parse the carouselItems
-	let pos = carouselItems.length;
-	while (--pos > -1) {
-		carouselItems[pos] = parseCarousel({ musicCarouselShelfRenderer: carouselItems[pos].musicCarouselShelfRenderer });
-	}
+	/// Get only the musicCarouselShelfRenderer's
+
+	carouselItems = contents
+		.filter((item) => "musicCarouselShelfRenderer" in item)
+		.map((shelf) => {
+			return parseCarousel(shelf);
+		});
 
 	return json({ carouselItems });
 };
@@ -79,23 +77,20 @@ function parseBody(contents: Record<string, any>[] = []):
 				browseId: any;
 			};
 	  }[] {
-	const items: any[] = [];
-	const length = contents.length;
-	let idx = -1;
-	while (++idx < length) {
-		const item = contents[idx];
+	const items: any[] = contents.map((item) => {
 		if ("musicTwoRowItemRenderer" in item) {
-			items[idx] = MusicTwoRowItemRenderer(item as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer });
+			return MusicTwoRowItemRenderer(item as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer });
 		}
 		if ("musicResponsiveListItemRenderer" in item) {
-			items[idx] = MusicResponsiveListItemRenderer(
+			return MusicResponsiveListItemRenderer(
 				item as { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer },
 			);
 		}
 		if ("musicNavigationButtonRenderer" in item) {
-			items[idx] = MoodsAndGenresItem(item);
+			return MoodsAndGenresItem(item);
 		}
-	}
+	});
+
 	return items;
 }
 

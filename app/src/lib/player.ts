@@ -450,16 +450,20 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		if (!this._HLSModule) this._HLSModule = await this.loadHLSModule();
 		if (this._HLSModule.isSupported() !== true) return;
 		if (this._HLS) this._HLS.destroy();
+
 		this._HLS = new this._HLSModule({
 			lowLatencyMode: true,
 			enableWorker: true,
 
 			backBufferLength: 90,
 		});
+
 		this._HLS.attachMedia(this._player);
+
 		this._HLS.on(this._HLSModule.Events.MEDIA_ATTACHED, () => {
 			this._HLS.loadSource(source);
 		});
+
 		this._HLS.on(this._HLSModule.Events.ERROR, (event, data) => {
 			const type = data.type;
 			switch (type) {
@@ -473,6 +477,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			}
 		});
 	}
+
 	private async getNextSongInQueue(position: number, shouldAutoplay = true): Promise<Nullable<ResponseBody>> {
 		const sessionList = this.currentSessionList();
 
@@ -541,6 +546,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			if (hasProperty(value)) return value;
 		});
 	}
+
 	private async handleRepeat(currentList: ISessionListProvider) {
 		if (currentList.position === currentList.mix.length - 1) {
 			SessionListService.updatePosition(1);
@@ -549,6 +555,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		}
 		this.__tick = false;
 	}
+
 	private async onEnded() {
 		if (this._repeat === "track") return;
 		const currentList = this.currentSessionList();
@@ -731,7 +738,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			this.dispatch("playing");
 		});
 
-		this._player.addEventListener("timeupdate", async () => {
+		this.onEvent("timeupdate", async () => {
 			this._currentTimeStore.set(this._player.currentTime);
 			this._durationStore.set(this._isWebkit && !this.isHLSPlayer ? this._player.duration / 2 : this._player.duration);
 
@@ -759,7 +766,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			}
 		});
 
-		this._player.addEventListener("ended", async () => this.onEnded());
+		this.onEvent("ended", async () => this.onEnded());
 	}
 
 	// #endregion Private Methods (5)

@@ -152,7 +152,9 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let addr: SocketAddr = "0.0.0.0:10000".parse().unwrap();
+    let bind: String = std::env::var("PROXY_ADDR").unwrap_or("0.0.0.0".to_string());
+    let port: String = std::env::var("PROXY_PORT").unwrap_or("10000".to_string());
+    let addr: SocketAddr = format!("{}:{}", &bind, &port).parse().unwrap();
 
     let listener = TcpListener::bind(&addr).await?;
 

@@ -2,6 +2,8 @@ import { buildRequest } from "$api/request";
 import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 
 import type { CarouselHeader } from "$lib/types";
+import type { IMusicResponsiveListItemRenderer, IMusicTwoRowItemRenderer } from "$lib/types/innertube/internals";
+import type { ButtonRenderer } from "$lib/types/innertube/musicCarouselShelfRenderer";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import type { Dict } from "$lib/types/utilities";
@@ -88,12 +90,14 @@ function baseResponse(data: Dict<any>, _visitorData: string) {
 		if ("musicCarouselShelfRenderer" in item) {
 			const carousel = parseCarousel(item);
 			carouselItems.push(carousel);
+			continue;
 		}
 		if ("musicImmersiveCarouselShelfRenderer" in item) {
 			headerThumbnail =
 				item.musicImmersiveCarouselShelfRenderer.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail?.thumbnails ||
 				[];
 			carouselItems.push(parseCarousel(item));
+			continue;
 		}
 	}
 
@@ -127,7 +131,13 @@ function parseHeader({ musicCarouselShelfBasicHeaderRenderer }): CarouselHeader 
 	}
 }
 
-function parseBody(contents: Array<any> = []):
+function parseBody(
+	contents:
+		| { musicNavigationButtonRenderer: ButtonRenderer }[]
+		| { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer }[]
+		| { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer }[]
+		| any[] = [],
+):
 	| ICarouselTwoRowItem[]
 	| IListItemRenderer[]
 	| {
@@ -138,12 +148,13 @@ function parseBody(contents: Array<any> = []):
 				browseId: any;
 			};
 	  }[] {
-	const items: unknown[] = [];
+	const items = [];
 	let idx = -1;
 	const length = contents.length;
 
 	while (++idx < length) {
-		const item = contents[idx] || {};
+		const item = contents[idx];
+
 		if ("musicTwoRowItemRenderer" in item) {
 			items[idx] = MusicTwoRowItemRenderer(item);
 		} else if ("musicResponsiveListItemRenderer" in item) {
@@ -152,7 +163,6 @@ function parseBody(contents: Array<any> = []):
 			items[idx] = MoodsAndGenresItem(item);
 		}
 	}
-
 	return items as any[];
 }
 

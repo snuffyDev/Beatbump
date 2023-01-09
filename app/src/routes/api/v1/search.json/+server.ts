@@ -65,7 +65,7 @@ export const GET: RequestHandler = async ({ url }) => {
 				? parseContinuation(continuationContents, filter as SearchFilter)
 				: parseContents(contents, filter as SearchFilter);
 
-		return json(Object.assign(results, { data }));
+		return json(results);
 	} catch (err) {
 		throw error(500, err);
 	}
@@ -139,10 +139,12 @@ function parseResults(items: any[], type: string) {
 	while (--idx > -1) {
 		const entry = items[idx];
 		const item = MusicResponsiveListItemRenderer(entry);
+		const _type = type === "top_result" ? (item.endpoint?.pageType?.match(/SINGLE|ALBUM/i) ? "albums" : type) : type;
+		Object.assign(item, {
+			type: _type,
+		});
 
-		Object.assign(item, { type: type });
-
-		if (type.includes("playlists") || type === "albums") {
+		if (_type.includes("playlists") || _type === "albums") {
 			let metaData = "";
 			iter(item.subtitle, (subtitle) => (metaData += subtitle.text));
 

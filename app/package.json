@@ -7,15 +7,20 @@
 		"cfw:deploy": "wrangler publish",
 		"vercel:deploy": "vercel deploy --prod",
 		"netlify:deploy": "netlify deploy --prod",
-		"build": "vite build",
-		"sync": "svelte-kit sync",
 		"preview": "vite preview --host",
+		"build": "vite build",
+		"test": "playwright test",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"test:unit": "vitest",
+		"sync": "svelte-kit sync",
 		"validate": "npm run format && npm run lint ",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint ."
 	},
 	"devDependencies": {
 		"@babel/core": "^7.18.6",
+		"@playwright/test": "^1.29.2",
 		"@snuffydev/fast-cli": "^0.0.1",
 		"@sveltejs/adapter-cloudflare": "^1.0.0",
 		"@sveltejs/adapter-cloudflare-workers": "^1.0.0",
@@ -47,16 +52,16 @@
 		"prettier-plugin-svelte": "^2.9.0",
 		"sass": "^1.53.0",
 		"svelte": "^3.55.0",
-		"svelte-check": "^2.8.0",
+		"svelte-check": "^2.9.2",
 		"svelte-preprocess": "^5.0.0",
 		"ts-node": "^10.9.1",
 		"tslib": "^2.4.0",
 		"typescript": "^4.9.4",
-		"vite": "^4.0.1"
+		"vite": "^4.0.1",
+		"vitest": "^0.26.3"
 	},
 	"type": "module",
 	"dependencies": {
-		"@fontsource/commissioner": "^4.5.7",
-		"comlink": "^4.3.1"
+		"@fontsource/commissioner": "^4.5.7"
 	}
 }

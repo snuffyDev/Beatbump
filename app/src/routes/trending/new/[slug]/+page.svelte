@@ -34,10 +34,11 @@
 				heading={header}
 				items={section.section}
 				let:item
+				let:index
 			>
 				<!-- <GridItem slot="item" {item} /> -->
 				<CarouselItem
-					index
+					{index}
 					aspectRatio={item.aspectRatio}
 					{item}
 					kind="album"

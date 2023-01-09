@@ -1,11 +1,12 @@
 import { sveltekit } from "@sveltejs/kit/vite";
-import type { UserConfig } from "vite";
+import type { UserConfig } from "vitest/config";
+
 const version = new Date(Date.now());
 const version_fmt = `${version.getUTCFullYear()}.${version.getMonth().toString().padStart(2, "0")}.${version
 	.getDate()
 	.toString()
 	.padStart(2, "0")}`;
-/** @type {*} */
+
 const config: UserConfig = {
 	plugins: [sveltekit()],
 	build: {
@@ -17,6 +18,9 @@ const config: UserConfig = {
 	},
 	esbuild: { treeShaking: true, minifyWhitespace: true, minifyIdentifiers: true, minifySyntax: true },
 
+	test: {
+		include: ["src/**/*.{test,spec}.{js,ts}"],
+	},
 	worker: {
 		plugins: [],
 		format: "es",

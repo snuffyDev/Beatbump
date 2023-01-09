@@ -1,32 +1,7 @@
-<script lang="ts">
-	import Icon from "$components/Icon/Icon.svelte";
-	import { clickOutside } from "$lib/actions/clickOutside";
-	import { cubicOut, quartOut } from "svelte/easing";
-	// import { slide } from 'svelte/transition'
-
-	import { PopperStore, isOpen } from "../Popper/popperStore";
-	import DropdownItem from "./DropdownItem.svelte";
-
-	export let main: HTMLElement;
-	$: items = $PopperStore?.items;
-	$: type = $PopperStore?.type;
-
-	$: isShowing = $PopperStore?.items.length !== 0;
-	let frame;
-	function onClose() {
-		// popper = null;
-		if ($PopperStore.srcNode !== undefined) {
-			$PopperStore.srcNode.focus();
-		}
-		PopperStore.reset();
-	}
-	let width;
-	let viewport_height;
-	let viewport_width;
-	let popperHeight;
-	let popper: HTMLElement = undefined;
-	let lastScrollPosY;
-	let lastScrollTime;
+<script
+	context="module"
+	lang="ts"
+>
 	export function slide(node: Element, { delay = 0, duration = 400, easing = cubicOut } = {}) {
 		const style = getComputedStyle(node);
 		const opacity = +style.opacity;
@@ -54,24 +29,8 @@
 				`border-bottom-width: ${t * border_bottom_width}px;`,
 		};
 	}
-	$: rect = popper && popper.getBoundingClientRect();
-	$: posY =
-		$PopperStore?.y - popperHeight <= 0
-			? $PopperStore.y
-			: $PopperStore.bottom + popperHeight >= viewport_height
-			? $PopperStore.y - popperHeight
-			: $PopperStore.y;
 
-	$: posX =
-		$PopperStore?.direction === "right"
-			? popper && rect?.left <= 0
-				? $PopperStore.x + rect?.width
-				: rect?.right >= viewport_width
-				? viewport_width + -width * 1.75
-				: $PopperStore.x
-			: $PopperStore.x - width;
-	$: popper && popper instanceof HTMLElement && popper.focus();
-	// $: console.log($PopperStore)
+	// Focus state action
 	function focusState(node: HTMLElement) {
 		function handleFocusOut(event: FocusEvent & { relatedTarget: HTMLElement & EventTarget }) {
 			// console.log(node.contains(event.relatedTarget))
@@ -80,45 +39,121 @@
 			}
 		}
 
-		node.addEventListener("focusout", handleFocusOut, { capture: true });
+		node.addEventListener("focusout", handleFocusOut, true);
 		return {
 			destroy() {
 				node.removeEventListener("focusout", handleFocusOut, true);
 			},
 		};
 	}
+</script>
+
+<script lang="ts">
+	import { clickOutside } from "$lib/actions/clickOutside";
+	import { windowHeight, windowWidth } from "$stores/window";
+	import { cubicOut } from "svelte/easing";
+
+	import { PopperStore, isOpen, activeNode } from "../Popper/popperStore";
+	import DropdownItem from "./DropdownItem.svelte";
+
+	export let main: HTMLElement;
+
+	$: items = $PopperStore?.items;
+	$: type = $PopperStore?.type;
+
+	$: isShowing = $PopperStore?.items.length !== 0;
+
+	let frame: number;
+
+	let width: number;
+	let popperHeight;
+	let popper: HTMLElement = undefined;
+	let scrollPosY: number = 0;
+	let lastScrollTime;
+	let isScrolling = false;
+	let posX: number;
+	let posY: number;
+
+	$: if (popper) {
+		let rect = popper.getBoundingClientRect();
+		// Get position on the X axis
+		if ($PopperStore?.direction === "right") {
+			if (rect?.left <= 0) {
+				posX = $PopperStore.x + rect?.width;
+			} else if (rect?.right >= $windowWidth) {
+				posX = $windowWidth + -width * 1.75;
+			} else {
+				posX = $PopperStore.x;
+			}
+		} else {
+			posX = $PopperStore.x - width;
+		}
+
+		// Get position on the Y axis
+		if ($PopperStore?.y - popperHeight <= 0) {
+			posY = $PopperStore.y;
+		} else if ($PopperStore.bottom + popperHeight >= $windowHeight) {
+			posY = $PopperStore.y - popperHeight;
+		} else {
+			posY = $PopperStore.y;
+		}
+	}
+
+	// Handle close
+	function onClose() {
+		if ($PopperStore.srcNode !== undefined) {
+			activeNode.set(new WeakRef({ value: null }));
+			$PopperStore.srcNode.focus();
+		}
+		$isOpen = false;
+		PopperStore.reset();
+		isScrolling = false;
+	}
+
 	function handleKeyDown(event: KeyboardEvent, fn: () => void) {
 		if (event.code === "Space") {
 			event.preventDefault();
-			const target = event.target as HTMLElement;
 			fn();
 			onClose();
 		}
 	}
+	let startTime: number;
+	function scrollHandler(ts: number) {
+		if (!popper) return;
+		if (startTime === undefined) {
+			startTime = ts;
+		}
+		const elapsed = ts - startTime;
 
-	function handleScroll(event: Event) {
-		const target = event.target as HTMLElement;
-		if (frame) cancelAnimationFrame(frame);
-		frame = requestAnimationFrame(() => {
-			if (target.scrollTop === lastScrollPosY) return;
-			if (isShowing) {
-				const scrollTop = target.scrollTop;
-				const diff = lastScrollPosY - scrollTop;
-				if (Math.abs(diff) > 5) {
-					isShowing = false;
-					onClose();
-				}
-			}
-			lastScrollPosY = target.scrollTop;
-		});
+		if (elapsed < 100) {
+			frame = requestAnimationFrame(scrollHandler);
+		} else {
+			onClose();
+			cancelAnimationFrame(frame);
+			isScrolling = false;
+			isShowing = false;
+			startTime = undefined;
+			scrollPosY = undefined;
+			frame = undefined;
+
+			return;
+		}
+	}
+
+	function onScroll() {
+		if (!popper) return;
+		if (!scrollPosY) scrollPosY = popper.getBoundingClientRect().top;
+		if (frame) {
+			return;
+		}
+		if (isScrolling) return;
+		isScrolling = true;
+
+		requestAnimationFrame(scrollHandler);
 	}
 </script>
 
-<svelte:window
-	bind:innerHeight={viewport_height}
-	bind:innerWidth={viewport_width}
-	on:scroll|capture={handleScroll}
-/>
+<svelte:window on:scroll|capture={onScroll} />
 
 {#if isShowing}
 	<div
@@ -129,10 +164,9 @@
 		bind:this={popper}
 		on:mouseleave|stopPropagation={onClose}
 		on:lostfocus={onClose}
-		on:click_outside|stopPropagation={onClose}
 		in:slide={{ delay: 125, duration: 125 }}
 		out:slide={{ duration: 125 }}
-		class={type == "player" ? "dd-player" : "dd-menu"}
+		class={type === "player" ? "dd-player" : "dd-menu"}
 		style="transform: translate({posX}px, {posY}px)"
 		tabindex="0"
 	>

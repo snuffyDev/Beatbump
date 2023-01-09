@@ -1,4 +1,4 @@
-export function throttle(callback, interval) {
+export function throttle<T extends any, A extends T[] = T[]>(callback: (...args: A) => void, interval: number) {
 	let enableCall = true;
 
 	return function (...args) {

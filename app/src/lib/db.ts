@@ -5,9 +5,7 @@ import { notify } from "./utils/utils";
 import { generateId } from "./utils/strings";
 import { getPlaylists, getFavorites, setMultipleFavorites, setMultiplePlaylists } from "./workers/db/db";
 
-import type {
-	IDBPlaylist,
-} from "./workers/db/types";
+import type { IDBPlaylist } from "./workers/db/types";
 interface ExportDBResult {
 	favorites?: Item[];
 	playlists?: IDBPlaylist[];
@@ -48,7 +46,7 @@ export async function importDB(data: File) {
 		const json = JSON.parse(jsonString) as ExportDBResult;
 		if (!json.favorites && !json.playlists) throw new Error("Provided file is not a valid DB JSON object");
 
-		await Promise.allSettled([await setMultiplePlaylists(json?.playlists), await setMultipleFavorites(json?.favorites)])
+		await Promise.allSettled([setMultiplePlaylists(json?.playlists), setMultipleFavorites(json?.favorites)])
 			.then(() => {
 				notify(`Successfully imported database from JSON`, "success");
 			})

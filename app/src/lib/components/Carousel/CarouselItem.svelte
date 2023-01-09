@@ -1,5 +1,39 @@
 <svelte:options immutable={true} />
 
+<script
+	context="module"
+	lang="ts"
+>
+	const RE_ALBUM_PLAYLIST_SINGLE = /PLAYLIST|ALBUM|SINGLE/;
+	const RE_THUMBNAIL_DIM = /=w\d+-h\d+-/gm;
+	const errorHandler = (
+		event: Event & {
+			currentTarget: EventTarget & HTMLImageElement;
+		},
+	) => {
+		if (!browser) return;
+		event.currentTarget.onerror = null;
+
+		event.currentTarget.src =
+			"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjNDI0MjQyIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA1LjU0IDE2Ni43OTQpIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCZxdW90O1NlZ29lIFVJJnF1b3Q7LFJvYm90byxPeHlnZW4sVWJ1bnR1LENhbnRhcmVsbCwmcXVvdDtPcGVuIFNhbnMmcXVvdDssJnF1b3Q7SGVsdmV0aWNhIE5ldWUmcXVvdDssc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNmYWZhZmEiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiA1NC44MzkpIiBkPSJNMCAwaDcydjE0Ni4zMjNIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+";
+	};
+
+	function handleContextMenu(event: MouseEvent, dropdownItems: Dropdown) {
+		event.preventDefault();
+		window.dispatchEvent(new CustomEvent("contextmenu", { detail: "carouselItem" }));
+
+		PopperStore.set({
+			items: dropdownItems,
+			x: event.pageX,
+			y: event.pageY,
+			direction: "normal",
+		});
+	}
+
+	const FILTER_ARTIST_ON_ARTIST_PAGE: ReadonlyArray<string> = ["Favorite", "Add to Queue", "View Artist"] as const;
+	const FILTER_ALBUM_PLAYLIST_ITEMS: ReadonlyArray<string> = ["Favorite", "Play Next", "View Artist"] as const;
+</script>
+
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import Loading from "$components/Loading/Loading.svelte";
@@ -7,29 +41,29 @@
 	import { IDBService } from "$lib/workers/db/service";
 
 	import list from "$lib/stores/list";
-	import type { Item } from "$lib/types";
 	import { Logger, notify } from "$lib/utils";
 	import { showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
 	import { page } from "$app/stores";
 	import { tick } from "svelte";
 	import { PopperButton, PopperStore } from "../Popper";
-	import { browseHandler } from "./functions";
+	import { browseHandler, clickHandler } from "./functions";
 	import { browser } from "$app/environment";
 	import { IsoBase64 } from "$lib/utils";
 	import { SITE_ORIGIN_URL } from "$stores/url";
 	import type { Dropdown } from "$lib/configs/dropdowns.config";
 	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
-	export let index;
+	import type { Item } from "$lib/types";
+
+	export let index: number;
 	export let item: IListItemRenderer;
 	export let type = "";
 	export let kind = "";
-	export let aspectRatio;
+	export let aspectRatio: string;
 	export let isBrowseEndpoint = false;
-	let loading;
-	let RATIO_SQUARE = item?.aspectRatio?.match(/SQUARE/) ? true : false;
+
+	let loading = false;
 	let RATIO_RECT =
-		(item?.aspectRatio?.includes("TWO_LINE_STACK") && kind !== "Fans might also like") ||
-		item?.aspectRatio?.includes("16_9")
+		(aspectRatio?.includes("TWO_LINE_STACK") && kind !== "Fans might also like") || aspectRatio?.includes("16_9")
 			? true
 			: false;
 	const ASPECT_RATIO = !RATIO_RECT ? "1x1" : "16x9";
@@ -38,18 +72,24 @@
 			text: "View Artist",
 			icon: "artist",
 			action: async () => {
-				goto(`/artist/${item.artistInfo.artist[0].browseId}`);
-				await tick();
-				window.scrollTo({
-					behavior: "smooth",
-					top: 0,
-					left: 0,
-				});
+				try {
+					const artistId = item.artistInfo ? item.artistInfo.artist[0].browseId : item.subtitle[0].browseId;
+					if (!artistId) throw new Error(`Expected a valid artistId string, received ${artistId}`);
+					goto(`/artist/${artistId}`);
+					await tick();
+					window.scrollTo({
+						behavior: "smooth",
+						top: 0,
+						left: 0,
+					});
+				} catch (e) {
+					notify(`Error: ${e}`, "error");
+				}
 			},
 		},
 		{
 			text: "Add to Queue",
-			icon: "list-music",
+			icon: "queue",
 			action: function action() {
 				list.setTrackWillPlayNext(item, $list.mix.length);
 				notify(`${item.title} has been added to your queue!`, "success");
@@ -58,7 +98,7 @@
 
 		{
 			text: "Play Next",
-			icon: "list-music",
+			icon: "queue",
 			action: function () {
 				list.setTrackWillPlayNext(item, $list.position);
 				notify(`${item.title} will play next!`, "success");
@@ -68,7 +108,7 @@
 			text: "Add to Playlist",
 			icon: "list-plus",
 			action: async () => {
-				if (item.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
+				if (item.endpoint?.pageType.match(RE_ALBUM_PLAYLIST_SINGLE)) {
 					const response = await fetch("/api/v1/get_queue.json?playlistId=" + item.playlistId);
 					const data = await response.json();
 					const items: Item[] = data;
@@ -116,7 +156,7 @@
 								await navigator.clipboard.writeText(shareData.url);
 								notify("Link copied successfully", "success");
 							} else {
-								const share = await navigator
+								await navigator
 									.share(shareData)
 									.then(() => {
 										notify("Shared successfully", "success");
@@ -164,7 +204,7 @@
 						await navigator.clipboard.writeText(shareData.url);
 						notify("Link copied successfully", "success");
 					} else {
-						const share = await navigator.share(shareData);
+						await navigator.share(shareData);
 						notify("Shared successfully", "success");
 					}
 				} catch (error) {
@@ -173,105 +213,38 @@
 			},
 		},
 	];
-
-	const errorHandler = (
-		event: Event & {
-			currentTarget: EventTarget & HTMLImageElement;
-		},
-	) => {
-		if (!browser) return;
-		event.currentTarget.onerror = null;
-
-		event.currentTarget.src =
-			"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjNDI0MjQyIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA1LjU0IDE2Ni43OTQpIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCZxdW90O1NlZ29lIFVJJnF1b3Q7LFJvYm90byxPeHlnZW4sVWJ1bnR1LENhbnRhcmVsbCwmcXVvdDtPcGVuIFNhbnMmcXVvdDssJnF1b3Q7SGVsdmV0aWNhIE5ldWUmcXVvdDssc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNmYWZhZmEiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiA1NC44MzkpIiBkPSJNMCAwaDcydjE0Ni4zMjNIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+";
-	};
-	const clickHandler = async (event: Event, index) => {
-		loading = true;
-		console.log(item);
-		if (type === "trending") {
-			isBrowseEndpoint
-				? goto(
-						"/release?type=" +
-							encodeURIComponent(item?.endpoint?.pageType) +
-							"&id=" +
-							encodeURIComponent(item.endpoint?.browseId),
-				  )
-				: await list.initAutoMixSession({
-						videoId: item.videoId,
-						playlistId: item.playlistId,
-						loggingContext: item?.loggingContext || null,
-						keyId: kind === "isPlaylist" ? index : 0,
-						config: { type: item?.musicVideoType },
-				  });
-
-			list.updatePosition(kind === "isPlaylist" ? index : 0);
-			loading = false;
+	$: {
+		if (type === "artist" || (item.endpoint && item.endpoint.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST"))) {
+			DropdownItems = DropdownItems.filter((item) => FILTER_ARTIST_ON_ARTIST_PAGE.includes(item.text));
 		}
-		if (type === "home") {
-			item?.endpoint?.pageType.includes("ARTIST") && goto(`/artist/${item?.endpoint?.browseId}`);
-			!isBrowseEndpoint && item.videoId !== undefined && !item?.endpoint?.pageType.includes("ARTIST")
-				? await list.initAutoMixSession({
-						videoId: item.videoId,
-						playlistId: item.playlistId,
-				  })
-				: browseHandler(item.endpoint.pageType, item.endpoint.browseId);
-			loading = false;
+		if (item.endpoint?.pageType) {
+			DropdownItems = item?.endpoint?.pageType.match(RE_ALBUM_PLAYLIST_SINGLE)
+				? [
+						{
+							action: () =>
+								list.initPlaylistSession({ playlistId: item.playlistId, params: "wAEB8gECKAE%3D", index: 0 }),
+							icon: "shuffle",
+							text: "Shuffle Play",
+						},
+						{
+							action: () => list.setTrackWillPlayNext(item, $list.position),
+							icon: "queue",
+							text: "Play Next",
+						},
+						{
+							action: () =>
+								list.initPlaylistSession({
+									playlistId: "RDAMPL" + item.playlistId,
+									params: "wAEB8gECeAE%3D",
+									index: 0,
+								}),
+							icon: "radio",
+							text: "Start Radio",
+						},
+						...DropdownItems.filter((item) => !FILTER_ALBUM_PLAYLIST_ITEMS.includes(item.text)),
+				  ]
+				: DropdownItems.filter((item) => FILTER_ALBUM_PLAYLIST_ITEMS.includes(item.text));
 		}
-		if (type === "artist") {
-			item?.endpoint?.pageType.includes("ARTIST") && goto(`/artist/${item?.endpoint?.browseId}`);
-
-			!isBrowseEndpoint && item.videoId !== undefined && !item?.endpoint?.pageType.includes("ARTIST")
-				? await list.initAutoMixSession({
-						videoId: item.videoId,
-						playlistId: item.playlistId,
-						keyId: index,
-				  })
-				: browseHandler(item.endpoint.pageType, item.endpoint.browseId);
-			loading = false;
-		}
-	};
-
-	if (kind === "Singles") {
-		DropdownItems.splice(1, 1);
-		DropdownItems = DropdownItems;
-	}
-	if (item?.endpoint?.pageType) {
-		DropdownItems = DropdownItems.filter((item) => {
-			if (!item.text.match(/Favorite|Add to Queue|Play Next|View Artist/gm)) {
-				return item;
-			}
-		});
-	}
-
-	if (item.endpoint?.pageType?.match(/MUSIC_PAGE_TYPE_(PLAYLIST|ALBUM)/)) {
-		DropdownItems = [
-			{
-				action: () => list.initPlaylistSession({ playlistId: item.playlistId, params: "wAEB8gECKAE%3D", index: 0 }),
-				icon: "shuffle",
-				text: "Shuffle Play",
-			},
-			{
-				action: () => list.initPlaylistSession({ playlistId: item.playlistId, index: 0 }),
-				icon: "list-music",
-				text: "Play Next",
-			},
-			{
-				action: () =>
-					list.initPlaylistSession({ playlistId: "RDAMPL" + item.playlistId, params: "wAEB8gECeAE%3D", index: 0 }),
-				icon: "radio",
-				text: "Start Radio",
-			},
-			...DropdownItems,
-		];
-	}
-	if (type === "artist" || (item.endpoint && item.endpoint.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST"))) {
-		DropdownItems = [
-			...DropdownItems.filter((item) => {
-				if (!item.text.match(/Favorite|Add to Queue|View Artist/gm)) {
-					return item;
-				}
-			}),
-		];
 	}
 
 	let srcImg = Array.isArray(item?.thumbnails)
@@ -285,18 +258,8 @@
 
 <article
 	class="item item{ASPECT_RATIO}"
-	on:contextmenu={(e) => {
-		e.preventDefault();
-		window.dispatchEvent(new CustomEvent("contextmenu", { detail: "carouselItem" }));
-
-		PopperStore.set({
-			items: [...DropdownItems],
-			x: e.pageX,
-			y: e.pageY,
-			direction: "right",
-		});
-	}}
-	on:click|stopPropagation={(e) => clickHandler(e, index)}
+	on:contextmenu={(event) => handleContextMenu(event, DropdownItems)}
+	on:click|stopPropagation={(e) => clickHandler({ isBrowseEndpoint, index, item, kind, type })}
 >
 	<section class="item-thumbnail-wrapper img{ASPECT_RATIO}">
 		<section
@@ -317,16 +280,20 @@
 				<img
 					alt="thumbnail img{ASPECT_RATIO}"
 					on:error={errorHandler}
-					loading={$page.data.iOS ? "eager" : "lazy"}
+					loading={index >= 3 ? "lazy" : null}
 					width={srcImg.width}
 					height={srcImg.height}
-					src={srcImg.placeholder}
-					data-src={srcImg.width < 100 ? srcImg.url.replace(/=w\d+-h\d+-/gm, "=w240-h240-") : srcImg.url}
+					src={index >= 3 ? srcImg.placeholder : srcImg.url}
+					data-src={index >= 3
+						? srcImg.width < 100
+							? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
+							: srcImg.url
+						: null}
 				/>
 			</div>
 			<div class="item-menu">
 				<PopperButton
-					tabindex="0"
+					tabindex={0}
 					items={DropdownItems}
 				/>
 			</div>
@@ -384,17 +351,16 @@
 		}
 	}
 	.item-thumbnail-wrapper {
-		padding-top: 100%;
 		position: relative;
 		overflow: hidden;
 		display: block;
 		margin-bottom: 0.5em;
 
 		&.img16x9 {
-			padding-top: 56.25%;
+			aspect-ratio: 16/9;
 		}
 		&.img1x1 {
-			padding-top: 100%;
+			aspect-ratio: 1/1;
 		}
 	}
 	.item-title.isArtistKind {
@@ -578,7 +544,6 @@
 		}
 		position: absolute;
 		top: 0;
-		width: 100%;
 		height: 100%;
 		overflow: hidden;
 		border-radius: var(--thumbnail-radius);

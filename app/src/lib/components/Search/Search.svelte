@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import Icon from "$lib/components/Icon/Icon.svelte";
-	import { preserveSearch } from "$lib/stores";
 	import { debounce } from "$lib/utils/sync";
 	import { createEventDispatcher } from "svelte";
 	import { fullscreenStore } from "../Player/channel";
@@ -11,17 +10,16 @@
 	export let query = "";
 	export let filter = searchFilter[0].params;
 
-	let filterType;
 	const dispatch = createEventDispatcher();
 	let results: Array<{ query?: string; id?: number }> = [];
 	async function handleSubmit() {
 		dispatch("submitted", { submitted: true, filter, query });
 		fullscreenStore.set("closed");
-		let url = `/search/${query}${filter !== undefined ? `?filter=${filter}` : ""}`;
+		let url = `/search/${encodeURIComponent(query)}${filter !== undefined ? `?filter=${filter}` : ""}`;
 		goto(url);
 	}
 	const typeahead = debounce(async () => {
-		if (query == "" || undefined) return (results = []);
+		if (!query) return (results = []);
 		const response = await fetch("/api/v1/get_search_suggestions.json?q=" + encodeURIComponent(query));
 		results = await response.json();
 	}, 250);
@@ -57,7 +55,7 @@
 				id="searchBox"
 				autocomplete="off"
 				aria-autocomplete="list"
-				autofocus={type == "inline" ? true : false}
+				autofocus={type === "inline" ? true : false}
 				autocorrect="off"
 				type="search"
 				placeholder="Search"
@@ -90,7 +88,7 @@
 	<div class="nav-item">
 		<div
 			class="select"
-			class:inline={type == "inline" ? true : false}
+			class:inline={type === "inline" ? true : false}
 		>
 			<select bind:value={filter}>
 				{#each searchFilter as option (option.params)}

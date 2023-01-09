@@ -1,0 +1,17 @@
+.m-item {
+	position: relative;
+	background-color: #0000;
+	transition: background-color cubic-bezier(0.25, 0.46, 0.45, 0.94) 200ms;
+	@media (hover: hover) {
+		&:hover {
+			background-color: scale-color(#57575831, $lightness: 10%);
+		}
+	}
+	&:not(.menu):active {
+		background-color: lighten(#d8d8d831, 5%);
+		transition: background-color cubic-bezier(0.25, 0.46, 0.45, 0.94) 200ms;
+	}
+	&.flex {
+		display: flex;
+	}
+}

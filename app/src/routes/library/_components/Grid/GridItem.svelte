@@ -24,7 +24,11 @@
 		<div class="item-description">
 			{@html item?.description ? item.description + ` &bull; ` : ""}
 			{#if item.items !== undefined}
-				{item?.items?.length == 1 ? `1 Song` : item?.items?.length == 0 ? "No tracks" : `${item?.items?.length} Songs`}
+				{item?.items?.length === 1
+					? `1 Song`
+					: item?.items?.length === 0
+					? "No tracks"
+					: `${item?.items?.length} Songs`}
 			{/if}
 		</div>
 	</div>

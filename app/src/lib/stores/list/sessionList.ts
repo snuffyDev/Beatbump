@@ -5,7 +5,7 @@
  *
  */
 import type { Item, Nullable } from "$lib/types";
-import { addToQueue, getSrc, notify } from "$lib/utils";
+import { addToQueue, getSrc, notify, seededShuffle } from "$lib/utils";
 import { Mutex } from "$lib/utils/sync";
 import { splice } from "$lib/utils/collections/array";
 import { writable, get } from "svelte/store";
@@ -32,6 +32,8 @@ function togglePlayerLoad() {
 	playerLoading.set(true);
 	return () => playerLoading.set(false);
 }
+
+class CSessionListService implements ISessionListProvider {}
 
 function _sessionListService(): ISessionListService {
 	// default values for the store
@@ -277,10 +279,13 @@ function _sessionListService(): ISessionListService {
 				if (res.results.length === 0) getMoreLikeThis({ playlistId });
 				return res;
 			});
+
 			const results = data?.results as any[];
+
 			mix.push(...results);
 
-			mix = get(filterAutoPlay) ? filterList(mix) : mix;
+			if (get(filterAutoPlay)) mix = filterList(mix);
+
 			visitorData = data["visitorData"] ?? visitorData;
 
 			continuation = data.continuation;
@@ -314,12 +319,15 @@ function _sessionListService(): ISessionListService {
 				return;
 			}
 			try {
-				const itemToAdd = await addToQueue(item.videoId);
-
+				const itemToAdd = await addToQueue(item);
+				const oldLength = mix.length;
 				// eslint-disable-next-line no-self-assign
-				splice(mix, key + 1, 0, itemToAdd);
-
+				splice(mix, key + 1, 0, ...itemToAdd);
 				commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
+				console.log({ oldLength, mix, itemToAdd });
+				if (!oldLength) {
+					await getSrc(mix[0].videoId, mix[0].playlistId, null, true);
+				}
 			} catch (err) {
 				console.error(err);
 				notify(`Error: ${err}`, "error");
@@ -327,7 +335,10 @@ function _sessionListService(): ISessionListService {
 		},
 
 		shuffleRandom(items = []) {
-			mix = [...items.sort(() => Math.random() - 0.6)];
+			mix = seededShuffle(
+				items,
+				crypto.getRandomValues(new Uint8Array(8)).reduce((prev, cur) => (prev += cur), 0),
+			);
 			commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });
 
 			if (groupSession?.initialized && groupSession?.hasActiveSession) {
@@ -344,9 +355,19 @@ function _sessionListService(): ISessionListService {
 		shuffle(index: number, preserveBeforeActive = true) {
 			if (typeof index !== "number") return;
 			if (!preserveBeforeActive) {
-				mix = [...mix.sort(() => Math.random() - 0.5)];
+				mix = seededShuffle(
+					mix.slice(),
+					crypto.getRandomValues(new Uint8Array(8)).reduce((prev, cur) => (prev += cur), 0),
+				);
 			} else {
-				mix = [...mix.slice(0, index), mix[index], ...mix.slice(index + 1).sort(() => Math.random() - 0.5)];
+				mix = [
+					...mix.slice(0, index),
+					mix[index],
+					...seededShuffle(
+						mix.slice(index + 1),
+						crypto.getRandomValues(new Uint8Array(8)).reduce((prev, cur) => (prev += cur), 0),
+					),
+				];
 			}
 			// console.log(mix)
 			commitChanges({ mix, clickTrackingParams, currentMixId, continuation, position, currentMixType });

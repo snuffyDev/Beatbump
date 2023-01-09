@@ -101,7 +101,7 @@ const DROPDOWN_ITEMS: Partial<Record<Label, Partial<DropdownItem>>> = {
 	"View Playlist": { text: "View Playlist", icon: "list" },
 	"Play Song Radio": { text: "Play Song Radio", icon: "radio" },
 	"Remove From Playlist": { text: "Remove from Playlist", icon: "x" },
-	"Add to Playlist": { text: "Add to Playlist", icon: "playlist-add" },
+	"Add to Playlist": { text: "Add to Playlist", icon: "list-plus" },
 	"Add to Favorites": { text: "Add to Favorites", icon: "heart" },
 	"Share Group Session": { text: "Share Group Session", icon: "share" },
 	Shuffle: { text: "Shuffle", icon: "shuffle" },

@@ -1,21 +1,18 @@
+
 .grid {
 	display: grid;
-	grid-template-columns: repeat(var(--grid-column-count), 1fr);
 	grid-gap: 0.5em;
 	justify-content: center;
 	margin: 0 auto;
 	--grid-column-count: 2;
-	--grid-columns: repeat(var(--grid-column-count), 1fr);
+	--thumbnail-size: 12.5rem;
+
 
 	@media screen and (min-width: 460px) and (max-width: 619px) {
 		--grid-column-count: 3;
 	}
 
-	@media screen and (min-width: 620px) and (max-width: 768px) {
-		--grid-column-count: 4;
-	}
-
-	@media screen and (min-width: 769px) and (max-width: 1148px) {
+	@media screen and (min-width: 620px) and (max-width: 1148px) {
 		--grid-column-count: 4;
 	}
 
@@ -24,8 +21,13 @@
 	}
 
 	@media screen and (min-width: 1401px) {
+		--thumbnail-size: 13rem;
 		--grid-column-count: 7;
 	}
+	--column-width: calc(var(--thumbnail-size) + 0.75rem);
+	--grid-columns: repeat(auto-fill, minmax(var(--column-width), 1fr));
+
+	grid-template-columns: var(--grid-columns);
 }
 
 .grid-container {

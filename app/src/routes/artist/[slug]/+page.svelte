@@ -24,10 +24,12 @@
 	let innerWidth = 640;
 
 	CTX_ListItem.set({ page: "artist", innerWidth });
+
+	$: console.log(data);
 </script>
 
 <Header
-	title={header?.name == undefined ? "Artist" : header?.name}
+	title={header?.name === undefined ? "Artist" : header?.name}
 	desc={header?.name}
 	url={$page.url.pathname}
 	image={header?.thumbnails && header?.thumbnails[0]?.url}

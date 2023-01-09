@@ -1,0 +1,97 @@
+.select {
+	width: 100%;
+	height: auto;
+	display: grid;
+	color: inherit;
+	min-width: 15ch;
+	max-width: 30ch;
+	min-height: 5ch;
+	max-height: 30ch;
+	position: relative;
+	align-content: center;
+	font-family: var(--base-font-family);
+	will-change: contents;
+	-webkit-text-size-adjust: none;
+	border-radius: var(--md-radius);
+	grid-template-columns: 1fr 0.5px;
+	grid-template-areas: "select end";
+	border: 0.0625rem solid hsla(0, 0%, 66.7%, 0.219);
+	transition: cubic-bezier(0.47, 0, 0.745, 0.715) 0.1s;
+	transition-property: filter, border, background;
+	&:active,
+	&:focus-within {
+		filter: brightness(1.15);
+		border: 0.25px rgb(114, 114, 114) solid;
+	}
+	@media screen and (hover: hover) {
+		&:hover {
+			filter: brightness(1.07);
+			border: 0.25px rgba(114, 114, 114, 0.663) solid;
+		}
+	}
+	&.inline {
+		max-width: 8rem;
+	}
+	&:disabled,
+	[disabled] {
+		color: var(--disabled-form-fg);
+		background-color: var(--disabled-form-bg);
+	}
+	&::after {
+		right: 0;
+		content: "";
+		width: 0.6rem;
+		height: 0.5rem;
+		color: inherit;
+		place-self: end;
+		align-self: center;
+		margin-right: 0.7rem;
+		grid-area: end !important;
+
+		background-color: currentColor;
+		clip-path: polygon(100% 0, 0 0, 50% 100%);
+		-webkit-clip-path: polygon(100% 0, 0 0, 50% 100%);
+	}
+	option {
+		background-color: #0d0e0ee0;
+	}
+}
+select {
+	-webkit-text-size-adjust: auto;
+
+	option {
+		background-color: inherit;
+		border-radius: var(--md-radius);
+	}
+
+	&:active,
+	&:focus-within {
+		filter: brightness(1.1);
+	}
+	-webkit-text-size-adjust: auto;
+	background: inherit;
+	margin: 0;
+	width: 100%;
+	outline: none;
+	color: inherit;
+	height: inherit;
+	cursor: inherit;
+	appearance: none;
+	white-space: pre;
+	grid-area: select;
+	position: relative;
+	min-height: inherit;
+	max-height: inherit;
+	font-family: inherit;
+	-moz-appearance: none;
+	align-content: center;
+	-webkit-appearance: none;
+	background-color: inherit;
+	font-size: 100% !important;
+	border-radius: var(--md-radius);
+	padding: 0.2em 2em 0.325em 0.6em;
+	border: none;
+	transition: cubic-bezier(0.47, 0, 0.745, 0.715);
+	transition-duration: 100ms;
+	transition-property: filter, border, background;
+}

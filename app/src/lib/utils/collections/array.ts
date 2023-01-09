@@ -37,12 +37,9 @@ export function findLast<T>(array: Array<T>, predicate: (item: T) => T): T | und
 }
 
 export function iter<T>(array: ArrayLike<T>, cb: VoidCallback<T>): void {
-	const len = array.length;
-	let idx = -1;
-	while (++idx < len) {
+	for (let idx = 0; idx < array.length; idx++) {
 		cb(array[idx], idx, array);
 	}
-	idx = null;
 }
 
 export function map<T, U>(array: ArrayLike<T>, cb: ItemCallback<T, U>): U[] {
@@ -67,7 +64,7 @@ export function filterMap<T, U>(array: Array<T>, cb: ItemCallback<T, U>, predica
 		}
 	}
 	idx = null;
-	return result as u[];
+	return result as U[];
 }
 export function filter<T, S>(array: Array<T>, predicate: (item: Maybe<T>) => boolean): T[] {
 	let idx = -1,

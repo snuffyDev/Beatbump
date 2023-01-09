@@ -126,9 +126,10 @@
 
 					action: async () => {
 						// showEditPlaylist = true;
-						isPagePlaying.add(playlistName);
+						// isPagePlaying.add(playlistName);
 						// $list.mix = ;
-						list.shuffleRandom([...items]);
+						list.shuffleRandom(items);
+						list.updatePosition(0);
 
 						await getSrc($list.mix[0]?.videoId);
 					},

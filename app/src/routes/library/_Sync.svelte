@@ -37,8 +37,8 @@
 	let stepCounter = 0;
 	let RTC;
 
-	$: peerType = check == "sending" ? "Sender" : "Receiver";
-	$: type = check == "sending" ? true : false;
+	$: peerType = check === "sending" ? "Sender" : "Receiver";
+	$: type = check === "sending" ? true : false;
 	$: connection = undefined;
 	const dataType = ["Playlists", "Favorites"];
 	let kindOfData = dataType;
@@ -64,7 +64,7 @@
 		},
 	};
 	const getObjectStores = (kindOfData: string[]) => {
-		if (kindOfData.length == 0) return;
+		if (kindOfData.length === 0) return;
 		return Promise.all([
 			...kindOfData.map((kind) =>
 				stores[kind]()
@@ -99,11 +99,11 @@
 					const ArrayOfStores = JSON.parse(data as string);
 					if (Array.isArray(ArrayOfStores)) {
 						ArrayOfStores.forEach(async (obj) => {
-							if (obj?.type == "Playlists") {
+							if (obj?.type === "Playlists") {
 								const itemList = obj;
 								await setMultiplePlaylists([...itemList?.items]);
 							}
-							if (obj?.type == "Favorites") {
+							if (obj?.type === "Favorites") {
 								const itemList = obj;
 								await setMultiplePlaylists([...itemList?.items]);
 							}
@@ -131,7 +131,7 @@
 		return "bb-" + id;
 	};
 	const nextStep = () => {
-		if (stepCounter == 3) {
+		if (stepCounter === 3) {
 			dispatch("close");
 		} else {
 			stepCounter++;
@@ -172,7 +172,7 @@
 	);
 	// $: console.log(RTC, _Peer)
 	function keyDownListener(event: KeyboardEvent) {
-		if (event.key == "Esc" || event.key == "Escape") {
+		if (event.key === "Esc" || event.key === "Escape") {
 			event.preventDefault();
 			dispatch("close");
 		}
@@ -208,7 +208,7 @@
 			class="screen-wrapper"
 			id="sWrapper"
 		>
-			{#if stepCounter == 0}
+			{#if stepCounter === 0}
 				<div class="screen">
 					<div class="content">
 						<h1>Sync your data</h1>
@@ -225,7 +225,7 @@
 						on:click={nextStep}>Next Step</button
 					>
 				</div>
-			{:else if stepCounter == 1}
+			{:else if stepCounter === 1}
 				<div class="screen">
 					<div class="content">
 						<h1>First things first...</h1>
@@ -240,7 +240,7 @@
 										id="sending"
 										type="checkbox"
 										on:input={() => (check = "sending")}
-										checked={check == "sending"}
+										checked={check === "sending"}
 									/>
 									<span class="checkbox-tile"
 										><Icon
@@ -256,7 +256,7 @@
 										id="receiving"
 										type="checkbox"
 										on:input={() => (check = "receiving")}
-										checked={check == "receiving"}
+										checked={check === "receiving"}
 									/>
 									<span class="checkbox-tile"
 										><Icon
@@ -269,7 +269,7 @@
 						</section>
 					</div>
 					<hr />
-					{#if check == "sending"}
+					{#if check === "sending"}
 						<div class="content">
 							<span class="subheading">What kind of data would you like to send?</span>
 							<div class="container">
@@ -291,13 +291,13 @@
 				<div class="next">
 					<button
 						class="nextbtn"
-						disabled={check == "sending" ? check == "sending" && kindOfData.length === 0 : check == undefined}
+						disabled={check === "sending" ? check === "sending" && kindOfData.length === 0 : check === undefined}
 						on:click={() => {
 							if (check !== undefined) nextStep();
 						}}>Next Step</button
 					>
 				</div>
-			{:else if stepCounter == 2}
+			{:else if stepCounter === 2}
 				<div class="screen">
 					<div class="content">
 						<h1>Generate Your ID</h1>
@@ -339,15 +339,15 @@
 				<div class="next">
 					<button
 						class="nextbtn"
-						disabled={id == "unset"}
+						disabled={id === "unset"}
 						on:click={() => {
 							if (id !== "unset") nextStep();
 						}}>Next Step</button
 					>
 				</div>
-			{:else if stepCounter == 3}
+			{:else if stepCounter === 3}
 				<div class="screen">
-					{#if check == "sending"}
+					{#if check === "sending"}
 						<div class="content">
 							<h1>
 								Get the {(peerType = check !== "sending" ? "Sender" : "Receiver")}'s ID

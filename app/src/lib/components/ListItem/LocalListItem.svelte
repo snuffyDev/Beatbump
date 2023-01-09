@@ -260,7 +260,7 @@
 			on:focus={() => (isHovering = true)}
 		>
 			<PopperButton
-				tabindex="0"
+				tabindex={0}
 				items={DropdownItems}
 			/>
 		</div>

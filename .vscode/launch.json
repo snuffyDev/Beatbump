@@ -5,6 +5,12 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"command": "npm start",
+			"name": "Run npm start",
+			"request": "launch",
+			"type": "node-terminal"
+		},
+		{
 			"type": "pwa-msedge",
 			"request": "launch",
 			"name": "Launch Chrome against localhost",

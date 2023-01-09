@@ -5,7 +5,7 @@
 	import type { ArtistPage } from "$lib/parsers";
 	import { browser } from "$app/environment";
 	import Description from "./Description";
-	import { isDesktopMQ } from "$stores/window";
+	import { isDesktopMQ, windowHeight, windowWidth } from "$stores/window";
 
 	export let header: ArtistPage["header"];
 	export let thumbnail = [];
@@ -19,20 +19,30 @@
 	let opacity = 0;
 	let img: HTMLImageElement;
 
-	const handler = () => {
+	const handler = (ts: number) => {
 		if (!browser && !container) return;
 
+		const elapsed = ts - timestamp;
+
 		const scroll = container.getBoundingClientRect();
-		const calc = -scroll.top / window.innerHeight;
-		y = window.innerWidth < 500 ? Math.min(Math.max(calc, 0), 1) * 325 : Math.min(Math.max(calc, 0), 1) * 116;
+		const calc = -scroll.top / $windowHeight;
+		y = $windowWidth < 500 ? Math.min(Math.max(calc, 0), 1) * 325 : Math.min(Math.max(calc, 0), 1) * 116;
+		if (elapsed < 100) {
+			timestamp = requestAnimationFrame(handler);
+		} else {
+			cancelAnimationFrame(timestamp);
+			timestamp = undefined;
+		}
 	};
 
 	function onScroll(event: UIEvent) {
-		cancelAnimationFrame(timestamp);
-		timestamp = requestAnimationFrame(handler);
+		if (timestamp) {
+			return;
+		}
+		requestAnimationFrame(handler);
 	}
+
 	onMount(() => {
-		let start;
 		if (img) {
 			img.decode().then(() => {
 				opacity = 1;
@@ -64,7 +74,7 @@
 		/>
 		<picture class="header-thumbnail">
 			{#each thumbnail as img, i (img)}
-				{#if i == 0}
+				{#if i === 0}
 					<source
 						media="(max-width:{img.width}px)"
 						srcset={img.url}
@@ -75,7 +85,7 @@
 						srcset={img.url}
 						type="image/jpeg"
 					/>
-				{:else if i == thumbnail.length - 1}
+				{:else if i === thumbnail.length - 1}
 					<!-- -->
 				{:else}
 					<source
@@ -103,7 +113,7 @@
 				{#if header?.foregroundThumbnails}
 					<picture>
 						{#each header?.foregroundThumbnails as img, i (img)}
-							{#if i == 0}
+							{#if i === 0}
 								<source
 									media="(max-width:{img?.width}px)"
 									srcset={img?.url}
@@ -116,7 +126,7 @@
 									srcset={img?.url}
 									type="image/jpeg"
 								/>
-							{:else if i == header?.foregroundThumbnails.length - 1}
+							{:else if i === header?.foregroundThumbnails.length - 1}
 								<!---->
 							{:else}
 								<source

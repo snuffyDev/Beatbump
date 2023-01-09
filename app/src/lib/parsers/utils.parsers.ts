@@ -1,5 +1,6 @@
 import type { PurpleRun } from "$lib/types/innertube/internals";
 
+const URL_REGEX = /=w\d+-h\d+-/gm;
 export function thumbnailTransformer(url: string): {
 	placeholder?: string;
 	url?: string;
@@ -18,28 +19,23 @@ export function thumbnailTransformer(url: string): {
 	const webp_url = url?.replace("-rj", "-rw");
 	output.url = webp_url;
 
-	output.placeholder = webp_url?.replace(
-		// /=(?:[wh][0-9].+?){2,}(-s)?/gm,
-		/=w\d+-h\d+-/gm,
-		"=w1-h1-p-fSoften=50,50,05-",
-	);
+	output.placeholder = webp_url?.replace(URL_REGEX, "=w1-h1-fSoften=50,50,05-");
 
 	return output;
 }
 
 export function subtitle(items: PurpleRun[]) {
 	const length = items.length;
-	const subtitles = Array(length);
 
 	let idx = -1;
 	while (++idx < length) {
 		const item = items[idx];
 		if (item.navigationEndpoint === undefined) {
-			subtitles[idx] = item;
+			items[idx] = item;
 			continue;
 		}
 
-		subtitles[idx] = {
+		items[idx] = {
 			text: item.text,
 			browseId: item.navigationEndpoint.browseEndpoint?.browseId,
 			pageType:
@@ -47,5 +43,5 @@ export function subtitle(items: PurpleRun[]) {
 					?.pageType,
 		};
 	}
-	return subtitles;
+	return items;
 }

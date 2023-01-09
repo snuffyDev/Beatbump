@@ -53,10 +53,10 @@ export const GET: RequestHandler = async ({ url }) => {
 	if (!continuation) {
 		const res = parseNextBody(data);
 
-		return json(Object.assign(res, { data }));
+		return json(res);
 	}
 
-	return json(Object.assign(parseNextBodyContinuation(data), { data }));
+	return json(parseNextBodyContinuation(data));
 };
 
 function parseNextBody(data) {

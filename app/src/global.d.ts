@@ -10,6 +10,7 @@ declare namespace svelte.JSX {
 		onenterViewport?: () => void;
 		onlosefocus?: () => void;
 		onpan?: (event: any) => void;
+		onpressing?: (event: any) => void;
 		onpanend?: (event: any) => void;
 	}
 }

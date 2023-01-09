@@ -3,13 +3,13 @@
 
 	import drag from "$lib/actions/drag";
 	import list from "$lib/stores/list";
+	import { windowHeight } from "$stores/window";
 	import { fade, fly } from "svelte/transition";
 	import Icon from "../Icon/Icon.svelte";
 	import { isOpen, PopperStore } from "./popperStore";
 	$: items = $PopperStore.items;
 	$: type = $PopperStore.type;
 
-	let listHeight;
 	let sliding;
 	let posY = 0;
 
@@ -21,7 +21,7 @@
 	function release(e) {
 		// console.log(e)
 		if (sliding) {
-			if (posY < listHeight * 0.3) {
+			if (posY < $windowHeight * 0.3) {
 				open();
 			} else {
 				close();
@@ -30,9 +30,9 @@
 		}
 	}
 	function trackMovement({ y }) {
-		if (y <= listHeight && y >= 0) {
+		if (y <= $windowHeight && y >= 0) {
 			posY = y;
-		} else if (y < listHeight * 0.7) {
+		} else if (y < $windowHeight * 0.7) {
 			trackOpen();
 		} else {
 			close();
@@ -61,14 +61,9 @@
 	$: items && noScroll();
 	let popperClientHeight;
 	let popper: Element = undefined;
-	$: height = listHeight - popperClientHeight;
-	// $: console.log(
-	// 	`posY: ${posY}, ${$PopperStore.metadata} height: ${height}; popperHeight: ${popperClientHeight}`
-	// )
-	// $: console.dir(popper)
+	$: height = $windowHeight - popperClientHeight;
 </script>
 
-<svelte:window bind:innerHeight={listHeight} />
 {#if items.length !== 0}
 	<div
 		on:click={allowScroll}
@@ -80,8 +75,8 @@
 		class="drag"
 		bind:clientHeight={popperClientHeight}
 		bind:this={popper}
-		in:fly={{ duration: 400, delay: 400, y: listHeight, opacity: 0.1 }}
-		out:fly={{ duration: 400 * 2, y: listHeight / 1.2 }}
+		in:fly={{ duration: 400, delay: 400, y: $windowHeight, opacity: 0.1 }}
+		out:fly={{ duration: 400 * 2, y: $windowHeight / 1.2 }}
 		style="transform: translateY({posY}px); top:{height ? `${height}px` : `-100%`};  {sliding
 			? ''
 			: 'transition: transform 300ms cubic-bezier(0.895, 0.03, 0.685, 0.22)'};"
@@ -96,7 +91,7 @@
 			>
 				<hr />
 			</div>
-			{#if type == "player"}
+			{#if type === "player"}
 				<section class="m-metadata">
 					<div
 						class="image"
@@ -123,7 +118,7 @@
 					</div>
 				</section>
 			{/if}
-			{#if type == "search" && $PopperStore.metadata?.artist !== undefined && $PopperStore.metadata.artist.length}
+			{#if type === "search" && $PopperStore.metadata?.artist !== undefined && $PopperStore.metadata.artist.length}
 				<section class="m-metadata">
 					<div class="image">
 						<img

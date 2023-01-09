@@ -263,7 +263,7 @@
 				>{item.title}
 				{#if item?.explicit}
 					<span class="explicit">
-						{item.explicit ? "E" : ""}
+						<span class="sr-only">Explicit</span>
 					</span>
 				{/if}
 			</span>
@@ -294,7 +294,7 @@
 			on:focus={() => (isHovering = true)}
 		>
 			<PopperButton
-				tabindex="0"
+				tabindex={0}
 				items={DropdownItems}
 			/>
 		</div>

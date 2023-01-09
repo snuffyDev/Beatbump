@@ -12,14 +12,14 @@ export interface CarouselHeader {
 	type?: string;
 }
 
-interface MoodsAndGenresItem {
+export interface MoodsAndGenresItem {
 	color: string;
 	endpoint: { params: string };
 	text: string;
 }
-export interface ICarousel {
+export interface ICarousel<T extends IListItemRenderer | MoodsAndGenresItem> {
 	header: CarouselHeader;
-	results: Array<CarouselItem & MoodsAndGenresItem>;
+	results: T[];
 	isBrowse?: boolean;
 }
 export type Item = IMergedObject<IMergedObject<IListItemRenderer, ICarouselTwoRowItem>, Song>;

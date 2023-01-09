@@ -1,0 +1,130 @@
+.listButton {
+	-webkit-text-size-adjust: 100%;
+	align-self: center;
+	cursor: pointer;
+	display: inline-block;
+	height: auto;
+	margin-left: auto;
+	margin-right: auto;
+	max-height: 44pt;
+	max-width: 44pt;
+	margin: 10pt;
+	width: auto;
+}
+.hidden {
+	display: none !important;
+}
+.player-btn {
+	-webkit-text-size-adjust: 100%;
+
+	cursor: pointer;
+	display: inline-flex;
+	height: auto;
+	max-height: 8em;
+	max-width: 8em;
+	margin: 0 0.1em;
+	padding: 0.8em;
+
+	position: relative;
+	width: auto;
+	isolation: isolate;
+
+	&::before {
+		position: absolute;
+		content: "";
+		z-index: -1;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+		border-radius: 50%;
+		opacity: 0;
+		transition: opacity, background linear 200ms;
+
+		background-position: center;
+		padding: 8pt;
+	}
+	@media (hover: hover) {
+		&:hover::before {
+			background: #55555528 radial-gradient(circle, transparent 1%, #55555528 1%) center/15000%;
+			opacity: 1;
+		}
+	}
+	&:active::before {
+		background-size: 100%;
+		background-color: #7272723f;
+		transition: background 0s;
+	}
+}
+
+.controls {
+	display: flex;
+	flex: 1 auto;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	padding: inherit;
+}
+.player-container {
+	align-items: center;
+
+	bottom: 0;
+	display: flex;
+	height: 100%;
+	flex-wrap: nowrap;
+
+	flex-direction: column;
+}
+
+.buttons {
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+}
+.player {
+	display: grid;
+	grid-template-columns: 1.25fr 1.1fr 1.25fr;
+	grid-template-areas: "n m r";
+	padding-inline: 1em;
+	max-width: 100%;
+	min-width: calc(100% - 40px);
+	width: 100%;
+	align-items: center;
+	@media screen and (max-width: 600px) {
+		grid-template-columns: 3fr 1fr;
+		grid-template-areas: "n r";
+	}
+}
+input[type="range"] {
+	-webkit-appearance: none;
+	background: none;
+	overflow: hidden;
+	outline: none;
+	background: #333333;
+	border-radius: 1.666667rem;
+	height: 0.6rem;
+	cursor: pointer;
+	transition-duration: 0.2s;
+
+	&:hover {
+		background: rgba(255, 255, 255, 0.295);
+
+		&::-webkit-slider-thumb {
+			opacity: 1;
+		}
+	}
+	&::-webkit-slider-runnable-track {
+		overflow: hidden;
+	}
+	&::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		width: 0;
+		height: 1rem;
+		background: white;
+		box-shadow: -100vw -100vh 0 100vw white;
+		opacity: 0.7;
+		transition-duration: 0.2s;
+	}
+}

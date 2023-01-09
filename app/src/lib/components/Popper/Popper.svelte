@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { windowWidth } from "$stores/window";
 	import Dropdown from "../Dropdown/Dropdown.svelte";
 	import MobilePopper from "./MobilePopper.svelte";
 	export let main: HTMLElement;
@@ -9,11 +10,8 @@
 		},
 		{ name: "desktop", component: Dropdown },
 	];
-	let width;
-	$: popper = width < 640 ? poppers[0] : poppers[1];
+	$: popper = $windowWidth < 640 ? poppers[0] : poppers[1];
 </script>
-
-<svelte:window bind:innerWidth={width} />
 
 <svelte:component
 	this={popper.component}

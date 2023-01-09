@@ -18,9 +18,9 @@
 	import { AudioPlayer } from "$lib/player";
 	import { page } from "$app/stores";
 	import { afterNavigate } from "$app/navigation";
-	import { browser } from "$app/environment";
+	import observer from "$components/Carousel/observer";
+	import { dev } from "$app/environment";
 	import SessionListService from "$stores/list/sessionList";
-
 	$: key = $page.data.key;
 	let main: HTMLElement;
 
@@ -84,8 +84,7 @@
 	lang="scss"
 	global
 >
-	@use "../global/stylesheet/layout" as *;
-	@use "../global/stylesheet/main" as *;
+	@use "../global/redesign/main.scss" as *;
 	.footer-container {
 		transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 350ms, opacity cubic-bezier(0.165, 0.84, 0.44, 1) 350ms;
 		opacity: 0;

@@ -1,0 +1,48 @@
+@use "../base/variables" as *;
+
+.header {
+	display: block;
+	font-weight: 600;
+
+	margin: 0 auto;
+	padding-block: 0.66667em;
+	justify-content: flex-start;
+	align-items: baseline;
+	/* white-space: pre; */
+
+	@include content-width();
+	margin-bottom: 1.38rem;
+	h1,
+	h2,
+	.h1,
+	.h2 {
+		margin-right: 0.175em;
+		margin-block: 0;
+
+		display: inline-block;
+	}
+	.subheading {
+		margin-bottom: 0.5em;
+	}
+	a {
+		display: inline-block;
+		position: relative;
+		vertical-align: middle;
+
+	}
+	a small {
+		$color: rgb(175, 175, 175);
+		font-size: 0.975em;
+		font-weight: 700;
+		font-variant-caps: all-petite-caps;
+		letter-spacing: 0.05rem;
+		transition: ease-in color 75ms;
+		color: $color;
+		&:hover {
+			color: lighten($color, 30%);
+			-webkit-text-decoration: underline 0.001rem solid;
+			text-decoration: underline 0.001rem solid;
+			text-underline-offset: 0.001rem;
+		}
+	}
+}

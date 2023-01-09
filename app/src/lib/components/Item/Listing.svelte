@@ -1,6 +1,4 @@
 <script lang="ts">
-	export let data: Item;
-
 	import Loading from "$components/Loading/Loading.svelte";
 	import { hasContext, tick } from "svelte";
 
@@ -12,21 +10,19 @@
 	import { browser } from "$app/environment";
 	import { createEventDispatcher } from "svelte";
 	import { PopperButton, PopperStore } from "../Popper";
-	import { filter, Logger, notify } from "$lib/utils";
+	import { filter, IsoBase64, Logger, notify } from "$lib/utils";
 	import { groupSession } from "$lib/stores";
-
-	import { IsoBase64 } from "$lib/utils";
 	import { SITE_ORIGIN_URL } from "$stores/url";
 
+	export let data: Item;
+
 	const dispatch = createEventDispatcher();
+
 	let isLibrary = hasContext("library") ? true : false;
 	let videoId = "";
 	let playlistId = "";
-	let isHidden: boolean = false;
 	let isArtist = Array.isArray(data?.subtitle) && data.subtitle[0]?.text === "Artist";
-	let clicked;
 
-	let hidden = clicked ? true : false;
 	let loading = false;
 
 	let DropdownItems = [
@@ -58,7 +54,7 @@
 		},
 		{
 			text: "Play Next",
-			icon: "list-music",
+			icon: "queue",
 			action: () =>
 				groupSession.hasActiveSession
 					? groupSession.addToQueue(data, $queuePosition)
@@ -66,7 +62,7 @@
 		},
 		{
 			text: "Add to Queue",
-			icon: "list-music",
+			icon: "queue",
 			action: () =>
 				groupSession.hasActiveSession
 					? groupSession.addToQueue(data, $queue.length)
@@ -75,7 +71,7 @@
 
 		{
 			text: "Add to Playlist",
-			icon: "list-plus",
+			icon: "playlist-add",
 			action: async () => {
 				if (data?.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
 					// console.log('PLAYLIST')
@@ -92,7 +88,6 @@
 			text: !isLibrary ? "Favorite" : "Remove from Favorites",
 			icon: !isLibrary ? "heart" : "x",
 			action: async () => {
-				// console.log(data)
 				if (!browser) return;
 				!isLibrary && IDBService.sendMessage("create", "favorite", data);
 				if (isLibrary) {
@@ -152,7 +147,7 @@
 						await navigator.clipboard.writeText(shareData.url);
 						notify("Link copied successfully", "success");
 					} else {
-						const share = await navigator.share(shareData);
+						await navigator.share(shareData);
 						notify("Shared successfully", "success");
 					}
 				} catch (error) {
@@ -162,7 +157,7 @@
 		},
 	];
 	if (isArtist) {
-		DropdownItems = [...DropdownItems.filter((item) => !item.text?.includes("Add to Playlist"))];
+		DropdownItems = DropdownItems.filter((item) => !item.text?.includes("Add to Playlist"));
 	}
 	if (data.type?.includes("playlist")) {
 		DropdownItems.splice(1, 1, {
@@ -179,7 +174,7 @@
 		});
 		DropdownItems.shift();
 		DropdownItems.pop();
-		DropdownItems = [...DropdownItems.slice().filter((item) => !item.text.includes("Favorite"))];
+		DropdownItems = DropdownItems.filter((item) => !item.text.includes("Favorite"));
 	}
 	if (data.type === "videos") {
 		DropdownItems = DropdownItems.filter((d) => {
@@ -195,7 +190,7 @@
 	}
 	const clickHandler = async (event) => {
 		if (
-			(event.target instanceof HTMLElement && (event.target.nodeName == "A" || event.target.nodeName == "P")) ||
+			(event.target instanceof HTMLElement && (event.target.nodeName === "A" || event.target.nodeName === "P")) ||
 			loading
 		)
 			return;
@@ -206,9 +201,8 @@
 		}
 		try {
 			loading = true;
-			console.log(data);
 			videoId = data.videoId ? data.videoId : "";
-			playlistId = data?.playlistId ? data?.playlistId : data.shuffle?.playlistId ? data.shuffle?.playlistId : "";
+			playlistId = data?.playlistId ? data?.playlistId : "";
 			if (data.type?.includes("playlist") || data?.type === "albums") {
 				await list.initPlaylistSession({
 					playlistId,
@@ -240,7 +234,7 @@
 		window.dispatchEvent(new window.CustomEvent("contextmenu", { detail: "listing" }));
 
 		PopperStore.set({
-			items: [...DropdownItems],
+			items: DropdownItems.slice(),
 			x: e.pageX,
 			y: e.pageY,
 			direction: "right",
@@ -265,7 +259,7 @@
 						id="img"
 						decoding="async"
 						loading="lazy"
-						src={data.thumbnails ? data.thumbnails[0]?.url : data.thumbnail}
+						src={data.thumbnails[0]?.url}
 						alt="thumbnail"
 					/>
 				</div>
@@ -277,7 +271,7 @@
 						class="explicit"
 						class:hidden={!data.explicit}
 					>
-						E
+						<span class="sr-only">Explicit</span>
 					</span>
 				</p>
 				{#if data.type === "artists"}
@@ -288,11 +282,11 @@
 					</p>
 				{:else if data.type === "playlist"}
 					<p class="text-artist">
-						{data.type == "playlist" ? `${data.metaData}` : ""}
+						{data.type === "playlist" && "metaData" in data ? `${data.metaData}` : ""}
 					</p>
 				{:else}
 					<p class="text-artist secondary">
-						{#each data?.subtitle as artist, i}
+						{#each data?.subtitle as artist}
 							{#if !artist.pageType}
 								{artist.text}
 							{:else if artist.pageType.includes("ALBUM")}
@@ -316,10 +310,10 @@
 			<PopperButton
 				metadata={{
 					artist:
-						data.type !== "playlist" && Array.isArray(data?.artistInfo?.artist)
-							? [...data?.artistInfo?.artist]
-							: data?.artistInfo?.artist ?? undefined,
-					thumbnail: data.thumbnails ? data.thumbnails[0]?.url : data.thumbnail,
+						data.type !== "playlist" &&
+						Array.isArray(data?.artistInfo?.artist) &&
+						(data?.artistInfo?.artist ?? undefined),
+					thumbnail: data.thumbnails[0]?.url,
 					title: data.title,
 					length: data.type !== "artist" && data.type !== "playlist" ? data?.length?.text : "",
 				}}

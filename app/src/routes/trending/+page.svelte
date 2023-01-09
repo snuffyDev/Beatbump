@@ -2,10 +2,22 @@
 	import type { PageData } from "./$types";
 	import Carousel from "$components/Carousel/Carousel.svelte";
 	import Header from "$lib/components/Layouts/Header.svelte";
+	import type { ICarousel, MoodsAndGenresItem } from "$lib/types";
+	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 
 	export let data: PageData;
 
 	const { carouselItems, page: path } = data;
+
+	const isMoodsAndGenres = (obj: unknown): obj is ICarousel<MoodsAndGenresItem> => {
+		return (obj as ICarousel<MoodsAndGenresItem>).results[0].color !== undefined;
+	};
+
+	const isValidCarousel = (obj: unknown): obj is ICarousel<IListItemRenderer> => {
+		return !!(obj as ICarousel<IListItemRenderer>).results[0].title;
+	};
+
+	$: console.log(carouselItems);
 </script>
 
 <Header
@@ -13,49 +25,39 @@
 	url={path}
 	desc="The latest trending songs and releases"
 />
-<main>
-	<Carousel
-		isBrowseEndpoint={false}
-		header={carouselItems[2].header}
-		items={carouselItems[2].results}
-		type="trending"
-		kind="isPlaylist"
-	/>
-
-	<div class="breakout">
-		<div class="box-cont">
-			<div class="header">
-				<span class="h2">{carouselItems[1].header.title}</span>
-				<a
-					class="link"
-					href="/explore"><small>See All</small></a
-				>
-			</div>
-			<box>
-				<div class="scroll">
-					{#each carouselItems[1].results as { color, endpoint = { params: '' }, text }}
-						<a
-							style="border-left: 0.5rem solid #{color}"
-							class="box"
-							href="/explore/{endpoint.params}">{text}</a
-						>
-					{/each}
+<main data-testid="trending">
+	{#each carouselItems as carousel (carousel)}
+		{#if isValidCarousel(carousel)}
+			<Carousel
+				isBrowseEndpoint={false}
+				header={carousel.header}
+				items={carousel.results}
+				type="trending"
+				kind="isPlaylist"
+			/>
+		{:else if isMoodsAndGenres(carousel)}
+			<div class="breakout">
+				<div class="header">
+					<span class="h2">{carousel.header.title}</span>
+					<a
+						class="link"
+						href="/explore"><small>See All</small></a
+					>
 				</div>
-			</box>
-		</div>
-	</div>
-	<Carousel
-		header={carouselItems[3].header}
-		items={carouselItems[3].results}
-		type="trending"
-		isBrowseEndpoint={false}
-	/>
-	<Carousel
-		header={carouselItems[0].header}
-		items={carouselItems[0].results}
-		isBrowseEndpoint={true}
-		type="trending"
-	/>
+				<div class="box">
+					<div class="scroll">
+						{#each carousel.results as item}
+							<a
+								style="--color: #{item?.color}"
+								class="item-box"
+								href="/explore/{item.endpoint.params}">{item.text}</a
+							>
+						{/each}
+					</div>
+				</div>
+			</div>
+		{/if}
+	{/each}
 </main>
 
 <style lang="scss">
@@ -71,40 +73,35 @@
 			margin-bottom: 3rem;
 		}
 	}
-	.box-cont {
-		justify-content: space-around;
-	}
-	box {
+	.box {
 		display: flex;
 		width: 100%;
 		overflow-x: auto;
 		padding: 0.8rem;
-		contain: layout;
+		contain: content;
 		flex-direction: column;
 	}
 	.scroll {
 		display: flex;
 		flex-flow: column wrap;
 		gap: 0.8rem;
-		max-height: 26rem;
+		justify-content: space-around;
+		//
+		max-height: calc(100vh - 1px - calc(100vh - 23em));
 	}
-	.box {
-		margin-bottom: 0.8em;
+	.item-box {
 		cursor: pointer;
 		background: #201e27;
-		display: inline-flex;
+		display: flex;
 		justify-content: flex-start;
 		flex-direction: row;
 		flex-wrap: nowrap;
 		text-overflow: clip;
-		font-size: 1em;
-		min-width: 12em;
-		max-width: 15em;
-		width: 100%;
+		width: clamp(12em, 13em, 15em);
 		contain: content;
-		border-radius: 0.8em;
+		border-radius: 0.3em;
 		font-family: "CommissionerVariable", sans-serif;
-
+		border-left: 0.5rem solid var(--color, red);
 		align-items: center;
 
 		height: 3.25em;

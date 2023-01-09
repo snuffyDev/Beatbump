@@ -22,8 +22,8 @@
 	<div class="header">
 		<h1>{header}</h1>
 	</div>
-	{#each [...sections] as section}
-		{#if type == "grid"}
+	{#each sections as section}
+		{#if type === "grid"}
 			<Grid
 				heading={section.title}
 				items={section.section}
@@ -31,7 +31,7 @@
 				let:index
 			>
 				<CarouselItem
-					index
+					{index}
 					aspectRatio={item.aspectRatio}
 					{item}
 					kind="isPlaylist"
@@ -44,7 +44,7 @@
 			<!-- {@debug section} -->
 			<Carousel
 				header={section.header}
-				items={[...section.results]}
+				items={section.results}
 				type="home"
 				isBrowseEndpoint={false}
 			/>

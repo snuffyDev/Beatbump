@@ -61,14 +61,22 @@ export function format(seconds: number) {
 }
 
 // Fetches a song length for adding to queue
-export const addToQueue = async (videoId: string): Promise<Song> => {
+export const addToQueue = async ({
+	videoId,
+	playlistId,
+}: {
+	videoId?: string;
+	playlistId?: string;
+}): Promise<Song[]> => {
 	try {
-		const url = `/api/v1/get_queue.json${videoId ? `?videoIds=${videoId}` : ""}`;
+		const url = `/api/v1/get_queue.json${
+			videoId ? `?videoIds=${videoId}` : playlistId ? "?playlistId=" + playlistId : ""
+		}`;
 		const data = (await fetch(url, { headers: { accept: "application/json" } })
 			.then((json) => json.json())
 			.catch((err) => console.log(err))) as Song[];
 
-		if (Array.isArray(data)) return data[0];
+		if (Array.isArray(data)) return data;
 	} catch (err) {
 		console.error(err);
 		notify(err, "error");

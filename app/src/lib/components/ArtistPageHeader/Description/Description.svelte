@@ -41,7 +41,7 @@
 			dispatch("update", (isExpanded = !isExpanded));
 		}}
 	>
-		<span class="btn-text">Show {isExpanded ? "Less" : "More"}</span>
+		<span class="btn-text">{isExpanded ? "Show Less" : "Show More"}</span>
 	</div>
 </div>
 

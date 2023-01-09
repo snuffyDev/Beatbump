@@ -1,0 +1,24 @@
+.alert {
+	margin-bottom: 1.125rem;
+}
+.m-alert {
+	position: relative;
+	display: block;
+	max-width: 85.735rem;
+	padding: 1rem 2rem;
+	border-radius: 0.8rem;
+	width: calc(100% - 2rem);
+	margin: 1em auto 0;
+	text-align: center;
+	text-shadow: 0.1rem 0.05rem rgba(0, 0, 0, 0.685);
+	color: #fff;
+	background-color: #ce7c7c;
+	&-error {
+		@extend .m-alert;
+		background-color: #b32f2a !important;
+	}
+	&-success {
+		@extend .m-alert;
+		background-color: #1d964b !important;
+	}
+}

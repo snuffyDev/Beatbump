@@ -1,5 +1,5 @@
 // import { isOpen } from "./PopperButton.svelte";
-import { writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 
 type PopperStore = {
 	items: any[];
@@ -46,3 +46,17 @@ function _popperStore() {
 }
 
 export const isOpen = writable(false);
+export const activeNode = _activeNode();
+
+function _activeNode() {
+	const { subscribe, set } = writable<WeakRef<HTMLElement> | WeakRef<{ value: null }>>();
+	return {
+		subscribe,
+		set: (node: WeakRef<HTMLElement> | WeakRef<{ value: null }>) => {
+			set(node);
+		},
+		get: () => {
+			return get(activeNode);
+		},
+	};
+}

@@ -22,6 +22,7 @@
 	$: preserve = $preserveSearch;
 	let query = "";
 	let filter = searchFilter[0].params;
+
 	const navBack = () => {
 		if (!browser) return;
 		$fullscreenStore && fullscreenStore.set("closed");

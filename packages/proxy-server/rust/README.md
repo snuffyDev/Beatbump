@@ -6,7 +6,16 @@ This audio proxy server is still an early work-in-progress, use with caution!
 >
 > In order to use this you must compile it locally!
 
-The server will listen on port 33125.
+## Config
+
+By default, the proxy listens to `0.0.0.0:10000`.
+
+You can change either the address or the port by running the proxy with the following Environment Variables:
+
+| Env Var      | Description                               |
+| ------------ | ----------------------------------------- |
+| `PROXY_ADDR` | Address to listen to (default: `0.0.0.0`) |
+| `PROXY_PORT` | Port to listen to (default: `10000`)      |
 
 ## Features
 
@@ -21,4 +30,3 @@ The server will listen on port 33125.
 - Write tests
 - Better error handling
 - Remove blacklisted headers
-- Use Environment Variables to specify configuration options

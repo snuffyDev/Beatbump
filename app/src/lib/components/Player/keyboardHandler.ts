@@ -7,7 +7,7 @@ export default function keyboardHandler(node: Node, params: { shortcut }): Svelt
 			event.metaKey ||
 			event.altKey ||
 			event.key.match(/F[1-9]+/) ||
-			event.code == "Tab"
+			event.code === "Tab"
 		)
 			return;
 		if (

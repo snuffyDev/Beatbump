@@ -49,11 +49,13 @@
 			<span class="box-title"
 				>{title}
 				{#if Array.isArray(subtitles) && subtitles[0]?.contentRating}
-					<span class="explicit"> E </span>
+					<span class="explicit">
+						<span class="sr-only">Explicit</span>
+					</span>
 				{/if}</span
 			>
 		</div>
-		{#if description && type == "playlist"}
+		{#if description && type === "playlist"}
 			{#key description}
 				<p
 					class="secondary subtitle description"
@@ -72,7 +74,7 @@
 					</em>
 				</span>
 			{/key}
-		{:else if type == "release"}
+		{:else if type === "release"}
 			<p class="secondary">
 				{#each artist as artist, i}
 					{#if artist.channelId}
@@ -90,13 +92,13 @@
 	</div>
 	<div class="button-group">
 		{#each buttons as { type, icon, text, action }, i}
-			{#if type == "icon"}
+			{#if type === "icon"}
 				<PopperButton items={DropdownItems} />
 			{:else}
 				<Button
 					on:click={action}
-					outlined={i == buttons.length - 1 || type == "outlined"}
-					icon={typeof icon == "string" ? { name: icon } : { name: icon?.name, size: icon?.size }}>{text}</Button
+					outlined={i === buttons.length - 1 || type === "outlined"}
+					icon={typeof icon === "string" ? { name: icon } : { name: icon?.name, size: icon?.size }}>{text}</Button
 				>
 			{/if}
 		{/each}

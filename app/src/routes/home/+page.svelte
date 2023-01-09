@@ -3,7 +3,6 @@
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
 	import Header from "$lib/components/Layouts/Header.svelte";
 	import Loading from "$lib/components/Loading/Loading.svelte";
-	import type { NextContinuationData, Thumbnail } from "$lib/types";
 	import type { PageData } from "./$types";
 
 	export let data: PageData;
@@ -53,14 +52,14 @@
 				src={headerThumbnail[0].url}
 				width={headerThumbnail[0].width}
 				height={headerThumbnail[0].height}
-				decoding="sync"
+				decoding="async"
 				class="immer-img"
 				alt="large background header"
 			/>
 		</picture>
 	{/if}
 </div>
-<main>
+<main data-testid="home">
 	{#each carousels as carousel}
 		<Carousel
 			items={carousel.items}
@@ -73,7 +72,7 @@
 	{#if Object.keys(continuations).length}
 		<div
 			class="viewport"
-			use:viewport={{ margin: "100px 325px" }}
+			use:viewport={{ margin: "100px" }}
 			on:enterViewport={async () => {
 				if (loading || hasData) return;
 				loading = true;
@@ -107,13 +106,15 @@
 </main>
 
 <style lang="scss">
+	main {
+		padding-bottom: 4em !important;
+	}
 	.viewport {
-		height: 2em;
+		height: 1.5em;
 		position: absolute;
 		bottom: 0;
 		margin-top: 9rem;
-		margin-bottom: 2rem;
-		padding-block: 3rem;
+		padding-block: 2.5em;
 		contain: content;
 		will-change: visibility;
 	}

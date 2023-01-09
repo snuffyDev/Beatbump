@@ -1,0 +1,44 @@
+.nav-item {
+	position: relative;
+	display: block;
+}
+.nav-search {
+	display: inline-flex;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	padding: 0 2rem;
+	z-index: 15;
+	box-sizing: border-box;
+	align-content: center;
+	justify-content: center;
+	flex-wrap: nowrap;
+	flex-direction: row;
+	max-width: 100%;
+	align-items: center;
+
+	background: inherit;
+
+	&::before {
+		backdrop-filter: brightness(1.1);
+		pointer-events: none;
+		box-shadow: 0 -0.5rem 1em 0.01rem #30303014 inset;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		width: 100%;
+		content: "";
+		z-index: -1;
+	}
+}
+
+@media screen and (max-width: 719px) {
+	.nav-search .x-button.icon-btn {
+		display: none !important;
+		visibility: none !important;
+	}
+}

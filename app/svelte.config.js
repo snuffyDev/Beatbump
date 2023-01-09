@@ -45,6 +45,7 @@ const config = {
 			$components: path.resolve("./src/lib/components"),
 			$env: path.resolve("./src/env.ts"),
 		},
+		prerender: { concurrency: 3 },
 		files: {
 			assets: "static",
 			lib: "src/lib",

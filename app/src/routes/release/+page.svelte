@@ -52,7 +52,7 @@
 	image={thumbnail}
 />
 {#await promise then _}
-	<main>
+	<main data-testid="release">
 		<InfoBox
 			{thumbnail}
 			buttons={[

@@ -17,18 +17,24 @@
 	import ProgressBar from "./ProgressBar";
 	import { CTX_ListItem } from "$lib/contexts";
 	import { requestFrameSingle } from "$lib/utils";
+	import type { Thumbnail } from "$lib/types";
+	import { windowWidth } from "$stores/window";
 
 	export let state: "open" | "closed";
 
 	const { paused } = AudioPlayer;
 
+	let windowHeight = 0,
+		queueHeight = 0,
+		sliding = false;
+	let titleWidth = 320;
+	let active = "UpNext";
+	let thumbnail: Thumbnail;
+
 	$: loading = $playerLoading;
 	$: data = $currentTrack;
 	$: heightCalc = -windowHeight + 140;
 	$: queueOpen = true;
-
-	let titleWidth = 320;
-	let active = "UpNext";
 
 	const tabs = [
 		{
@@ -46,28 +52,19 @@
 			},
 		},
 	];
+
 	const motion = tweened(0, {
 		duration: 180,
 		easing: cubicOut,
 	});
+
 	const queueTween = tweened(0, {
 		duration: 180,
 		easing: cubicOut,
 	});
 
-	let windowHeight = 0,
-		queueHeight = 0,
-		sliding = false,
-		innerWidth = 800;
-
 	CTX_ListItem.set({ page: "queue" });
 
-	$: $navigating !== null &&
-		(() => {
-			fullscreenStore.set("closed");
-			$motion = 0;
-			$queueTween = 0;
-		})();
 	function onDragStart(kind, { detail }) {
 		sliding = true;
 	}
@@ -82,6 +79,7 @@
 			sliding = false;
 		}
 	}
+
 	function trackMovement(kind: number, detail) {
 		if (kind === 1) {
 			motion.set(Math.min(48, Math.max(heightCalc, detail.clientY - 8)), { duration: 180 });
@@ -89,6 +87,7 @@
 			queueTween.set(0 - (detail.clientY * 0.7 + detail.clientY * 0.3) / windowHeight, { duration: 180 });
 		}
 	}
+
 	function open(kind: number, detail) {
 		const step = detail.deltaY / queueHeight;
 		const miss = detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : 1 - step;
@@ -111,6 +110,7 @@
 			);
 		}
 	}
+
 	function close(kind: number, detail) {
 		const step = detail.deltaY / queueHeight;
 		const miss = detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : step;
@@ -129,15 +129,27 @@
 		}
 		sliding = false;
 	}
-	$: thumbnail = (data && Array.isArray(data?.thumbnails) && data?.thumbnails.at(-1)) ?? {
-		width: 0,
-		height: 0,
-		url: "",
-		placeholder: "",
-	};
+
+	$: {
+		thumbnail = Array.isArray(data?.thumbnails)
+			? data?.thumbnails.at(-1)
+			: {
+					width: 0,
+					height: 0,
+					url: "",
+					placeholder: "",
+			  };
+	}
+
+	$: if ($navigating !== null) {
+		(() => {
+			fullscreenStore.set("closed");
+			$motion = 0;
+			$queueTween = 0;
+		})();
+	}
 </script>
 
-<svelte:window bind:innerWidth />
 {#if $queue.length}
 	<div
 		class="backdrop"
@@ -223,9 +235,9 @@
 							<div class="marquee">
 								<span
 									class="marquee-wrapper"
-									style="animation-play-state: {state === 'open' && titleWidth > innerWidth
+									style="animation-play-state: {state === 'open' && titleWidth > $windowWidth
 										? 'running'
-										: 'paused'}; {state === 'closed' || titleWidth < innerWidth
+										: 'paused'}; {state === 'closed' || titleWidth < $windowWidth
 										? 'animation: none; transform: unset;'
 										: ''}"
 									><span

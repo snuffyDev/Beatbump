@@ -10,10 +10,11 @@ export function MusicResponsiveListItemRenderer(
 	type: string | undefined = undefined,
 ): IListItemRenderer {
 	const item = ctx.musicResponsiveListItemRenderer;
-	const thumbnails = item.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails || [];
-	for (let idx = 0; idx < thumbnails.length; idx++) {
-		Object.assign(thumbnails[idx], thumbnailTransformer(thumbnails[idx].url));
-	}
+	const thumbnails = (item.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails || []).map((thumbnail) => ({
+		...thumbnail,
+		...thumbnailTransformer(thumbnail.url),
+	}));
+
 	const flexColumns = Array.isArray(item.flexColumns) && item.flexColumns;
 	const subtitleRuns = flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs;
 	const flexCol0 = flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0] || ({} as PurpleRun);
@@ -55,13 +56,12 @@ export function MusicResponsiveListItemRenderer(
 			item.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
 				?.watchEndpoint?.loggingContext,
 	};
-
 	if (isNavigationItem)
 		Item.endpoint = {
 			browseId: isNavigationItem.browseId,
 			pageType: isNavigationItem.browseEndpointContextSupportedConfigs.browseEndpointContextMusicConfig.pageType,
 		};
-	if (Item !== undefined && playlistSetVideoId ) {
+	if (Item !== undefined && playlistSetVideoId) {
 		Object.assign(Item, {
 			playlistSetVideoId:
 				item?.playlistSetVideoId ||

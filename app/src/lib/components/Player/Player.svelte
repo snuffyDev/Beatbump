@@ -18,15 +18,15 @@
 	import keyboardHandler from "./keyboardHandler";
 	import ProgressBar from "./ProgressBar";
 
-	import { page } from "$app/stores";
 	import { SITE_ORIGIN_URL } from "$stores/url";
+	import { windowWidth } from "$stores/window";
 
 	const { paused } = AudioPlayer;
 	let volume = 0.5;
 	let volumeHover;
 
 	$: isPlaying = $paused;
-	let innerWidth = 640;
+
 	messenger.listen("player", (data) => {
 		AudioPlayer.play();
 	});
@@ -107,15 +107,7 @@
 				list.shuffle($queuePosition, true);
 			},
 		},
-	].filter((item) => {
-		{
-			if (!$currentTrack?.artistInfo?.artist[0]?.browseId) {
-				return;
-			} else {
-				return item;
-			}
-		}
-	});
+	];
 
 	const shortcut = {
 		Comma: () => {
@@ -135,8 +127,6 @@
 	};
 </script>
 
-<svelte:window bind:innerWidth />
-<!-- <Fullscreen /> -->
 <div
 	class="player"
 	on:click={(e) => {
@@ -273,7 +263,7 @@
 			</div>
 			<div class="menu-container">
 				<PopperButton
-					tabindex="-1"
+					tabindex={-1}
 					type="player"
 					size="1.625em"
 					items={DropdownItems}

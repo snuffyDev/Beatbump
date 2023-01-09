@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	if (!response.ok) throw error(500, response.statusText);
 	const page = parseResponse(data);
 
-	return page;
+	return Object.assign(page);
 };
 function parseResponse(data) {
 	const header = data?.header;

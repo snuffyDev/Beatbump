@@ -11,7 +11,7 @@ export default function drag(node: HTMLElement) {
 		const rects = getNodeRects(node);
 		initTop = rects.initTop;
 		initHeight = rects.initHeight;
-		if (event.type == "touchstart") {
+		if (event.type === "touchstart") {
 			x = event.touches[0].pageX;
 			y = event.touches[0].pageY;
 		} else {
@@ -32,7 +32,7 @@ export default function drag(node: HTMLElement) {
 
 	function handleMousemove(event) {
 		let dx, dy;
-		if (event.type == "touchmove") {
+		if (event.type === "touchmove") {
 			// console.log(x, y, dx, dy)
 			x = event.touches[0].pageX;
 			y = event.touches[0].pageY;
@@ -67,7 +67,7 @@ export default function drag(node: HTMLElement) {
 	}
 
 	function handleMouseup(event) {
-		if (event.type == "touchend") {
+		if (event.type === "touchend") {
 			// console.log(JSON.stringify(event))
 			x = event.changedTouches[0].pageX;
 			y = event.changedTouches[0].pageY;

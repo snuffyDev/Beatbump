@@ -1,0 +1,63 @@
+@use "sass:math";
+
+@mixin keyframe($animation_name) {
+	@-webkit-keyframes #{$animation_name} {
+		@content;
+	}
+
+	@-moz-keyframes #{$animation_name} {
+		@content;
+	}
+
+	@-o-keyframes #{$animation_name} {
+		@content;
+	}
+
+	@keyframes #{$animation_name} {
+		@content;
+	}
+}
+
+@mixin animation($delay, $duration, $infinite: false, $animation, $direction: forward, $fillmode: fowards) {
+	-webkit-animation-delay: $delay;
+	-webkit-animation-duration: $duration;
+	-webkit-animation-name: $animation;
+	-webkit-animation-fill-mode: $fillmode;
+	-webkit-animation-direction: $direction;
+
+	-moz-animation-delay: $delay;
+	-moz-animation-duration: $duration;
+	-moz-animation-name: $animation;
+	-moz-animation-fill-mode: $fillmode;
+	-moz-animation-direction: $direction;
+
+	animation-delay: $delay;
+	animation-duration: $duration;
+	animation-name: $animation;
+	animation-fill-mode: $fillmode;
+	animation-direction: $direction;
+	@if ($infinite) {
+		animation-iteration-count: infinite;
+	}
+}
+
+@mixin trim($numLines: null) {
+	@if $numLines !=null {
+		--line-height: 1.4;
+
+		display: -webkit-box;
+		-webkit-line-clamp: $numLines;
+		-webkit-box-orient: vertical;
+		max-height: calc(1rem * $numLines);
+		--lines: #{$numLines};
+		--max-lines: var(--lines);
+		-webkit-line-clamp: var(--max-lines);
+		max-height: calc(var(--max-lines) * 1rem * var(--line-height));
+		overflow: hidden;
+	} @else {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+	}
+}

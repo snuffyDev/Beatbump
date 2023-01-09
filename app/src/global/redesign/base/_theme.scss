@@ -1,3 +1,4 @@
+
 $sections: (
 	bottom: (
 		footer-container,
@@ -6,13 +7,14 @@ $sections: (
 	top: (
 		nav,
 	),
-	form: (
+	forms: (
 		select,
 		input,
 		option,
 		suggestions,
 	),
 );
+
 $themes: (
 	YTM: (
 		"bottom": linear-gradient(0deg, #121018 28%, #18171e 100%),
@@ -37,26 +39,26 @@ $themes: (
 	),
 	Midnight: (
 		"base": #010102,
-		"top": hsl(267, 41%, 6%),
+		"top": hsl(267, 14%, 6%),
 		"side": #15131f,
 		"bottom": linear-gradient(0deg, #12131c 32%, #191a26 100%),
 		"form": #1b1922,
 	),
 );
-
 $theme-name: (Dark, Dim, Midnight, YTM);
 $section-names: (base, top, side, bottom, form);
 
 :root {
 	--mobile-popper-bg: unset;
 }
-
 html {
+	@each $section in $section-names {
+		@each $theme in $theme-name {
+			--#{$theme}-#{$section}: #{map-get($themes, $theme, $section)};
+		}
+	}
 	@each $theme in $theme-name {
 		&.#{$theme} {
-			@each $section in $section-names {
-				--#{$theme}-#{$section}: #{map-get($themes, $theme, $section)};
-			}
 			--mobile-popper-bg: #{map-get($themes, $theme, "side")};
 			--form-bg: #{map-get($themes, $theme, "form")};
 			--disabled-form-bg: #{scale-color(map-get($themes, $theme, "form"), $lightness: 17%, $alpha: -25%)};

@@ -5,16 +5,6 @@
 	export let hasFocus = true;
 	export let zIndex = 50;
 	const dispatch = createEventDispatcher();
-	function keyDownListener(event: KeyboardEvent) {
-		// console.log(event)
-		if (event.defaultPrevented) {
-			return; // Do nothing if the event was already processed
-		}
-		if (event.key == "Esc" || event.key == "Escape") {
-			event.preventDefault();
-			dispatch("close");
-		}
-	}
 </script>
 
 <svelte:window />
