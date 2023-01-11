@@ -1,0 +1,11 @@
+name = "beatbump"
+account_id = 'df5cf47a239a85c04bb28b7e797275e7'
+route = { pattern = "*beatbump.ml/*", zone_id = "399f706eb64b6b53005250ee99504f3b"}
+workers_dev = true
+compatibility_date = "2023-01-10"
+
+main = "./.cloudflare/worker.js"
+site.bucket = "./.cloudflare/public"
+
+build.command = "npm run build"
+
