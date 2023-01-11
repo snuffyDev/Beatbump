@@ -43,12 +43,13 @@ declare module '$env/static/private' {
 	export const NVM_INC: string;
 	export const XDG_MENU_PREFIX: string;
 	export const TERM_PROGRAM_VERSION: string;
+	export const _P9K_TTY: string;
 	export const NODE: string;
 	export const LC_ADDRESS: string;
 	export const DOTNET_ROOT: string;
 	export const LC_NAME: string;
 	export const SSH_AUTH_SOCK: string;
-	export const NODE_EXTRA_CA_CERTS: string;
+	export const P9K_TTY: string;
 	export const COLOR: string;
 	export const npm_config_local_prefix: string;
 	export const DESKTOP_SESSION: string;
@@ -67,7 +68,6 @@ declare module '$env/static/private' {
 	export const PANEL_GDK_CORE_DEVICE_EVENTS: string;
 	export const PNPM_HOME: string;
 	export const npm_config_init_module: string;
-	export const _: string;
 	export const XAUTHORITY: string;
 	export const VSCODE_GIT_ASKPASS_NODE: string;
 	export const XDG_GREETER_DATA_DIR: string;
@@ -134,6 +134,7 @@ declare module '$env/static/private' {
 	export const LC_NUMERIC: string;
 	export const OLDPWD: string;
 	export const TERM_PROGRAM: string;
+	export const _: string;
 	export const NODE_ENV: string;
 }
 
@@ -181,12 +182,13 @@ declare module '$env/dynamic/private' {
 		NVM_INC: string;
 		XDG_MENU_PREFIX: string;
 		TERM_PROGRAM_VERSION: string;
+		_P9K_TTY: string;
 		NODE: string;
 		LC_ADDRESS: string;
 		DOTNET_ROOT: string;
 		LC_NAME: string;
 		SSH_AUTH_SOCK: string;
-		NODE_EXTRA_CA_CERTS: string;
+		P9K_TTY: string;
 		COLOR: string;
 		npm_config_local_prefix: string;
 		DESKTOP_SESSION: string;
@@ -205,7 +207,6 @@ declare module '$env/dynamic/private' {
 		PANEL_GDK_CORE_DEVICE_EVENTS: string;
 		PNPM_HOME: string;
 		npm_config_init_module: string;
-		_: string;
 		XAUTHORITY: string;
 		VSCODE_GIT_ASKPASS_NODE: string;
 		XDG_GREETER_DATA_DIR: string;
@@ -272,6 +273,7 @@ declare module '$env/dynamic/private' {
 		LC_NUMERIC: string;
 		OLDPWD: string;
 		TERM_PROGRAM: string;
+		_: string;
 		NODE_ENV: string;
 		[key: `PUBLIC_${string}`]: undefined;
 		[key: string]: string | undefined;

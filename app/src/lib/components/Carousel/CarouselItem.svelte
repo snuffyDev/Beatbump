@@ -251,6 +251,7 @@
 		? item?.thumbnails.at(0)
 		: { width: 0, height: 0, url: "", placeholder: "" };
 
+	$: srcImg.url = srcImg.width < 100 ? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-") : srcImg.url;
 	let active;
 
 	$: isArtistKind = kind === "Fans might also like";
@@ -283,18 +284,8 @@
 					loading={index >= 3 ? "lazy" : null}
 					width={srcImg.width}
 					height={srcImg.height}
-					src={index >= 3
-						? srcImg.placeholder
-						: srcImg.width < 100
-						? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
-						: srcImg.url}
-					data-src={index >= 3
-						? srcImg.width < 100
-							? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
-							: srcImg.width < 100
-							? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
-							: null
-						: null}
+					src={index >= 3 ? srcImg.placeholder : srcImg.url}
+					data-src={index >= 3 ? srcImg.url : null}
 				/>
 			</div>
 			<div class="item-menu">
@@ -305,7 +296,7 @@
 			</div>
 		</section>
 	</section>
-	<section
+	<div
 		class="item-title"
 		class:isArtistKind
 	>
@@ -313,7 +304,7 @@
 			{item.title}
 		</span>
 		{#if item.subtitle}
-			<span class="subtitles secondary">
+			<div class="subtitles secondary">
 				{#each item.subtitle as sub}
 					{#if !sub?.browseId}
 						<span>{sub.text}</span>
@@ -326,9 +317,9 @@
 						>
 					{/if}
 				{/each}
-			</span>
+			</div>
 		{/if}
-	</section>
+	</div>
 </article>
 
 <style lang="scss">
@@ -348,7 +339,7 @@
 
 		@media (hover: hover) {
 			&:hover {
-				.image::before {
+				> :where(.image)::before {
 					background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
 					opacity: 0.7;
 					z-index: 1;
@@ -369,10 +360,10 @@
 			aspect-ratio: 1/1;
 		}
 	}
-	.item-title.isArtistKind {
+	:where(.item-title.isArtistKind) {
 		text-align: center;
 	}
-	.image.isArtistKind {
+	:where(.image.isArtistKind) {
 		width: var(--thumbnail-size);
 		height: var(--thumbnail-size);
 
@@ -385,23 +376,20 @@
 			color: #eee;
 		}
 	}
-	.item-title {
+	:where(.item-title) {
 		display: block;
-
-		contain: content;
-		.link {
-			display: block;
-			display: -webkit-box;
-			-webkit-line-clamp: 2;
-			-webkit-box-orient: vertical;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			margin-bottom: 0.325em;
-		}
+	}
+	:where(.link) {
+		display: block;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		margin-bottom: 0.325em;
 	}
 	.item1x1 {
 		position: relative;
-		// width: 15em;
 	}
 	.item16x9 {
 		width: calc(var(--column-width) * 2.5);
@@ -470,7 +458,7 @@
 			opacity: 1;
 		}
 
-		img {
+		> :where(img) {
 			height: inherit;
 			aspect-ratio: inherit;
 			user-select: none;
@@ -490,14 +478,12 @@
 			}
 		}
 	}
-	.active {
-	}
 
-	.item {
+	:where(.item) {
 		isolation: isolate;
 	}
-	.image:hover {
-		+ .item-menu {
+	:where(.image):hover {
+		+ :where(.item-menu) {
 			opacity: 1 !important;
 		}
 		& {

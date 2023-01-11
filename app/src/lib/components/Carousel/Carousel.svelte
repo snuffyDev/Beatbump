@@ -45,17 +45,18 @@
 			hasScrollWidth = true;
 			scrollPositions.width = measures.scrollWidth;
 		}
+
 		const scrollLeft = measures.scrollLeft;
+		moreOnLeft = scrollLeft < 15 ? false : true;
+		scrollPositions.left = scrollLeft;
+		moreOnRight = scrollPositions.left < scrollPositions.width - clientWidth - 15 ? true : false;
+		scrollPositions.right = scrollPositions.width - scrollLeft - 15;
 
 		if (elapsed < 100) {
 			lastFrame = ts;
 			frame = requestAnimationFrame((ts) => scrollHandler(ts, context));
 		} else {
 			cancelAnimationFrame(frame);
-			moreOnLeft = scrollLeft < 15 ? false : true;
-			scrollPositions.left = scrollLeft;
-			moreOnRight = scrollPositions.left < scrollPositions.width - clientWidth - 15 ? true : false;
-			scrollPositions.right = scrollPositions.width - scrollLeft - 15;
 			if (context === "left") {
 				carousel.scrollLeft -= Math.ceil((scrollPositions.width / items.length) * 2);
 			} else if (context === "right") {
