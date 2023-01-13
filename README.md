@@ -62,6 +62,10 @@ Some of Beatbump's features includes:
 | ~Vern (clearnet)             | https://bb.vern.cc/                                                       |
 | ~Vern (Onion)                | http://bb.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion/ |
 | ~Vern (I2P)                  | http://vern6inmbjzqpecx4kpkq5sln3cqqrfuxfzh4au3tpxbsfbwbnta.b32.i2p/      |
+| Project Segfault (GeoDNS)    | https://bb.projectsegfau.lt/																							 |
+| Project Segfault (EU)        | https://bb.eu.projectsegfau.lt/																					 |
+| Project Segfault (US)        | https://bb.us.projectsegfau.lt/																					 |
+| Project Segfault (Tor)       | http://beatbump.pjsfkvpxlinjamtawaksbnnaqs2fc2mtvmozrzckxh7f3kis6yea25ad.onion/ |
 
 
 ## Donations
