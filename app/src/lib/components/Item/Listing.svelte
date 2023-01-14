@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
 	import Loading from "$components/Loading/Loading.svelte";
 	import { hasContext, tick } from "svelte";

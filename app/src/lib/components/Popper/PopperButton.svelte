@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script
 	lang="ts"
 	context="module"

@@ -37,7 +37,6 @@ export function pan(node: HTMLElement) {
 				clearTimeout(timer);
 				return;
 			}
-
 			event.stopPropagation();
 			calculateVelocity(event, detail);
 

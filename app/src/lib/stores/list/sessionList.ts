@@ -5,10 +5,10 @@
  *
  */
 import type { Item, Nullable } from "$lib/types";
-import { addToQueue, getSrc, notify, seededShuffle } from "$lib/utils";
+import { WritableStore, addToQueue, getSrc, notify, seededShuffle } from "$lib/utils";
 import { Mutex } from "$lib/utils/sync";
 import { splice } from "$lib/utils/collections/array";
-import { writable, get } from "svelte/store";
+import { writable, get, type Writable } from "svelte/store";
 import { playerLoading, currentTitle, filterAutoPlay } from "../stores";
 import { groupSession } from "../sessions";
 import type { ISessionListService, ISessionListProvider } from "./types.list";
@@ -33,7 +33,29 @@ function togglePlayerLoad() {
 	return () => playerLoading.set(false);
 }
 
-class CSessionListService implements ISessionListProvider {}
+// class CSessionListService implements ISessionListService {
+// 	private $$store: Writable<ISessionListProvider>;
+
+// 	private _visitorData = "";
+// 	private _data: ISessionListProvider = {
+// 		clickTrackingParams: "",
+// 		continuation: "",
+// 		currentMixId: "",
+// 		currentMixType: "",
+// 		mix: [],
+// 		position: 0,
+// 	};
+
+// 	constructor() {
+// 		this.$$store = writable<ISessionListProvider>(this._data);
+// 	}
+// 	private get update() {
+// 		return this.$$store.update;
+// 	}
+// 	public get subscribe() {
+// 		return this.$$store.subscribe;
+// 	}
+// }
 
 function _sessionListService(): ISessionListService {
 	// default values for the store

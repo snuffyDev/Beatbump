@@ -23,7 +23,7 @@
 	let carousel: HTMLDivElement = undefined;
 
 	let frame: number;
-	let startTime: number, lastFrame: number;
+	let startTime: number;
 
 	let hasScrollWidth = false;
 	let isScrolling = false;
@@ -53,7 +53,6 @@
 		scrollPositions.right = scrollPositions.width - scrollLeft - 15;
 
 		if (elapsed < 100) {
-			lastFrame = ts;
 			frame = requestAnimationFrame((ts) => scrollHandler(ts, context));
 		} else {
 			cancelAnimationFrame(frame);
@@ -62,7 +61,6 @@
 			} else if (context === "right") {
 				carousel.scrollLeft += Math.ceil((scrollPositions.width / items.length) * 2);
 			}
-			lastFrame = undefined;
 			frame = undefined;
 			startTime = undefined;
 			isScrolling = false;

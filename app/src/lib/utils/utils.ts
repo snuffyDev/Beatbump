@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { sort, type PlayerFormats } from "$lib/parsers/player";
 import { updatePlayerSrc } from "$lib/player";
-import { alertHandler, currentId } from "$lib/stores/stores";
+import { alertHandler } from "$lib/stores/stores";
 import { settings, type UserSettings } from "$lib/stores/settings";
 import { browser } from "$app/environment";
 import type { Song } from "$lib/types";
@@ -108,7 +108,6 @@ export const getSrc = async (
 			dash: false,
 			proxyUrl: userSettings?.network["HLS Stream Proxy"] ?? "",
 		});
-		currentId.set(videoId);
 
 		const src = setTrack(formats, shouldAutoplay);
 

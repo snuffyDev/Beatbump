@@ -1,29 +1,23 @@
 <script lang="ts">
 	import { mobileLongPress } from "$lib/actions/longtouch";
 	import Button from "$lib/components/Button";
+	import { alertHandler } from "$stores/stores";
 
 	let style: string = "--progress: 0";
 	let pressing = false;
+	let n = 0;
 </script>
 
 <main>
-	<Button>Wow</Button>
+	<Button
+		on:click={() => {
+			alertHandler.add({ msg: `${++n}`, type: n % 2 ? "error" : "success" });
+		}}>Wow</Button
+	>
 	<div
 		class="TEST"
 		{style}
 		on:contextmenu|preventDefault={() => {}}
-		use:mobileLongPress
-		on:pressing={(e) => {
-			pressing = true;
-			console.log(e);
-			style = `--progress: ${e.detail.progress}`;
-		}}
-		on:pressEnd={(e) => {
-			style = `--progress: 0`;
-			pressing = false;
-
-			console.log(e);
-		}}
 	>
 		<h1>TEST CONTENT</h1>
 		<!-- <img src="/logo.png" /> -->

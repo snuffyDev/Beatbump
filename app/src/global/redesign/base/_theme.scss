@@ -61,6 +61,7 @@ html {
 		&.#{$theme} {
 			--mobile-popper-bg: #{map-get($themes, $theme, "side")};
 			--form-bg: #{map-get($themes, $theme, "form")};
+			--form-contrast-bg: #{scale-color(map-get($themes, $theme, "form"), $lightness: 33%, $saturation: -100%, $alpha: -85%)};
 			--disabled-form-bg: #{scale-color(map-get($themes, $theme, "form"), $lightness: 17%, $alpha: -25%)};
 			--disabled-form-fg: #{scale-color(map-get($themes, $theme, "form"), $lightness: 60%)};
 			--bottom-bg: #{map-get($themes, $theme, "bottom")};

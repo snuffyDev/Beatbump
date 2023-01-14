@@ -170,8 +170,11 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		if (!browser) return;
 		if ("window" in globalThis.self === false) return;
 		this._isWebkit = /i(Phone|Pad|Pod)/i.test(navigator.userAgent);
+		// Logger.log(`[LOG:PLAYER:Init]: Mobile Apple Device?`, this._isWebkit);
 
 		this._player = new Audio();
+		// Logger.log(`[LOG:PLAYER:Init]: Initializing Audio Player`, true);
+
 		// const setup = async () => {
 		// 	if (browser) {
 		// 		const module = await import("dashjs");
@@ -189,6 +192,8 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		this._player.preload = "metadata";
 
 		this._durationUnsubscriber = this._durationStore.subscribe((value) => {
+			// Logger.log(`[LOG:PLAYER:Update]: Duration: `, value);
+
 			this._duration = value;
 			// notify(`${this._duration}`, "error");]
 		});
@@ -260,6 +265,8 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	// #region Private Accessors (1)
 
 	private get hasFinishedPlayback(): boolean {
+		// Logger.log(`[LOG:PLAYER:State]: Has Finished Playback?`, this._player.currentTime >= this._player.duration);
+		// Logger.log(`[LOG:PLAYER:State]: Current Duration: `, this._player.duration);
 		return this._player.currentTime >= this._player.duration;
 	}
 
@@ -289,12 +296,14 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		if (this._repeat === "track" && userInitiated === false) return;
 		if (this.__tick === true) return;
 		this.__tick = true;
+		// Logger.log(`[LOG:PLAYER:Next]: Loading next track`, { repeat: this._repeat });
 
 		const sessionList = this.currentSessionList();
 		const canAllPlay = groupSession.allCanPlay();
 		let position = sessionList.position;
 
 		if (this._repeat === "playlist" && sessionList.position === sessionList.mix.length - 1) {
+			// Logger.log(`[LOG:PLAYER:Next]: Repeating song: `, { repeat: this._repeat });
 			this.handleRepeat(sessionList);
 			this.__tick = false;
 			return;
@@ -343,6 +352,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		if ("mediaSession" in navigator) {
 			navigator.mediaSession.playbackState = "paused";
 		}
+		// Logger.log(`[LOG:PLAYER:State]: Paused: `, true);
 
 		this._paused.set(true);
 		this._player.pause();
@@ -353,6 +363,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			navigator.mediaSession.playbackState = "playing";
 		}
 
+		// Logger.log(`[LOG:PLAYER:State]: Start Playback: `, true);
 		if (groupSession.initialized === true && groupSession.hasActiveSession === true) {
 			updateGroupState({
 				client: groupSession.client.clientId,
@@ -390,6 +401,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			Logger.log("There's nothing that way!");
 			return;
 		}
+		// Logger.log(`[LOG:PLAYER:Previous]: Loading previous track `, position - 1);
 		if (broadcast === true) updateGroupPosition("<-", position);
 		SessionListService.updatePosition("back");
 		this.getTrackSrc(position - 1);
@@ -413,14 +425,18 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	}
 
 	public updateSrc(dict: SrcDict | Promise<SrcDict>): void {
+		// Logger.log(`[LOG:PLAYER:Stream]: Updating Player Source: `, dict);
+
 		if (dict instanceof Promise) {
 			dict.then((result) => {
 				this.__srcUrl = result?.original_url;
 				this._src.set(result?.url);
+				// Logger.log(`[LOG:PLAYER:Stream]: Sucessfully Set Source: `, dict);
 			});
 			return;
 		}
 
+		// Logger.log(`[LOG:PLAYER:Stream]: Sucessfully Set Source: `, dict);
 		this.__srcUrl = dict?.url;
 		this._src.set(this.__srcUrl);
 	}
@@ -479,6 +495,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	}
 
 	private async getNextSongInQueue(position: number, shouldAutoplay = true): Promise<Nullable<ResponseBody>> {
+		// Logger.log(`[LOG:PLAYER:Queue]: Start Fetching Next Song: `, { position, shouldAutoplay });
 		const sessionList = this.currentSessionList();
 
 		if (position >= sessionList.mix.length - 1) {
@@ -508,6 +525,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		try {
 			this.__tick = false;
 			const response = await this.getTrackSrc(position, shouldAutoplay).then((value) => {
+				// Logger.log(`[LOG:PLAYER:Queue]: Got Next Track Source: `, { value });
 				if (hasUrl(value)) return value;
 			});
 			return response;
@@ -518,13 +536,27 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 
 	private getTrackSrc(position: number, shouldAutoplay = true): Promise<true | void | ResponseBody> {
 		const sessionList = this.currentSessionList();
+		// Logger.log(`[LOG:PLAYER:Stream]: Fetching next track source: `,{ {position, shouldAutoplay});
 		return getSrc(sessionList.mix[position].videoId, sessionList.mix[position].playlistId, null, shouldAutoplay)
 			.then(({ body, error }) => {
 				if (error === true) {
 					// this.next();
 					this.skip();
+
+					// Logger.err(`[LOG:PLAYER:Stream]: Error fetching next track source: `, {
+					// 	position,
+					// 	shouldAutoplay,
+					// 	error,
+					// 	body,
+					// });
 					return error;
 				}
+				// Logger.err(`[LOG:PLAYER:Stream]: Successfully fetched next track source: `, {
+				// 	position,
+				// 	shouldAutoplay,
+				// 	error,
+				// 	body,
+				// });
 				return body;
 			})
 			.catch((err: MediaError & Error) => {
@@ -553,6 +585,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			await tick();
 			this.previous(false);
 		}
+		// Logger.err(`[LOG:PLAYER:State]: Repeating: `, true);
 		this.__tick = false;
 	}
 
@@ -560,6 +593,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		if (this._repeat === "track") return;
 		const currentList = this.currentSessionList();
 		const isLastSong = currentList.position === currentList.mix.length - 1;
+		// Logger.err(`[LOG:PLAYER:Stream]: Track ended: `, true);
 		if (this._repeat === "playlist" && isLastSong) {
 			await this.handleRepeat(currentList);
 			return;

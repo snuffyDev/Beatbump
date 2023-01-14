@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
 	import { navigating } from "$app/stores";
 	import { AudioPlayer } from "$lib/player";

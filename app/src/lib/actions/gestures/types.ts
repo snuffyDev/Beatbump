@@ -14,9 +14,9 @@ export interface Detail {
 export type GestureEventTarget = Window | HTMLElement;
 
 export interface GestureHandlers {
-	onStart?: (event: PointerEvent) => void;
-	onMove?: (event: PointerEvent) => void;
-	onEnd?: (event: PointerEvent) => void;
+	onStart(event: PointerEvent): void;
+	onMove(event: PointerEvent): void;
+	onEnd(event: PointerEvent): void;
 }
 export interface DragEvent {
 	dragstart: Detail;

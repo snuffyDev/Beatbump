@@ -43,16 +43,16 @@
 	import list from "$lib/stores/list";
 	import { Logger, notify } from "$lib/utils";
 	import { showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
-	import { page } from "$app/stores";
 	import { tick } from "svelte";
 	import { PopperButton, PopperStore } from "../Popper";
-	import { browseHandler, clickHandler } from "./functions";
+	import { clickHandler } from "./functions";
 	import { browser } from "$app/environment";
 	import { IsoBase64 } from "$lib/utils";
 	import { SITE_ORIGIN_URL } from "$stores/url";
 	import type { Dropdown } from "$lib/configs/dropdowns.config";
 	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 	import type { Item } from "$lib/types";
+	import { createShare } from "$lib/shared/createShare";
 
 	export let index: number;
 	export let item: IListItemRenderer;
@@ -140,17 +140,19 @@
 					icon: "share",
 					action: async () => {
 						if (!browser) return;
-						const shareData = {
+						const shareData = createShare({
+							type: "SESSION",
 							title: `Join ${groupSession.client.displayName}'s Beatbump Session`,
-							url: `${import.meta.env.DEV ? "localhost:5173" : $SITE_ORIGIN_URL}/session?token=${encodeURIComponent(
+							id: encodeURIComponent(
 								IsoBase64.toBase64(
 									JSON.stringify({
 										clientId: groupSession.client.clientId,
 										displayName: groupSession.client.displayName,
 									}),
 								),
-							)}`,
-						};
+							),
+							origin: $SITE_ORIGIN_URL,
+						});
 						try {
 							if (!navigator.canShare) {
 								await navigator.clipboard.writeText(shareData.url);
@@ -174,31 +176,12 @@
 			text: "Share",
 			icon: "share",
 			action: async () => {
-				let shareData = {
+				const shareData = createShare({
+					origin: $SITE_ORIGIN_URL,
+					id: item.endpoint?.browseId ?? item.videoId,
+					type: item.endpoint?.pageType ?? null,
 					title: item.title,
-
-					url: `${$SITE_ORIGIN_URL}/listen?id=${item.videoId}`,
-				};
-				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_PLAYLIST")) {
-					shareData = {
-						title: item.title,
-
-						url: `${$SITE_ORIGIN_URL}/playlist/${item.endpoint?.browseId}`,
-					};
-				}
-				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ALBUM")) {
-					shareData = {
-						title: item.title,
-
-						url: `${$SITE_ORIGIN_URL}/release?id=${item.endpoint?.browseId}`,
-					};
-				}
-				if (item.endpoint?.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST")) {
-					shareData = {
-						title: item.title,
-						url: `${$SITE_ORIGIN_URL}/artist/${item.endpoint?.browseId}`,
-					};
-				}
+				});
 				try {
 					if (!navigator.canShare) {
 						await navigator.clipboard.writeText(shareData.url);
@@ -221,23 +204,27 @@
 			DropdownItems = item?.endpoint?.pageType.match(RE_ALBUM_PLAYLIST_SINGLE)
 				? [
 						{
-							action: () =>
-								list.initPlaylistSession({ playlistId: item.playlistId, params: "wAEB8gECKAE%3D", index: 0 }),
+							action: () => {
+								list.initPlaylistSession({ playlistId: item.playlistId, params: "wAEB8gECKAE%3D", index: 0 });
+							},
 							icon: "shuffle",
-							text: "Shuffle Play",
+							text: "Shuffle",
 						},
 						{
-							action: () => list.setTrackWillPlayNext(item, $list.position),
+							action: () => {
+								list.setTrackWillPlayNext(item, $list.position);
+							},
 							icon: "queue",
 							text: "Play Next",
 						},
 						{
-							action: () =>
+							action: () => {
 								list.initPlaylistSession({
 									playlistId: "RDAMPL" + item.playlistId,
 									params: "wAEB8gECeAE%3D",
 									index: 0,
-								}),
+								});
+							},
 							icon: "radio",
 							text: "Start Radio",
 						},

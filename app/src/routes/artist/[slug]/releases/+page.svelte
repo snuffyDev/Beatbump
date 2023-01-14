@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { GridItem, Grid } from "$lib/components/Grid";
+	import CarouselItem from "$components/Carousel/CarouselItem.svelte";
+	import { Grid } from "$lib/components/Grid";
 	import type { PageData } from "./$types";
 
 	export let data: PageData;
@@ -12,11 +13,16 @@
 	<Grid
 		heading={header?.type}
 		let:item
-		items={[...contents]}
+		let:index
+		items={contents}
 	>
-		<GridItem
+		<CarouselItem
+			isBrowseEndpoint={true}
+			kind="trending"
 			slot="item"
+			{index}
 			{item}
+			aspectRatio={item.aspectRatio}
 		/>
 	</Grid>
 </main>

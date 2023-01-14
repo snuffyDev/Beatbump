@@ -1,6 +1,5 @@
 <script lang="ts">
 	import ListItem from "$lib/components/ListItem/ListItem.svelte";
-	import { currentTitle, key } from "$stores/stores";
 	import { parsePageContents } from "$lib/parsers/release";
 	import { isPagePlaying } from "$stores/stores";
 	import list from "$lib/stores/list";
@@ -43,6 +42,7 @@
 	let thumbnail = releaseInfo?.thumbnails[0]?.url.replace(/=(w(\d+))-(h(\d+))/g, "=w512-h512");
 
 	CTX_ListItem.set({ parentPlaylistId: releaseInfo.playlistId, page: "release" });
+	// $: console.log(releaseInfo);
 </script>
 
 <Header

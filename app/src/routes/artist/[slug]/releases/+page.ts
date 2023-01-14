@@ -1,7 +1,7 @@
 import type { CarouselItem } from "$lib/types";
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
-export const load: PageLoad = async ({
+export const load: PageLoad = (async ({
 	fetch,
 	url,
 	params,
@@ -24,4 +24,4 @@ export const load: PageLoad = async ({
 		header: header,
 		contents: contents,
 	};
-};
+}) satisfies PageLoad;

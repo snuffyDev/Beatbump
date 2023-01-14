@@ -10,6 +10,8 @@
 	position: relative;
 	align-content: center;
 	font-family: var(--base-font-family);
+	background: var(--form-bg);
+
 	will-change: contents;
 	-webkit-text-size-adjust: none;
 	border-radius: var(--md-radius);
@@ -69,7 +71,7 @@ select {
 		filter: brightness(1.1);
 	}
 	-webkit-text-size-adjust: auto;
-	background: inherit;
+	background-color: var(--form-bg);
 	margin: 0;
 	width: 100%;
 	outline: none;
@@ -86,7 +88,6 @@ select {
 	-moz-appearance: none;
 	align-content: center;
 	-webkit-appearance: none;
-	background-color: inherit;
 	font-size: 100% !important;
 	border-radius: var(--md-radius);
 	padding: 0.2em 2em 0.325em 0.6em;

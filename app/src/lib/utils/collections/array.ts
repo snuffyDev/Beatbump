@@ -53,14 +53,16 @@ export function map<T, U>(array: ArrayLike<T>, cb: ItemCallback<T, U>): U[] {
 	return newArray;
 }
 
-export function filterMap<T, U>(array: Array<T>, cb: ItemCallback<T, U>, predicate: (item: U) => item is U): U[] {
+export function filterMap<T, U>(array: Array<T>, cb: ItemCallback<T, U>, predicate: (item: U) => item is U): U[];
+export function filterMap<T, U>(array: Array<T>, cb: ItemCallback<T, U>, predicate: (item: U) => boolean): U[];
+export function filterMap<T, U>(array: Array<T>, cb: ItemCallback<T, U>, predicate: (item: U) => unknown): U[] {
 	let idx = -1;
 	const length = array.length;
 	const result: U[] = [];
 	while (++idx < length) {
 		const res = cb(array[idx], idx, array);
 		if (predicate(res)) {
-			result[idx] = res;
+			result.push(res);
 		}
 	}
 	idx = null;

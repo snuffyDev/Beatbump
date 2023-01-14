@@ -70,7 +70,7 @@
 	}}
 />
 <GroupSessionCreator />
-<Alert />
+<Alert --alert-bottom={hasplayer ? "5.75em" : "0rem"} />
 <Fullscreen state={isFullscreen ? "open" : "closed"} />
 <footer
 	class="footer-container"

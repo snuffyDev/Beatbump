@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
 	import { AudioPlayer } from "$lib/player";
 	import { playerLoading } from "$lib/stores";

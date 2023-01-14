@@ -240,7 +240,7 @@
 		// isolation: isolate;
 		justify-content: space-between;
 		border-bottom: 0.0625rem hsl(0deg 0% 12%) solid;
-		@media screen and (min-width: 640px) {
+		@media screen and (min-width: 720px) {
 			z-index: 155;
 		}
 	}

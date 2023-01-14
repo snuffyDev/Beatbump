@@ -225,7 +225,7 @@ main {
 	max-width: 100%;
 	isolation: isolate;
 	z-index: 25;
-	@media screen and (min-width: 640px) {
+	@media screen and (min-width: 720px) {
 		z-index: 152;
 	}
 }

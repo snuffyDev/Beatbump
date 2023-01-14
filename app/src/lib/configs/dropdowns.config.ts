@@ -1,12 +1,6 @@
 import type icons from "$lib/components/Icon/icons";
 
-type DropdownItem = {
-	text: string;
-	icon: keyof typeof icons;
-	action: (...args) => void;
-};
-export type Dropdown = DropdownItem[];
-type Label =
+export type Label =
 	| "View Artist"
 	| "Add to Queue"
 	| "Play Next"
@@ -31,7 +25,9 @@ type Label =
 	| "Play Album"
 	| "Invite Group Session"
 	| "Album Radio";
-const DROPDOWN_TEXTS: Label[] = [
+
+export type Dropdown = TypedDropdownItem<Label>[];
+const DROPDOWN_TEXTS: ReadonlyArray<Label> = [
 	"View Artist",
 	"Add to Queue",
 	"Play Next",
@@ -55,7 +51,8 @@ const DROPDOWN_TEXTS: Label[] = [
 	"Play Album",
 	"Album Radio",
 ];
-type Icons =
+
+export type Icons =
 	| "artist"
 	| "queue"
 	| "playlist-add"
@@ -70,8 +67,12 @@ type Icons =
 	| "radio"
 	| "play"
 	| "edit"
+	| "list-plus"
+	| "list-music"
+	| "list-video"
 	| "dots";
-const DROPDOWN_ICONS: Icons[] = [
+
+const DROPDOWN_ICONS: ReadonlyArray<Icons> = [
 	"artist",
 	"queue",
 	"playlist-add",
@@ -86,26 +87,35 @@ const DROPDOWN_ICONS: Icons[] = [
 	"radio",
 	"play",
 	"edit",
+	"list-plus",
+	"list-music",
+	"list-video",
 	"dots",
-];
+] as const;
 
-const DROPDOWN_ITEMS: Partial<Record<Label, Partial<DropdownItem>>> = {
+export type TypedDropdownItem<T extends Label, I extends Icons = Icons> = {
+	text: T;
+	icon: I extends infer A ? A : I;
+	action: (...args) => Promise<void> | void;
+};
+
+export const DROPDOWN_ITEMS = {
 	"View Artist": { text: "View Artist", icon: "artist" },
 	"Add to Queue": { text: "Add to Queue", icon: "queue" },
 	"Play Next": { text: "Play Next", icon: "queue" },
 	Favorite: { text: "Favorite", icon: "heart" },
 	"Start Group Session": { text: "Start Group Session", icon: "users" },
 	Share: { text: "Share", icon: "share" },
-	"Go to Album": { text: "Go to album", icon: "album" },
+	"Go to Album": { text: "Go to Album", icon: "album" },
 	"Invite Group Session": { text: "Invite Group Session", icon: "send" },
 	"View Playlist": { text: "View Playlist", icon: "list" },
 	"Play Song Radio": { text: "Play Song Radio", icon: "radio" },
-	"Remove From Playlist": { text: "Remove from Playlist", icon: "x" },
+	"Remove From Playlist": { text: "Remove From Playlist", icon: "x" },
 	"Add to Playlist": { text: "Add to Playlist", icon: "list-plus" },
 	"Add to Favorites": { text: "Add to Favorites", icon: "heart" },
 	"Share Group Session": { text: "Share Group Session", icon: "share" },
 	Shuffle: { text: "Shuffle", icon: "shuffle" },
 	"Shuffle Playlist": { text: "Shuffle", icon: "shuffle" },
-};
+} as const;
 
 function buildDropdown() {}
