@@ -18,7 +18,7 @@ const adapters = {
 	cloudflare: adapterCf(),
 	vercel: vercel(),
 	netlify: netlify({ edge: false, split: false }),
-	node: node({ precompress: false }),
+	node: node({"precompress":true}),
 };
 
 const adapter = adapters[ENV_ADAPTER];

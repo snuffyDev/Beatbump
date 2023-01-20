@@ -48,6 +48,7 @@ declare module '$env/static/private' {
 	export const DOTNET_ROOT: string;
 	export const LC_NAME: string;
 	export const SSH_AUTH_SOCK: string;
+	export const NODE_EXTRA_CA_CERTS: string;
 	export const COLOR: string;
 	export const npm_config_local_prefix: string;
 	export const DESKTOP_SESSION: string;
@@ -59,12 +60,14 @@ declare module '$env/static/private' {
 	export const GTK_MODULES: string;
 	export const XDG_SEAT: string;
 	export const PWD: string;
-	export const XDG_SESSION_DESKTOP: string;
 	export const LOGNAME: string;
+	export const XDG_SESSION_DESKTOP: string;
 	export const QT_QPA_PLATFORMTHEME: string;
 	export const XDG_SESSION_TYPE: string;
+	export const PANEL_GDK_CORE_DEVICE_EVENTS: string;
 	export const PNPM_HOME: string;
 	export const npm_config_init_module: string;
+	export const _: string;
 	export const XAUTHORITY: string;
 	export const VSCODE_GIT_ASKPASS_NODE: string;
 	export const XDG_GREETER_DATA_DIR: string;
@@ -72,8 +75,8 @@ declare module '$env/static/private' {
 	export const GDM_LANG: string;
 	export const GTK2_RC_FILES: string;
 	export const HOME: string;
-	export const LANG: string;
 	export const LC_PAPER: string;
+	export const LANG: string;
 	export const LS_COLORS: string;
 	export const XDG_CURRENT_DESKTOP: string;
 	export const npm_package_version: string;
@@ -131,7 +134,6 @@ declare module '$env/static/private' {
 	export const LC_NUMERIC: string;
 	export const OLDPWD: string;
 	export const TERM_PROGRAM: string;
-	export const _: string;
 	export const NODE_ENV: string;
 }
 
@@ -184,6 +186,7 @@ declare module '$env/dynamic/private' {
 		DOTNET_ROOT: string;
 		LC_NAME: string;
 		SSH_AUTH_SOCK: string;
+		NODE_EXTRA_CA_CERTS: string;
 		COLOR: string;
 		npm_config_local_prefix: string;
 		DESKTOP_SESSION: string;
@@ -195,12 +198,14 @@ declare module '$env/dynamic/private' {
 		GTK_MODULES: string;
 		XDG_SEAT: string;
 		PWD: string;
-		XDG_SESSION_DESKTOP: string;
 		LOGNAME: string;
+		XDG_SESSION_DESKTOP: string;
 		QT_QPA_PLATFORMTHEME: string;
 		XDG_SESSION_TYPE: string;
+		PANEL_GDK_CORE_DEVICE_EVENTS: string;
 		PNPM_HOME: string;
 		npm_config_init_module: string;
+		_: string;
 		XAUTHORITY: string;
 		VSCODE_GIT_ASKPASS_NODE: string;
 		XDG_GREETER_DATA_DIR: string;
@@ -208,8 +213,8 @@ declare module '$env/dynamic/private' {
 		GDM_LANG: string;
 		GTK2_RC_FILES: string;
 		HOME: string;
-		LANG: string;
 		LC_PAPER: string;
+		LANG: string;
 		LS_COLORS: string;
 		XDG_CURRENT_DESKTOP: string;
 		npm_package_version: string;
@@ -267,7 +272,6 @@ declare module '$env/dynamic/private' {
 		LC_NUMERIC: string;
 		OLDPWD: string;
 		TERM_PROGRAM: string;
-		_: string;
 		NODE_ENV: string;
 		[key: `PUBLIC_${string}`]: undefined;
 		[key: string]: string | undefined;

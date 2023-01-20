@@ -4,6 +4,8 @@ import type { CarouselHeader } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import type { RequestHandler } from "@sveltejs/kit";
+import type { IMusicTwoRowItemRenderer, IMusicResponsiveListItemRenderer } from "$lib/types/innertube/internals";
+import type { ButtonRenderer } from "$lib/types/innertube/musicCarouselShelfRenderer";
 
 /* eslint-disable prefer-const */
 
@@ -15,6 +17,7 @@ export const GET: RequestHandler = async ({ params }) => {
 		`https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30&prettyPrint=false`,
 		{
 			method: "POST",
+			keepalive: true,
 			body: JSON.stringify({
 				context: {
 					// clickTracking: { clickTrackingParams: `${itct}` },
@@ -53,7 +56,7 @@ export const GET: RequestHandler = async ({ params }) => {
 	let grids = [];
 	let sections = [];
 	for (let index = 0; index < contents.length; index++) {
-		const element = { ...contents[index] };
+		const element = contents[index];
 
 		element?.musicCarouselShelfRenderer && carousels.push(element);
 		element?.gridRenderer && grids.push(element);
@@ -62,20 +65,22 @@ export const GET: RequestHandler = async ({ params }) => {
 		for (let index = 0; index < contents.length; index++) {
 			const element = contents[index];
 			if (element?.musicCarouselShelfRenderer) {
-				sections = [...sections, parseCarousel({ ...element })];
+				sections.push(parseCarousel(element));
 			}
 		}
 	}
 	if (grids.length !== 0) {
-		sections = grids.map(({ gridRenderer = {} }) => {
-			const { items = [], header = {} } = gridRenderer;
+		for (let idx = -1; ++idx < contents.length; ) {
+			const { gridRenderer = {} } = contents[idx];
+			const items = gridRenderer.items;
+			const header = gridRenderer.header;
 			const section = items.map((ctx) => MusicTwoRowItemRenderer(ctx));
-			return {
+			sections.push({
 				section,
 				type: "grid",
 				title: header?.gridHeaderRenderer?.title?.runs[0]?.text,
-			};
-		});
+			});
+		}
 	}
 
 	const getTitle = () => {
@@ -84,7 +89,7 @@ export const GET: RequestHandler = async ({ params }) => {
 			wordParts[i] = wordParts[i][0].toUpperCase() + wordParts[i].substr(1);
 		}
 		wordParts.join(" ");
-		const final = wordParts.shift();
+		wordParts.shift();
 		return wordParts.join(" ");
 	};
 	// console.log(sections)
@@ -113,7 +118,13 @@ function parseHeader({ musicCarouselShelfBasicHeaderRenderer }): CarouselHeader 
 	}
 }
 
-function parseBody(contents = []):
+function parseBody(
+	contents:
+		| { musicNavigationButtonRenderer: ButtonRenderer }[]
+		| { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer }[]
+		| { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer }[]
+		| any[] = [],
+):
 	| ICarouselTwoRowItem[]
 	| IListItemRenderer[]
 	| {
@@ -124,19 +135,20 @@ function parseBody(contents = []):
 				browseId: any;
 			};
 	  }[] {
-	let items = [];
-	for (let index = 0; index < contents.length; index++) {
-		const element = contents[index];
-		if (element.musicTwoRowItemRenderer) {
-			items = [...items, MusicTwoRowItemRenderer(element)];
+	const items: any[] = contents.map((item) => {
+		if ("musicTwoRowItemRenderer" in item) {
+			return MusicTwoRowItemRenderer(item as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer });
 		}
-		if (element.musicResponsiveListItemRenderer) {
-			items = [...items, MusicResponsiveListItemRenderer(element)];
+		if ("musicResponsiveListItemRenderer" in item) {
+			return MusicResponsiveListItemRenderer(
+				item as { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer },
+			);
 		}
-		if (element.musicNavigationButtonRenderer) {
-			items = [...items, MoodsAndGenresItem(element)];
+		if ("musicNavigationButtonRenderer" in item) {
+			return MoodsAndGenresItem(item);
 		}
-	}
+	});
+
 	return items;
 }
 

@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
 	import { createEventDispatcher, onMount, tick } from "svelte";
 	import vp from "$lib/actions/viewport";
