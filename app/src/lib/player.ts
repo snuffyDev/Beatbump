@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
-import { browser } from "$app/environment";
+import { browser, dev } from "$app/environment";
 import { cubicOut } from "svelte/easing";
 import { tweened } from "svelte/motion";
 import type { Unsubscriber } from "svelte/store";
@@ -17,6 +17,7 @@ import type HLS from "hls.js";
 import { settings } from "./stores";
 import type { StreamType } from "$stores/settings";
 import { tick } from "svelte";
+import { isSafari } from "./utils/browserDetection";
 
 export interface IAudioPlayer {
 	// #region Properties (6)
@@ -111,13 +112,41 @@ export const updateGroupState = (opts: { client: string; state: ConnectionState 
 export const updateGroupPosition = (dir: "<-" | "->" | undefined, position: number): void =>
 	groupSession.send("PATCH", "state.update.position", { dir, position }, groupSession.client);
 
+// Helper to generate a fallback URL if the current src fails to play
+function createFallbackUrl(currentUrl: string) {
+	if (typeof currentUrl !== "string")
+		throw Error(`Expected parameter 'currentUrl' to be a string, received ${currentUrl}`);
+	const srcUrl = new URL(currentUrl);
+
+	if (!srcUrl.hostname.includes("googlevideo.com")) return currentUrl;
+
+	// example: [ rr4---sn-p5ql61yl , googlevideo , com ]
+	const [subdomain, domain, ext] = srcUrl.hostname.split(".");
+
+	const fvip = srcUrl.searchParams.get("fvip");
+	// comma-separated list of fallback server hosts
+	const mn = srcUrl.searchParams.get("mn");
+
+	let [preDashes, postDashes] = subdomain.split("---");
+	// step 1: replace digits in first part of subdomain with fvip
+	preDashes = preDashes.replace(/\d/g, fvip);
+
+	// step 2: use one of the fallback server names found in mn
+	postDashes = mn.split(",")[1];
+
+	/**  */
+	srcUrl.hostname = `${`${preDashes}---${postDashes}`}.${domain}.${ext}`;
+
+	return srcUrl.toString();
+}
+
 interface AudioPlayerEvents {
 	"update:stream_type": { type: StreamType };
 	play: SrcDict;
 	playing: undefined;
 }
 
-function hasUrl(input: unknown): input is ResponseBody {
+function isResponseBody(input: unknown): input is ResponseBody {
 	return (input as ResponseBody).url !== undefined;
 }
 class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioPlayer, IEventHandler {
@@ -153,7 +182,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	private _worksWithHLSjs = new WritableStore(false);
 	private _streamType: "HTTP" | "HLS";
 	private currentSessionList = () => get(SessionListService);
-
+	private errorCount = -1;
 	private isHLSPlayer = false;
 
 	public progress = tweened(0, {
@@ -169,7 +198,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		super({});
 		if (!browser) return;
 		if ("window" in globalThis.self === false) return;
-		this._isWebkit = /i(Phone|Pad|Pod)/i.test(navigator.userAgent);
+		this._isWebkit = isSafari;
 		// Logger.log(`[LOG:PLAYER:Init]: Mobile Apple Device?`, this._isWebkit);
 
 		this._player = new Audio();
@@ -187,6 +216,9 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		// };
 		// setup();
 
+		if (dev) {
+			window["__player"] = this.player;
+		}
 		this._player.volume = 0.5;
 		this._player.autoplay = true;
 		this._player.preload = "metadata";
@@ -225,7 +257,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	public get durationStore(): WritableStore<number> {
 		if (!browser && !this._player) return;
 		return this._durationStore;
-	}
+		}
 
 	public set isSeeking(value: boolean) {
 		this.isSeeking = value;
@@ -359,40 +391,45 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	}
 
 	public play(event: Nullable<Event> = null): void {
-		if ("mediaSession" in navigator) {
-			navigator.mediaSession.playbackState = "playing";
-		}
+		try {
+			if ("mediaSession" in navigator) {
+				navigator.mediaSession.playbackState = "playing";
+			}
 
-		// Logger.log(`[LOG:PLAYER:State]: Start Playback: `, true);
-		if (groupSession.initialized === true && groupSession.hasActiveSession === true) {
-			updateGroupState({
-				client: groupSession.client.clientId,
-				state: {
-					finished: this.hasFinishedPlayback,
-					paused: false,
-					playing: true,
-					pos: this.currentSessionList().position,
-					stalled: !!this._player.error,
-				} as ConnectionState,
-			});
-		}
-		const canPlay = this._player.play();
-
-		if (canPlay !== undefined) {
-			canPlay
-				.then(() => {
-					this._player.play();
-					this._paused.set(false);
-				})
-				.catch((err: MediaError & Error) => {
-					notify(`${err.name}: ${err.message}`, "error");
-					return;
+			// Logger.log(`[LOG:PLAYER:State]: Start Playback: `, true);
+			if (groupSession.initialized === true && groupSession.hasActiveSession === true) {
+				updateGroupState({
+					client: groupSession.client.clientId,
+					state: {
+						finished: this.hasFinishedPlayback,
+						paused: false,
+						playing: true,
+						pos: this.currentSessionList().position,
+						stalled: !!this._player.error,
+					} as ConnectionState,
 				});
-		} else {
-			this._paused.set(false);
-			this.player.play();
+			}
+			const canPlay = this._player.play();
+
+			if (canPlay !== undefined) {
+				canPlay
+					.then(() => {
+						this._player.play();
+						this._paused.set(false);
+					})
+					.catch((err: MediaError & Error) => {
+						notify(`${err.name}: ${err.message}`, "error");
+						return;
+					});
+			} else {
+				this._paused.set(false);
+				this.player.play();
+			}
+			this._player.defaultMuted = false;
+		} catch (err) {
+			notify(`Error starting playback. You can find this error in the console logs as [playback-error]`, "error");
+			console.error(`[playback-error] `, err);
 		}
-		this._player.defaultMuted = false;
 	}
 
 	public previous(broadcast = false): void {
@@ -438,7 +475,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 
 		// Logger.log(`[LOG:PLAYER:Stream]: Sucessfully Set Source: `, dict);
 		this.__srcUrl = dict?.url;
-		this._src.set(this.__srcUrl);
+		this._src.set(dict?.url);
 	}
 
 	public updateTime(time: number): void {
@@ -459,6 +496,13 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		return import("hls.js").then((module) => {
 			return module.default;
 		});
+	}
+
+	private handleError() {
+		if (++this.errorCount > 2) {
+			this.errorCount = 0;
+			this.updateSrc({ original_url: createFallbackUrl(this.player.src), url: createFallbackUrl(this.player.src) });
+		}
 	}
 
 	private async createHLSPlayer(source?: string) {
@@ -526,7 +570,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			this.__tick = false;
 			const response = await this.getTrackSrc(position, shouldAutoplay).then((value) => {
 				// Logger.log(`[LOG:PLAYER:Queue]: Got Next Track Source: `, { value });
-				if (hasUrl(value)) return value;
+				if (isResponseBody(value)) return value;
 			});
 			return response;
 		} catch (error) {
@@ -711,37 +755,42 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		});
 
 		this.onEvent("play", async () => {
-			if ("mediaSession" in navigator) {
-				navigator.mediaSession.playbackState = "playing";
-			}
+			try {
+				if ("mediaSession" in navigator) {
+					navigator.mediaSession.playbackState = "playing";
+				}
 
-			if (groupSession.initialized === true && groupSession.hasActiveSession === true) {
-				updateGroupState({
-					client: groupSession.client.clientId,
-					state: {
-						finished: this.hasFinishedPlayback,
-						paused: false,
-						playing: true,
-						pos: this.currentSessionList().position,
-						stalled: !!this._player.error,
-					} as ConnectionState,
-				});
-			}
-			const canPlay = this._player.play();
-
-			if (canPlay !== undefined) {
-				canPlay
-					.then(() => {
-						this._player.play();
-						this._paused.set(false);
-					})
-					.catch((err: MediaError & Error) => {
-						notify(`${err.name}: ${err.message}`, "error");
-						return;
+				if (groupSession.initialized === true && groupSession.hasActiveSession === true) {
+					updateGroupState({
+						client: groupSession.client.clientId,
+						state: {
+							finished: this.hasFinishedPlayback,
+							paused: false,
+							playing: true,
+							pos: this.currentSessionList().position,
+							stalled: !!this._player.error,
+						} as ConnectionState,
 					});
-			} else {
-				this._paused.set(false);
-				this.player.play();
+				}
+				const canPlay = this._player.play();
+
+				if (canPlay !== undefined) {
+					canPlay
+						.then(() => {
+							this._player.play();
+							this._paused.set(false);
+						})
+						.catch((err: MediaError & Error) => {
+							notify(`${err.name}: ${err.message}`, "error");
+							return;
+						});
+				} else {
+					this._paused.set(false);
+					this.player.play();
+				}
+			} catch (err) {
+				this.handleError();
+				notify(`Error: ${err}`, "error");
 			}
 		});
 
@@ -775,7 +824,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		this.onEvent("timeupdate", async () => {
 			this._currentTimeStore.set(this._player.currentTime);
 			this._durationStore.set(this._isWebkit && !this.isHLSPlayer ? this._player.duration / 2 : this._player.duration);
-
+			console.log(this._isWebkit, this);
 			if (
 				!this._hasNextSrc && this.isWebkit && !this.isHLSPlayer
 					? this._player.currentTime * 2 >= this._player.duration / 4
@@ -795,12 +844,19 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 				 we have to cut the time in half. Doesn't effect other devices.
 			*/
 
-			if (this._isWebkit && this.isHLSPlayer === false && this._currentTime >= this._duration - 2) {
-				this.next();
+			if (this._isWebkit && this.isHLSPlayer === false && this._currentTime >= this._duration) {
+				this.onEnded();
 			}
 		});
 
 		this.onEvent("ended", async () => this.onEnded());
+
+		this.onEvent("error", (event) => {
+			if (this._player.error.message.includes("Empty src") || !this._player.error.message) return;
+
+			console.error(this._player.error);
+			this.handleError();
+		});
 	}
 
 	// #endregion Private Methods (5)
