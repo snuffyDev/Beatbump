@@ -1,6 +1,6 @@
 {
 	"environment": {
-		"adapter": "node",
+		"adapter": "vercel",
 		"proxy_streams": false
 	},
 	"platform": {
