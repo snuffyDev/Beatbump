@@ -18,20 +18,21 @@
 
 	let opacity = 0;
 	let img: HTMLImageElement;
-
+	let isScrolling = false;
+	let scroll: DOMRect;
+	let calc: number;
 	const handler = (ts: number) => {
 		if (!browser && !container) return;
 
 		const elapsed = ts - timestamp;
 
-		const scroll = container.getBoundingClientRect();
-		const calc = -scroll.top / $windowHeight;
-		y = $windowWidth < 500 ? Math.min(Math.max(calc, 0), 1) * 325 : Math.min(Math.max(calc, 0), 1) * 116;
+		y = $windowWidth < 500 ? Math.min(Math.max(calc, 0), 1) * 155 : Math.min(Math.max(calc, 0), 1) * 116;
 		if (elapsed < 100) {
 			timestamp = requestAnimationFrame(handler);
 		} else {
 			cancelAnimationFrame(timestamp);
 			timestamp = undefined;
+			isScrolling = false;
 		}
 	};
 
@@ -39,6 +40,10 @@
 		if (timestamp) {
 			return;
 		}
+		if (isScrolling) return;
+		scroll = container.getBoundingClientRect();
+		calc = -scroll.top / $windowHeight;
+		isScrolling = true;
 		requestAnimationFrame(handler);
 	}
 
@@ -50,10 +55,10 @@
 		}
 
 		wrapper = document.getElementById("wrapper");
-		wrapper.addEventListener("scroll", onScroll, { passive: true });
+		wrapper.addEventListener("scroll", onScroll, { passive: true, capture: true });
 		return () => {
 			if (timestamp) cancelAnimationFrame(timestamp);
-			wrapper.removeEventListener("scroll", onScroll);
+			wrapper.removeEventListener("scroll", onScroll, true);
 		};
 	});
 </script>

@@ -43,13 +43,11 @@ declare module '$env/static/private' {
 	export const NVM_INC: string;
 	export const XDG_MENU_PREFIX: string;
 	export const TERM_PROGRAM_VERSION: string;
-	export const _P9K_TTY: string;
 	export const NODE: string;
 	export const LC_ADDRESS: string;
 	export const DOTNET_ROOT: string;
 	export const LC_NAME: string;
 	export const SSH_AUTH_SOCK: string;
-	export const P9K_TTY: string;
 	export const COLOR: string;
 	export const npm_config_local_prefix: string;
 	export const DESKTOP_SESSION: string;
@@ -182,13 +180,11 @@ declare module '$env/dynamic/private' {
 		NVM_INC: string;
 		XDG_MENU_PREFIX: string;
 		TERM_PROGRAM_VERSION: string;
-		_P9K_TTY: string;
 		NODE: string;
 		LC_ADDRESS: string;
 		DOTNET_ROOT: string;
 		LC_NAME: string;
 		SSH_AUTH_SOCK: string;
-		P9K_TTY: string;
 		COLOR: string;
 		npm_config_local_prefix: string;
 		DESKTOP_SESSION: string;

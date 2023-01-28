@@ -39,11 +39,12 @@ export function mergeObjects<Target, Source>(target: Target, source: Source): IM
 	return target as IMergedObject<Target, Source>;
 }
 
-export function mergeObjectsRec<Target extends Record<string, any>, Source extends Record<string, any>>(
+export function mergeDeep<Target extends Record<string, any>, Source extends Record<string, any>>(
 	target: IObject<Target>,
 	source: IObject<Source>,
 ): IMergedObject<Target, Source> {
-	if ((typeof target || typeof source) !== "object") throw new Error("Both provided parameters are not valid objects.");
+	if ([typeof target, typeof source].some((t) => t !== "object"))
+		throw new Error("Both provided parameters are not valid objects.");
 	const obj: Record<string, unknown> = Object.assign({}, target);
 	const keys: Array<string> = Object.keys(source);
 	const length = keys.length;
@@ -59,7 +60,7 @@ export function mergeObjectsRec<Target extends Record<string, any>, Source exten
 			obj[key] = key in source ? source[key] : obj[key];
 		}
 	}
-	return obj as MergedObject<Target, Source>;
+	return obj as IMergedObject<Target, Source>;
 }
 
 export function sortObj<T extends IObject<T>>(object: T) {

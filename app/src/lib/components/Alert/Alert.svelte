@@ -1,46 +1,20 @@
 <script lang="ts">
 	import { alertHandler } from "$lib/stores/stores";
-	import { expoIn, expoOut, quintOut } from "svelte/easing";
-	import { crossfade, fly } from "svelte/transition";
-	let height = 0;
-	let win_height = 0;
-	function removeNotification() {
-		if (height && height >= win_height * 0.55) alertHandler.remove($alertHandler[0]);
-	}
-	// $: height && removeNotification();
-	// $: console.log($alertHandler, win_height, height, win_height * 0.55);
-	const [send, receive] = crossfade({
-		duration: (d) => Math.sqrt(d * 200),
-
-		fallback(node, params) {
-			const style = getComputedStyle(node);
-			const transform = style.transform === "none" ? "" : style.transform;
-
-			return {
-				duration: 600,
-				easing: quintOut,
-				css: (t) => `
-					transform: ${transform} scale(${t});
-					opacity: ${t}
-				`,
-			};
-		},
-	});
+	import { flip } from "svelte/animate";
+	import { expoOut } from "svelte/easing";
+	import { fade, fly } from "svelte/transition";
 </script>
 
-<svelte:window bind:innerHeight={win_height} />
-<div
-	class="alert-container"
-	bind:offsetHeight={height}
->
-	{#each $alertHandler as notif, idx}
+<div class="alert-container">
+	{#each $alertHandler as notif (notif.id)}
 		<div
 			in:fly={{ y: 150, duration: 250, easing: expoOut }}
-			out:fly={{ y: 150, duration: 500, delay: 250, easing: expoIn }}
+			out:fade={{ duration: 1250, delay: 500 }}
+			animate:flip={{ duration: 250, delay: 0 }}
 			on:introend={() => {
 				setTimeout(() => {
 					alertHandler.remove(notif);
-				}, 2125);
+				}, 3125);
 			}}
 			style=""
 			class={`alert m-alert-${notif.type}`}
@@ -54,7 +28,7 @@
 	.alert-container {
 		// display: flex;
 		position: fixed;
-		bottom: 5.75rem;
+		bottom: var(--alert-bottom, 5.75rem);
 		left: 0;
 		// flex-direction: column;
 		right: 0;
@@ -62,6 +36,7 @@
 		// isolation: isolate;
 		max-height: 60vmin;
 		// align-items: center;
+		contain: layout;
 		padding-bottom: 0.75rem;
 		pointer-events: none;
 	}

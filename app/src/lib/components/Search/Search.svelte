@@ -13,6 +13,7 @@
 	const dispatch = createEventDispatcher();
 	let results: Array<{ query?: string; id?: number }> = [];
 	async function handleSubmit() {
+		if (!query.length) return;
 		dispatch("submitted", { submitted: true, filter, query });
 		fullscreenStore.set("closed");
 		let url = `/search/${encodeURIComponent(query)}${filter !== undefined ? `?filter=${filter}` : ""}`;

@@ -1,5 +1,5 @@
 import { MusicResponsiveListItemRenderer } from "$lib/parsers/items/musicResponsiveListItemRenderer";
-import { filter, map } from "$lib/utils";
+import { filter, map, mergeObjectsRec } from "$lib/utils";
 type Data = {
 	header: {
 		musicDetailHeaderRenderer: {
@@ -35,22 +35,22 @@ type Data = {
 };
 /* eslint-disable no-prototype-builtins */
 export function parsePageContents(data: Data) {
-	// console.log(contents)
-	const contents = [
-		...data.contents?.singleColumnBrowseResultsRenderer?.tabs[0].tabRenderer.content.sectionListRenderer.contents[0]
-			.musicShelfRenderer.contents,
-	];
-	const songs = map(contents, ({ musicResponsiveListItemRenderer = {} }, index) => ({
+	const contents =
+		data.contents?.singleColumnBrowseResultsRenderer?.tabs[0].tabRenderer.content.sectionListRenderer.contents[0]
+			.musicShelfRenderer.contents || [];
+
+	const songs = map(contents, ({ musicResponsiveListItemRenderer }, index) => ({
 		...MusicResponsiveListItemRenderer({ musicResponsiveListItemRenderer }),
 		index,
 	}));
 
 	const releaseInfoParser = () => {
-		const year = data.header?.musicDetailHeaderRenderer?.subtitle?.runs.pop();
-		const length = data.header?.musicDetailHeaderRenderer?.subtitle?.runs.shift();
+		console.log(data.header.musicDetailHeaderRenderer.subtitle.runs);
+		const year = data.header?.musicDetailHeaderRenderer?.subtitle?.runs.at(-1);
+		const length = data.header?.musicDetailHeaderRenderer?.subtitle?.runs[0];
 		const artists = filter(
-			[...data.header?.musicDetailHeaderRenderer?.subtitle?.runs],
-			(item) => !item.text.match(/[\s]?•[\s]?/),
+			data.header?.musicDetailHeaderRenderer?.subtitle?.runs,
+			(item) => !!item?.navigationEndpoint?.browseEndpoint?.browseId,
 		).map((item) => ({
 			name: item.text,
 			channelId: item?.navigationEndpoint?.browseEndpoint?.browseId || "",

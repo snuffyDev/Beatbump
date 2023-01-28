@@ -102,14 +102,14 @@ input[type="range"] {
 	background: none;
 	overflow: hidden;
 	outline: none;
-	background: #333333;
+	background: hsl(0, 0%, 20%);
 	border-radius: 1.666667rem;
 	height: 0.6rem;
 	cursor: pointer;
 	transition-duration: 0.2s;
 
 	&:hover {
-		background: rgba(255, 255, 255, 0.295);
+		background: hsl(0, 0%, 32%);
 
 		&::-webkit-slider-thumb {
 			opacity: 1;

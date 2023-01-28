@@ -16,9 +16,9 @@ const ENV_ADAPTER = process.env["BB_ADAPTER"] ?? "cloudflare-workers";
 const adapters = {
 	"cloudflare-workers": adapterCfw({}),
 	cloudflare: adapterCf(),
-	vercel: vercel(),
+	vercel: vercel({"edge":false,"split":false}),
 	netlify: netlify({ edge: false, split: false }),
-	node: node({ precompress: false }),
+	node: node({"precompress":true}),
 };
 
 const adapter = adapters[ENV_ADAPTER];

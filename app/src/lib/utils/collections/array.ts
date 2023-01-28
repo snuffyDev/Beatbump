@@ -43,27 +43,23 @@ export function iter<T>(array: ArrayLike<T>, cb: VoidCallback<T>): void {
 }
 
 export function map<T, U>(array: ArrayLike<T>, cb: ItemCallback<T, U>): U[] {
-	let idx = -1;
-	const length = array.length;
-	const newArray: U[] = Array(length);
-	while (++idx < length) {
+	const newArray: U[] = Array(array.length);
+	for (let idx = 0; idx < array.length; idx++) {
 		newArray[idx] = cb(array[idx], idx, array);
 	}
-	idx = null;
 	return newArray;
 }
 
-export function filterMap<T, U>(array: Array<T>, cb: ItemCallback<T, U>, predicate: (item: U) => item is U): U[] {
-	let idx = -1;
-	const length = array.length;
+export function filterMap<T, U>(array: Array<T>, cb: ItemCallback<T, U>, predicate: (item: U) => item is U): U[];
+export function filterMap<T, U>(array: Array<T>, cb: ItemCallback<T, U>, predicate: (item: U) => boolean): U[];
+export function filterMap<T, U>(array: Array<T>, cb: ItemCallback<T, U>, predicate: (item: U) => unknown): U[] {
 	const result: U[] = [];
-	while (++idx < length) {
+	for (let idx = 0; idx < array.length; idx++) {
 		const res = cb(array[idx], idx, array);
 		if (predicate(res)) {
-			result[idx] = res;
+			result.push(res);
 		}
 	}
-	idx = null;
 	return result as U[];
 }
 export function filter<T, S>(array: Array<T>, predicate: (item: Maybe<T>) => boolean): T[] {

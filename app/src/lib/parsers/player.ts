@@ -10,7 +10,7 @@ const parseProxyRedir = (url: string) => {
 };
 
 import type { Dict } from "$lib/types/utilities";
-import { map } from "$lib/utils";
+import { Logger, filterMap, map } from "$lib/utils";
 import { buildDashManifest, type IFormat } from "$lib/utils/buildDashManifest";
 
 export interface PlayerFormats {
@@ -50,7 +50,7 @@ export function sort({
 	}
 
 	const host = data?.playerConfig?.hlsProxyConfig?.hlsChunkHost;
-	const formats = data?.streamingData?.adaptiveFormats as Array<any>;
+	const formats: Array<any> = data?.streamingData?.adaptiveFormats as Array<any>;
 	const hls =
 		(data?.streamingData?.hlsManifestUrl as string).replace(
 			/https:\/\/(.*?)\//,
@@ -58,26 +58,26 @@ export function sort({
 		) +
 		("?host=" + host);
 
-	let idx = -1;
-	const length = formats?.length;
-	const arr = [];
-	while (++idx < length) {
-		const item = formats[idx];
-		if ((item.itag as number) < 139 && item.itag > 251) continue;
-		if (WebM === true && item.itag === 251)
-			arr.push({
-				original_url: item.url,
-				url: parseProxyRedir(item.url),
-				mimeType: "webm",
-			});
-		if (item.itag === 140)
-			arr.push({
-				original_url: item.url,
-				url: item.url,
-				mimeType: "mp4",
-			});
-		// 	arr.push();
-	}
+	const arr = filterMap(
+		formats,
+		(item) => {
+			if ((item.itag as number) < 139 && item.itag > 251) return null;
+			if (WebM === true && item.itag === 251)
+				return {
+					original_url: item.url,
+					url: parseProxyRedir(item.url),
+					mimeType: "webm",
+				};
+			if (item.itag === 140)
+				return {
+					original_url: item.url,
+					url: item.url,
+					mimeType: "mp4",
+				};
+		},
+		(it) => !!it,
+	);
+	// Logger.log(`[LOG:STREAM-URLS]: `, arr);
 	return {
 		hls,
 		dash: dash_manifest,

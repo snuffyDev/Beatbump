@@ -12,40 +12,6 @@ export class Encoder {
 		return decoder.decode(input, options);
 	}
 }
-export const BLACKLISTED_CHARS = new Set([
-	";",
-	"(",
-	")",
-	"'",
-	'"',
-	"`",
-	";",
-	".",
-	"%",
-	"*",
-	"!",
-	"@",
-	"#",
-	"$",
-	"^",
-	"&",
-	"=",
-	"+",
-	"{",
-	"}",
-	"~",
-	"[",
-	"]",
-	"\\",
-	"\\\\",
-	",",
-	"/",
-	"|",
-	"<",
-	">",
-	"?",
-	":",
-]);
 
 export function sanitize(str: string): string {
 	if (typeof str !== "string") return;

@@ -2,22 +2,11 @@
 	import type { PageData } from "./$types";
 	import Carousel from "$components/Carousel/Carousel.svelte";
 	import Header from "$lib/components/Layouts/Header.svelte";
-	import type { ICarousel, MoodsAndGenresItem } from "$lib/types";
-	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+	import { isMoodsAndGenres, isValidCarousel } from "$lib/validation/typeGuards/isIListItemRenderer";
 
 	export let data: PageData;
 
 	const { carouselItems, page: path } = data;
-
-	const isMoodsAndGenres = (obj: unknown): obj is ICarousel<MoodsAndGenresItem> => {
-		return (obj as ICarousel<MoodsAndGenresItem>).results[0].color !== undefined;
-	};
-
-	const isValidCarousel = (obj: unknown): obj is ICarousel<IListItemRenderer> => {
-		return !!(obj as ICarousel<IListItemRenderer>).results[0].title;
-	};
-
-	$: console.log(carouselItems);
 </script>
 
 <Header

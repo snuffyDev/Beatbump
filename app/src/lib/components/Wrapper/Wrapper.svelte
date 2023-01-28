@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
 	import { quintOut } from "svelte/easing";
 	import { fly } from "svelte/transition";
@@ -19,6 +21,8 @@
 	div {
 		/* display: block; */
 		/* position: relative; */
+		contain: content;
+		overflow-y: auto;
 		contain: content;
 		inset: 0;
 		overflow-y: auto;

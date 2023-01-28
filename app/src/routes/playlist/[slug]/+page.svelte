@@ -42,8 +42,8 @@
 	let hasData = false;
 	let carousel: any;
 
-	// initialize playlist page
 	const trackStore = writable<IListItemRenderer[]>([]);
+
 	trackStore.set(tracks);
 
 	CTX_ListItem.set({ page: "playlist", innerWidth: width, parentPlaylistId: id, visitorData: data?.visitorData });
@@ -132,7 +132,7 @@
 	};
 	const setId = () => isPagePlaying.add(id);
 	let value;
-	let options = [
+	const options = [
 		{
 			label: "Unsorted",
 			params: "nosort",
@@ -243,7 +243,7 @@
 						// list.startPlaylist(header.playlistId)
 						list.initAutoMixSession({
 							playlistId: header.playlistId,
-							config: { playerParams: "wAEB" },
+							config: { playerParams: "wAEB8gECGAE%3D" },
 						});
 					},
 					icon: "shuffle",

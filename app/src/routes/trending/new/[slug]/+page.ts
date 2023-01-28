@@ -6,14 +6,9 @@ export const load: PageLoad = async ({ params, fetch, url }) => {
 			`${url.searchParams.get("params") ? `?params=${url.searchParams.get("params")}` : ""}` +
 			`${url.searchParams.get("itct") ? `&itct=${encodeURIComponent(url.searchParams.get("itct"))}` : ""}`,
 	);
-	const { sections = [], header = "", title = [] || "", data } = await response.json();
+	const data = await response.json();
 	// console.log(sections, header, title)
 	if (response.ok) {
-		return {
-			sections,
-			header,
-			title,
-			data,
-		};
+		return data;
 	}
 };

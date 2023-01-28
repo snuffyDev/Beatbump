@@ -26,8 +26,19 @@ type IHeaders = Record<string, string>;
 /** Helper function to build a request body
 	consisting of Context and params of type `T` */
 function buildRequestBody<T>(context: Context, params: Body<T>) {
-	return { context, ...params };
+	return Object.assign({}, { context }, params);
 }
+
+const ENDPOINT_DICT: Record<keyof APIEndpoints, Function> = {
+	artist: artistRequest,
+	browse: browseRequest,
+	home: browseRequest,
+	next: nextRequest,
+	player: playerRequest,
+	playlist: browseRequest,
+	related: browseRequest,
+	search: searchRequest,
+} as const;
 
 /**
  * Builds a YouTube Music API request.
@@ -53,26 +64,8 @@ export function buildRequest<
 ): Promise<Response | null> {
 	const ctx = { ...CONTEXT_DEFAULTS, ...context };
 	if (!headers) headers = {};
-	switch (endpoint) {
-		case "artist":
-			return artistRequest(ctx, params as ArtistEndpointParams);
-		case "next":
-			return nextRequest(ctx, params as NextEndpointParams);
-		case "player":
-			return playerRequest(ctx, params as PlayerEndpointParams);
-		case "playlist":
-			return browseRequest(ctx, params as PlaylistEndpointParams, continuation, headers);
-		case "related":
-			return browseRequest(ctx, params as RelatedEndpointParams, null, null);
-		case "browse":
-			return browseRequest(ctx, params as unknown as RelatedEndpointParams, null, null);
-		case "home":
-			return browseRequest(ctx, params as PlaylistEndpointParams, continuation, headers);
-		case "search":
-			return searchRequest(ctx, params as SearchEndpointParams, continuation as SearchEndpointParams);
-		default:
-			return Promise.resolve(null);
-	}
+	if (!(endpoint in ENDPOINT_DICT)) return Promise.resolve(null);
+	return ENDPOINT_DICT[endpoint](ctx, params, continuation, headers);
 }
 
 /**
@@ -85,9 +78,10 @@ export function buildRequest<
  */
 function nextRequest<T extends NextEndpointParams>(context: Context, params: T) {
 	const body = buildRequestBody(context, params);
-	const request = fetch(API_BASE_URL + ENDPOINT_NAMES.next + "?key=" + WEB_REMIX_KEY, {
+	return fetch(API_BASE_URL + ENDPOINT_NAMES.next + "?key=" + WEB_REMIX_KEY, {
 		body: JSON.stringify(body),
 		method: "POST",
+		keepalive: true,
 		headers: {
 			"Content-Type": "application/json; charset=utf-8",
 			Origin: "https://music.youtube.com",
@@ -98,7 +92,6 @@ function nextRequest<T extends NextEndpointParams>(context: Context, params: T) 
 			"User-Agent": USER_AGENT,
 		},
 	});
-	return request;
 }
 
 /**
@@ -116,7 +109,7 @@ function searchRequest<T extends SearchEndpointParams>(
 	continuation?: Nullable<SearchEndpointParams>,
 ) {
 	const body = buildRequestBody(context, params);
-	const request = fetch(
+	return fetch(
 		API_BASE_URL +
 			ENDPOINT_NAMES.search +
 			"?" +
@@ -125,6 +118,8 @@ function searchRequest<T extends SearchEndpointParams>(
 		{
 			body: JSON.stringify(body),
 			method: "POST",
+			keepalive: true,
+
 			headers: {
 				"Content-Type": "application/json; charset=utf-8",
 				Origin: "https://music.youtube.com",
@@ -132,7 +127,6 @@ function searchRequest<T extends SearchEndpointParams>(
 			},
 		},
 	);
-	return request;
 }
 
 /**
@@ -154,7 +148,7 @@ function browseRequest<T = PlayerEndpointParams | ArtistEndpointParams | Related
 	const body = buildRequestBody<T>(context as Context, params);
 
 	// if continuation is defined, querystringify it
-	const request = fetch(
+	return fetch(
 		API_BASE_URL +
 			Endpoints.Browse +
 			"?" +
@@ -174,11 +168,12 @@ function browseRequest<T = PlayerEndpointParams | ArtistEndpointParams | Related
 				},
 				headers,
 			),
+			keepalive: true,
+
 			body: JSON.stringify(body),
 			method: "POST",
 		},
 	);
-	return request;
 }
 
 /**
@@ -193,15 +188,15 @@ function browseRequest<T = PlayerEndpointParams | ArtistEndpointParams | Related
 function playerRequest<T extends PlayerEndpointParams>(context: Context, params: T) {
 	const body = buildRequestBody(context as Context, params);
 
-	const request = fetch(API_BASE_URL + ENDPOINT_NAMES.player + `?key=${ANDROID_KEY}`, {
+	return fetch(API_BASE_URL + ENDPOINT_NAMES.player + `?key=${ANDROID_KEY}`, {
 		headers: {
 			"Content-Type": "application/json; charset=utf-8",
 			Origin: API_ORIGIN,
 		},
 		body: JSON.stringify(body),
 		method: "POST",
+		keepalive: true,
 	});
-	return request;
 }
 
 /**
@@ -216,14 +211,15 @@ function playerRequest<T extends PlayerEndpointParams>(context: Context, params:
 function artistRequest<T extends ArtistEndpointParams>(context: Context, body: T) {
 	const reqBody = buildRequestBody(context as Context, body);
 
-	const request = fetch(API_BASE_URL + ENDPOINT_NAMES.artist + `?key=${WEB_REMIX_KEY}`, {
+	return fetch(API_BASE_URL + ENDPOINT_NAMES.artist + `?key=${WEB_REMIX_KEY}`, {
 		headers: {
 			Origin: API_ORIGIN,
 			"x-origin": API_ORIGIN,
 			"User-Agent": USER_AGENT,
 		},
 		method: "POST",
+		keepalive: true,
+
 		body: JSON.stringify(reqBody),
 	});
-	return request;
 }

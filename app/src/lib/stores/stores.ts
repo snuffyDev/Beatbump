@@ -1,14 +1,8 @@
-import { browser } from "$app/environment";
 import type { Item } from "$lib/types";
 import { filter } from "$lib/utils/collections";
-import type { Writable } from "svelte/store";
-import { derived, get, writable } from "svelte/store";
+import { derived, writable } from "svelte/store";
 import { settings } from "./settings";
 
-export const updateTrack = writable<{ originalUrl?: string; url?: string }>({
-	url: null,
-	originalUrl: null,
-});
 export const ctxKey = {};
 export const currentTitle = writable(undefined);
 
@@ -16,15 +10,11 @@ export type Alert = {
 	msg?: string;
 	action?: string;
 	type?: string;
-};
-type AlertStore = {
-	subscribe: Writable<Alert>["subscribe"];
-	set: Writable<Alert>["set"];
-	update: Writable<Alert>["update"];
+	id?: number;
 };
 
 // Derived from Settings
-export const theme = derived(settings, ($settings) => $settings.appearance.theme);
+export const theme = derived(settings, ($settings) => $settings.appearance.Theme);
 export const filterAutoPlay = derived(settings, ($settings) => $settings?.playback["Dedupe Automix"]);
 export const preferWebM = derived(settings, ($settings) => $settings?.playback["Prefer WebM Audio"]);
 export const preserveSearch = derived(settings, ($settings) => $settings?.search?.Preserve);
@@ -33,13 +23,14 @@ export const immersiveQueue = derived(settings, ($settings) => $settings?.appear
 export const alertHandler = _alertHandler();
 function _alertHandler() {
 	const { set, subscribe, update } = writable<Alert[]>([]);
+	let id = -1;
 	return {
 		subscribe,
 		add: ({ msg, type, action }: Alert) => {
-			update((u) => [...u, { msg, type, action }]);
+			update((u) => [...u, { msg, type, action, id: ++id }]);
 		},
-		remove: ({ msg, type, action }: Alert) => {
-			update((u) => filter(u, (item) => item.msg !== msg));
+		remove: ({ id }: Alert) => {
+			update((u) => filter(u, (item) => item.id !== id));
 		},
 	};
 }
@@ -70,8 +61,6 @@ function _isPagePlaying() {
 		},
 	};
 }
-export const key = writable<number>(0);
-export const currentId = writable("");
 export const playerLoading = writable(false);
 
 export const showAddToPlaylistPopper = writable<{

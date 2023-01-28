@@ -1,5 +1,4 @@
-export type { BufferEncoding } from "./buffer";
-export { Buffer, IsoBase64 } from "./buffer";
+export { IsoBase64 } from "./buffer";
 export type { IFormat } from "./buildDashManifest";
 export { buildDashManifest } from "./buildDashManifest";
 export { doOnUnload } from "./cleanup";

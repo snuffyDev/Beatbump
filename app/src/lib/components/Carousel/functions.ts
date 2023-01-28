@@ -24,7 +24,6 @@ export async function clickHandler({
 	type: string;
 	kind: string;
 }) {
-	console.log(item, arguments);
 	if (type === "trending") {
 		if (item.endpoint?.pageType?.match(/ALBUM|SINGLE/m)) {
 			goto(

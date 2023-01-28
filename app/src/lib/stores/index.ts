@@ -4,7 +4,6 @@ export type { Theme, UserSettings } from "./settings";
 export { SettingsSchema, settings } from "./settings";
 export type { Alert } from "./stores";
 export {
-	updateTrack,
 	ctxKey,
 	currentTitle,
 	theme,
@@ -14,8 +13,6 @@ export {
 	immersiveQueue,
 	alertHandler,
 	isPagePlaying,
-	key,
-	currentId,
 	playerLoading,
 	showAddToPlaylistPopper,
 	showGroupSessionManager,

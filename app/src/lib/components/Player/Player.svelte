@@ -19,7 +19,6 @@
 	import ProgressBar from "./ProgressBar";
 
 	import { SITE_ORIGIN_URL } from "$stores/url";
-	import { windowWidth } from "$stores/window";
 
 	const { paused } = AudioPlayer;
 	let volume = 0.5;

@@ -76,7 +76,10 @@
 			>
 				<span class="h3">{result.header.title}</span>
 				{#if filter !== "all"}
-					<div class="music-shelf-list">
+					<div
+						class="music-shelf-list"
+						style:margin-bottom|important={0}
+					>
 						<VirtualList
 							on:endList={() => {
 								queueMicrotask(paginate);

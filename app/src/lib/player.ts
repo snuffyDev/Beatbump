@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
-import { browser } from "$app/environment";
+import { browser, dev } from "$app/environment";
 import { cubicOut } from "svelte/easing";
 import { tweened } from "svelte/motion";
 import type { Unsubscriber } from "svelte/store";
@@ -17,6 +17,7 @@ import type HLS from "hls.js";
 import { settings } from "./stores";
 import type { StreamType } from "$stores/settings";
 import { tick } from "svelte";
+import { isSafari } from "./utils/browserDetection";
 
 export interface IAudioPlayer {
 	// #region Properties (6)
@@ -111,13 +112,41 @@ export const updateGroupState = (opts: { client: string; state: ConnectionState 
 export const updateGroupPosition = (dir: "<-" | "->" | undefined, position: number): void =>
 	groupSession.send("PATCH", "state.update.position", { dir, position }, groupSession.client);
 
+// Helper to generate a fallback URL if the current src fails to play
+function createFallbackUrl(currentUrl: string) {
+	if (typeof currentUrl !== "string")
+		throw Error(`Expected parameter 'currentUrl' to be a string, received ${currentUrl}`);
+	const srcUrl = new URL(currentUrl);
+
+	if (!srcUrl.hostname.includes("googlevideo.com")) return currentUrl;
+
+	// example: [ rr4---sn-p5ql61yl , googlevideo , com ]
+	const [subdomain, domain, ext] = srcUrl.hostname.split(".");
+
+	const fvip = srcUrl.searchParams.get("fvip");
+	// comma-separated list of fallback server hosts
+	const mn = srcUrl.searchParams.get("mn");
+
+	let [preDashes, postDashes] = subdomain.split("---");
+	// step 1: replace digits in first part of subdomain with fvip
+	preDashes = preDashes.replace(/\d/g, fvip);
+
+	// step 2: use one of the fallback server names found in mn
+	postDashes = mn.split(",")[1];
+
+	/**  */
+	srcUrl.hostname = `${`${preDashes}---${postDashes}`}.${domain}.${ext}`;
+
+	return srcUrl.toString();
+}
+
 interface AudioPlayerEvents {
 	"update:stream_type": { type: StreamType };
 	play: SrcDict;
 	playing: undefined;
 }
 
-function hasUrl(input: unknown): input is ResponseBody {
+function isResponseBody(input: unknown): input is ResponseBody {
 	return (input as ResponseBody).url !== undefined;
 }
 class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioPlayer, IEventHandler {
@@ -153,7 +182,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	private _worksWithHLSjs = new WritableStore(false);
 	private _streamType: "HTTP" | "HLS";
 	private currentSessionList = () => get(SessionListService);
-
+	private errorCount = -1;
 	private isHLSPlayer = false;
 
 	public progress = tweened(0, {
@@ -169,9 +198,12 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		super({});
 		if (!browser) return;
 		if ("window" in globalThis.self === false) return;
-		this._isWebkit = /i(Phone|Pad|Pod)/i.test(navigator.userAgent);
+		this._isWebkit = isSafari;
+		// Logger.log(`[LOG:PLAYER:Init]: Mobile Apple Device?`, this._isWebkit);
 
 		this._player = new Audio();
+		// Logger.log(`[LOG:PLAYER:Init]: Initializing Audio Player`, true);
+
 		// const setup = async () => {
 		// 	if (browser) {
 		// 		const module = await import("dashjs");
@@ -184,11 +216,16 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		// };
 		// setup();
 
+		if (dev) {
+			window["__player"] = this.player;
+		}
 		this._player.volume = 0.5;
 		this._player.autoplay = true;
 		this._player.preload = "metadata";
 
 		this._durationUnsubscriber = this._durationStore.subscribe((value) => {
+			// Logger.log(`[LOG:PLAYER:Update]: Duration: `, value);
+
 			this._duration = value;
 			// notify(`${this._duration}`, "error");]
 		});
@@ -260,6 +297,8 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	// #region Private Accessors (1)
 
 	private get hasFinishedPlayback(): boolean {
+		// Logger.log(`[LOG:PLAYER:State]: Has Finished Playback?`, this._player.currentTime >= this._player.duration);
+		// Logger.log(`[LOG:PLAYER:State]: Current Duration: `, this._player.duration);
 		return this._player.currentTime >= this._player.duration;
 	}
 
@@ -289,12 +328,14 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		if (this._repeat === "track" && userInitiated === false) return;
 		if (this.__tick === true) return;
 		this.__tick = true;
+		// Logger.log(`[LOG:PLAYER:Next]: Loading next track`, { repeat: this._repeat });
 
 		const sessionList = this.currentSessionList();
 		const canAllPlay = groupSession.allCanPlay();
 		let position = sessionList.position;
 
 		if (this._repeat === "playlist" && sessionList.position === sessionList.mix.length - 1) {
+			// Logger.log(`[LOG:PLAYER:Next]: Repeating song: `, { repeat: this._repeat });
 			this.handleRepeat(sessionList);
 			this.__tick = false;
 			return;
@@ -343,45 +384,52 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		if ("mediaSession" in navigator) {
 			navigator.mediaSession.playbackState = "paused";
 		}
+		// Logger.log(`[LOG:PLAYER:State]: Paused: `, true);
 
 		this._paused.set(true);
 		this._player.pause();
 	}
 
 	public play(event: Nullable<Event> = null): void {
-		if ("mediaSession" in navigator) {
-			navigator.mediaSession.playbackState = "playing";
-		}
+		try {
+			if ("mediaSession" in navigator) {
+				navigator.mediaSession.playbackState = "playing";
+			}
 
-		if (groupSession.initialized === true && groupSession.hasActiveSession === true) {
-			updateGroupState({
-				client: groupSession.client.clientId,
-				state: {
-					finished: this.hasFinishedPlayback,
-					paused: false,
-					playing: true,
-					pos: this.currentSessionList().position,
-					stalled: !!this._player.error,
-				} as ConnectionState,
-			});
-		}
-		const canPlay = this._player.play();
-
-		if (canPlay !== undefined) {
-			canPlay
-				.then(() => {
-					this._player.play();
-					this._paused.set(false);
-				})
-				.catch((err: MediaError & Error) => {
-					notify(`${err.name}: ${err.message}`, "error");
-					return;
+			// Logger.log(`[LOG:PLAYER:State]: Start Playback: `, true);
+			if (groupSession.initialized === true && groupSession.hasActiveSession === true) {
+				updateGroupState({
+					client: groupSession.client.clientId,
+					state: {
+						finished: this.hasFinishedPlayback,
+						paused: false,
+						playing: true,
+						pos: this.currentSessionList().position,
+						stalled: !!this._player.error,
+					} as ConnectionState,
 				});
-		} else {
-			this._paused.set(false);
-			this.player.play();
+			}
+			const canPlay = this._player.play();
+
+			if (canPlay !== undefined) {
+				canPlay
+					.then(() => {
+						this._player.play();
+						this._paused.set(false);
+					})
+					.catch((err: MediaError & Error) => {
+						notify(`${err.name}: ${err.message}`, "error");
+						return;
+					});
+			} else {
+				this._paused.set(false);
+				this.player.play();
+			}
+			this._player.defaultMuted = false;
+		} catch (err) {
+			notify(`Error starting playback. You can find this error in the console logs as [playback-error]`, "error");
+			console.error(`[playback-error] `, err);
 		}
-		this._player.defaultMuted = false;
 	}
 
 	public previous(broadcast = false): void {
@@ -390,6 +438,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			Logger.log("There's nothing that way!");
 			return;
 		}
+		// Logger.log(`[LOG:PLAYER:Previous]: Loading previous track `, position - 1);
 		if (broadcast === true) updateGroupPosition("<-", position);
 		SessionListService.updatePosition("back");
 		this.getTrackSrc(position - 1);
@@ -413,16 +462,20 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	}
 
 	public updateSrc(dict: SrcDict | Promise<SrcDict>): void {
+		// Logger.log(`[LOG:PLAYER:Stream]: Updating Player Source: `, dict);
+
 		if (dict instanceof Promise) {
 			dict.then((result) => {
 				this.__srcUrl = result?.original_url;
 				this._src.set(result?.url);
+				// Logger.log(`[LOG:PLAYER:Stream]: Sucessfully Set Source: `, dict);
 			});
 			return;
 		}
 
+		// Logger.log(`[LOG:PLAYER:Stream]: Sucessfully Set Source: `, dict);
 		this.__srcUrl = dict?.url;
-		this._src.set(this.__srcUrl);
+		this._src.set(dict?.url);
 	}
 
 	public updateTime(time: number): void {
@@ -443,6 +496,13 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		return import("hls.js").then((module) => {
 			return module.default;
 		});
+	}
+
+	private handleError() {
+		if (++this.errorCount > 2) {
+			this.errorCount = 0;
+			this.updateSrc({ original_url: createFallbackUrl(this.player.src), url: createFallbackUrl(this.player.src) });
+		}
 	}
 
 	private async createHLSPlayer(source?: string) {
@@ -479,6 +539,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	}
 
 	private async getNextSongInQueue(position: number, shouldAutoplay = true): Promise<Nullable<ResponseBody>> {
+		// Logger.log(`[LOG:PLAYER:Queue]: Start Fetching Next Song: `, { position, shouldAutoplay });
 		const sessionList = this.currentSessionList();
 
 		if (position >= sessionList.mix.length - 1) {
@@ -508,7 +569,8 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		try {
 			this.__tick = false;
 			const response = await this.getTrackSrc(position, shouldAutoplay).then((value) => {
-				if (hasUrl(value)) return value;
+				// Logger.log(`[LOG:PLAYER:Queue]: Got Next Track Source: `, { value });
+				if (isResponseBody(value)) return value;
 			});
 			return response;
 		} catch (error) {
@@ -518,13 +580,27 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 
 	private getTrackSrc(position: number, shouldAutoplay = true): Promise<true | void | ResponseBody> {
 		const sessionList = this.currentSessionList();
+		// Logger.log(`[LOG:PLAYER:Stream]: Fetching next track source: `,{ {position, shouldAutoplay});
 		return getSrc(sessionList.mix[position].videoId, sessionList.mix[position].playlistId, null, shouldAutoplay)
 			.then(({ body, error }) => {
 				if (error === true) {
 					// this.next();
 					this.skip();
+
+					// Logger.err(`[LOG:PLAYER:Stream]: Error fetching next track source: `, {
+					// 	position,
+					// 	shouldAutoplay,
+					// 	error,
+					// 	body,
+					// });
 					return error;
 				}
+				// Logger.err(`[LOG:PLAYER:Stream]: Successfully fetched next track source: `, {
+				// 	position,
+				// 	shouldAutoplay,
+				// 	error,
+				// 	body,
+				// });
 				return body;
 			})
 			.catch((err: MediaError & Error) => {
@@ -553,6 +629,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			await tick();
 			this.previous(false);
 		}
+		// Logger.err(`[LOG:PLAYER:State]: Repeating: `, true);
 		this.__tick = false;
 	}
 
@@ -560,6 +637,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		if (this._repeat === "track") return;
 		const currentList = this.currentSessionList();
 		const isLastSong = currentList.position === currentList.mix.length - 1;
+		// Logger.err(`[LOG:PLAYER:Stream]: Track ended: `, true);
 		if (this._repeat === "playlist" && isLastSong) {
 			await this.handleRepeat(currentList);
 			return;
@@ -677,37 +755,42 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		});
 
 		this.onEvent("play", async () => {
-			if ("mediaSession" in navigator) {
-				navigator.mediaSession.playbackState = "playing";
-			}
+			try {
+				if ("mediaSession" in navigator) {
+					navigator.mediaSession.playbackState = "playing";
+				}
 
-			if (groupSession.initialized === true && groupSession.hasActiveSession === true) {
-				updateGroupState({
-					client: groupSession.client.clientId,
-					state: {
-						finished: this.hasFinishedPlayback,
-						paused: false,
-						playing: true,
-						pos: this.currentSessionList().position,
-						stalled: !!this._player.error,
-					} as ConnectionState,
-				});
-			}
-			const canPlay = this._player.play();
-
-			if (canPlay !== undefined) {
-				canPlay
-					.then(() => {
-						this._player.play();
-						this._paused.set(false);
-					})
-					.catch((err: MediaError & Error) => {
-						notify(`${err.name}: ${err.message}`, "error");
-						return;
+				if (groupSession.initialized === true && groupSession.hasActiveSession === true) {
+					updateGroupState({
+						client: groupSession.client.clientId,
+						state: {
+							finished: this.hasFinishedPlayback,
+							paused: false,
+							playing: true,
+							pos: this.currentSessionList().position,
+							stalled: !!this._player.error,
+						} as ConnectionState,
 					});
-			} else {
-				this._paused.set(false);
-				this.player.play();
+				}
+				const canPlay = this._player.play();
+
+				if (canPlay !== undefined) {
+					canPlay
+						.then(() => {
+							this._player.play();
+							this._paused.set(false);
+						})
+						.catch((err: MediaError & Error) => {
+							notify(`${err.name}: ${err.message}`, "error");
+							return;
+						});
+				} else {
+					this._paused.set(false);
+					this.player.play();
+				}
+			} catch (err) {
+				this.handleError();
+				notify(`Error: ${err}`, "error");
 			}
 		});
 
@@ -741,7 +824,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		this.onEvent("timeupdate", async () => {
 			this._currentTimeStore.set(this._player.currentTime);
 			this._durationStore.set(this._isWebkit && !this.isHLSPlayer ? this._player.duration / 2 : this._player.duration);
-
+			// console.log(this._isWebkit, this);
 			if (
 				!this._hasNextSrc && this.isWebkit && !this.isHLSPlayer
 					? this._player.currentTime * 2 >= this._player.duration / 4
@@ -761,12 +844,19 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 				 we have to cut the time in half. Doesn't effect other devices.
 			*/
 
-			if (this._isWebkit && this.isHLSPlayer === false && this._currentTime >= this._duration - 2) {
-				this.next();
+			if (this._isWebkit && this.isHLSPlayer === false && this._currentTime >= this._duration) {
+				this.onEnded();
 			}
 		});
 
 		this.onEvent("ended", async () => this.onEnded());
+
+		this.onEvent("error", (event) => {
+			if (this._player.error.message.includes("Empty src") || !this._player.error.message) return;
+
+			console.error(this._player.error);
+			this.handleError();
+		});
 	}
 
 	// #endregion Private Methods (5)

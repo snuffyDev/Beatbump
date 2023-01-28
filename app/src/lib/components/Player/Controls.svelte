@@ -1,10 +1,8 @@
 <script lang="ts">
 	import { createEventDispatcher } from "svelte";
-	import { updateTrack } from "$lib/stores/stores";
 	import Icon from "../Icon/Icon.svelte";
 	import SessionListService, { queue } from "$lib/stores/list";
 	import { AudioPlayer } from "$lib/player";
-	import type { Icons } from "$components/Icon/icons";
 	// export let canPlay
 	export let prevBtn;
 	export let nextBtn;
