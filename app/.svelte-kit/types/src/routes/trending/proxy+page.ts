@@ -7,14 +7,12 @@ import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 export const load = async ({ fetch }: Parameters<PageLoad>[0]) => {
 	const response = await fetch<{ carouselItems: ICarousel<IListItemRenderer | MoodsAndGenresItem>[] }>(
 		"/trending.json?q=browse",
-	);
-	const data = await response.json();
-	if (!response.ok) {
-		throw error(response.status, response.statusText);
-	}
-	const { carouselItems } = data;
+	).then((res) => {
+		if (!res.ok) {
+			throw error(res.status, res.statusText);
+		}
+		return res.json();
+	});
 
-	return {
-		carouselItems,
-	};
+	return response;
 };

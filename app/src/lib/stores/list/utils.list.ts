@@ -1,3 +1,4 @@
+import type { Song } from "$lib/types";
 import { queryParams } from "$lib/utils";
 
 /** Take an array, turn it into chunks[][] of size `chunk` */
@@ -13,8 +14,8 @@ export function split(arr, chunk) {
 	return temp;
 }
 
-export function filterList(list) {
-	return [...list].filter(
+export function filterList(list: Song[] = []) {
+	return list.filter(
 		(
 			(set) => (f) =>
 				!set.has(f.videoId) && set.add(f.videoId)
@@ -43,8 +44,5 @@ export function fetchNext(
 		headers: { accept: "application/json" },
 	})
 		.then((json) => json.json())
-		.then((response) => {
-			return response;
-		})
 		.catch((err) => console.error(err));
 }

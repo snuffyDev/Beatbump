@@ -257,7 +257,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	public get durationStore(): WritableStore<number> {
 		if (!browser && !this._player) return;
 		return this._durationStore;
-		}
+	}
 
 	public set isSeeking(value: boolean) {
 		this.isSeeking = value;
@@ -824,7 +824,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		this.onEvent("timeupdate", async () => {
 			this._currentTimeStore.set(this._player.currentTime);
 			this._durationStore.set(this._isWebkit && !this.isHLSPlayer ? this._player.duration / 2 : this._player.duration);
-			console.log(this._isWebkit, this);
+			// console.log(this._isWebkit, this);
 			if (
 				!this._hasNextSrc && this.isWebkit && !this.isHLSPlayer
 					? this._player.currentTime * 2 >= this._player.duration / 4

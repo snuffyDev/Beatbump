@@ -41,22 +41,22 @@ export const GET: RequestHandler = async ({ url }) => {
 			params: params ?? "",
 		},
 		headers: {},
+	}).then((response) => {
+		if (!response.ok) {
+			throw error(500, response.statusText);
+		}
+		return response.json();
 	});
-	if (!response.ok) {
-		throw error(500, response.statusText);
-	}
-
-	const data = await response.json();
 
 	/* For when you are NOT listening to a song.
 	 ********************************************/
 	if (!continuation) {
-		const res = parseNextBody(data);
+		const res = parseNextBody(response);
 
 		return json(res);
 	}
 
-	return json(parseNextBodyContinuation(data));
+	return json(parseNextBodyContinuation(response));
 };
 
 function parseNextBody(data) {

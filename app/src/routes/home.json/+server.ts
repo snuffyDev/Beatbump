@@ -21,7 +21,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	// console.log(visitorData);
 	const browseId = "FEmusic_home";
 
-	const response = await buildRequest("home", {
+	const data = await buildRequest("home", {
 		context: {
 			client: {
 				visitorData: `${visitorData}`,
@@ -46,15 +46,18 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 		return response.json();
 	});
-	const data = response;
+
 	const _visitorData = data.responseContext?.visitorData;
+
 	if (ctoken === "") {
 		const result = baseResponse(data, _visitorData);
 
 		return result;
 	}
+
 	const sectionListContinuation = data.continuationContents?.sectionListContinuation;
 	const contents: any[] = sectionListContinuation.contents;
+
 	const nextContinuationData = Array.isArray(sectionListContinuation?.continuations)
 		? sectionListContinuation.continuations[0]?.nextContinuationData
 		: {};
@@ -82,8 +85,9 @@ function baseResponse(data: Dict<any>, _visitorData: string) {
 	const _contents: any[] = sectionListRenderer.contents || [];
 	const nextContinuationData = sectionListRenderer.continuations[0]?.nextContinuationData;
 
-	const carouselItems = _contents
-		.map((item) => {
+	const carouselItems = filterMap(
+		_contents,
+		(item) => {
 			if ("musicCarouselShelfRenderer" in item) {
 				return parseCarousel(item);
 			}
@@ -93,8 +97,9 @@ function baseResponse(data: Dict<any>, _visitorData: string) {
 						?.thumbnails || [];
 				return parseCarousel(item);
 			}
-		})
-		.filter(Boolean);
+		},
+		Boolean,
+	);
 
 	return json({
 		carousels: carouselItems,

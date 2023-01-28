@@ -89,7 +89,7 @@ function _sessionListService(): ISessionListService {
 		mix = value.mix ? value.mix : mix;
 		position = value.position ?? position;
 		currentMixType = value.currentMixType ?? currentMixType;
-		update((_) => (_ = { ..._, mix, position, currentMixId, continuation, clickTrackingParams, currentMixType }));
+		update((_) => ({ ..._, mix, position, currentMixId, continuation, clickTrackingParams, currentMixType }));
 		return {
 			clickTrackingParams,
 			continuation,
