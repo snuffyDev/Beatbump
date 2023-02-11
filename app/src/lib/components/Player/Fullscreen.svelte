@@ -681,6 +681,9 @@
 		@media screen and (max-width: 719px) {
 			max-height: 28vh;
 		}
+		@media screen and (min-width: 1800) {
+			max-height: 45vh;
+		}
 	}
 	.thumbnail {
 		position: relative;
