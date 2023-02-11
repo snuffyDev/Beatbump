@@ -1,7 +1,8 @@
 import type { Item } from "$lib/types";
 import { filter } from "$lib/utils/collections";
-import { derived, writable } from "svelte/store";
+import { writable } from "svelte/store";
 import { settings } from "./settings";
+import { derived } from "$lib/utils/stores";
 
 export const ctxKey = {};
 export const currentTitle = writable(undefined);

@@ -293,8 +293,8 @@
 								{artist.text}
 							{:else if artist.pageType.includes("ALBUM")}
 								<a
-									on:click|preventDefault={() => goto(`/release/${artist?.browseId}`)}
-									href={`/release/${artist?.browseId}`}>{artist.text}</a
+									on:click|preventDefault={() => goto(`/release?id=${artist?.browseId}`)}
+									href={`/release?id=${artist?.browseId}`}>{artist.text}</a
 								>
 							{:else}
 								<a

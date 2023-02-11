@@ -1,0 +1,25 @@
+img,
+picture {
+	margin: 0;
+	border-radius: var(--xs-radius);
+	max-width: 100%;
+
+	-webkit-user-drag: none;
+	-khtml-user-drag: none;
+	-moz-user-drag: none;
+	-o-user-drag: none;
+	user-drag: none;
+
+	-webkit-touch-callout: none;
+	-webkit-text-size-adjust: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+img::before,
+video::before {
+	display: block;
+	content: "";
+	position: absolute;
+	padding-top: calc(100% * 2 / 3);
+}

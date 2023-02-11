@@ -5,8 +5,17 @@ import { error, json } from "@sveltejs/kit";
 
 import { buildRequest } from "$api/request";
 import type { RequestHandler } from "./$types";
+import type { Item } from "$lib/types";
 
-export const GET: RequestHandler = async ({ url }) => {
+export type NextEndpointResponse = {
+	results: Item[];
+	continuation: string;
+	clickTrackingParams: string;
+	currentMixId: string;
+	visitorData: string;
+};
+
+export const GET: RequestHandler = async ({ url }): Promise<IResponse<NextEndpointResponse>> => {
 	const query = url.searchParams;
 	const params = query.get("params") || undefined;
 	const visitorData = query.get("visitorData") || "CgtlV0xyWk92dWZ5Zyilgu6ZBg%3D%3D";

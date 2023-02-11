@@ -1,5 +1,6 @@
-import type { Song } from "$lib/types";
+import type { Item, Song } from "$lib/types";
 import { queryParams } from "$lib/utils";
+import type { NextEndpointResponse } from "src/routes/api/v1/next.json/+server";
 
 /** Take an array, turn it into chunks[][] of size `chunk` */
 export function split(arr, chunk) {
@@ -14,7 +15,7 @@ export function split(arr, chunk) {
 	return temp;
 }
 
-export function filterList(list: Song[] = []) {
+export function filterList(list: Item[] = []) {
 	return list.filter(
 		(
 			(set) => (f) =>
@@ -37,12 +38,14 @@ export function fetchNext(
 		configType?: string;
 		visitorData?: string;
 	} = {},
-) {
+): Promise<NextEndpointResponse | void> {
 	const _params = queryParams(obj);
 	// console.log(options, _params)
-	return fetch("/api/v1/next.json?" + _params, {
+	return fetch<NextEndpointResponse>("/api/v1/next.json?" + _params, {
 		headers: { accept: "application/json" },
 	})
 		.then((json) => json.json())
-		.catch((err) => console.error(err));
+		.catch((err) => {
+			console.error(err);
+		});
 }

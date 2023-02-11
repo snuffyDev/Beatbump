@@ -245,20 +245,18 @@
 					</div>
 				{/if}
 			</div>
-			<div style="background:inherit;">
-				<div
-					on:click|capture|stopPropagation={() => {
-						if (!$queue) return;
-						fullscreenStore.toggle();
-					}}
-					class="listButton player-btn"
-				>
-					<Icon
-						color="white"
-						name="queue"
-						size="1.625em"
-					/>
-				</div>
+			<div
+				on:click|capture|stopPropagation={() => {
+					if (!$queue) return;
+					fullscreenStore.toggle();
+				}}
+				class="listButton player-btn"
+			>
+				<Icon
+					color="white"
+					name="queue"
+					size="1.625em"
+				/>
 			</div>
 			<div class="menu-container">
 				<PopperButton
@@ -277,16 +275,15 @@
 	.now-playing {
 		display: flex;
 		grid-area: n;
-		line-height: 1.7;
+		line-height: 1.3;
 		font-size: 0.95em;
 		gap: 0.95em;
-		will-change: visibility;
 		@media screen and (min-width: 720px) {
-			line-height: 1.6;
+			line-height: 1.4;
 			font-size: 14px;
 			// gap: 0.875em;
 		}
-		.container {
+		> .container {
 			visibility: visible;
 			display: flex;
 
@@ -332,14 +329,13 @@
 		width: 100%;
 	}
 	.player-controls {
-		// display: flex;
-		// place-self: center;
-
 		width: 100%;
 	}
+
 	row {
 		position: relative;
 	}
+
 	.hidden {
 		display: none !important;
 		visibility: hidden !important;
@@ -356,10 +352,14 @@
 
 	.listButton {
 		visibility: hidden !important;
+		order: -1;
+		pointer-events: none;
 	}
+
 	.player {
 		background-color: inherit;
 	}
+
 	.volume-wrapper {
 		background: var(--dark-bottom);
 		display: flex;
@@ -385,6 +385,7 @@
 			height: 2rem;
 		}
 	}
+
 	.volume-slider {
 		height: 100%;
 		background: var(--dark-bottom);
@@ -392,6 +393,7 @@
 		display: flex;
 		align-items: center;
 	}
+
 	.volume-icon {
 		cursor: pointer;
 	}
@@ -399,12 +401,9 @@
 	.menu-container {
 		padding: 0;
 		position: relative;
-		will-change: position;
-		// margin-right: 8%;
-		// grid-area: r;
 		place-self: flex-end;
 		align-self: center;
-		@media screen and (max-width: 500px) {
+		@media screen and (max-width: 575.5px) {
 			position: relative !important;
 			place-self: center;
 		}
@@ -416,6 +415,7 @@
 
 		align-items: center;
 	}
+
 	.player-right {
 		grid-area: r;
 		display: inline-flex;
@@ -424,9 +424,12 @@
 			width: auto;
 		}
 	}
+
 	@media screen and (min-width: 720px) {
 		.listButton {
 			visibility: visible !important;
+			order: 0;
+			pointer-events: unset;
 		}
 	}
 </style>

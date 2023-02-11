@@ -379,7 +379,7 @@
 		position: relative;
 	}
 	.item16x9 {
-		width: calc(var(--column-width) * 2.5);
+		width: 100%;
 	}
 	.img1x1 {
 		// width: 100%;
@@ -389,8 +389,9 @@
 		width: var(--thumbnail-size);
 	}
 	.img16x9 {
-		min-width: 100%;
-		height: var(--thumbnail-size);
+		min-width: calc(calc(var(--column-width) * 1));
+		width: 100%;
+		min-height: var(--thumbnail-size);
 		aspect-ratio: 16/9 !important;
 	}
 	.subtitles {
@@ -411,8 +412,6 @@
 	}
 
 	.image {
-		width: 100%;
-
 		min-height: 100%;
 		position: relative;
 		cursor: pointer;
@@ -421,9 +420,8 @@
 		overflow: hidden;
 		display: flex;
 		align-items: center;
-		width: 100%;
-		height: 100%;
 		contain: paint;
+		// will-change: opacity;
 
 		&:focus {
 			border: none;
@@ -518,6 +516,7 @@
 		contain: paint;
 
 		&:focus-visible,
+		&:hover,
 		&:focus-within {
 			@include active;
 		}

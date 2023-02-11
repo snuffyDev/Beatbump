@@ -141,7 +141,7 @@
 	}
 
 	function onScroll() {
-		if (!popper) return;
+		if (!isShowing && !popper) return;
 		if (!scrollPosY) scrollPosY = popper.getBoundingClientRect().top;
 		if (frame) {
 			return;

@@ -16,9 +16,9 @@ const ENV_ADAPTER = process.env["BB_ADAPTER"] ?? "cloudflare-workers";
 const adapters = {
 	"cloudflare-workers": adapterCfw({}),
 	cloudflare: adapterCf(),
-	vercel: vercel({"edge":false,"split":false}),
+	vercel: vercel({ edge: false, split: false }),
 	netlify: netlify({ edge: false, split: false }),
-	node: node({"precompress":true}),
+	node: node({ precompress: true }),
 };
 
 const adapter = adapters[ENV_ADAPTER];
@@ -30,7 +30,7 @@ const config = {
 
 		scss: {
 			includePaths: ["src"],
-			prependData: '@use "./src/global/stylesheet/base/_variables.scss" as *;',
+			prependData: '@use "./src/global/stylesheet/base/variables" as *;',
 			stripIndent: true,
 		},
 		postcss: { configFilePath: path.resolve("./postcss.config.cjs") },

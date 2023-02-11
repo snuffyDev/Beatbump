@@ -9,7 +9,8 @@ export interface ISessionListProvider {
 	clickTrackingParams: Nullable<string>;
 	mix: Array<Item>;
 	position: number;
-	currentMixType: "playlist" | "auto" | "local" | string;
+	currentMixType: "playlist" | "auto" | "local" | null;
+	visitorData: null | string;
 }
 
 export interface ISessionListService {

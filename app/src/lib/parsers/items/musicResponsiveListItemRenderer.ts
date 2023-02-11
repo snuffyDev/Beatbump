@@ -20,7 +20,8 @@ export function MusicResponsiveListItemRenderer(
 	const flexCol0 = flexColumns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs[0] || ({} as PurpleRun);
 	const subtitles = Array.isArray(subtitleRuns) && subtitle(subtitleRuns);
 	const isNavigationItem = item.navigationEndpoint?.browseEndpoint;
-	const Item: IListItemRenderer = {
+	const Item: IListItemRenderer = Object.create(null);
+	Object.assign(Item, {
 		subtitle: subtitles,
 		artistInfo: {
 			artist: [subtitles[0]],
@@ -55,7 +56,7 @@ export function MusicResponsiveListItemRenderer(
 		loggingContext:
 			item.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
 				?.watchEndpoint?.loggingContext,
-	};
+	});
 	if (isNavigationItem)
 		Item.endpoint = {
 			browseId: isNavigationItem.browseId,

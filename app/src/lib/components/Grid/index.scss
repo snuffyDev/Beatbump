@@ -1,4 +1,3 @@
-
 .grid {
 	display: grid;
 	grid-gap: 0.5em;
@@ -6,7 +5,6 @@
 	margin: 0 auto;
 	--grid-column-count: 2;
 	--thumbnail-size: 12.5rem;
-
 
 	@media screen and (min-width: 460px) and (max-width: 619px) {
 		--grid-column-count: 3;

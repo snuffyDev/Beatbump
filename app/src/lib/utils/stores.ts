@@ -1,4 +1,6 @@
+import { derived, type Readable, type Unsubscriber } from "svelte/store";
 import { iter, splice } from "./collections";
+import { noop } from "./noop";
 
 export class ReadableStore<T> {
 	protected _value: T;
@@ -58,3 +60,43 @@ export class WritableStore<T = unknown> extends ReadableStore<T> {
 		this.notifyObservers(oldValue);
 	}
 }
+type Stores = Readable<any> | [Readable<any>, ...Array<Readable<any>>] | Array<Readable<any>>;
+/** One or more values from `Readable` stores. */
+type StoresValues<T> = T extends Readable<infer U>
+	? U
+	: {
+			[K in keyof T]: T[K] extends Readable<infer U> ? U : never;
+	  };
+const _derived = (<S extends Stores, T>(
+	stores: S,
+	fn: (values: StoresValues<S>, set: (value: T) => void) => Unsubscriber | void,
+	init?: T,
+) => {
+	let state = init;
+	const single = !Array.isArray(stores);
+	const auto = fn.length < 2;
+
+	let cleanup = noop;
+	const { subscribe } = derived<S, T>(
+		stores,
+		(values, set) => {
+			state = values;
+			const result = fn(values, set);
+			if (auto) {
+				set(result as T);
+			} else {
+				cleanup = typeof result === "function" ? result : noop;
+				return cleanup;
+			}
+		},
+		init,
+	);
+	return {
+		subscribe,
+		get value() {
+			return state;
+		},
+	};
+}) satisfies typeof derived;
+
+export { _derived as derived };

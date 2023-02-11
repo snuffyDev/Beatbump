@@ -21,7 +21,6 @@ export function mobileLongPress(node: HTMLElement, config: ILongPressConfig = { 
 		event.preventDefault();
 		const startTime = performance.now() + config?.delay;
 		const endTime = startTime + config?.duration;
-		console.log(startTime, endTime, task);
 		if (task) task.abort();
 		curTime = 0;
 		running = true;
@@ -29,12 +28,10 @@ export function mobileLongPress(node: HTMLElement, config: ILongPressConfig = { 
 		task = loop((now) => {
 			if (running) {
 				if (now >= endTime) {
-					console.log(now, endTime);
 					cancel();
 					return (running = false);
 				}
 				if (now >= startTime) {
-					console.log(now, startTime);
 					curTime = circOut((now - startTime) / config?.duration);
 					dispatch(node, "pressing", { progress: curTime, timestamp: now });
 				}

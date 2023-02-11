@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { navigating } from "$app/stores";
 	import { AudioPlayer } from "$lib/player";
-	import { immersiveQueue, isMobileMQ, isPagePlaying, playerLoading } from "$lib/stores";
+	import { filterAutoPlay, immersiveQueue, isMobileMQ, isPagePlaying, playerLoading, theme } from "$lib/stores";
 	import { queue, currentTrack } from "$lib/stores/list";
 	import ListItem from "../ListItem/ListItem.svelte";
 	import Loading from "../Loading/Loading.svelte";
@@ -30,6 +30,7 @@
 	let titleWidth = 320;
 	let active = "UpNext";
 	let thumbnail: Thumbnail;
+	let tracklist: HTMLDivElement; 
 
 	$: loading = $playerLoading;
 	$: data = $currentTrack;
@@ -148,6 +149,8 @@
 			$queueTween = 0;
 		})();
 	}
+
+	$: console.log($immersiveQueue, $filterAutoPlay, $theme);
 </script>
 
 {#if $queue.length}
@@ -279,9 +282,13 @@
 			<div
 				class="handle vertical"
 				style="transform: translate3d({queueOpen ? 53.5 : 91.5}vw, 0px, 0) !important;"
+				on:pointerover={() => {
+					tracklist.style.willChange = "transform";
+				}}
 				on:click={() => {
 					requestFrameSingle(() => {
 						queueOpen = !queueOpen;
+						tracklist.style.willChange = "unset";
 					});
 				}}
 			>
@@ -290,10 +297,10 @@
 			<div
 				class="column container tracklist"
 				bind:clientHeight={queueHeight}
+				bind:this={tracklist}
+				
 				style={$isMobileMQ
-					? `transform: translate3d(0, ${$motion}px, 0); top: ${windowHeight - 65}px; bottom:0; ${
-							sliding ? "will-change: scroll-position, transform;" : ""
-					  } padding-bottom: calc(6.5em);`
+					? `transform: translate3d(0, ${$motion}px, 0); top: ${windowHeight - 65}px; bottom:0; padding-bottom: calc(6.5em);`
 					: `transform: translate3d(${queueOpen ? 55 : 93}vw, 0px, 0) !important;`}
 			>
 				<div
@@ -301,6 +308,14 @@
 					on:dragstart|capture|stopPropagation={(e) => onDragStart(1, e)}
 					on:dragmove|capture|stopPropagation={(e) => trackMovement(1, e.detail)}
 					on:dragend|capture|stopPropagation={(e) => release(1, e.detail)}
+					on:pointerdown={() => {
+						tracklist.style.willChange = "scroll-position, transform";
+					}}
+					on:pointerup={() => {
+						requestFrameSingle(() => {
+							tracklist.style.willChange = "unset";
+						});
+					}}
 					class="handle horz"
 				>
 					<hr class="horz" />
@@ -433,7 +448,6 @@
 		position: absolute;
 
 		bottom: 0;
-		will-change: transform;
 		height: 100%;
 		min-height: 0;
 		background: var(--bottom-bg);

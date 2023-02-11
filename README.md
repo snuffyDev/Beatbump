@@ -58,14 +58,15 @@ Some of Beatbump's features includes:
 
 | Name                         | URL
 | ---                          | ---                                                                       |
-| Beatbump (Official Instance) | https://beatbump.ml                                                       |
-| ~Vern (clearnet)             | https://bb.vern.cc/                                                       |
+| Beatbump (Official) | https://beatbump.ml                                                       |
+| ~Vern (Clearnet)             | https://bb.vern.cc/                                                       |
 | ~Vern (Onion)                | http://bb.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion/ |
 | ~Vern (I2P)                  | http://vern6inmbjzqpecx4kpkq5sln3cqqrfuxfzh4au3tpxbsfbwbnta.b32.i2p/      |
 | Project Segfault (GeoDNS)    | https://bb.projectsegfau.lt/																							 |
-| Project Segfault (EU)        | https://bb.eu.projectsegfau.lt/																					 |
+| Project Segfault (EU)    | https://bb.eu.projectsegfau.lt/																					 |
 | Project Segfault (US)        | https://bb.us.projectsegfau.lt/																					 |
 | Project Segfault (Tor)       | http://beatbump.pjsfkvpxlinjamtawaksbnnaqs2fc2mtvmozrzckxh7f3kis6yea25ad.onion/ |
+| btb.frail.duckdns.org (Clearnet) | https://btb.frail.duckdns.org/ |
 
 
 ## Donations
@@ -102,7 +103,7 @@ The app will now be accessible from `https://localhost:443  /  http://localhost:
 
 You can find (temporary, incomplete, and in-progress) API documentation here: https://beatbump-docs.vercel.app/
 
-> It's recommended (and appreciated) to host your own instance of Beatbump for public projects that want to use the data -- especially if you anticipate you will be making a large amount of requests. Thanks! 
+> It's recommended (and appreciated) to host your own instance of Beatbump for public projects that want to use the data -- especially if you anticipate you will be making a large amount of requests. Thanks!
 
 ## Project Inspirations
 

@@ -542,7 +542,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		// Logger.log(`[LOG:PLAYER:Queue]: Start Fetching Next Song: `, { position, shouldAutoplay });
 		const sessionList = this.currentSessionList();
 
-		if (position >= sessionList.mix.length - 1) {
+		if (sessionList.position >= sessionList.mix.length - 1) {
 			if (groupSession.initialized && groupSession.hasActiveSession && groupSession.client.role !== "host") {
 				const response = await this.getTrackSrc(position, shouldAutoplay);
 				return response as ResponseBody;
@@ -556,13 +556,13 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 
 			/// If track has continuation (automix), get next section of queue list
 			return SessionListService.getSessionContinuation({
-				itct: sessionList.mix[position]?.itct,
-				videoId: sessionList.mix[position]?.videoId,
+				itct: sessionList.mix[sessionList.position]?.itct,
+				videoId: sessionList.mix[sessionList.position]?.videoId,
 				playlistId: sessionList.currentMixId,
-				loggingContext: sessionList.mix[position].loggingContext,
+				loggingContext: sessionList.mix[sessionList.position].loggingContext,
 				ctoken: sessionList.continuation,
 				clickTrackingParams: sessionList.clickTrackingParams,
-				key: position,
+				key: sessionList.position,
 			});
 		}
 
