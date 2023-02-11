@@ -247,7 +247,10 @@
 <article
 	class="item item{ASPECT_RATIO}"
 	on:contextmenu={(event) => handleContextMenu(event, DropdownItems)}
-	on:click|stopPropagation={(e) => clickHandler({ isBrowseEndpoint, index, item, kind, type })}
+	on:click|stopPropagation={async (e) => {
+		loading = true;
+		loading = await clickHandler({ isBrowseEndpoint, index, item, kind, type });
+	}}
 >
 	<section class="item-thumbnail-wrapper img{ASPECT_RATIO}">
 		<section

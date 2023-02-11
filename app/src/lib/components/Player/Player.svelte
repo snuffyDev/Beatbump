@@ -1,3 +1,68 @@
+<script
+	context="module"
+	lang="ts"
+>
+	export const createPlayerPopperMenu = (
+		$currentTrack: Item,
+		$queuePosition: number,
+		hasActiveSession = false,
+		$SITE_ORIGIN_URL: string,
+	) =>
+		buildDropdown()
+			.add("View Artist", () => {
+				window.scrollTo({
+					behavior: "smooth",
+					top: 0,
+					left: 0,
+				});
+				goto(`/artist/${$currentTrack.artistInfo.artist[0].browseId}`);
+			})
+			.add("Add to Playlist", async () => {
+				showAddToPlaylistPopper.set({ state: true, item: $currentTrack });
+			})
+			.add("Add to Favorites", async () => {
+				if (!browser) return;
+				IDBService.sendMessage("create", "favorite", $currentTrack);
+			})
+			.add(
+				hasActiveSession ? "Share Group Session" : "Start Group Session",
+				hasActiveSession
+					? async () => {
+							if (!browser) return;
+							const shareData = {
+								title: `Join ${groupSession.client.displayName}'s Beatbump Session`,
+
+								url: `${$SITE_ORIGIN_URL}/session?token=${IsoBase64.toBase64(
+									JSON.stringify({
+										clientId: groupSession.client.clientId,
+										displayName: groupSession.client.displayName,
+									}),
+								)}`,
+							};
+							try {
+								if (!navigator.canShare) {
+									await navigator.clipboard.writeText(shareData.url);
+									notify("Link copied successfully", "success");
+								} else {
+									const share = await navigator.share(shareData);
+									notify("Shared successfully", "success");
+								}
+							} catch (error) {
+								notify("Error: " + error, "error");
+							}
+					  }
+					: async () => {
+							if (!browser) return;
+							showGroupSessionCreator.set(true);
+					  },
+			)
+			.add("Shuffle", () => {
+				list.shuffle($queuePosition, true);
+			})
+			.build()
+			.filter(Boolean);
+</script>
+
 <script lang="ts">
 	import { browser } from "$app/environment";
 	import { goto } from "$app/navigation";
@@ -19,6 +84,9 @@
 	import ProgressBar from "./ProgressBar";
 
 	import { SITE_ORIGIN_URL } from "$stores/url";
+	import type { Item } from "$lib/types";
+	import { buildDropdown } from "$lib/configs/dropdowns.config";
+	import PlayerButton from "./PlayerButton.svelte";
 
 	const { paused } = AudioPlayer;
 	let volume = 0.5;
@@ -34,79 +102,12 @@
 		(event.target as HTMLImageElement).src = IMAGE_NOT_FOUND;
 	}
 
-	$: DropdownItems = [
-		{
-			text: "View Artist",
-			icon: "artist",
-			action: () => {
-				window.scrollTo({
-					behavior: "smooth",
-					top: 0,
-					left: 0,
-				});
-				goto(`/artist/${$currentTrack.artistInfo.artist[0].browseId}`);
-			},
-		},
-		{
-			text: "Add to Playlist",
-			icon: "list-plus",
-			action: async () => {
-				showAddToPlaylistPopper.set({ state: true, item: $currentTrack });
-			},
-		},
-		{
-			text: "Add to Favorites",
-			icon: "heart",
-			action: async () => {
-				if (!browser) return;
-				IDBService.sendMessage("create", "favorite", $currentTrack);
-			},
-		},
-		!groupSession.hasActiveSession
-			? {
-					text: "Start Group Session",
-					icon: "users",
-					action: async () => {
-						if (!browser) return;
-						showGroupSessionCreator.set(true);
-					},
-			  }
-			: {
-					text: "Share Group Session",
-					icon: "share",
-					action: async () => {
-						if (!browser) return;
-						const shareData = {
-							title: `Join ${groupSession.client.displayName}'s Beatbump Session`,
-
-							url: `${$SITE_ORIGIN_URL}/session?token=${IsoBase64.toBase64(
-								JSON.stringify({
-									clientId: groupSession.client.clientId,
-									displayName: groupSession.client.displayName,
-								}),
-							)}`,
-						};
-						try {
-							if (!navigator.canShare) {
-								await navigator.clipboard.writeText(shareData.url);
-								notify("Link copied successfully", "success");
-							} else {
-								const share = await navigator.share(shareData);
-								notify("Shared successfully", "success");
-							}
-						} catch (error) {
-							notify("Error: " + error, "error");
-						}
-					},
-			  },
-		{
-			text: "Shuffle",
-			icon: "shuffle",
-			action: () => {
-				list.shuffle($queuePosition, true);
-			},
-		},
-	];
+	$: DropdownItems = createPlayerPopperMenu(
+		$currentTrack,
+		$queuePosition,
+		groupSession.hasActiveSession,
+		$SITE_ORIGIN_URL,
+	);
 
 	const shortcut = {
 		Comma: () => {
@@ -258,14 +259,20 @@
 					size="1.625em"
 				/>
 			</div>
-			<div class="menu-container">
-				<PopperButton
-					tabindex={-1}
-					type="player"
-					size="1.625em"
-					items={DropdownItems}
-				/>
-			</div>
+			{#if !$isMobileMQ}
+				<div class="menu-container">
+					<PopperButton
+						tabindex={-1}
+						type="player"
+						size="1.625em"
+						items={DropdownItems}
+					/>
+				</div>
+			{:else}
+				<div class="menu-container">
+					<PlayerButton />
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>

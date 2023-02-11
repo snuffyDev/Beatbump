@@ -50,6 +50,7 @@ export async function clickHandler({
 
 	if (!isBrowseEndpoint && item.videoId !== undefined && !item?.endpoint?.pageType.includes("ARTIST")) {
 		await list.initAutoMixSession({
+			loggingContext: item?.loggingContext,
 			videoId: item.videoId,
 			playlistId: item.playlistId,
 			keyId: type !== "home" ? index : undefined,
@@ -57,4 +58,5 @@ export async function clickHandler({
 	} else {
 		browseHandler(item.endpoint.pageType, item.endpoint.browseId);
 	}
+	return false;
 }

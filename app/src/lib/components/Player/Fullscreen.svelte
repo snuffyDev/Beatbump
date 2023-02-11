@@ -2,7 +2,7 @@
 	import { navigating } from "$app/stores";
 	import { AudioPlayer } from "$lib/player";
 	import { filterAutoPlay, immersiveQueue, isMobileMQ, isPagePlaying, playerLoading, theme } from "$lib/stores";
-	import { queue, currentTrack } from "$lib/stores/list";
+	import { queue, currentTrack, queuePosition } from "$lib/stores/list";
 	import ListItem from "../ListItem/ListItem.svelte";
 	import Loading from "../Loading/Loading.svelte";
 	import Tabs from "../Tabs";
@@ -11,7 +11,7 @@
 	import Controls from "./Controls.svelte";
 	import { pan } from "$lib/actions/gestures/handlers";
 	import { tweened } from "svelte/motion";
-	import { cubicOut } from "svelte/easing";
+	import { cubicOut, quartIn, quartOut } from "svelte/easing";
 	import { draggable } from "$lib/actions/draggable";
 	import { groupSession } from "$lib/stores/sessions";
 	import ProgressBar from "./ProgressBar";
@@ -19,6 +19,11 @@
 	import { requestFrameSingle } from "$lib/utils";
 	import type { Thumbnail } from "$lib/types";
 	import { windowWidth } from "$stores/window";
+	import { fade, type EasingFunction, type TransitionConfig } from "svelte/transition";
+	import PopperButton from "$components/Popper/PopperButton.svelte";
+	import { createPlayerPopperMenu } from "./Player.svelte";
+	import { SITE_ORIGIN_URL } from "$stores/url";
+	import type { Dropdown } from "$lib/configs/dropdowns.config";
 
 	export let state: "open" | "closed";
 
@@ -30,7 +35,7 @@
 	let titleWidth = 320;
 	let active = "UpNext";
 	let thumbnail: Thumbnail;
-	let tracklist: HTMLDivElement; 
+	let tracklist: HTMLDivElement;
 
 	$: loading = $playerLoading;
 	$: data = $currentTrack;
@@ -151,25 +156,56 @@
 	}
 
 	$: console.log($immersiveQueue, $filterAutoPlay, $theme);
+
+	function slideInOut(
+		node: HTMLElement,
+		{ duration = 400, delay = 400, easing = quartOut }: { duration?: number; easing?: EasingFunction; delay?: number },
+	): TransitionConfig {
+		const style = getComputedStyle(node);
+		const target_opacity = +style.opacity;
+		const transform = style.transform === "none" ? "" : style.transform;
+		const od = target_opacity * (1 - 0);
+
+		return {
+			easing,
+			duration,
+			delay,
+			css(t, u) {
+				return `
+				will-change: transform, opacity;
+					transform: ${transform} translate3d(0vh, ${(1 - t) * 100}vh, 0vh);
+					opacity: ${target_opacity - od * u};
+				`;
+			},
+		};
+	}
+	let DropdownItems: Dropdown;
+
+	$: {
+		if ($isMobileMQ) {
+			DropdownItems = createPlayerPopperMenu(
+				$currentTrack,
+				$queuePosition,
+				groupSession.hasActiveSession,
+				$SITE_ORIGIN_URL,
+			);
+		} else {
+			DropdownItems = undefined;
+		}
+	}
 </script>
 
-{#if $queue.length}
+{#if $queue.length && state === "open"}
 	<div
 		class="backdrop"
 		class:mobile={$isMobileMQ}
 		bind:clientHeight={windowHeight}
 		style:pointer-events={state === "open" ? "all" : "none"}
-		style="background-color: {state === 'open' ? 'hsla(0,0%,0%,65%)' : '#0000'} !important;"
 	>
 		<div
-			class:tr-open={state === "open"}
-			class:tr-close={state === "closed"}
 			class="fullscreen-player-popup"
-			style="top: 0; transform: translate3d(0, {state === 'open'
-				? $queueTween === 0
-					? '0vh'
-					: `clamp(0px, calc(${$queueTween * -50}px), 100vh)`
-				: '100vh'}, 0); opacity: {state === 'open' ? '1' : '0'};"
+			in:slideInOut|local={{ delay: 400, duration: 400 }}
+			out:slideInOut|local={{ delay: 200, duration: 400, easing: quartIn }}
 		>
 			<div
 				class="column container"
@@ -205,6 +241,15 @@
 							height={thumbnail?.height}
 							src={thumbnail ? thumbnail?.url : ""}
 							alt="thumbnail"
+						/>
+					</div>
+				{/if}
+				{#if $isMobileMQ}
+					<div class="menu-mobile">
+						<PopperButton
+							items={DropdownItems}
+							tabindex={-1}
+							size="2em"
 						/>
 					</div>
 				{/if}
@@ -298,9 +343,10 @@
 				class="column container tracklist"
 				bind:clientHeight={queueHeight}
 				bind:this={tracklist}
-				
 				style={$isMobileMQ
-					? `transform: translate3d(0, ${$motion}px, 0); top: ${windowHeight - 65}px; bottom:0; padding-bottom: calc(6.5em);`
+					? `transform: translate3d(0, ${$motion}px, 0); top: ${
+							windowHeight - 65
+					  }px; bottom:0; padding-bottom: calc(6.5em);`
 					: `transform: translate3d(${queueOpen ? 55 : 93}vw, 0px, 0) !important;`}
 			>
 				<div
@@ -486,11 +532,9 @@
 		isolation: isolate;
 		touch-action: pan-y;
 
-		opacity: 0;
 		transform: translate3d(0, 0vh, 0);
 		will-change: transform, opacity;
 		overscroll-behavior: contain;
-		content-visibility: auto;
 		overflow: hidden;
 		contain: strict;
 		// transition: transform 400ms cubic-bezier(0.83, 0, 0.17, 1), opacity 400ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -501,11 +545,11 @@
 		}
 	}
 	.tr-open {
-		transition: transform 400ms 400ms cubic-bezier(0.165, 0.84, 0.44, 1),
+		transition: transform 400ms 400ms cub cubic-bezier(0.165, 0.84, 0.44, 1),
 			opacity 200ms cubic-bezier(0.165, 0.84, 0.44, 1);
 	}
 	.tr-close {
-		transition: transform 400ms 0ms cubic-bezier(0.86, 0, 0.07, 1),
+		transition: transform 400ms 0ms c cubic-bezier(0.86, 0, 0.07, 1),
 			opacity 800ms cubic-bezier(0.895, 0.03, 0.685, 0.22) 400ms;
 	}
 	hr {
@@ -558,6 +602,25 @@
 		min-height: 100% !important;
 		margin-top: unset !important;
 	}
+
+	@keyframes fade-in {
+		0% {
+			background-color: #0000;
+		}
+
+		100% {
+			background-color: hsla(0, 0%, 0%, 65%);
+		}
+	}
+	.menu-mobile {
+		position: absolute;
+		top: 0;
+		right: 0;
+		margin: 1em;
+		z-index: 155;
+		max-width: 3em;
+		max-height: 3em;
+	}
 	.backdrop {
 		overscroll-behavior: contain;
 
@@ -569,7 +632,7 @@
 		background-color: #0000;
 		inset: 0;
 		z-index: 151;
-		transition: background-color 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+		animation: fade-in 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 100ms alternate backwards;
 		// transition-delay: 225ms;
 		margin-top: var(--top-bar-height);
 		height: calc(100% - calc(var(--top-bar-height) + var(--player-bar-height)));
@@ -584,7 +647,7 @@
 		// bottom: 0;
 	}
 	.album-art {
-		margin-top: 1.5em;
+		margin-top: 7vh;
 		overscroll-behavior: contain;
 		height: 100%;
 		display: grid;
@@ -655,7 +718,7 @@
 		border-top-right-radius: $sm-radius;
 		height: 2.75em;
 		padding-bottom: 0.0606em;
-
+		padding-block: 0.7em;
 		align-content: center;
 
 		top: 0;
