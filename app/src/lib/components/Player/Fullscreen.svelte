@@ -681,7 +681,7 @@
 		@media screen and (max-width: 719px) {
 			max-height: 28vh;
 		}
-		@media screen and (min-width: 1800) {
+		@media screen and (min-width: 1800px) {
 			max-height: 45vh;
 		}
 	}
