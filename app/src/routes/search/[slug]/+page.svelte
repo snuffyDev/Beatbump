@@ -56,6 +56,8 @@
 			itct = data?.continuation?.clickTrackingParams;
 		}
 	});
+
+	$: console.log(data);
 </script>
 
 <Header

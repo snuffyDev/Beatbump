@@ -27,10 +27,12 @@ function ensureIntersectionObserver(node: HTMLElement) {
 export default function lazyContainer(node: HTMLElement) {
 	ensureIntersectionObserver(node);
 
-	const children = node.querySelectorAll("img[data-src]");
+	let children = node.querySelectorAll("img[data-src]");
 
 	for (const img of children) {
-		intersectionObserver.observe(img);
+		queueMicrotask(() => {
+			intersectionObserver.observe(img);
+		});
 	}
 
 	return {
@@ -38,6 +40,7 @@ export default function lazyContainer(node: HTMLElement) {
 			for (const img of children) {
 				intersectionObserver.unobserve(img);
 			}
+			children = null;
 		},
 	};
 }

@@ -32,13 +32,13 @@
 		<Icon
 			color="white"
 			name="play"
-			size={"1.625em"}
+			size={"1.625rem"}
 		/>
 	{:else}
 		<Icon
 			color="white"
 			name="pause"
-			size={"1.625em"}
+			size={"1.625rem"}
 		/>
 	{/if}
 </div>

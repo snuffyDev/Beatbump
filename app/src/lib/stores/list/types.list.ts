@@ -11,6 +11,14 @@ export interface ISessionListProvider {
 	position: number;
 	currentMixType: "playlist" | "auto" | "local" | null;
 	visitorData: null | string;
+	related?: {
+		browseId: string;
+		browseEndpointContextSupportedConfigs: {
+			browseEndpointContextMusicConfig: {
+				pageType: "MUSIC_PAGE_TYPE_TRACK_RELATED";
+			};
+		};
+	} | null;
 }
 
 export interface ISessionListService {

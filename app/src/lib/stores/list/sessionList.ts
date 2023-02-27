@@ -4,17 +4,19 @@
  * - Use class instead of func impl (...?)
  *
  */
-import type { Artist, ArtistInfo, Item, Nullable, Song, Subtitle, Thumbnail } from "$lib/types";
-import { Logger, addToQueue, getSrc, notify, seededShuffle, type ResponseBody } from "$lib/utils";
+import type { Artist, ArtistInfo, Item, Song, Subtitle, Thumbnail } from "$lib/types";
+import { Logger, addToQueue, getSrc, notify, seededShuffle, type ResponseBody, WritableStore } from "$lib/utils";
 import { Mutex } from "$lib/utils/sync";
 import { splice } from "$lib/utils/collections/array";
-import { writable, get, type Writable } from "svelte/store";
-import { playerLoading, currentTitle, filterAutoPlay } from "../stores";
+import { writable, type Writable } from "svelte/store";
+import { playerLoading, filterAutoPlay } from "../stores";
 import { groupSession } from "../sessions";
 import type { ISessionListService, ISessionListProvider } from "./types.list";
 import { fetchNext, filterList } from "./utils.list";
 import { tick } from "svelte";
 import type { VssLoggingContext } from "$lib/types/innertube/internals";
+import type { RelatedEndpointResponse } from "src/routes/api/v1/related.json/+server";
+import { AudioPlayer } from "$lib/player";
 
 const mutex = new Mutex();
 
@@ -22,7 +24,7 @@ interface AutoMixArgs {
 	clickTracking?: string;
 	config?: { playerParams?: string; type?: string };
 	keyId?: number;
-	loggingContext: { vssLoggingContext: { serializedContextData: string } };
+	loggingContext?: { vssLoggingContext: { serializedContextData: string } };
 	playlistId?: string;
 	playlistSetVideoId?: string;
 	videoId?: string;
@@ -41,12 +43,13 @@ const VALID_KEYS = [
 	"currentMixId",
 	"currentMixType",
 	"visitorData",
+	"related",
 	"mix",
 	"position",
 ] as const;
 
 class ListService implements ISessionListService {
-	private $: Writable<ISessionListProvider>;
+	private $: WritableStore<ISessionListProvider> = new WritableStore<ISessionListProvider>(undefined);
 	private state: ISessionListProvider = {
 		clickTrackingParams: "",
 		continuation: "",
@@ -55,10 +58,11 @@ class ListService implements ISessionListService {
 		visitorData: "",
 		mix: [],
 		position: 0,
+		related: null,
 	};
 
 	constructor() {
-		this.$ = writable<ISessionListProvider>(this.state);
+		this.$.set(this.state);
 	}
 
 	public get clickTrackingParams(): string {
@@ -85,6 +89,10 @@ class ListService implements ISessionListService {
 		return this.$.set;
 	}
 
+	public get value() {
+		return this.state;
+	}
+
 	public get subscribe() {
 		return this.$.subscribe;
 	}
@@ -93,6 +101,50 @@ class ListService implements ISessionListService {
 		return this.$.update;
 	}
 
+	private currentTrack(position = 0) {
+		return this.state.mix?.[position];
+	}
+
+	public async next(userInitiated = false, broadcast = false) {
+		let position = this.state.position + 1;
+		if (position >= this.state.mix.length) {
+			position = this.state.position;
+		}
+		const currentTrack = this.currentTrack(position);
+		const data = await fetchNext({
+			visitorData: this.state?.visitorData,
+			params: encodeURIComponent("OAHyAQIIAQ=="),
+			playlistSetVideoId: currentTrack?.playlistSetVideoId,
+			index: position,
+			loggingContext: currentTrack?.loggingContext?.vssLoggingContext?.serializedContextData,
+			videoId: currentTrack?.videoId,
+			playlistId: this.currentMixId,
+			clickTracking: this?.clickTrackingParams,
+		});
+		if (!data) return;
+		await this.sanitizeAndUpdate("APPLY", data);
+
+		await AudioPlayer.next(userInitiated, broadcast);
+	}
+
+	public async previous(broadcast = false) {
+		const data = await fetchNext({
+			visitorData: this.state?.visitorData,
+			params: encodeURIComponent("OAHyAQIIAQ=="),
+			playlistSetVideoId: this.state.mix[this.position]?.playlistSetVideoId,
+			index: this.state.position,
+			loggingContext: this.currentTrack?.loggingContext?.vssLoggingContext?.serializedContextData,
+			videoId: this.currentTrack?.videoId,
+			playlistId: this.currentMixId,
+			ctoken: this?.continuation,
+			clickTracking: this?.clickTrackingParams,
+		});
+		if (!data) return;
+		this.state.related = data.related;
+		await this.sanitizeAndUpdate("APPLY", data);
+
+		await AudioPlayer.next(true, true);
+	}
 	public async getMoreLikeThis({ playlistId }: { playlistId?: string }): Promise<void> {
 		const toggle = togglePlayerLoad();
 		await tick();
@@ -116,13 +168,18 @@ class ListService implements ISessionListService {
 				response.results.shift();
 			}
 
-			this.sanitizeAndUpdate("APPLY", { ...response, mix: ["append", response.results] });
+			const state = await this.sanitizeAndUpdate("APPLY", { ...response, mix: ["append", response.results] });
 
 			if (groupSession?.initialized && groupSession?.hasActiveSession) {
-				groupSession.updateGuestTrackQueue(this.state);
+				groupSession.updateGuestTrackQueue(state);
 			}
 
-			await getSrc(this.state.mix[this.state.position + 1].videoId, this.state.mix[this.state.position].playlistId);
+			await getSrc(
+				this.state.mix[this.state.position + 1].videoId,
+				this.state.mix[this.state.position].playlistId,
+				null,
+				false,
+			);
 		} catch (err) {
 			Logger.err(err);
 			notify(err, "error");
@@ -176,7 +233,7 @@ class ListService implements ISessionListService {
 
 			const results = data.results;
 
-			this.sanitizeAndUpdate("APPLY", {
+			const state = await this.sanitizeAndUpdate("APPLY", {
 				...data,
 				mix: ["append", results],
 			});
@@ -184,7 +241,7 @@ class ListService implements ISessionListService {
 			const src = await getSrc(this.state.mix[key].videoId);
 
 			if (groupSession?.initialized && groupSession?.hasActiveSession) {
-				groupSession.updateGuestContinuation(this.state);
+				groupSession.updateGuestContinuation(state);
 			}
 
 			return src.body;
@@ -229,13 +286,14 @@ class ListService implements ISessionListService {
 
 			getSrc(videoId ?? item?.videoId, item?.playlistId, config?.playerParams);
 
-			this.sanitizeAndUpdate(
-				willRevert ? "SET" : "APPLY",
-				Object.assign(this.state, { ...data, mix: ["append", data.results] }),
-			);
+			const state = await this.sanitizeAndUpdate(willRevert ? "SET" : "APPLY", {
+				...this.state,
+				...data,
+				mix: ["append", data.results],
+			});
 
 			if (groupSession?.initialized && groupSession?.hasActiveSession) {
-				groupSession.expAutoMix(this.state);
+				groupSession.expAutoMix(state);
 			}
 		} catch (err) {
 			Logger.err(err);
@@ -292,14 +350,14 @@ class ListService implements ISessionListService {
 				return;
 			}
 
-			this.sanitizeAndUpdate("APPLY", {
+			const state = await this.sanitizeAndUpdate("APPLY", {
 				...data,
 				mix: ["set", data.results],
 				currentMixType: "playlist",
 			});
 			await tick();
 			if (groupSession?.initialized && groupSession?.hasActiveSession) {
-				groupSession.expAutoMix(this.state);
+				groupSession.expAutoMix(state);
 			}
 
 			return await getSrc(this.state.mix[index]?.videoId, playlistId, null, true);
@@ -348,7 +406,7 @@ class ListService implements ISessionListService {
 
 			splice(this.state.mix, key + 1, 0, ...itemToAdd);
 
-			this.sanitizeAndUpdate("APPLY", { mix: ["set", this.state.mix] satisfies MixListAppendOp });
+			await this.sanitizeAndUpdate("APPLY", { mix: ["set", this.state.mix] satisfies MixListAppendOp });
 
 			if (!oldLength) {
 				await getSrc(this.state.mix[0].videoId, this.state.mix[0].playlistId, null, true);
@@ -377,10 +435,10 @@ class ListService implements ISessionListService {
 			];
 		}
 		// console.log(mix)
-		this.sanitizeAndUpdate("APPLY", { mix: this.state.mix });
+		const state = this.sanitizeAndUpdate("APPLY", { mix: this.state.mix });
 
 		if (groupSession?.initialized && groupSession?.hasActiveSession) {
-			groupSession.updateGuestTrackQueue(this.state);
+			groupSession.updateGuestTrackQueue(state);
 		}
 	}
 
@@ -394,7 +452,7 @@ class ListService implements ISessionListService {
 			playerParams?: string;
 			playlistSetVideoId?: string;
 			clickTrackingParams?: string;
-			endpoint?: { browseId: string; pageType: string } & Endpoint;
+			endpoint?: { browseId: string; pageType: string };
 			musicVideoType?: string;
 			params?: string;
 			index?: number;
@@ -411,10 +469,10 @@ class ListService implements ISessionListService {
 			crypto.getRandomValues(new Uint8Array(8)).reduce((prev, cur) => (prev += cur), 0),
 		);
 
-		this.sanitizeAndUpdate("SET", { mix: this.state.mix });
+		const state = this.sanitizeAndUpdate("SET", { mix: this.state.mix });
 
 		if (groupSession?.initialized && groupSession?.hasActiveSession) {
-			groupSession.updateGuestTrackQueue(this.state);
+			groupSession.updateGuestTrackQueue(state);
 		}
 	}
 
@@ -447,12 +505,13 @@ class ListService implements ISessionListService {
 			mix: [],
 			visitorData: "",
 			position: 0,
+			related: null,
 		};
 		return this.state;
 	}
 
 	/** Sanitize (diff) and update the state */
-	private sanitizeAndUpdate(
+	private async sanitizeAndUpdate(
 		kind: "APPLY" | "SET",
 		to: {
 			[Key in keyof ISessionListProvider]?: ISessionListProvider[Key] extends any[]
@@ -460,50 +519,63 @@ class ListService implements ISessionListService {
 				: ISessionListProvider[Key];
 		},
 	) {
-		this.update((old) => {
-			if (kind === "APPLY") {
-				let key;
-				let item;
-				for (key in to) {
-					item = to[key];
-					if (!(item !== undefined && item !== null)) continue;
+		await this.$.updateAsync(
+			(old) =>
+				new Promise((resolve) => {
+					if (kind === "APPLY") {
+						let key;
+						let item;
+						for (key in to) {
+							item = to[key];
+							if (!(item != undefined && item != null)) continue;
 
-					if (!VALID_KEYS.includes(key)) {
-						console.log("SKIPPING INVALID KEY", key);
+							if (!VALID_KEYS.includes(key)) {
+								console.log("SKIPPING INVALID KEY", key);
 
-						continue;
-					}
-					// Skip if same value
-					if (old[key] === to[key]) {
-						console.log("SKIPPING UNCHANGED", key);
-						continue;
-					}
+								continue;
+							}
+							if (key === "related") {
+								if (old[key]?.browseId === to[key]?.browseId) {
+									old.related = null;
+									continue;
+								}
+							}
+							// Skip if same value
+							if (old[key] === to[key]) {
+								console.log("SKIPPING UNCHANGED", key);
+								continue;
+							}
 
-					// `mix` has a slightly altered type here
-					if (key === "mix") {
-						// index 0 = operation
-						// index 1 = data
-						if (to.mix[0] === "append") {
-							old.mix.push(...(to.mix[1] as Item[]));
-						} else if (to.mix[0] === "set") {
-							old.mix = (to.mix as MixListAppendOp)[1];
+							// `mix` has a slightly altered type here
+							if (key === "mix") {
+								// index 0 = operation
+								// index 1 = data
+								if (to.mix[0] === "append") {
+									old.mix.push(...(to.mix[1] as Item[]));
+								} else if (to.mix[0] === "set") {
+									old.mix = (to.mix as MixListAppendOp)[1];
+								}
+								if (filterAutoPlay.value) {
+									old.mix = filterList(old.mix);
+								}
+							} else if (to[key] !== undefined && to[key] !== null) {
+								old[key] = to[key];
+							}
 						}
-						if (filterAutoPlay.value) {
-							old.mix = filterList(old.mix);
+
+						Object.assign(this.state, old);
+
+						resolve({ ...old, ...this.state } as ISessionListProvider);
+					} else {
+						const { mix } = to;
+						for (const key in to) {
+							if (!VALID_KEYS.includes(key as any)) delete to[key];
 						}
-					} else if (to[key] !== undefined && to[key] !== null) {
-						old[key] = to[key];
+						resolve({ ...to, mix: mix[1] ? mix[1] : old["mix"] } as ISessionListProvider);
 					}
-				}
-
-				Object.assign(this.state, old);
-
-				return { ...old, ...this.state } as ISessionListProvider;
-			} else {
-				const { mix } = to;
-				return { ...to, mix: mix[1] ? mix[1] : old["mix"] } as ISessionListProvider;
-			}
-		});
+				}),
+		);
+		return this.$.value;
 	}
 }
 

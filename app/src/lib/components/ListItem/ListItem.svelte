@@ -120,6 +120,7 @@
 	import { CTX_ListItem } from "$lib/contexts";
 	import { SITE_ORIGIN_URL } from "$stores/url";
 	import { buildDropdown } from "$lib/configs/dropdowns.config";
+	import SessionListService from "$stores/list/sessionList";
 
 	export let item: Item;
 	export let idx: number;
@@ -156,13 +157,14 @@
 				if (idx === 0) {
 					updateGroupPosition(undefined, idx === 0 ? 1 : idx);
 					list.updatePosition(1);
+
 					return AudioPlayer.previous(false);
 				}
 
 				/// If the index is the last item, handle it differently
 				if (idx === $queue.length - 1) {
 					list.updatePosition(idx === 0 ? 0 : idx - 1);
-					AudioPlayer.next(true, true);
+					SessionListService.next(true, true);
 					await tick();
 					return;
 				}
@@ -171,7 +173,7 @@
 				list.updatePosition(idx === 0 ? 0 : idx - 1);
 				updateGroupPosition(undefined, idx === 0 ? 0 : idx - 1);
 				await tick();
-				AudioPlayer.next(true, true);
+				SessionListService.next(true, true);
 			} else {
 				if (idx === 0) {
 					list.updatePosition(1);
@@ -181,12 +183,12 @@
 				list.updatePosition(idx - 1);
 				await tick();
 
-				AudioPlayer.next(true, false);
+				SessionListService.next(true, false);
 			}
 		} else if (page === "playlist") {
 			if (item.playlistId === $list.currentMixId) {
 				list.updatePosition(idx - 1);
-				await AudioPlayer.next();
+				await SessionListService.next();
 				return;
 			}
 			list.updatePosition(idx);
@@ -208,7 +210,7 @@
 		} else if (page === "release") {
 			if (item.playlistId === $list.currentMixId) {
 				list.updatePosition(idx - 1);
-				await AudioPlayer.next();
+				await SessionListService.next();
 				return;
 			}
 			list.updatePosition(idx);

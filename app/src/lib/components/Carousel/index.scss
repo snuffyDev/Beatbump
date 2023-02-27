@@ -104,10 +104,10 @@
 }
 
 .scroll {
-	--thumbnail-size: calc(2vh + 12em);
+	--thumbnail-size: calc(2vh + 13em);
 
 	@include media-query-down(xs) {
-		--thumbnail-size: calc(3vmin + 12em);
+		--thumbnail-size: 14em;
 	}
 	@include media-query(sm) {
 		--thumbnail-size: calc(1vh + 13em);
@@ -122,10 +122,10 @@
 	}
 
 	@include media-query(xl) {
-		--thumbnail-size: calc(1vmin + 13em);
+		--thumbnail-size: calc(1vmin + 13.5em);
 	}
 	@include media-query-up(xxl) {
-		--thumbnail-size: calc(1vmin + 13em);
+		--thumbnail-size: calc(1vmin + 13.5em);
 	}
 
 	--column-width: calc(var(--thumbnail-size) + 1.5rem);

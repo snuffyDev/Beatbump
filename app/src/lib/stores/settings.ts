@@ -1,4 +1,5 @@
 import { browser } from "$app/environment";
+import { objectKeys } from "$lib/utils/collections/objects";
 import { ENV_DONATION_URL } from "../../env";
 import { get, writable } from "svelte/store";
 
@@ -38,30 +39,6 @@ export interface UserSettings {
 	appinfo: AppInfo;
 }
 
-export const SettingsSchema = {
-	appearance: {
-		Theme: [Kind.Multi, ["Dark", "Dim", "Midnight", "YTM"]],
-		"Immersive Queue": [Kind.Toggle, null],
-	},
-	playback: {
-		"Dedupe Automix": [Kind.Toggle, null],
-		"Prefer WebM Audio": [Kind.Toggle, null],
-		Quality: [Kind.Multi, ["Normal", "Low"]],
-		Stream: [Kind.Multi, ["HTTP", "HLS"]],
-	},
-	network: {
-		"HLS Stream Proxy": [Kind.Text, "(WIP)"],
-	},
-	search: {
-		Preserve: [Kind.Multi, ["Category", "Query", "Category + Query", "None"]],
-	},
-	about: {
-		Donate: [Kind.None, ENV_DONATION_URL],
-
-		GitHub: [Kind.None, "https://github.com/snuffyDev/Beatbump"],
-	},
-};
-
 let list: UserSettings = {
 	appearance: {
 		Theme: "Dark",
@@ -96,9 +73,12 @@ function _settings() {
 		return writable(list);
 	}
 	if ("localStorage" in self === false) return;
-	const stored = JSON.parse(localStorage.getItem("settings")) as UserSettings;
+	const stored = JSON.parse(localStorage.getItem("settings")) as Partial<UserSettings>;
+
 	// Migrate from previous settings to new ones
-	if (!stored?.appearance && !stored?.playback && !stored?.search) {
+	const keys = objectKeys(stored || list);
+
+	if (!keys.every((k) => ["appearance", "playback", "search", "network"].includes(k))) {
 		const theme = localStorage.getItem("theme") as Lowercase<Appearance["Theme"]>;
 		//@ts-expect-error it's correct, the compilers lying
 		list.appearance.Theme =
@@ -118,10 +98,10 @@ function _settings() {
 		localStorage.clear();
 		localStorage.setItem("settings", JSON.stringify(list));
 	} else {
-		if (!stored.network["HLS Stream Proxy"]) {
+		if (!stored?.network["HLS Stream Proxy"]) {
 			stored.network["HLS Stream Proxy"] = "https://yt-hls-rewriter.onrender.com/";
 		}
-		list = stored;
+		list = stored as UserSettings;
 	}
 
 	const store = writable<UserSettings>(list);

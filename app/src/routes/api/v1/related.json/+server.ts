@@ -1,6 +1,6 @@
 import { error, json as json$1 } from "@sveltejs/kit";
 import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
-import type { Item, Song } from "$lib/types";
+import type { CarouselHeader, Item, Song } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import type { RequestHandler } from "@sveltejs/kit";
@@ -10,9 +10,20 @@ type ResponseBody = {
 	params: string;
 	pageType: string;
 };
+
+export type RelatedEndpointResponse = {
+	carousels: {
+		header?: CarouselHeader;
+		items?: (ICarouselTwoRowItem | IListItemRenderer)[];
+	}[];
+	description: {
+		header?: string;
+		description?: string;
+	};
+};
 export const GET: RequestHandler = async ({ url }) => {
 	try {
-		const carousels: { header?: { text?: string }; items?: (ICarouselTwoRowItem | IListItemRenderer)[] }[] = [];
+		const carousels: { header?: CarouselHeader; items?: (ICarouselTwoRowItem | IListItemRenderer)[] }[] = [];
 		const description: { header?: string; description?: string } = {};
 		const browseId = url.searchParams.get("browseId");
 
@@ -36,7 +47,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		while (--pos > -1) {
 			const section = contents[pos];
 			if (section?.musicCarouselShelfRenderer) {
-				const carousel: { header?: { text: string }; items?: Item[] } = {};
+				const carousel: { header?: CarouselHeader; items?: Item[] } = {};
 				const items = [];
 				let idx = section?.musicCarouselShelfRenderer?.contents?.length;
 
@@ -52,8 +63,8 @@ export const GET: RequestHandler = async ({ url }) => {
 				}
 				carousel.items = items;
 				carousel.header = {
-					text: section?.musicCarouselShelfRenderer?.header?.musicCarouselShelfBasicHeaderRenderer?.title?.runs[0]
-						?.text,
+					title:
+						section?.musicCarouselShelfRenderer?.header?.musicCarouselShelfBasicHeaderRenderer?.title?.runs[0]?.text,
 				};
 				carousels.push(carousel);
 			}

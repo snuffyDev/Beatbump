@@ -7,18 +7,20 @@
 	export let key;
 </script>
 
-{#key key}
-	<div
-		class="app-content-p"
-		in:fly={{ x: -5, duration: 500, delay: 500, easing: cubicOut, opacity: 0 }}
-		out:fly={{ duration: 500, easing: cubicOut, opacity: 0 }}
-	>
-		<slot />
-	</div>
-{/key}
+<div class="app-content-p">
+	{#key key}
+		<div
+			class="app-transition-wrapper"
+			in:fly|local={{ x: -5, duration: 500, delay: 500, easing: cubicOut }}
+			out:fly|local={{ x: -5, duration: 500, easing: cubicOut, opacity: 0 }}
+		>
+			<slot />
+		</div>
+	{/key}
+</div>
 
 <style>
-	div {
+	.app-transition-wrapper {
 		/* display: block; */
 		/* position: relative; */
 		contain: content;
@@ -27,6 +29,13 @@
 		overflow-y: auto;
 		position: absolute;
 		transform: translateZ(0px);
+
 		isolation: isolate;
+	}
+
+	.app-content-p {
+		display: grid;
+		inset: 0;
+		position: absolute;
 	}
 </style>

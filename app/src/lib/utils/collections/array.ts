@@ -119,3 +119,18 @@ export function every<T, S extends T>(array: Array<T>, predicate: (item: T) => b
 	}
 	return true;
 }
+export function sift<T, S>(array: ArrayLike<T>, predicate: (item: T) => item is T): [T[], S[]];
+export function sift<T, S>(array: ArrayLike<T>, predicate: (item: T) => boolean): [T[], S[]];
+export function sift<T, S>(array: ArrayLike<T>, predicate: (item: T) => unknown): [T[], S[]] {
+	const resultT: T[] = [];
+	const resultF: S[] = [];
+
+	for (let idx = 0; idx < array.length; idx++) {
+		if (predicate(array[idx])) {
+			resultT.push(array[idx] as unknown as T);
+		} else {
+			resultF.push(array[idx] as unknown as S);
+		}
+	}
+	return [resultT, resultF];
+}

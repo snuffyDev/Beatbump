@@ -87,6 +87,7 @@
 	import type { Item } from "$lib/types";
 	import { buildDropdown } from "$lib/configs/dropdowns.config";
 	import PlayerButton from "./PlayerButton.svelte";
+	import SessionListService from "$stores/list/sessionList";
 
 	const { paused } = AudioPlayer;
 	let volume = 0.5;
@@ -114,7 +115,7 @@
 			AudioPlayer.previous();
 		},
 		Period: () => {
-			AudioPlayer.next(true);
+			SessionListService.next(true);
 		},
 		Space: () => {
 			if (!AudioPlayer && !AudioPlayer.src) return;
@@ -186,7 +187,7 @@
 				pause={() => AudioPlayer.pause()}
 				nextBtn={() => {
 					if ($queue.length === 0) return;
-					AudioPlayer.next(true, groupSession.hasActiveSession ? true : false);
+					SessionListService.next(true, groupSession.hasActiveSession ? true : false);
 					// AudioPlayer.updateTime($durationStore);
 				}}
 				prevBtn={() => AudioPlayer.previous(true)}

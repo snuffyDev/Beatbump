@@ -1,7 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg">
 	<symbol id="album">
-		<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-		<polyline points="11 3 11 11 14 8 17 11 17 3" />
+		<circle cx="12" cy="12" r="10"></circle>
+		<circle cx="12" cy="12" r="3"></circle>
+
 	</symbol>
 	<symbol id="chevron-left">
 		<polyline points="15 18 9 12 15 6" />

@@ -24,7 +24,8 @@
 	import { Logger } from "$lib/utils/logger";
 
 	let main: HTMLElement;
-	let key: string = $page.data.key;
+	$: key = $page.data.key;
+
 	let isFullscreen = false;
 	$: $fullscreenStore === "open"
 		? setTimeout(() => {
@@ -47,9 +48,7 @@
 			});
 		}
 	}
-	beforeNavigate(() => {
-		key = $page.data.key;
-	});
+
 	afterNavigate(() => {
 		if (import.meta.env.SSR) return;
 		if (main) main.scrollTop = 0;
@@ -58,6 +57,7 @@
 
 <svelte:window
 	on:beforeunload={() => {
+		if (!browser) return;
 		if (groupSession.initialized && groupSession.hasActiveSession) {
 			groupSession.disconnect();
 		}

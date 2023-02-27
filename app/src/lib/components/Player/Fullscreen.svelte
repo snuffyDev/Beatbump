@@ -1,3 +1,9 @@
+<script
+	context="module"
+	lang="ts"
+>
+</script>
+
 <script lang="ts">
 	import { navigating } from "$app/stores";
 	import { AudioPlayer } from "$lib/player";
@@ -16,14 +22,18 @@
 	import { groupSession } from "$lib/stores/sessions";
 	import ProgressBar from "./ProgressBar";
 	import { CTX_ListItem } from "$lib/contexts";
-	import { requestFrameSingle } from "$lib/utils";
+	import { notify, requestFrameSingle } from "$lib/utils";
 	import type { Thumbnail } from "$lib/types";
 	import { windowWidth } from "$stores/window";
-	import { fade, type EasingFunction, type TransitionConfig } from "svelte/transition";
+	import type { EasingFunction, TransitionConfig } from "svelte/transition";
 	import PopperButton from "$components/Popper/PopperButton.svelte";
 	import { createPlayerPopperMenu } from "./Player.svelte";
 	import { SITE_ORIGIN_URL } from "$stores/url";
 	import type { Dropdown } from "$lib/configs/dropdowns.config";
+	import SessionListService from "$stores/list/sessionList";
+	import { related } from "$stores/list/derived";
+	import Carousel from "$components/Carousel/Carousel.svelte";
+	import Description from "$components/ArtistPageHeader/Description/Description.svelte";
 
 	export let state: "open" | "closed";
 
@@ -53,7 +63,8 @@
 		{
 			id: "Related",
 			text: "Related",
-			action: () => {
+			action: async () => {
+				if (!$SessionListService.related) return;
 				active = tabs[1].id;
 			},
 		},
@@ -193,6 +204,7 @@
 			DropdownItems = undefined;
 		}
 	}
+	$: console.log($related);
 </script>
 
 {#if $queue.length && state === "open"}
@@ -285,9 +297,7 @@
 									class="marquee-wrapper"
 									style="animation-play-state: {state === 'open' && titleWidth > $windowWidth
 										? 'running'
-										: 'paused'}; {state === 'closed' || titleWidth < $windowWidth
-										? 'animation: none; transform: unset;'
-										: ''}"
+										: 'paused'}; {titleWidth < $windowWidth ? 'animation: none; transform: unset;' : ''}"
 									><span
 										bind:clientWidth={titleWidth}
 										class="h5 marquee-text">{data?.title}</span
@@ -315,7 +325,7 @@
 							pause={() => AudioPlayer.pause()}
 							nextBtn={() => {
 								if ($queue.length === 0) return;
-								AudioPlayer.next(true, groupSession.hasActiveSession ? true : false);
+								SessionListService.next(true, groupSession.hasActiveSession ? true : false);
 								// AudioPlayer.updateTime($durationStore);
 							}}
 							prevBtn={() => AudioPlayer.previous(true)}
@@ -370,30 +380,66 @@
 				<Tabs
 					{tabs}
 					{active}
-				/>
-				<div class="scroller">
-					<TrackList
-						items={$queue}
-						hasData={true}
-						let:index
-						let:item
+				>
+					<svelte:fragment
+						let:isActive
+						let:tab
+						slot="tab"
 					>
-						<ListItem
-							{item}
-							idx={index}
-							on:setPageIsPlaying={() => {
-								if (isPagePlaying.has("player-queue")) return;
-								isPagePlaying.add("player-queue");
-							}}
-						/>
-					</TrackList>
-				</div>
+						{#if tab.id === "UpNext"}
+							{#if isActive}
+								<div class="scroller">
+									<TrackList
+										items={$queue}
+										hasData={true}
+										let:index
+										let:item
+									>
+										<ListItem
+											{item}
+											idx={index}
+											on:setPageIsPlaying={() => {
+												if (isPagePlaying.has("player-queue")) return;
+												isPagePlaying.add("player-queue");
+											}}
+										/>
+									</TrackList>
+								</div>
+							{/if}
+						{:else if isActive}
+							<div class="scroller">
+								<div class="pad">
+									{#if $related.description.description}
+										<span class="h2">{$related?.description?.header}</span>
+										<Description description={$related.description.description} />
+									{/if}
+									{#if Array.isArray($related.carousels)}
+										{#key $related.carousels}
+											{#each $related.carousels as carousel, idx}
+												<Carousel
+													header={carousel.header}
+													items={carousel.items}
+													type="home"
+													kind={carousel.header?.type}
+													isBrowseEndpoint={false}
+												/>
+											{/each}
+										{/key}
+									{/if}
+								</div>
+							</div>
+						{/if}
+					</svelte:fragment>
+				</Tabs>
 			</div>
 		</div>
 	</div>
 {/if}
 
 <style lang="scss">
+	.pad {
+		padding: 2vh 2em 1.5em 2em;
+	}
 	.marquee {
 		position: relative;
 		overflow: hidden;
@@ -504,7 +550,7 @@
 		border-top-left-radius: $sm-radius;
 		border-top-right-radius: $sm-radius;
 		contain: paint layout;
-		@media screen and (min-width: 720px) and (hover: hover) {
+		@media screen and (min-width: 720px) {
 			position: absolute;
 			left: 0;
 			width: 45vw;
@@ -543,14 +589,6 @@
 			// gap: 1em;
 			flex-direction: row;
 		}
-	}
-	.tr-open {
-		transition: transform 400ms 400ms cub cubic-bezier(0.165, 0.84, 0.44, 1),
-			opacity 200ms cubic-bezier(0.165, 0.84, 0.44, 1);
-	}
-	.tr-close {
-		transition: transform 400ms 0ms c cubic-bezier(0.86, 0, 0.07, 1),
-			opacity 800ms cubic-bezier(0.895, 0.03, 0.685, 0.22) 400ms;
 	}
 	hr {
 		touch-action: none;
@@ -726,7 +764,7 @@
 
 		top: 0;
 		left: 0;
-		@media screen and (min-width: 720px) and (hover: hover) {
+		@media screen and (min-width: 720px) {
 			display: none !important;
 			visibility: none !important;
 		}

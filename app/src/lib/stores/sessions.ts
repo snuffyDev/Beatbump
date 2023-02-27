@@ -158,7 +158,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 				this._once = true;
 				this._allCanPlay = true;
 
-				await AudioPlayer.next(true, false);
+				await SessionListService.next(true, false);
 
 				setTimeout(() => (this._once = false), 25);
 			}
@@ -231,7 +231,9 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 
 	public connect(id: string): void {
 		if (!this._rtc) return;
-		if (this._peerIds.has(id)) return notify(`Already connected to peer ${id}!`, "error");
+		if (this._peerIds.has(id)) {
+			return notify(`Already connected to peer ${id}!`, "error");
+		}
 
 		// Connect to the session host, store this connection
 		if (!this._hasActiveSession) this._hasActiveSession = true;
@@ -243,6 +245,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 				permissions: {},
 				role: "guest",
 			} as ConnectedClient,
+			reliable: true,
 			serialization: "binary",
 		});
 
@@ -296,7 +299,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 			displayName: displayName,
 			role: type || "guest",
 		};
-		this._rtc = new this._peerJs(clientId);
+		this._rtc = new this._peerJs(clientId, { debug: 3 });
 
 		if (!this._hasActiveSession) this._hasActiveSession = true;
 		this._connectionStates.update((u) => ({
@@ -305,7 +308,6 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 		}));
 
 		this._rtc.on("open", (id) => {
-			Logger.debug(`Opened RTC Session: ${id}`);
 			if (type === "host") {
 				this.initSession();
 			}
@@ -344,7 +346,8 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 						});
 					} catch (err) {
 						if (err.message) {
-							const pos = parseInt((err.message as string).match(/\d+$/g).at(0));
+							console.log(err);
+							const pos = parseInt((err.message as string).match(/\d+$/g)?.at(0));
 							err.message.includes("position")
 								? console.log((data as string).slice(0, pos), (data as string).slice(pos))
 								: console.error(err);
@@ -361,7 +364,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 						});
 					}).then((list) => {
 						SessionListService.updatePosition(list.position - 1);
-						AudioPlayer.next(true, false);
+						SessionListService.next(true, false);
 					});
 				}
 				/** Any other mix updates */
@@ -391,7 +394,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 					if (dir === "<-") {
 						AudioPlayer.previous(false);
 					} else if (dir === "->") {
-						AudioPlayer.next(true, false);
+						SessionListService.next(true, false);
 					}
 				}
 				/** Updates the playback state for the connected client */
@@ -405,6 +408,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 
 	public send(command: Command, type: Kind, data: JSON, metadata?: Client): void {
 		if (!this._initialized) return;
+
 		iter(this._connections, (conn) => {
 			// TODO! figure out if this check is valiid or not
 			if (this.client.clientId === conn.peer) return;
@@ -517,8 +521,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 					this.send("PUT", "state.set.mix", SessionListService.toJSON(), this.client);
 				});
 			} else if (kind === "playlist") {
-				// Logger.debug(data);
-				SessionListService.initPlaylistSession({ playlistId: data?.playlistId }).then(() => {
+				SessionListService.initPlaylistSession({ index: 0, playlistId: data?.playlistId }).then(() => {
 					this.send("PUT", "state.set.mix", SessionListService.toJSON(), this.client);
 				});
 			}
@@ -532,10 +535,14 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 	private listenToConnection(connection: DataConnection): void {
 		connection.on("data", async (data) => {
 			const processed = await this.process(data as string);
-			if (processed.metadata.clientId === this.client.clientId) return;
+
+			if (processed.metadata.clientId === this.client.clientId)
+				return notify(processed.metadata.clientId + "  " + this.client.clientId, "error");
+
 			if (processed.command === "CONNECT" && Array.isArray(processed.data)) {
 				const _ids = filter(processed.data as string[], (id) => id !== this.client.clientId);
 				const ids = Object.keys(this._rtc.connections);
+
 				iter(_ids, (item) => {
 					if (!ids.includes(item)) {
 						this.connect(item);
@@ -543,6 +550,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 				});
 				return;
 			}
+
 			this.send(processed.command, processed.type, processed.data, processed.metadata);
 		});
 

@@ -13,6 +13,14 @@ export type NextEndpointResponse = {
 	clickTrackingParams: string;
 	currentMixId: string;
 	visitorData: string;
+	related: {
+		browseId: string;
+		browseEndpointContextSupportedConfigs: {
+			browseEndpointContextMusicConfig: {
+				pageType: "MUSIC_PAGE_TYPE_TRACK_RELATED";
+			};
+		};
+	};
 };
 
 export const GET: RequestHandler = async ({ url }): Promise<IResponse<NextEndpointResponse>> => {
@@ -62,10 +70,10 @@ export const GET: RequestHandler = async ({ url }): Promise<IResponse<NextEndpoi
 	if (!continuation) {
 		const res = parseNextBody(response);
 
-		return json(res);
+		return json(Object.assign({}, res, { response }));
 	}
 
-	return json(parseNextBodyContinuation(response));
+	return json(Object.assign({}, parseNextBodyContinuation(response), { response }));
 };
 
 function parseNextBody(data) {
@@ -128,6 +136,10 @@ function parseNextBodyContinuation(data) {
 
 	const visitorData = responseContext?.visitorData;
 	const parsed = parseContents(contents, continuation, clickTrackingParams, rest, visitorData);
+	const tabs =
+		data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs ||
+		[];
+	const related = Array.isArray(tabs) && tabs[2]?.tabRenderer?.endpoint?.browseEndpoint;
 
-	return parsed;
+	return Object.assign(parsed, { related });
 }

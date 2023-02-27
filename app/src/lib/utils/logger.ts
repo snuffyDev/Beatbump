@@ -31,11 +31,7 @@ function err(...message: any[]): void {
 }
 function dev(...message: any[]) {
 	if (!isDev) return;
-	if (arguments.length > 1) {
-		console.log(LOG_TYPES.dev, ...message);
-	} else {
-		console.log(LOG_TYPES.dev, message);
-	}
+	console.log(LOG_TYPES.dev, ...message);
 }
 
 export const Logger = {
