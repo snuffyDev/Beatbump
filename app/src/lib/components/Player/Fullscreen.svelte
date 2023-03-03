@@ -22,7 +22,7 @@
 	import { groupSession } from "$lib/stores/sessions";
 	import ProgressBar from "./ProgressBar";
 	import { CTX_ListItem } from "$lib/contexts";
-	import { notify, requestFrameSingle } from "$lib/utils";
+	import { requestFrameSingle } from "$lib/utils";
 	import type { Thumbnail } from "$lib/types";
 	import { windowWidth } from "$stores/window";
 	import type { EasingFunction, TransitionConfig } from "svelte/transition";
@@ -410,8 +410,10 @@
 							<div class="scroller">
 								<div class="pad">
 									{#if $related.description.description}
-										<span class="h2">{$related?.description?.header}</span>
-										<Description description={$related.description.description} />
+										<div class="mb-2">
+											<span class="h2">{$related?.description?.header}</span>
+											<Description description={$related.description.description} />
+										</div>
 									{/if}
 									{#if Array.isArray($related.carousels)}
 										{#key $related.carousels}
@@ -438,7 +440,12 @@
 
 <style lang="scss">
 	.pad {
-		padding: 2vh 2em 1.5em 2em;
+		padding: 2vh 1em 1.5em 1em;
+		// height: 100%;
+
+		overflow-y: auto;
+		contain: style paint size layout;
+		width: 100%;
 	}
 	.marquee {
 		position: relative;
@@ -498,7 +505,10 @@
 		// display: flex;
 		overflow-y: auto;
 		// touch-action: pan-y;
+		transform: translate3d(0px, 0px, 0px);
 		overflow-x: hidden;
+		backface-visibility: hidden;
+		contain: strict;
 		// background-color: rgb(18, 17, 24);
 		overscroll-behavior: contain;
 		height: inherit;
@@ -536,7 +546,8 @@
 			touch-action: none;
 		}
 	}
-	.tracklist {
+	.tracklist,
+	.pad {
 		position: absolute;
 
 		bottom: 0;

@@ -89,7 +89,7 @@
 		artist?: Artist[] | undefined;
 		length?: string;
 	}> = {};
-	export let size = "1.5em";
+	export let size = "1.8rem";
 	export let tabindex: number = 0;
 </script>
 

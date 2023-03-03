@@ -1,16 +1,10 @@
 import { browser } from "$app/environment";
-import { objectKeys } from "$lib/utils/collections/objects";
 import { ENV_DONATION_URL } from "../../env";
 import { get, writable } from "svelte/store";
 
 export type Theme = "Dark" | "Dim" | "Midnight" | "YTM";
 export type StreamType = "HTTP" | "HLS";
-enum Kind {
-	Toggle = 0,
-	Multi = 1,
-	Text = 2,
-	None = 3,
-}
+
 interface Appearance {
 	Theme?: Theme;
 	"Immersive Queue"?: boolean;
@@ -73,12 +67,10 @@ function _settings() {
 		return writable(list);
 	}
 	if ("localStorage" in self === false) return;
-	const stored = JSON.parse(localStorage.getItem("settings")) as Partial<UserSettings>;
-
 	// Migrate from previous settings to new ones
-	const keys = objectKeys(stored || list);
-
-	if (!keys.every((k) => ["appearance", "playback", "search", "network"].includes(k))) {
+	const stored = JSON.parse(localStorage.getItem("settings")) as UserSettings;
+	// Migrate from previous settings to new ones
+	if (!stored?.appearance && !stored?.playback && !stored?.search) {
 		const theme = localStorage.getItem("theme") as Lowercase<Appearance["Theme"]>;
 		//@ts-expect-error it's correct, the compilers lying
 		list.appearance.Theme =

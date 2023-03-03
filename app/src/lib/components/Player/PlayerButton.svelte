@@ -32,7 +32,7 @@
 		<Icon
 			color="white"
 			name="play"
-			size={"1.625rem"}
+			size={"24px"}
 		/>
 	{:else}
 		<Icon

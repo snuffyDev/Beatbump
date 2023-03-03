@@ -12,6 +12,7 @@ RUN npm ci --legacy-peer-deps
 # copy local files to image
 COPY . .
 
+RUN npm exec svelte-kit sync
 RUN npm run bb:build
 
 FROM node:18-alpine3.15 as app

@@ -91,11 +91,11 @@
 			],
 			{
 				duration: 600,
-				delay: 0,
+				delay: 300,
 				fill: "forwards",
 				direction: "normal",
 				easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-				composite: "accumulate",
+				composite: "replace",
 			},
 		);
 		anim.onfinish = () => {
@@ -114,7 +114,6 @@
 				{
 					duration: 500,
 					easing: quartOut,
-					delay: 200,
 				},
 			);
 			if (backdrop) {
@@ -125,11 +124,10 @@
 					],
 					{
 						duration: 600,
-						delay: 300,
 						fill: "forwards",
 						direction: "normal",
 						easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-						composite: "accumulate",
+						composite: "replace",
 					},
 				);
 				anim.onfinish = () => {
@@ -161,8 +159,8 @@
 		<div
 			class="column container drag"
 			bind:this={tracklist}
-			in:fly={{ duration: 600, delay: 800, opacity: 0, y: windowHeight }}
-			out:fly={{ duration: 600, y: windowHeight, opacity: 0, delay: 200 }}
+			in:fly={{ duration: 600, delay: 300, opacity: 0, y: windowHeight }}
+			out:fly={{ duration: 600, y: windowHeight, opacity: 0 }}
 			bind:clientHeight={queueHeight}
 			style={`transform: translate3d(0, ${$motion}px, 0);  bottom:0;`}
 		>
