@@ -4,7 +4,7 @@ import type { CarouselHeader, Item, Song } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import type { RequestHandler } from "@sveltejs/kit";
-import { buildRequest } from "$api/request";
+import { buildAPIRequest } from "$api/request";
 type ResponseBody = {
 	browseId: string;
 	params: string;
@@ -27,7 +27,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		const description: { header?: string; description?: string } = {};
 		const browseId = url.searchParams.get("browseId");
 
-		const response = await buildRequest("related", {
+		const response = await buildAPIRequest("related", {
 			context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
 			headers: null,
 			params: {

@@ -49,7 +49,7 @@
 		}
 	}
 
-	afterNavigate(() => {
+	afterNavigate(({from, to,}) => {
 		if (import.meta.env.SSR) return;
 		if (main) main.scrollTop = 0;
 	});

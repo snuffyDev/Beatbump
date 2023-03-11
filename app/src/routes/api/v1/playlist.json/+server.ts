@@ -5,7 +5,7 @@ import type { NextContinuationData } from "$lib/types";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { map } from "$lib/utils/collections";
 import { error, json, type RequestHandler } from "@sveltejs/kit";
-import { buildRequest } from "$api/request";
+import { buildAPIRequest } from "$api/request";
 import type { PlaylistEndpointContinuation, PlaylistEndpointParams } from "$api/_base";
 import type { Header, MusicCarouselShelfRenderer } from "$lib/types/innertube/musicCarouselShelfRenderer";
 import type { ITwoRowItemRenderer } from "$lib/types/musicCarouselTwoRowItem";
@@ -41,7 +41,7 @@ async function getPlaylistContinuation(
 	id?: string,
 	visitorData?: string,
 ) {
-	const response = await buildRequest("playlist", {
+	const response = await buildAPIRequest("playlist", {
 		context: {
 			client: {
 				clientName: "WEB_REMIX",

@@ -1,11 +1,11 @@
 // @ts-nocheck
-import { buildRequest } from "$api/request";
+import { buildAPIRequest } from "$api/request";
 import { error } from "@sveltejs/kit";
 import { ArtistPageParser } from "$lib/parsers/artist";
 import type { PageServerLoad } from "./$types";
 
 export const load = async ({ params }: Parameters<PageServerLoad>[0]) => {
-	const response = await buildRequest("artist", {
+	const response = await buildAPIRequest("artist", {
 		context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
 		headers: null,
 		params: {

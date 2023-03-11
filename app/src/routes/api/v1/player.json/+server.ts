@@ -1,5 +1,5 @@
 import type { RequestHandler } from "@sveltejs/kit";
-import { buildRequest } from "$api/request";
+import { buildAPIRequest } from "$api/request";
 import { error, json } from "@sveltejs/kit";
 
 /**
@@ -16,7 +16,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	const playlistId = query.get("list") || "";
 	const playerParams = query.get("playerParams") || "";
 	try {
-		const response = await buildRequest("player", {
+		const response = await buildAPIRequest("player", {
 			context: {
 				client: { clientName: "IOS", clientVersion: "17.13.3", hl: "en" },
 			},

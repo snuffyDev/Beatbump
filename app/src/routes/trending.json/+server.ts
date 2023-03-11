@@ -1,4 +1,4 @@
-import { buildRequest } from "$api/request";
+import { buildAPIRequest } from "$api/request";
 import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 
 import type { CarouselHeader } from "$lib/types";
@@ -17,7 +17,7 @@ import type { IMusicResponsiveListItemRenderer, IMusicTwoRowItemRenderer } from 
 export const GET: RequestHandler = async () => {
 	let carouselItems = [];
 
-	const response = await buildRequest("home", {
+	const response = await buildAPIRequest("home", {
 		context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
 		params: { browseId: "FEmusic_explore" },
 		headers: null,

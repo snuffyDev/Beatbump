@@ -1,10 +1,10 @@
-import { buildRequest } from "$api/request";
+import { buildAPIRequest } from "$api/request";
 import type { RequestHandler } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;
 	const browseId = query.get("browseId");
-	const response = await buildRequest("browse", {
+	const response = await buildAPIRequest("browse", {
 		context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
 		params: { browseId: browseId },
 	});

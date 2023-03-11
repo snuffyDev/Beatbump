@@ -26,7 +26,7 @@ type IHeaders = Record<string, string>;
 /** Helper function to build a request body
 	consisting of Context and params of type `T` */
 function buildRequestBody<T>(context: Context, params: Body<T>) {
-	return Object.assign({}, { context }, params);
+	return { context, ...params };
 }
 
 const ENDPOINT_DICT: Record<keyof APIEndpoints, Function> = {
@@ -46,7 +46,7 @@ const ENDPOINT_DICT: Record<keyof APIEndpoints, Function> = {
  * @param options
  * @returns {Promise<Response>} A promise consisting of a Response
  */
-export function buildRequest<
+export function buildAPIRequest<
 	T extends ArtistEndpointParams | PlayerEndpointParams | PlaylistEndpointParams | NextEndpointParams,
 >(
 	endpoint: keyof APIEndpoints,

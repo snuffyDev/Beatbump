@@ -3,7 +3,7 @@ import { parseContents } from "$lib/parsers/next";
 
 import { error, json } from "@sveltejs/kit";
 
-import { buildRequest } from "$api/request";
+import { buildAPIRequest } from "$api/request";
 import type { RequestHandler } from "./$types";
 import type { Item } from "$lib/types";
 
@@ -34,7 +34,7 @@ export const GET: RequestHandler = async ({ url }): Promise<IResponse<NextEndpoi
 	const index = parseInt(query.get("index")) || undefined;
 	const clickTracking = query.get("clickTracking") || undefined;
 	const playlistSetVideoId = query.get("playlistSetVideoId") || undefined;
-	const response = await buildRequest("next", {
+	const response = await buildAPIRequest("next", {
 		context: {
 			clickTracking: {
 				clickTrackingParams: clickTracking ? decodeURIComponent(decodeURIComponent(clickTracking)) : undefined,
