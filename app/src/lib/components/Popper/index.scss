@@ -70,7 +70,10 @@ hr {
 	isolation: isolate;
 	touch-action: none;
 
-	padding: 0.4rem;
+	padding: 0.8rem;
+	@media screen and (min-width: 960px) {
+		padding: 0.5rem;
+	}
 }
 .m-row {
 	touch-action: none;

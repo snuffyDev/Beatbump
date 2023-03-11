@@ -1,13 +1,13 @@
-import type { Song } from "$lib/types";
+import type { Item, Song } from "$lib/types";
 import type { IPlaylistPanelVideoRenderer } from "../types/playlistPanelVideoRenderer";
 import { PlaylistPanelVideoRenderer } from "./items/playlistPanelVideoRenderer";
 import { filterMap } from "$lib/utils/collections";
 
 type PanelAlias = { playlistPanelVideoRenderer: IPlaylistPanelVideoRenderer };
 
-function parseItem(item: Song | PanelAlias) {
-	if ((item as Record<string, any>)?.playlistPanelVideoRenderer) {
-		return PlaylistPanelVideoRenderer(item["playlistPanelVideoRenderer"]) as Song;
+function parseItem(item: Song) {
+	if ("playlistPanelVideoRenderer" in item) {
+		return PlaylistPanelVideoRenderer(item["playlistPanelVideoRenderer"] as IPlaylistPanelVideoRenderer) as Item;
 	}
 }
 function filterItem(item: Song | PanelAlias) {
@@ -20,7 +20,7 @@ export function parseContents(
 	current: any,
 	visitorData: string,
 ): {
-	results: Array<Song | PanelAlias>;
+	results: Array<Item>;
 	continuation: string;
 	clickTrackingParams: string;
 	currentMixId: string;
@@ -32,6 +32,6 @@ export function parseContents(
 		continuation: continuation,
 		clickTrackingParams: clickTrackingParams,
 		visitorData,
-		results: filterMap(contents, parseItem, filterItem),
+		results: filterMap<Song | PanelAlias, Item>(contents, parseItem, filterItem),
 	};
 }

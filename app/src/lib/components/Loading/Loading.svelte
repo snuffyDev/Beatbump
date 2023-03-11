@@ -1,11 +1,11 @@
 <script>
 	import { fade } from "svelte/transition";
-	export let size = "4em";
+	export let size = "3.5em";
 </script>
 
 <div
 	id="vertical-loading-bars"
-	style={` max-width: ${size};
+	style={`--size: ${size};  max-width: ${size};
     max-height: ${size}`}
 	transition:fade
 >
@@ -23,8 +23,8 @@
 		justify-content: center;
 		/* flex-flow: row nowrap; */
 		align-items: center;
-		justify-content: space-evenly;
-
+		// justify-content: ;
+		gap: 0.325em;
 		top: 0;
 		z-index: 1;
 		right: 0;
@@ -35,14 +35,19 @@
 		margin-top: auto;
 		margin-bottom: auto;
 		border-radius: 50%;
-		background-blend-mode: luminosity;
-		background: rgb(0, 0, 0);
-		background: -moz-radial-gradient(circle, rgba(0, 0, 0, 0.658) 32%, rgba(136, 136, 136, 0.06066176470588236) 99%);
-		background: -webkit-radial-gradient(circle, rgba(0, 0, 0, 0.658) 32%, rgba(136, 136, 136, 0.06066176470588236) 99%);
-		background: radial-gradient(circle, rgba(0, 0, 0, 0.658) 32%, rgba(136, 136, 136, 0.06066176470588236) 99%);
+		background-blend-mode: multiply;
+		background-color: rgba(0, 0, 0, 0.184);
+		background: radial-gradient(
+			circle at center,
+			hsl(0, 0%, 0%) 10%,
+			hsla(0, 0%, 0%, 0.543) 24%,
+			hsla(0, 0%, 0%, 0.388) 50%,
+			rgba(255, 255, 255, 0.195) 75%,
+			rgba(255, 255, 255, 0) 100%
+		);
 	}
 	#vertical-loading-bars span {
-		width: 0.3em;
+		width: 0.25rem;
 		height: 1rem;
 		background-color: #e7e9ee;
 	}

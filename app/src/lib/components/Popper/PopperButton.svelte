@@ -37,7 +37,7 @@
 				activeNode.set(new WeakRef(node));
 			}
 			const rect = node.getBoundingClientRect();
-
+			console.log(metadata);
 			x = rect.left;
 			y = rect.top;
 			bottom = rect.bottom;
@@ -75,7 +75,7 @@
 </script>
 
 <script lang="ts">
-	import type { Artist } from "$lib/types";
+	import type { Artist, Thumbnail } from "$lib/types";
 
 	import Icon from "../Icon/Icon.svelte";
 	import { activeNode, isOpen } from "./popperStore";
@@ -83,9 +83,13 @@
 	import { PopperStore } from "./popperStore";
 	export let items = [];
 	export let type = "";
-	export let metadata: Partial<{ thumbnail: string; title: string; artist?: Artist[] | undefined; length?: string }> =
-		{};
-	export let size = "1.5em";
+	export let metadata: Partial<{
+		thumbnail: Thumbnail[];
+		title: string;
+		artist?: Artist[] | undefined;
+		length?: string;
+	}> = {};
+	export let size = "1.8rem";
 	export let tabindex: number = 0;
 </script>
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Header from "$components/Layouts/Header.svelte";
 	import { AudioPlayer } from "$lib/player";
-	import { settings, SettingsSchema, type Theme } from "$stores/settings";
+	import { settings, type Theme } from "$stores/settings";
 	const themes: Theme[] = ["Dark", "Dim", "Midnight", "YTM"];
 
 	function handleStreamSelect() {

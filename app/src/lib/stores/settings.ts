@@ -4,12 +4,7 @@ import { get, writable } from "svelte/store";
 
 export type Theme = "Dark" | "Dim" | "Midnight" | "YTM";
 export type StreamType = "HTTP" | "HLS";
-enum Kind {
-	Toggle = 0,
-	Multi = 1,
-	Text = 2,
-	None = 3,
-}
+
 interface Appearance {
 	Theme?: Theme;
 	"Immersive Queue"?: boolean;
@@ -37,30 +32,6 @@ export interface UserSettings {
 	network: Network;
 	appinfo: AppInfo;
 }
-
-export const SettingsSchema = {
-	appearance: {
-		Theme: [Kind.Multi, ["Dark", "Dim", "Midnight", "YTM"]],
-		"Immersive Queue": [Kind.Toggle, null],
-	},
-	playback: {
-		"Dedupe Automix": [Kind.Toggle, null],
-		"Prefer WebM Audio": [Kind.Toggle, null],
-		Quality: [Kind.Multi, ["Normal", "Low"]],
-		Stream: [Kind.Multi, ["HTTP", "HLS"]],
-	},
-	network: {
-		"HLS Stream Proxy": [Kind.Text, "(WIP)"],
-	},
-	search: {
-		Preserve: [Kind.Multi, ["Category", "Query", "Category + Query", "None"]],
-	},
-	about: {
-		Donate: [Kind.None, ENV_DONATION_URL],
-
-		GitHub: [Kind.None, "https://github.com/snuffyDev/Beatbump"],
-	},
-};
 
 let list: UserSettings = {
 	appearance: {
@@ -96,6 +67,7 @@ function _settings() {
 		return writable(list);
 	}
 	if ("localStorage" in self === false) return;
+	// Migrate from previous settings to new ones
 	const stored = JSON.parse(localStorage.getItem("settings")) as UserSettings;
 	// Migrate from previous settings to new ones
 	if (!stored?.appearance && !stored?.playback && !stored?.search) {
@@ -118,10 +90,10 @@ function _settings() {
 		localStorage.clear();
 		localStorage.setItem("settings", JSON.stringify(list));
 	} else {
-		if (!stored.network["HLS Stream Proxy"]) {
+		if (!stored?.network["HLS Stream Proxy"]) {
 			stored.network["HLS Stream Proxy"] = "https://yt-hls-rewriter.onrender.com/";
 		}
-		list = stored;
+		list = stored as UserSettings;
 	}
 
 	const store = writable<UserSettings>(list);

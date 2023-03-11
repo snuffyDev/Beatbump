@@ -24,7 +24,7 @@
 		groupSession.init(displayName, "host", { forceSync: checked });
 		await tick();
 		step++;
-		sessionURL = `${import.meta.env.DEV ? "localhost:5000" : $SITE_ORIGIN_URL}/session?token=${IsoBase64.toBase64(
+		sessionURL = `${import.meta.env.DEV ? $page.url.host : $SITE_ORIGIN_URL}/session?token=${IsoBase64.toBase64(
 			JSON.stringify({
 				clientId: groupSession.client.clientId,
 				displayName: groupSession.client.displayName,

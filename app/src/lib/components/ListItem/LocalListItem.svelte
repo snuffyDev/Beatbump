@@ -130,14 +130,14 @@
 				if (idx === $queue.length - 1) {
 					const pos = SessionListService.updatePosition(idx === 0 ? 0 : idx - 1);
 					// updateGroupPosition("<-", pos);
-					AudioPlayer.next(true, true);
+					SessionListService.next(true, true);
 					await tick();
 					return;
 				}
 				SessionListService.updatePosition(idx === 0 ? 0 : idx - 1);
 				updateGroupPosition(undefined, idx === 0 ? 0 : idx - 1);
 				await tick();
-				AudioPlayer.next(true, true);
+				SessionListService.next(true, true);
 			} else {
 				if (idx === 0) {
 					SessionListService.updatePosition(1);
@@ -147,7 +147,7 @@
 				SessionListService.updatePosition(idx - 1);
 				await tick();
 
-				AudioPlayer.next(true, false);
+				SessionListService.next(true, false);
 			}
 		} else if (page === "playlist") {
 			SessionListService.updatePosition(idx);
@@ -157,6 +157,7 @@
 			dispatch("initLocalPlaylist", { idx });
 		} else {
 			await SessionListService.initAutoMixSession({
+				loggingContext: item?.loggingContext,
 				videoId: item.videoId,
 				playlistId: parentPlaylistId,
 				keyId: page === "artist" ? 0 : idx,

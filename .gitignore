@@ -19,3 +19,5 @@ node_modules
 /app/.svelte-kit/cloudflare*
 /app/.svelte-kit/adapter*
 /packages/proxy-server/rust/target
+/app/.svelte-kit/*
+app/.svelte-kit/ambient.d.ts

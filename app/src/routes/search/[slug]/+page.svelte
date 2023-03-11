@@ -13,6 +13,7 @@
 
 	export let data: PageData;
 	let { results, continuation, filter } = data;
+
 	const search = writable<Item[]>();
 	$: results && filter !== "all" && search.set(results[0].contents);
 	let ctoken = continuation?.continuation;

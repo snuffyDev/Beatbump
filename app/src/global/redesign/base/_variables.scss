@@ -13,10 +13,10 @@ $md-spacing: $base-spacing;
 $lg-spacing: calc($base-spacing * 2);
 $xl-spacing: calc($base-spacing * 1.25);
 
-$base-radius: 0.5em;
-$xs-radius: m.div($base-radius, 0.95);
-$sm-radius: m.div($base-radius, 0.8);
-$md-radius: m.div($base-radius, 0.625);
+$base-radius: 0.35em;
+$xs-radius: m.div($base-radius, .75);
+$sm-radius: m.div($base-radius, 0.675);
+$md-radius: m.div($base-radius, 0.575);
 $lg-radius: m.div($base-radius, 0.5);
 $xl-radius: m.div($base-radius, 0.3125);
 
@@ -34,14 +34,14 @@ $z-index: (
 	"z-500p": 500,
 );
 
-$content-width-mobile: calc(100vw - 2.25rem);
+$content-width-mobile: calc(100vw - 2.25em);
 
 $content-width-md: calc(100vw - 0.5625rem - 14rem);
 $content-width-lg: 82rem;
 $content-width-xl: 87.5rem;
 
 @mixin content-spacing($type: "padding") {
-	#{$type}: 1em 0 5vh;
+	#{$type}: 1.25em 0 5vh;
 	#{$type}-bottom: 3.3125vh !important;
 	@media only screen and (min-width: 640px) and (max-width: 1079.9px) {
 		#{$type}: 3vh 1rem 0 2rem;
@@ -71,4 +71,3 @@ $content-width-xl: 87.5rem;
 		max-width: $content-width-xl #{$important};
 	}
 }
-

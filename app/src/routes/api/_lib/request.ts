@@ -46,7 +46,7 @@ const ENDPOINT_DICT: Record<keyof APIEndpoints, Function> = {
  * @param options
  * @returns {Promise<Response>} A promise consisting of a Response
  */
-export function buildRequest<
+export function buildAPIRequest<
 	T extends ArtistEndpointParams | PlayerEndpointParams | PlaylistEndpointParams | NextEndpointParams,
 >(
 	endpoint: keyof APIEndpoints,

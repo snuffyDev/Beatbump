@@ -1,13 +1,13 @@
 import { json as json$1 } from "@sveltejs/kit";
 
-import { buildRequest } from "$api/request";
+import { buildAPIRequest } from "$api/request";
 import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 import type { CarouselHeader, CarouselItem } from "$lib/types";
 import type { RequestHandler } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ url, params }) => {
 	const { slug } = params;
-	const response = await buildRequest("browse", {
+	const response = await buildAPIRequest("browse", {
 		context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
 		params: { browseId: "FEmusic_moods_and_genres_category", params: slug },
 	});
@@ -34,10 +34,11 @@ export const GET: RequestHandler = async ({ url, params }) => {
 		element?.musicCarouselShelfRenderer && carousels.push(element);
 		element?.gridRenderer && grids.push(element);
 	}
+	// return json$1({ data });
 	if (carousels.length !== 0) {
 		sections = carousels.map(({ musicCarouselShelfRenderer }, i) => parseCarousel({ musicCarouselShelfRenderer }));
 		if (sections.length !== 0) {
-			return json$1({ sections, header: text, type: "carousel" });
+			return json$1({ data, sections, header: text, type: "carousel" });
 			return new Response(
 				JSON.stringify({
 					sections,
@@ -63,11 +64,24 @@ export const GET: RequestHandler = async ({ url, params }) => {
 	}
 };
 function parseHeader(header: any[]): CarouselHeader[] {
-	return header.map(({ musicCarouselShelfBasicHeaderRenderer } = {}) => ({
-		title: musicCarouselShelfBasicHeaderRenderer["title"]["runs"][0].text,
-		browseId:
-			musicCarouselShelfBasicHeaderRenderer.moreContentButton.buttonRenderer.navigationEndpoint.browseEndpoint.browseId,
-	}));
+	return header.map(({ musicCarouselShelfBasicHeaderRenderer } = {}) => {
+		const o = {} as any;
+		if (
+			musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer?.navigationEndpoint?.browseEndpoint
+				?.browseId
+		)
+			o.browseId =
+				musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer?.navigationEndpoint?.browseEndpoint?.browseId;
+
+		if (
+			musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer?.navigationEndpoint?.browseEndpoint
+				?.params
+		)
+			o.params =
+				musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer?.navigationEndpoint?.browseEndpoint?.params;
+		o.title = musicCarouselShelfBasicHeaderRenderer["title"]["runs"][0].text;
+		return o;
+	});
 }
 
 function parseBody(contents): CarouselItem[] {

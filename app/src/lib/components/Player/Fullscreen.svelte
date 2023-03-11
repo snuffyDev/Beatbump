@@ -1,8 +1,14 @@
+<script
+	context="module"
+	lang="ts"
+>
+</script>
+
 <script lang="ts">
 	import { navigating } from "$app/stores";
 	import { AudioPlayer } from "$lib/player";
-	import { immersiveQueue, isMobileMQ, isPagePlaying, playerLoading } from "$lib/stores";
-	import { queue, currentTrack } from "$lib/stores/list";
+	import { filterAutoPlay, immersiveQueue, isMobileMQ, isPagePlaying, playerLoading, theme } from "$lib/stores";
+	import { queue, currentTrack, queuePosition } from "$lib/stores/list";
 	import ListItem from "../ListItem/ListItem.svelte";
 	import Loading from "../Loading/Loading.svelte";
 	import Tabs from "../Tabs";
@@ -11,7 +17,7 @@
 	import Controls from "./Controls.svelte";
 	import { pan } from "$lib/actions/gestures/handlers";
 	import { tweened } from "svelte/motion";
-	import { cubicOut } from "svelte/easing";
+	import { cubicOut, quartIn, quartOut } from "svelte/easing";
 	import { draggable } from "$lib/actions/draggable";
 	import { groupSession } from "$lib/stores/sessions";
 	import ProgressBar from "./ProgressBar";
@@ -19,6 +25,15 @@
 	import { requestFrameSingle } from "$lib/utils";
 	import type { Thumbnail } from "$lib/types";
 	import { windowWidth } from "$stores/window";
+	import type { EasingFunction, TransitionConfig } from "svelte/transition";
+	import PopperButton from "$components/Popper/PopperButton.svelte";
+	import { createPlayerPopperMenu } from "./Player.svelte";
+	import { SITE_ORIGIN_URL } from "$stores/url";
+	import type { Dropdown } from "$lib/configs/dropdowns.config";
+	import SessionListService from "$stores/list/sessionList";
+	import { related } from "$stores/list/derived";
+	import Carousel from "$components/Carousel/Carousel.svelte";
+	import Description from "$components/ArtistPageHeader/Description/Description.svelte";
 
 	export let state: "open" | "closed";
 
@@ -30,6 +45,7 @@
 	let titleWidth = 320;
 	let active = "UpNext";
 	let thumbnail: Thumbnail;
+	let tracklist: HTMLDivElement;
 
 	$: loading = $playerLoading;
 	$: data = $currentTrack;
@@ -47,7 +63,8 @@
 		{
 			id: "Related",
 			text: "Related",
-			action: () => {
+			action: async () => {
+				if (!$SessionListService.related) return;
 				active = tabs[1].id;
 			},
 		},
@@ -148,25 +165,59 @@
 			$queueTween = 0;
 		})();
 	}
+
+	$: console.log($immersiveQueue, $filterAutoPlay, $theme);
+
+	function slideInOut(
+		node: HTMLElement,
+		{ duration = 400, delay = 400, easing = quartOut }: { duration?: number; easing?: EasingFunction; delay?: number },
+	): TransitionConfig {
+		const style = getComputedStyle(node);
+		const target_opacity = +style.opacity;
+		const transform = style.transform === "none" ? "" : style.transform;
+		const od = target_opacity * (1 - 0);
+
+		return {
+			easing,
+			duration,
+			delay,
+			css(t, u) {
+				return `
+				will-change: transform, opacity;
+					transform: ${transform} translate3d(0vh, ${(1 - t) * 100}vh, 0vh);
+					opacity: ${target_opacity - od * u};
+				`;
+			},
+		};
+	}
+	let DropdownItems: Dropdown;
+
+	$: {
+		if ($isMobileMQ) {
+			DropdownItems = createPlayerPopperMenu(
+				$currentTrack,
+				$queuePosition,
+				groupSession.hasActiveSession,
+				$SITE_ORIGIN_URL,
+			);
+		} else {
+			DropdownItems = undefined;
+		}
+	}
+	$: console.log($related);
 </script>
 
-{#if $queue.length}
+{#if $queue.length && state === "open"}
 	<div
 		class="backdrop"
 		class:mobile={$isMobileMQ}
 		bind:clientHeight={windowHeight}
 		style:pointer-events={state === "open" ? "all" : "none"}
-		style="background-color: {state === 'open' ? 'hsla(0,0%,0%,65%)' : '#0000'} !important;"
 	>
 		<div
-			class:tr-open={state === "open"}
-			class:tr-close={state === "closed"}
 			class="fullscreen-player-popup"
-			style="top: 0; transform: translate3d(0, {state === 'open'
-				? $queueTween === 0
-					? '0vh'
-					: `clamp(0px, calc(${$queueTween * -50}px), 100vh)`
-				: '100vh'}, 0); opacity: {state === 'open' ? '1' : '0'};"
+			in:slideInOut|local={{ delay: 400, duration: 400 }}
+			out:slideInOut|local={{ delay: 200, duration: 400, easing: quartIn }}
 		>
 			<div
 				class="column container"
@@ -205,6 +256,15 @@
 						/>
 					</div>
 				{/if}
+				{#if $isMobileMQ}
+					<div class="menu-mobile">
+						<PopperButton
+							items={DropdownItems}
+							tabindex={-1}
+							size="2em"
+						/>
+					</div>
+				{/if}
 				<div
 					class="album-art"
 					style="width: {!$isMobileMQ ? (queueOpen ? 55 : 95) : '100'}vw;"
@@ -237,9 +297,7 @@
 									class="marquee-wrapper"
 									style="animation-play-state: {state === 'open' && titleWidth > $windowWidth
 										? 'running'
-										: 'paused'}; {state === 'closed' || titleWidth < $windowWidth
-										? 'animation: none; transform: unset;'
-										: ''}"
+										: 'paused'}; {titleWidth < $windowWidth ? 'animation: none; transform: unset;' : ''}"
 									><span
 										bind:clientWidth={titleWidth}
 										class="h5 marquee-text">{data?.title}</span
@@ -267,7 +325,7 @@
 							pause={() => AudioPlayer.pause()}
 							nextBtn={() => {
 								if ($queue.length === 0) return;
-								AudioPlayer.next(true, groupSession.hasActiveSession ? true : false);
+								SessionListService.next(true, groupSession.hasActiveSession ? true : false);
 								// AudioPlayer.updateTime($durationStore);
 							}}
 							prevBtn={() => AudioPlayer.previous(true)}
@@ -279,9 +337,13 @@
 			<div
 				class="handle vertical"
 				style="transform: translate3d({queueOpen ? 53.5 : 91.5}vw, 0px, 0) !important;"
+				on:pointerover={() => {
+					tracklist.style.willChange = "transform";
+				}}
 				on:click={() => {
 					requestFrameSingle(() => {
 						queueOpen = !queueOpen;
+						tracklist.style.willChange = "unset";
 					});
 				}}
 			>
@@ -290,10 +352,11 @@
 			<div
 				class="column container tracklist"
 				bind:clientHeight={queueHeight}
+				bind:this={tracklist}
 				style={$isMobileMQ
-					? `transform: translate3d(0, ${$motion}px, 0); top: ${windowHeight - 65}px; bottom:0; ${
-							sliding ? "will-change: scroll-position, transform;" : ""
-					  } padding-bottom: calc(6.5em);`
+					? `transform: translate3d(0, ${$motion}px, 0); top: ${
+							windowHeight - 65
+					  }px; bottom:0; padding-bottom: calc(6.5em);`
 					: `transform: translate3d(${queueOpen ? 55 : 93}vw, 0px, 0) !important;`}
 			>
 				<div
@@ -301,6 +364,14 @@
 					on:dragstart|capture|stopPropagation={(e) => onDragStart(1, e)}
 					on:dragmove|capture|stopPropagation={(e) => trackMovement(1, e.detail)}
 					on:dragend|capture|stopPropagation={(e) => release(1, e.detail)}
+					on:pointerdown={() => {
+						tracklist.style.willChange = "scroll-position, transform";
+					}}
+					on:pointerup={() => {
+						requestFrameSingle(() => {
+							tracklist.style.willChange = "unset";
+						});
+					}}
 					class="handle horz"
 				>
 					<hr class="horz" />
@@ -309,30 +380,73 @@
 				<Tabs
 					{tabs}
 					{active}
-				/>
-				<div class="scroller">
-					<TrackList
-						items={$queue}
-						hasData={true}
-						let:index
-						let:item
+				>
+					<svelte:fragment
+						let:isActive
+						let:tab
+						slot="tab"
 					>
-						<ListItem
-							{item}
-							idx={index}
-							on:setPageIsPlaying={() => {
-								if (isPagePlaying.has("player-queue")) return;
-								isPagePlaying.add("player-queue");
-							}}
-						/>
-					</TrackList>
-				</div>
+						{#if tab.id === "UpNext"}
+							{#if isActive}
+								<div class="scroller">
+									<TrackList
+										items={$queue}
+										hasData={true}
+										let:index
+										let:item
+									>
+										<ListItem
+											{item}
+											idx={index}
+											on:setPageIsPlaying={() => {
+												if (isPagePlaying.has("player-queue")) return;
+												isPagePlaying.add("player-queue");
+											}}
+										/>
+									</TrackList>
+								</div>
+							{/if}
+						{:else if isActive}
+							<div class="scroller">
+								<div class="pad">
+									{#if $related.description.description}
+										<div class="mb-2">
+											<span class="h2">{$related?.description?.header}</span>
+											<Description description={$related.description.description} />
+										</div>
+									{/if}
+									{#if Array.isArray($related.carousels)}
+										{#key $related.carousels}
+											{#each $related.carousels as carousel, idx}
+												<Carousel
+													header={carousel.header}
+													items={carousel.items}
+													type="home"
+													kind={carousel.header?.type}
+													isBrowseEndpoint={false}
+												/>
+											{/each}
+										{/key}
+									{/if}
+								</div>
+							</div>
+						{/if}
+					</svelte:fragment>
+				</Tabs>
 			</div>
 		</div>
 	</div>
 {/if}
 
 <style lang="scss">
+	.pad {
+		padding: 2vh 1em 1.5em 1em;
+		// height: 100%;
+
+		overflow-y: auto;
+		contain: style paint size layout;
+		width: 100%;
+	}
 	.marquee {
 		position: relative;
 		overflow: hidden;
@@ -391,7 +505,10 @@
 		// display: flex;
 		overflow-y: auto;
 		// touch-action: pan-y;
+		transform: translate3d(0px, 0px, 0px);
 		overflow-x: hidden;
+		backface-visibility: hidden;
+		contain: strict;
 		// background-color: rgb(18, 17, 24);
 		overscroll-behavior: contain;
 		height: inherit;
@@ -429,11 +546,11 @@
 			touch-action: none;
 		}
 	}
-	.tracklist {
+	.tracklist,
+	.pad {
 		position: absolute;
 
 		bottom: 0;
-		will-change: transform;
 		height: 100%;
 		min-height: 0;
 		background: var(--bottom-bg);
@@ -444,7 +561,7 @@
 		border-top-left-radius: $sm-radius;
 		border-top-right-radius: $sm-radius;
 		contain: paint layout;
-		@media screen and (min-width: 720px) and (hover: hover) {
+		@media screen and (min-width: 720px) {
 			position: absolute;
 			left: 0;
 			width: 45vw;
@@ -472,11 +589,9 @@
 		isolation: isolate;
 		touch-action: pan-y;
 
-		opacity: 0;
 		transform: translate3d(0, 0vh, 0);
 		will-change: transform, opacity;
 		overscroll-behavior: contain;
-		content-visibility: auto;
 		overflow: hidden;
 		contain: strict;
 		// transition: transform 400ms cubic-bezier(0.83, 0, 0.17, 1), opacity 400ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -485,14 +600,6 @@
 			// gap: 1em;
 			flex-direction: row;
 		}
-	}
-	.tr-open {
-		transition: transform 400ms 400ms cubic-bezier(0.165, 0.84, 0.44, 1),
-			opacity 200ms cubic-bezier(0.165, 0.84, 0.44, 1);
-	}
-	.tr-close {
-		transition: transform 400ms 0ms cubic-bezier(0.86, 0, 0.07, 1),
-			opacity 800ms cubic-bezier(0.895, 0.03, 0.685, 0.22) 400ms;
 	}
 	hr {
 		touch-action: none;
@@ -544,6 +651,25 @@
 		min-height: 100% !important;
 		margin-top: unset !important;
 	}
+
+	@keyframes fade-in {
+		0% {
+			background-color: #0000;
+		}
+
+		100% {
+			background-color: hsla(0, 0%, 0%, 65%);
+		}
+	}
+	.menu-mobile {
+		position: absolute;
+		top: 0;
+		right: 0;
+		margin: 1em;
+		z-index: 155;
+		max-width: 3em;
+		max-height: 3em;
+	}
 	.backdrop {
 		overscroll-behavior: contain;
 
@@ -555,7 +681,7 @@
 		background-color: #0000;
 		inset: 0;
 		z-index: 151;
-		transition: background-color 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+		animation: fade-in 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 100ms alternate backwards;
 		// transition-delay: 225ms;
 		margin-top: var(--top-bar-height);
 		height: calc(100% - calc(var(--top-bar-height) + var(--player-bar-height)));
@@ -570,7 +696,7 @@
 		// bottom: 0;
 	}
 	.album-art {
-		margin-top: 1.5em;
+		margin-top: 7vh;
 		overscroll-behavior: contain;
 		height: 100%;
 		display: grid;
@@ -603,6 +729,9 @@
 		max-height: 35vh;
 		@media screen and (max-width: 719px) {
 			max-height: 28vh;
+		}
+		@media screen and (min-width: 1800px) {
+			max-height: 45vh;
 		}
 	}
 	.thumbnail {
@@ -641,12 +770,12 @@
 		border-top-right-radius: $sm-radius;
 		height: 2.75em;
 		padding-bottom: 0.0606em;
-
+		padding-block: 0.7em;
 		align-content: center;
 
 		top: 0;
 		left: 0;
-		@media screen and (min-width: 720px) and (hover: hover) {
+		@media screen and (min-width: 720px) {
 			display: none !important;
 			visibility: none !important;
 		}

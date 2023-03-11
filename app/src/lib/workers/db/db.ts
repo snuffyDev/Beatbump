@@ -307,7 +307,6 @@ export function deleteSongFromPlaylist(playlistId: string, videoId: string): Pro
 }
 
 export function getFavorites(): Promise<IDBMessage<Item[]>> {
-	let results = [];
 	return new Promise<IDBMessage<Item[]>>((resolve) => {
 		return db.transaction("favorites", "readwrite", (store) => {
 			try {
@@ -373,7 +372,7 @@ export function getPlaylists(): Promise<IDBMessage<IDBPlaylist[]>> {
 										const illegalArray = item?.items[subIdx];
 
 										results[idx].items.splice(subIdx, 1);
-										results[idx].items = [...results[idx].items, ...(illegalArray as Array<any>)];
+										results[idx].items = [...results[idx].items, ...(illegalArray as Array<any>)].flat();
 									}
 								}
 								results[idx].length = item?.items.length ?? item?.length;

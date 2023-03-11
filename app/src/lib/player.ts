@@ -219,7 +219,16 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		if (dev) {
 			window["__player"] = this.player;
 		}
-		this._player.volume = 0.5;
+		if (!localStorage.getItem("volume")) {
+			this._player.volume = 0.5;
+			try {
+				localStorage.setItem("volume", "0.5");
+			} catch (e) {
+				Logger.err("Cannot set item `volume` in localStorage", e);
+			}
+		} else {
+			this._player.volume = +localStorage.getItem("volume");
+		}
 		this._player.autoplay = true;
 		this._player.preload = "metadata";
 
@@ -290,6 +299,13 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 	public set volume(volume: number) {
 		if (!this._player && !browser) return;
 		this._player.volume = volume;
+		if (typeof localStorage !== "undefined") {
+			try {
+				localStorage.setItem("volume", `${volume}`);
+			} catch (e) {
+				Logger.err("Cannot save to localStorage", e);
+			}
+		}
 	}
 
 	// #endregion Public Accessors (12)
@@ -390,7 +406,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		this._player.pause();
 	}
 
-	public play(event: Nullable<Event> = null): void {
+	public play(_event: Nullable<Event> = null): void {
 		try {
 			if ("mediaSession" in navigator) {
 				navigator.mediaSession.playbackState = "playing";
@@ -524,7 +540,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 			this._HLS.loadSource(source);
 		});
 
-		this._HLS.on(this._HLSModule.Events.ERROR, (event, data) => {
+		this._HLS.on(this._HLSModule.Events.ERROR, (_event, data) => {
 			const type = data.type;
 			switch (type) {
 				case this._HLSModule.ErrorTypes.MEDIA_ERROR:
@@ -542,7 +558,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		// Logger.log(`[LOG:PLAYER:Queue]: Start Fetching Next Song: `, { position, shouldAutoplay });
 		const sessionList = this.currentSessionList();
 
-		if (position >= sessionList.mix.length - 1) {
+		if (sessionList.position >= sessionList.mix.length - 1) {
 			if (groupSession.initialized && groupSession.hasActiveSession && groupSession.client.role !== "host") {
 				const response = await this.getTrackSrc(position, shouldAutoplay);
 				return response as ResponseBody;
@@ -556,13 +572,13 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 
 			/// If track has continuation (automix), get next section of queue list
 			return SessionListService.getSessionContinuation({
-				itct: sessionList.mix[position]?.itct,
-				videoId: sessionList.mix[position]?.videoId,
+				itct: sessionList.mix[sessionList.position]?.itct,
+				videoId: sessionList.mix[sessionList.position]?.videoId,
 				playlistId: sessionList.currentMixId,
-				loggingContext: sessionList.mix[position].loggingContext,
+				loggingContext: sessionList.mix[sessionList.position].loggingContext,
 				ctoken: sessionList.continuation,
 				clickTrackingParams: sessionList.clickTrackingParams,
-				key: position,
+				key: sessionList.position,
 			});
 		}
 
@@ -612,8 +628,8 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 
 	private async handleAutoSuggestion(position: number): Promise<ResponseBody> {
 		const list = this.currentSessionList();
-
 		await SessionListService.getMoreLikeThis({ playlistId: list.currentMixId });
+
 		return this.getTrackSrc(position).then((value) => {
 			function hasProperty(input: unknown): input is ResponseBody {
 				return (input as ResponseBody).url !== undefined;
@@ -644,7 +660,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		}
 
 		if (isLastSong) {
-			this.next();
+			SessionListService.next();
 			return;
 		}
 		if (groupSession.initialized) {
@@ -851,7 +867,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 
 		this.onEvent("ended", async () => this.onEnded());
 
-		this.onEvent("error", (event) => {
+		this.onEvent("error", (_event) => {
 			if (this._player.error.message.includes("Empty src") || !this._player.error.message) return;
 
 			console.error(this._player.error);

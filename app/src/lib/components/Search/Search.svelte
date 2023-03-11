@@ -12,12 +12,34 @@
 
 	const dispatch = createEventDispatcher();
 	let results: Array<{ query?: string; id?: number }> = [];
+	let listbox: HTMLFormElement;
+
 	async function handleSubmit() {
 		if (!query.length) return;
 		dispatch("submitted", { submitted: true, filter, query });
 		fullscreenStore.set("closed");
 		let url = `/search/${encodeURIComponent(query)}${filter !== undefined ? `?filter=${filter}` : ""}`;
 		goto(url);
+	}
+
+	function handleKeyDown(event: KeyboardEvent) {
+		if (!listbox) return;
+		const target = event.target as HTMLLIElement;
+
+		if (event.key === "ArrowDown") {
+			if (target.nextElementSibling.parentElement !== listbox) return;
+			(target.nextElementSibling as HTMLElement).tabIndex = 0;
+			target.tabIndex = -1;
+			(target.nextElementSibling as HTMLElement).focus();
+		}
+		if (event.key === "ArrowUp") {
+			if (target.previousElementSibling.parentElement !== listbox) return;
+			(target.previousElementSibling as HTMLElement).tabIndex = 0;
+			target.tabIndex = -1;
+			(target.previousElementSibling as HTMLElement).focus();
+		}
+
+		return false;
 	}
 	const typeahead = debounce(async () => {
 		if (!query) return (results = []);
@@ -31,6 +53,7 @@
 	aria-owns="suggestions"
 	role="combobox"
 	class={type}
+	on:keydown|capture={handleKeyDown}
 	on:submit|preventDefault={handleSubmit}
 >
 	<div class="nav-item">
@@ -72,13 +95,21 @@
 		<ul
 			role="listbox"
 			id="suggestions"
+			bind:this={listbox}
 			class="suggestions"
 		>
 			{#each results as result (result?.id)}
 				<li
+					tabindex="0"
 					on:click={() => {
 						query = result.query;
 						handleSubmit();
+					}}
+					on:keydown={(e) => {
+						if (e.key === " ") {
+							query = result.query;
+							handleSubmit();
+						}
 					}}
 				>
 					{result.query}

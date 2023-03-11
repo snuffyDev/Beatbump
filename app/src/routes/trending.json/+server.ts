@@ -1,8 +1,8 @@
-import { buildRequest } from "$api/request";
+import { buildAPIRequest } from "$api/request";
 import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 
 import type { CarouselHeader } from "$lib/types";
-import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
+import type { ICarouselTwoRowItem, ITwoRowItemRenderer } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { error, type RequestHandler, json } from "@sveltejs/kit";
 import type { IMusicResponsiveListItemRenderer, IMusicTwoRowItemRenderer } from "$lib/types/innertube/internals";
@@ -17,7 +17,7 @@ import type { IMusicResponsiveListItemRenderer, IMusicTwoRowItemRenderer } from 
 export const GET: RequestHandler = async () => {
 	let carouselItems = [];
 
-	const response = await buildRequest("home", {
+	const response = await buildAPIRequest("home", {
 		context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
 		params: { browseId: "FEmusic_explore" },
 		headers: null,
@@ -66,7 +66,7 @@ function parseHeader({ musicCarouselShelfBasicHeaderRenderer }): CarouselHeader 
 	}
 }
 
-function parseBody(contents: Record<string, any>[] = []):
+type CarouselBody =
 	| ICarouselTwoRowItem[]
 	| IListItemRenderer[]
 	| {
@@ -76,22 +76,35 @@ function parseBody(contents: Record<string, any>[] = []):
 				params: any;
 				browseId: any;
 			};
-	  }[] {
-	const items: any[] = contents.map((item) => {
+	  }[];
+
+function parseBody(
+	contents: (
+		| { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer }
+		| { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer }
+		| {
+				text: any;
+				color: string;
+				endpoint: {
+					params: any;
+					browseId: any;
+				};
+		  }
+	)[] = [],
+): CarouselBody {
+	const items = contents.map((item) => {
 		if ("musicTwoRowItemRenderer" in item) {
-			return MusicTwoRowItemRenderer(item as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer });
+			return MusicTwoRowItemRenderer(item);
 		}
 		if ("musicResponsiveListItemRenderer" in item) {
-			return MusicResponsiveListItemRenderer(
-				item as { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer },
-			);
+			return MusicResponsiveListItemRenderer(item);
 		}
 		if ("musicNavigationButtonRenderer" in item) {
 			return MoodsAndGenresItem(item);
 		}
 	});
 
-	return items;
+	return items as any[];
 }
 
 function parseCarousel({ musicCarouselShelfRenderer }: { musicCarouselShelfRenderer?: Record<string, any> }) {

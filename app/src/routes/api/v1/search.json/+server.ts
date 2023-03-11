@@ -1,7 +1,7 @@
 import { error, json } from "@sveltejs/kit";
 import { MusicResponsiveListItemRenderer } from "$lib/parsers";
 import { iter, type Maybe } from "$lib/utils";
-import { buildRequest } from "$api/request";
+import { buildAPIRequest } from "$api/request";
 import type { NextContinuationData } from "$lib/types";
 import type { IMusicResponsiveListItemRenderer } from "$lib/types/innertube/internals";
 import type { RequestHandler } from "./$types";
@@ -31,7 +31,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	const rawFilterParam = Filters[filter] ?? undefined;
 	try {
-		const response = await buildRequest<SearchEndpointParams>("search", {
+		const response = await buildAPIRequest<SearchEndpointParams>("search", {
 			context: {
 				client: {
 					clientName: "WEB_REMIX",
@@ -53,27 +53,29 @@ export const GET: RequestHandler = async ({ url }) => {
 			throw error(response.status, response.statusText);
 		}
 		const data = await response.json();
+		console.log("RESPONSE", data);
 
 		const hasTabs = Array.isArray(data?.contents?.tabbedSearchResultsRenderer?.tabs);
 
 		const contents =
-			hasTabs && data.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer?.content?.sectionListRenderer?.contents;
+			hasTabs &&
+			data?.contents?.tabbedSearchResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents;
 		const continuationContents = data?.continuationContents?.musicShelfContinuation;
-
 		const results =
 			ctoken !== ""
 				? parseContinuation(continuationContents, filter as SearchFilter)
 				: parseContents(contents, filter as SearchFilter);
-
+		console.log("RESULTS", results);
 		return json(results);
 	} catch (err) {
+		console.error(err);
 		throw error(500, err);
 	}
 };
 
 function parseContinuation(contents: Record<string, any>, filter: string & SearchFilter) {
-	const continuation: Maybe<Partial<NextContinuationData>> =
-		Array.isArray(contents?.continuations) && contents?.continuations[0]?.nextContinuationData;
+	const continuation: Maybe<Partial<NextContinuationData>> = x;
+	Array.isArray(contents?.continuations) && contents?.continuations[0]?.nextContinuationData;
 	const type = filter.includes("playlists") ? "playlists" : filter;
 
 	const results = parseResults(contents.contents, type);
@@ -89,6 +91,7 @@ function parseContents(
 	contents: {
 		itemSectionRenderer?: unknown;
 		musicShelfContinuation: Record<string, any>;
+		musicCardShelfRenderer: Record<string, any>;
 		musicShelfRenderer?: {
 			continuations?: [{ nextContinuationData: NextContinuationData }];
 			contents?: { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer }[];
@@ -112,22 +115,25 @@ function parseContents(
 			continue;
 		}
 		const musicShelf = section.musicShelfRenderer;
-		// Get the inner contents
-		const items = Array.isArray(musicShelf.contents) && musicShelf.contents;
+		if (musicShelf) {
+			// Get the inner contents
+			const items = Array.isArray(musicShelf.contents) && musicShelf.contents;
 
-		// Gets the continuation tokens
-		if (Array.isArray(musicShelf?.continuations) && musicShelf?.continuations[0].nextContinuationData)
-			Object.assign(continuation, musicShelf.continuations[0].nextContinuationData);
+			// Gets the continuation tokens
+			if (Array.isArray(musicShelf?.continuations) && musicShelf?.continuations[0].nextContinuationData)
+				Object.assign(continuation, musicShelf.continuations[0].nextContinuationData);
 
-		// If the section has an array at the property `contents` - parse it.
-		if (musicShelf.title) {
-			shelf.header.title = musicShelf.title?.runs[0]?.text;
+			// If the section has an array at the property `contents` - parse it.
+			if (musicShelf.title) {
+				shelf.header.title = musicShelf.title?.runs[0]?.text;
+			}
+			if (items) {
+				const _results = parseResults(items, shelf.header?.title?.toLowerCase().replace(/\s/gm, "_"));
+				shelf.contents = _results;
+			}
+			results.unshift(shelf);
+		} else {
 		}
-		if (items) {
-			const _results = parseResults(items, shelf.header?.title?.toLowerCase().replace(/\s/gm, "_"));
-			shelf.contents = _results;
-		}
-		results.unshift(shelf);
 	}
 	return { results, continuation };
 }

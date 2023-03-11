@@ -33,6 +33,7 @@
 		width: -1,
 		right: 0,
 	};
+
 	function scrollHandler(ts: number, context?: (any & "left") | "right") {
 		if (!carousel) return;
 		const measures = { scrollWidth: carousel.scrollWidth, scrollLeft: carousel.scrollLeft };
@@ -40,6 +41,7 @@
 		if (startTime === undefined) {
 			startTime = ts;
 		}
+
 		const elapsed = ts - startTime;
 		if (!hasScrollWidth && scrollPositions.width < 0) {
 			hasScrollWidth = true;
@@ -47,8 +49,10 @@
 		}
 
 		const scrollLeft = measures.scrollLeft;
+
 		moreOnLeft = scrollLeft < 15 ? false : true;
 		scrollPositions.left = scrollLeft;
+
 		moreOnRight = scrollPositions.left < scrollPositions.width - clientWidth - 15 ? true : false;
 		scrollPositions.right = scrollPositions.width - scrollLeft - 15;
 
@@ -56,6 +60,7 @@
 			frame = requestAnimationFrame((ts) => scrollHandler(ts, context));
 		} else {
 			cancelAnimationFrame(frame);
+
 			if (context === "left") {
 				carousel.scrollLeft -= Math.ceil((scrollPositions.width / items.length) * 2);
 			} else if (context === "right") {

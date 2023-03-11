@@ -13,7 +13,6 @@
 	align-items: flex-start;
 
 	position: relative;
-
 	&::before {
 		display: block;
 		content: "";
@@ -47,7 +46,7 @@
 	justify-content: center;
 
 	contain: strict;
-
+	isolation: isolate;
 	&:hover {
 		background-color: rgb(233, 233, 233);
 		box-shadow: -1px -1px 8px -12px hsl(0deg 0% 0% / 20%) inset, 1px 1px 10px -6px hsl(0deg 0% 0% / 10%) inset;
@@ -67,19 +66,19 @@
 
 .left {
 	left: 0;
-	transform:translateX(-1.75em);
+	transform: translateX(-1.75em);
 
 	@media screen and (min-width: 640px) and (max-width: 1000px) {
-		transform:translateX(0em);
+		transform: translateX(0em);
 	}
 }
 
 .right {
 	right: 0;
-	transform:translateX(1.75em);
+	transform: translateX(1.75em);
 
 	@media screen and (min-width: 640px) and (max-width: 1000px) {
-		transform:translateX(0);
+		transform: translateX(0);
 	}
 }
 
@@ -105,25 +104,31 @@
 }
 
 .scroll {
-	--thumbnail-size: 13em;
+	--thumbnail-size: calc(2vh + 13em);
 
-	@include media-query(sm) {
+	@include media-query-down(xs) {
 		--thumbnail-size: 14em;
+	}
+	@include media-query(sm) {
+		--thumbnail-size: calc(1vh + 13em);
 	}
 
 	@include media-query(md) {
-		--thumbnail-size: 14em;
+		--thumbnail-size: calc(1vh + 14em);
 	}
 
 	@include media-query(lg) {
-		--thumbnail-size: 14.5em;
+		--thumbnail-size: calc(1vh + 14em);
 	}
 
 	@include media-query(xl) {
-		--thumbnail-size: 15em;
+		--thumbnail-size: calc(1vmin + 13.5em);
+	}
+	@include media-query-up(xxl) {
+		--thumbnail-size: calc(1vmin + 13.5em);
 	}
 
-	--column-width: calc(var(--thumbnail-size) + 1.25em);
+	--column-width: calc(var(--thumbnail-size) + 1.5rem);
 }
 
 .scroll {
@@ -142,7 +147,6 @@
 	-webkit-overflow-scrolling: touch;
 	scrollbar-gutter: 0.833333rem;
 	scrollbar-width: thin;
-
 	contain: layout style paint;
 	touch-action: pan-x pan-y;
 

@@ -1,17 +1,32 @@
 <script lang="ts">
-	import type { Dropdown } from "$lib/configs/dropdowns.config";
-	import { createEventDispatcher, tick } from "svelte";
+	import type { Dropdown, Icons } from "$lib/configs/dropdowns.config";
+	import { releasePageContext } from "$lib/contexts";
+	import { createEventDispatcher } from "svelte";
 	import Button from "../Button";
 	import PopperButton from "../Popper/PopperButton.svelte";
+
+	type Button<
+		Type extends string = string,
+		T = Type extends "icon" | "outlined" | (undefined & infer T) ? T : unknown,
+	> = {
+		text?: string;
+		type?: T;
+		action?: () => void;
+		icon?: Icons | { name: string; size?: string };
+	};
 	export let thumbnail: string;
 	export let title: string = "";
 	export let description = undefined;
 	export let subtitles = [];
 	export let secondSubtitle = [];
-	export let buttons = [];
-	export let artist = undefined;
+	export let buttons: Button[] = [];
+	export let artist: {
+		name: string;
+		channelId: string;
+	}[] = [];
 	export let editable = false;
 	export let type = "playlist";
+
 	let DropdownItems: Dropdown = [
 		{
 			text: "Add to Queue",
@@ -23,8 +38,19 @@
 		{
 			text: "Add to Playlist",
 			icon: "list-plus",
-			action: () => dispatch("playlistAdd"),
+			action: () => {
+				dispatch("playlistAdd");
+			},
 		},
+		releasePageContext.has()
+			? {
+					text: "Shuffle",
+					action: () => {
+						dispatch("shuffle");
+					},
+					icon: "shuffle",
+			  }
+			: undefined,
 	];
 
 	let width;
@@ -76,7 +102,7 @@
 			{/key}
 		{:else if type === "release"}
 			<p class="secondary">
-				{#each artist as artist, i}
+				{#each artist as artist}
 					{#if artist.channelId}
 						<a href={`/artist/${artist.channelId}`}>{artist.name}</a>
 					{:else}

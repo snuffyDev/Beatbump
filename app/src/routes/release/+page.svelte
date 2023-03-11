@@ -7,7 +7,7 @@
 	import { page } from "$app/stores";
 	import Header from "$lib/components/Layouts/Header.svelte";
 	import { groupSession } from "$lib/stores";
-	import { CTX_ListItem } from "$lib/contexts";
+	import { CTX_ListItem, releasePageContext } from "$lib/contexts";
 	import type { PageData } from "./$types";
 	export let data: PageData;
 
@@ -29,52 +29,54 @@
 		groupSession.setPlaylistMix(releaseInfo.playlistId);
 		// currentTitle.set(items[0].title);
 	};
+	const playShuffle = () => {
+		setId();
+
+		list.initPlaylistSession({
+			playlistId: `RDAMPL${releaseInfo?.playlistId}`,
+			index: 0,
+		});
+	};
 	const playRadio = () => {
 		setId();
 
-		list.initAutoMixSession({
-			videoId: items[0].videoId,
-			playlistId: releaseInfo?.autoMixId,
-			keyId: 0,
-		});
+		list.initPlaylistSession({ playlistId: releaseInfo?.autoMixId, params: "wAEB", index: 0 });
 	};
 
 	let thumbnail = releaseInfo?.thumbnails[0]?.url.replace(/=(w(\d+))-(h(\d+))/g, "=w512-h512");
 
 	CTX_ListItem.set({ parentPlaylistId: releaseInfo.playlistId, page: "release" });
-	// $: console.log(releaseInfo);
+	releasePageContext.set({ page: "release" });
 </script>
 
 <Header
 	title={releaseInfo.title}
-	desc={`${releaseInfo.title} by ${releaseInfo?.artist?.name || releaseInfo?.artist[0]?.name} on Beatbump`}
+	desc={`${releaseInfo.title} by ${releaseInfo?.artist[0]?.name} on Beatbump`}
 	url={path + `?id=${id}`}
 	image={thumbnail}
 />
-{#await promise then _}
-	<main data-testid="release">
-		<InfoBox
-			{thumbnail}
-			buttons={[
-				{ text: "Play Album", action: () => playAlbum(), icon: "play" },
-				{ text: "Album Radio", action: () => playRadio(), icon: "play" },
-			]}
-			title={releaseInfo.title}
-			artist={releaseInfo.artist}
-			subtitles={releaseInfo.subtitles}
-			type="release"
+<main data-testid="release">
+	<InfoBox
+		{thumbnail}
+		buttons={[
+			{ text: "Play Album", action: () => playAlbum(), icon: "play" },
+			{ text: "Album Radio", action: () => playRadio(), icon: "play" },
+			{ icon: "dots", type: "icon" },
+		]}
+		title={releaseInfo.title}
+		artist={releaseInfo.artist}
+		subtitles={releaseInfo.subtitles}
+		type="release"
+		on:shuffle={playShuffle}
+	/>
+	{#each items as item, index}
+		<ListItem
+			on:setPageIsPlaying={() => setId()}
+			{item}
+			idx={index}
 		/>
-		{#each items as item, index}
-			<ListItem
-				on:setPageIsPlaying={() => setId()}
-				{item}
-				idx={index}
-			/>
-		{/each}
-	</main>
-{:catch error}
-	{error}
-{/await}
+	{/each}
+</main>
 
 <!-- markup (zero or more items) goes here -->
 <style lang="scss">

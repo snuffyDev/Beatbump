@@ -75,11 +75,11 @@ body {
 	-ms-user-select: none;
 	user-select: none;
 	-webkit-tap-highlight-color: transparent !important;
-	-webkit-font-smoothing: antialiased;
+	-webkit-font-smoothing: -subpixel-antialiased;
 	--player-bar-height: clamp(5rem, 5.6rem, 5.95rem);
 	--top-bar-height: clamp(3.9rem, 4.175rem, 4.625rem);
-	text-rendering: auto;
-
+	text-rendering: geometricPrecision;
+	font-smooth: auto;
 	@media screen and (min-width: 40em) and (max-width: 115.375em) {
 		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
 		--base-font-size: 0.875rem;
@@ -152,13 +152,13 @@ html {
 
 	max-width: 100%;
 	overscroll-behavior: contain;
-	isolation: isolate;
-	contain: paint;
+	contain: strict;
 }
 main {
 	margin: 0 auto;
 	position: relative;
 	@include v.content-spacing($type: "padding");
+	transform: translateZ(0px);
 	overscroll-behavior: contain;
 	@media screen and (min-width: 640px) {
 		@include v.content-width();
@@ -183,12 +183,13 @@ main {
 	overscroll-behavior: contain;
 	position: absolute;
 	inset: 0;
-
 	isolation: isolate;
 }
 .app-content-m {
 	margin-block-start: calc(var(--top-bar-height) + 0px);
-	will-change: margin-block-end;
+	will-change: margin-block;
+	transform: translateZ(0px);
+	isolation: isolate;
 	&[hasplayer="true"] {
 		will-change: unset;
 		margin-block-end: calc(var(--player-bar-height) + 0px);

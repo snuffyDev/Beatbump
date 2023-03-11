@@ -3,10 +3,27 @@ import { parseContents } from "$lib/parsers/next";
 
 import { error, json } from "@sveltejs/kit";
 
-import { buildRequest } from "$api/request";
+import { buildAPIRequest } from "$api/request";
 import type { RequestHandler } from "./$types";
+import type { Item } from "$lib/types";
 
-export const GET: RequestHandler = async ({ url }) => {
+export type NextEndpointResponse = {
+	results: Item[];
+	continuation: string;
+	clickTrackingParams: string;
+	currentMixId: string;
+	visitorData: string;
+	related: {
+		browseId: string;
+		browseEndpointContextSupportedConfigs: {
+			browseEndpointContextMusicConfig: {
+				pageType: "MUSIC_PAGE_TYPE_TRACK_RELATED";
+			};
+		};
+	};
+};
+
+export const GET: RequestHandler = async ({ url }): Promise<IResponse<NextEndpointResponse>> => {
 	const query = url.searchParams;
 	const params = query.get("params") || undefined;
 	const visitorData = query.get("visitorData") || "CgtlV0xyWk92dWZ5Zyilgu6ZBg%3D%3D";
@@ -17,7 +34,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	const index = parseInt(query.get("index")) || undefined;
 	const clickTracking = query.get("clickTracking") || undefined;
 	const playlistSetVideoId = query.get("playlistSetVideoId") || undefined;
-	const response = await buildRequest("next", {
+	const response = await buildAPIRequest("next", {
 		context: {
 			clickTracking: {
 				clickTrackingParams: clickTracking ? decodeURIComponent(decodeURIComponent(clickTracking)) : undefined,
@@ -53,10 +70,10 @@ export const GET: RequestHandler = async ({ url }) => {
 	if (!continuation) {
 		const res = parseNextBody(response);
 
-		return json(res);
+		return json(Object.assign({}, res, { response }));
 	}
 
-	return json(parseNextBodyContinuation(response));
+	return json(Object.assign({}, parseNextBodyContinuation(response), { response }));
 };
 
 function parseNextBody(data) {
@@ -119,6 +136,10 @@ function parseNextBodyContinuation(data) {
 
 	const visitorData = responseContext?.visitorData;
 	const parsed = parseContents(contents, continuation, clickTrackingParams, rest, visitorData);
+	const tabs =
+		data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs ||
+		[];
+	const related = Array.isArray(tabs) && tabs[2]?.tabRenderer?.endpoint?.browseEndpoint;
 
-	return parsed;
+	return Object.assign(parsed, { related });
 }

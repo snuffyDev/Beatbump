@@ -1,4 +1,4 @@
-@use "../../global/stylesheet/base/variables" as v;
+@use "../../global/redesign/base/variables" as v;
 $width: 1fr;
 :root {
 	--width: #{$width};
@@ -124,7 +124,6 @@ small {
 	-ms-user-select: none;
 	-webkit-user-select: none;
 
-	will-change: contents, width;
 	background-color: #37455200;
 	border-color: #1f1f1f;
 	border-radius: 0.8em;
@@ -206,7 +205,6 @@ hr {
 .info {
 	width: 100%;
 	/* margin-left: auto; */
-	will-change: contents, width;
 
 	padding-left: 1.5rem;
 	@media screen and (max-width: 500px) {

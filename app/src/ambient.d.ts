@@ -8,7 +8,11 @@ interface CustomWindow extends Window {
 	bbPlayer: { src: string; duration: number; title: string };
 }
 
+type CSSKeys = {[key in keyof CSSStyleDeclaration]: CSSStyleDeclaration[key]}
 declare global {
+	interface IPropertyIndexedKeyFrames extends PropertyIndexedKeyframes, CSSKeys {
+
+	}
 	interface IBody<T> extends Body {
 		readonly body: ReadableStream<Uint8Array> | null;
 		readonly bodyUsed: boolean;

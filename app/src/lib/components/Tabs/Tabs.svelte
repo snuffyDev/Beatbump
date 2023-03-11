@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { notify } from "$lib/utils";
 	import type { TabItem } from ".";
 	import Tab from "../Tab/Tab.svelte";
 	export let tabs: TabItem[] = [
@@ -20,6 +19,11 @@
 	];
 
 	export let active = "";
+
+	interface $$Slots {
+		default: never;
+		tab: { tab: TabItem; isActive: boolean };
+	}
 </script>
 
 <div class="tab-bar">
@@ -30,6 +34,13 @@
 		>
 	{/each}
 </div>
+{#each tabs as tab}
+	<slot
+		{tab}
+		isActive={active === tab.id}
+		name="tab"
+	/>
+{/each}
 
 <style
 	src="./index.scss"

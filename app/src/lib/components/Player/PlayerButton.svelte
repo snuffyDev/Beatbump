@@ -12,7 +12,7 @@
 
 <div
 	class="player-btn player-title"
-	on:click={(e) => {
+	on:click|capture|stopPropagation={(e) => {
 		if (!$queue) return;
 		if (isPaused) {
 			// console.log(e)
@@ -31,14 +31,14 @@
 	{:else if isPaused}
 		<Icon
 			color="white"
-			name="play-player"
-			size={"1.625em"}
+			name="play"
+			size={"24px"}
 		/>
 	{:else}
 		<Icon
 			color="white"
 			name="pause"
-			size={"1.625em"}
+			size={"1.625rem"}
 		/>
 	{/if}
 </div>

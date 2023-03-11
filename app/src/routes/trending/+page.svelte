@@ -50,7 +50,21 @@
 </main>
 
 <style lang="scss">
-	@import "../../global/stylesheet/components/_carousel";
+	a small {
+		$color: rgb(175, 175, 175);
+		font-size: 0.95rem;
+		font-weight: 700;
+		font-variant-caps: all-petite-caps;
+		letter-spacing: 0.05rem;
+		transition: ease-in color 75ms;
+		color: $color;
+		&:hover {
+			color: lighten($color, 30%);
+			text-decoration: underline 0.001rem solid;
+			text-underline-offset: 0.001rem;
+		}
+	}
+
 	.breakout {
 		border-radius: 0.8rem;
 		-webkit-overflow-scrolling: touch;

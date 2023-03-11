@@ -1,10 +1,11 @@
 <script lang="ts">
 	import Icon from "../Icon/Icon.svelte";
-	import "../../../global/stylesheet/modules/_button.scss";
-	export let icon: { name?: string; size?: string } = undefined;
+	import type { Icons } from "$components/Icon/icons";
+
+	export let icon: { name?: Icons; size?: string } = undefined;
 	export let outlined = false;
 	export let disabled = false;
-	export let type = "button";
+	export let type: "button" | "reset" | "submit" | null = "button";
 	let className = "";
 	export { className as class };
 </script>

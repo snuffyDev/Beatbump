@@ -77,3 +77,7 @@ export function sortObj<T extends IObject<T>>(object: T) {
 			return acc;
 		}, {} as IObject<T>);
 }
+
+export function objectKeys<T extends IObject<T>>(object: T) {
+	return Object.keys(object) as unknown as (keyof T)[];
+}

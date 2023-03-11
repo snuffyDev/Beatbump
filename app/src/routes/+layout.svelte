@@ -17,12 +17,14 @@
 	import { groupSession } from "$lib/stores";
 	import { AudioPlayer } from "$lib/player";
 	import { page } from "$app/stores";
-	import { afterNavigate } from "$app/navigation";
-	import observer from "$components/Carousel/observer";
-	import { dev } from "$app/environment";
+	import { afterNavigate, beforeNavigate } from "$app/navigation";
+	import { browser, dev } from "$app/environment";
 	import SessionListService from "$stores/list/sessionList";
-	$: key = $page.data.key;
+	import { get } from "svelte/store";
+	import { Logger } from "$lib/utils/logger";
+
 	let main: HTMLElement;
+	$: key = $page.data.key;
 
 	let isFullscreen = false;
 	$: $fullscreenStore === "open"
@@ -32,9 +34,22 @@
 		: setTimeout(() => {
 				isFullscreen = false;
 		  }, 0);
+
 	$: hasplayer = $queue.length !== 0;
 
-	afterNavigate(() => {
+	$: if (dev && browser) {
+		console.log($SessionListService);
+		if (page && !window.$page) {
+			Object.defineProperty(window, "$page", {
+				get() {
+					return get(page);
+				},
+				configurable: true,
+			});
+		}
+	}
+
+	afterNavigate(({from, to,}) => {
 		if (import.meta.env.SSR) return;
 		if (main) main.scrollTop = 0;
 	});
@@ -42,6 +57,7 @@
 
 <svelte:window
 	on:beforeunload={() => {
+		if (!browser) return;
 		if (groupSession.initialized && groupSession.hasActiveSession) {
 			groupSession.disconnect();
 		}

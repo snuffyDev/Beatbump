@@ -1,5 +1,12 @@
 <svelte:options immutable={true} />
 
+<script
+	context="module"
+	lang="ts"
+>
+	const RE_THUMBNAIL_DIM = /=w\d+-h\d+-/gm;
+</script>
+
 <script lang="ts">
 	import Loading from "$components/Loading/Loading.svelte";
 	import { hasContext, tick } from "svelte";
@@ -15,6 +22,7 @@
 	import { filter, IsoBase64, Logger, notify } from "$lib/utils";
 	import { groupSession } from "$lib/stores";
 	import { SITE_ORIGIN_URL } from "$stores/url";
+	import type { Dropdown } from "$lib/configs/dropdowns.config";
 
 	export let data: Item;
 
@@ -27,7 +35,7 @@
 
 	let loading = false;
 
-	let DropdownItems = [
+	let DropdownItems: Dropdown = [
 		{
 			text: "View Artist",
 			icon: "artist",
@@ -39,11 +47,15 @@
 				});
 
 				await tick();
-				goto(`/artist/${data?.artistInfo ? data.artistInfo.artist[0].browseId : data?.subtitle[0].browseId}`);
+				goto(
+					`/artist/${
+						data?.subtitle.find((s) => s?.pageType?.includes("ARTIST"))?.browseId ?? data.artistInfo.artist[0].browseId
+					}`,
+				);
 			},
 		},
 		{
-			text: "Go to album",
+			text: "Go to Album",
 			icon: "album",
 			action: () => {
 				window.scrollTo({
@@ -73,7 +85,7 @@
 
 		{
 			text: "Add to Playlist",
-			icon: "playlist-add",
+			icon: "list-plus",
 			action: async () => {
 				if (data?.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
 					// console.log('PLAYLIST')
@@ -87,7 +99,7 @@
 			},
 		},
 		{
-			text: !isLibrary ? "Favorite" : "Remove from Favorites",
+			text: !isLibrary ? "Favorite" : "Remove From Favorites",
 			icon: !isLibrary ? "heart" : "x",
 			action: async () => {
 				if (!browser) return;
@@ -185,7 +197,7 @@
 	}
 
 	if (data?.album?.browseId === undefined) {
-		DropdownItems = filter(DropdownItems, (d) => d.text !== "Go to album");
+		DropdownItems = filter(DropdownItems, (d) => d.text !== "Go to Album");
 	}
 	if (isArtist) {
 		DropdownItems = filter(DropdownItems, (d) => d.text !== "View Artist");
@@ -214,6 +226,7 @@
 				});
 			} else {
 				await list.initAutoMixSession({
+					loggingContext: data?.loggingContext,
 					videoId: videoId,
 					playlistId: playlistId,
 					keyId: 0,
@@ -228,6 +241,11 @@
 			return;
 		}
 	};
+	let srcImg = Array.isArray(data?.thumbnails)
+		? data?.thumbnails.at(0)
+		: { width: 0, height: 0, url: "", placeholder: "" };
+
+	$: srcImg.url = srcImg.width < 100 ? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-") : srcImg.url;
 </script>
 
 <div
@@ -256,13 +274,12 @@
 					<Loading size="3em" />
 				{/if}
 				<div class="thumbnail">
-					<!-- svelte-ignore a11y-missing-attribute -->
 					<img
-						id="img"
-						decoding="async"
-						loading="lazy"
-						src={data.thumbnails[0]?.url}
 						alt="thumbnail"
+						loading={"lazy"}
+						width={srcImg.width}
+						height={srcImg.height}
+						src={srcImg.url}
 					/>
 				</div>
 			</div>
@@ -293,8 +310,8 @@
 								{artist.text}
 							{:else if artist.pageType.includes("ALBUM")}
 								<a
-									on:click|preventDefault={() => goto(`/release/${artist?.browseId}`)}
-									href={`/release/${artist?.browseId}`}>{artist.text}</a
+									on:click|preventDefault={() => goto(`/release?id=${artist?.browseId}`)}
+									href={`/release?id=${artist?.browseId}`}>{artist.text}</a
 								>
 							{:else}
 								<a
@@ -311,11 +328,11 @@
 		<div class="menu">
 			<PopperButton
 				metadata={{
-					artist:
-						data.type !== "playlist" &&
-						Array.isArray(data?.artistInfo?.artist) &&
-						(data?.artistInfo?.artist ?? undefined),
-					thumbnail: data.thumbnails[0]?.url,
+					artist: data.type !== "playlist" &&
+						Array.isArray(data?.subtitle) && [
+							data.subtitle.find((s) => s?.pageType?.includes("ARTIST")) ?? data.artistInfo?.artist[0],
+						],
+					thumbnail: data.thumbnails,
 					title: data.title,
 					length: data.type !== "artist" && data.type !== "playlist" ? data?.length?.text : "",
 				}}
@@ -400,7 +417,6 @@
 		width: auto;
 
 		height: auto;
-		backdrop-filter: contrast(0.9);
 	}
 	img::before {
 		display: block;

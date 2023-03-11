@@ -12,9 +12,8 @@
 	font-family: var(--base-font-family);
 	background: var(--form-bg);
 
-	will-change: contents;
 	-webkit-text-size-adjust: none;
-	border-radius: var(--md-radius);
+	border-radius: var(--xs-radius);
 	grid-template-columns: 1fr 0.5px;
 	grid-template-areas: "select end";
 	border: 0.0625rem solid hsla(0, 0%, 66.7%, 0.219);
@@ -89,7 +88,7 @@ select {
 	align-content: center;
 	-webkit-appearance: none;
 	font-size: 100% !important;
-	border-radius: var(--md-radius);
+	border-radius: var(--xs-radius);
 	padding: 0.2em 2em 0.325em 0.6em;
 	border: none;
 	transition: cubic-bezier(0.47, 0, 0.745, 0.715);

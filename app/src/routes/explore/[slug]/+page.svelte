@@ -1,16 +1,16 @@
 <script lang="ts">
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
-	import { Grid, GridItem } from "$lib/components/Grid";
+	import { Grid } from "$lib/components/Grid";
 	import Header from "$lib/components/Layouts/Header.svelte";
 	import CarouselItem from "$components/Carousel/CarouselItem.svelte";
 	import type { PageData } from "./$types";
 
 	export let data: PageData;
+
 	let sections = data?.sections;
 	let path = data?.path;
 	let header = data?.header;
 	let type = data?.type;
-	$: console.log(data);
 </script>
 
 <Header
