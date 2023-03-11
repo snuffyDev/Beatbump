@@ -26,7 +26,7 @@ type IHeaders = Record<string, string>;
 /** Helper function to build a request body
 	consisting of Context and params of type `T` */
 function buildRequestBody<T>(context: Context, params: Body<T>) {
-	return { context, ...params };
+	return Object.assign({}, { context }, params);
 }
 
 const ENDPOINT_DICT: Record<keyof APIEndpoints, Function> = {

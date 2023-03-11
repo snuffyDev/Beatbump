@@ -16,5 +16,3 @@ export const ListItemMenuSchema: Pick<
 	Favorite: DROPDOWN_ITEMS["Favorite"],
 	Share: DROPDOWN_ITEMS["Share"],
 };
-
-export const;
