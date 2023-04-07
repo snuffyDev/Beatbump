@@ -313,7 +313,7 @@ class ListService implements ISessionListService {
 	}): Promise<{ body: ResponseBody; error?: boolean }> {
 		const toggle = togglePlayerLoad();
 		try {
-			let {
+			const {
 				playlistId = "",
 				index = 0,
 				clickTrackingParams = "",

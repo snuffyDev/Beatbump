@@ -1,6 +1,21 @@
 import { browser, dev } from "$app/environment";
 import type { IDBMessage, Actions, Methods } from "./types";
 import { notify } from "$lib/utils/utils";
+type Deferred<T> = {
+	promise: Promise<T>;
+	resolve: (value: T | PromiseLike<T>) => void;
+	reject: (reason: any) => void;
+};
+const Defer = <T>() => {
+	const p: Partial<Deferred<T>> = {};
+
+	p.promise = new Promise<T>((resolve, reject) => {
+		p.resolve = resolve;
+		p.reject = reject;
+	});
+
+	return p as Deferred<T>;
+};
 
 class IDBService {
 	private worker: Worker = null;
@@ -28,32 +43,30 @@ class IDBService {
 		if (this.worker === null) {
 			this.worker = await this.setup();
 		}
-		return await new Promise<Awaited<ReturnType<Fn>>["data"]>((resolve, reject) => {
-			// Unfortunately in order to cleanup the event listener after
-			// We have to define `process` here.
-			function process<T extends IDBMessage<Awaited<ReturnType<Fn>>["data"]>>(event: MessageEvent<T>) {
-				const { data } = event;
+		const promise = Defer<Awaited<ReturnType<Fn>>["data"]>();
 
-				if (data.error) {
-					notify(data.message, "error");
-				}
+		const process = <T extends IDBMessage<Awaited<ReturnType<Fn>>["data"]>>(event: MessageEvent<T>) => {
+			const { data } = event;
 
-				if (data.message) {
-					notify(data.message, "success");
-				}
-
-				if (data.data) {
-					this.worker.onmessage = null;
-					resolve(data.data);
-				}
-
-				this.worker.onmessage = null;
-				resolve(data.data);
+			if (data.error) {
+				notify(data.message, "error");
 			}
 
-			this.worker.onmessage = process;
-			this.worker.postMessage({ action, type, params });
-		});
+			if (data.message) {
+				notify(data.message, "success");
+			}
+
+			if (data.data) {
+				promise.resolve(data.data);
+			}
+
+			promise.resolve(data.data);
+		};
+
+		this.worker.onmessage = process;
+		this.worker.postMessage({ action, type, params });
+
+		return promise.promise;
 	}
 }
 

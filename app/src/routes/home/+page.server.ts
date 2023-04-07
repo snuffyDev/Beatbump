@@ -1,20 +1,10 @@
 import { error } from "@sveltejs/kit";
-import type { PageLoad } from "./$types";
+import type { PageServerLoad } from "./$types";
 
-export const load: PageLoad = async ({ fetch, data: data$1, url }) => {
+export const load: PageServerLoad = async ({ fetch, url }) => {
 	// console.count("CONNECTION!");
-	const response = await fetch("/home.json");
-	const data = await response.json();
-	if (!response.ok) {
-		throw error(500, `Error: ${response.statusText}`);
-	}
-	const { carousels, headerThumbnail = undefined, continuations, visitorData } = data;
-
-	return {
-		carousels,
-		headerThumbnail,
-		continuations,
-		visitorData,
-		path: url.pathname,
-	};
+	const params = url.searchParams.get("params");
+	const data = await fetch(`/home.json${params ? `?params=${params}` : ""}`).then((r) => r.json());
+	// throw Error("TEST");
+	return { ...data, params, path: url.pathname };
 };

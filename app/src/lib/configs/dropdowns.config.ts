@@ -100,37 +100,39 @@ export type TypedDropdownItem<T extends Label, I extends Icons = Icons> = {
 	action: (...args) => Promise<void> | void;
 };
 
-export const DROPDOWN_ITEMS: Partial<{ [Key in Label]: () => Partial<TypedDropdownItem<Key, Icons>> }> = {
-	"View Artist": () => ({ text: "View Artist", icon: "artist" }),
-	"Add to Queue": () => ({ text: "Add to Queue", icon: "queue" }),
-	"Play Next": () => ({ text: "Play Next", icon: "queue" }),
-	Favorite: () => ({ text: "Favorite", icon: "heart" }),
-	"Start Group Session": () => ({ text: "Start Group Session", icon: "users" }),
-	Share: () => ({ text: "Share", icon: "share" }),
-	"Go to Album": () => ({ text: "Go to Album", icon: "album" }),
-	"Invite Group Session": () => ({ text: "Invite Group Session", icon: "send" }),
-	"View Playlist": () => ({ text: "View Playlist", icon: "list" }),
-	"Play Song Radio": () => ({ text: "Play Song Radio", icon: "radio" }),
-	"Remove From Playlist": () => ({ text: "Remove From Playlist", icon: "x" }),
-	"Add to Playlist": () => ({ text: "Add to Playlist", icon: "list-plus" }),
-	"Add to Favorites": () => ({ text: "Add to Favorites", icon: "heart" }),
-	"Share Group Session": () => ({ text: "Share Group Session", icon: "share" }),
-	Shuffle: () => ({ text: "Shuffle", icon: "shuffle" }),
-	"Shuffle Playlist": () => ({ text: "Shuffle Playlist", icon: "shuffle" }),
-	"Album Radio": () => ({ text: "Album Radio", icon: "album" }),
-	"Edit Playlist": () => ({ icon: "edit", text: "Edit Playlist" }),"Remove from Queue": ()=> ({icon: 'x', "text": 'Remove from Queue'})
+export const DROPDOWN_ITEMS: Partial<{ [Key in Label]: Partial<TypedDropdownItem<Key, Icons>> }> = {
+	"View Artist": { text: "View Artist", icon: "artist", action: () => {} },
+	"Add to Queue": { text: "Add to Queue", icon: "queue", action: () => {} },
+	"Play Next": { text: "Play Next", icon: "queue", action: () => {} },
+	Favorite: { text: "Favorite", icon: "heart", action: () => {} },
+	"Start Group Session": { text: "Start Group Session", icon: "users", action: () => {} },
+	Share: { text: "Share", icon: "share", action: () => {} },
+	"Go to Album": { text: "Go to Album", icon: "album", action: () => {} },
+	"Invite Group Session": { text: "Invite Group Session", icon: "send", action: () => {} },
+	"View Playlist": { text: "View Playlist", icon: "list", action: () => {} },
+	"Play Song Radio": { text: "Play Song Radio", icon: "radio", action: () => {} },
+	"Remove From Playlist": { text: "Remove From Playlist", icon: "x", action: () => {} },
+	"Add to Playlist": { text: "Add to Playlist", icon: "list-plus", action: () => {} },
+	"Add to Favorites": { text: "Add to Favorites", icon: "heart", action: () => {} },
+	"Share Group Session": { text: "Share Group Session", icon: "share", action: () => {} },
+	Shuffle: { text: "Shuffle", icon: "shuffle", action: () => {} },
+	"Shuffle Playlist": { text: "Shuffle Playlist", icon: "shuffle", action: () => {} },
+	"Album Radio": { text: "Album Radio", icon: "album", action: () => {} },
+	"Edit Playlist": { icon: "edit", text: "Edit Playlist", action: () => {} },
+	"Remove from Queue": { icon: "x", text: "Remove from Queue", action: () => {} },
 };
 
 export function buildDropdown() {
 	const menu: TypedDropdownItem<Label, Icons>[] = [];
 	return {
-		add: function (this, ...args: [label: Label | null, action: TypedDropdownItem<Label, Icons>["action"] | null]) {
-			const [label, action] = args;
-			if (!label && !action) return this as ReturnType<typeof buildDropdown>;
-			const item = DROPDOWN_ITEMS[label as keyof typeof DROPDOWN_ITEMS]();
-			item.action = action;
-			menu.push(item as TypedDropdownItem<Label, Icons>);
-			return this as ReturnType<typeof buildDropdown>;
+		add: function (label?: Label, action?: TypedDropdownItem<Label, Icons>["action"]) {
+			if (!label && !action) return this;
+			const item = Object.assign({}, DROPDOWN_ITEMS[label]) as TypedDropdownItem<Label, Icons>;
+			if (item) {
+				item.action = action;
+				menu.push(item);
+			}
+			return this;
 		},
 		build: function () {
 			return menu;

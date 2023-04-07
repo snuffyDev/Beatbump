@@ -136,9 +136,7 @@
 		{
 			label: "Unsorted",
 			params: "nosort",
-			action: () => {
-				console.log("nosort");
-			},
+			action: () => {},
 		},
 		{
 			label: "Artist (A-Z)",

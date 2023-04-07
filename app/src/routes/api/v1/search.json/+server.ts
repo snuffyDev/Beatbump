@@ -53,7 +53,6 @@ export const GET: RequestHandler = async ({ url }) => {
 			throw error(response.status, response.statusText);
 		}
 		const data = await response.json();
-		console.log("RESPONSE", data);
 
 		const hasTabs = Array.isArray(data?.contents?.tabbedSearchResultsRenderer?.tabs);
 
@@ -65,7 +64,6 @@ export const GET: RequestHandler = async ({ url }) => {
 			ctoken !== ""
 				? parseContinuation(continuationContents, filter as SearchFilter)
 				: parseContents(contents, filter as SearchFilter);
-		console.log("RESULTS", results);
 		return json(results);
 	} catch (err) {
 		console.error(err);
@@ -74,8 +72,8 @@ export const GET: RequestHandler = async ({ url }) => {
 };
 
 function parseContinuation(contents: Record<string, any>, filter: string & SearchFilter) {
-	const continuation: Maybe<Partial<NextContinuationData>> = x;
-	Array.isArray(contents?.continuations) && contents?.continuations[0]?.nextContinuationData;
+	const continuation: Maybe<Partial<NextContinuationData>> =
+		Array.isArray(contents?.continuations) && contents?.continuations[0]?.nextContinuationData;
 	const type = filter.includes("playlists") ? "playlists" : filter;
 
 	const results = parseResults(contents.contents, type);
@@ -133,6 +131,9 @@ function parseContents(
 			}
 			results.unshift(shelf);
 		} else {
+			const musicCardShelfRenderer = section.musicCardShelfRenderer;
+			const item = {};
+			item.buttons = musicCardShelfRenderer.buttons;
 		}
 	}
 	return { results, continuation };

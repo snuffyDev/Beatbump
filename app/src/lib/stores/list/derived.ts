@@ -18,7 +18,7 @@ const currentTrack = derived(SessionListService, ($list) => $list.mix[$list.posi
 const queuePosition = derived(SessionListService, ($list) => $list.position);
 
 const related = (() => {
-	let prevPosition = undefined;
+	const prevPosition = undefined;
 	const { subscribe } = derived<typeof SessionListService, RelatedEndpointResponse>(
 		SessionListService,
 		($list, set) => {

@@ -15,7 +15,7 @@
 		icon?: Icons | { name: string; size?: string };
 	};
 	export let thumbnail: string;
-	export let title: string = "";
+	export let title = "";
 	export let description = undefined;
 	export let subtitles = [];
 	export let secondSubtitle = [];

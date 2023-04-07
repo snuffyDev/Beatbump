@@ -14,7 +14,7 @@ $lg-spacing: calc($base-spacing * 2);
 $xl-spacing: calc($base-spacing * 1.25);
 
 $base-radius: 0.35em;
-$xs-radius: m.div($base-radius, .75);
+$xs-radius: m.div($base-radius, 0.75);
 $sm-radius: m.div($base-radius, 0.675);
 $md-radius: m.div($base-radius, 0.575);
 $lg-radius: m.div($base-radius, 0.5);

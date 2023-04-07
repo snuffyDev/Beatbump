@@ -68,7 +68,7 @@
 	let width: number;
 	let popperHeight;
 	let popper: HTMLElement = undefined;
-	let scrollPosY: number = 0;
+	let scrollPosY = 0;
 	let lastScrollTime;
 	let isScrolling = false;
 	let posX: number;

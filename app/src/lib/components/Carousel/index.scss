@@ -86,14 +86,14 @@
 	-webkit-overflow-scrolling: touch;
 	position: relative;
 
-	margin-bottom: 2.88em;
+	margin-bottom: 2.4em;
 
 	border-radius: var(--sm-radius);
 
 	contain: layout style;
 
 	@media screen and (min-width: 720px) {
-		margin-bottom: 2.3339em;
+		margin-bottom: 1em;
 	}
 }
 

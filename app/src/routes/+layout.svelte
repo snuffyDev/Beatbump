@@ -17,11 +17,10 @@
 	import { groupSession } from "$lib/stores";
 	import { AudioPlayer } from "$lib/player";
 	import { page } from "$app/stores";
-	import { afterNavigate, beforeNavigate } from "$app/navigation";
+	import { afterNavigate } from "$app/navigation";
 	import { browser, dev } from "$app/environment";
 	import SessionListService from "$stores/list/sessionList";
 	import { get } from "svelte/store";
-	import { Logger } from "$lib/utils/logger";
 
 	let main: HTMLElement;
 	$: key = $page.data.key;
@@ -49,7 +48,7 @@
 		}
 	}
 
-	afterNavigate(({from, to,}) => {
+	afterNavigate(({ from, to }) => {
 		if (import.meta.env.SSR) return;
 		if (main) main.scrollTop = 0;
 	});

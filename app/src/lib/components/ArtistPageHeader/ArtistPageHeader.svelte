@@ -9,7 +9,7 @@
 
 	export let header: ArtistPage["header"];
 	export let thumbnail = [];
-	export let description: string = "";
+	export let description = "";
 	let container: HTMLDivElement = undefined;
 	let y = 0;
 	let wrapper: HTMLElement;

@@ -9,9 +9,10 @@
 	import { browser } from "$app/environment";
 	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 	import observer from "./observer";
+	import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 
 	export let header: CarouselHeader;
-	export let items: IListItemRenderer[] = [];
+	export let items: (IListItemRenderer | ICarouselTwoRowItem)[] = [];
 	export let type = "";
 	export let kind = "normal";
 	export let isBrowseEndpoint: boolean;

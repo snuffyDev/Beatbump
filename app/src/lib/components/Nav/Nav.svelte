@@ -191,7 +191,6 @@
 				{query}
 				type="inline"
 				on:submitted={({ detail }) => {
-					console.log(detail);
 					if (preserve.includes("Category")) {
 						filter = detail?.filter;
 					}

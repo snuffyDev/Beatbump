@@ -1,7 +1,6 @@
 import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 
-import type { CarouselHeader } from "$lib/types";
-import type { NextContinuationData } from "$lib/types";
+import type { CarouselHeader, NextContinuationData } from "$lib/types";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { map } from "$lib/utils/collections";
 import { error, json, type RequestHandler } from "@sveltejs/kit";

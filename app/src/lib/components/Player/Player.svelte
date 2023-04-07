@@ -73,9 +73,8 @@
 	import { AudioPlayer } from "$lib/player";
 	import { groupSession, isMobileMQ } from "$lib/stores";
 	import list, { currentTrack, queue, queuePosition } from "$lib/stores/list";
-	import { IsoBase64, slide } from "$lib/utils";
+	import { IsoBase64, slide, notify } from "$lib/utils";
 	import { messenger } from "$lib/utils/sync";
-	import { notify } from "$lib/utils";
 	import { playerLoading, showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
 	import { PopperButton } from "../Popper";
 	import { fullscreenStore } from "./channel";

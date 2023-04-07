@@ -9,7 +9,7 @@
 
 <script lang="ts">
 	import Loading from "$components/Loading/Loading.svelte";
-	import { hasContext, tick } from "svelte";
+	import { hasContext, tick, createEventDispatcher } from "svelte";
 
 	import { showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
 	import { goto } from "$app/navigation";
@@ -17,7 +17,6 @@
 	import type { Item } from "$lib/types";
 	import { IDBService } from "$lib/workers/db/service";
 	import { browser } from "$app/environment";
-	import { createEventDispatcher } from "svelte";
 	import { PopperButton, PopperStore } from "../Popper";
 	import { filter, IsoBase64, Logger, notify } from "$lib/utils";
 	import { groupSession } from "$lib/stores";

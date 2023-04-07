@@ -3,7 +3,7 @@
 	import Button from "$lib/components/Button";
 	import { alertHandler } from "$stores/stores";
 
-	let style: string = "--progress: 0";
+	let style = "--progress: 0";
 	let pressing = false;
 	let n = 0;
 </script>

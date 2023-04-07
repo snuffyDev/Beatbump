@@ -8,6 +8,7 @@ import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import type { Dict } from "$lib/types/utilities";
 import { filterMap } from "$lib/utils";
+import { isArrayAndReturn } from "$lib/utils/isArray";
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ url }) => {
@@ -15,6 +16,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	let ctoken = query.get("ctoken") || "";
 	let itct = query.get("itct") || "";
+	const params = decodeURIComponent(query.get("params") || "");
 	itct = decodeURIComponent(itct);
 	ctoken = decodeURIComponent(ctoken);
 	const visitorData = query.get("visitorData") || "";
@@ -33,7 +35,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			},
 		},
 		headers: null,
-		params: { browseId: ctoken === "" ? browseId : "" },
+		params: { params: params, browseId: ctoken === "" ? browseId : "" },
 		continuation: ctoken !== "" && {
 			ctoken,
 			continuation: ctoken,
@@ -85,6 +87,19 @@ function baseResponse(data: Dict<any>, _visitorData: string) {
 	const _contents: any[] = sectionListRenderer.contents || [];
 	const nextContinuationData = sectionListRenderer.continuations[0]?.nextContinuationData;
 
+	const chips = isArrayAndReturn(sectionListRenderer?.header?.chipCloudRenderer?.chips, (item) =>
+		item.map((item) => {
+			const chipCloudChipRenderer = item?.chipCloudChipRenderer;
+			const text = chipCloudChipRenderer?.text?.runs[0]?.text;
+			const browseEndpoint = chipCloudChipRenderer.navigationEndpoint?.browseEndpoint;
+			const ctoken = chipCloudChipRenderer?.clickTrackingParams;
+			return {
+				text,
+				browseEndpoint,
+				ctoken,
+			};
+		}),
+	);
 	const carouselItems = filterMap(
 		_contents,
 		(item) => {
@@ -104,6 +119,7 @@ function baseResponse(data: Dict<any>, _visitorData: string) {
 	return json({
 		carousels: carouselItems,
 		headerThumbnail,
+		chips: chips ?? [],
 		visitorData: _visitorData,
 		continuations: nextContinuationData,
 	});

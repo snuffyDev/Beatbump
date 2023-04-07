@@ -41,13 +41,12 @@
 	import { IDBService } from "$lib/workers/db/service";
 
 	import list from "$lib/stores/list";
-	import { Logger, notify } from "$lib/utils";
+	import { Logger, notify, IsoBase64 } from "$lib/utils";
 	import { showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
 	import { tick } from "svelte";
 	import { PopperButton, PopperStore } from "../Popper";
 	import { clickHandler } from "./functions";
 	import { browser } from "$app/environment";
-	import { IsoBase64 } from "$lib/utils";
 	import { SITE_ORIGIN_URL } from "$stores/url";
 	import type { Dropdown } from "$lib/configs/dropdowns.config";
 	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";

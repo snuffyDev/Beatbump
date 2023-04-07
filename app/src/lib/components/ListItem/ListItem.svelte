@@ -7,8 +7,6 @@
 	context="module"
 	lang="ts"
 >
-	import { currentTrack, queuePosition } from "$lib/stores/list";
-
 	const buildMenu = ({
 		item,
 		idx,
@@ -33,7 +31,6 @@
 				});
 			})
 			.add("Play Song Radio", async () => {
-				console.log(item);
 				list.initAutoMixSession({ videoId: item.videoId, loggingContext: item?.loggingContext });
 			})
 			.add("Add to Playlist", async () => {
@@ -115,7 +112,7 @@
 	import PopperButton from "../Popper/PopperButton.svelte";
 	import { goto } from "$app/navigation";
 	import { IDBService } from "$lib/workers/db/service";
-	import list from "$lib/stores/list";
+	import list, { currentTrack, queuePosition } from "$lib/stores/list";
 	import { AudioPlayer, updateGroupPosition } from "$lib/player";
 	import { CTX_ListItem } from "$lib/contexts";
 	import { SITE_ORIGIN_URL } from "$stores/url";

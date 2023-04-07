@@ -37,7 +37,6 @@
 				activeNode.set(new WeakRef(node));
 			}
 			const rect = node.getBoundingClientRect();
-			console.log(metadata);
 			x = rect.left;
 			y = rect.top;
 			bottom = rect.bottom;
@@ -78,9 +77,8 @@
 	import type { Artist, Thumbnail } from "$lib/types";
 
 	import Icon from "../Icon/Icon.svelte";
-	import { activeNode, isOpen } from "./popperStore";
+	import { activeNode, isOpen, PopperStore } from "./popperStore";
 
-	import { PopperStore } from "./popperStore";
 	export let items = [];
 	export let type = "";
 	export let metadata: Partial<{
@@ -90,7 +88,7 @@
 		length?: string;
 	}> = {};
 	export let size = "1.8rem";
-	export let tabindex: number = 0;
+	export let tabindex = 0;
 </script>
 
 <div

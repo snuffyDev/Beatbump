@@ -7,16 +7,15 @@
 
 	import { groupSession } from "$lib/stores/sessions";
 
-	import { IsoBase64 } from "$lib/utils";
-	import { sanitize } from "$lib/utils";
+	import { IsoBase64, sanitize } from "$lib/utils";
 	import { SITE_ORIGIN_URL } from "$stores/url";
 	import { tick } from "svelte";
 	import { fade } from "svelte/transition";
 	import Button from "../Button";
 	let step = 0;
-	let displayName: string = "";
-	let checked: boolean = true;
-	let sessionURL: string = "";
+	let displayName = "";
+	let checked = true;
+	let sessionURL = "";
 
 	async function handleSubmit() {
 		if (!displayName) return;

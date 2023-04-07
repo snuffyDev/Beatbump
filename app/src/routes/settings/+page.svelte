@@ -5,7 +5,6 @@
 	const themes: Theme[] = ["Dark", "Dim", "Midnight", "YTM"];
 
 	function handleStreamSelect() {
-		console.log("settings");
 		AudioPlayer.dispatch("update:stream_type", { type: $settings.playback.Stream });
 	}
 </script>

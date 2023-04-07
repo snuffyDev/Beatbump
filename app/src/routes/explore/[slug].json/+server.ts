@@ -5,7 +5,7 @@ import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/p
 import type { CarouselHeader, CarouselItem } from "$lib/types";
 import type { RequestHandler } from "@sveltejs/kit";
 
-export const GET: RequestHandler = async ({ url, params }) => {
+export const GET: RequestHandler = async ({ params }) => {
 	const { slug } = params;
 	const response = await buildAPIRequest("browse", {
 		context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
@@ -13,7 +13,7 @@ export const GET: RequestHandler = async ({ url, params }) => {
 	});
 
 	const data = await response.json();
-	let {
+	const {
 		header: { musicHeaderRenderer: { title: { runs: [{ text = "" } = {}] = [] } = {} } = {} } = {},
 		contents: {
 			singleColumnBrowseResultsRenderer: {
@@ -21,8 +21,8 @@ export const GET: RequestHandler = async ({ url, params }) => {
 			} = {},
 		} = {},
 	} = await data;
-	let carousels = [];
-	let grids = [];
+	const carousels = [];
+	const grids = [];
 	let sections: Array<{
 		header?: Record<string, any>;
 		section?: any[];
@@ -36,7 +36,7 @@ export const GET: RequestHandler = async ({ url, params }) => {
 	}
 	// return json$1({ data });
 	if (carousels.length !== 0) {
-		sections = carousels.map(({ musicCarouselShelfRenderer }, i) => parseCarousel({ musicCarouselShelfRenderer }));
+		sections = carousels.map(({ musicCarouselShelfRenderer }) => parseCarousel({ musicCarouselShelfRenderer }));
 		if (sections.length !== 0) {
 			return json$1({ data, sections, header: text, type: "carousel" });
 			return new Response(

@@ -55,7 +55,7 @@ function buildElements(nodes: XMLNode[]) {
 
 export function buildXML(input: XMLRoot) {
 	let output = "";
-	let depth = 0;
+	const depth = 0;
 	let isFirstLine = true;
 	if (input["declaration"]) {
 		output += buildDeclaration(input["declaration"], depth);

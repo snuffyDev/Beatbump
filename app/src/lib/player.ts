@@ -221,6 +221,7 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		}
 		if (!localStorage.getItem("volume")) {
 			this._player.volume = 0.5;
+
 			try {
 				localStorage.setItem("volume", "0.5");
 			} catch (e) {
@@ -229,14 +230,12 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 		} else {
 			this._player.volume = +localStorage.getItem("volume");
 		}
+
 		this._player.autoplay = true;
 		this._player.preload = "metadata";
 
 		this._durationUnsubscriber = this._durationStore.subscribe((value) => {
-			// Logger.log(`[LOG:PLAYER:Update]: Duration: `, value);
-
 			this._duration = value;
-			// notify(`${this._duration}`, "error");]
 		});
 		this._currentTimeUnsubscriber = this._currentTimeStore.subscribe((value) => {
 			this._currentTime = value;
@@ -853,14 +852,14 @@ class BaseAudioPlayer extends EventEmitter<AudioPlayerEvents> implements IAudioP
 				this._hasNextSrc = true;
 			}
 
-			this.progress.set(this._isWebkit && !this.isHLSPlayer ? this._player.currentTime * 2 : this._player.currentTime);
+			this.progress.set(this._player.currentTime);
 
 			/* This checks if the user is on an iOS device
 				 due to the length of a song being doubled on iOS,
 				 we have to cut the time in half. Doesn't effect other devices.
 			*/
 
-			if (this._isWebkit && this.isHLSPlayer === false && this._currentTime >= this._duration) {
+			if (this._isWebkit && this.isHLSPlayer === false && this._player.currentTime >= this._duration - 1) {
 				this.onEnded();
 			}
 		});

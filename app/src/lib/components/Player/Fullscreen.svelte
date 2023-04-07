@@ -166,8 +166,6 @@
 		})();
 	}
 
-	$: console.log($immersiveQueue, $filterAutoPlay, $theme);
-
 	function slideInOut(
 		node: HTMLElement,
 		{ duration = 400, delay = 400, easing = quartOut }: { duration?: number; easing?: EasingFunction; delay?: number },
@@ -204,7 +202,6 @@
 			DropdownItems = undefined;
 		}
 	}
-	$: console.log($related);
 </script>
 
 {#if $queue.length && state === "open"}
@@ -225,15 +222,15 @@
 				on:pan={(event) => {
 					if (!$isMobileMQ) return;
 					const { detail } = event;
-					if (Math.abs(detail.deltaY) < 105) return;
+					if (Math.abs(detail.deltaY) < 65) return;
 					trackMovement(0, detail);
 				}}
 				on:panend={(event) => {
 					if (!$isMobileMQ) return;
 					const { detail } = event;
 					const direction = Math.sign(detail.deltaY) === -1 ? "up" : "down";
-					// notify(`${detail.deltaY} : ${detail.velocityY}`, "success");
-					if (Math.abs(detail.deltaY) < 105) return;
+
+					if (Math.abs(detail.deltaY) < 65) return;
 					if (direction === "down") {
 						close(0, detail);
 						fullscreenStore.set("closed");

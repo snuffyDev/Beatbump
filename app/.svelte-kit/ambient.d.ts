@@ -66,6 +66,7 @@ declare module '$env/static/private' {
 	export const PANEL_GDK_CORE_DEVICE_EVENTS: string;
 	export const PNPM_HOME: string;
 	export const npm_config_init_module: string;
+	export const _: string;
 	export const XAUTHORITY: string;
 	export const VSCODE_GIT_ASKPASS_NODE: string;
 	export const XDG_GREETER_DATA_DIR: string;
@@ -132,8 +133,6 @@ declare module '$env/static/private' {
 	export const LC_NUMERIC: string;
 	export const OLDPWD: string;
 	export const TERM_PROGRAM: string;
-	export const _: string;
-	export const NODE_ENV: string;
 }
 
 /**
@@ -203,6 +202,7 @@ declare module '$env/dynamic/private' {
 		PANEL_GDK_CORE_DEVICE_EVENTS: string;
 		PNPM_HOME: string;
 		npm_config_init_module: string;
+		_: string;
 		XAUTHORITY: string;
 		VSCODE_GIT_ASKPASS_NODE: string;
 		XDG_GREETER_DATA_DIR: string;
@@ -269,8 +269,6 @@ declare module '$env/dynamic/private' {
 		LC_NUMERIC: string;
 		OLDPWD: string;
 		TERM_PROGRAM: string;
-		_: string;
-		NODE_ENV: string;
 		[key: `PUBLIC_${string}`]: undefined;
 		[key: string]: string | undefined;
 	}

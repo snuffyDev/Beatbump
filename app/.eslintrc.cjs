@@ -6,7 +6,7 @@ module.exports = {
 		"plugin:@typescript-eslint/recommended",
 		"prettier",
 		"plugin:import/recommended",
-		"plugin:import/no-cycle",
+		"plugin:import/typescript",
 	],
 	plugins: ["svelte3", "@typescript-eslint", "import"],
 	ignorePatterns: ["*.cjs"],
@@ -21,7 +21,9 @@ module.exports = {
 			"@typescript-eslint/parser": [".ts", ".tsx"],
 		},
 		"import/resolver": {
+			node: true,
 			typescript: {
+				project: ["./.svelte-kit/tsconfig.json"],
 				alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
 			},
 		},

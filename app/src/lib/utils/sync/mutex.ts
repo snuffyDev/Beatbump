@@ -40,7 +40,7 @@ export class Semaphore implements ISemaphore {
 			queueMicrotask(release);
 		}
 	}
-	acquire(value: number = 1): Promise<[number, Releaser]> {
+	acquire(value = 1): Promise<[number, Releaser]> {
 		if (value <= 0) throw new Error(`Value must be greater than 0. Received: #{value}`);
 
 		return new Promise((resolve, reject) => {
