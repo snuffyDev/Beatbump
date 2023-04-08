@@ -4,6 +4,7 @@
 	import { createEventDispatcher } from "svelte";
 	import Button from "../Button";
 	import PopperButton from "../Popper/PopperButton.svelte";
+	import { windowWidth } from "$stores/window";
 
 	type Button<
 		Type extends string = string,
@@ -12,19 +13,29 @@
 		text?: string;
 		type?: T;
 		action?: () => void;
-		icon?: Icons | { name: string; size?: string };
+		icon?: Icons | { name: Icons; size?: string };
 	};
+
+	/** Thumbnail to display*/
 	export let thumbnail: string;
+	/** Title of the playlist/album */
 	export let title = "";
+	/** Description for the playlist/album */
 	export let description = undefined;
+	/** Subtitles (year/track count/etc.) */
 	export let subtitles = [];
+	/** Subtitles (year/track count/etc.) */
 	export let secondSubtitle = [];
+	/** Buttons (play album/shuffle/etc.)*/
 	export let buttons: Button[] = [];
+	/** An array of artist or channel objects */
 	export let artist: {
 		name: string;
 		channelId: string;
 	}[] = [];
+	/** Allows user to change the metadata (local playlists only)*/
 	export let editable = false;
+	/** Type of metadata (Album / Playlist) */
 	export let type = "playlist";
 
 	let DropdownItems: Dropdown = [
@@ -53,11 +64,8 @@
 			: undefined,
 	];
 
-	let width;
-	const dispatch = createEventDispatcher();
+	const dispatch = createEventDispatcher<{ shuffle: void; playlistAdd: void; addqueue: void }>();
 </script>
-
-<svelte:window bind:innerWidth={width} />
 
 <div class="box resp-content-width">
 	<div class="img">
@@ -85,7 +93,7 @@
 			{#key description}
 				<p
 					class="secondary subtitle description"
-					class:hidden={width < 640 ? true : false}
+					class:hidden={$windowWidth < 640 ? true : false}
 				>
 					{description}
 				</p>

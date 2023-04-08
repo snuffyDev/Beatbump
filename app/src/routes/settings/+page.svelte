@@ -83,10 +83,20 @@
 			</div>
 		</div>
 		<div class="setting">
-			<label for="stream">
-				Stream
-				<i> (reload Beatbump after setting)</i>
-			</label>
+			<label>Remember Last Track</label>
+			<input
+				name="lasttrack"
+				id="lasttrack"
+				type="checkbox"
+				bind:value={$settings["playback"]["Remember Last Track"]}
+			/>
+			<label
+				for="lasttrack"
+				class="switch"
+			/>
+		</div>
+		<div class="setting">
+			<label for="stream"> Stream </label>
 			<div class="select">
 				<select
 					name="stream"

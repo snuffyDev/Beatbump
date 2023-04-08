@@ -5,10 +5,8 @@ module.exports = {
 		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended",
 		"prettier",
-		"plugin:import/recommended",
-		"plugin:import/typescript",
 	],
-	plugins: ["svelte3", "@typescript-eslint", "import"],
+	plugins: ["svelte3", "@typescript-eslint"],
 	ignorePatterns: ["*.cjs"],
 	overrides: [
 		{ files: ["*.svelte"], processor: "svelte3/svelte3" },
@@ -17,16 +15,6 @@ module.exports = {
 	settings: {
 		"svelte3/typescript": () => require("typescript"),
 		"svelte3/ignore-styles": () => true,
-		"import/parsers": {
-			"@typescript-eslint/parser": [".ts", ".tsx"],
-		},
-		"import/resolver": {
-			node: true,
-			typescript: {
-				project: ["./.svelte-kit/tsconfig.json"],
-				alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
-			},
-		},
 	},
 	parserOptions: {
 		sourceType: "module",

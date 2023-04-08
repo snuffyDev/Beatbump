@@ -15,6 +15,7 @@ interface Search {
 interface Playback {
 	"Prefer WebM Audio"?: boolean;
 	"Dedupe Automix"?: boolean;
+	"Remember Last Track"?: boolean;
 	Quality?: "Normal" | "Low";
 	Stream?: StreamType;
 }
@@ -41,6 +42,7 @@ let list: UserSettings = {
 	playback: {
 		"Dedupe Automix": false,
 		Quality: "Normal",
+		"Remember Last Track": false,
 		"Prefer WebM Audio": false,
 		Stream: "HTTP",
 	},
@@ -84,6 +86,10 @@ function _settings() {
 			(Boolean(localStorage.getItem("preferWebM")) as Playback["Prefer WebM Audio"]) ??
 			list.playback["Prefer WebM Audio"];
 
+		list.playback["Remember Last Track"] =
+			(Boolean(localStorage.getItem("Remember Last Track")) as Playback["Remember Last Track"]) ??
+			list.playback["Remember Last Track"];
+
 		list.playback["Dedupe Automix"] =
 			(Boolean(localStorage.getItem("theme")) as Playback["Dedupe Automix"]) ?? list.playback["Dedupe Automix"];
 
@@ -101,6 +107,7 @@ function _settings() {
 	const { subscribe, update, set } = store;
 
 	setTopBarTheme(list.appearance.Theme);
+
 	function save(settings: UserSettings) {
 		themeSet(settings.appearance.Theme as Theme);
 

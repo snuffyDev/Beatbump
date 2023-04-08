@@ -10,17 +10,19 @@
 	import PlaylistPopper from "$lib/components/PlaylistPopper";
 	import "@fontsource/commissioner/variable.css";
 
-	import { queue } from "$lib/stores/list";
+	import { currentTrack, queue } from "$lib/stores/list";
 	import Fullscreen from "$lib/components/Player/Fullscreen.svelte";
 	import GroupSessionCreator from "$lib/components/GroupSessionCreator";
 	import { fullscreenStore } from "$lib/components/Player/channel";
-	import { groupSession } from "$lib/stores";
+	import { groupSession, settings } from "$lib/stores";
 	import { AudioPlayer } from "$lib/player";
 	import { page } from "$app/stores";
 	import { afterNavigate } from "$app/navigation";
 	import { browser, dev } from "$app/environment";
 	import SessionListService from "$stores/list/sessionList";
 	import { get } from "svelte/store";
+	import { onMount } from "svelte";
+	import { Logger } from "$lib/utils";
 
 	let main: HTMLElement;
 	$: key = $page.data.key;
@@ -48,9 +50,26 @@
 		}
 	}
 
+	$: if (browser && $settings["playback"]["Remember Last Track"] && $currentTrack) {
+		localStorage.setItem("lastTrack", JSON.stringify($currentTrack));
+	}
+
 	afterNavigate(({ from, to }) => {
 		if (import.meta.env.SSR) return;
 		if (main) main.scrollTop = 0;
+	});
+
+	onMount(() => {
+		try {
+			if ($settings["playback"]["Remember Last Track"] && localStorage["lastTrack"]) {
+				const track = JSON.parse(localStorage.getItem("lastTrack")) as unknown as typeof $currentTrack;
+
+				SessionListService.setTrackWillPlayNext(track, 0);
+				SessionListService.getMoreLikeThis({ playlistId: track?.playlistId ?? track?.autoMixList });
+			}
+		} catch (err) {
+			Logger.err(err);
+		}
 	});
 </script>
 

@@ -6,28 +6,28 @@
 	import InfoBox from "$lib/components/Layouts/InfoBox.svelte";
 	import { page } from "$app/stores";
 	import Header from "$lib/components/Layouts/Header.svelte";
-	import { groupSession } from "$lib/stores";
 	import { CTX_ListItem, releasePageContext } from "$lib/contexts";
 	import type { PageData } from "./$types";
+
 	export let data: PageData;
 
 	let { data: data$1, id, path } = data;
 
 	$: id = $page.url.searchParams.get("id");
+
 	const promise = parsePageContents(data$1);
+
 	let { items, releaseInfo } = promise;
-	// $: console.log(items);
+	let thumbnail = releaseInfo?.thumbnails[0]?.url.replace(/=(w(\d+))-(h(\d+))/g, "=w512-h512");
+
 	const setId = () => isPagePlaying.add(id);
+
 	const playAlbum = () => {
 		setId();
 		list.initPlaylistSession({ playlistId: releaseInfo.playlistId, index: 0 });
 		list.updatePosition(0);
 	};
-	const playGroupSession = () => {
-		setId();
-		groupSession.setPlaylistMix(releaseInfo.playlistId);
-		// currentTitle.set(items[0].title);
-	};
+
 	const playShuffle = () => {
 		setId();
 
@@ -36,13 +36,12 @@
 			index: 0,
 		});
 	};
+
 	const playRadio = () => {
 		setId();
 
 		list.initPlaylistSession({ playlistId: releaseInfo?.autoMixId, params: "wAEB", index: 0 });
 	};
-
-	let thumbnail = releaseInfo?.thumbnails[0]?.url.replace(/=(w(\d+))-(h(\d+))/g, "=w512-h512");
 
 	CTX_ListItem.set({ parentPlaylistId: releaseInfo.playlistId, page: "release" });
 	releasePageContext.set({ page: "release" });
@@ -54,6 +53,7 @@
 	url={path + `?id=${id}`}
 	image={thumbnail}
 />
+
 <main data-testid="release">
 	<InfoBox
 		{thumbnail}
@@ -76,7 +76,3 @@
 		/>
 	{/each}
 </main>
-
-<!-- markup (zero or more items) goes here -->
-<style lang="scss">
-</style>
