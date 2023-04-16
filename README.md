@@ -16,7 +16,7 @@ A privacy-respecting alternative frontend for YouTube Music. Built with SvelteKi
 	  <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">
     <img alt="License: AGPLv3" src="https://shields.io/badge/License-AGPL%20v3-blue.svg">
   </a>
-  <a href="https://github.com/humanetech-community/awesome-humane-tech">
+  <a href="https://codeberg.org/teaserbot-labs/delightful-humane-design">
     <img alt="Awesome Humane Tech" src="https://raw.githubusercontent.com/humanetech-community/awesome-humane-tech/main/humane-tech-badge.svg?sanitize=true">
   </a>
 </p>
