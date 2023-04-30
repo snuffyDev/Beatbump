@@ -38,6 +38,7 @@
 
 	$: hasplayer = $queue.length !== 0;
 
+	// Setup dev debugging logs
 	$: if (dev && browser) {
 		console.log($SessionListService);
 		if (page && !window.$page) {
@@ -50,7 +51,7 @@
 		}
 	}
 
-	$: if (browser && $settings["playback"]["Remember Last Track"] && $currentTrack) {
+	$: if (browser && $settings["playback"]["Remember Last Track"] === true && $currentTrack) {
 		localStorage.setItem("lastTrack", JSON.stringify($currentTrack));
 	}
 

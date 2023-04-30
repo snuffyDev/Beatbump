@@ -74,7 +74,9 @@ export const GET: RequestHandler = async ({ params }) => {
 			const { gridRenderer = {} } = contents[idx];
 			const items = gridRenderer.items;
 			const header = gridRenderer.header;
-			const section = items.map((ctx) => MusicTwoRowItemRenderer(ctx));
+			const section = items.map((ctx: { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer }) =>
+				MusicTwoRowItemRenderer(ctx),
+			);
 			sections.push({
 				section,
 				type: "grid",
@@ -98,7 +100,7 @@ export const GET: RequestHandler = async ({ params }) => {
 
 function parseHeader({ musicCarouselShelfBasicHeaderRenderer }): CarouselHeader {
 	if (musicCarouselShelfBasicHeaderRenderer) {
-		let subheading, browseId;
+		let subheading: any, browseId: any;
 		if (musicCarouselShelfBasicHeaderRenderer?.strapline?.runs[0]?.text) {
 			subheading = musicCarouselShelfBasicHeaderRenderer["strapline"]["runs"][0].text;
 		}
@@ -128,26 +130,31 @@ function parseBody(
 	| ICarouselTwoRowItem[]
 	| IListItemRenderer[]
 	| {
-			text: any;
+			text: unknown;
 			color: string;
 			endpoint: {
-				params: any;
-				browseId: any;
+				params: unknown;
+				browseId: unknown;
 			};
 	  }[] {
-	const items: any[] = contents.map((item) => {
-		if ("musicTwoRowItemRenderer" in item) {
-			return MusicTwoRowItemRenderer(item as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer });
-		}
-		if ("musicResponsiveListItemRenderer" in item) {
-			return MusicResponsiveListItemRenderer(
-				item as { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer },
-			);
-		}
-		if ("musicNavigationButtonRenderer" in item) {
-			return MoodsAndGenresItem(item);
-		}
-	});
+	const items: any[] = contents.map(
+		(item: {
+			musicTwoRowItemRenderer?: IMusicTwoRowItemRenderer;
+			musicResponsiveListItemRenderer?: IMusicResponsiveListItemRenderer;
+		}) => {
+			if ("musicTwoRowItemRenderer" in item) {
+				return MusicTwoRowItemRenderer(item as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer });
+			}
+			if ("musicResponsiveListItemRenderer" in item) {
+				return MusicResponsiveListItemRenderer(
+					item as { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer },
+				);
+			}
+			if ("musicNavigationButtonRenderer" in item) {
+				return MoodsAndGenresItem(item);
+			}
+		},
+	);
 
 	return items;
 }

@@ -1,15 +1,14 @@
-import type { PageLoad } from "./$types";
+import type { ExploreSlugResponse } from "../[slug].json/+server.js";
 
-export const load: PageLoad = async ({ url, params, fetch }) => {
-	const response = await fetch(`/explore/${params.slug}.json`);
-	const { sections, data, header, type } = await response.json();
+export const load = async ({ url, params, fetch }) => {
+	const response = await fetch<Awaited<ExploreSlugResponse>>(`/explore/${params.slug}.json`).then((response) =>
+		response.json(),
+	);
+
 	const path = url.pathname;
 	// console.log(routeId, params, path, sections, header, type);
 	return {
-		sections,
-		header,
-		data,
-		type,
+		response,
 		path,
-	};
+	} as const;
 };

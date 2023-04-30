@@ -2,31 +2,32 @@
 	import { createEventDispatcher, onMount, tick } from "svelte";
 	import vp from "$lib/actions/viewport";
 	import type { Item } from "$lib/types";
+
 	const dispatch = createEventDispatcher();
+
 	// props
-	export let items;
+	export let items: Item[] = [];
 	export let height = "100%";
-	export let itemHeight = undefined;
+	export let itemHeight: number | undefined = undefined;
 	export let isLoading = false;
 	export let hasData = false;
-	let foo;
 
 	// read-only, but visible to consumers via bind:start
 	export let start = 0;
 	export let end = 0;
 
 	// local state
-	let height_map = [];
-	let rows;
-	let viewport;
-	let contents;
+	let height_map: number[] = [];
+	let rows: HTMLCollectionOf<HTMLElement>;
+	let viewport: HTMLDivElement;
+	let contents: HTMLDivElement;
 	let viewport_height = 0;
 	let visible: { index: number; start?: number; data: Item }[];
-	let mounted;
+	let mounted: boolean | undefined;
 
 	let top = 0;
 	let bottom = 0;
-	let average_height;
+	let average_height: number | undefined;
 
 	$: visible = items.slice(start, end).map((data, i) => {
 		return { index: i + start, data };
@@ -66,20 +67,6 @@
 		height_map.length = items.length;
 	}
 
-	function scroller(node: HTMLElement) {
-		function handleScroll(e: UIEvent & { target: EventTarget & HTMLElement }) {
-			// console.log(e)
-			if (node.contains(e.target)) {
-				handle_scroll();
-			}
-		}
-		node.addEventListener("scroll", handleScroll, { passive: true });
-		return {
-			destroy: () => {
-				node.removeEventListener("scroll", handleScroll, true);
-			},
-		};
-	}
 	async function handle_scroll() {
 		const { scrollTop } = viewport;
 
@@ -144,7 +131,7 @@
 	}
 	// trigger initial refresh
 	onMount(() => {
-		rows = contents.getElementsByTagName("svelte-virtual-list-row");
+		rows = contents.getElementsByTagName("svelte-virtual-list-row") as HTMLCollectionOf<HTMLElement>;
 		if (items.length > 1) mounted = true;
 	});
 </script>

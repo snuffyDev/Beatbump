@@ -12,7 +12,7 @@
 			"precompress": false
 		},
 		"vercel": {
-			"edge": false,
+			"runtime": "nodejs18.x",
 			"split": false
 		}
 	},

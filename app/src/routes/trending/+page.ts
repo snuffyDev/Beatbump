@@ -1,12 +1,11 @@
-import type { ICarousel, MoodsAndGenresItem } from "$lib/types";
+import type { MoodsAndGenresItem } from "$lib/types";
 import { error } from "@sveltejs/kit";
-import type { PageLoad } from "./$types";
-import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+import type { ParsedCarousel } from "$api/models/Carousel";
 
-export const load: PageLoad = async ({ fetch }) => {
-	const response = await fetch<{ carouselItems: ICarousel<IListItemRenderer | MoodsAndGenresItem>[] }>(
-		"/trending.json?q=browse",
-	).then((res) => {
+export const load = async ({ fetch }) => {
+	const response = await fetch<{
+		carouselItems: (ParsedCarousel & { items: (ParsedCarousel["items"][number] | MoodsAndGenresItem)[] })[];
+	}>("/trending.json?q=browse").then((res) => {
 		if (!res.ok) {
 			throw error(res.status, res.statusText);
 		}

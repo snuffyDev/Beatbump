@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import type icons from "$lib/components/Icon/icons";
 
 export type Label =

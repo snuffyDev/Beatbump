@@ -31,13 +31,12 @@ export const GET: RequestHandler = async ({ url }): Promise<IResponse<NextEndpoi
 	const videoId = query.get("videoId") || "";
 	const playlistId = query.get("playlistId") || "RDAMVM" + (videoId ?? "");
 	const continuation = query.has("ctoken") ? decodeURIComponent(decodeURIComponent(query.get("ctoken"))) : undefined;
-	const index = parseInt(query.get("index")) || undefined;
 	const clickTracking = query.get("clickTracking") || undefined;
 	const playlistSetVideoId = query.get("playlistSetVideoId") || undefined;
 	const response = await buildAPIRequest("next", {
 		context: {
 			clickTracking: {
-				clickTrackingParams: clickTracking ? decodeURIComponent(decodeURIComponent(clickTracking)) : undefined,
+				clickTrackingParams: clickTracking ? decodeURIComponent(clickTracking) : undefined,
 			},
 			client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00", visitorData },
 		},
@@ -52,7 +51,6 @@ export const GET: RequestHandler = async ({ url }): Promise<IResponse<NextEndpoi
 			tunerSettingValue: "AUTOMIX_SETTING_NORMAL",
 			continuation,
 			videoId,
-			index,
 			playlistSetVideoId,
 			playlistId,
 			params: params ?? "",
@@ -94,9 +92,12 @@ function parseNextBody(data) {
 					data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer
 						?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.continuations,
 				) &&
-					data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer
+					(data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer
 						?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.continuations[0]
-						?.nextRadioContinuationData?.continuation) ||
+						?.nextRadioContinuationData?.continuation ||
+						data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer
+							?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.continuations[0]
+							?.nextContinuationData?.continuation)) ||
 				null;
 		const watchEndpoint = data?.currentVideoEndpoint?.watchEndpoint;
 		const visitorData = data?.responseContext?.visitorData;
@@ -125,7 +126,8 @@ function parseNextBodyContinuation(data) {
 		continuationContents: {
 			playlistPanelContinuation: {
 				contents = [],
-				continuations: [{ nextRadioContinuationData: { continuation = "" } = {} } = {}] = [],
+				continuations: [{ nextContinuationData: { continuation = "" } = {} } = {}] = [],
+				currentIndex = 0,
 				...rest
 			} = {},
 		} = {},
@@ -141,5 +143,5 @@ function parseNextBodyContinuation(data) {
 		[];
 	const related = Array.isArray(tabs) && tabs[2]?.tabRenderer?.endpoint?.browseEndpoint;
 
-	return Object.assign(parsed, { related });
+	return Object.assign(parsed, { related, currentIndex });
 }

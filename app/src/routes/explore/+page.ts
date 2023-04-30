@@ -1,7 +1,6 @@
 import { error } from "@sveltejs/kit";
-import type { PageLoad } from "./$types";
 
-export const load: PageLoad = async ({ fetch, url, parent }) => {
+export const load = async ({ fetch, url }) => {
 	const data = await fetch("/explore.json?browseId=FEmusic_moods_and_genres");
 	const response = await data.json();
 

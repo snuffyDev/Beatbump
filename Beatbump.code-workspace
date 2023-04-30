@@ -1,7 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"path": "app"
 		},
 		{
 			"path": "packages/proxy-server/rust"
@@ -11,6 +11,34 @@
 		"svg.preview.background": "custom",
 		"npm-intellisense.recursivePackageJsonLookup": true,
 		"typescript.format.enable": true,
-		"typescript.tsdk": "Beatbump/app/node_modules/typescript/lib"
+		"typescript.tsdk": "Beatbump/app/node_modules/typescript/lib",
+		"svelte.enable-ts-plugin": true,
+		"svelte.plugin.svelte.defaultScriptLanguage": "ts",
+		"eslint.lintTask.enable": true,
+		"eslint.useESLintClass": true,
+		"eslint.enable": true,
+		"eslint.probe": [
+			"javascript",
+			"javascriptreact",
+			"typescript",
+			"typescriptreact",
+			"html",
+			"svelte",
+			"vue",
+			"markdown"
+		],
+		// "eslint.lintTask.enable": true,
+		"eslint.run": "onType",
+		"eslint.validate": [
+			"javascript",
+			"javascriptreact",
+			"typescript",
+			"typescriptreact",
+			"html",
+			"svelte",
+			"vue",
+			"markdown"
+		],
+		"eslint.workingDirectories": []
 	}
 }

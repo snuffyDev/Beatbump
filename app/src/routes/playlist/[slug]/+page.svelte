@@ -55,6 +55,7 @@
 				? header?.description.substring(0, 240) + "..."
 				: header?.description
 			: "";
+	$: console.log(data);
 	const getCarousel = async () => {
 		if (!carouselContinuations) return;
 		const response = await fetch(

@@ -201,7 +201,7 @@
 			style="gap:0.5em;"
 		>
 			<div
-				class="volume "
+				class="volume"
 				on:pointerleave={() => {
 					volumeHover = false;
 				}}

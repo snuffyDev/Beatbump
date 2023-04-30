@@ -1,19 +1,17 @@
 <script lang="ts">
-	import { createEventDispatcher } from "svelte";
-
 	export let chip: { text: string; browseEndpoint: { browseId: string; params: string }; ctoken?: string };
 	export let selected = false;
-	const dispatch = createEventDispatcher<{ click: { params: string } }>();
 </script>
 
-<div
+<a
 	role="button"
 	class="chip"
 	class:selected
-	on:click={() => dispatch("click", { params: chip.browseEndpoint.params })}
+	href={chip.browseEndpoint.params ? `/home?params=${chip.browseEndpoint.params}` : "/home"}
+	on:click
 >
 	{chip.text}
-</div>
+</a>
 
 <style
 	src="./index.scss"

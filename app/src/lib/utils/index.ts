@@ -14,7 +14,14 @@ export { noop } from "./noop";
 export { requestFrameSingle } from "./raf";
 export { ReadableStore, WritableStore } from "./stores";
 export type { ResponseBody } from "./utils";
-export { notify, seededShuffle, shuffle, addToQueue, getSrc, queryParams, format } from "./utils";
+export {
+	notify,
+	seededShuffle,
+	shuffle,
+	addToQueue,
+	queryParams,
+	format,
+} from "./utils";
 export type { XMLNode, XMLRoot } from "./xmlBuilder";
 export { buildXML } from "./xmlBuilder";
 export * from "./collections";

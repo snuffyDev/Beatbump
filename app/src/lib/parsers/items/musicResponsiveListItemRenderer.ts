@@ -51,8 +51,9 @@ export function MusicResponsiveListItemRenderer(
 		playerParams:
 			flexCol0?.navigationEndpoint?.watchEndpoint?.playerParams || flexCol0?.navigationEndpoint?.watchEndpoint?.params,
 		clickTrackingParams:
+			flexCol0?.navigationEndpoint?.clickTrackingParams ||
 			item.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
-				?.clickTrackingParams || flexCol0?.navigationEndpoint?.clickTrackingParams,
+				?.clickTrackingParams,
 		loggingContext:
 			item.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
 				?.watchEndpoint?.loggingContext,

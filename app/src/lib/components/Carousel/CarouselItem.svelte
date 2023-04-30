@@ -52,6 +52,7 @@
 	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 	import type { Item } from "$lib/types";
 	import { createShare } from "$lib/shared/createShare";
+	import { APIParams } from "$lib/constants";
 
 	export let index: number;
 	export let item: IListItemRenderer;
@@ -61,11 +62,11 @@
 	export let isBrowseEndpoint = false;
 
 	let loading = false;
-	let RATIO_RECT =
+	$: RATIO_RECT =
 		(aspectRatio?.includes("TWO_LINE_STACK") && kind !== "Fans might also like") || aspectRatio?.includes("16_9")
 			? true
 			: false;
-	const ASPECT_RATIO = !RATIO_RECT ? "1x1" : "16x9";
+	$: ASPECT_RATIO = !RATIO_RECT ? "1x1" : "16x9";
 	let DropdownItems: Dropdown = [
 		{
 			text: "View Artist",
@@ -204,7 +205,7 @@
 				? [
 						{
 							action: () => {
-								list.initPlaylistSession({ playlistId: item.playlistId, params: "wAEB8gECKAE%3D", index: 0 });
+								list.initPlaylistSession({ playlistId: item.playlistId, params: APIParams.finite, index: 0 });
 							},
 							icon: "shuffle",
 							text: "Shuffle",
@@ -220,7 +221,7 @@
 							action: () => {
 								list.initPlaylistSession({
 									playlistId: "RDAMPL" + item.playlistId,
-									params: "wAEB8gECeAE%3D",
+									params: APIParams.finite,
 									index: 0,
 								});
 							},
@@ -233,7 +234,7 @@
 		}
 	}
 
-	let srcImg = Array.isArray(item?.thumbnails)
+	$: srcImg = Array.isArray(item?.thumbnails)
 		? item?.thumbnails.at(0)
 		: { width: 0, height: 0, url: "", placeholder: "" };
 

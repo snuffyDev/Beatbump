@@ -1,23 +1,21 @@
-// import type { Dict } from "$lib/types/utilities";
-// import { filter, iter } from "$lib/utils/collections";
+import type { Dict } from "$lib/types/utilities";
+import { filterMap, map } from "$lib/utils/collections/array";
+import { buildDashManifest, type IFormat } from "$lib/utils/buildDashManifest";
+export interface PlayerFormats {
+	hls?: string;
+	dash?: string;
+	streams?: { url: string; original_url: string; mimeType: string }[];
+}
 
-const parseProxyRedir = (url: string) => {
-	let new_url = url.replace("https://", "").split("/");
+/** Creates a new `redirector.googlevideo.com` URL */
+const createRedirectorURL = (url: string) => {
+	let new_url: string | string[] = url.replace("https://", "").split("/");
 
 	new_url = new_url[2] !== undefined ? new_url[2] : new_url[1];
 	url = "https://redirector.googlevideo.com/" + new_url;
 	return url;
 };
 
-import type { Dict } from "$lib/types/utilities";
-import { Logger, filterMap, map } from "$lib/utils";
-import { buildDashManifest, type IFormat } from "$lib/utils/buildDashManifest";
-
-export interface PlayerFormats {
-	hls?: string;
-	dash?: string;
-	streams?: { url: string; original_url: string; mimeType: string }[];
-}
 export function sort({
 	data = {},
 	WebM = false,
@@ -65,7 +63,7 @@ export function sort({
 			if (WebM === true && item.itag === 251)
 				return {
 					original_url: item.url,
-					url: parseProxyRedir(item.url),
+					url: createRedirectorURL(item.url),
 					mimeType: "webm",
 				};
 			if (item.itag === 140)

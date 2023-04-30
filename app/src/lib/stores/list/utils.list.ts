@@ -1,6 +1,8 @@
-import type { Item, Song } from "$lib/types";
+import type { Item } from "$lib/types";
 import { queryParams } from "$lib/utils";
-import type { NextEndpointResponse } from "src/routes/api/v1/next.json/+server";
+
+export const d = "";
+import type { NextEndpointResponse } from "../../../routes/api/v1/next.json/+server";
 
 /** Take an array, turn it into chunks[][] of size `chunk` */
 export function split(arr, chunk) {

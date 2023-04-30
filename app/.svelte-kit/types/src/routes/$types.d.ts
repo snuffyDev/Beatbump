@@ -8,6 +8,7 @@ export type RequiredKeys<T> = { [K in keyof T]-?: {} extends { [P in K]: T[K] } 
 type OutputDataShape<T> = MaybeWithVoid<Omit<App.PageData, RequiredKeys<T>> & Partial<Pick<App.PageData, keyof T & keyof App.PageData>> & Record<string, any>>
 type EnsureDefined<T> = T extends null | undefined ? {} : T;
 type OptionalUnion<U extends Record<string, any>, A extends keyof U = U extends U ? keyof U : never> = U extends unknown ? { [P in Exclude<A, keyof U>]?: never } & U : never;
+export type Snapshot<T = any> = Kit.Snapshot<T>;
 type PageParentData = EnsureDefined<LayoutData>;
 type LayoutRouteId = RouteId | "/" | "/artist/[slug]" | "/artist/[slug]/releases" | "/explore" | "/explore/[slug]" | "/home" | "/library" | "/library/playlists" | "/library/playlists/[slug]" | "/library/songs" | "/listen" | "/playlist/[slug]" | "/release" | "/search/[slug]" | "/session" | "/settings" | "/test" | "/trending" | "/trending/new/[slug]" | null
 type LayoutParams = RouteParams & { slug?: string }

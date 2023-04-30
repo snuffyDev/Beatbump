@@ -1,32 +1,33 @@
+<script
+	context="module"
+	lang="ts"
+>
+	export let test = "";
+</script>
+
 <script lang="ts">
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
 	import { Grid } from "$lib/components/Grid";
 	import Header from "$lib/components/Layouts/Header.svelte";
 	import CarouselItem from "$components/Carousel/CarouselItem.svelte";
-	import type { PageData } from "./$types";
 
-	export let data: PageData;
-
-	let sections = data?.sections;
-	let path = data?.path;
-	let header = data?.header;
-	let type = data?.type;
+	export let data;
 </script>
 
 <Header
-	title="{header} Playlists"
-	url={path}
+	title="{data.response.header} Playlists"
+	url={data.path}
 	desc="Find the perfect playlist that'll match your mood, or fit any occasion."
 />
 <main>
 	<div class="header">
-		<h1>{header}</h1>
+		<h1>{data.response.header}</h1>
 	</div>
-	{#each sections as section}
-		{#if type === "grid"}
+	{#each data.response.items as item}
+		{#if item.type === "grid"}
 			<Grid
-				heading={section.title}
-				items={section.section}
+				heading={item.header.title}
+				items={item.items}
 				let:item
 				let:index
 			>
@@ -43,8 +44,8 @@
 		{:else}
 			<!-- {@debug section} -->
 			<Carousel
-				header={section.header}
-				items={section.results}
+				header={item.header}
+				items={item.items}
 				type="home"
 				isBrowseEndpoint={false}
 			/>

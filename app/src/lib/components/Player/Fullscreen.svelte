@@ -1,13 +1,7 @@
-<script
-	context="module"
-	lang="ts"
->
-</script>
-
 <script lang="ts">
 	import { navigating } from "$app/stores";
 	import { AudioPlayer } from "$lib/player";
-	import { filterAutoPlay, immersiveQueue, isMobileMQ, isPagePlaying, playerLoading, theme } from "$lib/stores";
+	import { immersiveQueue, isMobileMQ, isPagePlaying, playerLoading } from "$lib/stores";
 	import { queue, currentTrack, queuePosition } from "$lib/stores/list";
 	import ListItem from "../ListItem/ListItem.svelte";
 	import Loading from "../Loading/Loading.svelte";
@@ -42,6 +36,7 @@
 	let windowHeight = 0,
 		queueHeight = 0,
 		sliding = false;
+	let DropdownItems: Dropdown;
 	let titleWidth = 320;
 	let active = "UpNext";
 	let thumbnail: Thumbnail;
@@ -156,6 +151,17 @@
 					url: "",
 					placeholder: "",
 			  };
+
+		if ($isMobileMQ) {
+			DropdownItems = createPlayerPopperMenu(
+				$currentTrack,
+				$queuePosition,
+				groupSession.hasActiveSession,
+				$SITE_ORIGIN_URL,
+			);
+		} else {
+			DropdownItems = undefined;
+		}
 	}
 
 	$: if ($navigating !== null) {
@@ -187,20 +193,6 @@
 				`;
 			},
 		};
-	}
-	let DropdownItems: Dropdown;
-
-	$: {
-		if ($isMobileMQ) {
-			DropdownItems = createPlayerPopperMenu(
-				$currentTrack,
-				$queuePosition,
-				groupSession.hasActiveSession,
-				$SITE_ORIGIN_URL,
-			);
-		} else {
-			DropdownItems = undefined;
-		}
 	}
 </script>
 
@@ -277,7 +269,7 @@
 								style="aspect-ratio: {thumbnail?.width} / {thumbnail?.height};"
 								width={thumbnail?.width}
 								height={thumbnail?.height}
-								src={thumbnail ? thumbnail?.url : data?.thumbnail}
+								src={thumbnail?.url ?? ""}
 								alt="thumbnail"
 							/>
 						</div>
@@ -414,7 +406,7 @@
 									{/if}
 									{#if Array.isArray($related.carousels)}
 										{#key $related.carousels}
-											{#each $related.carousels as carousel, idx}
+											{#each $related.carousels as carousel}
 												<Carousel
 													header={carousel.header}
 													items={carousel.items}
@@ -495,22 +487,15 @@
 	}
 	.scroller {
 		overflow-y: auto;
-		// overflow-x: hidden;
-		// background-color: rgb(18, 17, 24);
 		overscroll-behavior: contain;
-		// contain: paint
-		// display: flex;
 		overflow-y: auto;
-		// touch-action: pan-y;
 		transform: translate3d(0px, 0px, 0px);
 		overflow-x: hidden;
 		backface-visibility: hidden;
 		contain: strict;
-		// background-color: rgb(18, 17, 24);
 		overscroll-behavior: contain;
 		height: inherit;
 		-webkit-overflow-scrolling: touch;
-		// touch-action: none;
 	}
 
 	.immersive {
@@ -521,7 +506,11 @@
 		touch-action: none;
 		pointer-events: none;
 		overscroll-behavior: contain;
-
+		transform: translateZ(0);
+		contain: strict;
+		perspective: 1000px;
+		backface-visibility: hidden;
+		overflow: hidden;
 		&::after {
 			content: "";
 			position: absolute;
@@ -530,16 +519,24 @@
 
 			touch-action: none;
 			overscroll-behavior: contain;
+			transform: translateZ(0);
+			contain: strict;
+			perspective: 1000px;
+			backface-visibility: hidden;
+			overflow: hidden;
+			backdrop-filter: blur(1em);
 		}
 		> img {
 			object-fit: cover;
 			height: 100%;
 			overscroll-behavior: contain;
-
-			min-width: 100vw;
-			transform: scale(1.5);
-
-			filter: brightness(0.6) opacity(0.6) contrast(1) saturate(1.1) blur(1em) grayscale(0.3) sepia(0.2);
+			width: 100%;
+			position: absolute;
+			backface-visibility: hidden;
+			inset: 0;
+			transform: scale(1.5) translateZ(0);
+			overflow: hidden;
+			filter: brightness(0.6) opacity(0.6) contrast(1) saturate(1.1) grayscale(0.3) sepia(0.2);
 			touch-action: none;
 		}
 	}
@@ -570,7 +567,6 @@
 			top: unset !important;
 			border-top-left-radius: unset !important;
 			border-top-right-radius: unset !important;
-			// transition: unset !important;
 		}
 	}
 	.fullscreen-player-popup {
@@ -578,7 +574,6 @@
 		top: 0;
 		height: 100%;
 		width: 100%;
-		// pointer-events: none;
 		z-index: 1;
 		grid-area: m;
 		background: var(--base-bg);
@@ -591,7 +586,6 @@
 		overscroll-behavior: contain;
 		overflow: hidden;
 		contain: strict;
-		// transition: transform 400ms cubic-bezier(0.83, 0, 0.17, 1), opacity 400ms cubic-bezier(0.16, 1, 0.3, 1);
 
 		@media screen and (min-width: 720px) {
 			// gap: 1em;
@@ -642,7 +636,6 @@
 		&.vertical {
 			height: 100%;
 		}
-		// z-index: 100;
 	}
 	.mobile {
 		min-height: 100% !important;
@@ -679,7 +672,6 @@
 		inset: 0;
 		z-index: 151;
 		animation: fade-in 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 100ms alternate backwards;
-		// transition-delay: 225ms;
 		margin-top: var(--top-bar-height);
 		height: calc(100% - calc(var(--top-bar-height) + var(--player-bar-height)));
 		touch-action: none;
@@ -689,8 +681,6 @@
 		contain: strict;
 		touch-action: pan-y;
 		will-change: transform, opacity;
-
-		// bottom: 0;
 	}
 	.album-art {
 		margin-top: 7vh;
@@ -740,7 +730,6 @@
 		width: 100%;
 
 		max-height: inherit;
-		// position: absolute;
 		img {
 			touch-action: none;
 			max-width: inherit;
@@ -758,11 +747,9 @@
 		top: 0;
 		right: 0;
 		z-index: 100;
-		// margin: 0.5em;
 	}
 	.horz {
 		width: 100%;
-		// border-top: 0.0175rem groove rgba(171, 171, 171, 0.151);
 		border-top-left-radius: $sm-radius;
 		border-top-right-radius: $sm-radius;
 		height: 2.75em;
@@ -780,7 +767,6 @@
 	.handle {
 		overscroll-behavior: contain;
 
-		// box-shadow: 0 -0.4rem 23px -17px hsl(0deg 0% 100% / 100%);
 		z-index: 1;
 		display: grid;
 		cursor: pointer;

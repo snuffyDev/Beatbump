@@ -1,25 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { sort, type PlayerFormats } from "$lib/parsers/player";
-import { updatePlayerSrc } from "$lib/player";
 import { alertHandler } from "$lib/stores/stores";
-import { settings, type UserSettings } from "$lib/stores/settings";
-import { browser } from "$app/environment";
 import type { Song } from "$lib/types";
+import { normalizeURIEncoding } from "./strings/strings";
 
-let userSettings: UserSettings;
-if (browser && globalThis.self.name !== "IDB" && settings) {
-	settings.subscribe((value) => {
-		userSettings = value;
-	});
-}
 // notifications
-export const notify = (msg: string, type: "success" | "error", action?: string): void => {
+export const notify = (
+	msg: string,
+	type: "success" | "error",
+	action?: string,
+): void => {
 	alertHandler.add({
 		msg: msg,
 		type: type,
 		action,
 	});
 };
+
 // Shuffle array positions
 export function seededShuffle<T>(array: T[], _seed?: number): T[] {
 	let rand: () => number;
@@ -46,7 +42,11 @@ export function seededShuffle<T>(array: T[], _seed?: number): T[] {
 }
 
 export function shuffle(array: any[], index: number): any[] {
-	array = [...array.slice(0, index), array[index], ...array.slice(index + 1).sort(() => Math.random() - 0.5)];
+	array = [
+		...array.slice(0, index),
+		array[index],
+		...array.slice(index + 1).sort(() => Math.random() - 0.5),
+	];
 	return array;
 }
 
@@ -70,7 +70,11 @@ export const addToQueue = async ({
 }): Promise<Song[]> => {
 	try {
 		const url = `/api/v1/get_queue.json${
-			videoId ? `?videoIds=${videoId}` : playlistId ? "?playlistId=" + playlistId : ""
+			videoId
+				? `?videoIds=${videoId}`
+				: playlistId
+				? "?playlistId=" + playlistId
+				: ""
 		}`;
 		const data = (await fetch(url, { headers: { accept: "application/json" } })
 			.then((json) => json.json())
@@ -84,69 +88,15 @@ export const addToQueue = async ({
 };
 
 export type ResponseBody = { original_url: string; url: string };
-// Get source URLs
-export const getSrc = async (
-	videoId?: string,
-	playlistId?: string,
-	params?: string,
-	shouldAutoplay = true,
-): Promise<{
-	body: ResponseBody;
-	error?: boolean;
-}> => {
-	try {
-		const res = await fetch(
-			`/api/v1/player.json?videoId=${videoId}${playlistId ? `&playlistId=${playlistId}` : ""}${
-				params ? `&playerParams=${params}` : ""
-			}`,
-		).then((res) => res.json());
-		if (res && !res?.streamingData && res?.playabilityStatus.status === "UNPLAYABLE") {
-			return handleError();
-		}
-		const formats = sort({
-			data: res,
-			dash: false,
-			proxyUrl: userSettings?.network["HLS Stream Proxy"] ?? "",
-		});
-
-		const src = setTrack(formats, shouldAutoplay);
-
-		return src;
-	} catch (err) {
-		console.error(err);
-		notify(err, "error");
-	}
-};
-
-function setTrack(formats: PlayerFormats, shouldAutoplay) {
-	let format;
-	if (userSettings?.playback?.Stream === "HLS") {
-		format = { original_url: formats?.hls, url: formats.hls };
-	} else {
-		format = formats.streams[0];
-	}
-	if (shouldAutoplay) updatePlayerSrc({ original_url: format.original_url, url: format.url });
-	return {
-		body: { original_url: format.original_url, url: format.url },
-		error: false,
-	};
-}
-function handleError() {
-	console.log("error");
-
-	notify("An error occurred while initiating playback, skipping...", "error", "getNextTrack");
-	return {
-		body: null,
-		error: true,
-	};
-}
 
 export const queryParams = (params: Record<any, any>): string => {
 	const result = [];
 	let key = "";
 	for (key in params) {
 		if (typeof params[key] !== "number" && !params[key]) continue;
-		result.push(`${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`);
+		result.push(
+			`${encodeURIComponent(key)}=${normalizeURIEncoding(params[key])}`,
+		);
 	}
 	return result.join("&");
 };

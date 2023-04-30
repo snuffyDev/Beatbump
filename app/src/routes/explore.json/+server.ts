@@ -13,7 +13,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	const contents =
 		data.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents;
-	let sections = [];
+	const sections = [];
 	for (let index = 0; index < contents.length; index++) {
 		const { gridRenderer } = contents[index];
 		const { items = [], header = {} } = gridRenderer;
@@ -29,13 +29,10 @@ export const GET: RequestHandler = async ({ url }) => {
 				},
 			};
 		}
-		sections = [
-			...sections,
-			{
-				section: [...items],
-				title: header?.gridHeaderRenderer?.title?.runs[0]?.text,
-			},
-		];
+		sections.push({
+			section: items,
+			title: header?.gridHeaderRenderer?.title?.runs[0]?.text,
+		});
 	}
 
 	return new Response(JSON.stringify(sections));

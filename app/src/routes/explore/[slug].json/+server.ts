@@ -1,11 +1,15 @@
 import { json as json$1 } from "@sveltejs/kit";
 
 import { buildAPIRequest } from "$api/request";
-import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
-import type { CarouselHeader, CarouselItem } from "$lib/types";
-import type { RequestHandler } from "@sveltejs/kit";
+import type { ParsedCarousel } from "$api/models/Carousel";
+import type { ParsedGrid } from "$api/models/Grid";
+import { parseCarouselItem, parseGridItem, type GridOrCarousel } from "$lib/parsers/innertube/parseSectionObject.js";
 
-export const GET: RequestHandler = async ({ params }) => {
+export type ExploreSlugResponse = Awaited<ReturnType<Awaited<ReturnType<typeof GET>>["json"]>>;
+
+export const GET = async ({
+	params,
+}): Promise<IResponse<{ header: string; items: (ParsedCarousel | ParsedGrid)[] }>> => {
 	const { slug } = params;
 	const response = await buildAPIRequest("browse", {
 		context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
@@ -21,84 +25,28 @@ export const GET: RequestHandler = async ({ params }) => {
 			} = {},
 		} = {},
 	} = await data;
-	const carousels = [];
-	const grids = [];
-	let sections: Array<{
-		header?: Record<string, any>;
-		section?: any[];
-		type?: "grids";
-	}> = [];
+
+	const toParse: [type: "carousel" | "grid", data: GridOrCarousel<"grid"> | GridOrCarousel<"carousel">][] = [];
+	const responseItems: (ParsedCarousel | ParsedGrid)[] = [];
+
 	for (let index = 0; index < contents.length; index++) {
 		const element = { ...contents[index] };
 
-		element?.musicCarouselShelfRenderer && carousels.push(element);
-		element?.gridRenderer && grids.push(element);
+		element?.musicCarouselShelfRenderer && toParse.push(["carousel", element]);
+		element?.gridRenderer && toParse.push(["grid", element]);
 	}
-	// return json$1({ data });
-	if (carousels.length !== 0) {
-		sections = carousels.map(({ musicCarouselShelfRenderer }) => parseCarousel({ musicCarouselShelfRenderer }));
-		if (sections.length !== 0) {
-			return json$1({ data, sections, header: text, type: "carousel" });
-			return new Response(
-				JSON.stringify({
-					sections,
-					header: text,
-					type: "carousel",
-				}),
-			);
+
+	for (const [type, data] of toParse) {
+		if (type === "grid") {
+			responseItems.push(parseGridItem(data as GridOrCarousel<"grid">));
 		}
-	} else {
-		sections = grids.map(({ gridRenderer = {} }) => {
-			const { items = [], header = {} } = gridRenderer;
-			const section = items.map((ctx) => MusicTwoRowItemRenderer(ctx));
-			return {
-				section,
-				title: header?.gridHeaderRenderer?.title?.runs[0]?.text,
-			};
-		});
-		return json$1({
-			sections,
-			header: text,
-			type: "grid",
-		});
+		if ("musicCarouselShelfRenderer" in data) {
+			responseItems.push(parseCarouselItem(data as GridOrCarousel<"carousel">));
+		}
 	}
+
+	return json$1({ header: text, items: responseItems }) as IResponse<{
+		header: string;
+		items: (ParsedCarousel | ParsedGrid)[];
+	}>;
 };
-function parseHeader(header: any[]): CarouselHeader[] {
-	return header.map(({ musicCarouselShelfBasicHeaderRenderer } = {}) => {
-		const o = {} as any;
-		if (
-			musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer?.navigationEndpoint?.browseEndpoint
-				?.browseId
-		)
-			o.browseId =
-				musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer?.navigationEndpoint?.browseEndpoint?.browseId;
-
-		if (
-			musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer?.navigationEndpoint?.browseEndpoint
-				?.params
-		)
-			o.params =
-				musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer?.navigationEndpoint?.browseEndpoint?.params;
-		o.title = musicCarouselShelfBasicHeaderRenderer["title"]["runs"][0].text;
-		return o;
-	});
-}
-
-function parseBody(contents): CarouselItem[] {
-	return contents.map(({ ...r }) => {
-		if (r.musicTwoRowItemRenderer) {
-			return MusicTwoRowItemRenderer(r);
-		}
-		if (r.musicResponsiveListItemRenderer) {
-			return MusicResponsiveListItemRenderer(r);
-		}
-
-		throw new Error("Unable to parse items, can't find " + `${r}`);
-	});
-}
-function parseCarousel({ musicCarouselShelfRenderer }) {
-	return {
-		header: parseHeader([musicCarouselShelfRenderer.header])[0],
-		results: parseBody(musicCarouselShelfRenderer.contents),
-	};
-}

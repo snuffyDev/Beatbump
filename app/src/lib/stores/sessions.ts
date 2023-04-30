@@ -8,9 +8,9 @@ import type Peer from "peerjs";
 import type { DataConnection } from "peerjs";
 import SessionListService, { type ISessionListProvider } from "./list";
 
-import { AudioPlayer } from "$lib/player";
+import { getSrc, AudioPlayer } from "$lib/player";
 import { EventEmitter, Mutex } from "$lib/utils/sync";
-import { getSrc, notify } from "$lib/utils/utils";
+import { notify } from "$lib/utils/utils";
 import { get } from "svelte/store";
 
 type BaseKind = "action" | "state" | "status";

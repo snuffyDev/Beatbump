@@ -5,13 +5,14 @@
 	import List from "../_List.svelte";
 	import { isPagePlaying } from "$lib/stores/stores";
 	import list from "$lib/stores/list";
-	import { filter, getSrc } from "$lib/utils";
+	import { filter } from "$lib/utils";
 	import Header from "$lib/components/Layouts/Header.svelte";
 	import { page } from "$app/stores";
 	import CreatePlaylist from "$lib/components/PlaylistPopper/CreatePlaylist.svelte";
 	import ListInfoBar from "$lib/components/ListInfoBar";
 	import LocalListItem from "$lib/components/ListItem/LocalListItem.svelte";
 	import { CTX_ListItem } from "$lib/contexts";
+	import { getSrc} from '$lib/player';
 	import Search from "../_Search.svelte";
 	import { onMount, tick } from "svelte";
 
@@ -24,16 +25,14 @@
 
 	let items: Item[] = [];
 	let playlist: IDBPlaylist = undefined;
-	let thumbnail = undefined;
 	let showEditPlaylist;
 	let hasQuery = false;
 	async function getPlaylist() {
 		const promise = await IDBService.sendMessage("get", "playlist", playlistName);
 		playlist = {};
 		Object.assign(playlist, promise);
-		playlist = playlist;
+		playlist = [...playlist];
 		items = playlist.items;
-		thumbnail = playlist?.thumbnail;
 	}
 	onMount(async () => {
 		await getPlaylist();
@@ -61,7 +60,6 @@
 		const start = i;
 		event.dataTransfer.setData("text/plain", start);
 	};
-	let hovering: number | boolean = false;
 </script>
 
 <Header
@@ -84,13 +82,12 @@
 				on:close={() => (showEditPlaylist = false)}
 				on:cancel={() => (showEditPlaylist = false)}
 				on:submit={async ({ detail }) => {
-					const promise = await IDBService.sendMessage("update", "playlist", {
+					await IDBService.sendMessage("update", "playlist", {
 						thumbnail: detail?.thumbnail,
 						id: $page.params.slug,
 						name: detail?.title,
 						description: detail?.description,
 					});
-					thumbnail = detail?.thumbnail;
 					playlist = {
 						...playlist,
 						thumbnail: detail.thumbnail,
@@ -155,14 +152,10 @@
 			{items}
 			let:item
 			let:index
-			let:send
-			let:receive
 		>
 			<LocalListItem
-				on:hovering={({ detail }) => (hovering = detail?.idx)}
-				on:notHovering={() => (hovering = null)}
 				on:dragstart={(event) => dragstart(event, index)}
-				on:change={async (event) => getPlaylist()}
+				on:change={async () => getPlaylist()}
 				on:drop={async (event) => {
 					if (hasQuery) return;
 					drop(event, index);

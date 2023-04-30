@@ -9,8 +9,10 @@ const observerCallback = (entries: IntersectionObserverEntry[], ob) => {
 		if (entry.isIntersecting) {
 			target.decode().finally(() => {
 				target.src = target.dataset.src;
-				target.decode().finally(() => {
-					intersectionObserver.unobserve(entry.target);
+				queueMicrotask(() => {
+					target.decode().finally(() => {
+						intersectionObserver.unobserve(entry.target);
+					});
 				});
 			});
 		}
@@ -30,9 +32,7 @@ export default function lazyContainer(node: HTMLElement) {
 	let children = node.querySelectorAll("img[data-src]");
 
 	for (const img of children) {
-		queueMicrotask(() => {
-			intersectionObserver.observe(img);
-		});
+		intersectionObserver.observe(img);
 	}
 
 	return {

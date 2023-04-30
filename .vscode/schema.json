@@ -40,8 +40,9 @@
 					"type": "object",
 					"description": "",
 					"properties": {
-						"edge": {
-							"type": "boolean",
+						"runtime": {
+							"type": "string",
+							"oneOf": [{ "const": "edge" }, { "const": "nodejs16.x" }, { "const": "nodejs18.x" }],
 							"default": false
 						},
 						"split": {

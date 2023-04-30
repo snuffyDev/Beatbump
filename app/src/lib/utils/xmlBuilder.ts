@@ -1,5 +1,3 @@
-import type { JSON } from "$lib/types";
-import type { Dict } from "$lib/types/utilities";
 import { reduce } from "./collections";
 
 export interface XMLNode {
@@ -56,13 +54,11 @@ function buildElements(nodes: XMLNode[]) {
 export function buildXML(input: XMLRoot) {
 	let output = "";
 	const depth = 0;
-	let isFirstLine = true;
 	if (input["declaration"]) {
 		output += buildDeclaration(input["declaration"], depth);
-		isFirstLine = false;
 	}
 	if (input["nodes"]) {
-		output += buildElements(input["nodes"], depth, isFirstLine);
+		output += buildElements(input["nodes"]);
 	}
 	console.log(output);
 	return output;

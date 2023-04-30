@@ -1,0 +1,14 @@
+{
+	"tabWidth": 2,
+	"useTabs": true,
+	"trailingComma": "all",
+	"singleQuote": false,
+	"semi": true,
+	"printWidth": 80,
+	"proseWrap": "preserve",
+	"bracketSpacing": true,"htmlWhitespaceSensitivity": "strict",
+	"quoteProps": "as-needed",
+	"singleAttributePerLine": true,
+	"arrowParens": "always",
+	"svelteSortOrder": "options-scripts-markup-styles"
+}

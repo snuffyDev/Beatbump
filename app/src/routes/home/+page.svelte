@@ -10,21 +10,11 @@
 
 	export let data: PageData;
 
-	let { carousels, chips, params, headerThumbnail, continuations, visitorData, path } = data;
+	$: ({ carousels, chips, params, headerThumbnail, continuations, visitorData, path } = data);
 
 	let loading = false;
 	let hasData = false;
 
-	afterNavigate(({ to }) => {
-		if (to.url.pathname.includes("/home")) {
-			carousels = data.carousels;
-			chips = data.chips;
-			params = data.params;
-			headerThumbnail = data.headerThumbnail;
-			continuations = data.continuations;
-			visitorData = data.visitorData;
-		}
-	});
 	homeChipContext.set({ params });
 </script>
 
@@ -77,59 +67,53 @@
 <main data-testid="home">
 	<Chips
 		{chips}
-		on:click={async ({ detail }) => {
-			if (params !== detail.params) {
-				await goto(`/home?params=${detail.params}`);
-			} else {
-				await goto(`/home`);
-			}
+		on:click={({ detail }) => {
+			invalidate("home:load");
 		}}
 	/>
-	{#key data}
-		{#each carousels as carousel}
-			<Carousel
-				items={carousel.items}
-				header={carousel.header}
-				type="home"
-				kind={carousel.header?.type}
-				isBrowseEndpoint={false}
-			/>
-		{/each}
-		{#if Object.keys(continuations).length}
-			<div
-				class="viewport"
-				use:viewport={{ margin: "100px" }}
-				on:enterViewport={async () => {
-					if (loading || hasData) return;
-					loading = true;
-					const response = await fetch(
-						`/home.json?itct=${encodeURIComponent(continuations.clickTrackingParams)}${
-							params ? `&params=${encodeURIComponent(params)}` : ""
-						}&ctoken=${encodeURIComponent(continuations.continuation)}&type=next&visitorData=${visitorData}`,
-					);
-					const data = await response.json();
-					// const {continuations, carousels} = data;
-					if (data.continuations) {
-						continuations = data.continuations;
-						queueMicrotask(() => {
-							carousels = [...carousels, ...data.carousels];
-						});
-						loading = false;
-						return hasData;
-					}
-					hasData = data.continuations === undefined;
-					return !loading;
-				}}
-			/>
+	{#each carousels as carousel}
+		<Carousel
+			items={carousel.items}
+			header={carousel.header}
+			type="home"
+			kind={carousel.header?.type}
+			isBrowseEndpoint={false}
+		/>
+	{/each}
+	{#if Object.keys(continuations).length}
+		<div
+			class="viewport"
+			use:viewport={{ margin: "100px" }}
+			on:enterViewport={async () => {
+				if (loading || hasData) return;
+				loading = true;
+				const response = await fetch(
+					`/home.json?itct=${encodeURIComponent(continuations.clickTrackingParams)}${
+						params ? `&params=${encodeURIComponent(params)}` : ""
+					}&ctoken=${encodeURIComponent(continuations.continuation)}&type=next&visitorData=${visitorData}`,
+				);
+				const data = await response.json();
+				// const {continuations, carousels} = data;
+				if (data.continuations) {
+					continuations = data.continuations;
+					queueMicrotask(() => {
+						carousels = [...carousels, ...data.carousels];
+					});
+					loading = false;
+					return hasData;
+				}
+				hasData = data.continuations === undefined;
+				return !loading;
+			}}
+		/>
 
-			<div
-				class="loading"
-				style:opacity={loading ? 1 : 0}
-			>
-				<Loading />
-			</div>
-		{/if}
-	{/key}
+		<div
+			class="loading"
+			style:opacity={loading ? 1 : 0}
+		>
+			<Loading />
+		</div>
+	{/if}
 </main>
 
 <style lang="scss">

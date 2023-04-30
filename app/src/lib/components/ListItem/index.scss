@@ -8,11 +8,11 @@
 	touch-action: auto;
 	line-height: 1.5;
 	@media screen and (min-width: 720px) {
+		align-content: center;
 		display: grid;
 		flex: none;
-		align-content: center;
 		grid-template-areas: "left middle right";
-		grid-template-columns: 2.25em calc(100% - 4.8em) 2.45em;
+		grid-template-columns: 2.25fr minmax(0, 78%) 5fr;
 	}
 	@supports (content-visibility: auto) {
 		content-visibility: auto;
@@ -91,7 +91,8 @@
 .length {
 	align-self: center;
 	grid-area: right;
-	width: 2.45em;
+	display: flex;
+	justify-content: flex-end;
 }
 
 .thumbnail {

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { PageData } from "./$types";
 	import Carousel from "$components/Carousel/Carousel.svelte";
 	import Header from "$lib/components/Layouts/Header.svelte";
 	import { isMoodsAndGenres, isValidCarousel } from "$lib/validation/typeGuards/isIListItemRenderer";
 
-	export let data: PageData;
+	export let data;
 
 	const { carouselItems, page: path } = data;
+	$: console.log(data.data);
 </script>
 
 <Header
@@ -20,7 +20,7 @@
 			<Carousel
 				isBrowseEndpoint={false}
 				header={carousel.header}
-				items={carousel.results}
+				items={carousel.items}
 				type="trending"
 				kind="isPlaylist"
 			/>
@@ -35,7 +35,7 @@
 				</div>
 				<div class="box">
 					<div class="scroll">
-						{#each carousel.results as item}
+						{#each carousel.items as item}
 							<a
 								style="--color: #{item?.color}"
 								class="item-box"

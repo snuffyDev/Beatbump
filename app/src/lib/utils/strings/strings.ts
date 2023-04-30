@@ -13,6 +13,17 @@ export class Encoder {
 	}
 }
 
+export function normalizeURIEncoding(str: string): string {
+	try {
+		const decodedStr = decodeURIComponent(str);
+		const reencodedStr1 = encodeURIComponent(decodedStr);
+		const reencodedStr2 = encodeURIComponent(reencodedStr1);
+		return reencodedStr2 === str ? str : reencodedStr2;
+	} catch (e) {
+		return encodeURIComponent(str);
+	}
+}
+
 export function sanitize(str: string): string {
 	if (typeof str !== "string") return;
 	return str

@@ -1,6 +1,5 @@
-import { buildXML, type XMLRoot } from "./xmlBuilder";
+import { buildXML, type XMLRoot, XMLNode } from "./xmlBuilder";
 
-import type { XMLNode } from "./xmlBuilder";
 import { iter } from "./collections";
 
 function buildAudioNode(item: IFormat): XMLNode {

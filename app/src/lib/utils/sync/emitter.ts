@@ -14,74 +14,81 @@ export interface IEventEmitter<T> {
 	on<Name extends KeyOf<T> = KeyOf<T>>(type: Name, cb: EventCallback<T[Name]>): void;
 }
 
-export class EventEmitter<Events extends Record<string, any> = any> implements IEventEmitter<Events> {
-	private __target: object;
-	private _eventQueue = new WeakMap<object, EventListeners<any>>();
+export function EventEmitterMixin<TBase extends new (...args: any[]) => {}, Events extends Record<string, any> = any>(
+	Base: TBase,
+) {
+	return class EventEmitter extends Base implements IEventEmitter<Events> {
+		__target: object;
+		_eventQueue: WeakMap<object, EventListeners<any>>;
 
-	constructor(target: object) {
-		this.__target = target;
-	}
-
-	dispatch<Name extends KeyOf<Events> = KeyOf<Events>>(type: Name, args?: Events[Name]): void {
-		const queue = this._eventQueue.get(this.__target);
-
-		if (!queue) {
-			return;
+		constructor(...target: any[]) {
+			super(...target);
+			this.__target = target;
+			this._eventQueue = new WeakMap<object, EventListeners<any>>();
 		}
 
-		const listeners = queue.get(type);
+		dispatch<Name extends KeyOf<Events> = KeyOf<Events>>(type: Name, args?: Events[Name]): void {
+			const queue = this._eventQueue.get(this.__target);
 
-		if (!listeners) return;
+			if (!queue) {
+				return;
+			}
 
-		const length = listeners.length;
-		let idx = -1;
+			const listeners = queue.get(type);
 
-		for (; ++idx < length; ) {
-			listeners[idx](args);
+			if (!listeners) return;
+
+			const length = listeners.length;
+			let idx = -1;
+
+			for (; ++idx < length; ) {
+				listeners[idx](args);
+			}
 		}
-	}
 
-	public dispose(): void {
-		if (this._eventQueue !== null) this._eventQueue.delete(this.__target);
-		this._eventQueue = null;
-	}
-
-	public off<Name extends KeyOf<Events> = KeyOf<Events>>(type: Name, cb: EventCallback<Events[Name]>): void {
-		const listeners = this._eventQueue.get(this.__target);
-		if (!listeners) return;
-		if (type === undefined) {
-			listeners.clear();
-			// console.log(this._eventQueue, listeners);
-			return;
+		public dispose(): void {
+			if (this._eventQueue !== null) this._eventQueue.delete(this.__target);
+			this._eventQueue = null;
 		}
-		if (cb === undefined) {
-			listeners.delete(type);
-			// console.log(this._eventQueue, listeners);
-			return;
+
+		public off<Name extends KeyOf<Events> = KeyOf<Events>>(type: Name, cb: EventCallback<Events[Name]>): void {
+			const listeners = this._eventQueue.get(this.__target);
+			if (!listeners) return;
+			if (type === undefined) {
+				listeners.clear();
+				// console.log(this._eventQueue, listeners);
+				return;
+			}
+			if (cb === undefined) {
+				listeners.delete(type);
+				// console.log(this._eventQueue, listeners);
+				return;
+			}
 		}
-	}
 
-	public on<Name extends KeyOf<Events> = KeyOf<Events>>(type: Name, cb: EventCallback<Events[Name]>): void {
-		if (!this.__target) return;
-		const queue = this._eventQueue.get(this.__target) ?? (new Map() as EventListeners<any>);
+		public on<Name extends KeyOf<Events> = KeyOf<Events>>(type: Name, cb: EventCallback<Events[Name]>): void {
+			if (!this.__target) return;
+			const queue = this._eventQueue.get(this.__target) ?? (new Map() as EventListeners<any>);
 
-		const listeners = queue.get(type) ?? [];
-		queue.set(type, listeners.concat(cb));
+			const listeners = queue.get(type) ?? [];
+			queue.set(type, listeners.concat(cb));
 
-		this._eventQueue.set(this.__target, queue);
-	}
+			this._eventQueue.set(this.__target, queue);
+		}
 
-	public once<Name extends KeyOf<Events> = KeyOf<Events>>(name: Name, cb: EventCallback<Events[Name]>) {
-		if (!this.__target) return;
+		public once<Name extends KeyOf<Events> = KeyOf<Events>>(name: Name, cb: EventCallback<Events[Name]>) {
+			if (!this.__target) return;
 
-		const doOnce = (data: Events[Name]) => {
-			this.off(name, doOnce);
-			cb(data);
-		};
+			const doOnce = (data: Events[Name]) => {
+				this.off(name, doOnce);
+				cb(data);
+			};
 
-		this.on(name, doOnce);
-	}
+			this.on(name, doOnce);
+		}
+	};
 }
+export const EventEmitter = EventEmitterMixin(class P {});
 
 export const Messenger = new EventEmitter({});
 

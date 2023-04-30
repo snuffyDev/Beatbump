@@ -1,5 +1,3 @@
-import type { Maybe } from "$lib/utils/collections/array";
-
 export type Releaser = () => void;
 export type Callback<T> = () => Promise<T> | T;
 

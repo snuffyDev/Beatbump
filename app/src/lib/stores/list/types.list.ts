@@ -79,7 +79,7 @@ export interface ISessionListService {
 
 	toJSON(): string;
 
-	updatePosition(direction: "next" | "back" | number): number;
+	updatePosition(direction: "next" | "back" | number): Promise<number>;
 	/** Getter for queue position */
 	position: number;
 	/** Getter for mix */

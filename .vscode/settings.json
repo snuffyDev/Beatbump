@@ -1,6 +1,6 @@
 {
 	"svg.preview.background": "custom",
-	"eslint.probe": ["javascript", "typescript", "html", "markdown", "svelte"],
+	"eslint.enable": true,
 	"editor.formatOnSave": true,
 	"deno.enable": false,
 	"npm.autoDetect": "on",
@@ -9,24 +9,24 @@
 	"json.schemas": [
 		{
 			"url": "./.vscode/schema.json",
-			"fileMatch": [
-				"/app/beatbump.conf.json"
-			]
+			"fileMatch": ["/app/beatbump.conf.json"]
 		}
 	],
 	"typescript.format.enable": true,
 	"prettier.enable": true,
 	"prettier.configPath": ".prettierrc",
-	"editor.formatOnSaveMode": "modificationsIfAvailable",
+	"editor.formatOnSaveMode": "file",
 	"[typescript]": {
 		"editor.formatOnSave": true,
 		"editor.formatOnSaveMode": "file",
-		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
+	"eslint.nodePath": "app/node_modules",
 	"[svelte]": {
 		"editor.formatOnSave": true,
 		"editor.formatOnSaveMode": "file",
-		"editor.defaultFormatter": "svelte.svelte-vscode",
+
+		"editor.defaultFormatter": "svelte.svelte-vscode"
 	},
 	"typescript.tsdk": "./app/node_modules/typescript/lib"
 }

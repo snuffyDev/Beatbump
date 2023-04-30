@@ -7,6 +7,7 @@ import node from "@sveltejs/adapter-node";
 import path from "path";
 import sveltePreprocess from "svelte-preprocess";
 import dotenv from "dotenv";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
@@ -16,12 +17,14 @@ const ENV_ADAPTER = process.env["BB_ADAPTER"] ?? "cloudflare-workers";
 const adapters = {
 	"cloudflare-workers": adapterCfw({}),
 	cloudflare: adapterCf(),
-	vercel: vercel({ edge: false, split: false }),
-	netlify: netlify({ edge: false, split: false }),
-	node: node({ precompress: true }),
+	vercel: vercel({}),
+	netlify: netlify({}),
+	node: node({ precompress: false }),
 };
 
 const adapter = adapters[ENV_ADAPTER];
+
+const SASS_PATH = `${path.dirname(fileURLToPath(import.meta.url))}/src/global/redesign/base/_variables.scss`;
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -29,8 +32,9 @@ const config = {
 		sass: false,
 
 		scss: {
-			includePaths: ["src"],
-			prependData: '@use "./src/global/stylesheet/base/variables" as *;',
+			includePaths: ["./src/"],
+
+			prependData: `@use "${SASS_PATH}" as *;`,
 			stripIndent: true,
 		},
 		postcss: { configFilePath: path.resolve("./postcss.config.cjs") },
