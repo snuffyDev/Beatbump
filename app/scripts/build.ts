@@ -25,12 +25,15 @@ const pkg = require(path.resolve("./package.json"));
  */
 const json: BeatbumpSchema = json_config as BeatbumpSchema;
 
-const adapter: Adapter = (json["environment"]!["adapter"]! as Adapter) ?? "vercel";
+const adapter: Adapter =
+	(json["environment"]!["adapter"]! as Adapter) ?? "vercel";
 
 const rootPath = path.resolve(".");
 
 const svelteConfigPath = path.join(rootPath, "svelte.config.js");
-const originalSvelteConfig = readFileSync(svelteConfigPath, { encoding: "utf-8" });
+const originalSvelteConfig = readFileSync(svelteConfigPath, {
+	encoding: "utf-8",
+});
 let modifiedSvelteConfig = "";
 
 const adapterImportRegexp = /(?=@sveltejs\/adapter).+(?=")/gm;
@@ -53,12 +56,20 @@ export class Logger {
 
 async function installAdapter(adapter: Adapter, options: Platform) {
 	try {
-		modifiedSvelteConfig = originalSvelteConfig.replace(adapterImportRegexp, `@sveltejs/adapter-${adapter}`);
+		modifiedSvelteConfig = originalSvelteConfig.replace(
+			adapterImportRegexp,
+			`@sveltejs/adapter-${adapter}`,
+		);
 		if (adapter.match(/vercel|node|netlify/g)) {
-			modifiedSvelteConfig = modifiedSvelteConfig.replace(/adapter\(.[^,]+/gm, `adapter(${JSON.stringify(options)})`);
+			modifiedSvelteConfig = modifiedSvelteConfig.replace(
+				/adapter\(.[^,]+/gm,
+				`adapter(${JSON.stringify(options)})`,
+			);
 		}
 
-		writeFileSync(svelteConfigPath, modifiedSvelteConfig, { encoding: "utf-8" });
+		writeFileSync(svelteConfigPath, modifiedSvelteConfig, {
+			encoding: "utf-8",
+		});
 		return true;
 	} catch (err) {
 		Logger.err(err);
@@ -71,15 +82,23 @@ async function main() {
 	});
 	try {
 		if (!beatbump_config_path) {
-			Logger.err(`No config file was found. Please create a file named 'beatbump.config.json' at ${rootPath}`);
+			Logger.err(
+				`No config file was found. Please create a file named 'beatbump.config.json' at ${rootPath}`,
+			);
 			return;
 		}
-		Logger.info(`---Beatbump-------------------\nConfig path: ${beatbump_config_path}\n`);
+		Logger.info(
+			`---Beatbump-------------------\nConfig path: ${beatbump_config_path}\n`,
+		);
 
-		const options = adapter.match(/node|vercel|netlify/g) ? json["platform"][adapter] : null;
+		const options = adapter.match(/node|vercel|netlify/g)
+			? json["platform"][adapter]
+			: null;
 
 		if (!pkg.devDependencies[`@sveltejs/adapter-${adapter}`]) {
-			Logger.info(`Adapter @sveltejs/adapter-${adapter} was not found. Installing...`);
+			Logger.info(
+				`Adapter @sveltejs/adapter-${adapter} was not found. Installing...`,
+			);
 
 			spawnSync(`npm`, [`i`, `-D`, `@sveltejs/adapter-${adapter}@next`], {
 				stdio: "inherit",

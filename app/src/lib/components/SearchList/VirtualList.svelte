@@ -131,7 +131,9 @@
 	}
 	// trigger initial refresh
 	onMount(() => {
-		rows = contents.getElementsByTagName("svelte-virtual-list-row") as HTMLCollectionOf<HTMLElement>;
+		rows = contents.getElementsByTagName(
+			"svelte-virtual-list-row",
+		) as HTMLCollectionOf<HTMLElement>;
 		if (items.length > 1) mounted = true;
 	});
 </script>

@@ -8,7 +8,12 @@ export const browseHandler = (pageType: string, browseId: string): void => {
 	} else {
 		pageType.includes("PLAYLIST")
 			? goto("/playlist/" + browseId)
-			: goto("/release?type=" + encodeURIComponent(pageType) + "&id=" + encodeURIComponent(browseId));
+			: goto(
+					"/release?type=" +
+						encodeURIComponent(pageType) +
+						"&id=" +
+						encodeURIComponent(browseId),
+			  );
 	}
 };
 export async function clickHandler({
@@ -48,7 +53,11 @@ export async function clickHandler({
 		goto(`/artist/${item?.endpoint?.browseId}`);
 	}
 
-	if (!isBrowseEndpoint && item.videoId !== undefined && !item?.endpoint?.pageType.includes("ARTIST")) {
+	if (
+		!isBrowseEndpoint &&
+		item.videoId !== undefined &&
+		!item?.endpoint?.pageType.includes("ARTIST")
+	) {
 		await list.initAutoMixSession({
 			loggingContext: item?.loggingContext,
 			videoId: item.videoId,

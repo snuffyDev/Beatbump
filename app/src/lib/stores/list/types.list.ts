@@ -31,7 +31,9 @@ export interface ISessionListService {
 		playlistId?: string;
 		keyId?: number;
 		playlistSetVideoId?: string;
-		loggingContext?: Nullable<{ vssLoggingContext?: { serializedContextData: string } }>;
+		loggingContext?: Nullable<{
+			vssLoggingContext?: { serializedContextData: string };
+		}>;
 		clickTracking?: string;
 		config?: { playerParams?: string; type?: string };
 	}): Promise<void>;

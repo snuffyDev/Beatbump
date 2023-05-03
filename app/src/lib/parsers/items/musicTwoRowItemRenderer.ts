@@ -1,4 +1,7 @@
-import type { IMusicTwoRowItemRenderer, SubtitleRun } from "$lib/types/innertube/internals";
+import type {
+	IMusicTwoRowItemRenderer,
+	SubtitleRun,
+} from "$lib/types/innertube/internals";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import { subtitle, thumbnailTransformer } from "../utils.parsers";
 
@@ -7,16 +10,20 @@ export const MusicTwoRowItemRenderer = (ctx: {
 }): ICarouselTwoRowItem => {
 	const musicTwoRowItemRenderer = ctx.musicTwoRowItemRenderer;
 	const thumbnails = (
-		musicTwoRowItemRenderer.thumbnailRenderer?.musicThumbnailRenderer?.thumbnail?.thumbnails || []
+		musicTwoRowItemRenderer.thumbnailRenderer?.musicThumbnailRenderer?.thumbnail
+			?.thumbnails || []
 	).map((item) => ({ ...item, ...thumbnailTransformer(item.url) }));
 
-	const playlistIdShort = musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint?.playlistId;
+	const playlistIdShort =
+		musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint?.playlistId;
 	const playlistId =
 		playlistIdShort ??
-		musicTwoRowItemRenderer.thumbnailOverlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer
-			?.playNavigationEndpoint?.watchPlaylistEndpoint?.playlistId ??
-		musicTwoRowItemRenderer.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer
-			?.playNavigationEndpoint?.watchPlaylistEndpoint?.playlistId;
+		musicTwoRowItemRenderer.thumbnailOverlay?.musicItemThumbnailOverlayRenderer
+			?.content?.musicPlayButtonRenderer?.playNavigationEndpoint
+			?.watchPlaylistEndpoint?.playlistId ??
+		musicTwoRowItemRenderer.overlay?.musicItemThumbnailOverlayRenderer?.content
+			?.musicPlayButtonRenderer?.playNavigationEndpoint?.watchPlaylistEndpoint
+			?.playlistId;
 
 	const Item: ICarouselTwoRowItem = {
 		title: musicTwoRowItemRenderer["title"]["runs"][0].text,
@@ -25,21 +32,27 @@ export const MusicTwoRowItemRenderer = (ctx: {
 		videoId: musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint?.videoId,
 		playlistId,
 		musicVideoType:
-			musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint?.watchEndpointMusicSupportedConfigs
-				?.watchEndpointMusicConfig?.musicVideoType,
-		playerParams: musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint?.params,
+			musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint
+				?.watchEndpointMusicSupportedConfigs?.watchEndpointMusicConfig
+				?.musicVideoType,
+		playerParams:
+			musicTwoRowItemRenderer.navigationEndpoint?.watchEndpoint?.params,
 		endpoint: musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint
 			? {
-					browseId: musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint?.browseId || undefined,
+					browseId:
+						musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint
+							?.browseId || undefined,
 					pageType:
-						musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint?.browseEndpointContextSupportedConfigs
+						musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint
+							?.browseEndpointContextSupportedConfigs
 							?.browseEndpointContextMusicConfig?.pageType || undefined,
 			  }
 			: undefined,
 
 		subtitle:
-			Array.isArray(musicTwoRowItemRenderer.subtitle?.runs as Array<SubtitleRun>) &&
-			subtitle(musicTwoRowItemRenderer.subtitle.runs),
+			Array.isArray(
+				musicTwoRowItemRenderer.subtitle?.runs as Array<SubtitleRun>,
+			) && subtitle(musicTwoRowItemRenderer.subtitle.runs),
 	};
 
 	return Item;

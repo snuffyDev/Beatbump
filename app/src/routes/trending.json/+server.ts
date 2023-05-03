@@ -14,7 +14,9 @@ export const GET: RequestHandler = async () => {
 	let carouselItems = [];
 
 	const response = await buildAPIRequest("home", {
-		context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
+		context: {
+			client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" },
+		},
 		params: { browseId: "FEmusic_explore" },
 		headers: null,
 	}).then((res) => {
@@ -26,12 +28,14 @@ export const GET: RequestHandler = async () => {
 
 	const data = await response;
 
-	const contents = data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer
-		?.contents as any[];
+	const contents = data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]
+		?.tabRenderer?.content?.sectionListRenderer?.contents as any[];
 
 	/// Get only the musicCarouselShelfRenderer's
 
-	carouselItems = contents.filter((item) => "musicCarouselShelfRenderer" in item).map(parseCarouselItem);
+	carouselItems = contents
+		.filter((item) => "musicCarouselShelfRenderer" in item)
+		.map(parseCarouselItem);
 
 	return json({ carouselItems, data });
 };

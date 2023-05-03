@@ -14,8 +14,12 @@ function normalizeObject<T = Record<string, unknown>>(data: T) {
 	return normalizedStr;
 }
 
-export async function hash<T = Record<string, unknown>>(data: T): Promise<string> {
-	const rawData = Encoder.encode(normalizeObject(data as unknown as Record<string, unknown>));
+export async function hash<T = Record<string, unknown>>(
+	data: T,
+): Promise<string> {
+	const rawData = Encoder.encode(
+		normalizeObject(data as unknown as Record<string, unknown>),
+	);
 	const buffer = await crypto.subtle.digest("SHA-256", rawData);
 	const hashString = Array.from(new Uint8Array(buffer))
 		.map((bytes) => bytes.toString(16).padStart(2, "0"))
@@ -23,7 +27,10 @@ export async function hash<T = Record<string, unknown>>(data: T): Promise<string
 	return hashString;
 }
 
-export function chunk<T = Record<string, unknown>, Keys extends keyof typeof ChunkSizes = keyof typeof ChunkSizes>(
+export function chunk<
+	T = Record<string, unknown>,
+	Keys extends keyof typeof ChunkSizes = keyof typeof ChunkSizes,
+>(
 	src: T,
 	size: Keys,
 ): {

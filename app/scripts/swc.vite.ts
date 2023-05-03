@@ -10,7 +10,11 @@ export default function swc(options: Options = {}): PluginOption[] {
 				config.esbuild = false;
 			},
 			async transform(code, id) {
-				if (!id.includes("node_modules") && id.includes(".svelte") === false && REG.test(id)) {
+				if (
+					!id.includes("node_modules") &&
+					id.includes(".svelte") === false &&
+					REG.test(id)
+				) {
 					const isTypescript = /\.(ts|tsx)$/.test(id);
 					const opt: Options = {
 						filename: id,
@@ -22,7 +26,12 @@ export default function swc(options: Options = {}): PluginOption[] {
 							parser: { syntax: isTypescript ? "typescript" : "ecmascript" },
 							transform: { optimizer: {} },
 							minify: {
-								compress: { dead_code: true, loops: true, join_vars: true, defaults: true },
+								compress: {
+									dead_code: true,
+									loops: true,
+									join_vars: true,
+									defaults: true,
+								},
 								format: {},
 							},
 						},

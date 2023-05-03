@@ -8,7 +8,10 @@ export class Encoder {
 		}
 		return encoder.encode(input);
 	}
-	static decoder(input: Uint8Array, options: TextDecodeOptions = { stream: false }): string {
+	static decoder(
+		input: Uint8Array,
+		options: TextDecodeOptions = { stream: false },
+	): string {
 		return decoder.decode(input, options);
 	}
 }

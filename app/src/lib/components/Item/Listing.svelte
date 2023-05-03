@@ -11,7 +11,10 @@
 	import Loading from "$components/Loading/Loading.svelte";
 	import { hasContext, tick, createEventDispatcher } from "svelte";
 
-	import { showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
+	import {
+		showAddToPlaylistPopper,
+		showGroupSessionCreator,
+	} from "$stores/stores";
 	import { goto } from "$app/navigation";
 	import list, { queue, queuePosition } from "$lib/stores/list";
 	import type { Item } from "$lib/types";
@@ -30,7 +33,8 @@
 	let isLibrary = hasContext("library") ? true : false;
 	let videoId = "";
 	let playlistId = "";
-	let isArtist = Array.isArray(data?.subtitle) && data.subtitle[0]?.text === "Artist";
+	let isArtist =
+		Array.isArray(data?.subtitle) && data.subtitle[0]?.text === "Artist";
 
 	let loading = false;
 
@@ -48,7 +52,8 @@
 				await tick();
 				goto(
 					`/artist/${
-						data?.subtitle.find((s) => s?.pageType?.includes("ARTIST"))?.browseId ?? data.artistInfo.artist[0].browseId
+						data?.subtitle.find((s) => s?.pageType?.includes("ARTIST"))
+							?.browseId ?? data.artistInfo.artist[0].browseId
 					}`,
 				);
 			},
@@ -88,7 +93,9 @@
 			action: async () => {
 				if (data?.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
 					// console.log('PLAYLIST')
-					const response = await fetch("/api/v1/get_queue.json?playlistId=" + data?.playlistId);
+					const response = await fetch(
+						"/api/v1/get_queue.json?playlistId=" + data?.playlistId,
+					);
 					const _data = await response.json();
 					const items: Item[] = _data;
 					showAddToPlaylistPopper.set({ state: true, item: [...items] });
@@ -170,7 +177,9 @@
 		},
 	];
 	if (isArtist) {
-		DropdownItems = DropdownItems.filter((item) => !item.text?.includes("Add to Playlist"));
+		DropdownItems = DropdownItems.filter(
+			(item) => !item.text?.includes("Add to Playlist"),
+		);
 	}
 	if (data.type?.includes("playlist")) {
 		DropdownItems.splice(1, 1, {
@@ -187,7 +196,9 @@
 		});
 		DropdownItems.shift();
 		DropdownItems.pop();
-		DropdownItems = DropdownItems.filter((item) => !item.text.includes("Favorite"));
+		DropdownItems = DropdownItems.filter(
+			(item) => !item.text.includes("Favorite"),
+		);
 	}
 	if (data.type === "videos") {
 		DropdownItems = DropdownItems.filter((d) => {
@@ -203,7 +214,7 @@
 	}
 	const clickHandler = async (event) => {
 		if (
-			(event.target instanceof HTMLElement && (event.target.nodeName === "A" || event.target.nodeName === "P")) ||
+			(event.target instanceof HTMLElement && event.target.nodeName === "A") ||
 			loading
 		)
 			return;
@@ -230,7 +241,10 @@
 					playlistId: playlistId,
 					keyId: 0,
 					clickTracking: data.params,
-					config: { playerParams: data.playerParams, type: data.musicVideoType },
+					config: {
+						playerParams: data.playerParams,
+						type: data.musicVideoType,
+					},
 				});
 			}
 			loading = false;
@@ -244,13 +258,18 @@
 		? data?.thumbnails.at(0)
 		: { width: 0, height: 0, url: "", placeholder: "" };
 
-	$: srcImg.url = srcImg.width < 100 ? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-") : srcImg.url;
+	$: srcImg.url =
+		srcImg.width < 100
+			? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
+			: srcImg.url;
 </script>
 
 <div
 	class="container"
 	on:contextmenu|preventDefault={(e) => {
-		window.dispatchEvent(new window.CustomEvent("contextmenu", { detail: "listing" }));
+		window.dispatchEvent(
+			new window.CustomEvent("contextmenu", { detail: "listing" }),
+		);
 
 		PopperStore.set({
 			items: DropdownItems.slice(),
@@ -260,11 +279,12 @@
 		});
 	}}
 >
-	<div class="innercard">
-		<div
-			class="itemWrapper"
-			on:click|stopPropagation={clickHandler}
-		>
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<div
+		class="innercard"
+		on:click|stopPropagation={clickHandler}
+	>
+		<div class="itemWrapper">
 			<div
 				class="img-container"
 				class:artist-img={isArtist}
@@ -300,7 +320,9 @@
 					</p>
 				{:else if data.type === "playlist"}
 					<p class="text-artist">
-						{data.type === "playlist" && "metaData" in data ? `${data.metaData}` : ""}
+						{data.type === "playlist" && "metaData" in data
+							? `${data.metaData}`
+							: ""}
 					</p>
 				{:else}
 					<p class="text-artist secondary">
@@ -309,12 +331,14 @@
 								{artist.text}
 							{:else if artist.pageType.includes("ALBUM")}
 								<a
-									on:click|preventDefault={() => goto(`/release?id=${artist?.browseId}`)}
+									on:click|preventDefault|stopPropagation={() =>
+										goto(`/release?id=${artist?.browseId}`)}
 									href={`/release?id=${artist?.browseId}`}>{artist.text}</a
 								>
 							{:else}
 								<a
-									on:click|preventDefault={() => goto(`/artist/${artist?.browseId}`)}
+									on:click|preventDefault|stopPropagation={() =>
+										goto(`/artist/${artist?.browseId}`)}
 									href={`/artist/${artist?.browseId}`}>{artist.text}</a
 								>
 							{/if}
@@ -329,11 +353,15 @@
 				metadata={{
 					artist: data.type !== "playlist" &&
 						Array.isArray(data?.subtitle) && [
-							data.subtitle.find((s) => s?.pageType?.includes("ARTIST")) ?? data.artistInfo?.artist[0],
+							data.subtitle.find((s) => s?.pageType?.includes("ARTIST")) ??
+								data.artistInfo?.artist[0],
 						],
 					thumbnail: data.thumbnails,
 					title: data.title,
-					length: data.type !== "artist" && data.type !== "playlist" ? data?.length?.text : "",
+					length:
+						data.type !== "artist" && data.type !== "playlist"
+							? data?.length?.text
+							: "",
 				}}
 				type="search"
 				items={DropdownItems}
@@ -370,6 +398,7 @@
 		padding: 0.3em 0.3em 0.3em 0.6em;
 		flex-direction: row;
 		flex-wrap: nowrap;
+		overflow: hidden;
 		align-items: center;
 	}
 	p {
@@ -399,14 +428,15 @@
 		@include mixins.trim(2);
 	}
 	.text-title {
-		font-size: 1em;
-
-		font-weight: 400;
-		text-overflow: ellipsis;
-		overflow: hidden;
-		white-space: nowrap;
+		align-self: center;
 		display: block;
-		max-width: calc(100% - 2ch) !important;
+		flex-direction: column;
+
+		font-size: 1.1em;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		width: 100%;
 		&:hover {
 			text-decoration: underline solid currentColor 0.0714rem;
 			cursor: pointer;
@@ -423,27 +453,36 @@
 		padding-top: calc(100% * 2 / 3);
 	}
 	.innercard {
-		display: flex;
-		width: 100%;
-		flex-direction: row;
 		align-items: center;
-		flex-wrap: nowrap;
-		padding: 0.4rem 0rem;
+		display: grid;
+		/* flex-direction: row; */
+		grid-template-columns: 12fr 1fr;
+		overflow: hidden;
+		padding: 0.4rem 0;
 		position: relative;
+		text-overflow: ellipsis;
+		width: 100%;
+		// max-width: calc(100% - 4.45em);
 		@media screen and (min-width: 640px) {
 			padding: 0.2rem 0rem;
 		}
 	}
 
 	.title {
-		display: inline-flex;
-		// width: 100%;
-		margin-left: 1rem;
-		// line-height: 1.3;
-		align-self: center;
+		// display: inline-flex;
+		// width: 100%;    align-self: center;
 		flex-direction: column;
 		font-size: 100%;
-		width: calc(100vmin - 50vmin);
+		margin-left: 1rem;
+		max-width: calc(87% - 4.6em);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		width: 100%;
+		white-space: nowrap;
+		line-height: 1.7;
+
+		// line-height: 2;
+		display: inherit;
 	}
 	.img-container {
 		position: relative;

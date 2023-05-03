@@ -5,7 +5,9 @@
 	const themes: Theme[] = ["Dark", "Dim", "Midnight", "YTM"];
 
 	function handleStreamSelect() {
-		AudioPlayer.dispatch("update:stream_type", { type: $settings.playback.Stream });
+		AudioPlayer.dispatch("update:stream_type", {
+			type: $settings.playback.Stream,
+		});
 	}
 </script>
 
@@ -28,7 +30,8 @@
 					{#each themes as theme}
 						<option
 							value={theme}
-							selected={$settings["appearance"]["Theme"] === theme}>{theme}</option
+							selected={$settings["appearance"]["Theme"] === theme}
+							>{theme}</option
 						>
 					{/each}
 				</select>
@@ -76,7 +79,8 @@
 					{#each ["Normal", "High"] as option}
 						<option
 							value={option}
-							selected={$settings["playback"]["Quality"] === option}>{option}</option
+							selected={$settings["playback"]["Quality"] === option}
+							>{option}</option
 						>
 					{/each}
 				</select>
@@ -107,7 +111,8 @@
 					{#each ["HTTP", "HLS"] as option}
 						<option
 							value={option}
-							selected={$settings["playback"]["Stream"] === option}>{option}</option
+							selected={$settings["playback"]["Stream"] === option}
+							>{option}</option
 						>
 					{/each}
 				</select>
@@ -138,7 +143,8 @@
 				<span
 					class="link"
 					on:click={() => {
-						$settings["network"]["HLS Stream Proxy"] = "https://yt-hls-rewriter.onrender.com/";
+						$settings["network"]["HLS Stream Proxy"] =
+							"https://yt-hls-rewriter.onrender.com/";
 					}}>Reset to default</span
 				>
 			</div>
@@ -157,7 +163,8 @@
 					{#each ["Category", "Query", "Category + Query", "None"] as option}
 						<option
 							value={option}
-							selected={$settings["playback"]["Stream"] === option}>{option}</option
+							selected={$settings["playback"]["Stream"] === option}
+							>{option}</option
 						>
 					{/each}
 				</select>
@@ -176,8 +183,9 @@
 	label {
 		display: inline-block;
 
-		font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
-			"Open Sans", "Helvetica Neue", sans-serif;
+		font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+			Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+			sans-serif;
 		font-size: 1em;
 		text-transform: none !important;
 		font-variant: unset;

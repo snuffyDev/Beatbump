@@ -5,11 +5,17 @@ import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params }) => {
 	const response = await buildAPIRequest("artist", {
-		context: { client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" } },
+		context: {
+			client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" },
+		},
 		headers: null,
 		params: {
 			browseId: params.slug,
-			browseEndpointContextMusicConfig: { browseEndpointContextMusicConfig: { pageType: "MUSIC_PAGE_TYPE_ARTIST" } },
+			browseEndpointContextMusicConfig: {
+				browseEndpointContextMusicConfig: {
+					pageType: "MUSIC_PAGE_TYPE_ARTIST",
+				},
+			},
 		},
 	});
 	const data = await response.json();
@@ -21,7 +27,8 @@ export const load: PageServerLoad = async ({ params }) => {
 function parseResponse(data) {
 	const header = data?.header;
 	const contents =
-		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents;
+		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+			?.content?.sectionListRenderer?.contents;
 	const visitorData = data?.responseContext?.visitorData ?? "";
 	return ArtistPageParser({
 		header,

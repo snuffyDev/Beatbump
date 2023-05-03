@@ -16,13 +16,21 @@ $breakpoint-widths: (
 
 	@return if($max and $max > 0, $max - 0.02, null);
 }
-@function between-breakpoint($name, $breakpoints: $breakpoint-widths, $breakpoint-names: map-keys($breakpoints)) {
+@function between-breakpoint(
+	$name,
+	$breakpoints: $breakpoint-widths,
+	$breakpoint-names: map-keys($breakpoints)
+) {
 	$idx: index($breakpoint-names, $name);
 	@if not $idx {
 		@error "No breakpoint found";
 	}
 
-	@return if($idx < length($breakpoint-names), nth($breakpoint-names, $idx + 1), null);
+	@return if(
+		$idx < length($breakpoint-names),
+		nth($breakpoint-names, $idx + 1),
+		null
+	);
 }
 
 @mixin media-query-up($name, $breakpoints: $breakpoint-widths) {

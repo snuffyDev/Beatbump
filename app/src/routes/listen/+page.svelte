@@ -36,7 +36,9 @@
 
 	<meta
 		property="og:url"
-		content={`${$SITE_ORIGIN_URL}/listen?id=${videoId}${playlist ? `&list=${playlist}` : ""}`}
+		content={`${$SITE_ORIGIN_URL}/listen?id=${videoId}${
+			playlist ? `&list=${playlist}` : ""
+		}`}
 	/>
 	<title>{title} | Beatbump</title>
 </svelte:head>

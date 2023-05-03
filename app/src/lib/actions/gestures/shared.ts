@@ -3,7 +3,11 @@ import { addListener, removeListener } from "./utils";
 
 export function setHandlers(
 	node: HTMLElement,
-	args: { handlers: GestureHandlers; capture?: boolean; onDestroy?: () => void | null },
+	args: {
+		handlers: GestureHandlers;
+		capture?: boolean;
+		onDestroy?: () => void | null;
+	},
 ) {
 	const { capture, handlers, onDestroy = null } = args;
 	addListener(node, "pointerdown", handlers.onStart, capture);

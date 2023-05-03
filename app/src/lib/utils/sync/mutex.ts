@@ -39,7 +39,8 @@ export class Semaphore implements ISemaphore {
 		}
 	}
 	acquire(value = 1): Promise<[number, Releaser]> {
-		if (value <= 0) throw new Error(`Value must be greater than 0. Received: #{value}`);
+		if (value <= 0)
+			throw new Error(`Value must be greater than 0. Received: #{value}`);
 
 		return new Promise((resolve, reject) => {
 			if (!this.#queue[value - 1]) {
@@ -50,7 +51,8 @@ export class Semaphore implements ISemaphore {
 		});
 	}
 	waitForUnlock(value: number | undefined = 1): Promise<void> {
-		if (value <= 0) throw new Error(`Value must be greater than 0. Received: #{value}`);
+		if (value <= 0)
+			throw new Error(`Value must be greater than 0. Received: #{value}`);
 
 		return new Promise((resolve, reject) => {
 			if (!this.#waiting[value - 1]) {

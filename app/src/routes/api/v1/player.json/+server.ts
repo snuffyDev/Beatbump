@@ -1,6 +1,19 @@
 import type { RequestHandler } from "@sveltejs/kit";
 import { buildAPIRequest } from "$api/request";
 import { error, json } from "@sveltejs/kit";
+import { parseParams } from "$api/utils";
+
+type PlayerSchema = {
+	videoId?: string;
+	playlistId?: string;
+	playerParams?: string;
+};
+
+const parser = parseParams<PlayerSchema>([
+	"playerParams",
+	"playlistId",
+	"videoId",
+]);
 
 /**
  * @root "/api/v1/"
@@ -9,28 +22,32 @@ import { error, json } from "@sveltejs/kit";
  * @method GET
  * @returns {PlayerAPIResponse}
  */
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;
 
-	const videoId = query.get("videoId") || "";
-	const playlistId = query.get("list") || "";
-	const playerParams = query.get("playerParams") || "";
+	const { videoId, playlistId, playerParams } = parser(query.entries());
+
 	try {
 		const response = await buildAPIRequest("player", {
 			context: {
-				client: { clientName: "IOS", clientVersion: "17.13.3", hl: "en" },
+				client: { clientName: "IOS", clientVersion: "16.20", hl: "en" },
 			},
-			params: { videoId, playlistId, params: playerParams, racyCheckOk: true, contentCheckOk: true },
+			params: {
+				videoId,
+				playlistId,
+				params: playerParams,
+				racyCheckOk: true,
+				contentCheckOk: true,
+			},
+		}).then((res) => {
+			if (!res) throw Error("Failed to fetch endpoint");
+			if (!res.ok) throw Error(res.statusText);
+			return res.json();
 		});
 
-		if (!response.ok) {
-			throw error(response.status, response.statusText);
-		}
-		const data = await response.json();
-
-		return json(data);
+		return json(response);
 	} catch (err) {
 		console.error(err);
-		throw error(500, err);
+		throw error(500, err as string);
 	}
 };

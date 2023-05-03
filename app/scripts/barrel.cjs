@@ -25,14 +25,19 @@ function recursiveDirRead(path) {
 			if (!fs.existsSync(makePath(path, "index.ts")))
 				fs.writeFileSync(makePath(path, "index.ts"), "", { encoding: "utf-8" });
 			if (entry === "index") return;
-			const file = fs.readFileSync(makePath(path, entry), { encoding: "utf-8" });
+			const file = fs.readFileSync(makePath(path, entry), {
+				encoding: "utf-8",
+			});
 			const $exports = [...new Set(file.match(NormalExport) || [])];
 			const $typeExports = [...new Set(file.match(TypeExport) || [])];
 
 			if ($typeExports.length > 0)
 				fs.appendFileSync(
 					makePath(path, "index.ts"),
-					`export type { ${$typeExports.join(", ")} } from './${entry.slice(0, -3)}';\n`,
+					`export type { ${$typeExports.join(", ")} } from './${entry.slice(
+						0,
+						-3,
+					)}';\n`,
 					{ encoding: "utf-8" },
 				);
 			if ($exports.length > 0)
@@ -44,7 +49,9 @@ function recursiveDirRead(path) {
 		}
 	});
 	dirs.forEach((item) => {
-		fs.appendFileSync(indexPath, `export * from './${item}';\n`, { encoding: "utf-8" });
+		fs.appendFileSync(indexPath, `export * from './${item}';\n`, {
+			encoding: "utf-8",
+		});
 	});
 }
 recursiveDirRead(makePath(BASE_PATH, ""));

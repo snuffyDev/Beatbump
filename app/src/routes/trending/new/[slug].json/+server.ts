@@ -1,10 +1,17 @@
 import { json as json$1 } from "@sveltejs/kit";
-import { MoodsAndGenresItem, MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
+import {
+	MoodsAndGenresItem,
+	MusicResponsiveListItemRenderer,
+	MusicTwoRowItemRenderer,
+} from "$lib/parsers";
 import type { CarouselHeader } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import type { RequestHandler } from "@sveltejs/kit";
-import type { IMusicTwoRowItemRenderer, IMusicResponsiveListItemRenderer } from "$lib/types/innertube/internals";
+import type {
+	IMusicTwoRowItemRenderer,
+	IMusicResponsiveListItemRenderer,
+} from "$lib/types/innertube/internals";
 import type { ButtonRenderer } from "$lib/types/innertube/musicCarouselShelfRenderer";
 
 /* eslint-disable prefer-const */
@@ -42,10 +49,20 @@ export const GET: RequestHandler = async ({ params }) => {
 
 	const data = await response.json();
 	let {
-		header: { musicHeaderRenderer: { title: { runs: [{ text = "" } = {}] = [] } = {} } = {} } = {},
+		header: {
+			musicHeaderRenderer: {
+				title: { runs: [{ text = "" } = {}] = [] } = {},
+			} = {},
+		} = {},
 		contents: {
 			singleColumnBrowseResultsRenderer: {
-				tabs: [{ tabRenderer: { content: { sectionListRenderer: { contents = [] } = {} } = {} } = {} } = {}] = [],
+				tabs: [
+					{
+						tabRenderer: {
+							content: { sectionListRenderer: { contents = [] } = {} } = {},
+						} = {},
+					} = {},
+				] = [],
 			} = {},
 		} = {},
 	} = await data;
@@ -74,8 +91,9 @@ export const GET: RequestHandler = async ({ params }) => {
 			const { gridRenderer = {} } = contents[idx];
 			const items = gridRenderer.items;
 			const header = gridRenderer.header;
-			const section = items.map((ctx: { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer }) =>
-				MusicTwoRowItemRenderer(ctx),
+			const section = items.map(
+				(ctx: { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer }) =>
+					MusicTwoRowItemRenderer(ctx),
 			);
 			sections.push({
 				section,
@@ -98,19 +116,22 @@ export const GET: RequestHandler = async ({ params }) => {
 	return json$1({ title: getTitle(), sections, header: text, data });
 };
 
-function parseHeader({ musicCarouselShelfBasicHeaderRenderer }): CarouselHeader {
+function parseHeader({
+	musicCarouselShelfBasicHeaderRenderer,
+}): CarouselHeader {
 	if (musicCarouselShelfBasicHeaderRenderer) {
 		let subheading: any, browseId: any;
 		if (musicCarouselShelfBasicHeaderRenderer?.strapline?.runs[0]?.text) {
-			subheading = musicCarouselShelfBasicHeaderRenderer["strapline"]["runs"][0].text;
+			subheading =
+				musicCarouselShelfBasicHeaderRenderer["strapline"]["runs"][0].text;
 		}
 		if (
-			musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer?.navigationEndpoint?.browseEndpoint
-				?.browseId
+			musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer
+				?.navigationEndpoint?.browseEndpoint?.browseId
 		) {
 			browseId =
-				musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer?.navigationEndpoint?.browseEndpoint
-					?.browseId;
+				musicCarouselShelfBasicHeaderRenderer?.moreContentButton?.buttonRenderer
+					?.navigationEndpoint?.browseEndpoint?.browseId;
 		}
 		return {
 			title: musicCarouselShelfBasicHeaderRenderer["title"]["runs"][0].text,
@@ -143,11 +164,15 @@ function parseBody(
 			musicResponsiveListItemRenderer?: IMusicResponsiveListItemRenderer;
 		}) => {
 			if ("musicTwoRowItemRenderer" in item) {
-				return MusicTwoRowItemRenderer(item as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer });
+				return MusicTwoRowItemRenderer(
+					item as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer },
+				);
 			}
 			if ("musicResponsiveListItemRenderer" in item) {
 				return MusicResponsiveListItemRenderer(
-					item as { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer },
+					item as {
+						musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer;
+					},
 				);
 			}
 			if ("musicNavigationButtonRenderer" in item) {
@@ -165,11 +190,13 @@ function parseCarousel(carousel: {
 }) {
 	return {
 		header: parseHeader(
-			carousel.musicCarouselShelfRenderer?.header ?? carousel.musicImmersiveCarouselShelfRenderer?.header,
+			carousel.musicCarouselShelfRenderer?.header ??
+				carousel.musicImmersiveCarouselShelfRenderer?.header,
 		),
 		type: "carousel",
 		results: parseBody(
-			carousel.musicCarouselShelfRenderer?.contents ?? carousel.musicImmersiveCarouselShelfRenderer?.contents,
+			carousel.musicCarouselShelfRenderer?.contents ??
+				carousel.musicImmersiveCarouselShelfRenderer?.contents,
 		),
 	};
 }

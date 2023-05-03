@@ -1,4 +1,4 @@
-import { buildXML, type XMLRoot, XMLNode } from "./xmlBuilder";
+import { buildXML, type XMLRoot, type XMLNode } from "./xmlBuilder";
 
 import { iter } from "./collections";
 

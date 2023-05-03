@@ -1,7 +1,11 @@
 <script lang="ts">
 	import Chip from "./Chip/Chip.svelte";
 
-	export let chips: { text: string; browseEndpoint: { browseId: string; params: string }; ctoken?: string }[] = [];
+	export let chips: {
+		text: string;
+		browseEndpoint: { browseId: string; params: string };
+		ctoken?: string;
+	}[] = [];
 	let active: string;
 </script>
 

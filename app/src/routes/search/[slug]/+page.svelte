@@ -26,7 +26,10 @@
 		try {
 			isLoading = true;
 			const response = await fetch(
-				`/api/v1/search.json?q=` + `&filter=` + filter + `&itct=${itct}${ctoken ? `&ctoken=${ctoken}` : ""}`,
+				`/api/v1/search.json?q=` +
+					`&filter=` +
+					filter +
+					`&itct=${itct}${ctoken ? `&ctoken=${ctoken}` : ""}`,
 			);
 			const newPage = await response.json();
 			const res: PageData = await newPage;
@@ -104,7 +107,9 @@
 						<div class="show-more">
 							<a
 								data-testid=""
-								href={`${$page.params.slug}?filter=${result.header.title.replace(/\s/g, "_").toLowerCase()}`}
+								href={`${$page.params.slug}?filter=${result.header.title
+									.replace(/\s/g, "_")
+									.toLowerCase()}`}
 								class="link secondary">Show All</a
 							>
 						</div>
@@ -120,7 +125,7 @@
 		font-weight: 600;
 	}
 	.max-height {
-		height: 100%;
+		height: calc(100% - var(--player-bar-height) + var(--top-bar-height));
 	}
 	.music-shelf {
 		margin-bottom: 3.333em;

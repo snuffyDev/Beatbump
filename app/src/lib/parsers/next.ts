@@ -7,7 +7,9 @@ type PanelAlias = { playlistPanelVideoRenderer: IPlaylistPanelVideoRenderer };
 
 function parseItem(item: Song) {
 	if ("playlistPanelVideoRenderer" in item) {
-		return PlaylistPanelVideoRenderer(item["playlistPanelVideoRenderer"] as IPlaylistPanelVideoRenderer) as Item;
+		return PlaylistPanelVideoRenderer(
+			item["playlistPanelVideoRenderer"] as IPlaylistPanelVideoRenderer,
+		) as Item;
 	}
 }
 function filterItem(item: Song | PanelAlias) {
@@ -32,6 +34,10 @@ export function parseContents(
 		continuation: continuation,
 		clickTrackingParams: clickTrackingParams,
 		visitorData,
-		results: filterMap<Song | PanelAlias, Item>(contents, parseItem, filterItem),
+		results: filterMap<Song | PanelAlias, Item>(
+			contents,
+			parseItem,
+			filterItem,
+		),
 	};
 }

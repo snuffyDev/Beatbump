@@ -214,8 +214,8 @@
 						<h1>Sync your data</h1>
 						<div class="subheading">Access your favorites on any device</div>
 						<p>
-							Securely sync your data across your devices! <br /> To begin, open this screen on another device. Whenever
-							you are ready, hit 'Next Step'
+							Securely sync your data across your devices! <br /> To begin, open
+							this screen on another device. Whenever you are ready, hit 'Next Step'
 						</p>
 					</div>
 				</div>
@@ -271,7 +271,9 @@
 					<hr />
 					{#if check === "sending"}
 						<div class="content">
-							<span class="subheading">What kind of data would you like to send?</span>
+							<span class="subheading"
+								>What kind of data would you like to send?</span
+							>
 							<div class="container">
 								{#each dataType as option}
 									<label>
@@ -291,7 +293,9 @@
 				<div class="next">
 					<button
 						class="nextbtn"
-						disabled={check === "sending" ? check === "sending" && kindOfData.length === 0 : check === undefined}
+						disabled={check === "sending"
+							? check === "sending" && kindOfData.length === 0
+							: check === undefined}
 						on:click={() => {
 							if (check !== undefined) nextStep();
 						}}>Next Step</button
@@ -350,10 +354,14 @@
 					{#if check === "sending"}
 						<div class="content">
 							<h1>
-								Get the {(peerType = check !== "sending" ? "Sender" : "Receiver")}'s ID
+								Get the {(peerType =
+									check !== "sending" ? "Sender" : "Receiver")}'s ID
 							</h1>
 							<div class="subheading">Let's find the other device</div>
-							<p>After generating an ID for both devices, enter the other's ID in the field below.</p>
+							<p
+								>After generating an ID for both devices, enter the other's ID
+								in the field below.</p
+							>
 							<hr />
 							<div class="id">
 								<p>Your ID:</p>
@@ -363,7 +371,8 @@
 								</div>
 
 								<p>
-									{(peerType = check !== "sending" ? "Sender" : "Receiver")}'s ID:
+									{(peerType = check !== "sending" ? "Sender" : "Receiver")}'s
+									ID:
 								</p>
 
 								<div class="id-cont">
@@ -396,11 +405,12 @@
 					{:else}
 						<div class="content">
 							<h1>Ready to Receive Data</h1>
-							<span
-								>Your ID: <div class="id-cont"><code>{id}</code></div></span
-							>
+							<span>Your ID: <div class="id-cont"><code>{id}</code></div></span>
 							<div class="subheading">Waiting for sender to connect.</div>
-							<p>Once data transfer is completed, this popup window will close automatically</p>
+							<p
+								>Once data transfer is completed, this popup window will close
+								automatically</p
+							>
 						</div>
 					{/if}
 				</div>

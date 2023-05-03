@@ -1,5 +1,9 @@
 <script lang="ts">
-	export let chip: { text: string; browseEndpoint: { browseId: string; params: string }; ctoken?: string };
+	export let chip: {
+		text: string;
+		browseEndpoint: { browseId: string; params: string };
+		ctoken?: string;
+	};
 	export let selected = false;
 </script>
 
@@ -7,7 +11,9 @@
 	role="button"
 	class="chip"
 	class:selected
-	href={chip.browseEndpoint.params ? `/home?params=${chip.browseEndpoint.params}` : "/home"}
+	href={chip.browseEndpoint.params
+		? `/home?params=${chip.browseEndpoint.params}`
+		: "/home"}
 	on:click
 >
 	{chip.text}

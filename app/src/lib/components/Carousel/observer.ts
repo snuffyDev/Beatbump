@@ -21,7 +21,10 @@ const observerCallback = (entries: IntersectionObserverEntry[], ob) => {
 
 function ensureIntersectionObserver(node: HTMLElement) {
 	if (intersectionObserver) return;
-	intersectionObserver = new IntersectionObserver(observerCallback, { threshold: 0, rootMargin: "95px 80px" });
+	intersectionObserver = new IntersectionObserver(observerCallback, {
+		threshold: 0,
+		rootMargin: "95px 80px",
+	});
 	return intersectionObserver;
 }
 

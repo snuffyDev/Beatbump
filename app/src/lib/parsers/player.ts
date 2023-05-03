@@ -31,24 +31,29 @@ export function sort({
 
 	if (dash === true) {
 		const proxy_url = new URL(proxyUrl);
-		const formats = map(data?.streamingData?.adaptiveFormats as Array<IFormat>, (item) => {
-			const url = new URL(item.url);
-			const host = url.host;
-			url.host = proxy_url.host ?? "yt-hls-rewriter.onrender.com";
-			url.searchParams.set("host", host);
-			return {
-				...item,
-				url: url.toString(),
-			};
-		});
+		const formats = map(
+			data?.streamingData?.adaptiveFormats as Array<IFormat>,
+			(item) => {
+				const url = new URL(item.url);
+				const host = url.host;
+				url.host = proxy_url.host ?? "yt-hls-rewriter.onrender.com";
+				url.searchParams.set("host", host);
+				return {
+					...item,
+					url: url.toString(),
+				};
+			},
+		);
 		const length = data?.videoDetails?.lengthSeconds;
 
 		const manifest = buildDashManifest(formats, length);
-		dash_manifest = "data:application/dash+xml;charset=utf-8;base64," + btoa(manifest);
+		dash_manifest =
+			"data:application/dash+xml;charset=utf-8;base64," + btoa(manifest);
 	}
 
 	const host = data?.playerConfig?.hlsProxyConfig?.hlsChunkHost;
-	const formats: Array<any> = data?.streamingData?.adaptiveFormats as Array<any>;
+	const formats: Array<any> = data?.streamingData
+		?.adaptiveFormats as Array<any>;
 	const hls =
 		(data?.streamingData?.hlsManifestUrl as string).replace(
 			/https:\/\/(.*?)\//,

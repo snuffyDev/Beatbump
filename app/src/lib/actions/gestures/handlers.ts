@@ -1,9 +1,23 @@
 import { setHandlers } from "./shared";
 import type { DragEvent, Detail, GestureHandlers, PanEvent } from "./types";
-import { dispatcher, addListener, boundingRect, calculateVelocity, removeListener, updateDetail } from "./utils";
+import {
+	dispatcher,
+	addListener,
+	boundingRect,
+	calculateVelocity,
+	removeListener,
+	updateDetail,
+} from "./utils";
 
 export function pan(node: HTMLElement) {
-	const detail: Detail = { startTime: 0, timeStamp: 0, startY: 0, clientY: 0, deltaY: 0, velocityY: 0 };
+	const detail: Detail = {
+		startTime: 0,
+		timeStamp: 0,
+		startY: 0,
+		clientY: 0,
+		deltaY: 0,
+		velocityY: 0,
+	};
 
 	const dispatch = dispatcher<PanEvent>();
 	const initialRect = { top: 0, height: 0, parentTop: 0 };
@@ -40,7 +54,10 @@ export function pan(node: HTMLElement) {
 			event.stopPropagation();
 			calculateVelocity(event, detail);
 
-			dispatch(node, "pan", { ...detail, clientY: detail.clientY - initialRect.parentTop - initialRect.height });
+			dispatch(node, "pan", {
+				...detail,
+				clientY: detail.clientY - initialRect.parentTop - initialRect.height,
+			});
 		},
 		onEnd(event) {
 			if (canFireEvent === false) {
@@ -61,7 +78,14 @@ export function pan(node: HTMLElement) {
 }
 
 export function draggable(node: HTMLElement) {
-	const detail: Detail = { startTime: 0, timeStamp: 0, startY: 0, clientY: 0, deltaY: 0, velocityY: 0 };
+	const detail: Detail = {
+		startTime: 0,
+		timeStamp: 0,
+		startY: 0,
+		clientY: 0,
+		deltaY: 0,
+		velocityY: 0,
+	};
 	const dispatch = dispatcher<DragEvent>();
 	const initialRect = { top: 0, height: 0, parentTop: 0 };
 
@@ -87,7 +111,10 @@ export function draggable(node: HTMLElement) {
 			// event.preventDefault();
 			calculateVelocity(event, detail);
 
-			dispatch(node, "dragmove", { ...detail, clientY: detail.clientY - initialRect.parentTop - initialRect.height });
+			dispatch(node, "dragmove", {
+				...detail,
+				clientY: detail.clientY - initialRect.parentTop - initialRect.height,
+			});
 			// event.preventDefault();
 		},
 		onEnd(event) {

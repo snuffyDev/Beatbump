@@ -26,7 +26,10 @@
 
 		const elapsed = ts - timestamp;
 
-		y = $windowWidth < 500 ? Math.min(Math.max(calc, 0), 1) * 155 : Math.min(Math.max(calc, 0), 1) * 116;
+		y =
+			$windowWidth < 500
+				? Math.min(Math.max(calc, 0), 1) * 155
+				: Math.min(Math.max(calc, 0), 1) * 116;
 		if (elapsed < 100) {
 			timestamp = requestAnimationFrame(handler);
 		} else {
@@ -55,7 +58,10 @@
 		}
 
 		wrapper = document.getElementById("wrapper");
-		wrapper.addEventListener("scroll", onScroll, { passive: true, capture: true });
+		wrapper.addEventListener("scroll", onScroll, {
+			passive: true,
+			capture: true,
+		});
 		return () => {
 			if (timestamp) cancelAnimationFrame(timestamp);
 			wrapper.removeEventListener("scroll", onScroll, true);
@@ -86,7 +92,9 @@
 						type="image/jpeg"
 					/>
 					<source
-						media={`(min-width:${img.width + 1}px) and (max-width:${thumbnail[i + 1].width}px)`}
+						media={`(min-width:${img.width + 1}px) and (max-width:${
+							thumbnail[i + 1].width
+						}px)`}
 						srcset={img.url}
 						type="image/jpeg"
 					/>
@@ -94,7 +102,9 @@
 					<!-- -->
 				{:else}
 					<source
-						media={`(min-width:${img.width + 1}px) and (max-width:${thumbnail[i + 1].width}px)`}
+						media={`(min-width:${img.width + 1}px) and (max-width:${
+							thumbnail[i + 1].width
+						}px)`}
 						srcset={thumbnail[i + 1].url}
 						type="image/jpeg"
 					/>

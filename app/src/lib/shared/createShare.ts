@@ -5,7 +5,12 @@ export function createShare({
 	id,
 }: {
 	origin: string;
-	type?: "MUSIC_PAGE_TYPE_PLAYLIST" | "MUSIC_PAGE_TYPE_ARTIST" | "MUSIC_PAGE_TYPE_ALBUM" | "SESSION" | null;
+	type?:
+		| "MUSIC_PAGE_TYPE_PLAYLIST"
+		| "MUSIC_PAGE_TYPE_ARTIST"
+		| "MUSIC_PAGE_TYPE_ALBUM"
+		| "SESSION"
+		| null;
 	id: string;
 	title?: string;
 }): { url: string; title: string } {

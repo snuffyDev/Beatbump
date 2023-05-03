@@ -20,7 +20,9 @@
 
 	function handleContextMenu(event: MouseEvent, dropdownItems: Dropdown) {
 		event.preventDefault();
-		window.dispatchEvent(new CustomEvent("contextmenu", { detail: "carouselItem" }));
+		window.dispatchEvent(
+			new CustomEvent("contextmenu", { detail: "carouselItem" }),
+		);
 
 		PopperStore.set({
 			items: dropdownItems,
@@ -30,8 +32,16 @@
 		});
 	}
 
-	const FILTER_ARTIST_ON_ARTIST_PAGE: ReadonlyArray<string> = ["Favorite", "Add to Queue", "View Artist"] as const;
-	const FILTER_ALBUM_PLAYLIST_ITEMS: ReadonlyArray<string> = ["Favorite", "Play Next", "View Artist"] as const;
+	const FILTER_ARTIST_ON_ARTIST_PAGE: ReadonlyArray<string> = [
+		"Favorite",
+		"Add to Queue",
+		"View Artist",
+	] as const;
+	const FILTER_ALBUM_PLAYLIST_ITEMS: ReadonlyArray<string> = [
+		"Favorite",
+		"Play Next",
+		"View Artist",
+	] as const;
 </script>
 
 <script lang="ts">
@@ -42,7 +52,10 @@
 
 	import list from "$lib/stores/list";
 	import { Logger, notify, IsoBase64 } from "$lib/utils";
-	import { showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
+	import {
+		showAddToPlaylistPopper,
+		showGroupSessionCreator,
+	} from "$stores/stores";
 	import { tick } from "svelte";
 	import { PopperButton, PopperStore } from "../Popper";
 	import { clickHandler } from "./functions";
@@ -63,7 +76,9 @@
 
 	let loading = false;
 	$: RATIO_RECT =
-		(aspectRatio?.includes("TWO_LINE_STACK") && kind !== "Fans might also like") || aspectRatio?.includes("16_9")
+		(aspectRatio?.includes("TWO_LINE_STACK") &&
+			kind !== "Fans might also like") ||
+		aspectRatio?.includes("16_9")
 			? true
 			: false;
 	$: ASPECT_RATIO = !RATIO_RECT ? "1x1" : "16x9";
@@ -73,8 +88,13 @@
 			icon: "artist",
 			action: async () => {
 				try {
-					const artistId = item.artistInfo ? item.artistInfo.artist[0].browseId : item.subtitle[0].browseId;
-					if (!artistId) throw new Error(`Expected a valid artistId string, received ${artistId}`);
+					const artistId = item.artistInfo
+						? item.artistInfo.artist[0].browseId
+						: item.subtitle[0].browseId;
+					if (!artistId)
+						throw new Error(
+							`Expected a valid artistId string, received ${artistId}`,
+						);
 					goto(`/artist/${artistId}`);
 					await tick();
 					window.scrollTo({
@@ -109,7 +129,9 @@
 			icon: "list-plus",
 			action: async () => {
 				if (item.endpoint?.pageType.match(RE_ALBUM_PLAYLIST_SINGLE)) {
-					const response = await fetch("/api/v1/get_queue.json?playlistId=" + item.playlistId);
+					const response = await fetch(
+						"/api/v1/get_queue.json?playlistId=" + item.playlistId,
+					);
 					const data = await response.json();
 					const items: Item[] = data;
 					showAddToPlaylistPopper.set({ state: true, item: [...items] });
@@ -197,15 +219,25 @@
 		},
 	];
 	$: {
-		if (type === "artist" || (item.endpoint && item.endpoint.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST"))) {
-			DropdownItems = DropdownItems.filter((item) => FILTER_ARTIST_ON_ARTIST_PAGE.includes(item.text));
+		if (
+			type === "artist" ||
+			(item.endpoint &&
+				item.endpoint.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST"))
+		) {
+			DropdownItems = DropdownItems.filter((item) =>
+				FILTER_ARTIST_ON_ARTIST_PAGE.includes(item.text),
+			);
 		}
 		if (item.endpoint?.pageType) {
 			DropdownItems = item?.endpoint?.pageType.match(RE_ALBUM_PLAYLIST_SINGLE)
 				? [
 						{
 							action: () => {
-								list.initPlaylistSession({ playlistId: item.playlistId, params: APIParams.finite, index: 0 });
+								list.initPlaylistSession({
+									playlistId: item.playlistId,
+									params: APIParams.finite,
+									index: 0,
+								});
 							},
 							icon: "shuffle",
 							text: "Shuffle",
@@ -228,9 +260,13 @@
 							icon: "radio",
 							text: "Start Radio",
 						},
-						...DropdownItems.filter((item) => !FILTER_ALBUM_PLAYLIST_ITEMS.includes(item.text)),
+						...DropdownItems.filter(
+							(item) => !FILTER_ALBUM_PLAYLIST_ITEMS.includes(item.text),
+						),
 				  ]
-				: DropdownItems.filter((item) => FILTER_ALBUM_PLAYLIST_ITEMS.includes(item.text));
+				: DropdownItems.filter((item) =>
+						FILTER_ALBUM_PLAYLIST_ITEMS.includes(item.text),
+				  );
 		}
 	}
 
@@ -238,7 +274,10 @@
 		? item?.thumbnails.at(0)
 		: { width: 0, height: 0, url: "", placeholder: "" };
 
-	$: srcImg.url = srcImg.width < 100 ? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-") : srcImg.url;
+	$: srcImg.url =
+		srcImg.width < 100
+			? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
+			: srcImg.url;
 	let active;
 
 	$: isArtistKind = kind === "Fans might also like";
@@ -316,7 +355,11 @@
 	@import "../../../global/redesign/utility/mixins/media-query";
 
 	article {
-		--thumbnail-radius: clamp(4px, calc(var(--column-width, 0px) - 32px) * 0.025, 8px);
+		--thumbnail-radius: clamp(
+			4px,
+			calc(var(--column-width, 0px) - 32px) * 0.025,
+			8px
+		);
 
 		padding: 0.75em;
 		margin-bottom: 1em;
@@ -330,7 +373,10 @@
 		@media (hover: hover) {
 			&:hover {
 				> :where(.image)::before {
-					background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
+					background: linear-gradient(
+						rgba(0, 0, 0, 0.534),
+						rgba(0, 0, 0, 0.11)
+					);
 					opacity: 0.7;
 					z-index: 1;
 				}
@@ -434,7 +480,11 @@
 			position: absolute;
 			content: "";
 			inset: 0;
-			background-image: linear-gradient(rgba(0, 0, 0, 0.502), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
+			background-image: linear-gradient(
+				rgba(0, 0, 0, 0.502),
+				rgba(0, 0, 0, 0),
+				rgba(0, 0, 0, 0)
+			);
 			pointer-events: none;
 			transition: background-image linear 0.1s, opacity linear 0.1s;
 			opacity: 0.1;
@@ -442,7 +492,10 @@
 		}
 
 		&:active:hover::before {
-			background-image: linear-gradient(rgba(0, 0, 0, 0.589), rgba(0, 0, 0, 0.11));
+			background-image: linear-gradient(
+				rgba(0, 0, 0, 0.589),
+				rgba(0, 0, 0, 0.11)
+			);
 			opacity: 1;
 		}
 

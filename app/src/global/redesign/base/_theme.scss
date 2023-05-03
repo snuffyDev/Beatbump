@@ -66,10 +66,21 @@ html {
 					$saturation: -100%,
 					$alpha: -85%
 				)};
-			--disabled-form-bg: #{scale-color(map-get($themes, $theme, "form"), $lightness: 17%, $alpha: -25%)};
-			--disabled-form-fg: #{scale-color(map-get($themes, $theme, "form"), $lightness: 60%)};
+			--disabled-form-bg: #{scale-color(
+					map-get($themes, $theme, "form"),
+					$lightness: 17%,
+					$alpha: -25%
+				)};
+			--disabled-form-fg: #{scale-color(
+					map-get($themes, $theme, "form"),
+					$lightness: 60%
+				)};
 			--bottom-bg: #{map-get($themes, $theme, "bottom")};
-			--bottom-bg-light: #{scale-color(map-get($themes, $theme, "base"), $lightness: 8%, $saturation: -66%)};
+			--bottom-bg-light: #{scale-color(
+					map-get($themes, $theme, "base"),
+					$lightness: 8%,
+					$saturation: -66%
+				)};
 			--top-bg: #{map-get($themes, $theme, "top")};
 			--base-bg: #{map-get($themes, $theme, "base")};
 			background: var(--base-bg);

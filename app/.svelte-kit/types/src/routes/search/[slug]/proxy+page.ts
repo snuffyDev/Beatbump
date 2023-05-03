@@ -10,11 +10,17 @@ export interface SearchResponse {
 	filter: SearchFilter;
 	type?: "next" | undefined;
 }
-export const load = async ({ url, params, fetch }: Parameters<PageLoad>[0]): Promise<SearchResponse> => {
+export const load = async ({
+	url,
+	params,
+	fetch,
+}: Parameters<PageLoad>[0]): Promise<SearchResponse> => {
 	const slug = params.slug;
 	const filter = url.searchParams.get("filter") || "";
 
-	const apiUrl = `/api/v1/search.json?q=${slug}${filter !== "" ? `&filter=${encodeURIComponent(filter)}` : ""}`;
+	const apiUrl = `/api/v1/search.json?q=${slug}${
+		filter !== "" ? `&filter=${encodeURIComponent(filter)}` : ""
+	}`;
 	const response = await fetch(apiUrl);
 	const data = (await response.json()) as SearchResponse;
 	Object.assign(data, { filter });

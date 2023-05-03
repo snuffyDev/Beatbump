@@ -23,22 +23,33 @@ export type NextEndpointResponse = {
 	};
 };
 
-export const GET: RequestHandler = async ({ url }): Promise<IResponse<NextEndpointResponse>> => {
+export const GET: RequestHandler = async ({
+	url,
+}): Promise<IResponse<NextEndpointResponse>> => {
 	const query = url.searchParams;
 	const params = query.get("params") || undefined;
-	const visitorData = query.get("visitorData") || "CgtlV0xyWk92dWZ5Zyilgu6ZBg%3D%3D";
+	const visitorData =
+		query.get("visitorData") || "CgtlV0xyWk92dWZ5Zyilgu6ZBg%3D%3D";
 	const loggingContext = query.get("loggingContext") || "";
 	const videoId = query.get("videoId") || "";
 	const playlistId = query.get("playlistId") || "RDAMVM" + (videoId ?? "");
-	const continuation = query.has("ctoken") ? decodeURIComponent(decodeURIComponent(query.get("ctoken"))) : undefined;
+	const continuation = query.has("ctoken")
+		? decodeURIComponent(decodeURIComponent(query.get("ctoken")))
+		: undefined;
 	const clickTracking = query.get("clickTracking") || undefined;
 	const playlistSetVideoId = query.get("playlistSetVideoId") || undefined;
 	const response = await buildAPIRequest("next", {
 		context: {
 			clickTracking: {
-				clickTrackingParams: clickTracking ? decodeURIComponent(clickTracking) : undefined,
+				clickTrackingParams: clickTracking
+					? decodeURIComponent(clickTracking)
+					: undefined,
 			},
-			client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00", visitorData },
+			client: {
+				clientName: "WEB_REMIX",
+				clientVersion: "1.20220404.01.00",
+				visitorData,
+			},
 		},
 		params: {
 			loggingContext: {
@@ -71,33 +82,47 @@ export const GET: RequestHandler = async ({ url }): Promise<IResponse<NextEndpoi
 		return json(Object.assign({}, res, { response }));
 	}
 
-	return json(Object.assign({}, parseNextBodyContinuation(response), { response }));
+	return json(
+		Object.assign({}, parseNextBodyContinuation(response), { response }),
+	);
 };
 
 function parseNextBody(data) {
 	try {
 		const tabs =
-			data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs ||
-			[];
-		const related = Array.isArray(tabs) && tabs[2]?.tabRenderer?.endpoint?.browseEndpoint;
+			data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer
+				?.watchNextTabbedResultsRenderer?.tabs || [];
+		const related =
+			Array.isArray(tabs) && tabs[2]?.tabRenderer?.endpoint?.browseEndpoint;
 		const contents =
-			Array.isArray(tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.contents) &&
-			(tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.contents as Array<any>);
+			Array.isArray(
+				tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content
+					?.playlistPanelRenderer?.contents,
+			) &&
+			(tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content
+				?.playlistPanelRenderer?.contents as Array<any>);
 		const clickTrackingParams =
 				(Array.isArray(contents) &&
-					contents[contents.length - 1]?.playlistPanelVideoRenderer?.navigationEndpoint?.clickTrackingParams) ||
+					contents[contents.length - 1]?.playlistPanelVideoRenderer
+						?.navigationEndpoint?.clickTrackingParams) ||
 				null,
 			continuation =
 				(Array.isArray(
-					data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer
-						?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.continuations,
+					data?.contents?.singleColumnMusicWatchNextResultsRenderer
+						?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs[0]
+						?.tabRenderer?.content?.musicQueueRenderer?.content
+						?.playlistPanelRenderer?.continuations,
 				) &&
-					(data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer
-						?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.continuations[0]
-						?.nextRadioContinuationData?.continuation ||
-						data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer
-							?.tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.continuations[0]
-							?.nextContinuationData?.continuation)) ||
+					(data?.contents?.singleColumnMusicWatchNextResultsRenderer
+						?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs[0]
+						?.tabRenderer?.content?.musicQueueRenderer?.content
+						?.playlistPanelRenderer?.continuations[0]?.nextRadioContinuationData
+						?.continuation ||
+						data?.contents?.singleColumnMusicWatchNextResultsRenderer
+							?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs[0]
+							?.tabRenderer?.content?.musicQueueRenderer?.content
+							?.playlistPanelRenderer?.continuations[0]?.nextContinuationData
+							?.continuation)) ||
 				null;
 		const watchEndpoint = data?.currentVideoEndpoint?.watchEndpoint;
 		const visitorData = data?.responseContext?.visitorData;
@@ -126,22 +151,31 @@ function parseNextBodyContinuation(data) {
 		continuationContents: {
 			playlistPanelContinuation: {
 				contents = [],
-				continuations: [{ nextContinuationData: { continuation = "" } = {} } = {}] = [],
+				continuations: [
+					{ nextContinuationData: { continuation = "" } = {} } = {},
+				] = [],
 				currentIndex = 0,
 				...rest
 			} = {},
 		} = {},
 	} = data;
 
-	const clickTrackingParams = (contents as any[]).at(-1)?.playlistPanelVideoRenderer?.navigationEndpoint
-		?.clickTrackingParams;
+	const clickTrackingParams = (contents as any[]).at(-1)
+		?.playlistPanelVideoRenderer?.navigationEndpoint?.clickTrackingParams;
 
 	const visitorData = responseContext?.visitorData;
-	const parsed = parseContents(contents, continuation, clickTrackingParams, rest, visitorData);
+	const parsed = parseContents(
+		contents,
+		continuation,
+		clickTrackingParams,
+		rest,
+		visitorData,
+	);
 	const tabs =
-		data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs ||
-		[];
-	const related = Array.isArray(tabs) && tabs[2]?.tabRenderer?.endpoint?.browseEndpoint;
+		data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer
+			?.watchNextTabbedResultsRenderer?.tabs || [];
+	const related =
+		Array.isArray(tabs) && tabs[2]?.tabRenderer?.endpoint?.browseEndpoint;
 
 	return Object.assign(parsed, { related, currentIndex });
 }

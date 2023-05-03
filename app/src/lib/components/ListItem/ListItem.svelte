@@ -110,7 +110,9 @@
 								: item?.playlistSetVideoId,
 
 						ctoken:
-							APIParams.lt100 === item.playerParams ? undefined : $list.continuation,
+							APIParams.lt100 === item.playerParams
+								? undefined
+								: $list.continuation,
 						clickTrackingParams: item.clickTrackingParams,
 					})
 					.then(() => {

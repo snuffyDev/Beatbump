@@ -12,8 +12,15 @@ export interface Detail {
 	timestamp: number;
 }
 
-export function mobileLongPress(node: HTMLElement, config: ILongPressConfig = { duration: 400, delay: 200 }) {
-	const dispatch = dispatcher<{ pressEnd: Detail; pressing: Detail; pressStart: Detail }>();
+export function mobileLongPress(
+	node: HTMLElement,
+	config: ILongPressConfig = { duration: 400, delay: 200 },
+) {
+	const dispatch = dispatcher<{
+		pressEnd: Detail;
+		pressing: Detail;
+		pressStart: Detail;
+	}>();
 	let curTime = 0;
 	let running;
 	let task: Task;
@@ -53,7 +60,10 @@ export function mobileLongPress(node: HTMLElement, config: ILongPressConfig = { 
 		running = false;
 		curTime = 0;
 
-		dispatch(node, "pressEnd", { progress: Math.ceil(curTime), timestamp: performance.now() });
+		dispatch(node, "pressEnd", {
+			progress: Math.ceil(curTime),
+			timestamp: performance.now(),
+		});
 		node.removeEventListener("pointerup", handlePointerEnd);
 		node.removeEventListener("pointercancel", handlePointerEnd);
 	}

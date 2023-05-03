@@ -67,7 +67,9 @@
 		>
 			<Icon
 				color="white"
-				style="stroke-width:2; stroke: {isShuffled ? '#fff' : 'hsla(0, 0%, 100%, 0.5)'};"
+				style="stroke-width:2; stroke: {isShuffled
+					? '#fff'
+					: 'hsla(0, 0%, 100%, 0.5)'};"
 				name="shuffle"
 				fill={"none"}
 				size={"1em"}

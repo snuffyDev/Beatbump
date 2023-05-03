@@ -36,7 +36,9 @@
 	const { page, parentPlaylistId = null } = CTX_ListItem.get();
 
 	$: isPlaying =
-		(page !== "queue" && page !== "release" ? $isPagePlaying.has($SPage.params.slug) : true) &&
+		(page !== "queue" && page !== "release"
+			? $isPagePlaying.has($SPage.params.slug)
+			: true) &&
 		$SessionListService.mix.length > 0 &&
 		$SessionListService.position === idx &&
 		$SessionListService.mix[idx]?.videoId === item.videoId;
@@ -48,7 +50,13 @@
 			text: "View Artist",
 			icon: "artist",
 			action: async () => {
-				goto(`/artist/${item?.artistInfo ? item.artistInfo.artist[0].browseId : item?.subtitle[0].browseId}`);
+				goto(
+					`/artist/${
+						item?.artistInfo
+							? item.artistInfo.artist[0].browseId
+							: item?.subtitle[0].browseId
+					}`,
+				);
 				await tick();
 				window.scrollTo({
 					behavior: "smooth",
@@ -128,7 +136,9 @@
 					return AudioPlayer.previous(false);
 				}
 				if (idx === $queue.length - 1) {
-					const pos = SessionListService.updatePosition(idx === 0 ? 0 : idx - 1);
+					const pos = SessionListService.updatePosition(
+						idx === 0 ? 0 : idx - 1,
+					);
 					// updateGroupPosition("<-", pos);
 					SessionListService.next(true, true);
 					await tick();
@@ -151,7 +161,10 @@
 			}
 		} else if (page === "playlist") {
 			SessionListService.updatePosition(idx);
-			await SessionListService.initPlaylistSession({ playlistId: item.playlistId, index: idx });
+			await SessionListService.initPlaylistSession({
+				playlistId: item.playlistId,
+				index: idx,
+			});
 		} else if (page === "library") {
 			SessionListService.updatePosition(idx);
 			dispatch("initLocalPlaylist", { idx });
@@ -161,7 +174,10 @@
 				videoId: item.videoId,
 				playlistId: parentPlaylistId,
 				keyId: page === "artist" ? 0 : idx,
-				config: { playerParams: item?.playerParams, type: item?.musicVideoType },
+				config: {
+					playerParams: item?.playerParams,
+					type: item?.musicVideoType,
+				},
 			});
 		}
 		dispatch("setPageIsPlaying", { id: parentPlaylistId });
@@ -173,7 +189,9 @@
 	bind:this={parent}
 	class="m-item"
 	tabindex="0"
-	class:isPlaying={isPagePlaying.has($SPage.params.slug) && $queue?.length > 0 && $queuePosition === idx}
+	class:isPlaying={isPagePlaying.has($SPage.params.slug) &&
+		$queue?.length > 0 &&
+		$queuePosition === idx}
 	on:click={handleClick}
 	on:pointerenter={(e) => {
 		isHovering = true;
@@ -268,7 +286,8 @@
 	{:else}
 		<span
 			class="length"
-			class:hidden={!item?.length ? true : false}>{(item?.length?.text ?? item.length) || ""}</span
+			class:hidden={!item?.length ? true : false}
+			>{(item?.length?.text ?? item.length) || ""}</span
 		>
 	{/if}
 </article>

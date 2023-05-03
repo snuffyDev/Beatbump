@@ -46,9 +46,17 @@
 
 	trackStore.set(tracks);
 
-	CTX_ListItem.set({ page: "playlist", innerWidth: width, parentPlaylistId: id, visitorData: data?.visitorData });
+	CTX_ListItem.set({
+		page: "playlist",
+		innerWidth: width,
+		parentPlaylistId: id,
+		visitorData: data?.visitorData,
+	});
 
-	pageTitle = pageTitle.length > 64 ? pageTitle.substring(0, 64) + "..." : header?.title || "";
+	pageTitle =
+		pageTitle.length > 64
+			? pageTitle.substring(0, 64) + "..."
+			: header?.title || "";
 	description =
 		header?.description !== undefined
 			? header?.description.length > 240
@@ -62,7 +70,13 @@
 			"/api/v1/playlist.json" +
 				"?ref=" +
 				id +
-				`${carouselContinuations ? `&ctoken=${encodeURIComponent(carouselContinuations?.continuation)}` : ""}` +
+				`${
+					carouselContinuations
+						? `&ctoken=${encodeURIComponent(
+								carouselContinuations?.continuation,
+						  )}`
+						: ""
+				}` +
 				"&itct=" +
 				carouselContinuations?.clickTrackingParams,
 		);
@@ -88,7 +102,11 @@
 					id +
 					"&visitorData=" +
 					visitorData +
-					`${ctoken ? `&ctoken=${encodeURIComponent(encodeURIComponent(ctoken))}` : ""}` +
+					`${
+						ctoken
+							? `&ctoken=${encodeURIComponent(encodeURIComponent(ctoken))}`
+							: ""
+					}` +
 					"&itct=" +
 					itct,
 			);
@@ -222,7 +240,9 @@
 		title={header?.title}
 		url={`${key}`}
 		desc={description}
-		image={header?.thumbnails !== null ? header?.thumbnails[header?.thumbnails?.length - 1]?.url : undefined}
+		image={header?.thumbnails !== null
+			? header?.thumbnails[header?.thumbnails?.length - 1]?.url
+			: undefined}
 	/>
 {/if}
 <main>
@@ -231,7 +251,10 @@
 			subtitles={header?.subtitles}
 			secondSubtitle={header?.secondSubtitle}
 			thumbnail={header?.thumbnails !== null
-				? header?.thumbnails[header?.thumbnails?.length - 1].url.replace(/=(w(\d+))-(h(\d+))/g, "=w512-h512")
+				? header?.thumbnails[header?.thumbnails?.length - 1].url.replace(
+						/=(w(\d+))-(h(\d+))/g,
+						"=w512-h512",
+				  )
 				: undefined}
 			title={pageTitle}
 			{description}
@@ -275,7 +298,9 @@
 				notify(`${pageTitle} added to queue!`, "success");
 			}}
 			on:playlistAdd={async () => {
-				const response = await fetch("/api/v1/get_queue.json?playlistId=" + header?.playlistId);
+				const response = await fetch(
+					"/api/v1/get_queue.json?playlistId=" + header?.playlistId,
+				);
 				const data = await response.json();
 				const items = data;
 				showAddToPlaylistPopper.set({ state: true, item: [...items] });

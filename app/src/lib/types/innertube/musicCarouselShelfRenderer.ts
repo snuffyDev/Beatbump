@@ -1,4 +1,7 @@
-import type { IMusicResponsiveListItemRenderer, IMusicTwoRowItemRenderer } from "./internals";
+import type {
+	IMusicResponsiveListItemRenderer,
+	IMusicTwoRowItemRenderer,
+} from "./internals";
 
 export interface MusicCarouselShelfRenderer {
 	header: Header;

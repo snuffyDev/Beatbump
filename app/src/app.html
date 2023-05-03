@@ -97,7 +97,10 @@
 			// }
 			const hasSettings = localStorage.settings;
 			if (!hasSettings) document.documentElement.classList.add("Dark");
-			else document.documentElement.classList.add(JSON.parse(hasSettings)?.appearance?.Theme ?? "Dark");
+			else
+				document.documentElement.classList.add(
+					JSON.parse(hasSettings)?.appearance?.Theme ?? "Dark",
+				);
 		</script>
 		%sveltekit.head%
 	</head>

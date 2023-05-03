@@ -1,12 +1,25 @@
-import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
+import {
+	MusicResponsiveListItemRenderer,
+	MusicTwoRowItemRenderer,
+} from "$lib/parsers";
 
-import type { CarouselHeader, NextContinuationData, Thumbnail } from "$lib/types";
+import type {
+	CarouselHeader,
+	NextContinuationData,
+	Thumbnail,
+} from "$lib/types";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { map } from "$lib/utils/collections";
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 import { buildAPIRequest } from "$api/request";
-import type { PlaylistEndpointContinuation, PlaylistEndpointParams } from "$api/_base";
-import type { Header, MusicCarouselShelfRenderer } from "$lib/types/innertube/musicCarouselShelfRenderer";
+import type {
+	PlaylistEndpointContinuation,
+	PlaylistEndpointParams,
+} from "$api/_base";
+import type {
+	Header,
+	MusicCarouselShelfRenderer,
+} from "$lib/types/innertube/musicCarouselShelfRenderer";
 import type { ITwoRowItemRenderer } from "$lib/types/musicCarouselTwoRowItem";
 import { objectKeys } from "$lib/utils/collections/objects";
 
@@ -26,6 +39,14 @@ export interface PlaylistResponseBody {
 	visitorData?: string;
 }
 
+const ALLOWED_HEADER_KEYS = new Set([
+	"subtitle",
+	"secondSubtitle",
+	"description",
+	"thumbnail",
+	"title",
+]);
+
 export const GET: RequestHandler = async ({ url }) => {
 	try {
 		const query = url.searchParams;
@@ -41,7 +62,12 @@ export const GET: RequestHandler = async ({ url }) => {
 		if (ctoken !== "") {
 			return getPlaylistContinuation(
 				params,
-				{ ctoken: decodeURIComponent(ctoken), continuation: decodeURIComponent(ctoken), itct, type: "next" },
+				{
+					ctoken: decodeURIComponent(ctoken),
+					continuation: decodeURIComponent(ctoken),
+					itct,
+					type: "next",
+				},
 				referrer.slice(2),
 				visitorData,
 			);
@@ -49,7 +75,10 @@ export const GET: RequestHandler = async ({ url }) => {
 
 		return getPlaylist(browseId, referrer);
 	} catch (err) {
-		return new Response(undefined, { status: 500, headers: { statusText: `${err}` } });
+		return new Response(undefined, {
+			status: 500,
+			headers: { statusText: `${err}` },
+		});
 	}
 };
 async function getPlaylistContinuation(
@@ -74,22 +103,34 @@ async function getPlaylistContinuation(
 		params: {},
 		continuation,
 	});
-	if (response === null) throw error(500, { message: "Error fetching playlist" });
+	if (response === null)
+		throw error(500, { message: "Error fetching playlist" });
 	if (!response.ok) {
 		throw error(response.status, response.statusText);
 	}
 
 	const data = await response.json();
-	const { continuationContents: { musicPlaylistShelfContinuation: { contents = [], continuations = [] } = {} } = {} } =
-		await data;
+	const {
+		continuationContents: {
+			musicPlaylistShelfContinuation: {
+				contents = [],
+				continuations = [],
+			} = {},
+		} = {},
+	} = await data;
 	// console.log(data, contents, continuations)
 
 	let tracks: (IListItemRenderer | ITwoRowItemRenderer)[] = [];
 	let carousel;
-	const cont: NextContinuationData = continuations.length !== 0 ? continuations[0]?.nextContinuationData : null;
-	if (data?.continuationContents?.sectionListContinuation?.contents[0]?.musicCarouselShelfRenderer) {
+	const cont: NextContinuationData =
+		continuations.length !== 0 ? continuations[0]?.nextContinuationData : null;
+	if (
+		data?.continuationContents?.sectionListContinuation?.contents[0]
+			?.musicCarouselShelfRenderer
+	) {
 		carousel = parseCarousel(
-			data?.continuationContents?.sectionListContinuation?.contents[0]?.musicCarouselShelfRenderer,
+			data?.continuationContents?.sectionListContinuation?.contents[0]
+				?.musicCarouselShelfRenderer,
 		);
 	} else {
 		tracks = parseTrack(contents, id);
@@ -121,11 +162,14 @@ async function getPlaylist(browseId: string, referrer: string) {
 						osName: "Googlebot",
 						osVersion: "2.1",
 						locationInfo: {
-							locationPermissionAuthorizationStatus: "LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED",
+							locationPermissionAuthorizationStatus:
+								"LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED",
 						},
 						musicAppInfo: {
-							musicActivityMasterSwitch: "MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
-							musicLocationMasterSwitch: "MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE",
+							musicActivityMasterSwitch:
+								"MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
+							musicLocationMasterSwitch:
+								"MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE",
 							pwaInstallabilityStatus: "PWA_INSTALLABILITY_STATUS_UNKNOWN",
 						},
 						utcOffsetMinutes: -new Date().getTimezoneOffset(),
@@ -150,8 +194,10 @@ async function getPlaylist(browseId: string, referrer: string) {
 				"x-origin": "https://music.youtube.com",
 				"X-Goog-Visitor-Id": "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D",
 
-				"User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-				referer: "https://music.youtube.com/playlist?list=" + referrer || browseId,
+				"User-Agent":
+					"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+				referer:
+					"https://music.youtube.com/playlist?list=" + referrer || browseId,
 			},
 		},
 	);
@@ -166,21 +212,23 @@ async function getPlaylist(browseId: string, referrer: string) {
 		musicDetailHeaderRenderer = detailHeader;
 	}
 	const visitorData = data.responseContext?.visitorData;
-	const contents =
-			data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents[0]
-				?.musicPlaylistShelfRenderer.contents,
-		musicPlaylistShelfRenderer =
-			data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents[0]
-				?.musicPlaylistShelfRenderer,
-		playlistId = musicPlaylistShelfRenderer.playlistId,
-		continuations = musicPlaylistShelfRenderer?.continuations;
+
+	const musicPlaylistShelfRenderer =
+		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+			?.content?.sectionListRenderer?.contents[0]?.musicPlaylistShelfRenderer;
+
+	const contents = musicPlaylistShelfRenderer.contents;
+
+	const playlistId = musicPlaylistShelfRenderer.playlistId;
+	const continuations = musicPlaylistShelfRenderer?.continuations;
 
 	const _carouselContinuation =
-		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer
-			?.continuations || null;
+		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+			?.content?.sectionListRenderer?.continuations || null;
 
 	// console.log(musicDetailHeaderRenderer)
-	const cont: NextContinuationData = data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content
+	const continuationData: NextContinuationData = data?.contents
+		?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content
 		?.sectionListRenderer?.continuations
 		? Array.isArray(continuations) && continuations[0]?.nextContinuationData
 			? continuations[0]?.nextContinuationData
@@ -197,34 +245,46 @@ async function getPlaylist(browseId: string, referrer: string) {
 				}
 				return arr;
 			})();
-		const ALLOWED_KEYS = new Set(["subtitle", "secondSubtitle", "description", "thumbnail", "title"]);
 		// const key_map = Object.keys(musicDetailHeaderRenderer);
 		// let len = key_map.length;
 		for (const key of objectKeys(musicDetailHeaderRenderer)) {
-			if (!ALLOWED_KEYS.has(key)) {
+			if (!ALLOWED_HEADER_KEYS.has(key)) {
 				delete musicDetailHeaderRenderer[key];
 			}
 
 			if (key === "subtitle" || key === "secondSubtitle") {
-				musicDetailHeaderRenderer[key] = musicDetailHeaderRenderer[key]["runs"]["length"] !== 0 ? createArray(key) : [];
+				musicDetailHeaderRenderer[key] =
+					musicDetailHeaderRenderer[key]["runs"]["length"] !== 0
+						? createArray(key)
+						: [];
 			}
 
 			const item = musicDetailHeaderRenderer[key] as Record<string, unknown>;
-			if (key === "description" && "runs" in item && Array.isArray(item.runs) && item.runs.length !== 0) {
+			if (
+				key === "description" &&
+				"runs" in item &&
+				Array.isArray(item.runs) &&
+				item.runs.length !== 0
+			) {
 				musicDetailHeaderRenderer[key] = item.runs[0]?.text || undefined;
 			}
 			if (key === "thumbnail") {
-				const croppedSquareThumbnail = item?.croppedSquareThumbnailRenderer as Record<string, unknown>;
-				if (typeof croppedSquareThumbnail.thumbnail === "object" && "thumbnails" in croppedSquareThumbnail.thumbnail) {
-					musicDetailHeaderRenderer[key + "s"] = croppedSquareThumbnail.thumbnail.thumbnails || null;
+				const croppedSquareThumbnail =
+					item?.croppedSquareThumbnailRenderer as Record<string, unknown>;
+				if (
+					typeof croppedSquareThumbnail.thumbnail === "object" &&
+					"thumbnails" in croppedSquareThumbnail.thumbnail
+				) {
+					musicDetailHeaderRenderer[key + "s"] =
+						croppedSquareThumbnail.thumbnail.thumbnails || null;
 				}
 				delete musicDetailHeaderRenderer[key];
 			}
 			if (key === "title")
-				musicDetailHeaderRenderer[key] = musicDetailHeaderRenderer[key]["runs"][0]["text"] || "Error";
+				musicDetailHeaderRenderer[key] =
+					musicDetailHeaderRenderer[key]["runs"][0]["text"] || "[ Unknown ]";
 		}
 		musicDetailHeaderRenderer["playlistId"] = playlistId;
-		ALLOWED_KEYS.clear();
 	};
 	getHeader();
 
@@ -232,19 +292,26 @@ async function getPlaylist(browseId: string, referrer: string) {
 	// console.timeEnd("playlist");
 	const obj = {
 		_original: data,
-		continuations: cont,
+		continuations: continuationData,
 		tracks,
 		visitorData,
-		carouselContinuations: _carouselContinuation && _carouselContinuation[0].nextContinuationData,
+		carouselContinuations:
+			_carouselContinuation && _carouselContinuation[0].nextContinuationData,
 		header: musicDetailHeaderRenderer,
 	};
 	return json();
 }
-function parseTrack(contents = [], playlistId?: string): Array<IListItemRenderer> {
+function parseTrack(
+	contents = [],
+	playlistId?: string,
+): Array<IListItemRenderer> {
 	// let idx = contents.length;
 
 	return contents
-		.map((track) => MusicResponsiveListItemRenderer(track, true, playlistId) || undefined)
+		.map(
+			(track) =>
+				MusicResponsiveListItemRenderer(track, true, playlistId) || undefined,
+		)
 		.filter((track) => track && track.videoId);
 }
 
@@ -254,12 +321,16 @@ function parseHeader(header: Header[]): CarouselHeader[] {
 	}));
 }
 
-function parseBody(contents: MusicCarouselShelfRenderer["contents"] = []): (IListItemRenderer | ITwoRowItemRenderer)[] {
+function parseBody(
+	contents: MusicCarouselShelfRenderer["contents"] = [],
+): (IListItemRenderer | ITwoRowItemRenderer)[] {
 	const items = [];
 	for (let idx = 0; idx < contents.length; idx++) {
 		const item = contents[idx];
-		if ("musicTwoRowItemRenderer" in item) items[idx] = MusicTwoRowItemRenderer(item);
-		if ("musicResponsiveListItemRenderer" in item) items[idx] = MusicResponsiveListItemRenderer(item);
+		if ("musicTwoRowItemRenderer" in item)
+			items[idx] = MusicTwoRowItemRenderer(item);
+		if ("musicResponsiveListItemRenderer" in item)
+			items[idx] = MusicResponsiveListItemRenderer(item);
 	}
 	return items;
 }

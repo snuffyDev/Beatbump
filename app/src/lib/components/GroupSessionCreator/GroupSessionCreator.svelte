@@ -23,7 +23,9 @@
 		groupSession.init(displayName, "host", { forceSync: checked });
 		await tick();
 		step++;
-		sessionURL = `${import.meta.env.DEV ? $page.url.host : $SITE_ORIGIN_URL}/session?token=${IsoBase64.toBase64(
+		sessionURL = `${
+			import.meta.env.DEV ? $page.url.host : $SITE_ORIGIN_URL
+		}/session?token=${IsoBase64.toBase64(
 			JSON.stringify({
 				clientId: groupSession.client.clientId,
 				displayName: groupSession.client.displayName,
@@ -90,8 +92,8 @@
 					</div>
 					<div class="modal-body">
 						<p>
-							Your group session has been created! You can invite anyone to join your session by sending them the link
-							found below!
+							Your group session has been created! You can invite anyone to join
+							your session by sending them the link found below!
 						</p>
 						<p />
 						<p>Your Session URL:</p>

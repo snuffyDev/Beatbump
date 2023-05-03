@@ -36,7 +36,9 @@
 	function seekAudio(event: PointerEvent) {
 		if (!songBar && !AudioPlayer.player.src) return;
 
-		AudioPlayer.seek(seek(event, songBar.getBoundingClientRect()) * $durationStore);
+		AudioPlayer.seek(
+			seek(event, songBar.getBoundingClientRect()) * $durationStore,
+		);
 	}
 </script>
 

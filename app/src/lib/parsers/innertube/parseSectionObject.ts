@@ -14,10 +14,14 @@ export type GridOrCarousel<T extends "grid" | "carousel"> = T extends "grid"
 	  }
 	: { musicCarouselShelfRenderer: MusicCarouselShelfRenderer };
 
-export const parseGridItem = ({ gridRenderer }: GridOrCarousel<"grid">) => {
+export const parseGridRendererSection = ({
+	gridRenderer,
+}: GridOrCarousel<"grid">) => {
 	const { items: contents = [], header } = gridRenderer;
 	const items = contents.map((ctx) =>
-		MusicTwoRowItemRenderer(ctx as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer }),
+		MusicTwoRowItemRenderer(
+			ctx as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer },
+		),
 	);
 	return {
 		items,

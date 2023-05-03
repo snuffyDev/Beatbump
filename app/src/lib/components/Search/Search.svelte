@@ -18,7 +18,9 @@
 		if (!query.length) return;
 		dispatch("submitted", { submitted: true, filter, query });
 		fullscreenStore.set("closed");
-		let url = `/search/${encodeURIComponent(query)}${filter !== undefined ? `?filter=${filter}` : ""}`;
+		let url = `/search/${encodeURIComponent(query)}${
+			filter !== undefined ? `?filter=${filter}` : ""
+		}`;
 		goto(url);
 	}
 
@@ -43,7 +45,9 @@
 	}
 	const typeahead = debounce(async () => {
 		if (!query) return (results = []);
-		const response = await fetch("/api/v1/get_search_suggestions.json?q=" + encodeURIComponent(query));
+		const response = await fetch(
+			"/api/v1/get_search_suggestions.json?q=" + encodeURIComponent(query),
+		);
 		results = await response.json();
 	}, 250);
 </script>

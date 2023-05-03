@@ -48,10 +48,19 @@ test.describe("user journey", () => {
 		const main = page.locator("#wrapper");
 		let relatedPlaylistSection: Locator;
 
-		while (!(await main.locator("footer").isVisible())) await main.locator("footer").scrollIntoViewIfNeeded();
+		while (!(await main.locator("footer").isVisible()))
+			await main.locator("footer").scrollIntoViewIfNeeded();
 
-		if (main.getByRole("main").locator("div").filter({ hasText: "Related playlists" })) {
-			relatedPlaylistSection = await main.getByRole("main").locator("div").filter({ hasText: "Related playlists" });
+		if (
+			main
+				.getByRole("main")
+				.locator("div")
+				.filter({ hasText: "Related playlists" })
+		) {
+			relatedPlaylistSection = await main
+				.getByRole("main")
+				.locator("div")
+				.filter({ hasText: "Related playlists" });
 		}
 
 		await expect(relatedPlaylistSection).toBeVisible();

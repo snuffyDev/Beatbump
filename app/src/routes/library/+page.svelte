@@ -168,7 +168,9 @@
 				{:else}
 					<div class="container">
 						<h4>Empty!</h4>
-						<span class="subheading"><em>Add some songs to keep track of what you love!</em></span>
+						<span class="subheading"
+							><em>Add some songs to keep track of what you love!</em></span
+						>
 					</div>
 				{/if}
 			</div>

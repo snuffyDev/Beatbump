@@ -22,7 +22,10 @@ export interface ICarousel<T extends IListItemRenderer | MoodsAndGenresItem> {
 	results: T[];
 	isBrowse?: boolean;
 }
-export type Item = IMergedObject<IMergedObject<IListItemRenderer, ICarouselTwoRowItem>, Song>;
+export type Item = IMergedObject<
+	IMergedObject<IListItemRenderer, ICarouselTwoRowItem>,
+	Song
+>;
 
 export interface Album {
 	browseId?: string;

@@ -50,13 +50,16 @@
 
 	function trackMovement(kind: number, detail) {
 		if (kind === 1) {
-			motion.set(Math.min(heightCalc, Math.max(0, detail.clientY - 8)), { duration: 180 });
+			motion.set(Math.min(heightCalc, Math.max(0, detail.clientY - 8)), {
+				duration: 180,
+			});
 		}
 	}
 
 	function open(kind: number, detail) {
 		const step = detail.deltaY / queueHeight;
-		const miss = detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : 1 - step;
+		const miss =
+			detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : 1 - step;
 		const distance = miss * windowHeight;
 		motion.update(
 			() => {
@@ -70,7 +73,8 @@
 
 	async function close(kind: number, detail) {
 		const step = detail.deltaY / queueHeight;
-		const miss = detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : step;
+		const miss =
+			detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : step;
 		const distance = miss * windowHeight;
 		if (kind === 1) {
 			motion.set(windowHeight, {
@@ -136,14 +140,23 @@
 				anim.play();
 			}
 		} else if (items.length === 0) {
-			motion.update(() => windowHeight, { duration: 600, easing: quartOut, delay: 400 });
+			motion.update(() => windowHeight, {
+				duration: 600,
+				easing: quartOut,
+				delay: 400,
+			});
 		}
 	}
-	$: srcImg = Array.isArray($PopperStore.metadata?.thumbnail ?? $PopperStore.items[0]?.thumbnails)
+	$: srcImg = Array.isArray(
+		$PopperStore.metadata?.thumbnail ?? $PopperStore.items[0]?.thumbnails,
+	)
 		? $PopperStore.metadata?.thumbnail[0] ?? $PopperStore.items[0]?.thumbnails
 		: { width: 0, height: 0, url: "", placeholder: "" };
 
-	$: srcImg.url = srcImg.width < 100 ? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-") : srcImg.url;
+	$: srcImg.url =
+		srcImg.width < 100
+			? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
+			: srcImg.url;
 </script>
 
 {#if isOpen}
@@ -353,7 +366,9 @@
 		// inset: 0;
 		left: 0;
 		right: 0;
-		max-height: calc(100% - calc(var(--top-bar-height) + var(--player-bar-height)));
+		max-height: calc(
+			100% - calc(var(--top-bar-height) + var(--player-bar-height))
+		);
 		max-height: 80%;
 		padding-bottom: 0.3125em;
 	}
