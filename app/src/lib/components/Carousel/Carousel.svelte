@@ -57,10 +57,7 @@
 		moreOnLeft = scrollLeft < 15 ? false : true;
 		scrollPositions.left = scrollLeft;
 
-		moreOnRight =
-			scrollPositions.left < scrollPositions.width - clientWidth - 15
-				? true
-				: false;
+		moreOnRight = scrollPositions.left < scrollPositions.width - clientWidth - 15 ? true : false;
 		scrollPositions.right = scrollPositions.width - scrollLeft - 15;
 
 		if (elapsed < 100) {
@@ -69,13 +66,9 @@
 			cancelAnimationFrame(frame);
 
 			if (context === "left") {
-				carousel.scrollLeft -= Math.ceil(
-					(scrollPositions.width / items.length) * 2,
-				);
+				carousel.scrollLeft -= Math.ceil((scrollPositions.width / items.length) * 2);
 			} else if (context === "right") {
-				carousel.scrollLeft += Math.ceil(
-					(scrollPositions.width / items.length) * 2,
-				);
+				carousel.scrollLeft += Math.ceil((scrollPositions.width / items.length) * 2);
 			}
 			frame = undefined;
 			startTime = undefined;
@@ -111,18 +104,14 @@
 	const isArtistPage = $page.url.pathname.includes("/artist/");
 	const urls = {
 		playlist: `/playlist/${header?.browseId}`,
-		trending: `/trending/new/${header?.browseId}${
-			header?.params ? `?params=${header.params}` : ""
-		}${header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ""}`,
+		trending: `/trending/new/${header?.browseId}${header?.params ? `?params=${header.params}` : ""}${
+			header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ""
+		}`,
 		artist: `${header.browseId}/releases?visitorData=${visitorData}&params=${header?.params}&itct=${header?.itct}`,
 	};
 
 	let href =
-		header?.browseId && isArtistPage
-			? urls.artist
-			: header.browseId?.includes("VLP")
-			? urls.playlist
-			: urls.trending;
+		header?.browseId && isArtistPage ? urls.artist : header.browseId?.includes("VLP") ? urls.playlist : urls.trending;
 </script>
 
 <div class="header resp-content-width">

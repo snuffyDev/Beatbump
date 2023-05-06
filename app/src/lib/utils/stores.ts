@@ -77,10 +77,7 @@ export class WritableStore<T = unknown> extends ReadableStore<T> {
 		this.notifyObservers(oldValue);
 	}
 }
-type Stores =
-	| Readable<any>
-	| [Readable<any>, ...Array<Readable<any>>]
-	| Array<Readable<any>>;
+type Stores = Readable<any> | [Readable<any>, ...Array<Readable<any>>] | Array<Readable<any>>;
 /** One or more values from `Readable` stores. */
 type StoresValues<T> = T extends Readable<infer U>
 	? U

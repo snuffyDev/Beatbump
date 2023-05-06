@@ -1,10 +1,6 @@
 import { browser } from "$app/environment";
 import { throttle } from "$lib/utils";
-import {
-	readable,
-	type StartStopNotifier,
-	type Subscriber,
-} from "svelte/store";
+import { readable, type StartStopNotifier, type Subscriber } from "svelte/store";
 
 function mediaQuery(query: string): StartStopNotifier<boolean> {
 	return (set: Subscriber<boolean>) => {
@@ -20,15 +16,9 @@ function mediaQuery(query: string): StartStopNotifier<boolean> {
 	};
 }
 
-export const isMobileMQ = readable(
-	false,
-	mediaQuery("screen and (max-width: 719px)"),
-);
+export const isMobileMQ = readable(false, mediaQuery("screen and (max-width: 719px)"));
 
-export const isDesktopMQ = readable(
-	false,
-	mediaQuery("screen and (min-width: 720px)"),
-);
+export const isDesktopMQ = readable(false, mediaQuery("screen and (min-width: 720px)"));
 
 function size(bound: "innerWidth" | "innerHeight") {
 	return (set: Subscriber<number>) => {

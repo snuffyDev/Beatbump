@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-	import { cubicOut, quintOut } from "svelte/easing";
+	import { cubicOut } from "svelte/easing";
 	import { fly } from "svelte/transition";
 	export let main: HTMLElement;
 	export let key;

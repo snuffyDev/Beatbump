@@ -9,7 +9,7 @@
 		"plugin:import/typescript",
 		"plugin:svelte/recommended"
 	],
-	"plugins": ["@typescript-eslint", "import"],
+	"plugins": ["@typescript-eslint", "import", "unused-imports", "svelte"],
 	"ignorePatterns": ["*.cjs"],
 	"overrides": [
 		{
@@ -22,13 +22,21 @@
 		{ "files": ["*.cjs"], "env": { "node": true } }
 	],
 	"rules": {
-		"import/no-unresolved": [2, { "ignore": ["\\$app/"] }],
-		"import/no-cycle": "error"
+		"import/no-unresolved": [2, { "ignore": ["\\$app/", "\\$service-worker"] }],
+		"import/no-cycle": "error",
+		"import/no-unused-modules": "off",
+		"no-mixed-spaces-and-tabs": "off",
+		"svelte/valid-compile": "off",
+		"no-unused-vars": "off", // or "@typescript-eslint/no-unused-vars": "off",
+		"unused-imports/no-unused-imports": "error",
+		"unused-imports/no-unused-vars": [
+			"warn",
+			{ "vars": "all", "varsIgnorePattern": "^_", "args": "after-used", "argsIgnorePattern": "^_" }
+		]
 	},
 	"settings": {
 		"import/parsers": {
 			"@typescript-eslint/parser": [".ts", ".tsx"],
-			"svelte-eslint-parser": [".svelte"],
 			"espree": [".js"]
 		},
 		"import/resolver": {

@@ -10,8 +10,7 @@
 	class="item"
 	on:click={() => {
 		const itemType = item.endpoint?.pageType;
-		itemType.includes("PLAYLIST") &&
-			goto("/playlist/" + item.endpoint.browseId);
+		itemType.includes("PLAYLIST") && goto("/playlist/" + item.endpoint.browseId);
 		itemType.includes("ALBUM") && goto("/release?id=" + item.endpoint.browseId);
 		item.videoId &&
 			list.initAutoMixSession({

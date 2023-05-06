@@ -6,9 +6,7 @@ function ensureIntersectionObserver(options?: { margin: string }) {
 	intersectionObserver = new IntersectionObserver(
 		(entries) => {
 			entries.forEach((entry) => {
-				const eventName = entry.isIntersecting
-					? "enterViewport"
-					: "exitViewport";
+				const eventName = entry.isIntersecting ? "enterViewport" : "exitViewport";
 				entry.target.dispatchEvent(new CustomEvent(eventName));
 			});
 		},

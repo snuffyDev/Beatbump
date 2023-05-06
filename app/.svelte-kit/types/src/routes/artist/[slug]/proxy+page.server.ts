@@ -1,13 +1,14 @@
 // @ts-nocheck
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { buildAPIRequest } from "$api/request";
-import { error } from "@sveltejs/kit";
 import { ArtistPageParser } from "$lib/parsers/artist";
+import { error } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 
 export const load = async ({ params }: Parameters<PageServerLoad>[0]) => {
 	const response = await buildAPIRequest("artist", {
 		context: {
-			client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" },
+			client: { clientName: "WEB_REMIX", clientVersion: "1.20230501.01.00" },
 		},
 		headers: null,
 		params: {
@@ -19,17 +20,25 @@ export const load = async ({ params }: Parameters<PageServerLoad>[0]) => {
 			},
 		},
 	});
+	if (!response) throw error(500, "Failed to fetch");
 	const data = await response.json();
 	if (!response.ok) throw error(500, response.statusText);
 	const page = parseResponse(data);
 
 	return Object.assign(page);
 };
-function parseResponse(data) {
+function parseResponse(data: {
+	header: any;
+	contents: {
+		singleColumnBrowseResultsRenderer: {
+			tabs: { tabRenderer: { content: { sectionListRenderer: { contents: any } } } }[];
+		};
+	};
+	responseContext: { visitorData: string };
+}) {
 	const header = data?.header;
 	const contents =
-		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
-			?.content?.sectionListRenderer?.contents;
+		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents;
 	const visitorData = data?.responseContext?.visitorData ?? "";
 	return ArtistPageParser({
 		header,

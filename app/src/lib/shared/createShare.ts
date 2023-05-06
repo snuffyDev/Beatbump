@@ -1,3 +1,9 @@
+export type SharePageType =
+	| "MUSIC_PAGE_TYPE_PLAYLIST"
+	| "MUSIC_PAGE_TYPE_ARTIST"
+	| "MUSIC_PAGE_TYPE_ALBUM"
+	| "SESSION"
+	| null;
 export function createShare({
 	origin,
 	title,
@@ -5,12 +11,7 @@ export function createShare({
 	id,
 }: {
 	origin: string;
-	type?:
-		| "MUSIC_PAGE_TYPE_PLAYLIST"
-		| "MUSIC_PAGE_TYPE_ARTIST"
-		| "MUSIC_PAGE_TYPE_ALBUM"
-		| "SESSION"
-		| null;
+	type?: SharePageType;
 	id: string;
 	title?: string;
 }): { url: string; title: string } {

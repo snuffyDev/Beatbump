@@ -5,12 +5,14 @@
 		},
 		{
 			"path": "packages/proxy-server/rust"
+		},
+		{
+			"path": "."
 		}
 	],
 	"settings": {
 		"svg.preview.background": "custom",
 		"npm-intellisense.recursivePackageJsonLookup": true,
-		"typescript.format.enable": true,
 		"typescript.tsdk": "Beatbump/app/node_modules/typescript/lib",
 		"svelte.enable-ts-plugin": true,
 		"svelte.plugin.svelte.defaultScriptLanguage": "ts",
@@ -39,6 +41,16 @@
 			"vue",
 			"markdown"
 		],
-		"eslint.workingDirectories": []
+		"eslint.workingDirectories": [],
+		"css.validate": false,
+		"scss.validate": false,
+		"stylelint.enable": true,
+		"editor.codeActionsOnSave": {
+			"source.fixAll": true,
+			"source.organizeImports": true
+		},
+		"eslint.format.enable": false,
+		"eslint.codeActionsOnSave.mode": "all",
+		"stylelint.validate": ["css", "less", "postcss"]
 	}
 }

@@ -123,9 +123,8 @@
 		max-width: 15.5rem;
 	}
 	.file-button {
-		font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-			Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-			sans-serif;
+		font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+			"Open Sans", "Helvetica Neue", sans-serif;
 		&:hover::after {
 			background: #525252b2;
 		}
@@ -136,8 +135,7 @@
 		background: var(--form-bg);
 		border: 0.0625rem solid hsla(0, 0%, 66.7%, 0.219);
 		border-radius: $md-radius;
-		box-shadow: inset 0.1125em -0.1125em 1em 0.5em hsla(0, 0%, 96.9%, 0.014),
-			0 0 0.25em 0.02em hsla(0, 0%, 66.7%, 0) !important;
+		box-shadow: inset 0.1125em -0.1125em 1em 0.5em hsla(0, 0%, 96.9%, 0.014), 0 0 0.25em 0.02em hsla(0, 0%, 66.7%, 0) !important;
 
 		padding: 0.4rem 0.7rem;
 		outline: none;

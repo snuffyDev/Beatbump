@@ -4,10 +4,8 @@
 	import { page } from "$app/stores";
 	import { IDBService } from "$lib/workers/db/service";
 
-	import { showAddToPlaylistPopper } from "$lib/stores/stores";
-
 	import { createEventDispatcher, onMount } from "svelte";
-	import { fade, fly } from "svelte/transition";
+	import { fade } from "svelte/transition";
 	import Icon from "../Icon/Icon.svelte";
 	import Modal from "../Modal";
 	export let defaults: {
@@ -102,8 +100,8 @@
 		>
 			<h1>Delete Playlist?</h1>
 			<p>
-				Deleting this playlist will permanently delete all of it's data from
-				your device (thumbnail, title, songs, etc.).
+				Deleting this playlist will permanently delete all of it's data from your device (thumbnail, title, songs,
+				etc.).
 			</p>
 			<p>This action is permanent and cannot be undone!</p>
 		</div>
@@ -255,11 +253,7 @@
 		height: 100%;
 		pointer-events: none;
 		padding: 1rem;
-		background: linear-gradient(
-			180deg,
-			hsl(0deg 0% 0% / 10%),
-			hsl(0deg 0% 0% / 49%)
-		);
+		background: linear-gradient(180deg, hsl(0deg 0% 0% / 10%), hsl(0deg 0% 0% / 49%));
 		align-items: flex-end;
 		justify-content: flex-end;
 		border-radius: var(--xs-radius);

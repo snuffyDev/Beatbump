@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ListItem from "$lib/components/ListItem/ListItem.svelte";
+	import ListItem, { listItemPageContext } from "$lib/components/ListItem/ListItem.svelte";
 	import list from "$lib/stores/list";
 	import { isPagePlaying, showAddToPlaylistPopper } from "$lib/stores/stores";
 	import List from "../_List.svelte";
@@ -11,6 +11,7 @@
 	import { CTX_ListItem } from "$lib/contexts";
 	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 	import { notify } from "$lib/utils";
+	import { onMount } from "svelte";
 	import { writable } from "svelte/store";
 	import type { PageData } from "./$types";
 
@@ -47,36 +48,26 @@
 	trackStore.set(tracks);
 
 	CTX_ListItem.set({
-		page: "playlist",
 		innerWidth: width,
 		parentPlaylistId: id,
 		visitorData: data?.visitorData,
 	});
 
-	pageTitle =
-		pageTitle.length > 64
-			? pageTitle.substring(0, 64) + "..."
-			: header?.title || "";
+	pageTitle = pageTitle.length > 64 ? pageTitle.substring(0, 64) + "..." : header?.title || "";
 	description =
 		header?.description !== undefined
 			? header?.description.length > 240
 				? header?.description.substring(0, 240) + "..."
 				: header?.description
 			: "";
-	$: console.log(data);
+	$: !import.meta.env.SSR && console.log(data);
 	const getCarousel = async () => {
 		if (!carouselContinuations) return;
 		const response = await fetch(
 			"/api/v1/playlist.json" +
 				"?ref=" +
 				id +
-				`${
-					carouselContinuations
-						? `&ctoken=${encodeURIComponent(
-								carouselContinuations?.continuation,
-						  )}`
-						: ""
-				}` +
+				`${carouselContinuations ? `&ctoken=${encodeURIComponent(carouselContinuations?.continuation)}` : ""}` +
 				"&itct=" +
 				carouselContinuations?.clickTrackingParams,
 		);
@@ -102,11 +93,7 @@
 					id +
 					"&visitorData=" +
 					visitorData +
-					`${
-						ctoken
-							? `&ctoken=${encodeURIComponent(encodeURIComponent(ctoken))}`
-							: ""
-					}` +
+					`${ctoken ? `&ctoken=${encodeURIComponent(encodeURIComponent(ctoken))}` : ""}` +
 					"&itct=" +
 					itct,
 			);
@@ -232,6 +219,13 @@
 	];
 	let filter = value ? value : options[0].params;
 	// $: browser && console.log(data);
+
+	onMount(() => {
+		const cb = listItemPageContext.add("playlist");
+		return () => {
+			cb();
+		};
+	});
 </script>
 
 <svelte:window bind:innerWidth={width} />
@@ -240,9 +234,7 @@
 		title={header?.title}
 		url={`${key}`}
 		desc={description}
-		image={header?.thumbnails !== null
-			? header?.thumbnails[header?.thumbnails?.length - 1]?.url
-			: undefined}
+		image={header?.thumbnails !== null ? header?.thumbnails[header?.thumbnails?.length - 1]?.url : undefined}
 	/>
 {/if}
 <main>
@@ -251,10 +243,7 @@
 			subtitles={header?.subtitles}
 			secondSubtitle={header?.secondSubtitle}
 			thumbnail={header?.thumbnails !== null
-				? header?.thumbnails[header?.thumbnails?.length - 1].url.replace(
-						/=(w(\d+))-(h(\d+))/g,
-						"=w512-h512",
-				  )
+				? header?.thumbnails[header?.thumbnails?.length - 1].url.replace(/=(w(\d+))-(h(\d+))/g, "=w512-h512")
 				: undefined}
 			title={pageTitle}
 			{description}
@@ -298,9 +287,7 @@
 				notify(`${pageTitle} added to queue!`, "success");
 			}}
 			on:playlistAdd={async () => {
-				const response = await fetch(
-					"/api/v1/get_queue.json?playlistId=" + header?.playlistId,
-				);
+				const response = await fetch("/api/v1/get_queue.json?playlistId=" + header?.playlistId);
 				const data = await response.json();
 				const items = data;
 				showAddToPlaylistPopper.set({ state: true, item: [...items] });

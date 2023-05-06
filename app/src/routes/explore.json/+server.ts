@@ -1,21 +1,23 @@
 import { buildAPIRequest } from "$api/request";
 import type { RequestHandler } from "@sveltejs/kit";
 
+export const prerender = false;
+
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;
 	const browseId = query.get("browseId");
 	const response = await buildAPIRequest("browse", {
 		context: {
-			client: { clientName: "WEB_REMIX", clientVersion: "1.20220404.01.00" },
+			client: { clientName: "WEB_REMIX", clientVersion: "1.20230501.01.00" },
 		},
+		headers: null,
 		params: { browseId: browseId },
 	});
 
-	const data = await response.json();
+	const data = await response?.json();
 
 	const contents =
-		data.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
-			?.content?.sectionListRenderer?.contents;
+		data.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents;
 	const sections = [];
 	for (let index = 0; index < contents.length; index++) {
 		const { gridRenderer } = contents[index];
@@ -25,9 +27,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			const item = items[i]?.musicNavigationButtonRenderer;
 			items[i] = {
 				text: item?.buttonText?.runs[0]?.text,
-				color: `#${(
-					"00000000" + (item?.solid?.leftStripeColor & 0xffffff).toString(16)
-				).slice(-6)}`,
+				color: `#${("00000000" + (item?.solid?.leftStripeColor & 0xffffff).toString(16)).slice(-6)}`,
 				endpoint: {
 					params: item?.clickCommand?.browseEndpoint?.params,
 					browseId: item?.clickCommand?.browseEndpoint?.browseId,

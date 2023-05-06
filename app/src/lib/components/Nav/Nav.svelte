@@ -7,7 +7,6 @@
 	import Search from "$components/Search/Search.svelte";
 	import { tooltip } from "$lib/actions/tooltip";
 	import { clickOutside } from "$lib/actions/clickOutside";
-	import { ripple } from "$lib/actions/ripple";
 	import { circOut } from "svelte/easing";
 	import { fade } from "svelte/transition";
 	import { fullscreenStore } from "../Player/channel";
@@ -327,13 +326,10 @@
 			border-radius: 50%;
 
 			overflow: hidden;
-			background: rgba(255, 255, 255, 0.2)
-				radial-gradient(circle, rgba(255, 255, 255, 0.4) 1%, #0000 1%)
-				center/15000%;
+			background: rgba(255, 255, 255, 0.2) radial-gradient(circle, rgba(255, 255, 255, 0.4) 1%, #0000 1%) center/15000%;
 
 			z-index: 1;
-			box-shadow: -2px -2px 22px -4px rgba(0, 0, 0, 0.208) inset,
-				-2px -2px 33px -12px rgba(0, 0, 0, 0.308) inset,
+			box-shadow: -2px -2px 22px -4px rgba(0, 0, 0, 0.208) inset, -2px -2px 33px -12px rgba(0, 0, 0, 0.308) inset,
 				2px 2px 33px -12px rgba(0, 0, 0, 0.308) inset;
 
 			width: 100%;
@@ -356,8 +352,7 @@
 			&:hover:not(:active):not(:focus-visible)::before {
 				opacity: 0.2;
 
-				box-shadow: -2px -2px 22px -8px rgba(0, 0, 0, 0.208) inset,
-					-2px -2px 26px -12px rgba(0, 0, 0, 0.308) inset,
+				box-shadow: -2px -2px 22px -8px rgba(0, 0, 0, 0.208) inset, -2px -2px 26px -12px rgba(0, 0, 0, 0.308) inset,
 					2px 2px 33px -14px rgba(0, 0, 0, 0.308) inset;
 
 				background-color: rgba(255, 255, 255, 0.2) !important;
@@ -368,8 +363,7 @@
 		&:active:hover::before {
 			opacity: 0.7;
 			transition: 0s !important;
-			box-shadow: -2px -2px 22px -4px rgba(0, 0, 0, 0.208) inset,
-				-2px -2px 33px -12px rgba(0, 0, 0, 0.308) inset,
+			box-shadow: -2px -2px 22px -4px rgba(0, 0, 0, 0.208) inset, -2px -2px 33px -12px rgba(0, 0, 0, 0.308) inset,
 				2px 2px 33px -12px rgba(0, 0, 0, 0.308) inset;
 
 			background-size: 150%;

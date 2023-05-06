@@ -1,27 +1,15 @@
-import {
-	MusicResponsiveListItemRenderer,
-	MusicTwoRowItemRenderer,
-} from "$lib/parsers";
+import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
 
-import type {
-	CarouselHeader,
-	NextContinuationData,
-	Thumbnail,
-} from "$lib/types";
+import type { PlaylistEndpointContinuation } from "$api/_base";
+import { buildAPIRequest } from "$api/request";
+import { parseParams } from "$api/utils";
+import type { CarouselHeader, NextContinuationData, Thumbnail } from "$lib/types";
+import type { Header, MusicCarouselShelfRenderer } from "$lib/types/innertube/musicCarouselShelfRenderer";
+import type { ITwoRowItemRenderer } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { map } from "$lib/utils/collections";
-import { error, json, type RequestHandler } from "@sveltejs/kit";
-import { buildAPIRequest } from "$api/request";
-import type {
-	PlaylistEndpointContinuation,
-	PlaylistEndpointParams,
-} from "$api/_base";
-import type {
-	Header,
-	MusicCarouselShelfRenderer,
-} from "$lib/types/innertube/musicCarouselShelfRenderer";
-import type { ITwoRowItemRenderer } from "$lib/types/musicCarouselTwoRowItem";
 import { objectKeys } from "$lib/utils/collections/objects";
+import { error, json, type RequestHandler } from "@sveltejs/kit";
 
 export type PlaylistHeader = {
 	title: string;
@@ -39,59 +27,52 @@ export interface PlaylistResponseBody {
 	visitorData?: string;
 }
 
-const ALLOWED_HEADER_KEYS = new Set([
-	"subtitle",
-	"secondSubtitle",
-	"description",
-	"thumbnail",
-	"title",
-]);
+type PlaylistSchema = {
+	itct?: string;
+    list?: string;
+	ctoken?: string;
+	referrer?: string;
+	visitorData?: string;
+};
+
+const parser = parseParams<PlaylistSchema>(["list", "ctoken", "itct", "referrer", "visitorData"]);
+
+const ALLOWED_HEADER_KEYS = new Set(["subtitle", "secondSubtitle", "description", "thumbnail", "title"]);
 
 export const GET: RequestHandler = async ({ url }) => {
 	try {
 		const query = url.searchParams;
-		const browseId = query.get("list") || "";
-		const itct = query.get("itct") || "";
-		const ctoken = query.get("ctoken") || "";
-		const referrer = query.get("ref") || "";
-		const visitorData = query.get("visitorData") || "";
+		const { list: browseId, itct, ctoken, referrer = "", visitorData } = parser(query.entries());
 
-		const params: PlaylistEndpointParams = {
-			browseId,
-		};
-		if (ctoken !== "") {
-			return getPlaylistContinuation(
-				params,
+		if (ctoken) {
+			return await getPlaylistContinuation(
 				{
-					ctoken: decodeURIComponent(ctoken),
-					continuation: decodeURIComponent(ctoken),
-					itct,
+					...(ctoken && { ctoken: ctoken, continuation: ctoken }),
+					...(itct && { itct }),
 					type: "next",
 				},
-				referrer.slice(2),
-				visitorData,
+				referrer?.slice(2),
+				visitorData ?? "",
 			);
 		}
-
-		return getPlaylist(browseId, referrer);
+		if (!browseId) throw Error("Missing playlist browseId");
+		return await getPlaylist(browseId, referrer ?? "");
 	} catch (err) {
-		return new Response(undefined, {
+		console.error(err);
+		return new Response(err as string, {
 			status: 500,
-			headers: { statusText: `${err}` },
+			headers: {
+				statusText: `${err}`,
+			},
 		});
 	}
 };
-async function getPlaylistContinuation(
-	params: PlaylistEndpointParams,
-	continuation: PlaylistEndpointContinuation,
-	id?: string,
-	visitorData?: string,
-) {
+async function getPlaylistContinuation(continuation: PlaylistEndpointContinuation, id?: string, visitorData?: string) {
 	const response = await buildAPIRequest("playlist", {
 		context: {
 			client: {
 				clientName: "WEB_REMIX",
-				clientVersion: "1.20220404.01.00",
+				clientVersion: "1.20230501.01.00",
 				hl: "en",
 				visitorData: visitorData,
 				originalUrl: "https://music.youtube.com/playlist?list=" + id,
@@ -103,37 +84,25 @@ async function getPlaylistContinuation(
 		params: {},
 		continuation,
 	});
-	if (response === null)
-		throw error(500, { message: "Error fetching playlist" });
+	if (response === null) throw error(500, { message: "Error fetching playlist" });
 	if (!response.ok) {
 		throw error(response.status, response.statusText);
 	}
 
 	const data = await response.json();
-	const {
-		continuationContents: {
-			musicPlaylistShelfContinuation: {
-				contents = [],
-				continuations = [],
-			} = {},
-		} = {},
-	} = await data;
+	const { continuationContents: { musicPlaylistShelfContinuation: { contents = [], continuations = [] } = {} } = {} } =
+		await data;
 	// console.log(data, contents, continuations)
 
 	let tracks: (IListItemRenderer | ITwoRowItemRenderer)[] = [];
 	let carousel;
-	const cont: NextContinuationData =
-		continuations.length !== 0 ? continuations[0]?.nextContinuationData : null;
-	if (
-		data?.continuationContents?.sectionListContinuation?.contents[0]
-			?.musicCarouselShelfRenderer
-	) {
-		carousel = parseCarousel(
-			data?.continuationContents?.sectionListContinuation?.contents[0]
-				?.musicCarouselShelfRenderer,
+	const cont: NextContinuationData = continuations.length !== 0 ? continuations[0]?.nextContinuationData : null;
+	if (data?.continuationContents?.sectionListContinuation?.contents[0]?.musicCarouselShelfRenderer) {
+		carousel = await parseCarousel(
+			data?.continuationContents?.sectionListContinuation?.contents[0]?.musicCarouselShelfRenderer,
 		);
 	} else {
-		tracks = parseTrack(contents, id);
+		tracks = await parseTrack(contents, id);
 	}
 	return json({
 		_original: data,
@@ -162,14 +131,11 @@ async function getPlaylist(browseId: string, referrer: string) {
 						osName: "Googlebot",
 						osVersion: "2.1",
 						locationInfo: {
-							locationPermissionAuthorizationStatus:
-								"LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED",
+							locationPermissionAuthorizationStatus: "LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED",
 						},
 						musicAppInfo: {
-							musicActivityMasterSwitch:
-								"MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
-							musicLocationMasterSwitch:
-								"MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE",
+							musicActivityMasterSwitch: "MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
+							musicLocationMasterSwitch: "MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE",
 							pwaInstallabilityStatus: "PWA_INSTALLABILITY_STATUS_UNKNOWN",
 						},
 						utcOffsetMinutes: -new Date().getTimezoneOffset(),
@@ -194,19 +160,18 @@ async function getPlaylist(browseId: string, referrer: string) {
 				"x-origin": "https://music.youtube.com",
 				"X-Goog-Visitor-Id": "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D",
 
-				"User-Agent":
-					"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-				referer:
-					"https://music.youtube.com/playlist?list=" + referrer || browseId,
+				"User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+				referer: "https://music.youtube.com/playlist?list=" + referrer || browseId,
 			},
 		},
 	);
 	if (!response.ok) {
+		console.error(response.statusText);
 		throw error(response.status, { message: response.statusText });
 	}
 
 	const data = await response.json();
-	let musicDetailHeaderRenderer: Partial<Record<string, unknown>> = {};
+	let musicDetailHeaderRenderer: Partial<Record<string, any>> = {};
 	if ("header" in data) {
 		const { musicDetailHeaderRenderer: detailHeader = {} } = data.header;
 		musicDetailHeaderRenderer = detailHeader;
@@ -214,8 +179,8 @@ async function getPlaylist(browseId: string, referrer: string) {
 	const visitorData = data.responseContext?.visitorData;
 
 	const musicPlaylistShelfRenderer =
-		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
-			?.content?.sectionListRenderer?.contents[0]?.musicPlaylistShelfRenderer;
+		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents[0]
+			?.musicPlaylistShelfRenderer;
 
 	const contents = musicPlaylistShelfRenderer.contents;
 
@@ -223,96 +188,85 @@ async function getPlaylist(browseId: string, referrer: string) {
 	const continuations = musicPlaylistShelfRenderer?.continuations;
 
 	const _carouselContinuation =
-		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
-			?.content?.sectionListRenderer?.continuations || null;
+		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer
+			?.continuations || null;
 
 	// console.log(musicDetailHeaderRenderer)
-	const continuationData: NextContinuationData = data?.contents
-		?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content
-		?.sectionListRenderer?.continuations
+	const continuationData: NextContinuationData = data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+		?.content?.sectionListRenderer?.continuations
 		? Array.isArray(continuations) && continuations[0]?.nextContinuationData
 			? continuations[0]?.nextContinuationData
 			: _carouselContinuation[0]?.nextContinuationData
 		: null;
 
+	const header = {
+		subtitle: [] as string[],
+		secondSubtitle: [] as string[],
+		description: "",
+		playlistId: "",
+		thumbnails: [] as Thumbnail[],
+		title: "",
+	};
 	const getHeader = () => {
-		const createArray = (key: string) =>
-			Array.isArray(musicDetailHeaderRenderer[key]["runs"]) &&
-			(() => {
-				const arr = [];
-				for (const { text } of musicDetailHeaderRenderer[key]["runs"]) {
-					arr.push(text);
-				}
-				return arr;
-			})();
-		// const key_map = Object.keys(musicDetailHeaderRenderer);
-		// let len = key_map.length;
+		const createArray = (key: string) => {
+			return Array.isArray(musicDetailHeaderRenderer[key]["runs"])
+				? (
+						musicDetailHeaderRenderer[key]?.runs as {
+							text: string;
+						}[]
+				  ).map(({ text }) => text)
+				: [];
+		};
+
 		for (const key of objectKeys(musicDetailHeaderRenderer)) {
 			if (!ALLOWED_HEADER_KEYS.has(key)) {
-				delete musicDetailHeaderRenderer[key];
+				continue;
 			}
 
 			if (key === "subtitle" || key === "secondSubtitle") {
-				musicDetailHeaderRenderer[key] =
-					musicDetailHeaderRenderer[key]["runs"]["length"] !== 0
-						? createArray(key)
-						: [];
+				header[key] = musicDetailHeaderRenderer[key]["runs"]["length"] !== 0 ? createArray(key) : ([] as string[]);
 			}
 
 			const item = musicDetailHeaderRenderer[key] as Record<string, unknown>;
-			if (
-				key === "description" &&
-				"runs" in item &&
-				Array.isArray(item.runs) &&
-				item.runs.length !== 0
-			) {
-				musicDetailHeaderRenderer[key] = item.runs[0]?.text || undefined;
+			if (key === "description" && "runs" in item && Array.isArray(item.runs) && item.runs.length !== 0) {
+				header[key] = item.runs[0]?.text || undefined;
 			}
 			if (key === "thumbnail") {
-				const croppedSquareThumbnail =
-					item?.croppedSquareThumbnailRenderer as Record<string, unknown>;
+				const croppedSquareThumbnail = (item?.croppedSquareThumbnailRenderer as Record<string, unknown>)?.thumbnail;
+
 				if (
-					typeof croppedSquareThumbnail.thumbnail === "object" &&
-					"thumbnails" in croppedSquareThumbnail.thumbnail
+					croppedSquareThumbnail != null &&
+					typeof croppedSquareThumbnail === "object" &&
+					"thumbnails" in croppedSquareThumbnail
 				) {
-					musicDetailHeaderRenderer[key + "s"] =
-						croppedSquareThumbnail.thumbnail.thumbnails || null;
+					header[(key + "s") as "thumbnails"] = (croppedSquareThumbnail.thumbnails || []) as Thumbnail[];
 				}
-				delete musicDetailHeaderRenderer[key];
 			}
-			if (key === "title")
-				musicDetailHeaderRenderer[key] =
-					musicDetailHeaderRenderer[key]["runs"][0]["text"] || "[ Unknown ]";
+			if (key === "title") header[key] = musicDetailHeaderRenderer[key]["runs"][0]["text"] || "[ Unknown ]";
 		}
-		musicDetailHeaderRenderer["playlistId"] = playlistId;
+		header["playlistId"] = playlistId;
 	};
 	getHeader();
 
-	const tracks = parseTrack(contents, playlistId ?? browseId.slice(2));
+	const tracks = await parseTrack(contents, playlistId ?? browseId.slice(2));
 	// console.timeEnd("playlist");
 	const obj = {
 		_original: data,
 		continuations: continuationData,
 		tracks,
 		visitorData,
-		carouselContinuations:
-			_carouselContinuation && _carouselContinuation[0].nextContinuationData,
-		header: musicDetailHeaderRenderer,
+		carouselContinuations: _carouselContinuation && _carouselContinuation[0].nextContinuationData,
+		header,
 	};
-	return json();
+	return json(obj);
 }
-function parseTrack(
-	contents = [],
-	playlistId?: string,
-): Array<IListItemRenderer> {
+async function parseTrack(contents = [], playlistId?: string): Promise<IListItemRenderer[]> {
 	// let idx = contents.length;
 
-	return contents
-		.map(
-			(track) =>
-				MusicResponsiveListItemRenderer(track, true, playlistId) || undefined,
-		)
-		.filter((track) => track && track.videoId);
+	const items = (
+		await Promise.all(contents.map((track) => MusicResponsiveListItemRenderer(track, true, playlistId) || undefined))
+	).filter((track) => track && track.videoId);
+	return items;
 }
 
 function parseHeader(header: Header[]): CarouselHeader[] {
@@ -321,22 +275,22 @@ function parseHeader(header: Header[]): CarouselHeader[] {
 	}));
 }
 
-function parseBody(
+async function parseBody(
 	contents: MusicCarouselShelfRenderer["contents"] = [],
-): (IListItemRenderer | ITwoRowItemRenderer)[] {
-	const items = [];
-	for (let idx = 0; idx < contents.length; idx++) {
-		const item = contents[idx];
-		if ("musicTwoRowItemRenderer" in item)
-			items[idx] = MusicTwoRowItemRenderer(item);
-		if ("musicResponsiveListItemRenderer" in item)
-			items[idx] = MusicResponsiveListItemRenderer(item);
-	}
-	return items;
+): Promise<(IListItemRenderer | ITwoRowItemRenderer)[]> {
+	const items = await Promise.all(
+		contents.map((item) => {
+			if ("musicTwoRowItemRenderer" in item) return MusicTwoRowItemRenderer(item);
+			if ("musicResponsiveListItemRenderer" in item) return MusicResponsiveListItemRenderer(item);
+			return undefined as never;
+		}),
+	);
+
+	return items.filter(Boolean);
 }
-function parseCarousel(musicCarouselShelfRenderer: MusicCarouselShelfRenderer) {
+async function parseCarousel(musicCarouselShelfRenderer: MusicCarouselShelfRenderer) {
 	return {
 		header: parseHeader([musicCarouselShelfRenderer.header])[0],
-		results: parseBody(musicCarouselShelfRenderer.contents),
+		results: await parseBody(musicCarouselShelfRenderer.contents),
 	};
 }

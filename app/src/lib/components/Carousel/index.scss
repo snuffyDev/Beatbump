@@ -49,15 +49,13 @@
 	isolation: isolate;
 	&:hover {
 		background-color: rgb(233, 233, 233);
-		box-shadow: -1px -1px 8px -12px hsl(0deg 0% 0% / 20%) inset,
-			1px 1px 10px -6px hsl(0deg 0% 0% / 10%) inset;
+		box-shadow: -1px -1px 8px -12px hsl(0deg 0% 0% / 20%) inset, 1px 1px 10px -6px hsl(0deg 0% 0% / 10%) inset;
 		color: #111111e0;
 	}
 
 	&:active {
 		background-color: rgb(223, 223, 223);
-		box-shadow: 0 0 12px -9px hsl(0deg 0% 7% / 88%) inset,
-			inset -2px -2px 5px -9px hsl(0deg 0% 8% / 92%);
+		box-shadow: 0 0 12px -9px hsl(0deg 0% 7% / 88%) inset, inset -2px -2px 5px -9px hsl(0deg 0% 8% / 92%);
 	}
 
 	@media screen and (max-width: 640px) {

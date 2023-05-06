@@ -48,8 +48,7 @@
 					<span class="h2">Songs</span>
 					<a
 						style="white-space:pre; display: inline-block;"
-						href={`/playlist/${songs?.header?.browseId}`}
-						><small>See All</small></a
+						href={`/playlist/${songs?.header?.browseId}`}><small>See All</small></a
 					>
 				</div>
 				<section class="songs">

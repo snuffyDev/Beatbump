@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { IDBService } from "$lib/workers/db/service";
-
 	export let item = {};
 	export let i;
 	import { createEventDispatcher } from "svelte";

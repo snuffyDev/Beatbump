@@ -51,10 +51,7 @@ interface IAudioPlayer {
 	// #endregion Public Methods (5)
 }
 
-export type Callback<K extends keyof HTMLElementEventMap> = (
-	this: HTMLElement,
-	event: HTMLElementEventMap[K],
-) => void;
+export type Callback<K extends keyof HTMLElementEventMap> = (this: HTMLElement, event: HTMLElementEventMap[K]) => void;
 
 export type Listeners = Map<string, Callback<keyof HTMLElementEventMap>[]>;
 
@@ -80,9 +77,7 @@ const events: Map<
 const setPosition = () => {
 	if ("mediaSession" in navigator) {
 		navigator.mediaSession.setPositionState({
-			duration: AudioPlayer.isWebkit
-				? AudioPlayer.duration / 2
-				: AudioPlayer.duration,
+			duration: AudioPlayer.isWebkit ? AudioPlayer.duration / 2 : AudioPlayer.duration,
 			position: AudioPlayer.currentTime,
 		});
 	}
@@ -99,11 +94,8 @@ function metaDataHandler(sessionList: Maybe<ISessionListProvider>) {
 			album: currentTrack?.album?.title ?? undefined,
 			artwork: [
 				{
-					src: currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1]
-						.url,
-					sizes: `${
-						currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].width
-					}x${
+					src: currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].url,
+					sizes: `${currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].width}x${
 						currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].height
 					}`,
 					type: "image/jpeg",
@@ -124,39 +116,23 @@ function metaDataHandler(sessionList: Maybe<ISessionListProvider>) {
 
 			setPosition();
 		});
-		navigator.mediaSession.setActionHandler("previoustrack", () =>
-			AudioPlayer.previous(),
-		);
-		navigator.mediaSession.setActionHandler("nexttrack", () =>
-			AudioPlayer.next(),
-		);
+		navigator.mediaSession.setActionHandler("previoustrack", () => AudioPlayer.previous());
+		navigator.mediaSession.setActionHandler("nexttrack", () => AudioPlayer.next());
 	}
 }
 
 // eslint-disable-next-line import/no-unused-modules
-export const updateGroupState = (opts: {
-	client: string;
-	state: ConnectionState;
-}): void => groupSession.sendGroupState(opts);
+export const updateGroupState = (opts: { client: string; state: ConnectionState }): void =>
+	groupSession.sendGroupState(opts);
 
 // eslint-disable-next-line import/no-unused-modules
-export const updateGroupPosition = (
-	dir: "<-" | "->" | undefined,
-	position: number,
-): void =>
-	groupSession.send(
-		"PATCH",
-		"state.update.position",
-		{ dir, position },
-		groupSession.client,
-	);
+export const updateGroupPosition = (dir: "<-" | "->" | undefined, position: number): void =>
+	groupSession.send("PATCH", "state.update.position", { dir, position }, groupSession.client);
 
 // Helper to generate a fallback URL if the current src fails to play
 function createFallbackUrl(currentUrl: string) {
 	if (typeof currentUrl !== "string")
-		throw Error(
-			`Expected parameter 'currentUrl' to be a string, received ${currentUrl}`,
-		);
+		throw Error(`Expected parameter 'currentUrl' to be a string, received ${currentUrl}`);
 	const srcUrl = new URL(currentUrl);
 
 	if (!srcUrl.hostname.includes("googlevideo.com")) return currentUrl;
@@ -191,10 +167,7 @@ function isResponseBody(input: unknown): input is ResponseBody {
 	return (input as ResponseBody).url !== undefined;
 }
 
-class BaseAudioPlayer
-	extends ListService
-	implements IAudioPlayer, IEventHandler
-{
+class BaseAudioPlayer extends ListService implements IAudioPlayer, IEventHandler {
 	// #region Properties (21)
 
 	#_HLS: HLS;
@@ -267,11 +240,9 @@ class BaseAudioPlayer
 		this.#_durationUnsubscriber = this.#_durationStore.subscribe((value) => {
 			this.#_duration = value;
 		});
-		this.#_currentTimeUnsubscriber = this.#_currentTimeStore.subscribe(
-			(value) => {
-				this.#_currentTime = value;
-			},
-		);
+		this.#_currentTimeUnsubscriber = this.#_currentTimeStore.subscribe((value) => {
+			this.#_currentTime = value;
+		});
 		this.#setup();
 	}
 
@@ -416,10 +387,7 @@ class BaseAudioPlayer
 			}
 
 			// Logger.log(`[LOG:PLAYER:State]: Start Playback: `, true);
-			if (
-				groupSession.initialized === true &&
-				groupSession.hasActiveSession === true
-			) {
+			if (groupSession.initialized === true && groupSession.hasActiveSession === true) {
 				updateGroupState({
 					client: groupSession.client.clientId,
 					state: {
@@ -449,10 +417,7 @@ class BaseAudioPlayer
 			}
 			this.#_player.defaultMuted = false;
 		} catch (err) {
-			notify(
-				`Error starting playback. You can find this error in the console logs as [playback-error]`,
-				"error",
-			);
+			notify(`Error starting playback. You can find this error in the console logs as [playback-error]`, "error");
 			console.error(`[playback-error] `, err);
 		}
 	}
@@ -568,29 +533,18 @@ class BaseAudioPlayer
 		});
 	}
 
-	async #getNextSongInQueue(
-		position: number,
-		shouldAutoplay = true,
-	): Promise<Nullable<ResponseBody>> {
+	async #getNextSongInQueue(position: number, shouldAutoplay = true): Promise<Nullable<ResponseBody>> {
 		// Logger.log(`[LOG:PLAYER:Queue]: Start Fetching Next Song: `, { position, shouldAutoplay });
 		const sessionList = this.#currentSessionList();
 
 		if (sessionList.position >= sessionList.mix.length - 1) {
-			if (
-				groupSession.initialized &&
-				groupSession.hasActiveSession &&
-				groupSession.client.role !== "host"
-			) {
+			if (groupSession.initialized && groupSession.hasActiveSession && groupSession.client.role !== "host") {
 				const response = await this.#getTrackSrc(position, shouldAutoplay);
 				return response as ResponseBody;
 			}
 
 			/// Check if track is a single or if there's no continuation set
-			if (
-				sessionList.currentMixType !== "playlist" &&
-				!sessionList.continuation &&
-				!sessionList.clickTrackingParams
-			) {
+			if (sessionList.currentMixType !== "playlist" && !sessionList.continuation && !sessionList.clickTrackingParams) {
 				const response = await this.#handleAutoSuggestion(sessionList.position);
 				return response;
 			}
@@ -609,30 +563,20 @@ class BaseAudioPlayer
 
 		try {
 			this.#__tick = false;
-			const response = await this.#getTrackSrc(position, shouldAutoplay).then(
-				(value) => {
-					// Logger.log(`[LOG:PLAYER:Queue]: Got Next Track Source: `, { value });
-					if (isResponseBody(value)) return value;
-				},
-			);
+			const response = await this.#getTrackSrc(position, shouldAutoplay).then((value) => {
+				// Logger.log(`[LOG:PLAYER:Queue]: Got Next Track Source: `, { value });
+				if (isResponseBody(value)) return value;
+			});
 			return response;
 		} catch (error) {
 			// this.getTrackSrc(position + 1);
 		}
 	}
 
-	#getTrackSrc(
-		position: number,
-		shouldAutoplay = true,
-	): Promise<true | void | ResponseBody> {
+	#getTrackSrc(position: number, shouldAutoplay = true): Promise<true | void | ResponseBody> {
 		const sessionList = this.#currentSessionList();
 		// Logger.log(`[LOG:PLAYER:Stream]: Fetching next track source: `,{ {position, shouldAutoplay});
-		return getSrc(
-			sessionList.mix[position].videoId,
-			sessionList.mix[position].playlistId,
-			null,
-			shouldAutoplay,
-		)
+		return getSrc(sessionList.mix[position].videoId, sessionList.mix[position].playlistId, null, shouldAutoplay)
 			.then(({ body, error }) => {
 				if (error === true) {
 					// this.next();
@@ -719,11 +663,7 @@ class BaseAudioPlayer
 			return;
 		}
 
-		if (
-			this.#_hasNextSrc === true &&
-			this.#_nextTrackURL &&
-			this.#_nextTrackURL?.url
-		) {
+		if (this.#_hasNextSrc === true && this.#_nextTrackURL && this.#_nextTrackURL?.url) {
 			await this.updatePosition("next");
 			this.updateSrc(this.#_nextTrackURL);
 		} else {
@@ -766,8 +706,7 @@ class BaseAudioPlayer
 		this.playerType = await this.#canUseHLSjs();
 
 		this.#__unsubscriber = this.#_src.subscribe(async (value) => {
-			if (this.playerType === "HLS.JS" && !this.#_HLSModule)
-				this.#_HLSModule = await this.#loadHLSModule();
+			if (this.playerType === "HLS.JS" && !this.#_HLSModule) this.#_HLSModule = await this.#loadHLSModule();
 
 			if (this.#isHLSPlayer && this.playerType === "HLS.JS") {
 				this.#createHLSPlayer(value);
@@ -815,10 +754,7 @@ class BaseAudioPlayer
 					navigator.mediaSession.playbackState = "playing";
 				}
 
-				if (
-					groupSession.initialized === true &&
-					groupSession.hasActiveSession === true
-				) {
+				if (groupSession.initialized === true && groupSession.hasActiveSession === true) {
 					updateGroupState({
 						client: groupSession.client.clientId,
 						state: {
@@ -882,9 +818,7 @@ class BaseAudioPlayer
 		this.onEvent("timeupdate", async () => {
 			this.#_currentTimeStore.set(this.#_player.currentTime);
 			this.#_durationStore.set(
-				this.#_isWebkit && !this.#isHLSPlayer
-					? this.#_player.duration / 2
-					: this.#_player.duration,
+				this.#_isWebkit && !this.#isHLSPlayer ? this.#_player.duration / 2 : this.#_player.duration,
 			);
 			// console.log(this._isWebkit, this);
 			if (
@@ -893,10 +827,7 @@ class BaseAudioPlayer
 					: this.#_player.currentTime >= this.#_player.duration / 2
 			) {
 				if (this.#_hasNextSrc === true) return;
-				this.#getNextSongInQueue(
-					this.#currentSessionList().position + 1,
-					false,
-				).then((value) => {
+				this.#getNextSongInQueue(this.#currentSessionList().position + 1, false).then((value) => {
 					this.#_nextTrackURL = value;
 				});
 				this.#_hasNextSrc = true;
@@ -909,11 +840,7 @@ class BaseAudioPlayer
 				 we have to cut the time in half. Doesn't effect other devices.
 			*/
 
-			if (
-				this.#_isWebkit &&
-				this.#isHLSPlayer === false &&
-				this.#_player.currentTime >= this.#_duration - 1
-			) {
+			if (this.#_isWebkit && this.#isHLSPlayer === false && this.#_player.currentTime >= this.#_duration - 1) {
 				this.#onEnded();
 			}
 		});
@@ -921,11 +848,7 @@ class BaseAudioPlayer
 		this.onEvent("ended", async () => this.#onEnded());
 
 		this.onEvent("error", (_event) => {
-			if (
-				this.#_player.error.message.includes("Empty src") ||
-				!this.#_player.error.message
-			)
-				return;
+			if (this.#_player.error.message.includes("Empty src") || !this.#_player.error.message) return;
 
 			console.error(this.#_player.error);
 			this.#handleError();
@@ -941,14 +864,9 @@ class BaseAudioPlayer
 	// #endregion Private Methods (5)
 }
 
-interface BaseAudioPlayer
-	extends ReturnType<typeof EventEmitterMixin>,
-		ListService,
-		IAudioPlayer {}
+interface BaseAudioPlayer extends ReturnType<typeof EventEmitterMixin>, ListService, IAudioPlayer {}
 
-const AP = EventEmitterMixin<typeof BaseAudioPlayer, AudioPlayerEvents>(
-	BaseAudioPlayer,
-);
+const AP = EventEmitterMixin<typeof BaseAudioPlayer, AudioPlayerEvents>(BaseAudioPlayer);
 export const AudioPlayer = new AP();
 
 /** Updates the current track for the audio player */
@@ -967,15 +885,11 @@ export const getSrc = async (
 }> => {
 	try {
 		const res = await fetch(
-			`/api/v1/player.json?videoId=${videoId}${
-				playlistId ? `&playlistId=${playlistId}` : ""
-			}${params ? `&playerParams=${params}` : ""}`,
+			`/api/v1/player.json?videoId=${videoId}${playlistId ? `&playlistId=${playlistId}` : ""}${
+				params ? `&playerParams=${params}` : ""
+			}`,
 		).then((res) => res.json());
-		if (
-			res &&
-			!res?.streamingData &&
-			res?.playabilityStatus.status === "UNPLAYABLE"
-		) {
+		if (res && !res?.streamingData && res?.playabilityStatus.status === "UNPLAYABLE") {
 			return handleError();
 		}
 		const formats = sort({
@@ -1000,8 +914,7 @@ function setTrack(formats: PlayerFormats, shouldAutoplay: boolean) {
 	} else {
 		format = formats.streams[0];
 	}
-	if (shouldAutoplay)
-		updatePlayerSrc({ original_url: format.original_url, url: format.url });
+	if (shouldAutoplay) updatePlayerSrc({ original_url: format.original_url, url: format.url });
 	return {
 		body: { original_url: format.original_url, url: format.url },
 		error: false,
@@ -1010,11 +923,7 @@ function setTrack(formats: PlayerFormats, shouldAutoplay: boolean) {
 function handleError() {
 	console.log("error");
 
-	notify(
-		"An error occurred while initiating playback, skipping...",
-		"error",
-		"getNextTrack",
-	);
+	notify("An error occurred while initiating playback, skipping...", "error", "getNextTrack");
 	return {
 		body: null,
 		error: true,

@@ -26,7 +26,8 @@
 
 <style lang="scss">
 	.alert-container {
-		// display: flex;
+		display: flex;
+		justify-content: center;
 		position: fixed;
 		bottom: var(--alert-bottom, 5.75rem);
 		left: 0;
@@ -35,7 +36,8 @@
 		z-index: 1000;
 		// isolation: isolate;
 		max-height: 60vmin;
-		// align-items: center;
+		align-items: center;
+		margin: 0 auto;
 		contain: layout;
 		padding-bottom: 0.75rem;
 		pointer-events: none;

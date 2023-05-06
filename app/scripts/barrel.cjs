@@ -34,10 +34,7 @@ function recursiveDirRead(path) {
 			if ($typeExports.length > 0)
 				fs.appendFileSync(
 					makePath(path, "index.ts"),
-					`export type { ${$typeExports.join(", ")} } from './${entry.slice(
-						0,
-						-3,
-					)}';\n`,
+					`export type { ${$typeExports.join(", ")} } from './${entry.slice(0, -3)}';\n`,
 					{ encoding: "utf-8" },
 				);
 			if ($exports.length > 0)

@@ -22,14 +22,11 @@ export const GET: RequestHandler = async ({ url }) => {
 						osName: "Googlebot",
 						osVersion: "2.1",
 						locationInfo: {
-							locationPermissionAuthorizationStatus:
-								"LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED",
+							locationPermissionAuthorizationStatus: "LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED",
 						},
 						musicAppInfo: {
-							musicActivityMasterSwitch:
-								"MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
-							musicLocationMasterSwitch:
-								"MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE",
+							musicActivityMasterSwitch: "MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
+							musicLocationMasterSwitch: "MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE",
 							pwaInstallabilityStatus: "PWA_INSTALLABILITY_STATUS_UNKNOWN",
 						},
 						utcOffsetMinutes: -new Date().getTimezoneOffset(),
@@ -63,17 +60,12 @@ export const GET: RequestHandler = async ({ url }) => {
 			headers: {
 				"Content-Type": "application/json; charset=utf-8",
 				Origin: "https://music.youtube.com",
-				"User-Agent":
-					"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+				"User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
 			},
 		},
 	);
 	const data = await response.json();
-	const {
-		contents: [
-			{ searchSuggestionsSectionRenderer: { contents = [] } = {} } = {},
-		] = [],
-	} = data;
+	const { contents: [{ searchSuggestionsSectionRenderer: { contents = [] } = {} } = {}] = [] } = data;
 	const results = contents.map(({ searchSuggestionRenderer }, i) => {
 		return {
 			query: searchSuggestionRenderer.navigationEndpoint.searchEndpoint.query,

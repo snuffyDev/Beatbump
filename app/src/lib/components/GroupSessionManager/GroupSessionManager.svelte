@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { groupSession } from "$lib/stores/sessions";
 </script>
 
 <div class="groupSessionManager-frame">

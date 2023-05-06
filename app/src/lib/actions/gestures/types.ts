@@ -1,5 +1,3 @@
-import type { Maybe } from "$lib/utils";
-
 export type Axis = "x" | "y";
 export type EventKind = "drag";
 export interface Detail {

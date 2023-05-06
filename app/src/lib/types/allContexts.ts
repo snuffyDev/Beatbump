@@ -1,8 +1,8 @@
 import type { Nullable } from "$lib/types";
 
+export type PageContext = "playlist" | "queue" | "artist" | "release" | "library" | "browse";
 export interface ListItemCtx {
-	page: "playlist" | "queue" | "artist" | "release" | "library";
-	parentPlaylistId?: Nullable<string>;
+	parentPlaylistId: Nullable<string>;
 	innerWidth?: number;
-	visitorData?: string;
+	visitorData: string;
 }

@@ -14,9 +14,7 @@ export const load: PageLoad = (async ({
 	const itct = url.searchParams.get("itct");
 	const visitorData = url.searchParams.get("visitorData");
 	const response = await fetch(
-		`/artist/${
-			params.slug
-		}/releases.json?visitorData=${visitorData}&params=${qparams}&itct=${encodeURIComponent(
+		`/artist/${params.slug}/releases.json?visitorData=${visitorData}&params=${qparams}&itct=${encodeURIComponent(
 			itct,
 		)}`,
 	);

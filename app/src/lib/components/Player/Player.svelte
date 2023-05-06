@@ -75,11 +75,7 @@
 	import list, { currentTrack, queue, queuePosition } from "$lib/stores/list";
 	import { IsoBase64, slide, notify } from "$lib/utils";
 	import { messenger } from "$lib/utils/sync";
-	import {
-		playerLoading,
-		showAddToPlaylistPopper,
-		showGroupSessionCreator,
-	} from "$stores/stores";
+	import { playerLoading, showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
 	import { PopperButton } from "../Popper";
 	import { fullscreenStore } from "./channel";
 	import Controls from "./Controls.svelte";
@@ -102,9 +98,7 @@
 		AudioPlayer.play();
 	});
 
-	function handleImageError(
-		event: Event & { currentTarget: EventTarget & HTMLElement },
-	) {
+	function handleImageError(event: Event & { currentTarget: EventTarget & HTMLElement }) {
 		(event.target as HTMLImageElement).src = IMAGE_NOT_FOUND;
 	}
 
@@ -160,9 +154,7 @@
     letter-spacing: -0.02em;"
 			>
 				<span class="now-playing-title">{$currentTrack?.title}</span>
-				<span class="now-playing-artist"
-					>{$currentTrack?.artistInfo?.artist[0]?.text}</span
-				>
+				<span class="now-playing-artist">{$currentTrack?.artistInfo?.artist[0]?.text}</span>
 			</div>
 		{:else}
 			<img
@@ -194,10 +186,7 @@
 				pause={() => AudioPlayer.pause()}
 				nextBtn={() => {
 					if ($queue.length === 0) return;
-					SessionListService.next(
-						true,
-						groupSession.hasActiveSession ? true : false,
-					);
+					SessionListService.next(true, groupSession.hasActiveSession ? true : false);
 					// AudioPlayer.updateTime($durationStore);
 				}}
 				prevBtn={() => AudioPlayer.previous(true)}

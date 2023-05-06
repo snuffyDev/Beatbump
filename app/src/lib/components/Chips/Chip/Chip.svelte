@@ -11,9 +11,7 @@
 	role="button"
 	class="chip"
 	class:selected
-	href={chip.browseEndpoint.params
-		? `/home?params=${chip.browseEndpoint.params}`
-		: "/home"}
+	href={chip.browseEndpoint.params ? `/home?params=${chip.browseEndpoint.params}` : "/home"}
 	on:click
 >
 	{chip.text}

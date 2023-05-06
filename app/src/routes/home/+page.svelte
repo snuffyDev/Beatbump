@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { afterNavigate, goto, invalidate } from "$app/navigation";
+	import { invalidate } from "$app/navigation";
 	import Chips from "$components/Chips/Chips.svelte";
 	import viewport from "$lib/actions/viewport";
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
@@ -10,15 +10,7 @@
 
 	export let data: PageData;
 
-	$: ({
-		carousels,
-		chips,
-		params,
-		headerThumbnail,
-		continuations,
-		visitorData,
-		path,
-	} = data);
+	$: ({ carousels, chips, params, headerThumbnail, continuations, visitorData, path } = data);
 
 	let loading = false;
 	let hasData = false;
@@ -56,9 +48,7 @@
 					/>
 				{:else}
 					<source
-						media={`(min-width: ${
-							headerThumbnail[i - 1].width + 1
-						}px) and (max-width: ${thumbnail?.width}px)`}
+						media={`(min-width: ${headerThumbnail[i - 1].width + 1}px) and (max-width: ${thumbnail?.width}px)`}
 						srcset={thumbnail.url}
 					/>
 				{/if}
@@ -98,13 +88,9 @@
 				if (loading || hasData) return;
 				loading = true;
 				const response = await fetch(
-					`/home.json?itct=${encodeURIComponent(
-						continuations.clickTrackingParams,
-					)}${
+					`/home.json?itct=${encodeURIComponent(continuations.clickTrackingParams)}${
 						params ? `&params=${encodeURIComponent(params)}` : ""
-					}&ctoken=${encodeURIComponent(
-						continuations.continuation,
-					)}&type=next&visitorData=${visitorData}`,
+					}&ctoken=${encodeURIComponent(continuations.continuation)}&type=next&visitorData=${visitorData}`,
 				);
 				const data = await response.json();
 				// const {continuations, carousels} = data;

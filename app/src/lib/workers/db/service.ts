@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { browser, dev } from "$app/environment";
-import type { IDBMessage, Actions, Methods } from "./types";
 import { notify } from "$lib/utils/utils";
+import type { Actions, Methods } from "./types";
 type Deferred<T> = {
 	promise: Promise<T>;
 	resolve: (value: T | PromiseLike<T>) => void;
@@ -18,12 +19,13 @@ const Defer = <T>() => {
 };
 
 class IDBService {
-	private worker: Worker = null;
+	private worker: Worker | null = null;
+	private queue: Deferred<any>[] = [];
 	constructor() {
 		if (!browser) return;
 	}
 	async setup() {
-		if (!browser) return;
+		if (!browser) return null;
 		if (this.worker) return this.worker;
 		const workerInstance = dev
 			? new Worker(new URL("./worker.ts", import.meta.url), {
@@ -31,50 +33,54 @@ class IDBService {
 					name: "idb",
 			  })
 			: new Worker(new URL("./worker.ts", import.meta.url), { name: "idb" });
+		workerInstance.onmessage = this.process;
 		return workerInstance;
 	}
-	async sendMessage<
+	process = <
 		Action extends Actions = Actions,
 		Type extends "favorite" | "playlist" | "playlists" | "favorites" = any,
-		Key extends keyof Methods &
-			`${Action & string}${Capitalize<Type>}` = keyof Methods &
+		Key extends keyof Methods & `${Action & string}${Capitalize<Type>}` = keyof Methods &
 			`${Action & string}${Capitalize<Type>}`,
 		Fn extends Methods[Key] = Methods[Key],
 	>(
-		action: Action,
-		type: Type,
-		...params: Parameters<Fn>
-	): Promise<Awaited<ReturnType<Fn>>["data"]> {
+		event: MessageEvent<Awaited<ReturnType<Fn>>>,
+	) => {
+		const { data } = event;
+		const promise = this.queue.shift();
+		if (!promise) return;
+		if (data.error) {
+			"message" in data && notify(data.message??"", "error");
+		}
+
+		if (data.message) {
+			notify(data.message, "success");
+		}
+
+		if (data.data) {
+			promise.resolve(data.data);
+		}
+
+		promise.resolve(data.data);
+	};
+	async sendMessage<
+		Action extends Actions = Actions,
+		Type extends "favorite" | "playlist" | "playlists" | "favorites" = any,
+		Key extends keyof Methods & `${Action & string}${Capitalize<Type>}` = keyof Methods &
+			`${Action & string}${Capitalize<Type>}`,
+		Fn extends Methods[Key] = Methods[Key],
+	>(action: Action, type: Type, ...params: Parameters<Fn>): Promise<Awaited<ReturnType<Fn>>["data"]> {
 		if (browser === false) {
 			return;
 		}
 		if (this.worker === null) {
 			this.worker = await this.setup();
 		}
+
 		const promise = Defer<Awaited<ReturnType<Fn>>["data"]>();
 
-		const process = <T extends IDBMessage<Awaited<ReturnType<Fn>>["data"]>>(
-			event: MessageEvent<T>,
-		) => {
-			const { data } = event;
+		this.queue.push(promise);
 
-			if (data.error) {
-				notify(data.message, "error");
-			}
-
-			if (data.message) {
-				notify(data.message, "success");
-			}
-
-			if (data.data) {
-				promise.resolve(data.data);
-			}
-
-			promise.resolve(data.data);
-		};
-
-		this.worker.onmessage = process;
-		this.worker.postMessage({ action, type, params });
+		this.worker?.postMessage({ action, type, params });
 
 		return promise.promise;
 	}

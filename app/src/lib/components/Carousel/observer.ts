@@ -1,5 +1,3 @@
-import { iter } from "$lib/utils/collections";
-
 let intersectionObserver: IntersectionObserver;
 
 const observerCallback = (entries: IntersectionObserverEntry[], ob) => {

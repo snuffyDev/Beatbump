@@ -1,11 +1,6 @@
 import { debounce } from "./debounce";
 import { throttle } from "./throttle";
-import type {
-	EventType,
-	EventCallback,
-	EventListeners,
-	IEventEmitter,
-} from "./emitter";
+import type { EventType, EventCallback, EventListeners, IEventEmitter } from "./emitter";
 import { EventEmitter, Messenger, messenger } from "./emitter";
 import type { SyncResult, Receiver, Sender } from "./mpmc";
 import { mpmc, globalChannel } from "./mpmc";

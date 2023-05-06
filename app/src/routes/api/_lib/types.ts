@@ -1,6 +1,6 @@
 export interface Client {
 	clientName?: "ANDROID" | "WEB_REMIX" | "IOS";
-	clientVersion?: "17.13.3" | "1.20220404.01.00" | "16.20";
+	clientVersion?: "17.13.3" | "1.20230501.01.00";
 	utcOffsetMinutes?: number;
 	visitorData?: string;
 	gl?: string;
@@ -11,7 +11,7 @@ export interface Client {
 }
 
 export interface ClickTracking {
-	clickTrackingParams: string;
+	clickTrackingParams?: string | undefined;
 }
 
 export interface Context {
@@ -23,7 +23,7 @@ export interface Context {
 	user: {
 		lockedSafetyMode: boolean;
 	};
-	captionParams: {};
+	captionParams: Record<string, never>;
 }
 
 export enum Endpoints {

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import type { LayoutServerLoad } from "./$types";
-
+export const prerender = false;
 export const load = async ({ locals, url }: Parameters<LayoutServerLoad>[0]) => {
 	return {
 		key: url.pathname,

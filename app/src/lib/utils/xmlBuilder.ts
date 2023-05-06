@@ -15,9 +15,7 @@ export interface XMLRoot {
 function buildAttrs(attributes: XMLNode["attrs"]) {
 	let output = "";
 	for (const attr in attributes) {
-		output += ` ${attr}="${`${attributes[attr]}`
-			.toString()
-			.replace('"', '\\"')}"`;
+		output += ` ${attr}="${`${attributes[attr]}`.toString().replace('"', '\\"')}"`;
 	}
 	return output;
 }
@@ -29,11 +27,7 @@ function buildElement(node: XMLNode): string {
 	if (node.attrs) element += buildAttrs(node.attrs);
 	element += node.nodes || node.text ? ">" : "/>";
 	if (node.text)
-		element += `${node.text}`
-			.replace(/&amp;/g, "&")
-			.replace(/&/g, "&amp;")
-			.replace(/</g, "&lt;")
-			.replace(/>/g, "&gt;"); // desanitize to avoid double sanitization;
+		element += `${node.text}`.replace(/&amp;/g, "&").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); // desanitize to avoid double sanitization;
 	if (node.nodes) element += buildElements(node.nodes);
 	if (node.nodes || node.text) element += `</${node.name}>`;
 	return element;

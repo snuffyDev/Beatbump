@@ -14,14 +14,10 @@ export type GridOrCarousel<T extends "grid" | "carousel"> = T extends "grid"
 	  }
 	: { musicCarouselShelfRenderer: MusicCarouselShelfRenderer };
 
-export const parseGridRendererSection = ({
-	gridRenderer,
-}: GridOrCarousel<"grid">) => {
+export const parseGridRendererSection = async ({ gridRenderer }: GridOrCarousel<"grid">) => {
 	const { items: contents = [], header } = gridRenderer;
-	const items = contents.map((ctx) =>
-		MusicTwoRowItemRenderer(
-			ctx as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer },
-		),
+	const items = await Promise.all(
+		contents.map((ctx) => MusicTwoRowItemRenderer(ctx as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer })),
 	);
 	return {
 		items,

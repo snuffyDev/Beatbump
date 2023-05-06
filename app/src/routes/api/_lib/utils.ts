@@ -1,34 +1,23 @@
-import { objectKeys } from "$lib/utils/collections/objects";
+type ParameterSchema = Record<string, string>;
 
-export type ParameterSchema = Record<string, string>;
 type ParsedParameters<T> = {
-	[Key in keyof T]-?: undefined extends Extract<T[Key], undefined>
-		? NonNullable<T[Key]> | null
-		: T[Key];
+	[Key in keyof T]-?: undefined extends Extract<T[Key], undefined> ? NonNullable<T[Key]> | null : T[Key];
 };
-
-export type OptionalKeys<T> = {
-	[K in keyof T]-?: undefined extends T[K] ? K : never;
-}[keyof T];
-export type DefaultsFor<T> = Required<{
-	[K in OptionalKeys<T>]: Exclude<T[K], undefined>;
-}>;
-
-export const parseParams = <
-	Schema extends ParameterSchema,
-	Keys extends keyof Schema = keyof Schema,
->(
+export const parseParams = <Schema extends ParameterSchema, Keys extends keyof Schema = keyof Schema>(
 	keys: Keys[],
-): ((
-	params: IterableIterator<[string, string]>,
-) => ParsedParameters<Schema>) => {
+): ((params: IterableIterator<[string, string]>) => ParsedParameters<Schema>) => {
 	return (params) => {
 		const result: Partial<ParsedParameters<Schema>> = {};
+
+		// Validate each entry in the query parameter iterator
 		for (const [key, value] of params) {
-			if (!keys.includes(key as never)) continue;
-			result[key as keyof Schema] = (value ??
+			if (!value || !keys.includes(key as never)) continue;
+
+			// Key is valid - assign 'null' if the value is nullish
+			result[key as keyof Schema] = (decodeURIComponent(value ?? "") ??
 				null) as ParsedParameters<Schema>[keyof ParsedParameters<Schema>];
 		}
+
 		return result as ParsedParameters<Schema>;
 	};
 };

@@ -6,11 +6,7 @@ export type IObject<T> = {
 	[Property in keyof T]: T[Property];
 };
 
-export type IsObject<T> = T extends object
-	? T extends any[]
-		? false
-		: true
-	: false;
+export type IsObject<T> = T extends object ? (T extends any[] ? false : true) : false;
 
 export type IMergedObject<T, U> = IsObject<T> & IsObject<U> extends true
 	? {

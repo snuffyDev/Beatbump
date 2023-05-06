@@ -1,19 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type Maybe<T> = T | undefined;
-export type VoidCallback<T> = (
-	item: T,
-	index: number,
-	array: ArrayLike<T>,
-) => void;
-export type ItemCallback<T, U> = (
-	item: T,
-	index: number,
-	array: ArrayLike<T>,
-) => U;
+export type VoidCallback<T> = (item: T, index: number, array: ArrayLike<T>) => void;
+export type ItemCallback<T, U> = (item: T, index: number, array: ArrayLike<T>) => U;
 
-export function findFirst<T>(
-	array: Array<T>,
-	predicate: (item: T) => T,
-): T | undefined {
+export function findFirst<T>(array: Array<T>, predicate: (item: T) => T): T | undefined {
 	const length = array.length;
 	let idx = -1;
 	for (; ++idx < length; ) {
@@ -25,27 +15,20 @@ export function findFirst<T>(
 }
 export function reduce<T, K = unknown>(
 	array: Array<T>,
-	callback: (
-		previousValue: K,
-		currentValue: T,
-		index: number,
-		array: Array<T>,
-	) => K,
+	callback: (previousValue: K, currentValue: T, index: number, array: Array<T>) => K,
 	thisArg: K,
 ): K {
 	let result = thisArg,
-		length = array.length,
 		idx = -1;
+	const length = array.length;
+
 	for (; ++idx < length; ) {
 		result = callback(result as K, array[idx], idx, array);
 	}
-	(length = null), (idx = null);
+
 	return result;
 }
-export function findLast<T>(
-	array: Array<T>,
-	predicate: (item: T) => T,
-): T | undefined {
+export function findLast<T>(array: Array<T>, predicate: (item: T) => T): T | undefined {
 	let len = array.length;
 	for (; len--; ) {
 		if (predicate(array[len])) {
@@ -69,21 +52,9 @@ export function map<T, U>(array: ArrayLike<T>, cb: ItemCallback<T, U>): U[] {
 	return newArray;
 }
 
-export function filterMap<T, U>(
-	array: Array<T>,
-	cb: ItemCallback<T, U>,
-	predicate: (item: U) => item is U,
-): U[];
-export function filterMap<T, U>(
-	array: Array<T>,
-	cb: ItemCallback<T, U>,
-	predicate: (item: U) => boolean,
-): U[];
-export function filterMap<T, U>(
-	array: Array<T>,
-	cb: ItemCallback<T, U>,
-	predicate: (item: U) => unknown,
-): U[] {
+export function filterMap<T, U>(array: Array<T>, cb: ItemCallback<T, U>, predicate: (item: U) => item is U): U[];
+export function filterMap<T, U>(array: Array<T>, cb: ItemCallback<T, U>, predicate: (item: U) => boolean): U[];
+export function filterMap<T, U>(array: Array<T>, cb: ItemCallback<T, U>, predicate: (item: U) => unknown): U[] {
 	const result: U[] = [];
 	for (let idx = 0; idx < array.length; idx++) {
 		const res = cb(array[idx], idx, array);
@@ -93,10 +64,39 @@ export function filterMap<T, U>(
 	}
 	return result as U[];
 }
-export function filter<T, S>(
+
+export function filterMapAsync<T, U>(
 	array: Array<T>,
-	predicate: (item: Maybe<T>) => boolean,
-): T[] {
+	cb: (...args: any[]) => Promise<ReturnType<ItemCallback<T, U>>>,
+	predicate: (item: U) => item is U,
+): Promise<U[]>;
+export function filterMapAsync<T, U>(
+	array: Array<T>,
+	cb: (...args: any[]) => Promise<ReturnType<ItemCallback<T, U>>>,
+	predicate: (item: U) => boolean,
+): Promise<U[]>;
+export async function filterMapAsync<T, U>(
+	array: Array<T>,
+	cb: (...args: any[]) => Promise<ReturnType<ItemCallback<T, U>>>,
+	predicate: (item: U) => unknown,
+): Promise<U[]> {
+	return new Promise<U[]>((resolve) => {
+		const result: U[] = [];
+
+		for (let idx = 0; idx < array.length; idx++) {
+			cb(array[idx], idx, array).then((res) => {
+				if (predicate(res)) {
+					result.push(res);
+				}
+				if (idx === array.length - 1) {
+					resolve(result);
+				}
+			});
+		}
+	});
+}
+
+export function filter<T>(array: Array<T>, predicate: (item: Maybe<T>) => boolean): T[] {
 	let idx = -1,
 		curPos = 0;
 	const result: T[] = [],
@@ -120,19 +120,12 @@ export function splice<T>(
 	const deleted = array.slice(spliceIndex, spliceIndex + itemsToRemove);
 	let inserted: Array<unknown> = [];
 	if (!items) {
-		inserted = [
-			...array.slice(0, spliceIndex),
-			...array.slice(spliceIndex + itemsToRemove),
-		];
+		inserted = [...array.slice(0, spliceIndex), ...array.slice(spliceIndex + itemsToRemove)];
 	}
-	inserted = [
-		...array.slice(0, spliceIndex),
-		...items,
-		...array.slice(spliceIndex + itemsToRemove),
-	];
+	inserted = [...array.slice(0, spliceIndex), ...items, ...array.slice(spliceIndex + itemsToRemove)];
 	array.length = 0;
 	// eslint-disable-next-line prefer-spread
-	array.push.apply(array, inserted);
+	array.push.apply(array, inserted as any[]);
 	return deleted;
 }
 
@@ -150,10 +143,7 @@ export function rmUndef<T>(array: Array<T>): T[] {
 	return newArray;
 }
 
-export function every<T, S extends T>(
-	array: Array<T>,
-	predicate: (item: T) => boolean,
-): boolean {
+export function every<T>(array: Array<T>, predicate: (item: T) => boolean): boolean {
 	let idx = -1;
 	const length = array.length;
 	for (; ++idx < length; ) {
@@ -163,18 +153,9 @@ export function every<T, S extends T>(
 	}
 	return true;
 }
-export function sift<T, S>(
-	array: ArrayLike<T>,
-	predicate: (item: T) => item is T,
-): [T[], S[]];
-export function sift<T, S>(
-	array: ArrayLike<T>,
-	predicate: (item: T) => boolean,
-): [T[], S[]];
-export function sift<T, S>(
-	array: ArrayLike<T>,
-	predicate: (item: T) => unknown,
-): [T[], S[]] {
+export function sift<T, S>(array: ArrayLike<T>, predicate: (item: T) => item is T): [T[], S[]];
+export function sift<T, S>(array: ArrayLike<T>, predicate: (item: T) => boolean): [T[], S[]];
+export function sift<T, S>(array: ArrayLike<T>, predicate: (item: T) => unknown): [T[], S[]] {
 	const resultT: T[] = [];
 	const resultF: S[] = [];
 

@@ -10,10 +10,7 @@ type APIResponse = {
 	ok: boolean;
 };
 
-export async function api(
-	fetch: Fetch,
-	params?: RequestParams,
-): Promise<APIResponse> {
+export async function api(fetch: Fetch, params?: RequestParams): Promise<APIResponse> {
 	// Turn Object's Key-Value pairs into string
 	const urlParams = queryParams(params);
 	// Make fetch call

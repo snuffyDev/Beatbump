@@ -9,11 +9,7 @@ type PlayerSchema = {
 	playerParams?: string;
 };
 
-const parser = parseParams<PlayerSchema>([
-	"playerParams",
-	"playlistId",
-	"videoId",
-]);
+const parser = parseParams<PlayerSchema>(["playerParams", "playlistId", "videoId"]);
 
 /**
  * @root "/api/v1/"

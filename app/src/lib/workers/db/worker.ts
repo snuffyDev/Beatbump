@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /// <reference lib="webworker" />
 import type { Actions, Methods } from "./types";
 import { dbHandler } from "./db";
@@ -7,8 +8,7 @@ const worker = self as unknown as DedicatedWorkerGlobalScope;
 worker.onmessage = async <
 	Action extends Actions = any,
 	Type extends "favorite" | "playlist" | "playlists" | "favorites" = any,
-	Key extends keyof Methods & `${Action}${Capitalize<Type>}` = keyof Methods &
-		`${Action & string}${Capitalize<Type>}`,
+	Key extends keyof Methods & `${Action}${Capitalize<Type>}` = keyof Methods & `${Action & string}${Capitalize<Type>}`,
 	Fn extends Methods[Key] = Methods[Key],
 >(
 	event: MessageEvent<{

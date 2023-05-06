@@ -1,38 +1,33 @@
 <script lang="ts">
 	import { navigating } from "$app/stores";
+	import Description from "$components/ArtistPageHeader/Description/Description.svelte";
+	import Carousel from "$components/Carousel/Carousel.svelte";
+	import PopperButton from "$components/Popper/PopperButton.svelte";
+	import { draggable } from "$lib/actions/draggable";
+	import { pan } from "$lib/actions/gestures/handlers";
+	import type { Dropdown } from "$lib/configs/dropdowns.config";
+	import { CTX_ListItem } from "$lib/contexts";
 	import { AudioPlayer } from "$lib/player";
-	import {
-		immersiveQueue,
-		isMobileMQ,
-		isPagePlaying,
-		playerLoading,
-	} from "$lib/stores";
-	import { queue, currentTrack, queuePosition } from "$lib/stores/list";
-	import ListItem from "../ListItem/ListItem.svelte";
+	import { immersiveQueue, isMobileMQ, isPagePlaying, playerLoading } from "$lib/stores";
+	import { currentTrack, queue, queuePosition } from "$lib/stores/list";
+	import { groupSession } from "$lib/stores/sessions";
+	import type { Thumbnail } from "$lib/types";
+	import { requestFrameSingle } from "$lib/utils";
+	import { related } from "$stores/list/derived";
+	import SessionListService from "$stores/list/sessionList";
+	import { SITE_ORIGIN_URL } from "$stores/url";
+	import { windowWidth } from "$stores/window";
+	import { cubicOut, quartIn, quartOut } from "svelte/easing";
+	import { tweened } from "svelte/motion";
+	import type { EasingFunction, TransitionConfig } from "svelte/transition";
+	import ListItem, { listItemPageContext } from "../ListItem/ListItem.svelte";
 	import Loading from "../Loading/Loading.svelte";
 	import Tabs from "../Tabs";
 	import TrackList from "../TrackList";
-	import { fullscreenStore } from "./channel";
 	import Controls from "./Controls.svelte";
-	import { pan } from "$lib/actions/gestures/handlers";
-	import { tweened } from "svelte/motion";
-	import { cubicOut, quartIn, quartOut } from "svelte/easing";
-	import { draggable } from "$lib/actions/draggable";
-	import { groupSession } from "$lib/stores/sessions";
-	import ProgressBar from "./ProgressBar";
-	import { CTX_ListItem } from "$lib/contexts";
-	import { requestFrameSingle } from "$lib/utils";
-	import type { Thumbnail } from "$lib/types";
-	import { windowWidth } from "$stores/window";
-	import type { EasingFunction, TransitionConfig } from "svelte/transition";
-	import PopperButton from "$components/Popper/PopperButton.svelte";
 	import { createPlayerPopperMenu } from "./Player.svelte";
-	import { SITE_ORIGIN_URL } from "$stores/url";
-	import type { Dropdown } from "$lib/configs/dropdowns.config";
-	import SessionListService from "$stores/list/sessionList";
-	import { related } from "$stores/list/derived";
-	import Carousel from "$components/Carousel/Carousel.svelte";
-	import Description from "$components/ArtistPageHeader/Description/Description.svelte";
+	import ProgressBar from "./ProgressBar";
+	import { fullscreenStore } from "./channel";
 
 	export let state: "open" | "closed";
 
@@ -46,6 +41,7 @@
 	let active = "UpNext";
 	let thumbnail: Thumbnail;
 	let tracklist: HTMLDivElement;
+	let rmContextFn: (() => void) | undefined = undefined;
 
 	$: loading = $playerLoading;
 	$: data = $currentTrack;
@@ -103,17 +99,13 @@
 				duration: 180,
 			});
 		} else {
-			queueTween.set(
-				0 - (detail.clientY * 0.7 + detail.clientY * 0.3) / windowHeight,
-				{ duration: 180 },
-			);
+			queueTween.set(0 - (detail.clientY * 0.7 + detail.clientY * 0.3) / windowHeight, { duration: 180 });
 		}
 	}
 
 	function open(kind: number, detail) {
 		const step = detail.deltaY / queueHeight;
-		const miss =
-			detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : 1 - step;
+		const miss = detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : 1 - step;
 		const distance = miss * windowHeight;
 		if (kind === 1) {
 			motion.update(
@@ -136,8 +128,7 @@
 
 	function close(kind: number, detail) {
 		const step = detail.deltaY / queueHeight;
-		const miss =
-			detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : step;
+		const miss = detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : step;
 		const distance = miss * windowHeight;
 		if (kind === 1) {
 			motion.set(0, {
@@ -154,6 +145,15 @@
 		sliding = false;
 	}
 
+	$: if (state === "open") {
+		rmContextFn = listItemPageContext.add("queue");
+	}
+	$: if (state === "closed") {
+		if (rmContextFn) {
+			rmContextFn();
+			rmContextFn = undefined;
+		}
+	}
 	$: {
 		thumbnail = Array.isArray(data?.thumbnails)
 			? data?.thumbnails.at(-1)
@@ -186,11 +186,7 @@
 
 	function slideInOut(
 		node: HTMLElement,
-		{
-			duration = 400,
-			delay = 400,
-			easing = quartOut,
-		}: { duration?: number; easing?: EasingFunction; delay?: number },
+		{ duration = 400, delay = 400, easing = quartOut }: { duration?: number; easing?: EasingFunction; delay?: number },
 	): TransitionConfig {
 		const style = getComputedStyle(node);
 		const target_opacity = +style.opacity;
@@ -300,12 +296,9 @@
 							<div class="marquee">
 								<span
 									class="marquee-wrapper"
-									style="animation-play-state: {state === 'open' &&
-									titleWidth > $windowWidth
+									style="animation-play-state: {state === 'open' && titleWidth > $windowWidth
 										? 'running'
-										: 'paused'}; {titleWidth < $windowWidth
-										? 'animation: none; transform: unset;'
-										: ''}"
+										: 'paused'}; {titleWidth < $windowWidth ? 'animation: none; transform: unset;' : ''}"
 									><span
 										bind:clientWidth={titleWidth}
 										class="h5 marquee-text">{data?.title}</span
@@ -315,9 +308,7 @@
 							<span
 								class="h6"
 								style="text-align:center; "
-								>{data?.artistInfo && data?.artistInfo.artist.at(0)
-									? data?.artistInfo.artist.at(0).text
-									: ""}</span
+								>{data?.artistInfo && data?.artistInfo.artist.at(0) ? data?.artistInfo.artist.at(0).text : ""}</span
 							>
 						</div>
 						<div
@@ -335,10 +326,7 @@
 							pause={() => AudioPlayer.pause()}
 							nextBtn={() => {
 								if ($queue.length === 0) return;
-								SessionListService.next(
-									true,
-									groupSession.hasActiveSession ? true : false,
-								);
+								SessionListService.next(true, groupSession.hasActiveSession ? true : false);
 								// AudioPlayer.updateTime($durationStore);
 							}}
 							prevBtn={() => AudioPlayer.previous(true)}
@@ -349,9 +337,7 @@
 
 			<div
 				class="handle vertical"
-				style="transform: translate3d({queueOpen
-					? 53.5
-					: 91.5}vw, 0px, 0) !important;"
+				style="transform: translate3d({queueOpen ? 53.5 : 91.5}vw, 0px, 0) !important;"
 				on:pointerover={() => {
 					tracklist.style.willChange = "transform";
 				}}
@@ -372,15 +358,12 @@
 					? `transform: translate3d(0, ${$motion}px, 0); top: ${
 							windowHeight - 65
 					  }px; bottom:0; padding-bottom: calc(6.5em);`
-					: `transform: translate3d(${
-							queueOpen ? 55 : 93
-					  }vw, 0px, 0) !important;`}
+					: `transform: translate3d(${queueOpen ? 55 : 93}vw, 0px, 0) !important;`}
 			>
 				<div
 					use:draggable
 					on:dragstart|capture|stopPropagation={(e) => onDragStart(1, e)}
-					on:dragmove|capture|stopPropagation={(e) =>
-						trackMovement(1, e.detail)}
+					on:dragmove|capture|stopPropagation={(e) => trackMovement(1, e.detail)}
 					on:dragend|capture|stopPropagation={(e) => release(1, e.detail)}
 					on:pointerdown={() => {
 						tracklist.style.willChange = "scroll-position, transform";
@@ -430,9 +413,7 @@
 									{#if $related.description.description}
 										<div class="mb-2">
 											<span class="h2">{$related?.description?.header}</span>
-											<Description
-												description={$related.description.description}
-											/>
+											<Description description={$related.description.description} />
 										</div>
 									{/if}
 									{#if Array.isArray($related.carousels)}
@@ -514,8 +495,7 @@
 		gap: 1em;
 	}
 	.text-shadow {
-		text-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.692),
-			-0.1em -0.1em 0.2em rgba(0, 0, 0, 0.418);
+		text-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.692), -0.1em -0.1em 0.2em rgba(0, 0, 0, 0.418);
 	}
 	.scroller {
 		overflow-y: auto;
@@ -568,8 +548,7 @@
 			inset: 0;
 			transform: scale(1.5) translateZ(0);
 			overflow: hidden;
-			filter: brightness(0.6) opacity(0.6) contrast(1) saturate(1.1)
-				grayscale(0.3) sepia(0.2);
+			filter: brightness(0.6) opacity(0.6) contrast(1) saturate(1.1) grayscale(0.3) sepia(0.2);
 			touch-action: none;
 		}
 	}
@@ -704,8 +683,7 @@
 		background-color: #0000;
 		inset: 0;
 		z-index: 151;
-		animation: fade-in 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 100ms
-			alternate backwards;
+		animation: fade-in 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 100ms alternate backwards;
 		margin-top: var(--top-bar-height);
 		height: calc(100% - calc(var(--top-bar-height) + var(--player-bar-height)));
 		touch-action: none;

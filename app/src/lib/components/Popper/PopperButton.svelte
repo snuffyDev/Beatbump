@@ -4,10 +4,7 @@
 	lang="ts"
 	context="module"
 >
-	function dropdown(
-		node: HTMLElement,
-		{ items = [], type = "", metadata = {} },
-	) {
+	function dropdown(node: HTMLElement, { items = [], type = "", metadata = {} }) {
 		let x: number, y: number, bottom: number;
 		let open = false;
 		const a11yClick = (e: KeyboardEvent) => {
@@ -16,14 +13,8 @@
 			open = false;
 		};
 
-		function handleDocumentClick(
-			event: MouseEvent & { target: HTMLElement & EventTarget },
-		) {
-			if (
-				open &&
-				!node.contains(event.target) &&
-				!node.isSameNode(event.target)
-			) {
+		function handleDocumentClick(event: MouseEvent & { target: HTMLElement & EventTarget }) {
+			if (open && !node.contains(event.target) && !node.isSameNode(event.target)) {
 				isOpen.set(false);
 				open = false;
 				PopperStore.reset();
@@ -31,9 +22,7 @@
 			}
 		}
 
-		function handleClick(
-			event: MouseEvent & { target: HTMLElement & EventTarget },
-		) {
+		function handleClick(event: MouseEvent & { target: HTMLElement & EventTarget }) {
 			event.stopPropagation();
 			// console.log(node);
 			// Button clicked is same node as the event target -> reset state!

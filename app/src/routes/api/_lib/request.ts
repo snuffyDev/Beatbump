@@ -40,21 +40,14 @@ const ENDPOINT_HANDLERS = {
 	search: searchRequest,
 } as const;
 
-type HandlerMap<
-	T extends Record<string, (...args: never[]) => Promise<Response>>,
-> = {
+type HandlerMap<T extends Record<string, (...args: never[]) => Promise<Response>>> = {
 	[Key in keyof T]: ((...args: never[]) => Promise<Response>) extends T[Key]
 		? (...args: Parameters<T[Key]>) => Promise<Response>
 		: any;
 };
 
-const ENDPOINT_DICT: Exclude<
-	HandlerMap<typeof ENDPOINT_HANDLERS>[keyof typeof ENDPOINT_HANDLERS],
-	never
-> = ENDPOINT_HANDLERS as Exclude<
-	HandlerMap<typeof ENDPOINT_HANDLERS>[keyof typeof ENDPOINT_HANDLERS],
-	never
->;
+const ENDPOINT_DICT: Exclude<HandlerMap<typeof ENDPOINT_HANDLERS>[keyof typeof ENDPOINT_HANDLERS], never> =
+	ENDPOINT_HANDLERS as Exclude<HandlerMap<typeof ENDPOINT_HANDLERS>[keyof typeof ENDPOINT_HANDLERS], never>;
 
 /**
  * Builds a YouTube Music API request.
@@ -63,11 +56,7 @@ const ENDPOINT_DICT: Exclude<
  * @returns {Promise<Response>} A promise consisting of a Response
  */
 export function buildAPIRequest<
-	T extends
-		| ArtistEndpointParams
-		| PlayerEndpointParams
-		| PlaylistEndpointParams
-		| NextEndpointParams,
+	T extends ArtistEndpointParams | PlayerEndpointParams | PlaylistEndpointParams | NextEndpointParams,
 >(
 	endpoint: keyof APIEndpoints,
 	{
@@ -79,18 +68,13 @@ export function buildAPIRequest<
 		context: Partial<Context>;
 		params: T | Record<string, unknown>;
 		continuation?: Nullable<PlaylistEndpointContinuation>;
-		headers?: Nullable<IHeaders>;
+		headers: Nullable<IHeaders>;
 	},
 ): Promise<Response | null> {
 	const ctx = { ...CONTEXT_DEFAULTS, ...context };
 	if (!headers) headers = {};
 	if (!(endpoint in ENDPOINT_DICT)) return Promise.resolve(null);
-	return ENDPOINT_DICT[endpoint](
-		ctx,
-		params as never,
-		continuation as never,
-		headers as never,
-	);
+	return ENDPOINT_DICT[endpoint](ctx, params as never, continuation as never, headers as never);
 }
 
 /**
@@ -101,10 +85,7 @@ export function buildAPIRequest<
  * @param {T} params
  * @returns {*}
  */
-function nextRequest<T extends NextEndpointParams>(
-	context: Context,
-	params: T,
-) {
+function nextRequest<T extends NextEndpointParams>(context: Context, params: T) {
 	const body = buildRequestBody(context, params);
 	return fetch(API_BASE_URL + ENDPOINT_NAMES.next + "?key=" + WEB_REMIX_KEY, {
 		body: JSON.stringify(body),
@@ -115,7 +96,7 @@ function nextRequest<T extends NextEndpointParams>(
 			Origin: "https://music.youtube.com",
 
 			"x-youtube-client-name": "67",
-			"x-youtube-client-version": "1.20221212.01.0",
+			"x-youtube-client-version": "1.20230501.01.00",
 			"X-Goog-Visitor-Id": `${context?.client?.visitorData}`,
 			"User-Agent": USER_AGENT,
 		},
@@ -141,9 +122,7 @@ function searchRequest<T extends SearchEndpointParams>(
 		API_BASE_URL +
 			ENDPOINT_NAMES.search +
 			"?" +
-			(continuation
-				? queryParams(continuation) + `&sp=EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D&`
-				: "") +
+			(continuation ? queryParams(continuation) + `&sp=EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D&` : "") +
 			`key=${WEB_REMIX_KEY}`,
 		{
 			body: JSON.stringify(body),
@@ -153,8 +132,7 @@ function searchRequest<T extends SearchEndpointParams>(
 			headers: {
 				"Content-Type": "application/json; charset=utf-8",
 				Origin: "https://music.youtube.com",
-				"User-Agent":
-					"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+				"User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
 			},
 		},
 	);
@@ -170,9 +148,7 @@ function searchRequest<T extends SearchEndpointParams>(
  * @param {IHeaders} [headers={}]
  * @returns
  */
-function browseRequest<
-	T = PlayerEndpointParams | ArtistEndpointParams | RelatedEndpointParams,
->(
+function browseRequest<T = PlayerEndpointParams | ArtistEndpointParams | RelatedEndpointParams>(
 	context: Context,
 	params: T,
 	continuation?: Nullable<PlaylistEndpointContinuation>,
@@ -196,7 +172,7 @@ function browseRequest<
 					"x-origin": "https://music.youtube.com",
 					"x-goog-visitor-id": context["client"]["visitorData"] || "",
 					"x-youtube-client-name": "67",
-					"x-youtube-client-version": "1.20221212.01.0",
+					"x-youtube-client-version": "1.20230501.01.00",
 					Origin: "https://music.youtube.com",
 				},
 				headers,
@@ -218,10 +194,7 @@ function browseRequest<
  * @param {T} params
  * @returns {*}
  */
-function playerRequest<T extends PlayerEndpointParams>(
-	context: Context,
-	params: T,
-) {
+function playerRequest<T extends PlayerEndpointParams>(context: Context, params: T) {
 	const body = buildRequestBody(context as Context, params);
 
 	return fetch(API_BASE_URL + ENDPOINT_NAMES.player + `?key=${ANDROID_KEY}`, {
@@ -244,10 +217,7 @@ function playerRequest<T extends PlayerEndpointParams>(
  * @param {T} body
  * @returns {*}
  */
-function artistRequest<T extends ArtistEndpointParams>(
-	context: Context,
-	body: T,
-) {
+function artistRequest<T extends ArtistEndpointParams>(context: Context, body: T) {
 	const reqBody = buildRequestBody(context as Context, body);
 
 	return fetch(API_BASE_URL + ENDPOINT_NAMES.artist + `?key=${WEB_REMIX_KEY}`, {

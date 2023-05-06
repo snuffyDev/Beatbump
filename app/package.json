@@ -16,7 +16,10 @@
 		"sync": "svelte-kit sync",
 		"validate": "npm run format && npm run lint ",
 		"format": "prettier --plugin-search-dir . --write .",
-		"lint": "prettier --plugin-search-dir . --check . && eslint --fix ."
+		"lint": "npm run lint:prettier && npm run lint:styles && npm run lint:ts",
+		"lint:prettier": "prettier --plugin-search-dir . --check . ",
+		"lint:styles": "stylelint --fix",
+		"lint:ts": " eslint \"src/**/*.{js,ts}\" --ext js,ts --fix "
 	},
 	"devDependencies": {
 		"@babel/core": "^7.21.5",
@@ -29,7 +32,7 @@
 		"@sveltejs/adapter-vercel": "^2.4.3",
 		"@sveltejs/kit": "^1.15.9",
 		"@swc/core": "^1.3.56",
-		"@types/node": "^18.16.3",
+		"@types/node": "^18.16.5",
 		"@typescript-eslint/eslint-plugin": "^5.59.1",
 		"@typescript-eslint/parser": "^5.59.1",
 		"autoprefixer": "^10.4.14",
@@ -51,6 +54,11 @@
 		"prettier": "^2.8.8",
 		"prettier-plugin-svelte": "^2.10.0",
 		"sass": "^1.62.1",
+		"stylelint": "^15.6.1",
+		"stylelint-config-prettier": "^9.0.5",
+		"stylelint-config-sass-guidelines": "^10.0.0",
+		"stylelint-config-standard": "^33.0.0",
+		"stylelint-prettier": "^3.0.0",
 		"svelte": "^3.58.0",
 		"svelte-check": "^3.2.0",
 		"svelte-preprocess": "^5.0.3",
@@ -62,6 +70,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@fontsource/commissioner": "^4.5.10"
+		"@fontsource/commissioner": "^4.5.10",
+		"eslint-plugin-unused-imports": "^2.0.0"
 	}
 }

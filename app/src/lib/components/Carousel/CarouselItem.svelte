@@ -6,23 +6,19 @@
 >
 	const RE_ALBUM_PLAYLIST_SINGLE = /PLAYLIST|ALBUM|SINGLE/;
 	const RE_THUMBNAIL_DIM = /=w\d+-h\d+-/gm;
-	const errorHandler = (
-		event: Event & {
-			currentTarget: EventTarget & HTMLImageElement;
-		},
-	) => {
-		if (!browser) return;
-		event.currentTarget.onerror = null;
 
-		event.currentTarget.src =
+	const errorHandler = (event: Event) => {
+		if (!browser) return;
+		const target = event.currentTarget as HTMLImageElement;
+		target.onerror = null;
+
+		target.src =
 			"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjNDI0MjQyIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA1LjU0IDE2Ni43OTQpIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCZxdW90O1NlZ29lIFVJJnF1b3Q7LFJvYm90byxPeHlnZW4sVWJ1bnR1LENhbnRhcmVsbCwmcXVvdDtPcGVuIFNhbnMmcXVvdDssJnF1b3Q7SGVsdmV0aWNhIE5ldWUmcXVvdDssc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNmYWZhZmEiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiA1NC44MzkpIiBkPSJNMCAwaDcydjE0Ni4zMjNIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+";
 	};
 
 	function handleContextMenu(event: MouseEvent, dropdownItems: Dropdown) {
 		event.preventDefault();
-		window.dispatchEvent(
-			new CustomEvent("contextmenu", { detail: "carouselItem" }),
-		);
+		window.dispatchEvent(new CustomEvent("contextmenu", { detail: "carouselItem" }));
 
 		PopperStore.set({
 			items: dropdownItems,
@@ -32,40 +28,103 @@
 		});
 	}
 
-	const FILTER_ARTIST_ON_ARTIST_PAGE: ReadonlyArray<string> = [
-		"Favorite",
-		"Add to Queue",
-		"View Artist",
-	] as const;
-	const FILTER_ALBUM_PLAYLIST_ITEMS: ReadonlyArray<string> = [
-		"Favorite",
-		"Play Next",
-		"View Artist",
-	] as const;
+	const FILTER_ARTIST_ON_ARTIST_PAGE: ReadonlyArray<string> = ["Favorite", "Add to Queue", "View Artist"] as const;
+	const FILTER_ALBUM_PLAYLIST_ITEMS: ReadonlyArray<string> = ["Favorite", "Play Next", "View Artist"] as const;
+
+	const MENU_HANDLERS = {
+		artist: async (ctx: BuildMenuParams) => {
+			const { item } = ctx;
+			try {
+				const artistId = item.artistInfo ? item.artistInfo?.artist?.[0].browseId : item.subtitle[0].browseId;
+				if (!artistId) throw new Error(`Expected a valid artistId string, received ${artistId}`);
+				goto(`/artist/${artistId}`);
+				await tick();
+				window.scrollTo({
+					behavior: "smooth",
+					top: 0,
+					left: 0,
+				});
+			} catch (e) {
+				notify(`Error: ${e}`, "error");
+			}
+		},
+		addToQueue: (ctx: BuildMenuParams) => {
+			const { item } = ctx;
+			list.setTrackWillPlayNext(item, list.$.value.mix.length);
+			notify(`${item.title} has been added to your queue!`, "success");
+		},
+		playNext: (ctx: BuildMenuParams) => {
+			const { item } = ctx;
+			list.setTrackWillPlayNext(item, list.position);
+			notify(`${item.title} will play next!`, "success");
+		},
+		addToPlaylist: async (ctx: BuildMenuParams) => {
+			const { item } = ctx;
+			if (item.endpoint?.pageType.match(RE_ALBUM_PLAYLIST_SINGLE)) {
+				const response = await fetch("/api/v1/get_queue.json?playlistId=" + item.playlistId);
+				const data = await response.json();
+				const items: Item[] = data;
+				showAddToPlaylistPopper.set({ state: true, item: [...items] });
+			} else {
+				showAddToPlaylistPopper.set({ state: true, item: item });
+			}
+		},
+		favorite: (ctx: BuildMenuParams) => {
+			const { item } = ctx;
+			IDBService.sendMessage("create", "favorite", item);
+		},
+		share: async (ctx: BuildMenuParams) => {
+			const { SITE_ORIGIN_URL: $SITE_ORIGIN_URL, item } = ctx;
+			const shareData = createShare({
+				origin: $SITE_ORIGIN_URL,
+				id: item.endpoint?.browseId ?? item.videoId,
+				type: item.endpoint?.pageType as SharePageType,
+				title: item.title,
+			});
+			try {
+				if (!navigator.canShare) {
+					await navigator.clipboard.writeText(shareData.url);
+					notify("Link copied successfully", "success");
+				} else {
+					await navigator.share(shareData);
+					notify("Shared successfully", "success");
+				}
+			} catch (error) {
+				notify("Error: " + error, "error");
+			}
+		},
+	};
+	const buildMenu = (ctx: BuildMenuParams) =>
+		buildDropdown()
+			.add("View Artist", MENU_HANDLERS.artist.bind(MENU_HANDLERS.artist, ctx))
+			.add("Add to Queue", MENU_HANDLERS.addToQueue.bind(MENU_HANDLERS.addToQueue, ctx))
+			.add("Play Next", MENU_HANDLERS.playNext.bind(MENU_HANDLERS.playNext, ctx))
+			.add("Add to Playlist", MENU_HANDLERS.addToPlaylist.bind(MENU_HANDLERS.addToPlaylist, ctx))
+			.add("Favorite", MENU_HANDLERS.favorite.bind(MENU_HANDLERS.favorite, ctx))
+			.add("Share", MENU_HANDLERS.share.bind(MENU_HANDLERS.share, ctx))
+			.build();
 </script>
 
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import Loading from "$components/Loading/Loading.svelte";
-	import { groupSession } from "$lib/stores";
+	// import { groupSession } from "$lib/stores";
 	import { IDBService } from "$lib/workers/db/service";
 
 	import list from "$lib/stores/list";
-	import { Logger, notify, IsoBase64 } from "$lib/utils";
-	import {
-		showAddToPlaylistPopper,
-		showGroupSessionCreator,
-	} from "$stores/stores";
+	import { notify, noop } from "$lib/utils";
+	import { showAddToPlaylistPopper } from "$stores/stores";
 	import { tick } from "svelte";
 	import { PopperButton, PopperStore } from "../Popper";
 	import { clickHandler } from "./functions";
 	import { browser } from "$app/environment";
 	import { SITE_ORIGIN_URL } from "$stores/url";
-	import type { Dropdown } from "$lib/configs/dropdowns.config";
+	import { buildDropdown, type Dropdown } from "$lib/configs/dropdowns.config";
 	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
-	import type { Item } from "$lib/types";
-	import { createShare } from "$lib/shared/createShare";
+	import type { Item, Thumbnail } from "$lib/types";
+	import { createShare, type SharePageType } from "$lib/shared/createShare";
 	import { APIParams } from "$lib/constants";
+	import type { BuildMenuParams } from "$lib/types/common";
 
 	export let index: number;
 	export let item: IListItemRenderer;
@@ -75,158 +134,24 @@
 	export let isBrowseEndpoint = false;
 
 	let loading = false;
+
 	$: RATIO_RECT =
-		(aspectRatio?.includes("TWO_LINE_STACK") &&
-			kind !== "Fans might also like") ||
-		aspectRatio?.includes("16_9")
+		(aspectRatio?.includes("TWO_LINE_STACK") && kind !== "Fans might also like") || aspectRatio?.includes("16_9")
 			? true
 			: false;
 	$: ASPECT_RATIO = !RATIO_RECT ? "1x1" : "16x9";
-	let DropdownItems: Dropdown = [
-		{
-			text: "View Artist",
-			icon: "artist",
-			action: async () => {
-				try {
-					const artistId = item.artistInfo
-						? item.artistInfo.artist[0].browseId
-						: item.subtitle[0].browseId;
-					if (!artistId)
-						throw new Error(
-							`Expected a valid artistId string, received ${artistId}`,
-						);
-					goto(`/artist/${artistId}`);
-					await tick();
-					window.scrollTo({
-						behavior: "smooth",
-						top: 0,
-						left: 0,
-					});
-				} catch (e) {
-					notify(`Error: ${e}`, "error");
-				}
-			},
-		},
-		{
-			text: "Add to Queue",
-			icon: "queue",
-			action: function action() {
-				list.setTrackWillPlayNext(item, $list.mix.length);
-				notify(`${item.title} has been added to your queue!`, "success");
-			},
-		},
 
-		{
-			text: "Play Next",
-			icon: "queue",
-			action: function () {
-				list.setTrackWillPlayNext(item, $list.position);
-				notify(`${item.title} will play next!`, "success");
-			},
-		},
-		{
-			text: "Add to Playlist",
-			icon: "list-plus",
-			action: async () => {
-				if (item.endpoint?.pageType.match(RE_ALBUM_PLAYLIST_SINGLE)) {
-					const response = await fetch(
-						"/api/v1/get_queue.json?playlistId=" + item.playlistId,
-					);
-					const data = await response.json();
-					const items: Item[] = data;
-					showAddToPlaylistPopper.set({ state: true, item: [...items] });
-				} else {
-					showAddToPlaylistPopper.set({ state: true, item: item });
-				}
-			},
-		},
+	let DropdownItems = buildMenu({
+		item,
+		SITE_ORIGIN_URL: $SITE_ORIGIN_URL,
+		dispatch: noop,
+		idx: index,
+		page: item.endpoint?.pageType as Exclude<SharePageType, null>,
+	});
 
-		{
-			text: "Favorite",
-			icon: "heart",
-			action: () => {
-				IDBService.sendMessage("create", "favorite", item);
-			},
-		},
-		!groupSession.hasActiveSession
-			? {
-					text: "Start Group Session",
-					icon: "users",
-					action: async () => {
-						if (!browser) return;
-						showGroupSessionCreator.set(true);
-					},
-			  }
-			: {
-					text: "Share Group Session",
-					icon: "share",
-					action: async () => {
-						if (!browser) return;
-						const shareData = createShare({
-							type: "SESSION",
-							title: `Join ${groupSession.client.displayName}'s Beatbump Session`,
-							id: encodeURIComponent(
-								IsoBase64.toBase64(
-									JSON.stringify({
-										clientId: groupSession.client.clientId,
-										displayName: groupSession.client.displayName,
-									}),
-								),
-							),
-							origin: $SITE_ORIGIN_URL,
-						});
-						try {
-							if (!navigator.canShare) {
-								await navigator.clipboard.writeText(shareData.url);
-								notify("Link copied successfully", "success");
-							} else {
-								await navigator
-									.share(shareData)
-									.then(() => {
-										notify("Shared successfully", "success");
-									})
-									.catch((err) => {
-										Logger.err(err);
-									});
-							}
-						} catch (error) {
-							notify("Error: " + error, "error");
-						}
-					},
-			  },
-		{
-			text: "Share",
-			icon: "share",
-			action: async () => {
-				const shareData = createShare({
-					origin: $SITE_ORIGIN_URL,
-					id: item.endpoint?.browseId ?? item.videoId,
-					type: item.endpoint?.pageType ?? null,
-					title: item.title,
-				});
-				try {
-					if (!navigator.canShare) {
-						await navigator.clipboard.writeText(shareData.url);
-						notify("Link copied successfully", "success");
-					} else {
-						await navigator.share(shareData);
-						notify("Shared successfully", "success");
-					}
-				} catch (error) {
-					notify("Error: " + error, "error");
-				}
-			},
-		},
-	];
 	$: {
-		if (
-			type === "artist" ||
-			(item.endpoint &&
-				item.endpoint.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST"))
-		) {
-			DropdownItems = DropdownItems.filter((item) =>
-				FILTER_ARTIST_ON_ARTIST_PAGE.includes(item.text),
-			);
+		if (type === "artist" || (item.endpoint && item.endpoint.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST"))) {
+			DropdownItems = DropdownItems.filter((item) => FILTER_ARTIST_ON_ARTIST_PAGE.includes(item.text));
 		}
 		if (item.endpoint?.pageType) {
 			DropdownItems = item?.endpoint?.pageType.match(RE_ALBUM_PLAYLIST_SINGLE)
@@ -260,33 +185,25 @@
 							icon: "radio",
 							text: "Start Radio",
 						},
-						...DropdownItems.filter(
-							(item) => !FILTER_ALBUM_PLAYLIST_ITEMS.includes(item.text),
-						),
+						...DropdownItems.filter((item) => !FILTER_ALBUM_PLAYLIST_ITEMS.includes(item.text)),
 				  ]
-				: DropdownItems.filter((item) =>
-						FILTER_ALBUM_PLAYLIST_ITEMS.includes(item.text),
-				  );
+				: DropdownItems.filter((item) => FILTER_ALBUM_PLAYLIST_ITEMS.includes(item.text));
 		}
 	}
-
 	$: srcImg = Array.isArray(item?.thumbnails)
-		? item?.thumbnails.at(0)
+		? (item?.thumbnails.at(0) as Thumbnail)
 		: { width: 0, height: 0, url: "", placeholder: "" };
 
-	$: srcImg.url =
-		srcImg.width < 100
-			? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
-			: srcImg.url;
-	let active;
+	$: srcImg.url = srcImg.width < 100 ? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-") : srcImg.url;
 
 	$: isArtistKind = kind === "Fans might also like";
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <article
 	class="item item{ASPECT_RATIO}"
 	on:contextmenu={(event) => handleContextMenu(event, DropdownItems)}
-	on:click|stopPropagation={async (e) => {
+	on:click|stopPropagation={async () => {
 		loading = true;
 		loading = await clickHandler({ isBrowseEndpoint, index, item, kind, type });
 	}}
@@ -298,9 +215,9 @@
 			on:focus
 			on:blur
 		>
+			<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 			<div
 				class="image img{ASPECT_RATIO}"
-				class:active
 				class:isArtistKind
 				tabindex="0"
 			>
@@ -309,7 +226,7 @@
 				{/if}
 				<img
 					alt="thumbnail img{ASPECT_RATIO}"
-					on:error={errorHandler}
+					on:error={(e) => errorHandler(e)}
 					loading={index >= 3 ? "lazy" : null}
 					width={srcImg.width}
 					height={srcImg.height}
@@ -355,11 +272,7 @@
 	@import "../../../global/redesign/utility/mixins/media-query";
 
 	article {
-		--thumbnail-radius: clamp(
-			4px,
-			calc(var(--column-width, 0px) - 32px) * 0.025,
-			8px
-		);
+		--thumbnail-radius: clamp(4px, calc(var(--column-width, 0px) - 32px) * 0.025, 8px);
 
 		padding: 0.75em;
 		margin-bottom: 1em;
@@ -373,10 +286,7 @@
 		@media (hover: hover) {
 			&:hover {
 				> :where(.image)::before {
-					background: linear-gradient(
-						rgba(0, 0, 0, 0.534),
-						rgba(0, 0, 0, 0.11)
-					);
+					background: linear-gradient(rgba(0, 0, 0, 0.534), rgba(0, 0, 0, 0.11));
 					opacity: 0.7;
 					z-index: 1;
 				}
@@ -480,11 +390,7 @@
 			position: absolute;
 			content: "";
 			inset: 0;
-			background-image: linear-gradient(
-				rgba(0, 0, 0, 0.502),
-				rgba(0, 0, 0, 0),
-				rgba(0, 0, 0, 0)
-			);
+			background-image: linear-gradient(rgba(0, 0, 0, 0.502), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
 			pointer-events: none;
 			transition: background-image linear 0.1s, opacity linear 0.1s;
 			opacity: 0.1;
@@ -492,10 +398,7 @@
 		}
 
 		&:active:hover::before {
-			background-image: linear-gradient(
-				rgba(0, 0, 0, 0.589),
-				rgba(0, 0, 0, 0.11)
-			);
+			background-image: linear-gradient(rgba(0, 0, 0, 0.589), rgba(0, 0, 0, 0.11));
 			opacity: 1;
 		}
 

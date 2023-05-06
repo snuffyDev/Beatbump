@@ -11,10 +11,7 @@
 	import Loading from "$components/Loading/Loading.svelte";
 	import { hasContext, tick, createEventDispatcher } from "svelte";
 
-	import {
-		showAddToPlaylistPopper,
-		showGroupSessionCreator,
-	} from "$stores/stores";
+	import { showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
 	import { goto } from "$app/navigation";
 	import list, { queue, queuePosition } from "$lib/stores/list";
 	import type { Item } from "$lib/types";
@@ -33,8 +30,7 @@
 	let isLibrary = hasContext("library") ? true : false;
 	let videoId = "";
 	let playlistId = "";
-	let isArtist =
-		Array.isArray(data?.subtitle) && data.subtitle[0]?.text === "Artist";
+	let isArtist = Array.isArray(data?.subtitle) && data.subtitle[0]?.text === "Artist";
 
 	let loading = false;
 
@@ -52,8 +48,7 @@
 				await tick();
 				goto(
 					`/artist/${
-						data?.subtitle.find((s) => s?.pageType?.includes("ARTIST"))
-							?.browseId ?? data.artistInfo.artist[0].browseId
+						data?.subtitle.find((s) => s?.pageType?.includes("ARTIST"))?.browseId ?? data.artistInfo.artist[0].browseId
 					}`,
 				);
 			},
@@ -93,9 +88,7 @@
 			action: async () => {
 				if (data?.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
 					// console.log('PLAYLIST')
-					const response = await fetch(
-						"/api/v1/get_queue.json?playlistId=" + data?.playlistId,
-					);
+					const response = await fetch("/api/v1/get_queue.json?playlistId=" + data?.playlistId);
 					const _data = await response.json();
 					const items: Item[] = _data;
 					showAddToPlaylistPopper.set({ state: true, item: [...items] });
@@ -177,9 +170,7 @@
 		},
 	];
 	if (isArtist) {
-		DropdownItems = DropdownItems.filter(
-			(item) => !item.text?.includes("Add to Playlist"),
-		);
+		DropdownItems = DropdownItems.filter((item) => !item.text?.includes("Add to Playlist"));
 	}
 	if (data.type?.includes("playlist")) {
 		DropdownItems.splice(1, 1, {
@@ -196,9 +187,7 @@
 		});
 		DropdownItems.shift();
 		DropdownItems.pop();
-		DropdownItems = DropdownItems.filter(
-			(item) => !item.text.includes("Favorite"),
-		);
+		DropdownItems = DropdownItems.filter((item) => !item.text.includes("Favorite"));
 	}
 	if (data.type === "videos") {
 		DropdownItems = DropdownItems.filter((d) => {
@@ -213,11 +202,7 @@
 		DropdownItems = filter(DropdownItems, (d) => d.text !== "View Artist");
 	}
 	const clickHandler = async (event) => {
-		if (
-			(event.target instanceof HTMLElement && event.target.nodeName === "A") ||
-			loading
-		)
-			return;
+		if ((event.target instanceof HTMLElement && event.target.nodeName === "A") || loading) return;
 		// console.log(event.target)
 		if (isArtist) {
 			goto(`/artist/${data.artistInfo.artist[0].browseId}`);
@@ -258,18 +243,13 @@
 		? data?.thumbnails.at(0)
 		: { width: 0, height: 0, url: "", placeholder: "" };
 
-	$: srcImg.url =
-		srcImg.width < 100
-			? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
-			: srcImg.url;
+	$: srcImg.url = srcImg.width < 100 ? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-") : srcImg.url;
 </script>
 
 <div
 	class="container"
 	on:contextmenu|preventDefault={(e) => {
-		window.dispatchEvent(
-			new window.CustomEvent("contextmenu", { detail: "listing" }),
-		);
+		window.dispatchEvent(new window.CustomEvent("contextmenu", { detail: "listing" }));
 
 		PopperStore.set({
 			items: DropdownItems.slice(),
@@ -320,9 +300,7 @@
 					</p>
 				{:else if data.type === "playlist"}
 					<p class="text-artist">
-						{data.type === "playlist" && "metaData" in data
-							? `${data.metaData}`
-							: ""}
+						{data.type === "playlist" && "metaData" in data ? `${data.metaData}` : ""}
 					</p>
 				{:else}
 					<p class="text-artist secondary">
@@ -331,14 +309,12 @@
 								{artist.text}
 							{:else if artist.pageType.includes("ALBUM")}
 								<a
-									on:click|preventDefault|stopPropagation={() =>
-										goto(`/release?id=${artist?.browseId}`)}
+									on:click|preventDefault|stopPropagation={() => goto(`/release?id=${artist?.browseId}`)}
 									href={`/release?id=${artist?.browseId}`}>{artist.text}</a
 								>
 							{:else}
 								<a
-									on:click|preventDefault|stopPropagation={() =>
-										goto(`/artist/${artist?.browseId}`)}
+									on:click|preventDefault|stopPropagation={() => goto(`/artist/${artist?.browseId}`)}
 									href={`/artist/${artist?.browseId}`}>{artist.text}</a
 								>
 							{/if}
@@ -353,15 +329,11 @@
 				metadata={{
 					artist: data.type !== "playlist" &&
 						Array.isArray(data?.subtitle) && [
-							data.subtitle.find((s) => s?.pageType?.includes("ARTIST")) ??
-								data.artistInfo?.artist[0],
+							data.subtitle.find((s) => s?.pageType?.includes("ARTIST")) ?? data.artistInfo?.artist[0],
 						],
 					thumbnail: data.thumbnails,
 					title: data.title,
-					length:
-						data.type !== "artist" && data.type !== "playlist"
-							? data?.length?.text
-							: "",
+					length: data.type !== "artist" && data.type !== "playlist" ? data?.length?.text : "",
 				}}
 				type="search"
 				items={DropdownItems}

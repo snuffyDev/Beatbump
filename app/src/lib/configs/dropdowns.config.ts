@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import type icons from "$lib/components/Icon/icons";
 
 export type Label =
 	| "View Artist"
@@ -98,7 +97,7 @@ const DROPDOWN_ICONS: ReadonlyArray<Icons> = [
 export type TypedDropdownItem<T extends Label, I extends Icons = Icons> = {
 	text: T;
 	icon: I extends infer A ? A : I;
-	action: (...args) => Promise<void> | void;
+	action: (...args: any[]) => Promise<void> | void;
 };
 
 export const DROPDOWN_ITEMS: Partial<{
@@ -164,17 +163,11 @@ export const DROPDOWN_ITEMS: Partial<{
 export function buildDropdown() {
 	const menu: TypedDropdownItem<Label, Icons>[] = [];
 	return {
-		add: function (
-			label?: Label,
-			action?: TypedDropdownItem<Label, Icons>["action"],
-		) {
+		add: function (label?: Label, action?: TypedDropdownItem<Label, Icons>["action"]) {
 			if (!label && !action) return this;
-			const item = Object.assign(
-				{},
-				DROPDOWN_ITEMS[label],
-			) as TypedDropdownItem<Label, Icons>;
+			const item = Object.assign({}, DROPDOWN_ITEMS[label!]) as TypedDropdownItem<Label, Icons>;
 			if (item) {
-				item.action = action;
+				item.action = action!;
 				menu.push(item);
 			}
 			return this;

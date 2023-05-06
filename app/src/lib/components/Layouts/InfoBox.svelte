@@ -103,9 +103,7 @@
 				</p>
 				<span class="secondary subtitle-group">
 					<p class="secondary subtitle">
-						{Array.isArray(subtitles) && subtitles.length !== 0
-							? subtitles.join(" ")
-							: ""}
+						{Array.isArray(subtitles) && subtitles.length !== 0 ? subtitles.join(" ") : ""}
 					</p>
 					<em
 						><small class="subtitle">
@@ -138,9 +136,7 @@
 				<Button
 					on:click={action}
 					outlined={i === buttons.length - 1 || type === "outlined"}
-					icon={typeof icon === "string"
-						? { name: icon }
-						: { name: icon?.name, size: icon?.size }}>{text}</Button
+					icon={typeof icon === "string" ? { name: icon } : { name: icon?.name, size: icon?.size }}>{text}</Button
 				>
 			{/if}
 		{/each}

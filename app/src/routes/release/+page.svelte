@@ -18,10 +18,7 @@
 	const promise = parsePageContents(data$1);
 
 	let { items, releaseInfo } = promise;
-	let thumbnail = releaseInfo?.thumbnails[0]?.url.replace(
-		/=(w(\d+))-(h(\d+))/g,
-		"=w512-h512",
-	);
+	let thumbnail = releaseInfo?.thumbnails[0]?.url.replace(/=(w(\d+))-(h(\d+))/g, "=w512-h512");
 
 	const setId = () => isPagePlaying.add(id);
 

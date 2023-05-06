@@ -39,9 +39,8 @@ export function subtitle(items: PurpleRun[]) {
 			text: item.text,
 			browseId: item.navigationEndpoint.browseEndpoint?.browseId,
 			pageType:
-				item.navigationEndpoint.browseEndpoint
-					.browseEndpointContextSupportedConfigs
-					?.browseEndpointContextMusicConfig?.pageType,
+				item.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig
+					?.pageType,
 		};
 	}
 	return items;

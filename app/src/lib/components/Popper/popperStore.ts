@@ -49,9 +49,7 @@ export const isOpen = writable(false);
 export const activeNode = _activeNode();
 
 function _activeNode() {
-	const { subscribe, set } = writable<
-		WeakRef<HTMLElement> | WeakRef<{ value: null }>
-	>();
+	const { subscribe, set } = writable<WeakRef<HTMLElement> | WeakRef<{ value: null }>>();
 	return {
 		subscribe,
 		set: (node: WeakRef<HTMLElement> | WeakRef<{ value: null }>) => {

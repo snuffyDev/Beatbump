@@ -1,7 +1,4 @@
-export default function keyboardHandler(
-	node: Node,
-	params: { shortcut },
-): SvelteActionReturnType {
+export default function keyboardHandler(node: Node, params: { shortcut }): SvelteActionReturnType {
 	function keyDown(event: KeyboardEvent) {
 		if (
 			!Object.keys(params.shortcut).includes(event.code) ||

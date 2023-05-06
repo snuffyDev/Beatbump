@@ -1,5 +1,3 @@
-import { dev } from "$app/environment";
-
 import type { Handle } from "@sveltejs/kit";
 
 const headers = {
@@ -11,11 +9,7 @@ const headers = {
 };
 
 const checkUserAgent = (userAgent: string) =>
-	/i(Phone|Pad|Pod)/i.test(userAgent)
-		? "iOS"
-		: /Android/i.test(userAgent)
-		? "Android"
-		: "Other";
+	/i(Phone|Pad|Pod)/i.test(userAgent) ? "iOS" : /Android/i.test(userAgent) ? "Android" : "Other";
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const UA = event.request.headers.get("User-Agent");

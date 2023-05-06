@@ -19,7 +19,7 @@ export const GET: RequestHandler = async ({ url, params }) => {
 				userAgent:
 					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36 Edg/100.0.1185.36",
 				clientName: "WEB_REMIX",
-				clientVersion: "1.20220328.01.00",
+				clientVersion: "1.20230501.01.00",
 				osName: "Windows",
 				osVersion: "10.0",
 				// originalUrl: "https://music.youtube.com/channel/" + browseId,
@@ -38,13 +38,10 @@ export const GET: RequestHandler = async ({ url, params }) => {
 					pwaInstallabilityStatus: "PWA_INSTALLABILITY_STATUS_CAN_BE_INSTALLED",
 					webDisplayMode: "WEB_DISPLAY_MODE_BROWSER",
 					storeDigitalGoodsApiSupportStatus: {
-						playStoreDigitalGoodsApiSupportStatus:
-							"DIGITAL_GOODS_API_SUPPORT_STATUS_UNSUPPORTED",
+						playStoreDigitalGoodsApiSupportStatus: "DIGITAL_GOODS_API_SUPPORT_STATUS_UNSUPPORTED",
 					},
-					musicActivityMasterSwitch:
-						"MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
-					musicLocationMasterSwitch:
-						"MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE",
+					musicActivityMasterSwitch: "MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
+					musicLocationMasterSwitch: "MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE",
 				},
 			},
 			user: {
@@ -109,8 +106,8 @@ export const GET: RequestHandler = async ({ url, params }) => {
 		items: any[];
 		header: { gridHeaderRenderer: { title: { runs: [{ text: string }] } } };
 	} =
-		contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content
-			?.sectionListRenderer?.contents[0]?.gridRenderer;
+		contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents[0]
+			?.gridRenderer;
 
 	const items = [];
 

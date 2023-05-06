@@ -28,11 +28,7 @@
 	let showEditPlaylist;
 	let hasQuery = false;
 	async function getPlaylist() {
-		const promise = await IDBService.sendMessage(
-			"get",
-			"playlist",
-			playlistName,
-		);
+		const promise = await IDBService.sendMessage("get", "playlist", playlistName);
 		playlist = {};
 		Object.assign(playlist, promise);
 		playlist = [...playlist];
@@ -108,10 +104,7 @@
 			title={playlist?.name}
 			editable={true}
 			type="playlist"
-			subtitles={[
-				playlist?.items?.length,
-				playlist?.items?.length > 1 ? "Songs" : "Song",
-			]}
+			subtitles={[playlist?.items?.length, playlist?.items?.length > 1 ? "Songs" : "Song"]}
 			buttons={[
 				{
 					icon: "play",
@@ -151,12 +144,7 @@
 		<Search
 			on:input={({ detail }) => {
 				hasQuery = detail.query.length === 0 ? false : true;
-				items = filter(
-					playlist.items,
-					(item) =>
-						item.title &&
-						item.title.toLocaleLowerCase().includes(detail?.query),
-				);
+				items = filter(playlist.items, (item) => item.title && item.title.toLocaleLowerCase().includes(detail?.query));
 			}}
 		/>
 		<ListInfoBar />

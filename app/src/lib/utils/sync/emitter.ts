@@ -10,20 +10,13 @@ type KeyOf<T> = keyof T & string;
 
 export interface IEventEmitter<T> {
 	dispatch<Name extends KeyOf<T> = KeyOf<T>>(type: Name, args?: T[Name]): void;
-	off<Name extends KeyOf<T> = KeyOf<T>>(
-		type: Name,
-		cb: EventCallback<T[Name]>,
-	): void;
-	on<Name extends KeyOf<T> = KeyOf<T>>(
-		type: Name,
-		cb: EventCallback<T[Name]>,
-	): void;
+	off<Name extends KeyOf<T> = KeyOf<T>>(type: Name, cb: EventCallback<T[Name]>): void;
+	on<Name extends KeyOf<T> = KeyOf<T>>(type: Name, cb: EventCallback<T[Name]>): void;
 }
 
-export function EventEmitterMixin<
-	TBase extends new (...args: any[]) => {},
-	Events extends Record<string, any> = any,
->(Base: TBase) {
+export function EventEmitterMixin<TBase extends new (...args: any[]) => {}, Events extends Record<string, any> = any>(
+	Base: TBase,
+) {
 	return class EventEmitter extends Base implements IEventEmitter<Events> {
 		__target: object;
 		_eventQueue: WeakMap<object, EventListeners<any>>;
@@ -34,10 +27,7 @@ export function EventEmitterMixin<
 			this._eventQueue = new WeakMap<object, EventListeners<any>>();
 		}
 
-		dispatch<Name extends KeyOf<Events> = KeyOf<Events>>(
-			type: Name,
-			args?: Events[Name],
-		): void {
+		dispatch<Name extends KeyOf<Events> = KeyOf<Events>>(type: Name, args?: Events[Name]): void {
 			const queue = this._eventQueue.get(this.__target);
 
 			if (!queue) {
@@ -61,10 +51,7 @@ export function EventEmitterMixin<
 			this._eventQueue = null;
 		}
 
-		public off<Name extends KeyOf<Events> = KeyOf<Events>>(
-			type: Name,
-			cb: EventCallback<Events[Name]>,
-		): void {
+		public off<Name extends KeyOf<Events> = KeyOf<Events>>(type: Name, cb: EventCallback<Events[Name]>): void {
 			const listeners = this._eventQueue.get(this.__target);
 			if (!listeners) return;
 			if (type === undefined) {
@@ -79,14 +66,9 @@ export function EventEmitterMixin<
 			}
 		}
 
-		public on<Name extends KeyOf<Events> = KeyOf<Events>>(
-			type: Name,
-			cb: EventCallback<Events[Name]>,
-		): void {
+		public on<Name extends KeyOf<Events> = KeyOf<Events>>(type: Name, cb: EventCallback<Events[Name]>): void {
 			if (!this.__target) return;
-			const queue =
-				this._eventQueue.get(this.__target) ??
-				(new Map() as EventListeners<any>);
+			const queue = this._eventQueue.get(this.__target) ?? (new Map() as EventListeners<any>);
 
 			const listeners = queue.get(type) ?? [];
 			queue.set(type, listeners.concat(cb));
@@ -94,10 +76,7 @@ export function EventEmitterMixin<
 			this._eventQueue.set(this.__target, queue);
 		}
 
-		public once<Name extends KeyOf<Events> = KeyOf<Events>>(
-			name: Name,
-			cb: EventCallback<Events[Name]>,
-		) {
+		public once<Name extends KeyOf<Events> = KeyOf<Events>>(name: Name, cb: EventCallback<Events[Name]>) {
 			if (!this.__target) return;
 
 			const doOnce = (data: Events[Name]) => {

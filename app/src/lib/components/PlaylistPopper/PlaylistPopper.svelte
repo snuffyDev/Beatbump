@@ -4,19 +4,24 @@
 	import { showAddToPlaylistPopper } from "$lib/stores/stores";
 	import List from "./List.svelte";
 
+	import type { IDBPlaylist } from "$lib/workers/db/types";
 	import { createEventDispatcher } from "svelte";
-	import CreatePlaylist from "./CreatePlaylist.svelte";
 	import Modal from "../Modal";
+	import CreatePlaylist from "./CreatePlaylist.svelte";
 	$: isShowing = $showAddToPlaylistPopper.state;
-	let showCreatePlaylist;
-	let playlists = [];
+
+	$: item = $showAddToPlaylistPopper.item;
+	let showCreatePlaylist = false;
+	let playlists: IDBPlaylist[] = [];
 	const fetchPlaylists = async () => {
 		const promise = await IDBService.sendMessage("get", "playlists");
-		playlists = promise;
+		if (promise) {
+			playlists = promise;
+		}
 	};
 	$: if (isShowing) fetchPlaylists();
 	const dispatch = createEventDispatcher();
-	let hasFocus;
+	let hasFocus = false;
 	// $: console.log(playlists, showConfirmation, item);
 </script>
 
@@ -27,7 +32,15 @@
 			hasFocus = true;
 			showCreatePlaylist = false;
 		}}
-		on:submit={async () => {
+		on:submit={async (e) => {
+			await IDBService.sendMessage("create", "playlist", {
+				name: e.detail?.title,
+				description: e.detail?.description,
+				thumbnail:
+					e.detail?.thumbnail ??
+					"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjNDI0MjQyIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA1LjU0IDE2Ni43OTQpIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCZxdW90O1NlZ29lIFVJJnF1b3Q7LFJvYm90byxPeHlnZW4sVWJ1bnR1LENhbnRhcmVsbCwmcXVvdDtPcGVuIFNhbnMmcXVvdDssJnF1b3Q7SGVsdmV0aWNhIE5ldWUmcXVvdDssc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNmYWZhZmEiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiA1NC44MzkpIiBkPSJNMCAwaDcydjE0Ni4zMjNIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+",
+				items: Array.isArray(item) ? [...item] : [item],
+			});
 			hasFocus = true;
 			showCreatePlaylist = false;
 			dispatch("close");

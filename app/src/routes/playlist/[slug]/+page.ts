@@ -2,7 +2,6 @@ import type { NextContinuationData } from "$lib/types";
 import type { Header } from "$lib/types/playlist";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import type { Maybe } from "$lib/utils";
-import { error } from "@sveltejs/kit";
 import type { PlaylistResponseBody } from "../../api/v1/playlist.json/+server.js";
 export const load = async ({
 	params,
@@ -18,28 +17,19 @@ export const load = async ({
 	key: string;
 }> => {
 	const { slug } = params;
-	const data = await fetch<PlaylistResponseBody>(
-		`/api/v1/playlist.json?list=${slug}`,
-	)
-		.then((response) => {
-			if (!response.ok) {
-				throw error(response.status, response.statusText);
-			}
-			return response.json();
-		})
-		.catch((r) => {
-			throw r;
-		});
+	console.time("playlist");
+	const data = await fetch<PlaylistResponseBody>(`/api/v1/playlist.json?list=${slug}`).then((response) => {
+		if (!response.ok) {
+			console.error(response.status, response.statusText);
+			throw response.statusText;
+		}
+		return response.json();
+	});
 
 	// console.log(data);
-	const {
-		tracks = [],
-		header = {},
-		continuations,
-		carouselContinuations,
-		visitorData,
-	} = await data;
+	const { tracks = [], header = {}, continuations, carouselContinuations, visitorData } = await data;
 
+	console.timeEnd("playlist");
 	return {
 		tracks: tracks,
 		visitorData,

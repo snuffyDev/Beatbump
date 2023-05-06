@@ -9,7 +9,7 @@
 
 	import { IDBService } from "$lib/workers/db/service";
 
-	import { onMount, setContext } from "svelte";
+	import { setContext } from "svelte";
 	import Grid from "./_components/Grid/Grid.svelte";
 	import Sync from "./_Sync.svelte";
 	import Button from "$components/Button";
@@ -168,9 +168,7 @@
 				{:else}
 					<div class="container">
 						<h4>Empty!</h4>
-						<span class="subheading"
-							><em>Add some songs to keep track of what you love!</em></span
-						>
+						<span class="subheading"><em>Add some songs to keep track of what you love!</em></span>
 					</div>
 				{/if}
 			</div>

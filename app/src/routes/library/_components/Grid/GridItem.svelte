@@ -1,8 +1,4 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
-	import lazy from "$lib/lazy";
-	import type { Item } from "$lib/types";
-	import list from "$lib/stores/list";
 	export let item;
 </script>
 

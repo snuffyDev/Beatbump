@@ -5,6 +5,6 @@ export const FINITE_LIST_PARAMS = "wAEB8gECeAE%3D";
 
 export const APIParams = {
 	finite: FINITE_LIST_PARAMS,
-	next: "OAHyAQIIAQ==",
+	next: encodeURIComponent("OAHyAQIIAQ=="),
 	lt100: "8gECGAM%3D",
-};
+} as const;

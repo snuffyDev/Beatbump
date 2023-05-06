@@ -15,6 +15,27 @@
 
 	const startIndex = writable(0);
 
+	export const listItemPageContext = (() => {
+		let stack: { context: PageContext }[] = [];
+
+		const { subscribe, update } = writable<PageContext>();
+		return {
+			subscribe,
+			add(context: PageContext) {
+				const id = { context } as const;
+				if (context === "queue") {
+					stack.unshift(id);
+				} else {
+					stack.push(id);
+				}
+				update(() => stack[0].context);
+				return () => {
+					stack = stack.filter((ctx) => ctx !== id);
+				};
+			},
+		};
+	})();
+
 	const PositionCache = () => {
 		type TrackListPosition = number;
 		type QueuePosition = number;
@@ -23,7 +44,7 @@
 		return {
 			cache,
 			get(position: TrackListPosition): QueuePosition {
-				return cache.get(position);
+				return cache.get(position)!;
 			},
 			set(trackListPosition: TrackListPosition, queuePosition: QueuePosition) {
 				cache.set(trackListPosition, queuePosition);
@@ -41,12 +62,7 @@
 	const cache = PositionCache();
 
 	interface ClickHandler {
-		(
-			item: Item,
-			index: number,
-			stores: StoreSubscriptions,
-			visitorData?: string,
-		): Promise<void>;
+		(item: Item, index: number, stores: StoreSubscriptions, visitorData?: string): Promise<void>;
 	}
 
 	function binarySearchIndex<T extends Record<string, any>[]>(
@@ -73,14 +89,9 @@
 		return -1;
 	}
 
-	const handlePlaylistClick: ClickHandler = async (
-		item,
-		index,
-		stores,
-		visitorData,
-	) => {
-		const { $queue, $startIndex, $list } = stores;
-		if (item.playlistId === $list.currentMixId) {
+	const handlePlaylistClick: ClickHandler = async (item, index, stores, visitorData) => {
+		const { $queue, $startIndex = 0, $list } = stores;
+		if (item.playlistId === $list!.currentMixId) {
 			if (index - $startIndex < $queue.length) {
 				await list
 					.getSessionContinuation({
@@ -104,15 +115,9 @@
 						playlistId: item.playlistId,
 						loggingContext: item.loggingContext,
 						playerParams: item?.playerParams,
-						playlistSetVideoId:
-							APIParams.lt100 === item.playerParams
-								? undefined
-								: item?.playlistSetVideoId,
+						playlistSetVideoId: APIParams.lt100 === item.playerParams ? undefined : item?.playlistSetVideoId,
 
-						ctoken:
-							APIParams.lt100 === item.playerParams
-								? undefined
-								: $list.continuation,
+						ctoken: APIParams.lt100 === item.playerParams ? undefined : $list.continuation,
 						clickTrackingParams: item.clickTrackingParams,
 					})
 					.then(() => {
@@ -138,9 +143,7 @@
 			playlistId: item.playlistId,
 			visitorData,
 			clickTrackingParams:
-				(item.playlistId === $list.currentMixId &&
-					$queue[index]?.clickTrackingParams) ||
-				item?.clickTrackingParams,
+				(item.playlistId === $list.currentMixId && $queue[index]?.clickTrackingParams) || item?.clickTrackingParams,
 			index: index,
 			params: item.playerParams ?? item?.itct,
 			playlistSetVideoId: item?.playlistSetVideoId,
@@ -186,28 +189,10 @@
 		}
 	};
 
-	const buildMenu = ({
-		item,
-		idx,
-		SITE_ORIGIN_URL,
-		dispatch,
-		page,
-	}: {
-		item: Item;
-		dispatch: (...args: any) => void;
-		page: string;
-		idx: number;
-		SITE_ORIGIN_URL: string;
-	}) =>
+	const buildMenu = ({ item, idx, SITE_ORIGIN_URL, dispatch, page }: BuildMenuParams) =>
 		buildDropdown()
 			.add("View Artist", async () => {
-				goto(
-					`/artist/${
-						item?.artistInfo
-							? item.artistInfo.artist[0].browseId
-							: item?.subtitle[0].browseId
-					}`,
-				);
+				goto(`/artist/${item?.artistInfo ? item?.artistInfo?.artist?.[0].browseId : item?.subtitle[0].browseId}`);
 				await tick();
 				window.scrollTo({
 					behavior: "smooth",
@@ -223,9 +208,7 @@
 			})
 			.add("Add to Playlist", async () => {
 				if (item.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
-					const response = await fetch(
-						"/api/v1/get_queue.json?playlistId=" + item.playlistId,
-					);
+					const response = await fetch("/api/v1/get_queue.json?playlistId=" + item.playlistId);
 					const data = await response.json();
 					const items: Item[] = data;
 					showAddToPlaylistPopper.set({ state: true, item: [...items] });
@@ -291,36 +274,32 @@
 </script>
 
 <script lang="ts">
-	import {
-		groupSession,
-		isMobileMQ,
-		isPagePlaying,
-		queue,
-		showAddToPlaylistPopper,
-	} from "$lib/stores";
 	import { page as PageStore } from "$app/stores";
+	import { groupSession, isMobileMQ, isPagePlaying, queue, showAddToPlaylistPopper } from "$lib/stores";
 	import type { Item } from "$lib/types";
 	import { Logger, notify } from "$lib/utils";
 
-	import { createEventDispatcher, tick } from "svelte";
-	import Icon from "../Icon/Icon.svelte";
-	import { fullscreenStore } from "../Player/channel";
-	import PopperButton from "../Popper/PopperButton.svelte";
 	import { goto } from "$app/navigation";
-	import { IDBService } from "$lib/workers/db/service";
+	import { buildDropdown } from "$lib/configs/dropdowns.config";
+	import { APIParams } from "$lib/constants";
+	import { CTX_ListItem } from "$lib/contexts";
+	import { AudioPlayer, updateGroupPosition } from "$lib/player";
 	import list, {
 		currentTrack,
 		queuePosition,
-		type ISessionListService,
 		type ISessionListProvider,
+		type ISessionListService,
 	} from "$lib/stores/list";
-	import { AudioPlayer, updateGroupPosition } from "$lib/player";
-	import { CTX_ListItem } from "$lib/contexts";
-	import { SITE_ORIGIN_URL } from "$stores/url";
-	import { buildDropdown } from "$lib/configs/dropdowns.config";
+	import type { PageContext } from "$lib/types/allContexts";
+	import type { BuildMenuParams } from "$lib/types/common";
+	import { IDBService } from "$lib/workers/db/service";
 	import SessionListService from "$stores/list/sessionList";
+	import { SITE_ORIGIN_URL } from "$stores/url";
+	import { createEventDispatcher, tick } from "svelte";
 	import { writable } from "svelte/store";
-	import { APIParams } from "$lib/constants";
+	import Icon from "../Icon/Icon.svelte";
+	import { fullscreenStore } from "../Player/channel";
+	import PopperButton from "../Popper/PopperButton.svelte";
 
 	export let item: Item;
 	export let idx: number;
@@ -332,7 +311,8 @@
 	}
 
 	const dispatch = createEventDispatcher<$$Events>();
-	const { page, parentPlaylistId = null, visitorData } = CTX_ListItem.get();
+	const { visitorData = "", parentPlaylistId = "" } = CTX_ListItem.get()!;
+	$: page = $listItemPageContext;
 	const DropdownItems = buildMenu({
 		item,
 		idx,
@@ -354,56 +334,23 @@
 		if (target && target.nodeName === "A") return;
 
 		Logger.dev(item);
-		const queueIndex = binarySearchIndex<typeof $list.mix>(
-			$list.mix,
-			{ index: idx },
-			(a, b) => a?.index - b?.index,
-		);
-		const position = cache.has(idx)
-			? cache.get(idx)
-			: cache.set(idx, queueIndex < 0 ? idx : queueIndex);
-		console.log({ cache, idx, position, queueIndex });
+		const queueIndex = binarySearchIndex<typeof $list.mix>($list.mix, { index: idx }, (a, b) => a?.index - b?.index);
+		const position = cache.has(idx) ? cache.get(idx) : cache.set(idx, queueIndex < 0 ? idx : queueIndex);
+		console.log({ cache, idx, position, queueIndex, $listItemPageContext });
 		switch (page) {
 			case "queue":
-				await handleQueueClick(item, position, { $startIndex, $queue });
+				await handlePlaylistClick(item, position, { $list, $queue, $startIndex }, visitorData);
 				break;
 			case "playlist":
-				await handlePlaylistClick(
-					item,
-					position,
-					{ $list, $queue, $startIndex },
-					visitorData,
-				);
+				await handlePlaylistClick(item, position, { $list, $queue, $startIndex }, visitorData);
 				break;
 			case "library":
 				list.updatePosition(idx);
 				dispatch("initLocalPlaylist", { idx });
 				break;
 			case "release":
-				if (item.playlistId === $list.currentMixId) {
-					await SessionListService.updatePosition(idx - 1);
-					await SessionListService.next().then(() => {});
-				}
+				await handlePlaylistClick(item, position, { $list, $queue, $startIndex }, visitorData);
 
-				await list
-					.initAutoMixSession({
-						playlistId: item.playlistId,
-						clickTracking:
-							(item.playlistId === $list.currentMixId &&
-								$queue[idx]?.clickTrackingParams) ||
-							item?.clickTrackingParams,
-						keyId: idx,
-						loggingContext: item?.loggingContext,
-						videoId: item?.videoId,
-					})
-					.then(() => {
-						return list.getMoreLikeThis({
-							playlistId: item.playlistId ?? parentPlaylistId,
-						});
-					})
-					.then(() => {
-						list.updatePosition(idx);
-					});
 				break;
 			default:
 				await list.initAutoMixSession({
@@ -508,8 +455,7 @@
 	{:else}
 		<span
 			class="length"
-			class:hidden={!item?.length ? true : false}
-			>{(item?.length?.text ?? item.length) || ""}</span
+			class:hidden={!item?.length ? true : false}>{(item?.length?.text ?? item.length) || ""}</span
 		>
 	{/if}
 </article>
