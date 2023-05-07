@@ -8,20 +8,23 @@
 	const { paused } = AudioPlayer;
 
 	$: isPaused = $paused;
-</script>
-
-<div
-	class="player-btn player-title"
-	on:click|capture|stopPropagation={(e) => {
+	$: console.log(isPaused);
+	function handleButtonPress(e: Event) {
 		if (!$queue) return;
 		if (isPaused) {
 			// console.log(e)
 			// AudioPlayer.play(e)
-			AudioPlayer.play(e);
+			return AudioPlayer.play();
 		} else {
 			AudioPlayer.pause();
 		}
-	}}
+	}
+</script>
+
+<div
+	class="player-btn player-title"
+	on:click|capture|stopPropagation={handleButtonPress}
+	on:keydown|capture|stopPropagation={handleButtonPress}
 >
 	{#if $playerLoading}
 		<div

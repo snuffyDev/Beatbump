@@ -69,24 +69,24 @@
 	import Icon from "$components/Icon/Icon.svelte";
 	import { clickOutside } from "$lib/actions/clickOutside";
 	import { IMAGE_NOT_FOUND } from "$lib/constants";
-	import { IDBService } from "$lib/workers/db/service";
 	import { AudioPlayer } from "$lib/player";
 	import { groupSession, isMobileMQ } from "$lib/stores";
 	import list, { currentTrack, queue, queuePosition } from "$lib/stores/list";
-	import { IsoBase64, slide, notify } from "$lib/utils";
+	import { IsoBase64, notify, slide } from "$lib/utils";
 	import { messenger } from "$lib/utils/sync";
+	import { IDBService } from "$lib/workers/db/service";
 	import { playerLoading, showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
 	import { PopperButton } from "../Popper";
-	import { fullscreenStore } from "./channel";
 	import Controls from "./Controls.svelte";
-	import keyboardHandler from "./keyboardHandler";
 	import ProgressBar from "./ProgressBar";
+	import { fullscreenStore } from "./channel";
+	import keyboardHandler from "./keyboardHandler";
 
-	import { SITE_ORIGIN_URL } from "$stores/url";
-	import type { Item } from "$lib/types";
 	import { buildDropdown } from "$lib/configs/dropdowns.config";
-	import PlayerButton from "./PlayerButton.svelte";
+	import type { Item } from "$lib/types";
 	import SessionListService from "$stores/list/sessionList";
+	import { SITE_ORIGIN_URL } from "$stores/url";
+	import PlayerButton from "./PlayerButton.svelte";
 
 	const { paused } = AudioPlayer;
 	let volume = 0.5;

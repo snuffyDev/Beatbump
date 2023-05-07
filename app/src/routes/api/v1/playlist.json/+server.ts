@@ -29,20 +29,20 @@ export interface PlaylistResponseBody {
 
 type PlaylistSchema = {
 	itct?: string;
-    list?: string;
+	list?: string;
 	ctoken?: string;
-	referrer?: string;
+	ref?: string;
 	visitorData?: string;
 };
 
-const parser = parseParams<PlaylistSchema>(["list", "ctoken", "itct", "referrer", "visitorData"]);
+const parser = parseParams<PlaylistSchema>(["list", "ctoken", "itct", "ref", "visitorData"]);
 
 const ALLOWED_HEADER_KEYS = new Set(["subtitle", "secondSubtitle", "description", "thumbnail", "title"]);
 
 export const GET: RequestHandler = async ({ url }) => {
 	try {
 		const query = url.searchParams;
-		const { list: browseId, itct, ctoken, referrer = "", visitorData } = parser(query.entries());
+		const { list: browseId, itct, ctoken, ref: referrer = "", visitorData } = parser(query.entries());
 
 		if (ctoken) {
 			return await getPlaylistContinuation(
@@ -56,7 +56,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			);
 		}
 		if (!browseId) throw Error("Missing playlist browseId");
-		return await getPlaylist(browseId, referrer ?? "");
+		return await getPlaylist(browseId ?? referrer, referrer ?? "");
 	} catch (err) {
 		console.error(err);
 		return new Response(err as string, {

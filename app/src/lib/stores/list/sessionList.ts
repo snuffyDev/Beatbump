@@ -1,16 +1,16 @@
-import type { Artist, ArtistInfo, Item, Song, Subtitle, Thumbnail } from "$lib/types";
-import { Logger, addToQueue, notify, seededShuffle, type ResponseBody, WritableStore } from "$lib/utils";
-import { Mutex } from "$lib/utils/sync";
-import { splice } from "$lib/utils/collections/array";
-import { playerLoading, filterAutoPlay } from "../stores";
-import { groupSession } from "../sessions";
-import type { ISessionListService, ISessionListProvider } from "./types.list";
-import { fetchNext, filterList } from "./utils.list";
-import { tick } from "svelte";
-import type { VssLoggingContext } from "$lib/types/innertube/internals";
 import { APIParams } from "$lib/constants";
-import { AudioPlayer, getSrc } from "$lib/player";
+import { AudioPlayer, getSrc, updatePlayerSrc } from "$lib/player";
+import type { Artist, ArtistInfo, Item, Song, Subtitle, Thumbnail } from "$lib/types";
+import type { VssLoggingContext } from "$lib/types/innertube/internals";
+import { Logger, WritableStore, addToQueue, notify, seededShuffle, type ResponseBody } from "$lib/utils";
+import { splice } from "$lib/utils/collections/array";
 import { objectKeys } from "$lib/utils/collections/objects";
+import { Mutex } from "$lib/utils/sync";
+import { tick } from "svelte";
+import { groupSession } from "../sessions";
+import { filterAutoPlay, playerLoading } from "../stores";
+import type { ISessionListProvider, ISessionListService } from "./types.list";
+import { fetchNext, filterList } from "./utils.list";
 
 const mutex = new Mutex();
 
@@ -43,8 +43,17 @@ const VALID_KEYS = [
 ] as const;
 
 export class ListService implements ISessionListService {
-	_$: WritableStore<ISessionListProvider> = new WritableStore<ISessionListProvider>(undefined);
-	_state: ISessionListProvider = {
+	_$: WritableStore<ISessionListProvider> = new WritableStore<ISessionListProvider>({
+		clickTrackingParams: "",
+		continuation: "",
+		currentMixId: "",
+		currentMixType: null,
+		visitorData: "",
+		mix: [],
+		position: 0,
+		related: null,
+	});
+	#_state: ISessionListProvider = {
 		clickTrackingParams: "",
 		continuation: "",
 		currentMixId: "",
@@ -57,6 +66,9 @@ export class ListService implements ISessionListService {
 
 	constructor() {
 		this._$.set(this._state);
+	}
+	private get _state() {
+		return this._$.value;
 	}
 
 	public get subscribe() {
@@ -100,46 +112,119 @@ export class ListService implements ISessionListService {
 	}
 
 	#currentTrack(position = 0) {
-		return this._state.mix?.[position];
+		return this._$.value.mix[position];
 	}
 
-	public async next(userInitiated = false, broadcast = false) {
-		console.log("SESSION LIST NEXT");
+	public async next(nextSrc?: string | undefined = undefined) {
+		const currentPosition = this._state.position;
+		const nextTrack = this._state.mix[this._state.position + 1];
+
+		if (!nextTrack) {
+			const currentTrack = this._$.value.mix[this._state.position];
+
+			await this.getSessionContinuation(
+				{
+					videoId: currentTrack?.videoId,
+					key: this._state.position,
+					playlistId: currentTrack?.playlistId!,
+					loggingContext: currentTrack?.loggingContext,
+					playerParams: currentTrack?.playerParams,
+					playlistSetVideoId:
+						APIParams.lt100 === currentTrack?.playerParams ? undefined : currentTrack?.playlistSetVideoId,
+
+					ctoken: this.continuation,
+					clickTrackingParams: this.clickTrackingParams!,
+				},
+				true,
+			).then((data) => {
+				this.updatePosition(currentPosition + 1);
+				return data;
+			});
+
+			return;
+		} else {
+			if (nextSrc) {
+				await this.updatePosition("next");
+				updatePlayerSrc({ original_url: nextSrc, url: nextSrc });
+			} else {
+				let position = await this.updatePosition("next");
+				if (position >= this._state.mix.length) {
+					position = this._state.position;
+				}
+				const currentTrack = this.#currentTrack(position);
+				const data = await fetchNext({
+					...(this._state?.visitorData && { visitorData: this._state.visitorData }),
+					params: "gAQBiAQB",
+					playlistSetVideoId: currentTrack?.playlistSetVideoId,
+					index: position,
+					loggingContext: currentTrack?.loggingContext?.vssLoggingContext?.serializedContextData,
+					videoId: currentTrack?.videoId,
+					playlistId: this.currentMixId,
+					clickTracking: this?.clickTrackingParams,
+				});
+				if (!data) return;
+
+				const state = await this.#sanitizeAndUpdate("APPLY", data);
+				await getSrc(
+					state.mix[currentPosition + 1].videoId,
+					state.mix[currentPosition + 1].playlistId,
+					undefined,
+					true,
+				);
+			}
+		}
+	}
+	public async prefetchNextTrack() {
+		const nextTrack = this._state.mix[this._state.position + 1];
+		if (!nextTrack) {
+			const currentTrack = this._$.value.mix[this._state.position];
+			const currentIndex = this._state.position;
+			console.log({ nextTrack, currentTrack, state: this._state, this: this });
+			await this.getSessionContinuation(
+				{
+					videoId: currentTrack?.videoId,
+					key: this._state.position,
+					playlistId: currentTrack?.playlistId,
+					loggingContext: currentTrack?.loggingContext,
+					playerParams: currentTrack?.playerParams,
+					playlistSetVideoId:
+						APIParams.lt100 === currentTrack?.playerParams ? undefined : currentTrack?.playlistSetVideoId,
+
+					ctoken: this.continuation,
+					clickTrackingParams: this.clickTrackingParams!,
+				},
+				false,
+			).then(() => {
+				this.updatePosition(currentIndex + 1);
+			});
+			return;
+		}
+		const response = await getSrc(nextTrack.videoId, nextTrack.playlistId, undefined, false);
+		if (response.body) {
+			AudioPlayer.setNextTrackPrefetchedUrl(response.body.url);
+		}
+	}
+	public async previous(broadcast = false) {
+		const currentPosition = this._state.position;
 		let position = await this.updatePosition("next");
 		if (position >= this._state.mix.length) {
 			position = this._state.position;
 		}
-		const currentTrack = this.#currentTrack(position);
 		const data = await fetchNext({
-			visitorData: this._state?.visitorData,
-			params: "gAQBiAQB",
-			playlistSetVideoId: currentTrack?.playlistSetVideoId,
-			index: position,
-			loggingContext: currentTrack?.loggingContext?.vssLoggingContext?.serializedContextData,
-			videoId: currentTrack?.videoId,
-			playlistId: this.currentMixId,
-			clickTracking: this?.clickTrackingParams,
-		});
-		if (!data) return;
-
-		const state = await this.#sanitizeAndUpdate("APPLY", data);
-	}
-
-	public async previous(broadcast = false) {
-		const data = await fetchNext({
-			visitorData: this._state?.visitorData,
+			...(this._state?.visitorData && { visitorData: this._state?.visitorData }),
 			params: "OAHyAQIIAQ==",
 			playlistSetVideoId: this._state.mix[this.position]?.playlistSetVideoId,
 			index: this._state.position,
 			loggingContext: this.#currentTrack(this.position)?.loggingContext?.vssLoggingContext?.serializedContextData,
 			videoId: this.#currentTrack(this.position)?.videoId,
 			playlistId: this.currentMixId,
-			continuation: this?.continuation,
+			...(this.continuation && { continuation: this?.continuation }),
 			clickTracking: this?.clickTrackingParams,
 		});
 		if (!data) return;
-		this._state.related = data.related;
-		await this.#sanitizeAndUpdate("APPLY", data);
+		if (data.related) this._state.related = data.related;
+		const state = await this.#sanitizeAndUpdate("APPLY", data);
+		await getSrc(state.mix[position].videoId, state.mix[position].playlistId, undefined, true);
 	}
 	public async getMoreLikeThis({ playlistId }: { playlistId?: string }): Promise<void> {
 		const toggle = togglePlayerLoad();
@@ -187,46 +272,49 @@ export class ListService implements ISessionListService {
 		}
 	}
 
-	public async getSessionContinuation({
-		playlistSetVideoId,
-		clickTrackingParams,
-		ctoken,
-		itct,
-		key,
-		playlistId,
-		playerParams,
+	public async getSessionContinuation(
+		{
+			playlistSetVideoId,
+			clickTrackingParams,
+			ctoken,
+			itct,
+			key,
+			playlistId,
+			playerParams,
 
-		videoId,
-		loggingContext,
-	}: {
-		itct?: string;
-		videoId: string;
-		playlistId: string;
-		ctoken: string;
-		clickTrackingParams: string;
-		loggingContext?: { vssLoggingContext: { serializedContextData: string } };
-		key: number;
-		playerParams?: string;
-		playlistSetVideoId?: string;
-	}): Promise<ResponseBody> {
+			videoId,
+			loggingContext,
+		}: {
+			itct?: string;
+			videoId: string;
+			playlistId: string | undefined;
+			ctoken: string;
+			clickTrackingParams: string;
+			loggingContext?: { vssLoggingContext: { serializedContextData: string } };
+			key: number;
+			playerParams?: string;
+			playlistSetVideoId?: string;
+		},
+		autoPlay = true,
+	): Promise<ResponseBody | void> {
 		const toggle = togglePlayerLoad();
 		await tick();
 
 		try {
 			if (!clickTrackingParams && !ctoken) {
-				playlistId = !playlistId.startsWith("RDAMPL") ? "RDAMPL" + playlistId : playlistId;
+				playlistId = !playlistId?.startsWith("RDAMPL") ? "RDAMPL" + playlistId : playlistId;
 				itct = "wAEB8gECeAE%3D";
 			}
 
 			const params: Parameters<typeof fetchNext>["0"] = {
-				visitorData: this._state.visitorData,
+				...(this._state?.visitorData && { visitorData: this._state?.visitorData }),
 				params: playerParams ?? encodeURIComponent("OAHyAQIIAQ=="),
 				playlistSetVideoId: playlistSetVideoId ?? this._state.mix[key]?.playlistSetVideoId,
 				loggingContext: loggingContext?.vssLoggingContext?.serializedContextData,
 				videoId,
 				playlistId,
 				index: key ?? undefined,
-				continuation: ctoken,
+				...(ctoken && { continuation: ctoken }),
 				clickTracking: clickTrackingParams,
 			};
 			const data = await fetchNext(params);
@@ -243,13 +331,15 @@ export class ListService implements ISessionListService {
 				mix: ["append", results],
 			});
 
-			const src = await getSrc(state.mix[key].videoId);
+			if (autoPlay) {
+				const src = await getSrc(state.mix[key].videoId);
 
-			if (groupSession?.initialized && groupSession?.hasActiveSession) {
-				groupSession.updateGuestContinuation(state);
+				if (groupSession?.initialized && groupSession?.hasActiveSession) {
+					groupSession.updateGuestContinuation(state);
+				}
+
+				return src.body;
 			}
-
-			return src.body;
 		} catch (err) {
 			Logger.err(err);
 			throw err;
@@ -267,7 +357,7 @@ export class ListService implements ISessionListService {
 
 			let willRevert = false;
 			// Reset the current mix state
-			if (this._state.mix) {
+			if (this._state.mix.length) {
 				willRevert = true;
 				this.#revertState();
 			}
@@ -526,7 +616,7 @@ export class ListService implements ISessionListService {
 	}
 
 	#revertState(): ISessionListProvider {
-		this._state = {
+		this._$.set({
 			clickTrackingParams: "",
 			continuation: "",
 			currentMixId: "",
@@ -535,7 +625,7 @@ export class ListService implements ISessionListService {
 			visitorData: "",
 			position: 0,
 			related: null,
-		};
+		});
 		return this._state;
 	}
 
@@ -604,6 +694,7 @@ export class ListService implements ISessionListService {
 						for (const key in to) {
 							if (!VALID_KEYS.includes(key as any)) delete to[key];
 						}
+						Object.assign(this._state, old);
 						resolve({
 							...to,
 							mix: mix[1] ? mix[1] : old["mix"],
@@ -611,7 +702,8 @@ export class ListService implements ISessionListService {
 					}
 				}),
 		);
-		return this._$.value;
 	}
 }
-export { AudioPlayer as default };
+
+export const SessionListService = new ListService();
+export default SessionListService;

@@ -33,6 +33,7 @@
 
 	const { paused } = AudioPlayer;
 
+	$: isPlaying = !$paused;
 	let windowHeight = 0,
 		queueHeight = 0,
 		sliding = false;
@@ -319,7 +320,7 @@
 						</div>
 						<Controls
 							sizes={{ main: "2.75em", skip: "1.75em" }}
-							bind:isPaused={$paused}
+							bind:isPaused={isPlaying}
 							bind:loading={$playerLoading}
 							on:play={() => AudioPlayer.play()}
 							isQueue={true}

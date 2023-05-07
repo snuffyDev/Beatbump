@@ -31,6 +31,15 @@ export async function parseContents(
 		continuation: continuation,
 		clickTrackingParams: clickTrackingParams,
 		visitorData: visitorData ? visitorData : "",
-		results: (await Promise.all(contents.map((item) => parseItem(item as never)))).filter(Boolean) as Array<Item>,
+		results: (
+			await Promise.all(
+				contents.map((item) =>
+					parseItem(item as never)?.then((item) => {
+						if (!item.playlistId) item.playlistId = currentMix;
+						return item;
+					}),
+				),
+			)
+		).filter(Boolean) as Array<Item>,
 	};
 }

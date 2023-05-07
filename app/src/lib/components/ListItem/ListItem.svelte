@@ -117,8 +117,8 @@
 						playerParams: item?.playerParams,
 						playlistSetVideoId: APIParams.lt100 === item.playerParams ? undefined : item?.playlistSetVideoId,
 
-						ctoken: APIParams.lt100 === item.playerParams ? undefined : $list.continuation,
-						clickTrackingParams: item.clickTrackingParams,
+						ctoken: $list!.continuation,
+						clickTrackingParams: item.clickTrackingParams!,
 					})
 					.then(() => {
 						return list.updatePosition(index);
@@ -334,7 +334,11 @@
 		if (target && target.nodeName === "A") return;
 
 		Logger.dev(item);
-		const queueIndex = binarySearchIndex<typeof $list.mix>($list.mix, { index: idx }, (a, b) => a?.index - b?.index);
+		const queueIndex = binarySearchIndex<typeof $list.mix>(
+			$list.mix,
+			{ index: idx },
+			(a, b) => (a.index ?? 0) - (b.index ?? 0),
+		);
 		const position = cache.has(idx) ? cache.get(idx) : cache.set(idx, queueIndex < 0 ? idx : queueIndex);
 		console.log({ cache, idx, position, queueIndex, $listItemPageContext });
 		switch (page) {
