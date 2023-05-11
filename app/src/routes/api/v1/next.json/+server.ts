@@ -177,12 +177,7 @@ async function parseNextBodyContinuation(data: { contents?: any; responseContext
 		continuationContents: {
 			playlistPanelContinuation: {
 				contents = [],
-				continuations: [
-					{
-						nextContinuationData: { continuation = "" } = {},
-						nextRadioContinuationData: { continuation: continuation2 = "" } = {},
-					} = {},
-				] = [],
+				continuations: [{ nextRadioContinuationData: { continuation: continuation = "" } = {} } = {}] = [],
 				currentIndex = 0,
 				...rest
 			} = {},
@@ -193,7 +188,7 @@ async function parseNextBodyContinuation(data: { contents?: any; responseContext
 		?.clickTrackingParams;
 
 	const visitorData = responseContext?.visitorData;
-	const parsed = await parseContents(contents, continuation ?? continuation2, clickTrackingParams, rest, visitorData);
+	const parsed = await parseContents(contents, continuation, clickTrackingParams, rest, visitorData);
 
 	const tabs =
 		data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs ||

@@ -1,3 +1,4 @@
+import type { Subtitle } from "$lib/types";
 import type { PurpleRun } from "$lib/types/innertube/internals";
 
 const URL_REGEX = /=w\d+-h\d+-/gm;
@@ -24,24 +25,18 @@ export function thumbnailTransformer(url: string): {
 	return output;
 }
 
-export function subtitle(items: PurpleRun[]) {
-	const length = items.length;
-
-	let idx = -1;
-	while (++idx < length) {
-		const item = items[idx];
+export function subtitle(items: PurpleRun[]): Subtitle[] {
+	return items.map((item) => {
 		if (item.navigationEndpoint === undefined) {
-			items[idx] = item;
-			continue;
+			return item as unknown as Subtitle;
 		}
 
-		items[idx] = {
+		return {
 			text: item.text,
 			browseId: item.navigationEndpoint.browseEndpoint?.browseId,
 			pageType:
-				item.navigationEndpoint.browseEndpoint.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig
+				item.navigationEndpoint?.browseEndpoint?.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig
 					?.pageType,
 		};
-	}
-	return items;
+	});
 }

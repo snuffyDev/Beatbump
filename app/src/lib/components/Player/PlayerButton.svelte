@@ -9,7 +9,7 @@
 
 	$: isPaused = $paused;
 	$: console.log(isPaused);
-	function handleButtonPress(e: Event) {
+	function handleButtonPress() {
 		if (!$queue) return;
 		if (isPaused) {
 			// console.log(e)

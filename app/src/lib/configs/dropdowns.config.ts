@@ -62,6 +62,7 @@ export type Icons =
 	| "share"
 	| "shuffle"
 	| "album"
+	| "pause"
 	| "x"
 	| "send"
 	| "list"

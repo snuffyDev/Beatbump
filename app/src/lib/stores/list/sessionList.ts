@@ -9,7 +9,7 @@ import { Mutex } from "$lib/utils/sync";
 import { tick } from "svelte";
 import { groupSession } from "../sessions";
 import { filterAutoPlay, playerLoading } from "../stores";
-import type { ISessionListProvider, ISessionListService } from "./types.list";
+import type { ISessionListProvider } from "./types.list";
 import { fetchNext, filterList } from "./utils.list";
 
 const mutex = new Mutex();
@@ -42,7 +42,8 @@ const VALID_KEYS = [
 	"position",
 ] as const;
 
-export class ListService implements ISessionListService {
+export class ListService {
+	private nextTrackUrl: string | null = null;
 	_$: WritableStore<ISessionListProvider> = new WritableStore<ISessionListProvider>({
 		clickTrackingParams: "",
 		continuation: "",
@@ -75,8 +76,8 @@ export class ListService implements ISessionListService {
 		return this._$.subscribe;
 	}
 
-	public get clickTrackingParams(): string {
-		return this._state.clickTrackingParams;
+	public get clickTrackingParams(): string | null {
+		return this._$.value.clickTrackingParams;
 	}
 
 	public get $() {
@@ -84,19 +85,19 @@ export class ListService implements ISessionListService {
 	}
 
 	public get continuation() {
-		return this._state.continuation;
+		return this._$.value.continuation;
 	}
 
 	public get currentMixId(): string {
-		return this._state.currentMixId;
+		return this._$.value.currentMixId;
 	}
 
 	public get mix() {
-		return this._state.mix.slice();
+		return this._$.value.mix.slice();
 	}
 
 	public get position() {
-		return this._state.position;
+		return this._$.value.position;
 	}
 
 	public get set() {
@@ -115,17 +116,17 @@ export class ListService implements ISessionListService {
 		return this._$.value.mix[position];
 	}
 
-	public async next(nextSrc?: string | undefined = undefined) {
-		const currentPosition = this._state.position;
-		const nextTrack = this._state.mix[this._state.position + 1];
+	public async next(nextSrc: string | undefined = undefined) {
+		const currentPosition = this._$.value.position;
+		const nextTrack = this._$.value.mix[this._$.value.position + 1];
 
 		if (!nextTrack) {
-			const currentTrack = this._$.value.mix[this._state.position];
+			const currentTrack = this._$.value.mix[this._$.value.position];
 
 			await this.getSessionContinuation(
 				{
 					videoId: currentTrack?.videoId,
-					key: this._state.position,
+					key: this._$.value.position,
 					playlistId: currentTrack?.playlistId!,
 					loggingContext: currentTrack?.loggingContext,
 					playerParams: currentTrack?.playerParams,
@@ -143,17 +144,21 @@ export class ListService implements ISessionListService {
 
 			return;
 		} else {
-			if (nextSrc) {
+			if (nextSrc || this.nextTrackUrl) {
 				await this.updatePosition("next");
-				updatePlayerSrc({ original_url: nextSrc, url: nextSrc });
+				updatePlayerSrc({
+					original_url: nextSrc ? nextSrc : (this.nextTrackUrl as string),
+					url: nextSrc ? (nextSrc as string) : (this.nextTrackUrl as string),
+				});
+				this.nextTrackUrl = null;
 			} else {
 				let position = await this.updatePosition("next");
-				if (position >= this._state.mix.length) {
-					position = this._state.position;
+				if (position >= this._$.value.mix.length) {
+					position = this._$.value.position;
 				}
 				const currentTrack = this.#currentTrack(position);
 				const data = await fetchNext({
-					...(this._state?.visitorData && { visitorData: this._state.visitorData }),
+					...(this._$.value?.visitorData && { visitorData: this._$.value.visitorData }),
 					params: "gAQBiAQB",
 					playlistSetVideoId: currentTrack?.playlistSetVideoId,
 					index: position,
@@ -174,16 +179,15 @@ export class ListService implements ISessionListService {
 			}
 		}
 	}
-	public async prefetchNextTrack() {
-		const nextTrack = this._state.mix[this._state.position + 1];
+	public async prefetchTrackAtIndex(index: number) {
+		const nextTrack = this._$.value.mix[index];
 		if (!nextTrack) {
-			const currentTrack = this._$.value.mix[this._state.position];
-			const currentIndex = this._state.position;
-			console.log({ nextTrack, currentTrack, state: this._state, this: this });
+			const currentTrack = this._$.value.mix[this._$.value.position];
+			const currentIndex = this._$.value.position;
 			await this.getSessionContinuation(
 				{
 					videoId: currentTrack?.videoId,
-					key: this._state.position,
+					key: this._$.value.position,
 					playlistId: currentTrack?.playlistId,
 					loggingContext: currentTrack?.loggingContext,
 					playerParams: currentTrack?.playerParams,
@@ -194,27 +198,71 @@ export class ListService implements ISessionListService {
 					clickTrackingParams: this.clickTrackingParams!,
 				},
 				false,
-			).then(() => {
-				this.updatePosition(currentIndex + 1);
-			});
+			)
+				.then(() => {
+					this.updatePosition(currentIndex + 1);
+				})
+				.then(() => {
+					if (groupSession.hasActiveSession) {
+						groupSession.updateGuestContinuation(this._$.value);
+					}
+				});
 			return;
 		}
 		const response = await getSrc(nextTrack.videoId, nextTrack.playlistId, undefined, false);
-		if (response.body) {
+		if (response && response.body) {
+			this.nextTrackUrl = response.body.url as string;
+			AudioPlayer.setNextTrackPrefetchedUrl(response.body.url);
+		}
+	}
+	public async prefetchNextTrack() {
+		const nextTrack = this._$.value.mix[this._$.value.position + 1];
+		if (!nextTrack) {
+			const currentTrack = this._$.value.mix[this._$.value.position];
+			const currentIndex = this._$.value.position;
+			console.log({ nextTrack, currentTrack, state: this._state, this: this });
+			await this.getSessionContinuation(
+				{
+					videoId: currentTrack?.videoId,
+					key: this._$.value.position,
+					playlistId: currentTrack?.playlistId,
+					loggingContext: currentTrack?.loggingContext,
+					playerParams: currentTrack?.playerParams,
+					playlistSetVideoId:
+						APIParams.lt100 === currentTrack?.playerParams ? undefined : currentTrack?.playlistSetVideoId,
+
+					ctoken: this.continuation,
+					clickTrackingParams: this.clickTrackingParams!,
+				},
+				false,
+			)
+				.then(() => {
+					this.updatePosition(currentIndex + 1);
+				})
+				.then(() => {
+					if (groupSession.hasActiveSession) {
+						groupSession.updateGuestContinuation(this._$.value);
+					}
+				});
+			return;
+		}
+		const response = await getSrc(nextTrack.videoId, nextTrack.playlistId, undefined, false);
+		if (response && response.body) {
+			this.nextTrackUrl = response.body.url as string;
 			AudioPlayer.setNextTrackPrefetchedUrl(response.body.url);
 		}
 	}
 	public async previous(broadcast = false) {
-		const currentPosition = this._state.position;
+		const currentPosition = this._$.value.position;
 		let position = await this.updatePosition("next");
-		if (position >= this._state.mix.length) {
-			position = this._state.position;
+		if (position >= this._$.value.mix.length) {
+			position = this._$.value.position;
 		}
 		const data = await fetchNext({
-			...(this._state?.visitorData && { visitorData: this._state?.visitorData }),
+			...(this._$.value?.visitorData && { visitorData: this._$.value?.visitorData }),
 			params: "OAHyAQIIAQ==",
-			playlistSetVideoId: this._state.mix[this.position]?.playlistSetVideoId,
-			index: this._state.position,
+			playlistSetVideoId: this._$.value.mix[this.position]?.playlistSetVideoId,
+			index: this._$.value.position,
 			loggingContext: this.#currentTrack(this.position)?.loggingContext?.vssLoggingContext?.serializedContextData,
 			videoId: this.#currentTrack(this.position)?.videoId,
 			playlistId: this.currentMixId,
@@ -222,7 +270,7 @@ export class ListService implements ISessionListService {
 			clickTracking: this?.clickTrackingParams,
 		});
 		if (!data) return;
-		if (data.related) this._state.related = data.related;
+		if (data.related) this._$.value.related = data.related;
 		const state = await this.#sanitizeAndUpdate("APPLY", data);
 		await getSrc(state.mix[position].videoId, state.mix[position].playlistId, undefined, true);
 	}
@@ -238,14 +286,14 @@ export class ListService implements ISessionListService {
 						? playlistId.startsWith("RDAMPL")
 							? playlistId
 							: "RDAMPL" + playlistId
-						: this._state.currentMixId,
+						: this._$.value.currentMixId,
 			});
 
 			if (!response || !response.results.length) {
 				throw new Error("Invalid response returned by `next` endpoint");
 			}
 
-			if (this._state.mix.length) {
+			if (this._$.value.mix.length) {
 				response.results.shift();
 			}
 
@@ -259,8 +307,8 @@ export class ListService implements ISessionListService {
 			}
 
 			await getSrc(
-				this._state.mix[this._state.position + 1].videoId,
-				this._state.mix[this._state.position].playlistId,
+				this._$.value.mix[this._$.value.position + 1].videoId,
+				this._$.value.mix[this._$.value.position].playlistId,
 				null,
 				false,
 			);
@@ -300,6 +348,14 @@ export class ListService implements ISessionListService {
 		const toggle = togglePlayerLoad();
 		await tick();
 
+		if (key < this._$.value.mix.length - 1) {
+			const nextIndex = await this.updatePosition(key);
+			const nextTrack = this._$.value.mix[nextIndex];
+			await getSrc(nextTrack?.videoId, nextTrack?.playlistId, undefined, true);
+			toggle();
+			return;
+		}
+
 		try {
 			if (!clickTrackingParams && !ctoken) {
 				playlistId = !playlistId?.startsWith("RDAMPL") ? "RDAMPL" + playlistId : playlistId;
@@ -307,9 +363,9 @@ export class ListService implements ISessionListService {
 			}
 
 			const params: Parameters<typeof fetchNext>["0"] = {
-				...(this._state?.visitorData && { visitorData: this._state?.visitorData }),
+				...(this._$.value?.visitorData && { visitorData: this._$.value?.visitorData }),
 				params: playerParams ?? encodeURIComponent("OAHyAQIIAQ=="),
-				playlistSetVideoId: playlistSetVideoId ?? this._state.mix[key]?.playlistSetVideoId,
+				playlistSetVideoId: playlistSetVideoId ?? this._$.value.mix[key]?.playlistSetVideoId,
 				loggingContext: loggingContext?.vssLoggingContext?.serializedContextData,
 				videoId,
 				playlistId,
@@ -357,12 +413,12 @@ export class ListService implements ISessionListService {
 
 			let willRevert = false;
 			// Reset the current mix state
-			if (this._state.mix.length) {
+			if (this._$.value.mix.length) {
 				willRevert = true;
 				this.#revertState();
 			}
 
-			this._state.currentMixType = "auto";
+			this._$.value.currentMixType = "auto";
 
 			const data = await fetchNext({
 				params: config?.playerParams ? config?.playerParams : undefined,
@@ -421,7 +477,7 @@ export class ListService implements ISessionListService {
 			await tick();
 			console.log("this.initPlaylistSession");
 
-			if (this._state.currentMixId !== playlistId) {
+			if (this._$.value.currentMixId !== playlistId) {
 				this.#revertState();
 			}
 			console.time("playlistInit");
@@ -475,7 +531,7 @@ export class ListService implements ISessionListService {
 	}
 
 	public removeTrack(index: number) {
-		this._state.mix.splice(index, 1);
+		this._$.value.mix.splice(index, 1);
 		this._$.update((u) => ({
 			...u,
 			mix: [...u.mix.slice(0, index), ...u.mix.slice(index + 1)],
@@ -507,16 +563,16 @@ export class ListService implements ISessionListService {
 		}
 		try {
 			const itemToAdd = await addToQueue(item);
-			const oldLength = this._state.mix.length;
+			const oldLength = this._$.value.mix.length;
 
-			splice(this._state.mix, key + 1, 0, ...itemToAdd);
+			splice(this._$.value.mix, key + 1, 0, ...itemToAdd);
 
 			await this.#sanitizeAndUpdate("APPLY", {
-				mix: ["set", this._state.mix] satisfies MixListAppendOp,
+				mix: ["set", this._$.value.mix] satisfies MixListAppendOp,
 			});
 
 			if (!oldLength) {
-				await getSrc(this._state.mix[0].videoId, this._state.mix[0].playlistId, null, true);
+				await getSrc(this._$.value.mix[0].videoId, this._$.value.mix[0].playlistId, null, true);
 			}
 		} catch (err) {
 			console.error(err);
@@ -527,22 +583,22 @@ export class ListService implements ISessionListService {
 	public shuffle(index: number, preserveBeforeActive = true) {
 		if (typeof index !== "number") return;
 		if (!preserveBeforeActive) {
-			this._state.mix = seededShuffle(
-				this._state.mix.slice(),
+			this._$.value.mix = seededShuffle(
+				this._$.value.mix.slice(),
 				crypto.getRandomValues(new Uint8Array(8)).reduce((prev, cur) => (prev += cur), 0),
 			);
 		} else {
-			this._state.mix = [
-				...this._state.mix.slice().slice(0, index),
-				this._state.mix[index],
+			this._$.value.mix = [
+				...this._$.value.mix.slice().slice(0, index),
+				this._$.value.mix[index],
 				...seededShuffle(
-					this._state.mix.slice().slice(index + 1),
+					this._$.value.mix.slice().slice(index + 1),
 					crypto.getRandomValues(new Uint8Array(8)).reduce((prev, cur) => (prev += cur), 0),
 				),
 			];
 		}
 		// console.log(mix)
-		this.#sanitizeAndUpdate("APPLY", { mix: this._state.mix }).then((state) => {
+		this.#sanitizeAndUpdate("APPLY", { mix: this._$.value.mix }).then((state) => {
 			if (groupSession?.initialized && groupSession?.hasActiveSession) {
 				groupSession.updateGuestTrackQueue(state);
 			}
@@ -575,12 +631,12 @@ export class ListService implements ISessionListService {
 			type?: string;
 		} & Song)[],
 	): void {
-		this._state.mix = seededShuffle(
+		this._$.value.mix = seededShuffle(
 			items,
 			crypto.getRandomValues(new Uint8Array(8)).reduce((prev, cur) => (prev += cur), 0),
 		);
 
-		this.#sanitizeAndUpdate("SET", { mix: this._state.mix }).then((state) => {
+		this.#sanitizeAndUpdate("SET", { mix: this._$.value.mix }).then((state) => {
 			if (groupSession?.initialized && groupSession?.hasActiveSession) {
 				groupSession.updateGuestTrackQueue(state);
 			}
@@ -593,26 +649,29 @@ export class ListService implements ISessionListService {
 
 	/** Update the track position based on a keyword or number */
 	public async updatePosition(direction: "next" | "back" | number): Promise<number> {
+		const startIdx = this.position;
 		if (typeof direction === "number") {
 			const state = await this.#sanitizeAndUpdate("APPLY", {
 				position: direction,
 			});
+
 			return state.position;
 		}
 		if (direction === "next") {
 			const state = await this.#sanitizeAndUpdate("APPLY", {
-				position: this._state.position + 1,
+				position: this._$.value.position + 1,
 			});
+
 			return state.position;
 		}
 		if (direction === "back") {
 			const state = await this.#sanitizeAndUpdate("APPLY", {
-				position: this._state.position - 1,
+				position: this._$.value.position - 1,
 			});
 			return state.position;
 		}
 
-		return this._state.position;
+		return this._$.value.position;
 	}
 
 	#revertState(): ISessionListProvider {

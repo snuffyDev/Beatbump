@@ -126,7 +126,7 @@
 					})
 					.catch(() => {
 						return list.initPlaylistSession({
-							playlistId: item.playlistId,
+							playlistId: item.playlistId ?? "",
 							visitorData,
 							clickTrackingParams: item?.clickTrackingParams,
 							index: index,

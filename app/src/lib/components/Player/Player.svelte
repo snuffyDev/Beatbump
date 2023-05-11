@@ -90,7 +90,7 @@
 
 	const { paused } = AudioPlayer;
 	let volume = 0.5;
-	let volumeHover;
+	let volumeHover = false;
 
 	$: isPlaying = $paused;
 
@@ -114,7 +114,7 @@
 			AudioPlayer.previous();
 		},
 		Period: () => {
-			SessionListService.next(true);
+			SessionListService.next();
 		},
 		Space: () => {
 			if (!AudioPlayer && !AudioPlayer.src) return;
@@ -127,6 +127,7 @@
 	};
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
 	class="player"
 	on:click={(e) => {
@@ -186,10 +187,10 @@
 				pause={() => AudioPlayer.pause()}
 				nextBtn={() => {
 					if ($queue.length === 0) return;
-					SessionListService.next(true, groupSession.hasActiveSession ? true : false);
+					SessionListService.next();
 					// AudioPlayer.updateTime($durationStore);
 				}}
-				prevBtn={() => AudioPlayer.previous(true)}
+				prevBtn={() => SessionListService.previous()}
 			/>
 			<ProgressBar />
 		{/if}
@@ -208,6 +209,7 @@
 				use:clickOutside
 				on:click_outside={() => (volumeHover = false)}
 			>
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<div
 					color="white"
 					class="volume-icon player-btn"
@@ -246,6 +248,7 @@
 					</div>
 				{/if}
 			</div>
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div
 				on:click|capture|stopPropagation={() => {
 					if (!$queue) return;

@@ -5,10 +5,10 @@ import type { UserSettings } from "$stores/settings";
 import { tweened } from "svelte/motion";
 import { writable } from "svelte/store";
 import { sort, type PlayerFormats } from "./parsers/player";
-import { settings, type ISessionListProvider } from "./stores";
+import { settings } from "./stores";
 import { groupSession, type ConnectionState } from "./stores/sessions";
 import type { JSON } from "./types";
-import { notify, type Maybe, type ResponseBody } from "./utils";
+import { WritableStore, notify, type ResponseBody } from "./utils";
 import { isAppleMobileDevice } from "./utils/browserDetection";
 
 let userSettings: UserSettings | undefined = undefined;
@@ -35,13 +35,13 @@ interface AudioPlayerEvents {
 const setPosition = () => {
 	if ("mediaSession" in navigator) {
 		navigator.mediaSession.setPositionState({
-			duration: AudioPlayer.isWebkit ? AudioPlayer.duration / 2 : AudioPlayer.duration,
+			duration: isAppleMobileDevice ? AudioPlayer.duration / 2 : AudioPlayer.duration,
 			position: AudioPlayer.currentTime,
 		});
 	}
 };
 
-function metaDataHandler(sessionList: Maybe<ISessionListProvider>) {
+function metaDataHandler() {
 	if ("mediaSession" in navigator) {
 		const position = SessionListService.position;
 		const currentTrack = SessionListService.mix[position];
@@ -65,7 +65,7 @@ function metaDataHandler(sessionList: Maybe<ISessionListProvider>) {
 		navigator.mediaSession.setActionHandler("pause", () => AudioPlayer.pause());
 		navigator.mediaSession.setActionHandler("seekto", (session) => {
 			if (session.fastSeek && "fastSeek" in AudioPlayer) {
-                session.seekTime &&		AudioPlayer.fastSeek(session.seekTime);
+				session.seekTime && AudioPlayer.fastSeek(session.seekTime);
 				setPosition();
 				return;
 			}
@@ -116,14 +116,14 @@ function createFallbackUrl(currentUrl: string) {
 
 type EventCallbackFn<T> = (data: T) => void;
 
-class EventEmitter<Events extends Record<string, any>> {
-	private listeners: Map<keyof Events, EventCallbackFn<Events[keyof Events] & string>[]> = new Map();
+class EventEmitter<Events> {
+	private listeners: Map<keyof Events, EventCallbackFn<Events[keyof Events]>[]> = new Map();
 
 	constructor() {
 		//
 	}
 
-	dispatch<Key extends keyof Events = keyof Events & string>(name: Key, data: Events[Key]) {
+	dispatch<Key extends keyof Events = keyof Events>(name: Key, data: Events[Key]) {
 		const listeners = this.listeners.get(name) ?? [];
 
 		for (const cb of listeners) {
@@ -131,9 +131,9 @@ class EventEmitter<Events extends Record<string, any>> {
 		}
 	}
 
-	off<Key extends keyof Events = keyof Events & string>(name: Key, callback: EventCallbackFn<Events[Key]>) {
+	off<Key extends keyof Events = keyof Events>(name: Key, callback: EventCallbackFn<Events[Key]>) {
 		const listeners = this.listeners.get(name) ?? [];
-		const index = listeners.indexOf(callback);
+		const index = listeners.indexOf(callback as never);
 
 		if (index > 0) {
 			listeners.splice(index, 1);
@@ -143,17 +143,20 @@ class EventEmitter<Events extends Record<string, any>> {
 
 	on<Key extends keyof Events = keyof Events & string>(name: Key, callback: EventCallbackFn<Events[Key]>) {
 		const listeners = this.listeners.get(name) ?? [];
-		listeners.push(callback);
+		listeners.push(callback as never);
 		this.listeners.set(name, listeners);
 	}
 }
 
 const getPlayerVolumeFromLS = (player: HTMLAudioElement) => {
 	const storedLevel = localStorage.getItem("volume");
-	const setDefaultVolume = () => localStorage.setItem("volume", "0.5");
+	const setDefaultVolume = () => {
+		localStorage.setItem("volume", "0.5");
+		player.volume = 0.5;
+	};
 	if (storedLevel !== null) {
 		try {
-			player.volume = parseInt(storedLevel);
+			player.volume = +storedLevel;
 		} catch {
 			setDefaultVolume();
 		}
@@ -161,23 +164,12 @@ const getPlayerVolumeFromLS = (player: HTMLAudioElement) => {
 		setDefaultVolume();
 	}
 };
-const lockedResource = <T, A, O = unknown>(fn: (resolve: (value: T | PromiseLike<T>) => void, ...args: A[]) => O) => {
-	let isLocked = false;
-	return (...args: A[]) => {
-		if (isLocked) return;
-		return new Promise<T>((resolve) => {
-			Promise.resolve(fn(resolve, ...args));
-		}).finally(() => {
-			isLocked = false;
-		});
-	};
-};
 class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
-	private _currentTimeStore = writable<number>(0);
-	private _durationStore = writable<number>(0);
+	private _currentTimeStore = new WritableStore<number>(0);
+	private _durationStore = new WritableStore<number>(0);
 	private _paused = writable(true);
 	private _progress = tweened<number>(0);
-	private _taskQueue: [name: keyof AudioPlayerImpl, args: [...rest: any[]]][] = [];
+	private _taskQueue: [name: keyof AudioPlayerImpl, args: [...rest: unknown[]]][] = [];
 	private audioNodeListeners: Record<string, () => void> = {};
 	private invalidationTimer: ReturnType<typeof setTimeout> | null = null;
 	private nextSrc: { stale: boolean; url: string | undefined } = { stale: false, url: "" };
@@ -189,37 +181,43 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 		const onUserInteractionCallback = () => {
 			if (!this.player) {
 				this.createAudioNode();
+				window["_player"] = this.player;
 			}
 		};
 
 		document.addEventListener("click", onUserInteractionCallback, { capture: true, once: true });
-		const unsubscriber = this.currentTimeStore.subscribe((currentTime) => {
-			if (!this.player) return;
-			const remainingTime = this.player.duration - this.player.currentTime;
-			const halfwayTime = this.player.duration / 2;
-
-			const timeoutDuration = Math.max(halfwayTime - remainingTime / 2, 0);
-
-			console.log({ timeoutDuration });
-			console.log({ remainingTime, halfwayTime });
-		});
 	}
 
 	public get currentTimeStore() {
 		return this._currentTimeStore;
 	}
+	public get currentTime() {
+		return this._currentTimeStore.value;
+	}
 
-    public get fastSeek() {
-        return this.player ? 'fastSeek' in this.player ? this.player.fastSeek : (number: number)=>{
-            //
-        } : (number: number) => {//
-        }
-    }
+	public get fastSeek() {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		return this.player
+			? "fastSeek" in this.player
+				? this.player.fastSeek
+				: // eslint-disable-next-line @typescript-eslint/no-unused-vars
+				  (_number: number) => {
+						//
+						// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				  }
+			: // eslint-disable-next-line @typescript-eslint/no-unused-vars
+			  (_number: number) => {
+					//
+			  };
+	}
 
 	public get durationStore() {
 		return this._durationStore;
 	}
 
+	public get duration() {
+		return this._durationStore.value;
+	}
 	public get paused() {
 		return this._paused;
 	}
@@ -266,6 +264,18 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 			this.addTaskToTaskQueue("play");
 			return;
 		}
+		if (groupSession.initialized === true && groupSession.hasActiveSession === true) {
+			updateGroupState({
+				client: groupSession.client.clientId,
+				state: {
+					finished: this.player.ended,
+					paused: false,
+					playing: true,
+					pos: SessionListService.position,
+					stalled: !!this.player.error,
+				} as ConnectionState,
+			});
+		}
 		const promise = this.player.play();
 		if (promise) {
 			promise
@@ -277,6 +287,7 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 	}
 
 	public seek(to: number) {
+		if (to < this.durationStore.value / 2) this.setStaleTimeout();
 		this.player.currentTime = to;
 	}
 
@@ -285,45 +296,75 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 		this.nextSrc.stale = false;
 	}
 
-	public updateSrc({ original_url, url }: { original_url: string; url: string }) {
-		this.player.src = original_url;
+	public updateSrc({ url }: { url: string }) {
+		this.player.src = url;
 	}
 
-	private addTaskToTaskQueue(name: keyof AudioPlayerImpl, ...args: any[]) {
+	private addTaskToTaskQueue(name: keyof AudioPlayerImpl, ...args: unknown[]) {
 		this._taskQueue.push([name, args]);
+	}
+	private errorCount = 0;
+	private handleError() {
+		if (++this.errorCount > 2) {
+			this.errorCount = 0;
+			this.updateSrc({
+				url: createFallbackUrl(this.player.src),
+			});
+		}
 	}
 
 	private createAudioNode() {
+		let locked = false;
 		this.player = new Audio();
 		this.player.autoplay = true;
 		getPlayerVolumeFromLS(this.player);
 		const prefetchLock = (() => {
 			let initial = this.player.src;
 			let tick = 0;
-			let promise: Promise<any> | undefined = Promise.resolve();
-			return (duration: number) => {
-				return !tick
-					? (promise = new Promise<void>((resolve) => {
-							if (!tick && this.nextSrc.stale && this.player.currentTime >= duration / 2) {
-								initial = this.player.src;
-								tick += 1;
-								if (this.nextSrc.stale)
-									SessionListService.prefetchNextTrack().finally(() => {
-										this.setStaleTimeout();
-									});
-							} else if (tick && this.player.src === initial) return false;
-							else if (tick && this.player.src !== initial) {
-								tick = 0;
-								promise = undefined;
-								this.nextSrc.url = undefined;
+			let promise: Promise<unknown> | undefined = Promise.resolve();
+			const setPromiseAndReturn = (duration: number) => {
+				promise = new Promise<void>((resolve) => {
+					if (!tick && this.nextSrc.stale && this.player.currentTime >= duration / 2) {
+						initial = this.player.src;
+						tick += 1;
+						if (this.nextSrc.stale)
+							SessionListService.prefetchNextTrack().finally(() => {
+								this.setStaleTimeout();
+							});
+					} else if (tick && this.player.src === initial) return false;
+					else if (tick && this.player.src !== initial) {
+						tick = 0;
+						promise = undefined;
+						this.nextSrc.url = undefined;
 
-								return resolve(undefined as never);
-							}
-					  }))
-					: promise;
+						return resolve(undefined as never);
+					}
+				});
+				return promise;
+			};
+			return (duration: number) => {
+				return !tick ? setPromiseAndReturn(duration) : promise;
 			};
 		})();
-		let locked = false;
+
+		// Dispatched on first autoplay
+		this.on("play", () => {
+			this.play();
+		});
+
+		this.onEvent("loadedmetadata", () => {
+			this._paused.set(false);
+			groupSession.resetAllCanPlay();
+
+			this.setStaleTimeout();
+			metaDataHandler();
+		});
+
+		this.onEvent("play", () => {
+			this._paused.set(false);
+			this.play();
+		});
+
 		this.onEvent("timeupdate", async () => {
 			this._currentTimeStore.set(this.player.currentTime);
 
@@ -332,31 +373,48 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 
 			// We're at the end - get the next track!
 			if (this.player.currentTime >= duration - 0.1 && !locked) {
-				if (!locked) locked = true;
-				return await SessionListService.next(this.nextSrc.url).finally(() => {
-					locked = false;
-					this.nextSrc.url = undefined;
-				});
+				try {
+					if (!locked) locked = true;
+					if (groupSession.initialized) {
+						await Promise.resolve(
+							updateGroupState({
+								client: groupSession.client.clientId,
+								state: {
+									finished: true,
+									paused: true,
+									playing: false,
+									pos: SessionListService.position,
+									stalled: !!this.player.error,
+								} as ConnectionState,
+							}),
+						);
+					}
+
+					if (groupSession.hasActiveSession && !groupSession.allCanPlay)
+						return await groupSession.waitUntilPlayable(() => SessionListService.next(this.nextSrc?.url));
+					return await SessionListService.next(this.nextSrc.url).finally(() => {
+						locked = false; // Unlock this 'if' block when finished
+						this.nextSrc.url = undefined; // Set to undefined since e 'used' the value
+					});
+				} finally {
+				}
 			} else if (this.nextSrc.stale && this.player.currentTime >= duration / 2) {
 				return await prefetchLock(duration);
 			}
 		});
-		this.on("play", () => {
-			console.log(this);
-			this.play();
-		});
-		this.onEvent("loadedmetadata", () => {
-			this._paused.set(false);
-			this.setStaleTimeout();
-		});
-		console.log(this);
-		this.onEvent("play", () => {
-			this._paused.set(false);
-			this.play();
+
+		this.onEvent("error", () => {
+			if (this.player?.error?.message.includes("Empty src") || !this.player?.error?.message) return;
+
+			console.error(this.player.error);
+			this.handleError();
 		});
 
+		// If there's any actions (eg: set volume) that take place before
+		// we're setup, they'll be put in the taskQueue - process them here
 		if (this._taskQueue.length) {
 			while (this._taskQueue.length) {
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				const [name, args] = this._taskQueue.shift()!;
 				const method = this[name];
 				//@ts-expect-error It's fine
@@ -364,7 +422,6 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 			}
 		}
 	}
-
 	private onEvent(name: keyof HTMLMediaElementEventMap, callback: () => void) {
 		if (!this.player) this.createAudioNode();
 		this.audioNodeListeners[name] = callback;
@@ -387,8 +444,8 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 export const AudioPlayer = new AudioPlayerImpl();
 
 /** Updates the current track for the audio player */
-export function updatePlayerSrc({ original_url, url }: SrcDict): void {
-	AudioPlayer.updateSrc({ original_url, url });
+export function updatePlayerSrc({ url }: SrcDict): void {
+	AudioPlayer.updateSrc({ url });
 }
 
 // Get source URLs

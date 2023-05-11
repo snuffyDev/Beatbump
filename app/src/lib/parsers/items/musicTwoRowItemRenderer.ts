@@ -35,11 +35,10 @@ export const MusicTwoRowItemRenderer = async (ctx: {
 						musicTwoRowItemRenderer.navigationEndpoint?.browseEndpoint?.browseEndpointContextSupportedConfigs
 							?.browseEndpointContextMusicConfig?.pageType || undefined,
 			  }
-			: undefined,
-
-		subtitle:
-			Array.isArray(musicTwoRowItemRenderer.subtitle?.runs as Array<SubtitleRun>) &&
-			subtitle(musicTwoRowItemRenderer.subtitle.runs),
+			: null,
+		subtitle: Array.isArray(musicTwoRowItemRenderer.subtitle?.runs as Array<SubtitleRun>)
+			? subtitle(musicTwoRowItemRenderer.subtitle.runs)
+			: [],
 	};
 
 	return Item;

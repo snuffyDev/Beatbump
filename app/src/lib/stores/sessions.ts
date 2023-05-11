@@ -8,7 +8,7 @@ import type Peer from "peerjs";
 import type { DataConnection } from "peerjs";
 import SessionListService, { type ISessionListProvider } from "./list";
 
-import { getSrc, AudioPlayer } from "$lib/player";
+import { AudioPlayer, getSrc } from "$lib/player";
 import { EventEmitter, Mutex } from "$lib/utils/sync";
 import { notify } from "$lib/utils/utils";
 import { get } from "svelte/store";
@@ -90,7 +90,7 @@ interface GroupSessionController {
 	/** Process data received from connected clients */
 	process(data: string): unknown;
 	/** Send a command to connected clients */
-	send(command: Command, type: Kind, data: JSON, metadata?: Client): void;
+	send(command: Command, type: Kind, data: Record<string, unknown>, metadata?: Client): void;
 	/** Send client state to other clients in session */
 	sendGroupState(clientState: { client: string; state: ConnectionState }): void;
 
@@ -117,7 +117,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 	private _connection: DataConnection;
 	private _connectionStates: WritableStore<ConnectionStates> = new WritableStore({});
 	private _connections: DataConnection[] = [];
-	private _hasActiveSession = false;
+	private _hasActiveSession: WritableStore<boolean> = new WritableStore<boolean>(false);
 	private _history: WritableStore<Message[]> = new WritableStore([]);
 	private _initialized = false;
 	private _once = false;
@@ -128,8 +128,11 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 	private _type: "host" | "guest";
 	private _unsubscriber: () => void;
 	private _lock: Mutex;
+	private _resolver: { resolve: () => void; cb: () => void }[] = [];
 	// #endregion Properties (15)
-
+	public get hasActiveSessionState() {
+		return this._hasActiveSession;
+	}
 	// #region Constructors (1)
 
 	constructor() {
@@ -155,11 +158,13 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 				entries.length !== 0 &&
 				every(entries, (item) => item?.finished === true) === true
 			) {
+				const { cb, resolve } = this._resolver.shift()!;
+
 				this._once = true;
 				this._allCanPlay = true;
 
-				await SessionListService.next(true, false);
-
+				cb();
+				resolve();
 				setTimeout(() => (this._once = false), 25);
 			}
 		});
@@ -182,7 +187,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 	}
 
 	public get hasActiveSession(): boolean {
-		return this._hasActiveSession;
+		return this._hasActiveSession.value;
 	}
 
 	public get history(): WritableStore<Message[]> {
@@ -218,7 +223,10 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 			});
 		});
 	}
-
+	public resetAllCanPlay() {
+		this._once = false;
+		this._allCanPlay = false;
+	}
 	public allCanPlay(): [boolean, () => void] {
 		return [
 			this._allCanPlay,
@@ -228,7 +236,11 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 			},
 		];
 	}
-
+	public waitUntilPlayable = (cb: () => void) => {
+		return new Promise<void>((resolve) => {
+			this._resolver.push({ cb, resolve });
+		});
+	};
 	public connect(id: string): void {
 		if (!this._rtc) return;
 		if (this._peerIds.has(id)) {
@@ -236,7 +248,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 		}
 
 		// Connect to the session host, store this connection
-		if (!this._hasActiveSession) this._hasActiveSession = true;
+		if (!this._hasActiveSession.value) this._hasActiveSession.set(true);
 
 		const connection = this._rtc.connect(id, {
 			metadata: {
@@ -277,7 +289,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 
 		this._rtc.destroy();
 		this._unsubscriber();
-		this._hasActiveSession = false;
+		this._hasActiveSession.set(false);
 		this._initialized = false;
 		this._connectionStates.set(null);
 	}
@@ -301,7 +313,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 		};
 		this._rtc = new this._peerJs(clientId, { debug: 3 });
 
-		if (!this._hasActiveSession) this._hasActiveSession = true;
+		if (!this._hasActiveSession.value) this._hasActiveSession.set(true);
 		this._connectionStates.update((u) => ({
 			...u,
 			[this._client.clientId]: {
@@ -324,11 +336,12 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 	public process(rawData: string): Promise<Message> {
 		if (typeof rawData !== "string") return;
 		const { command, data, metadata, type } = JSON.parse(rawData) as Message;
-
+		console.log({ command, data, metadata, type });
+		console.log(this);
 		if (metadata.clientId === this.client.clientId) return;
 
 		// Logger.debug([`Processing Message`, command, data, metadata, type]);
-		return this._lock.do(() => {
+		return this._lock.do(async () => {
 			/** Get a user-defined track  */
 			if (command === "GET" && type === "action.mix.init") {
 				SessionListService.initAutoMixSession({ videoId: data as string });
@@ -369,8 +382,8 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 							resolve(SessionListService.lockedSet(list));
 						});
 					}).then((list) => {
-						SessionListService.updatePosition(list.position - 1);
-						SessionListService.next(true, false);
+						SessionListService.updatePosition(list.position);
+						getSrc(list.mix[list.position]?.videoId, list.mix[list.position]?.playlistId, undefined, true);
 					});
 				}
 				/** Any other mix updates */
@@ -393,14 +406,17 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 						dir: "<-" | "->" | undefined;
 						position: number;
 					};
-					SessionListService.updatePosition(position === 0 ? 0 : position);
+					console.log();
+					await SessionListService.prefetchTrackAtIndex(position);
+					await SessionListService.updatePosition(position === 0 ? 0 : position - 1);
+
 					if (typeof dir === "undefined") {
-						AudioPlayer.skip();
+						SessionListService.next();
 					}
 					if (dir === "<-") {
-						AudioPlayer.previous(false);
+						SessionListService.previous();
 					} else if (dir === "->") {
-						SessionListService.next(true, false);
+						SessionListService.next();
 					}
 				}
 				/** Updates the playback state for the connected client */
@@ -415,7 +431,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 		});
 	}
 
-	public send(command: Command, type: Kind, data: JSON, metadata?: Client): void {
+	public send(command: Command, type: Kind, data: Record<string, unknown>, metadata?: Client): void {
 		if (!this._initialized) return;
 
 		iter(this._connections, (conn) => {

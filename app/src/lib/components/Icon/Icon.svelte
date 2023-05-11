@@ -19,6 +19,7 @@
 	{fill}
 	stroke-width={fill !== "none" ? 0 : 2}
 	stroke-linecap="round"
+	stroke={color}
 	stroke-linejoin="round"
 	style="width: {size}; height:{size}; {style}; transition: stroke linear 50ms;"
 	viewBox="0 0 24 24"><use href="{icons}#{name}" /></svg

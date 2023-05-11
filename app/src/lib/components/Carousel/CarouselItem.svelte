@@ -58,6 +58,32 @@
 			list.setTrackWillPlayNext(item, list.position);
 			notify(`${item.title} will play next!`, "success");
 		},
+		startGroupSession: () => showGroupSessionCreator.set(true),
+		shareGroupSession: async (ctx: BuildMenuParams) => {
+			if (!browser) return;
+			const { SITE_ORIGIN_URL } = ctx;
+			const shareData = {
+				title: `Join ${groupSession.client.displayName}'s Beatbump Session`,
+
+				url: `${SITE_ORIGIN_URL}/session?token=${IsoBase64.toBase64(
+					JSON.stringify({
+						clientId: groupSession.client.clientId,
+						displayName: groupSession.client.displayName,
+					}),
+				)}`,
+			};
+			try {
+				if (!navigator.canShare) {
+					await navigator.clipboard.writeText(shareData.url);
+					notify("Link copied successfully", "success");
+				} else {
+					const share = await navigator.share(shareData);
+					notify("Shared successfully", "success");
+				}
+			} catch (error) {
+				notify("Error: " + error, "error");
+			}
+		},
 		addToPlaylist: async (ctx: BuildMenuParams) => {
 			const { item } = ctx;
 			if (item.endpoint?.pageType.match(RE_ALBUM_PLAYLIST_SINGLE)) {
@@ -101,6 +127,7 @@
 			.add("Play Next", MENU_HANDLERS.playNext.bind(MENU_HANDLERS.playNext, ctx))
 			.add("Add to Playlist", MENU_HANDLERS.addToPlaylist.bind(MENU_HANDLERS.addToPlaylist, ctx))
 			.add("Favorite", MENU_HANDLERS.favorite.bind(MENU_HANDLERS.favorite, ctx))
+			.add("Start Group Session", MENU_HANDLERS.startGroupSession.bind(MENU_HANDLERS.favorite, ctx))
 			.add("Share", MENU_HANDLERS.share.bind(MENU_HANDLERS.share, ctx))
 			.build();
 </script>
@@ -111,20 +138,21 @@
 	// import { groupSession } from "$lib/stores";
 	import { IDBService } from "$lib/workers/db/service";
 
+	import { browser } from "$app/environment";
+	import { buildDropdown, type Dropdown } from "$lib/configs/dropdowns.config";
+	import { APIParams } from "$lib/constants";
+	import { createShare, type SharePageType } from "$lib/shared/createShare";
 	import list from "$lib/stores/list";
-	import { notify, noop } from "$lib/utils";
-	import { showAddToPlaylistPopper } from "$stores/stores";
+	import type { Item, Thumbnail } from "$lib/types";
+	import type { BuildMenuParams } from "$lib/types/common";
+	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+	import { IsoBase64, noop, notify } from "$lib/utils";
+	import { groupSession } from "$stores/sessions";
+	import { showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
+	import { SITE_ORIGIN_URL } from "$stores/url";
 	import { tick } from "svelte";
 	import { PopperButton, PopperStore } from "../Popper";
 	import { clickHandler } from "./functions";
-	import { browser } from "$app/environment";
-	import { SITE_ORIGIN_URL } from "$stores/url";
-	import { buildDropdown, type Dropdown } from "$lib/configs/dropdowns.config";
-	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
-	import type { Item, Thumbnail } from "$lib/types";
-	import { createShare, type SharePageType } from "$lib/shared/createShare";
-	import { APIParams } from "$lib/constants";
-	import type { BuildMenuParams } from "$lib/types/common";
 
 	export let index: number;
 	export let item: IListItemRenderer;
@@ -133,6 +161,7 @@
 	export let aspectRatio: string;
 	export let isBrowseEndpoint = false;
 
+	const { hasActiveSessionState } = groupSession;
 	let loading = false;
 
 	$: RATIO_RECT =
@@ -141,13 +170,15 @@
 			: false;
 	$: ASPECT_RATIO = !RATIO_RECT ? "1x1" : "16x9";
 
-	let DropdownItems = buildMenu({
+	$: ctx = {
 		item,
 		SITE_ORIGIN_URL: $SITE_ORIGIN_URL,
 		dispatch: noop,
 		idx: index,
 		page: item.endpoint?.pageType as Exclude<SharePageType, null>,
-	});
+	};
+
+	let DropdownItems = buildMenu(ctx);
 
 	$: {
 		if (type === "artist" || (item.endpoint && item.endpoint.pageType?.includes("MUSIC_PAGE_TYPE_ARTIST"))) {
@@ -189,6 +220,29 @@
 				  ]
 				: DropdownItems.filter((item) => FILTER_ALBUM_PLAYLIST_ITEMS.includes(item.text));
 		}
+	}
+	$: {
+		if (Array.isArray(DropdownItems)) {
+			if ($hasActiveSessionState === true) {
+				const idxOfSessionItem = DropdownItems.findIndex((item) => item.text.includes("Group Session"));
+
+				DropdownItems[idxOfSessionItem] = {
+					text: "Share Group Session",
+					action: MENU_HANDLERS.shareGroupSession.bind(MENU_HANDLERS.shareGroupSession, ctx),
+					icon: "share",
+				};
+			} else {
+				const idxOfSessionItem = DropdownItems.findIndex((item) => item.text.includes("Group Session"));
+
+				DropdownItems[idxOfSessionItem] = {
+					text: "Start Group Session",
+					action: MENU_HANDLERS.startGroupSession.bind(MENU_HANDLERS.startGroupSession, ctx),
+					icon: "users",
+				};
+			}
+		}
+		// eslint-disable-next-line no-self-assign
+		DropdownItems = DropdownItems;
 	}
 	$: srcImg = Array.isArray(item?.thumbnails)
 		? (item?.thumbnails.at(0) as Thumbnail)

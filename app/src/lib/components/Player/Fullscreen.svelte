@@ -327,10 +327,10 @@
 							pause={() => AudioPlayer.pause()}
 							nextBtn={() => {
 								if ($queue.length === 0) return;
-								SessionListService.next(true, groupSession.hasActiveSession ? true : false);
+								SessionListService.next();
 								// AudioPlayer.updateTime($durationStore);
 							}}
-							prevBtn={() => AudioPlayer.previous(true)}
+							prevBtn={() => SessionListService.previous()}
 						/>
 					</div>
 				{/if}
