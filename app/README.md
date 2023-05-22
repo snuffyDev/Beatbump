@@ -4,7 +4,7 @@
 
 Beatbump is an alternative frontend for YouTube Music created using Svelte/SvelteKit, and powered by Cloudflare Workers.
 
-**Live Site**: https://beatbump.ml/
+**Live Site**: https://beatbump.io/
 
 <p align="center">
 	  <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">
