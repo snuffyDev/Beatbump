@@ -19,7 +19,7 @@
 	import { windowWidth } from "$stores/window";
 	import { cubicOut, quartIn, quartOut } from "svelte/easing";
 	import { tweened } from "svelte/motion";
-	import type { EasingFunction, TransitionConfig } from "svelte/transition";
+	import { fade, type EasingFunction, type TransitionConfig } from "svelte/transition";
 	import ListItem, { listItemPageContext } from "../ListItem/ListItem.svelte";
 	import Loading from "../Loading/Loading.svelte";
 	import Tabs from "../Tabs";
@@ -27,6 +27,7 @@
 	import Controls from "./Controls.svelte";
 	import { createPlayerPopperMenu } from "./Player.svelte";
 	import ProgressBar from "./ProgressBar";
+	import blurURL from "./blur.svg?url";
 	import { fullscreenStore } from "./channel";
 
 	export let state: "open" | "closed";
@@ -210,6 +211,26 @@
 </script>
 
 {#if $queue.length && state === "open"}
+	{#if $immersiveQueue}
+		<div
+			class="immersive"
+			class:open={state === "open"}
+			in:fade={{ duration: 800, delay: 0, easing: quartIn }}
+			out:fade={{ duration: 400, delay: 0, easing: quartIn }}
+			style="--svg: url({new URL(blurURL + '#blur', import.meta.url)});"
+		>
+			<img
+				id="img"
+				loading="eager"
+				decoding="sync"
+				style="aspect-ratio: {thumbnail?.width} / {thumbnail?.height};"
+				width={thumbnail?.width}
+				height={thumbnail?.height}
+				src={thumbnail ? thumbnail?.url : ""}
+				alt="thumbnail"
+			/>
+		</div>
+	{/if}
 	<div
 		class="backdrop"
 		class:mobile={$isMobileMQ}
@@ -244,20 +265,6 @@
 					}
 				}}
 			>
-				{#if $immersiveQueue}
-					<div class="immersive">
-						<img
-							id="img"
-							loading="eager"
-							decoding="sync"
-							style="aspect-ratio: {thumbnail?.width} / {thumbnail?.height};"
-							width={thumbnail?.width}
-							height={thumbnail?.height}
-							src={thumbnail ? thumbnail?.url : ""}
-							alt="thumbnail"
-						/>
-					</div>
-				{/if}
 				{#if $isMobileMQ}
 					<div class="menu-mobile">
 						<PopperButton
@@ -440,6 +447,24 @@
 	</div>
 {/if}
 
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	height="0"
+>
+	<defs>
+		<filter
+			id="blur"
+			x="0"
+			y="0"
+		>
+			<feGaussianBlur
+				in="SourceGraphic"
+				stdDeviation="5"
+			/>
+		</filter>
+	</defs>
+</svg>
+
 <style lang="scss">
 	.pad {
 		padding: 2vh 1em 1.5em 1em;
@@ -514,7 +539,7 @@
 	.immersive {
 		position: absolute;
 		inset: 0;
-		z-index: -1;
+		z-index: 1;
 		isolation: isolate;
 		touch-action: none;
 		pointer-events: none;
@@ -524,6 +549,11 @@
 		perspective: 1000px;
 		backface-visibility: hidden;
 		overflow: hidden;
+		will-change: contents, opacity;
+
+		// mask-size: 100% 100%;
+		// mask-composite: add;
+		// mask-image: var(--svg);
 		&::after {
 			content: "";
 			position: absolute;
@@ -537,7 +567,6 @@
 			perspective: 1000px;
 			backface-visibility: hidden;
 			overflow: hidden;
-			backdrop-filter: blur(1em);
 		}
 		> img {
 			object-fit: cover;
@@ -547,9 +576,11 @@
 			position: absolute;
 			backface-visibility: hidden;
 			inset: 0;
-			transform: scale(1.5) translateZ(0);
+			transform: scale(1.5) translate3d(0px, 0px, 0px);
 			overflow: hidden;
-			filter: brightness(0.6) opacity(0.6) contrast(1) saturate(1.1) grayscale(0.3) sepia(0.2);
+			will-change: filter, visibility;
+			filter: brightness(0.6) opacity(1) contrast(1) saturate(1.1) grayscale(0.3) sepia(0.2) url(#blur);
+
 			touch-action: none;
 		}
 	}
@@ -589,7 +620,13 @@
 		width: 100%;
 		z-index: 1;
 		grid-area: m;
-		background: var(--base-bg);
+		&::before {
+			position: absolute;
+			content: "";
+			inset: 0;
+			opacity: 0.2;
+			background: var(--base-bg);
+		}
 		display: flex;
 		isolation: isolate;
 		touch-action: pan-y;
@@ -661,7 +698,7 @@
 		}
 
 		100% {
-			background-color: hsla(0, 0%, 0%, 65%);
+			background-color: hsla(0, 0%, 0%, 0.587);
 		}
 	}
 	.menu-mobile {
@@ -684,7 +721,7 @@
 		background-color: #0000;
 		inset: 0;
 		z-index: 151;
-		animation: fade-in 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 100ms alternate backwards;
+		animation: fade-in 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 100ms alternate forwards;
 		margin-top: var(--top-bar-height);
 		height: calc(100% - calc(var(--top-bar-height) + var(--player-bar-height)));
 		touch-action: none;
@@ -703,7 +740,7 @@
 		place-items: center;
 		margin-bottom: 1em;
 		width: 55vw;
-
+		contain: strict;
 		justify-content: center;
 		max-width: 100%;
 		@media screen and (max-width: 719px) {

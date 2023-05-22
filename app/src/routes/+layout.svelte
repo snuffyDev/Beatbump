@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Nav from "$components/Nav/Nav.svelte";
+	import Alert from "$lib/components/Alert/Alert.svelte";
 	import Player from "$lib/components/Player/Player.svelte";
 	import Wrapper from "$lib/components/Wrapper/Wrapper.svelte";
-	import Alert from "$lib/components/Alert/Alert.svelte";
 	import { showAddToPlaylistPopper } from "$stores/stores";
 
 	import { Popper } from "$lib/components/Popper";
@@ -10,23 +10,23 @@
 	import PlaylistPopper from "$lib/components/PlaylistPopper";
 	import "@fontsource/commissioner/variable.css";
 
-	import { currentTrack, queue } from "$lib/stores/list";
-	import Fullscreen from "$lib/components/Player/Fullscreen.svelte";
-	import GroupSessionCreator from "$lib/components/GroupSessionCreator";
-	import { fullscreenStore } from "$lib/components/Player/channel";
-	import { groupSession, settings } from "$lib/stores";
-	import { AudioPlayer } from "$lib/player";
-	import { page } from "$app/stores";
-	import { afterNavigate } from "$app/navigation";
 	import { browser, dev } from "$app/environment";
-	import SessionListService from "$stores/list/sessionList";
-	import { get } from "svelte/store";
-	import { onMount } from "svelte";
+	import { afterNavigate } from "$app/navigation";
+	import { page } from "$app/stores";
+	import GroupSessionCreator from "$lib/components/GroupSessionCreator";
+	import Fullscreen from "$lib/components/Player/Fullscreen.svelte";
+	import { fullscreenStore } from "$lib/components/Player/channel";
+	import { AudioPlayer } from "$lib/player";
+	import { groupSession, settings } from "$lib/stores";
+	import { currentTrack, queue } from "$lib/stores/list";
 	import { Logger } from "$lib/utils";
+	import SessionListService from "$stores/list/sessionList";
+	import { onMount } from "svelte";
+	import { get } from "svelte/store";
 
 	let main: HTMLElement;
 	$: key = $page.data.key;
-
+	$: console.log($groupSession);
 	let isFullscreen = false;
 	$: $fullscreenStore === "open"
 		? setTimeout(() => {

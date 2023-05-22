@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { APIParams } from "$lib/constants";
-import { AudioPlayer, getSrc, updatePlayerSrc } from "$lib/player";
+// eslint-disable-next-line import/no-cycle
+import { AudioPlayer, getSrc, updateGroupPosition, updatePlayerSrc } from "$lib/player";
 import type { Artist, ArtistInfo, Item, Song, Subtitle, Thumbnail } from "$lib/types";
 import type { VssLoggingContext } from "$lib/types/innertube/internals";
 import { Logger, WritableStore, addToQueue, notify, seededShuffle, type ResponseBody } from "$lib/utils";
@@ -7,6 +9,7 @@ import { splice } from "$lib/utils/collections/array";
 import { objectKeys } from "$lib/utils/collections/objects";
 import { Mutex } from "$lib/utils/sync";
 import { tick } from "svelte";
+// eslint-disable-next-line import/no-cycle
 import { groupSession } from "../sessions";
 import { filterAutoPlay, playerLoading } from "../stores";
 import type { ISessionListProvider } from "./types.list";
@@ -54,16 +57,6 @@ export class ListService {
 		position: 0,
 		related: null,
 	});
-	#_state: ISessionListProvider = {
-		clickTrackingParams: "",
-		continuation: "",
-		currentMixId: "",
-		currentMixType: null,
-		visitorData: "",
-		mix: [],
-		position: 0,
-		related: null,
-	};
 
 	constructor() {
 		this._$.set(this._state);
@@ -108,15 +101,11 @@ export class ListService {
 		return this._state;
 	}
 
-	get #update() {
-		return this._$.update;
-	}
-
 	#currentTrack(position = 0) {
 		return this._$.value.mix[position];
 	}
 
-	public async next(nextSrc: string | undefined = undefined) {
+	public async next(nextSrc: string | undefined = undefined, update = false) {
 		const currentPosition = this._$.value.position;
 		const nextTrack = this._$.value.mix[this._$.value.position + 1];
 
@@ -127,7 +116,7 @@ export class ListService {
 				{
 					videoId: currentTrack?.videoId,
 					key: this._$.value.position,
-					playlistId: currentTrack?.playlistId!,
+					playlistId: currentTrack?.playlistId,
 					loggingContext: currentTrack?.loggingContext,
 					playerParams: currentTrack?.playerParams,
 					playlistSetVideoId:
@@ -165,7 +154,7 @@ export class ListService {
 					loggingContext: currentTrack?.loggingContext?.vssLoggingContext?.serializedContextData,
 					videoId: currentTrack?.videoId,
 					playlistId: this.currentMixId,
-					clickTracking: this?.clickTrackingParams,
+					...(this?.clickTrackingParams && { clickTracking: this.clickTrackingParams }),
 				});
 				if (!data) return;
 
@@ -176,6 +165,10 @@ export class ListService {
 					undefined,
 					true,
 				);
+			}
+			const position = this._$.value.position;
+			if (update) {
+				updateGroupPosition("->", position);
 			}
 		}
 	}
@@ -252,8 +245,7 @@ export class ListService {
 			AudioPlayer.setNextTrackPrefetchedUrl(response.body.url);
 		}
 	}
-	public async previous(broadcast = false) {
-		const currentPosition = this._$.value.position;
+	public async previous(_broadcast = false) {
 		let position = await this.updatePosition("next");
 		if (position >= this._$.value.mix.length) {
 			position = this._$.value.position;
@@ -267,7 +259,7 @@ export class ListService {
 			videoId: this.#currentTrack(this.position)?.videoId,
 			playlistId: this.currentMixId,
 			...(this.continuation && { continuation: this?.continuation }),
-			clickTracking: this?.clickTrackingParams,
+			...(this?.clickTrackingParams && { clickTracking: this.clickTrackingParams }),
 		});
 		if (!data) return;
 		if (data.related) this._$.value.related = data.related;
@@ -283,7 +275,7 @@ export class ListService {
 				params: APIParams.finite,
 				playlistId:
 					playlistId !== null
-						? playlistId.startsWith("RDAMPL")
+						? playlistId?.startsWith("RDAMPL")
 							? playlistId
 							: "RDAMPL" + playlistId
 						: this._$.value.currentMixId,
@@ -309,12 +301,12 @@ export class ListService {
 			await getSrc(
 				this._$.value.mix[this._$.value.position + 1].videoId,
 				this._$.value.mix[this._$.value.position].playlistId,
-				null,
+				undefined,
 				false,
 			);
 		} catch (err) {
 			Logger.err(err);
-			notify(err, "error");
+			notify(err as string, "error");
 		} finally {
 			toggle();
 		}
@@ -325,7 +317,6 @@ export class ListService {
 			playlistSetVideoId,
 			clickTrackingParams,
 			ctoken,
-			itct,
 			key,
 			playlistId,
 			playerParams,
@@ -359,7 +350,6 @@ export class ListService {
 		try {
 			if (!clickTrackingParams && !ctoken) {
 				playlistId = !playlistId?.startsWith("RDAMPL") ? "RDAMPL" + playlistId : playlistId;
-				itct = "wAEB8gECeAE%3D";
 			}
 
 			const params: Parameters<typeof fetchNext>["0"] = {
@@ -386,15 +376,14 @@ export class ListService {
 				...data,
 				mix: ["append", results],
 			});
+			if (groupSession?.initialized && groupSession?.hasActiveSession) {
+				groupSession.updateGuestContinuation(state);
+			}
 
 			if (autoPlay) {
 				const src = await getSrc(state.mix[key].videoId);
 
-				if (groupSession?.initialized && groupSession?.hasActiveSession) {
-					groupSession.updateGuestContinuation(state);
-				}
-
-				return src.body;
+				return src?.body ?? ({} as ResponseBody);
 			}
 		} catch (err) {
 			Logger.err(err);
@@ -462,7 +451,7 @@ export class ListService {
 		videoId?: string;
 		visitorData?: string;
 		playlistSetVideoId?: string;
-	}): Promise<{ body: ResponseBody; error?: boolean }> {
+	}): Promise<{ body: ResponseBody; error?: boolean } | undefined> {
 		const toggle = togglePlayerLoad();
 		try {
 			const {
@@ -499,25 +488,24 @@ export class ListService {
 			if (!data.results.length) {
 				Logger.dev("NO RESULTS LENGTH!!!");
 				this.getMoreLikeThis({ playlistId });
-				return;
-			}
-			const state = await this.#sanitizeAndUpdate("APPLY", {
-				...data,
-				mix: ["set", data.results],
-				currentMixType: "playlist",
-			});
-			const position = state.mix.findIndex((item) => item.index === index);
-			await this.updatePosition(position ?? 0);
-			await tick();
-			if (groupSession?.initialized && groupSession?.hasActiveSession) {
-				groupSession.expAutoMix(state);
-			}
+			} else {
+				const state = await this.#sanitizeAndUpdate("APPLY", {
+					...data,
+					mix: ["set", data.results],
+					currentMixType: "playlist",
+				});
+				const position = state.mix.findIndex((item) => item.index === index);
+				await this.updatePosition(position ?? 0);
+				await tick();
+				if (groupSession?.initialized && groupSession?.hasActiveSession) {
+					groupSession.expAutoMix(state);
+				}
 
-			return await getSrc(state.mix[position]?.videoId, playlistId, null, true);
+				return (await getSrc(state.mix[position]?.videoId, playlistId, undefined, true)) as any;
+			}
 		} catch (err) {
 			Logger.err(err);
 			notify("Error starting playlist playback.", "error");
-			return null;
 		} finally {
 			toggle();
 		}
@@ -555,7 +543,7 @@ export class ListService {
 		}
 	}
 
-	public async setTrackWillPlayNext(item: Item, key) {
+	public async setTrackWillPlayNext(item: Item, key: number) {
 		await tick();
 		if (!item) {
 			notify("No track to remove was provided!", "error");
@@ -572,7 +560,7 @@ export class ListService {
 			});
 
 			if (!oldLength) {
-				await getSrc(this._$.value.mix[0].videoId, this._$.value.mix[0].playlistId, null, true);
+				await getSrc(this._$.value.mix[0].videoId, this._$.value.mix[0].playlistId, undefined, true);
 			}
 		} catch (err) {
 			console.error(err);
@@ -649,7 +637,6 @@ export class ListService {
 
 	/** Update the track position based on a keyword or number */
 	public async updatePosition(direction: "next" | "back" | number): Promise<number> {
-		const startIdx = this.position;
 		if (typeof direction === "number") {
 			const state = await this.#sanitizeAndUpdate("APPLY", {
 				position: direction,
@@ -729,6 +716,7 @@ export class ListService {
 
 							// `mix` has a slightly altered type here
 							if (key === "mix") {
+								if (!Array.isArray(to.mix)) continue;
 								// index 0 = operation
 								// index 1 = data
 								if (to.mix[0] === "append") {
@@ -741,7 +729,7 @@ export class ListService {
 									old.mix = filterList(old.mix);
 								}
 							} else if (to[key] !== undefined && to[key] !== null) {
-								old[key] = to[key];
+								old[key] = to[key] as never;
 							}
 						}
 
@@ -749,9 +737,10 @@ export class ListService {
 
 						resolve({ ...old, ...this._state } as ISessionListProvider);
 					} else {
-						const { mix } = to;
+						let { mix } = to;
+						if (!mix) mix = [];
 						for (const key in to) {
-							if (!VALID_KEYS.includes(key as any)) delete to[key];
+							if (!VALID_KEYS.includes(key as any)) delete to[key as keyof typeof to];
 						}
 						Object.assign(this._state, old);
 						resolve({

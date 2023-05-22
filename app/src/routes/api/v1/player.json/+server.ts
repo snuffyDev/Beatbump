@@ -1,7 +1,7 @@
-import type { RequestHandler } from "@sveltejs/kit";
 import { buildAPIRequest } from "$api/request";
-import { error, json } from "@sveltejs/kit";
 import { parseParams } from "$api/utils";
+import type { RequestHandler } from "@sveltejs/kit";
+import { error, json } from "@sveltejs/kit";
 
 type PlayerSchema = {
 	videoId?: string;
@@ -26,8 +26,9 @@ export const GET: RequestHandler = async ({ url }) => {
 	try {
 		const response = await buildAPIRequest("player", {
 			context: {
-				client: { clientName: "IOS", clientVersion: "16.20", hl: "en" },
+				client: { clientName: "IOS", clientVersion: "17.13.3", hl: "en" },
 			},
+			headers: {},
 			params: {
 				videoId,
 				playlistId,

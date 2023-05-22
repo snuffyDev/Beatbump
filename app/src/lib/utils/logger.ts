@@ -7,23 +7,22 @@ const LOG_TYPES = {
 	err: `[ERROR] `,
 } as const;
 
-function debug(...message: any[]): void;
-function debug(message: string): void {
-	if (Array.isArray(message)) {
+function debug(...message: string[]): void {
+	if (message.length > 1) {
 		console.log(LOG_TYPES.debug, ...message);
 	} else {
 		console.log(LOG_TYPES.debug, message);
 	}
 }
 function log(...message: any[]): void {
-	if (arguments.length > 1) {
+	if (message.length > 1) {
 		console.log(`[LOG]`, ...message);
 	} else {
 		console.log(`[LOG]`, message);
 	}
 }
 function err(...message: any[]): void {
-	if (arguments.length > 1) {
+	if (message.length > 1) {
 		console.error(`[ERROR]`, ...message);
 	} else {
 		console.error(`[ERROR]`, message);

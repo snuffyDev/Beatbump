@@ -392,11 +392,13 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 
 					if (groupSession.hasActiveSession && !groupSession.allCanPlay)
 						return await groupSession.waitUntilPlayable(() => SessionListService.next(this.nextSrc?.url));
+
 					return await SessionListService.next(this.nextSrc.url).finally(() => {
-						locked = false; // Unlock this 'if' block when finished
-						this.nextSrc.url = undefined; // Set to undefined since e 'used' the value
-					});
+													locked = false; // Unlock this 'if' block when finished
+													this.nextSrc.url = undefined; // Set to undefined since e 'used' the value
+												});
 				} finally {
+					locked = false;
 				}
 			} else if (this.nextSrc.stale && this.player.currentTime >= duration / 2) {
 				return await prefetchLock(duration);

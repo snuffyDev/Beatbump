@@ -11,7 +11,7 @@ import SessionListService, { type ISessionListProvider } from "./list";
 import { AudioPlayer, getSrc } from "$lib/player";
 import { EventEmitter, Mutex } from "$lib/utils/sync";
 import { notify } from "$lib/utils/utils";
-import { get } from "svelte/store";
+import { get, type StartStopNotifier, type Unsubscriber } from "svelte/store";
 
 type BaseKind = "action" | "state" | "status";
 type Kind =
@@ -133,8 +133,18 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 	public get hasActiveSessionState() {
 		return this._hasActiveSession;
 	}
+	private subscribers = new Set<(v: this, startStop?: StartStopNotifier<typeof this>) => void>();
 	// #region Constructors (1)
-
+	public subscribe = (run: (value: this, startStop?: StartStopNotifier<typeof this>) => Unsubscriber) => {
+		this.subscribers.add(run);
+		run(this);
+		return () => {
+			this.subscribers.delete(run);
+			if (this.subscribers.size <= 1) {
+				this.subscribers.clear();
+			}
+		};
+	};
 	constructor() {
 		super({});
 		this._lock = new Mutex();
@@ -158,13 +168,11 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 				entries.length !== 0 &&
 				every(entries, (item) => item?.finished === true) === true
 			) {
-				const { cb, resolve } = this._resolver.shift()!;
-
 				this._once = true;
 				this._allCanPlay = true;
 
-				cb();
-				resolve();
+				await SessionListService.next(undefined, false);
+
 				setTimeout(() => (this._once = false), 25);
 			}
 		});
@@ -298,12 +306,12 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 		this.send("PUT", "state.set.mix", JSON.stringify(items), this.client);
 	}
 
+	private callSubs = () => this.subscribers.forEach((c) => c(this));
+
 	public init(displayName: string, type?: "host" | "guest", settings: Settings = { forceSync: true }): void {
 		if (this.initialized) return;
-
 		this._initialized = true;
 		this._settings = settings;
-
 		const clientId = "bbgs_" + generateId(9, "alternative");
 
 		this._client = {
@@ -331,107 +339,113 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 			}
 			this.dispatch("init");
 		});
+		this.callSubs();
 	}
 
-	public process(rawData: string): Promise<Message> {
+	public async process(rawData: string): Promise<Message> {
 		if (typeof rawData !== "string") return;
 		const { command, data, metadata, type } = JSON.parse(rawData) as Message;
 		console.log({ command, data, metadata, type });
 		console.log(this);
-		if (metadata.clientId === this.client.clientId) return;
 
 		// Logger.debug([`Processing Message`, command, data, metadata, type]);
-		return this._lock.do(async () => {
-			/** Get a user-defined track  */
-			if (command === "GET" && type === "action.mix.init") {
-				SessionListService.initAutoMixSession({ videoId: data as string });
-			}
-			/** Handle setting configuration command */
-			if (command === "CONFIG") {
-				this._settings = data as unknown as Settings;
-			}
+		/** Get a user-defined track  */
+		if (command === "GET" && type === "action.mix.init") {
+			await SessionListService.initAutoMixSession({ videoId: data as string });
+		}
+		/** Handle setting configuration command */
+		if (command === "CONFIG") {
+			this._settings = data as unknown as Settings;
+		}
 
-			if (command === "PUT") {
-				/** Initial SessionListService received from host */
-				if (type === "state.set.mix") {
-					try {
-						const list = JSON.parse(data as string) as ISessionListProvider;
+		if (command === "PUT") {
+			/** Initial SessionListService received from host */
+			if (type === "state.set.mix") {
+				try {
+					const list = JSON.parse(data as string) as ISessionListProvider;
 
-						SessionListService.set(list);
+					SessionListService.set(list);
 
-						getSrc(list.mix[list.position].videoId, list.mix[list.position].playlistId).then((body) => {
-							AudioPlayer.updateSrc(body.body);
-							AudioPlayer.play();
+					await getSrc(list.mix[list.position].videoId, list.mix[list.position].playlistId)
+						.then((body) => {
+							return AudioPlayer.updateSrc(body.body);
+						})
+						.then(() => {
+							return AudioPlayer.play();
 						});
-					} catch (err) {
-						if (err.message) {
-							console.log(err);
-							const pos = parseInt((err.message as string).match(/\d+$/g)?.at(0));
-							err.message.includes("position")
-								? console.log((data as string).slice(0, pos), (data as string).slice(pos))
-								: console.error(err);
-						}
+				} catch (err) {
+					if (err.message) {
+						console.log(err);
+						const pos = parseInt((err.message as string).match(/\d+$/g)?.at(0));
+						err.message.includes("position")
+							? console.log((data as string).slice(0, pos), (data as string).slice(pos))
+							: console.error(err);
 					}
 				}
-				/** Receive the list with the continuation data */
-				if (type === "state.update.continuation") {
+			}
+			/** Receive the list with the continuation data */
+			if (type === "state.update.continuation") {
+				const list = JSON.parse(data as string) as ISessionListProvider;
+				if (!list.mix && !list.mix.length) throw new Error("Provided SessionList is not valid!", {});
+				await new Promise<ISessionListProvider>((resolve) => {
+					setTimeout(() => {
+						resolve(SessionListService.lockedSet(list));
+					});
+				})
+					.then((list) => {
+						return SessionListService.updatePosition(list.position).then(() => {
+							return list;
+						});
+					})
+					.then((list) => {
+						return getSrc(list.mix[list.position]?.videoId, list.mix[list.position]?.playlistId, undefined, true);
+					});
+			}
+			/** Any other mix updates */
+			if (command === "PUT" && type === "state.update.mix") {
+				try {
 					const list = JSON.parse(data as string) as ISessionListProvider;
 					if (!list.mix && !list.mix.length) throw new Error("Provided SessionList is not valid!", {});
-					new Promise<ISessionListProvider>((resolve) => {
-						setTimeout(() => {
-							resolve(SessionListService.lockedSet(list));
-						});
-					}).then((list) => {
-						SessionListService.updatePosition(list.position);
-						getSrc(list.mix[list.position]?.videoId, list.mix[list.position]?.playlistId, undefined, true);
-					});
-				}
-				/** Any other mix updates */
-				if (command === "PUT" && type === "state.update.mix") {
-					try {
-						const list = JSON.parse(data as string) as ISessionListProvider;
-						if (!list.mix && !list.mix.length) throw new Error("Provided SessionList is not valid!", {});
-						SessionListService.set(list);
-					} catch (error) {
-						console.error();
-					}
+					await SessionListService.set(list);
+				} catch (error) {
+					console.error();
 				}
 			}
+		}
 
-			/** Modify already existing state */
-			if (command === "PATCH") {
-				/** Gets the next or previous track */
-				if (type === "state.update.position") {
-					const { dir = undefined, position = 0 }: { dir: "<-" | "->" | undefined; position: number } = data as {
-						dir: "<-" | "->" | undefined;
-						position: number;
-					};
-					console.log();
-					await SessionListService.prefetchTrackAtIndex(position);
-					await SessionListService.updatePosition(position === 0 ? 0 : position - 1);
+		/** Modify already existing state */
+		if (command === "PATCH") {
+			/** Gets the next or previous track */
+			if (type === "state.update.position") {
+				const { dir = undefined, position = 0 }: { dir: "<-" | "->" | undefined; position: number } = data as {
+					dir: "<-" | "->" | undefined;
+					position: number;
+				};
+				console.log();
+				await SessionListService.prefetchTrackAtIndex(position);
+				await SessionListService.updatePosition(position === 0 ? 0 : position - 1);
 
-					if (typeof dir === "undefined") {
-						SessionListService.next();
-					}
-					if (dir === "<-") {
-						SessionListService.previous();
-					} else if (dir === "->") {
-						SessionListService.next();
-					}
-				}
-				/** Updates the playback state for the connected client */
-				if (type === "state") {
-					this._connectionStates.update((u) => ({
-						...u,
-						[data["client"]]: data["state"],
-					}));
+				if (typeof dir === "undefined") {
+					await SessionListService.next();
+				} else if (dir === "<-") {
+					await SessionListService.previous();
+				} else if (dir === "->") {
+					await SessionListService.next();
 				}
 			}
-			return { command, data, metadata, type };
-		});
+			/** Updates the playback state for the connected client */
+			if (type === "state") {
+				this._connectionStates.update((u) => ({
+					...u,
+					[data["client"]]: data["state"],
+				}));
+			}
+		}
+		this.callSubs();
+		return { command, data, metadata, type };
 	}
 
-	public send(command: Command, type: Kind, data: Record<string, unknown>, metadata?: Client): void {
+	public send(command: Command, type: Kind, data: string | Record<string, unknown>, metadata?: Client): void {
 		if (!this._initialized) return;
 
 		iter(this._connections, (conn) => {
@@ -455,6 +469,7 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 			...u,
 			[this.client.clientId]: clientState["state"],
 		}));
+		this.callSubs();
 
 		this.send("PATCH", "state", clientState, this.client);
 	}
@@ -463,19 +478,23 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 		type: "automix" | "playlist",
 		{ videoId = "", playlistId = "" }: { videoId?: string; playlistId?: string },
 	): Status {
+		this.callSubs();
 		return this.initializeHostPlayback("automix", { videoId, playlistId });
 	}
 
 	public setPlaylistMix(playlistId = ""): Status {
+		this.callSubs();
 		return this.initializeHostPlayback("playlist", { playlistId });
 	}
 
 	public updateGuestContinuation(_mix: ISessionListProvider): void {
+		this.callSubs();
 		this.send("PUT", "state.update.continuation", JSON.stringify(_mix), this._client);
 	}
 
 	public updateGuestTrackQueue(_mix: ISessionListProvider): void {
 		// TODO! finish this
+		this.callSubs();
 		this.send("PUT", "state.update.mix", JSON.stringify(_mix), this._client);
 
 		// this.send('PATCH', 'state.update.position', JSON.stringify(_mix.position), this._client);
@@ -588,10 +607,12 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 						this.connect(item);
 					}
 				});
+				this.callSubs();
 				return;
 			}
 
-			this.send(processed.command, processed.type, processed.data, processed.metadata);
+			this.send(processed.command, processed.type, processed.data as Record<string, unknown>, processed.metadata);
+			this.callSubs();
 		});
 
 		connection.on("close", () => {

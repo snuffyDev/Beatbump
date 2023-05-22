@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { alertHandler } from "$lib/stores/stores";
 import type { Song } from "$lib/types";
+import { objectKeys } from "./collections/objects";
 import { normalizeURIEncoding } from "./strings/strings";
 
 // notifications
@@ -59,7 +60,7 @@ export const addToQueue = async ({
 }: {
 	videoId?: string;
 	playlistId?: string;
-}): Promise<Song[]> => {
+}): Promise<Song[] | void> => {
 	try {
 		const url = `/api/v1/get_queue.json${
 			videoId ? `?videoIds=${videoId}` : playlistId ? "?playlistId=" + playlistId : ""
@@ -71,7 +72,7 @@ export const addToQueue = async ({
 		if (Array.isArray(data)) return data;
 	} catch (err) {
 		console.error(err);
-		notify(err, "error");
+		notify(err as string, "error");
 	}
 };
 
@@ -80,14 +81,11 @@ export type ResponseBody = { original_url: string; url: string };
 export const queryParams = (params: Record<any, any>): string => {
 	const result = [];
 	let key = "";
-	for (key in params) {
+	const keys = objectKeys(params);
+
+	for (key of keys) {
 		if (typeof params[key] !== "number" && !params[key]) continue;
 		result.push(`${encodeURIComponent(key)}=${normalizeURIEncoding(params[key])}`);
 	}
 	return result.join("&");
 };
-// export const queryParams = (params: Record<any, any>): string =>
-// 	map(Object.keys(params), (k) => {
-// 		if (params[k] === undefined) return;
-// 		return k + "=" + params[k];
-// 	}).join("&");

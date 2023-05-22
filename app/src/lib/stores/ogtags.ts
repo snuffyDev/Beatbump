@@ -17,13 +17,13 @@ type Tags = {
 const tags: Tags = {
 	title: "Beatbump",
 	description: "Unlock your music",
-	url: "https://beatbump.ml/",
+	url: "https://beatbump.io/",
 	type: "website",
-	image: "https://beatbump.ml/favicon.png",
+	image: "https://beatbump.io/favicon.png",
 	"og:image": "/favicon.png",
 	"og:description": "Unlock your music",
 	"og:type": "website",
-	"og:url": "https://beatbump.ml/",
+	"og:url": "https://beatbump.io/",
 };
 
 type Store = {
@@ -38,7 +38,7 @@ type Store = {
 
 const metatags = (): Store => {
 	const { subscribe, set, update } = writable(tags);
-	let origin = "https://beatbump.ml";
+	let origin = "https://beatbump.io";
 	const desc = (desc) => update((d) => ({ ...d, description: desc, "og:description": desc }));
 	const title = (title) => update((t) => ({ ...t, title: title, "og:title": title }));
 	const url = (url) =>

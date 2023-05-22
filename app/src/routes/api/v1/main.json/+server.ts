@@ -1,7 +1,7 @@
 import type { RequestHandler } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ url }) => {
-	const query = url.searchParams; // if (headers.origin !== 'https://beatbump.ml/') {
+	const query = url.searchParams; // if (headers.origin !== 'https://beatbump.io/') {
 	// 	return { status: 403, body: JSON.stringify('CORS error!') }
 	// }
 

@@ -1,24 +1,16 @@
 import { queryParams } from "$lib/utils/utils";
-import {
-	CONTEXT_DEFAULTS,
-	API_BASE_URL,
-	WEB_REMIX_KEY,
-	USER_AGENT,
-	ENDPOINT_NAMES,
-	ANDROID_KEY,
-	API_ORIGIN,
-} from "./constants";
-import type { Body, APIEndpoints, Context } from "./types";
-import { Endpoints } from "./types";
 import type {
 	ArtistEndpointParams,
-	PlayerEndpointParams,
-	PlaylistEndpointParams,
 	NextEndpointParams,
+	PlayerEndpointParams,
 	PlaylistEndpointContinuation,
-	SearchEndpointParams,
+	PlaylistEndpointParams,
 	RelatedEndpointParams,
+	SearchEndpointParams,
 } from "./_base";
+import { API_BASE_URL, API_ORIGIN, CONTEXT_DEFAULTS, ENDPOINT_NAMES, USER_AGENT, WEB_REMIX_KEY } from "./constants";
+import type { APIEndpoints, Body, Context } from "./types";
+import { Endpoints } from "./types";
 
 type Nullable<T> = T | null;
 type IHeaders = Record<string, string>;
@@ -194,17 +186,29 @@ function browseRequest<T = PlayerEndpointParams | ArtistEndpointParams | Related
  * @param {T} params
  * @returns {*}
  */
-function playerRequest<T extends PlayerEndpointParams>(context: Context, params: T) {
+function playerRequest<T extends PlayerEndpointParams>(
+	context: Context,
+	params: T,
+	continuation?: string | null = null,
+	headers?: any,
+) {
 	const body = buildRequestBody(context as Context, params);
-
-	return fetch(API_BASE_URL + ENDPOINT_NAMES.player + `?key=${ANDROID_KEY}`, {
-		headers: {
-			"Content-Type": "application/json; charset=utf-8",
-			Origin: API_ORIGIN,
+	const req = {
+		URL: API_BASE_URL + ENDPOINT_NAMES.player + `?key=${"AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w"}`,
+		init: {
+			headers: {
+				"Content-Type": "application/json; charset=utf-8",
+				Origin: API_ORIGIN,
+				...headers,
+			},
+			body: body,
+			method: "POST",
+			keepalive: true,
 		},
-		body: JSON.stringify(body),
-		method: "POST",
-		keepalive: true,
+	};
+	return fetch(API_BASE_URL + ENDPOINT_NAMES.player + `?key=${"AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w"}`, {
+		...req.init,
+		body: JSON.stringify(req.init.body),
 	});
 }
 
