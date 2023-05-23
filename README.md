@@ -58,7 +58,7 @@ Some of Beatbump's features includes:
 
 | Name                         | URL
 | ---                          | ---                                                                       |
-| Beatbump (Official) | https://beatbump.ml                                                       |
+| Beatbump (Official) | https://beatbump.io                                                       |
 | ~Vern (Clearnet)             | https://bb.vern.cc/                                                       |
 | ~Vern (Onion)                | http://bb.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion/ |
 | ~Vern (I2P)                  | http://vern6inmbjzqpecx4kpkq5sln3cqqrfuxfzh4au3tpxbsfbwbnta.b32.i2p/      |
