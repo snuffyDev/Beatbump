@@ -187,10 +187,10 @@
 				pause={() => AudioPlayer.pause()}
 				nextBtn={() => {
 					if ($queue.length === 0) return;
-					SessionListService.next();
+					SessionListService.next(undefined, true);
 					// AudioPlayer.updateTime($durationStore);
 				}}
-				prevBtn={() => SessionListService.previous()}
+				prevBtn={() => SessionListService.previous(true)}
 			/>
 			<ProgressBar />
 		{/if}

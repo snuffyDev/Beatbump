@@ -215,21 +215,13 @@
 		<div
 			class="immersive"
 			class:open={state === "open"}
-			in:fade={{ duration: 800, delay: 0, easing: quartIn }}
-			out:fade={{ duration: 400, delay: 0, easing: quartIn }}
-			style="--svg: url({new URL(blurURL + '#blur', import.meta.url)});"
-		>
-			<img
-				id="img"
-				loading="eager"
-				decoding="sync"
-				style="aspect-ratio: {thumbnail?.width} / {thumbnail?.height};"
-				width={thumbnail?.width}
-				height={thumbnail?.height}
-				src={thumbnail ? thumbnail?.url : ""}
-				alt="thumbnail"
-			/>
-		</div>
+			in:fade={{ duration: 400, delay: 500, easing: quartIn }}
+			out:fade={{ duration: 400, delay: 400, easing: quartOut }}
+			style="--svg: url({new URL(
+				blurURL + '#blur',
+				import.meta.url,
+			)}); background-image: url({thumbnail.url}); --scale: {queueOpen ? 1 : 1}; --blur: {queueOpen ? 0.1 : 0.2}rem;"
+		/>
 	{/if}
 	<div
 		class="backdrop"
@@ -239,8 +231,8 @@
 	>
 		<div
 			class="fullscreen-player-popup"
-			in:slideInOut|local={{ delay: 400, duration: 400 }}
-			out:slideInOut|local={{ delay: 200, duration: 400, easing: quartIn }}
+			in:slideInOut={{ delay: 400, duration: 400 }}
+			out:slideInOut={{ delay: 200, duration: 400, easing: quartIn }}
 		>
 			<div
 				class="column container"
@@ -347,13 +339,15 @@
 				class="handle vertical"
 				style="transform: translate3d({queueOpen ? 53.5 : 91.5}vw, 0px, 0) !important;"
 				on:pointerover={() => {
-					tracklist.style.willChange = "transform";
+					requestFrameSingle(() => {
+						tracklist.style.willChange = "transform";
+					});
 				}}
 				on:click={() => {
 					requestFrameSingle(() => {
-						queueOpen = !queueOpen;
 						tracklist.style.willChange = "unset";
 					});
+					queueOpen = !queueOpen;
 				}}
 			>
 				<hr class="vertical" />
@@ -544,29 +538,42 @@
 		touch-action: none;
 		pointer-events: none;
 		overscroll-behavior: contain;
-		transform: translateZ(0);
-		contain: strict;
+		contain: style;
 		perspective: 1000px;
 		backface-visibility: hidden;
 		overflow: hidden;
-		will-change: contents, opacity;
 
-		// mask-size: 100% 100%;
-		// mask-composite: add;
-		// mask-image: var(--svg);
+		background-color: hsla(0, 0%, 0%, 0.587);
+		// mask-composite: ;
+		// backdrop-filter: brightness(0.6) opacity(1) contrast(1) saturate(1.1) grayscale(0.3) sepia(0.2) url(1rem);
+		&.open {
+		}
 		&::after {
 			content: "";
 			position: absolute;
 			inset: 0;
+			width: 100%;
+			height: 100%;
+
+			border-radius: 9999rem;
 			z-index: 1;
 
 			touch-action: none;
 			overscroll-behavior: contain;
-			transform: translateZ(0);
-			contain: strict;
 			perspective: 1000px;
 			backface-visibility: hidden;
-			overflow: hidden;
+			// overflow: hidden;
+			will-change: opacity, backdrop-filter;
+			contain: style;
+			transform: scale(var(--scale)) translate3d(0px, 0px, 0px);
+			transition-delay: 450ms;
+			transition-duration: 800ms;
+			transition: backdrop-filter cubic-bezier(0.895, 0.03, 0.685, 0.22) 800ms 800ms;
+			box-shadow: 0px 0px 100px -20px #000000d5 inset, 0px 0px 50rem 5px #000000c9;
+			backdrop-filter: brightness(0.9) opacity(1) contrast(1) saturate(1.7) grayscale(0.35) sepia(0.2)
+				blur(var(--blur, 8px));
+			// mask-image: url(#blur);
+			// mask-size: 100% 100%;
 		}
 		> img {
 			object-fit: cover;
@@ -576,10 +583,8 @@
 			position: absolute;
 			backface-visibility: hidden;
 			inset: 0;
-			transform: scale(1.5) translate3d(0px, 0px, 0px);
 			overflow: hidden;
 			will-change: filter, visibility;
-			filter: brightness(0.6) opacity(1) contrast(1) saturate(1.1) grayscale(0.3) sepia(0.2) url(#blur);
 
 			touch-action: none;
 		}
@@ -598,7 +603,7 @@
 
 		border-top-left-radius: $sm-radius;
 		border-top-right-radius: $sm-radius;
-		contain: paint layout;
+		contain: paint layout style;
 		@media screen and (min-width: 720px) {
 			position: absolute;
 			left: 0;

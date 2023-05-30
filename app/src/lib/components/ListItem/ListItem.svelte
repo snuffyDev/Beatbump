@@ -343,6 +343,7 @@
 		console.log({ cache, idx, position, queueIndex, $listItemPageContext });
 		switch (page) {
 			case "queue":
+                
 				await handlePlaylistClick(item, position, { $list, $queue, $startIndex }, visitorData);
 				break;
 			case "playlist":

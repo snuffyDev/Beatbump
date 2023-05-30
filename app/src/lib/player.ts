@@ -376,7 +376,7 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 				try {
 					if (!locked) locked = true;
 					if (groupSession.initialized) {
-						await Promise.resolve(
+						return await Promise.resolve(
 							updateGroupState({
 								client: groupSession.client.clientId,
 								state: {
@@ -387,12 +387,15 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 									stalled: !!this.player.error,
 								} as ConnectionState,
 							}),
-						);
+						).then(() => {
+							const [allCanPlay, fn] = groupSession.allCanPlay();
+							if (allCanPlay) {
+								fn();
+								locked = false;
+							}
+						});
 					}
-
-					if (groupSession.hasActiveSession && !groupSession.allCanPlay)
-						return await groupSession.waitUntilPlayable(() => SessionListService.next(this.nextSrc?.url));
-
+					if (groupSession.hasActiveSession && !groupSession.allCanPlay) return;
 					return await SessionListService.next(this.nextSrc.url).finally(() => {
 													locked = false; // Unlock this 'if' block when finished
 													this.nextSrc.url = undefined; // Set to undefined since e 'used' the value

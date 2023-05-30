@@ -170,10 +170,10 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 			) {
 				this._once = true;
 				this._allCanPlay = true;
-
-				await SessionListService.next(undefined, false);
-
-				setTimeout(() => (this._once = false), 25);
+                if (this.client.role === "host") {
+									await SessionListService.next(void 0, true);
+								}
+								setTimeout(() => (this._once = false), 0);
 			}
 		});
 	}
@@ -423,15 +423,15 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 				};
 				console.log();
 				await SessionListService.prefetchTrackAtIndex(position);
-				await SessionListService.updatePosition(position === 0 ? 0 : position - 1);
 
 				if (typeof dir === "undefined") {
-					await SessionListService.next();
+                    await SessionListService.next();
 				} else if (dir === "<-") {
-					await SessionListService.previous();
+                    await SessionListService.previous();
 				} else if (dir === "->") {
-					await SessionListService.next();
+                    await SessionListService.next();
 				}
+                await SessionListService.updatePosition(position);
 			}
 			/** Updates the playback state for the connected client */
 			if (type === "state") {

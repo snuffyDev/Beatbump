@@ -126,11 +126,16 @@ export class ListService {
 					clickTrackingParams: this.clickTrackingParams!,
 				},
 				true,
-			).then((data) => {
-				this.updatePosition(currentPosition + 1);
-				return data;
-			});
-
+			)
+				.then((data) => {
+					return data;
+				})
+				.finally(async () => {
+					const newPosition = await this.updatePosition(currentPosition + 1);
+					if (update) {
+						updateGroupPosition("->", newPosition);
+					}
+				});
 			return;
 		} else {
 			if (nextSrc || this.nextTrackUrl) {
@@ -341,6 +346,9 @@ export class ListService {
 
 		if (key < this._$.value.mix.length - 1) {
 			const nextIndex = await this.updatePosition(key);
+            if (groupSession.initialized && groupSession.hasActiveSession) {
+							updateGroupPosition("->", nextIndex);
+						}
 			const nextTrack = this._$.value.mix[nextIndex];
 			await getSrc(nextTrack?.videoId, nextTrack?.playlistId, undefined, true);
 			toggle();
