@@ -5,7 +5,11 @@ import { objectKeys } from "./collections/objects";
 import { normalizeURIEncoding } from "./strings/strings";
 
 // notifications
-export const notify = (msg: string, type: "success" | "error", action?: string): void => {
+export const notify = (
+	msg: string,
+	type: "success" | "error",
+	action?: string,
+): void => {
 	alertHandler.add({
 		msg: msg,
 		type: type,
@@ -39,7 +43,11 @@ export function seededShuffle<T>(array: T[], _seed?: number): T[] {
 }
 
 export function shuffle(array: any[], index: number): any[] {
-	array = [...array.slice(0, index), array[index], ...array.slice(index + 1).sort(() => Math.random() - 0.5)];
+	array = [
+		...array.slice(0, index),
+		array[index],
+		...array.slice(index + 1).sort(() => Math.random() - 0.5),
+	];
 	return array;
 }
 
@@ -63,7 +71,11 @@ export const addToQueue = async ({
 }): Promise<Song[] | void> => {
 	try {
 		const url = `/api/v1/get_queue.json${
-			videoId ? `?videoIds=${videoId}` : playlistId ? "?playlistId=" + playlistId : ""
+			videoId
+				? `?videoIds=${videoId}`
+				: playlistId
+				? "?playlistId=" + playlistId
+				: ""
 		}`;
 		const data = (await fetch(url, { headers: { accept: "application/json" } })
 			.then((json) => json.json())
@@ -85,7 +97,9 @@ export const queryParams = (params: Record<any, any>): string => {
 
 	for (key of keys) {
 		if (typeof params[key] !== "number" && !params[key]) continue;
-		result.push(`${encodeURIComponent(key)}=${normalizeURIEncoding(params[key])}`);
+		result.push(
+			`${encodeURIComponent(key)}=${normalizeURIEncoding(params[key])}`,
+		);
 	}
 	return result.join("&");
 };

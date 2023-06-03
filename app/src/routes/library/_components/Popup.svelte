@@ -91,29 +91,32 @@
 <style lang="scss">
 	form {
 		display: inline-block;
-		flex-direction: row;
+		flex-flow: row wrap;
 		min-width: 50%;
 		align-content: center;
-		flex-wrap: wrap;
 		align-self: flex-start;
 		gap: 0.8rem;
 		justify-self: center;
 		place-content: center;
 		align-items: flex-end;
 		margin: 0 auto;
+
 		button {
 			margin-bottom: 0 !important;
 		}
 	}
+
 	[type="file"] {
 		min-width: 10rem;
 		margin: 0;
 		filter: opacity(0);
 		opacity: 0;
 	}
+
 	[type="file"]::-webkit-file-upload-button {
 		visibility: hidden;
 	}
+
 	.file {
 		position: relative;
 		display: inline-block;
@@ -122,67 +125,73 @@
 		font-variant-caps: unset;
 		max-width: 15.5rem;
 	}
+
 	.file-button {
-		font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
-			"Open Sans", "Helvetica Neue", sans-serif;
+		font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+			Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+			sans-serif;
+
 		&:hover::after {
 			background: #525252b2;
 		}
 	}
+
 	.file-button::before {
 		content: "Choose an image";
 		display: inline-block;
 		background: var(--form-bg);
-		border: 0.0625rem solid hsla(0, 0%, 66.7%, 0.219);
+		border: 0.0625rem solid hsl(0deg 0% 66.7% / 21.9%);
 		border-radius: $md-radius;
-		box-shadow: inset 0.1125em -0.1125em 1em 0.5em hsla(0, 0%, 96.9%, 0.014), 0 0 0.25em 0.02em hsla(0, 0%, 66.7%, 0) !important;
-
+		box-shadow: inset 0.1125em -0.1125em 1em 0.5em hsl(0deg 0% 96.9% / 1.4%),
+			0 0 0.25em 0.02em hsl(0deg 0% 66.7% / 0%) !important;
 		padding: 0.4rem 0.7rem;
 		outline: none;
 		white-space: nowrap;
-		-webkit-user-select: none;
+		user-select: none;
 		position: absolute;
 		inset: 0;
 		width: inherit;
 		height: inherit;
 		color: #e3e3e3;
-		// color: rgb(53, 53, 53) !important;
+		// color: rgb(53, 53, 53) !important;color
 		cursor: pointer;
-		// text-shadow: 1px 1px #fff;
-		// font-weight: 700;
+		// text-shadow: 1px 1px #fff;text-shadow
+		// font-weight: 700;font-weight
 		font-variant-caps: unset !important;
 		font-size: 10pt;
 	}
+
 	.file-button::after {
 		position: absolute;
 		top: 0;
 		right: 0;
 		bottom: 0;
-		// left:0;
+		// left:0;left
 		content: "Select";
-		color: rgb(238, 238, 238);
+		color: rgb(238 238 238);
 		background: #353535b2;
 		display: block;
 		font-weight: 500;
-		// padding: ;
+		// padding: ;padding
 		padding: 0.4rem 0.7rem;
 		transition: background linear 125ms;
 	}
+
 	[type="file"]:hover::before {
 		border-color: black;
 	}
+
 	[type="file"]:active::before {
-		background: -webkit-linear-gradient(to top, #e3e3e3, #f9f9f9);
+		background: linear-gradient(to top, #e3e3e3, #f9f9f9);
 	}
+
 	.playlist-modal {
 		position: fixed;
 		gap: 0.8rem;
-
 		z-index: 100;
 		background: var(--mobile-popper-bg);
 		display: flex;
-		flex-direction: column;
-		flex-wrap: wrap;
+		flex-flow: column wrap;
 		top: 50%;
 		left: 50%;
 		min-width: 50%;
@@ -191,12 +200,13 @@
 		max-width: 100%;
 		max-height: 100%;
 		border-radius: $lg-radius;
-		border-color: rgba(129, 129, 129, 0.411);
+		border-color: rgb(129 129 129 / 41.1%);
 		border-width: 0.025rem;
 		border-style: solid;
 		transform: translate(-50%, -50%);
 		padding: 0.8rem;
 	}
+
 	.image {
 		align-self: center;
 	}

@@ -5,7 +5,10 @@ const RE_TEXT = /(?<=text:.*").[a-zA-Z ]+|.^$/gm;
 const RE_OBJ = /(\{)\n.*((text|icon|action):[\s\S]+?){3}\},([\s\S]+?).+?\}/gm;
 
 const PATH_TO_SRC = path.resolve("./src");
-const objects: Map<string, { text: string; icon: string; action: Promise<void> | void }> = new Map();
+const objects: Map<
+	string,
+	{ text: string; icon: string; action: Promise<void> | void }
+> = new Map();
 function recurse(fPath: string) {
 	const join = (str: string) => path.join(fPath, str);
 	const directory = fs.readdirSync(fPath, { encoding: "utf-8" });
@@ -18,7 +21,9 @@ function recurse(fPath: string) {
 		if (fs.statSync(join(item)).isDirectory()) {
 			const res = recurse(join(item));
 			Object.keys(res).forEach((key) => {
-				const set = res[key] as Set<string & { text: string; icon: string; action: Promise<void> | void }>;
+				const set = res[key] as Set<
+					string & { text: string; icon: string; action: Promise<void> | void }
+				>;
 
 				if (key === "text") {
 					for (const item of set) {

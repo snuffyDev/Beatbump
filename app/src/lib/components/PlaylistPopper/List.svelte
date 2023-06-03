@@ -25,12 +25,13 @@
 
 <style lang="scss">
 	.create {
-		// display: flex;
-		// flex-direction: row;
-		// padding: 0.125rem 0.25rem;
-		// background-color: var(--);
+		// display: flex;display
+		// flex-direction: row;flex-direction
+		// padding: 0.125rem 0.25rem;padding
+		// background-color: var(--);background-color
 		margin-bottom: 0;
 	}
+
 	li {
 		display: flex;
 		flex-direction: row;
@@ -38,27 +39,27 @@
 		gap: 0.8rem;
 		backdrop-filter: brightness(1.5);
 		border-radius: $lg-radius;
-		border: rgba(163, 163, 163, 0.212) solid 1px;
+		border: rgb(163 163 163 / 21.2%) solid 1px;
 
 		:first-of-type {
 			margin: 0 auto;
 		}
-		// backdrop-filter: brightness(2);
+		// backdrop-filter: brightness(2);backdrop-filter
 	}
+
 	ul {
 		list-style-type: none;
-		// overflow-x: hidden;
-		// overflow-y: scroll;
+		// overflow-x: hidden;overflow-x
+		// overflow-y: scroll;overflow-y
 		height: 100%;
-		padding: 0;
 		margin: 0;
 		display: flex;
 		gap: 0.5rem;
 		padding: 0;
-		// overflow-y: scroll;
+		// overflow-y: scroll;overflow-y
 
 		flex-direction: column;
-		// background: inherit;
-		// padding: 0.25rem 0.5rem;
+		// background: inherit;background
+		// padding: 0.25rem 0.5rem;padding
 	}
 </style>

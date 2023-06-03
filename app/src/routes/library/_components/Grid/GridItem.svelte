@@ -33,53 +33,58 @@
 <style lang="scss">
 	.item {
 		display: flex;
-		flex-wrap: nowrap;
-		flex-direction: column;
-
+		flex-flow: column nowrap;
 		justify-content: flex-start;
-
 		cursor: pointer;
 		border-radius: 0.4rem;
 		padding: 0.5rem 0.4rem 0.4rem;
 		position: relative;
 		gap: 0.3rem;
 		width: 100%;
+
 		.img {
 			width: 100%;
 			margin-bottom: 0.5em;
+
 			img {
 				height: auto;
 				width: 100%;
 			}
 		}
 	}
+
 	.item-title {
 		display: inline;
 		padding: 0.3rem 0.1rem;
-		font-family: "CommissionerVariable";
+		font-family: CommissionerVariable;
 		font-weight: 500;
 		font-size: 1.1em;
 		letter-spacing: -0.02em;
-		// margin-bottom: 0.5em;
+		// margin-bottom: 0.5em;margin-bottom
 	}
+
 	.item-description {
 		font-weight: 500;
 		color: #999;
 	}
+
 	.item-text {
 		display: flex;
 		flex-direction: column;
 	}
+
 	@media screen and (min-width: 25em) and (max-width: 37em) {
 		.item {
 			max-width: 14rem;
 		}
 	}
+
 	@media screen and (min-width: 37em) and (max-width: 48em) {
 		.item {
 			max-width: 14.75rem;
 		}
 	}
+
 	@media screen and (min-width: 48em) {
 		.item {
 			max-width: 16rem;

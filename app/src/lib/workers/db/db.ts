@@ -23,7 +23,10 @@ function iter<T>(array: ArrayLike<T>, cb: VoidCallback<T>): void {
 	idx = null;
 }
 
-function filter<T, S>(array: Array<T>, predicate: (item: Maybe<T>) => boolean): T[] {
+function filter<T, S>(
+	array: Array<T>,
+	predicate: (item: Maybe<T>) => boolean,
+): T[] {
 	let idx = -1,
 		curPos = 0;
 	const result: T[] = [],
@@ -76,7 +79,10 @@ export class IDB {
 			};
 		});
 	}
-	public transaction<K = unknown, T extends (store: IDBObjectStore) => K = (store: IDBObjectStore) => K>(
+	public transaction<
+		K = unknown,
+		T extends (store: IDBObjectStore) => K = (store: IDBObjectStore) => K,
+	>(
 		store: IDBStoreKeys,
 		type: IDBTransactionMode,
 		callback: T,
@@ -115,13 +121,18 @@ const mod = {
 	},
 };
 
-function generateId(size = 16, charset: "normal" | "alternative" = "normal"): string {
+function generateId(
+	size = 16,
+	charset: "normal" | "alternative" = "normal",
+): string {
 	return mod.generate(size, charset);
 }
 
 const db = new IDB("beatbump", 3);
 
-export function updatePlaylist(entry: IDBPlaylistInternal): Promise<IDBMessage<IDBPlaylist>> {
+export function updatePlaylist(
+	entry: IDBPlaylistInternal,
+): Promise<IDBMessage<IDBPlaylist>> {
 	let result: IDBMessage;
 	return new Promise<IDBMessage<IDBPlaylist>>((resolve) => {
 		db.transaction("playlists", "readwrite", (store) => {
@@ -135,8 +146,12 @@ export function updatePlaylist(entry: IDBPlaylistInternal): Promise<IDBMessage<I
 							name: entry?.name ?? cursor?.value?.name,
 							thumbnail: entry?.thumbnail ?? cursor?.value?.thumbnail,
 							description: entry?.description ?? cursor?.value?.description,
-							length: Array.isArray(entry?.items) ? entry?.items.length : cursor?.value?.items.length,
-							items: Array.isArray(entry?.items) ? [...entry.items] : [...cursor.value.items],
+							length: Array.isArray(entry?.items)
+								? entry?.items.length
+								: cursor?.value?.items.length,
+							items: Array.isArray(entry?.items)
+								? [...entry.items]
+								: [...cursor.value.items],
 						});
 					}
 
@@ -160,14 +175,18 @@ export function updatePlaylist(entry: IDBPlaylistInternal): Promise<IDBMessage<I
 	});
 }
 
-export function createNewPlaylist(entry: IDBPlaylist): Promise<IDBMessage<void>> {
+export function createNewPlaylist(
+	entry: IDBPlaylist,
+): Promise<IDBMessage<void>> {
 	return new Promise<IDBMessage<void>>((resolve) => {
 		db.transaction("playlists", "readwrite", (store) => {
 			try {
 				const result = store.put(
 					Object.assign(entry, {
 						id: generateId(32),
-						length: Array.isArray(entry?.items) ? [...entry.items].length : [entry?.items].length,
+						length: Array.isArray(entry?.items)
+							? [...entry.items].length
+							: [entry?.items].length,
 					}),
 				);
 				result.onsuccess = () => {
@@ -210,7 +229,9 @@ export function setMultipleFavorites(items: Item[]): Promise<IDBMessage<void>> {
 				};
 				store.transaction.onerror = () => {
 					resolve({
-						message: "Error adding items to favorites. Reason: " + store.transaction.error,
+						message:
+							"Error adding items to favorites. Reason: " +
+							store.transaction.error,
 					});
 				};
 			} catch (error) {
@@ -222,7 +243,9 @@ export function setMultipleFavorites(items: Item[]): Promise<IDBMessage<void>> {
 	});
 }
 
-export function setMultiplePlaylists(items: IDBPlaylist[] = []): Promise<IDBMessage<void>> {
+export function setMultiplePlaylists(
+	items: IDBPlaylist[] = [],
+): Promise<IDBMessage<void>> {
 	if (Array.isArray(items) && !items.length) return;
 	return new Promise<IDBMessage<void>>((resolve) => {
 		return db.transaction("playlists", "readwrite", (store) => {
@@ -233,7 +256,9 @@ export function setMultiplePlaylists(items: IDBPlaylist[] = []): Promise<IDBMess
 				};
 				store.transaction.onerror = () => {
 					resolve({
-						message: "Error creating new playlists. Reason: " + store.transaction.error,
+						message:
+							"Error creating new playlists. Reason: " +
+							store.transaction.error,
 					});
 				};
 			} catch (error) {
@@ -287,7 +312,10 @@ export function deleteAllPlaylists(): Promise<IDBMessage<void>> {
 	});
 }
 
-export function deleteSongFromPlaylist(playlistId: string, videoId: string): Promise<IDBMessage<void>> {
+export function deleteSongFromPlaylist(
+	playlistId: string,
+	videoId: string,
+): Promise<IDBMessage<void>> {
 	return new Promise<IDBMessage<void>>((resolve) => {
 		return db.transaction("playlists", "readwrite", (store) => {
 			try {
@@ -354,7 +382,10 @@ export function getPlaylists(): Promise<IDBMessage<IDBPlaylist[]>> {
 	return new Promise<IDBMessage<IDBPlaylist[]>>((resolve) => {
 		db.transaction("playlists", "readwrite", (store) => {
 			try {
-				if (MIGRATION_DATA["playlists"] && Array.isArray(MIGRATION_DATA["playlists"])) {
+				if (
+					MIGRATION_DATA["playlists"] &&
+					Array.isArray(MIGRATION_DATA["playlists"])
+				) {
 					iter(MIGRATION_DATA["playlists"], (item) => {
 						store.put(item);
 					});
@@ -382,7 +413,10 @@ export function getPlaylists(): Promise<IDBMessage<IDBPlaylist[]>> {
 										const illegalArray = item?.items[subIdx];
 
 										results[idx].items.splice(subIdx, 1);
-										results[idx].items = [...results[idx].items, ...(illegalArray as Array<any>)].flat();
+										results[idx].items = [
+											...results[idx].items,
+											...(illegalArray as Array<any>),
+										].flat();
 									}
 								}
 								results[idx].length = item?.items.length ?? item?.length;
@@ -415,7 +449,8 @@ const methods = {
 export const dbHandler = <
 	Action extends Actions = any,
 	Type extends "favorite" | "playlist" | "playlists" | "favorites" = any,
-	Key extends keyof Methods & `${Action & string}${Capitalize<Type>}` = keyof Methods &
+	Key extends keyof Methods &
+		`${Action & string}${Capitalize<Type>}` = keyof Methods &
 		`${Action & string}${Capitalize<Type>}` &
 		string,
 	Fn extends Methods[Key] = Methods[Key],

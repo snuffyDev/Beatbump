@@ -2,7 +2,10 @@
 	context="module"
 	lang="ts"
 >
-	export function slide(node: Element, { delay = 0, duration = 400, easing = cubicOut } = {}) {
+	export function slide(
+		node: Element,
+		{ delay = 0, duration = 400, easing = cubicOut } = {},
+	) {
 		const style = getComputedStyle(node);
 		const opacity = +style.opacity;
 		const height = parseFloat(style.height);
@@ -32,7 +35,9 @@
 
 	// Focus state action
 	function focusState(node: HTMLElement) {
-		function handleFocusOut(event: FocusEvent & { relatedTarget: HTMLElement & EventTarget }) {
+		function handleFocusOut(
+			event: FocusEvent & { relatedTarget: HTMLElement & EventTarget },
+		) {
 			// console.log(node.contains(event.relatedTarget))
 			if (!node.contains(event.relatedTarget)) {
 				node.dispatchEvent(new CustomEvent("lostfocus"));
@@ -186,12 +191,14 @@
 	.menu {
 		display: contents;
 	}
+
 	.dd-button {
-		stroke: rgba(0, 0, 0, 0.692);
-		margin: 0pt;
+		stroke: rgb(0 0 0 / 69.2%);
+		margin: 0;
 		position: unset;
-		// z-index: 5;
+		// z-index: 5;z-index
 		margin-left: auto;
+
 		/* place-items: flex-end; */
 		cursor: pointer;
 	}

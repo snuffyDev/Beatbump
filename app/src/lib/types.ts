@@ -22,7 +22,10 @@ export interface ICarousel<T extends IListItemRenderer | MoodsAndGenresItem> {
 	results: T[];
 	isBrowse?: boolean;
 }
-export type Item = IMergedObject<IMergedObject<IListItemRenderer, ICarouselTwoRowItem>, Song>;
+export type Item = IMergedObject<
+	IMergedObject<IListItemRenderer, ICarouselTwoRowItem>,
+	Song
+>;
 
 export interface Album {
 	browseId?: string;
@@ -147,7 +150,12 @@ export enum RequestType {
 	artist = "artist",
 	playlist = "playlist",
 }
-export type JSON = string | number | boolean | JSON[] | Record<string, { [key: string]: JSON }>;
+export type JSON =
+	| string
+	| number
+	| boolean
+	| JSON[]
+	| Record<string, { [key: string]: JSON }>;
 
 export type RequestParams = {
 	endpoint?: string;

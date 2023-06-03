@@ -24,10 +24,15 @@
 	import { onMount } from "svelte";
 	import { get } from "svelte/store";
 
+	export let data;
+
+	$: ({ key } = data);
 	let main: HTMLElement;
-	$: key = $page.data.key;
+
 	$: console.log($groupSession);
+
 	let isFullscreen = false;
+
 	$: $fullscreenStore === "open"
 		? setTimeout(() => {
 				isFullscreen = true;
@@ -51,7 +56,11 @@
 		}
 	}
 
-	$: if (browser && $settings["playback"]["Remember Last Track"] === true && $currentTrack) {
+	$: if (
+		browser &&
+		$settings["playback"]["Remember Last Track"] === true &&
+		$currentTrack
+	) {
 		localStorage.setItem("lastTrack", JSON.stringify($currentTrack));
 	}
 
@@ -62,8 +71,13 @@
 
 	onMount(() => {
 		try {
-			if ($settings["playback"]["Remember Last Track"] && localStorage["lastTrack"]) {
-				const track = JSON.parse(localStorage.getItem("lastTrack")) as unknown as typeof $currentTrack;
+			if (
+				$settings["playback"]["Remember Last Track"] &&
+				localStorage["lastTrack"]
+			) {
+				const track = JSON.parse(
+					localStorage.getItem("lastTrack"),
+				) as unknown as typeof $currentTrack;
 
 				SessionListService.setTrackWillPlayNext(track, 0);
 				SessionListService.getMoreLikeThis({
@@ -91,7 +105,10 @@
 	class="wrapper app-content-m"
 	{hasplayer}
 	bind:this={main}
-	style:overflow-y={$page.route.id === "/search/[slug]" && !$page.url.search.includes("all") ? "hidden" : "auto"}
+	style:overflow-y={$page.route.id === "/search/[slug]" &&
+	!$page.url.search.includes("all")
+		? "hidden"
+		: "auto"}
 	id="wrapper"
 >
 	<Wrapper
@@ -122,16 +139,20 @@
 	global
 >
 	@use "../global/redesign/main.scss" as *;
+
 	.footer-container {
-		transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 350ms, opacity cubic-bezier(0.165, 0.84, 0.44, 1) 350ms;
+		transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 350ms,
+			opacity cubic-bezier(0.165, 0.84, 0.44, 1) 350ms;
 		opacity: 0;
 		transform: translate3d(0, var(--player-bar-height), 0);
 	}
+
 	.show-player {
 		opacity: 1;
 		transform: translate3d(0, 0, 0);
 		will-change: transform;
 	}
+
 	.wrapper {
 		overflow-y: auto;
 		-webkit-overflow-scrolling: touch;

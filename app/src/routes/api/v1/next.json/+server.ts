@@ -48,7 +48,9 @@ const parser = parseParams<NextSchema>([
 	"visitorData",
 ]);
 
-export const GET: RequestHandler = async ({ url }): Promise<IResponse<NextEndpointResponse>> => {
+export const GET: RequestHandler = async ({
+	url,
+}): Promise<IResponse<NextEndpointResponse>> => {
 	const query = url.searchParams;
 
 	const {
@@ -113,7 +115,9 @@ export const GET: RequestHandler = async ({ url }): Promise<IResponse<NextEndpoi
 		return json(Object.assign({}, res, { response }));
 	}
 
-	return json(Object.assign({}, await parseNextBodyContinuation(response), { response }));
+	return json(
+		Object.assign({}, await parseNextBodyContinuation(response), { response }),
+	);
 };
 
 async function parseNextBody(data: Dict<any>) {
@@ -121,30 +125,37 @@ async function parseNextBody(data: Dict<any>) {
 		const tabs =
 			("contents" in data &&
 				typeof data?.contents === "object" &&
-				data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer
-					?.tabs) ||
+				data?.contents?.singleColumnMusicWatchNextResultsRenderer
+					?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs) ||
 			[];
 
-		const related = Array.isArray(tabs) && tabs[2]?.tabRenderer?.endpoint?.browseEndpoint;
+		const related =
+			Array.isArray(tabs) && tabs[2]?.tabRenderer?.endpoint?.browseEndpoint;
 		const contents = Array.isArray(
-			tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.contents,
+			tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content
+				?.playlistPanelRenderer?.contents,
 		)
-			? (tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.contents as Array<any>)
+			? (tabs[0]?.tabRenderer?.content?.musicQueueRenderer?.content
+					?.playlistPanelRenderer?.contents as Array<any>)
 			: null;
 
 		if (!contents) throw Error("Failed to locate `contents` object");
 
 		const nextRadioContinuationData =
 			Array.isArray(
-				data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer
-					?.tabs?.[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.continuations,
+				data?.contents?.singleColumnMusicWatchNextResultsRenderer
+					?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs?.[0]
+					?.tabRenderer?.content?.musicQueueRenderer?.content
+					?.playlistPanelRenderer?.continuations,
 			) &&
-			(data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer
-				?.tabs?.[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.continuations[0]
+			(data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer
+				?.watchNextTabbedResultsRenderer?.tabs?.[0]?.tabRenderer?.content
+				?.musicQueueRenderer?.content?.playlistPanelRenderer?.continuations[0]
 				?.nextRadioContinuationData ??
-				data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer
-					?.tabs?.[0]?.tabRenderer?.content?.musicQueueRenderer?.content?.playlistPanelRenderer?.continuations[0]
-					?.nextContinuationData);
+				data?.contents?.singleColumnMusicWatchNextResultsRenderer
+					?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs?.[0]
+					?.tabRenderer?.content?.musicQueueRenderer?.content
+					?.playlistPanelRenderer?.continuations[0]?.nextContinuationData);
 
 		const clickTrackingParams = nextRadioContinuationData?.clickTrackingParams;
 		const continuation = nextRadioContinuationData?.continuation;
@@ -171,30 +182,45 @@ async function parseNextBody(data: Dict<any>) {
 /*
  * This is for when you are already listening to a song
  **************************************/
-async function parseNextBodyContinuation(data: { contents?: any; responseContext?: any; continuationContents?: any }) {
+async function parseNextBodyContinuation(data: {
+	contents?: any;
+	responseContext?: any;
+	continuationContents?: any;
+}) {
 	const {
 		responseContext = {},
 		continuationContents: {
 			playlistPanelContinuation: {
 				contents = [],
-				continuations: [{ nextRadioContinuationData: { continuation: continuation = "" } = {} } = {}] = [],
+				continuations: [
+					{
+						nextRadioContinuationData: { continuation: continuation = "" } = {},
+					} = {},
+				] = [],
 				currentIndex = 0,
 				...rest
 			} = {},
 		} = {},
 	} = data;
 
-	const clickTrackingParams = (contents as any[]).at(-1)?.playlistPanelVideoRenderer?.navigationEndpoint
-		?.clickTrackingParams;
+	const clickTrackingParams = (contents as any[]).at(-1)
+		?.playlistPanelVideoRenderer?.navigationEndpoint?.clickTrackingParams;
 
 	const visitorData = responseContext?.visitorData;
-	const parsed = await parseContents(contents, continuation, clickTrackingParams, rest, visitorData);
+	const parsed = await parseContents(
+		contents,
+		continuation,
+		clickTrackingParams,
+		rest,
+		visitorData,
+	);
 
 	const tabs =
-		data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer?.tabs ||
-		[];
+		data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer
+			?.watchNextTabbedResultsRenderer?.tabs || [];
 
-	const related = Array.isArray(tabs) && tabs[2]?.tabRenderer?.endpoint?.browseEndpoint;
+	const related =
+		Array.isArray(tabs) && tabs[2]?.tabRenderer?.endpoint?.browseEndpoint;
 
 	return Object.assign(parsed, { related, currentIndex });
 }

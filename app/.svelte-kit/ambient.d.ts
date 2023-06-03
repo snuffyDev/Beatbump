@@ -110,6 +110,7 @@ declare module '$env/static/private' {
 	export const DEBUGINFOD_URLS: string;
 	export const npm_package_json: string;
 	export const LC_TIME: string;
+	export const BUN_INSTALL: string;
 	export const P9K_SSH: string;
 	export const npm_config_legacy_peer_deps: string;
 	export const VSCODE_GIT_ASKPASS_MAIN: string;
@@ -248,6 +249,7 @@ declare module '$env/dynamic/private' {
 		DEBUGINFOD_URLS: string;
 		npm_package_json: string;
 		LC_TIME: string;
+		BUN_INSTALL: string;
 		P9K_SSH: string;
 		npm_config_legacy_peer_deps: string;
 		VSCODE_GIT_ASKPASS_MAIN: string;

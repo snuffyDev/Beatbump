@@ -15,11 +15,26 @@ export type Alert = {
 };
 
 // Derived from Settings
-export const theme = derived(settings, ($settings) => $settings.appearance.Theme);
-export const filterAutoPlay = derived(settings, ($settings) => $settings?.playback["Dedupe Automix"]);
-export const preferWebM = derived(settings, ($settings) => $settings?.playback["Prefer WebM Audio"]);
-export const preserveSearch = derived(settings, ($settings) => $settings?.search?.Preserve);
-export const immersiveQueue = derived(settings, ($settings) => $settings?.appearance["Immersive Queue"]);
+export const theme = derived(
+	settings,
+	($settings) => $settings.appearance.Theme,
+);
+export const filterAutoPlay = derived(
+	settings,
+	($settings) => $settings?.playback["Dedupe Automix"],
+);
+export const preferWebM = derived(
+	settings,
+	($settings) => $settings?.playback["Prefer WebM Audio"],
+);
+export const preserveSearch = derived(
+	settings,
+	($settings) => $settings?.search?.Preserve,
+);
+export const immersiveQueue = derived(
+	settings,
+	($settings) => $settings?.appearance["Immersive Queue"],
+);
 // Alert
 export const alertHandler = _alertHandler();
 function _alertHandler() {

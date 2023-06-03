@@ -31,14 +31,17 @@ function parseResponse(data: {
 	header: any;
 	contents: {
 		singleColumnBrowseResultsRenderer: {
-			tabs: { tabRenderer: { content: { sectionListRenderer: { contents: any } } } }[];
+			tabs: {
+				tabRenderer: { content: { sectionListRenderer: { contents: any } } };
+			}[];
 		};
 	};
 	responseContext: { visitorData: string };
 }) {
 	const header = data?.header;
 	const contents =
-		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents;
+		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+			?.content?.sectionListRenderer?.contents;
 	const visitorData = data?.responseContext?.visitorData ?? "";
 	return ArtistPageParser({
 		header,

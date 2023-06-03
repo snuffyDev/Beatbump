@@ -18,7 +18,9 @@
 		if (!query.length) return;
 		dispatch("submitted", { submitted: true, filter, query });
 		fullscreenStore.set("closed");
-		let url = `/search/${encodeURIComponent(query)}${filter !== undefined ? `?filter=${filter}` : ""}`;
+		let url = `/search/${encodeURIComponent(query)}${
+			filter !== undefined ? `?filter=${filter}` : ""
+		}`;
 		goto(url);
 	}
 
@@ -43,7 +45,9 @@
 	}
 	const typeahead = debounce(async () => {
 		if (!query) return (results = []);
-		const response = await fetch("/api/v1/get_search_suggestions.json?q=" + encodeURIComponent(query));
+		const response = await fetch(
+			"/api/v1/get_search_suggestions.json?q=" + encodeURIComponent(query),
+		);
 		results = await response.json();
 	}, 250);
 </script>
@@ -135,14 +139,15 @@
 	.nav-item {
 		margin: 0 0.4rem;
 	}
+
 	.suggestions {
 		position: absolute;
 		top: 4.5em;
 		z-index: 200;
 		background: var(--top-bg);
 		width: 100%;
-
 		width: clamp(28vw, 35vw, 78vw);
+
 		/* max-height: 44vh; */
 		border-radius: $xs-radius;
 		height: auto;
@@ -153,27 +158,25 @@
 
 		&::after {
 			position: absolute;
-			top: 0;
-			right: 0;
+			inset: 0;
 			border-radius: inherit;
-			bottom: 0;
-			left: 0;
 			content: "";
 			width: 100%;
 			height: 100%;
-			background: rgba(255, 255, 255, 0.007);
+			background: rgb(255 255 255 / 0.7%);
 			z-index: -1;
 			pointer-events: none;
-			border: 0.0625rem solid hsla(0, 0%, 66.7%, 0.219);
+			border: 0.0625rem solid hsl(0deg 0% 66.7% / 21.9%);
 		}
+
 		@media only screen and (max-width: 640px) {
 			left: 0;
-
 			width: clamp(68%, 78%, 95%);
 			right: 0;
 		}
-		// padding: 0.4em;
+		// padding: 0.4em;padding
 	}
+
 	form.inline {
 		position: absolute;
 		height: 4em;
@@ -185,6 +188,7 @@
 		right: 0;
 		width: 100%;
 	}
+
 	ul {
 		padding: 0;
 		margin: 0;
@@ -195,24 +199,26 @@
 			&:first-child {
 				border-radius: $xs-radius $xs-radius 0 0;
 			}
+
 			&:last-child {
 				border-radius: 0 0 $xs-radius $xs-radius;
 			}
-			transition: background-color cubic-bezier(0.47, 0, 0.745, 0.715) 80ms;
 
+			transition: background-color cubic-bezier(0.47, 0, 0.745, 0.715) 80ms;
 			padding: 0.7em 0.5em;
 			z-index: 1;
 			margin: 0;
-			// border-radius: inherit;
+			// border-radius: inherit;border-radius
 			cursor: pointer;
-			// background: inherit;
+			// background: inherit;background
 			font-size: 1em;
 			background: #0000;
-			// height: 100%;
-			// max-height: 5.125em;
-			// border-bottom: 1px solid #1a1a1a;
+			// height: 100%;height
+			// max-height: 5.125em;max-height
+			// border-bottom: 1px solid #1a1a1a;border-bottom
+
 			&:hover {
-				background: rgba(255, 255, 255, 0.1);
+				background: rgb(255 255 255 / 10%);
 			}
 		}
 	}

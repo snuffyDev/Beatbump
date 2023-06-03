@@ -2,7 +2,10 @@ import { DROPDOWN_ITEMS, type TypedDropdownItem } from "./dropdowns.config";
 
 type Schema = {
 	readonly [PropertyKey in keyof typeof DROPDOWN_ITEMS]: Partial<
-		TypedDropdownItem<(typeof DROPDOWN_ITEMS)[PropertyKey]["text"], (typeof DROPDOWN_ITEMS)[PropertyKey]["icon"]>
+		TypedDropdownItem<
+			(typeof DROPDOWN_ITEMS)[PropertyKey]["text"],
+			(typeof DROPDOWN_ITEMS)[PropertyKey]["icon"]
+		>
 	>;
 };
 

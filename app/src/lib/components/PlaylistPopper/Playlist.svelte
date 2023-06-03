@@ -29,6 +29,7 @@
 	.image {
 		max-width: 5.333333rem;
 		max-height: 5.333333rem;
+
 		img {
 			max-width: inherit;
 			max-height: inherit;
@@ -36,10 +37,12 @@
 			height: 100%;
 		}
 	}
+
 	.list-item-body {
 		display: flex;
 		flex-direction: column;
 	}
+
 	li {
 		display: flex;
 		flex-direction: row;
@@ -47,14 +50,16 @@
 		gap: 0.8rem;
 		backdrop-filter: brightness(1.5);
 		border-radius: $lg-radius;
-		// backdrop-filter: brightness(2);
+		// backdrop-filter: brightness(2);backdrop-filter
 		transition: backdrop-filter linear 50ms;
-		border: rgba(163, 163, 163, 0.212) solid 1px;
+		border: rgb(163 163 163 / 21.2%) solid 1px;
 		align-items: center;
+
 		&:hover {
 			backdrop-filter: brightness(1.95);
 			cursor: pointer;
 		}
+
 		&:active:hover {
 			backdrop-filter: brightness(2.25);
 		}

@@ -62,7 +62,12 @@
 	const cache = PositionCache();
 
 	interface ClickHandler {
-		(item: Item, index: number, stores: StoreSubscriptions, visitorData?: string): Promise<void>;
+		(
+			item: Item,
+			index: number,
+			stores: StoreSubscriptions,
+			visitorData?: string,
+		): Promise<void>;
 	}
 
 	function binarySearchIndex<T extends Record<string, any>[]>(
@@ -89,7 +94,12 @@
 		return -1;
 	}
 
-	const handlePlaylistClick: ClickHandler = async (item, index, stores, visitorData) => {
+	const handlePlaylistClick: ClickHandler = async (
+		item,
+		index,
+		stores,
+		visitorData,
+	) => {
 		const { $queue, $startIndex = 0, $list } = stores;
 		if (item.playlistId === $list!.currentMixId) {
 			if (index - $startIndex < $queue.length) {
@@ -115,7 +125,10 @@
 						playlistId: item.playlistId,
 						loggingContext: item.loggingContext,
 						playerParams: item?.playerParams,
-						playlistSetVideoId: APIParams.lt100 === item.playerParams ? undefined : item?.playlistSetVideoId,
+						playlistSetVideoId:
+							APIParams.lt100 === item.playerParams
+								? undefined
+								: item?.playlistSetVideoId,
 
 						ctoken: $list!.continuation,
 						clickTrackingParams: item.clickTrackingParams!,
@@ -143,7 +156,9 @@
 			playlistId: item.playlistId,
 			visitorData,
 			clickTrackingParams:
-				(item.playlistId === $list.currentMixId && $queue[index]?.clickTrackingParams) || item?.clickTrackingParams,
+				(item.playlistId === $list.currentMixId &&
+					$queue[index]?.clickTrackingParams) ||
+				item?.clickTrackingParams,
 			index: index,
 			params: item.playerParams ?? item?.itct,
 			playlistSetVideoId: item?.playlistSetVideoId,
@@ -189,10 +204,22 @@
 		}
 	};
 
-	const buildMenu = ({ item, idx, SITE_ORIGIN_URL, dispatch, page }: BuildMenuParams) =>
+	const buildMenu = ({
+		item,
+		idx,
+		SITE_ORIGIN_URL,
+		dispatch,
+		page,
+	}: BuildMenuParams) =>
 		buildDropdown()
 			.add("View Artist", async () => {
-				goto(`/artist/${item?.artistInfo ? item?.artistInfo?.artist?.[0].browseId : item?.subtitle[0].browseId}`);
+				goto(
+					`/artist/${
+						item?.artistInfo
+							? item?.artistInfo?.artist?.[0].browseId
+							: item?.subtitle[0].browseId
+					}`,
+				);
 				await tick();
 				window.scrollTo({
 					behavior: "smooth",
@@ -208,7 +235,9 @@
 			})
 			.add("Add to Playlist", async () => {
 				if (item.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
-					const response = await fetch("/api/v1/get_queue.json?playlistId=" + item.playlistId);
+					const response = await fetch(
+						"/api/v1/get_queue.json?playlistId=" + item.playlistId,
+					);
 					const data = await response.json();
 					const items: Item[] = data;
 					showAddToPlaylistPopper.set({ state: true, item: [...items] });
@@ -275,7 +304,13 @@
 
 <script lang="ts">
 	import { page as PageStore } from "$app/stores";
-	import { groupSession, isMobileMQ, isPagePlaying, queue, showAddToPlaylistPopper } from "$lib/stores";
+	import {
+		groupSession,
+		isMobileMQ,
+		isPagePlaying,
+		queue,
+		showAddToPlaylistPopper,
+	} from "$lib/stores";
 	import type { Item } from "$lib/types";
 	import { Logger, notify } from "$lib/utils";
 
@@ -339,22 +374,38 @@
 			{ index: idx },
 			(a, b) => (a.index ?? 0) - (b.index ?? 0),
 		);
-		const position = cache.has(idx) ? cache.get(idx) : cache.set(idx, queueIndex < 0 ? idx : queueIndex);
+		const position = cache.has(idx)
+			? cache.get(idx)
+			: cache.set(idx, queueIndex < 0 ? idx : queueIndex);
 		console.log({ cache, idx, position, queueIndex, $listItemPageContext });
 		switch (page) {
 			case "queue":
-                
-				await handlePlaylistClick(item, position, { $list, $queue, $startIndex }, visitorData);
+				await handlePlaylistClick(
+					item,
+					position,
+					{ $list, $queue, $startIndex },
+					visitorData,
+				);
 				break;
 			case "playlist":
-				await handlePlaylistClick(item, position, { $list, $queue, $startIndex }, visitorData);
+				await handlePlaylistClick(
+					item,
+					position,
+					{ $list, $queue, $startIndex },
+					visitorData,
+				);
 				break;
 			case "library":
 				list.updatePosition(idx);
 				dispatch("initLocalPlaylist", { idx });
 				break;
 			case "release":
-				await handlePlaylistClick(item, position, { $list, $queue, $startIndex }, visitorData);
+				await handlePlaylistClick(
+					item,
+					position,
+					{ $list, $queue, $startIndex },
+					visitorData,
+				);
 
 				break;
 			default:
@@ -460,7 +511,8 @@
 	{:else}
 		<span
 			class="length"
-			class:hidden={!item?.length ? true : false}>{(item?.length?.text ?? item.length) || ""}</span
+			class:hidden={!item?.length ? true : false}
+			>{(item?.length?.text ?? item.length) || ""}</span
 		>
 	{/if}
 </article>

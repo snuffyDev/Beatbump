@@ -36,7 +36,9 @@
 	const { page, parentPlaylistId = null } = CTX_ListItem.get();
 
 	$: isPlaying =
-		(page !== "queue" && page !== "release" ? $isPagePlaying.has($SPage.params.slug) : true) &&
+		(page !== "queue" && page !== "release"
+			? $isPagePlaying.has($SPage.params.slug)
+			: true) &&
 		$SessionListService.mix.length > 0 &&
 		$SessionListService.position === idx &&
 		$SessionListService.mix[idx]?.videoId === item.videoId;
@@ -48,7 +50,13 @@
 			text: "View Artist",
 			icon: "artist",
 			action: async () => {
-				goto(`/artist/${item?.artistInfo ? item.artistInfo.artist[0].browseId : item?.subtitle[0].browseId}`);
+				goto(
+					`/artist/${
+						item?.artistInfo
+							? item.artistInfo.artist[0].browseId
+							: item?.subtitle[0].browseId
+					}`,
+				);
 				await tick();
 				window.scrollTo({
 					behavior: "smooth",
@@ -128,7 +136,9 @@
 					return AudioPlayer.previous(false);
 				}
 				if (idx === $queue.length - 1) {
-					const pos = SessionListService.updatePosition(idx === 0 ? 0 : idx - 1);
+					const pos = SessionListService.updatePosition(
+						idx === 0 ? 0 : idx - 1,
+					);
 					// updateGroupPosition("<-", pos);
 					SessionListService.next(true, true);
 					await tick();
@@ -179,7 +189,9 @@
 	bind:this={parent}
 	class="m-item"
 	tabindex="0"
-	class:isPlaying={isPagePlaying.has($SPage.params.slug) && $queue?.length > 0 && $queuePosition === idx}
+	class:isPlaying={isPagePlaying.has($SPage.params.slug) &&
+		$queue?.length > 0 &&
+		$queuePosition === idx}
 	on:click={handleClick}
 	on:pointerenter={(e) => {
 		isHovering = true;
@@ -274,7 +286,8 @@
 	{:else}
 		<span
 			class="length"
-			class:hidden={!item?.length ? true : false}>{(item?.length?.text ?? item.length) || ""}</span
+			class:hidden={!item?.length ? true : false}
+			>{(item?.length?.text ?? item.length) || ""}</span
 		>
 	{/if}
 </article>

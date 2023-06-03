@@ -5,13 +5,16 @@
 
 	import { AudioPlayer } from "$lib/player";
 	import { format } from "$lib/utils";
-	const { currentTimeStore, durationStore } = AudioPlayer;
+	import { windowWidth } from "$stores/window";
+	const { progress, currentTimeStore, durationStore } = AudioPlayer;
 
 	let isTouchDrag = false;
 	let seeking = false;
 	let hovering = false;
 	let hoverWidth;
+	let cWidth = 0;
 	let songBar: HTMLElement;
+	let songBarRect: DOMRect;
 	function trackMouse(event: PointerEvent) {
 		if (seeking) seekAudio(event);
 		if (hovering) hoverEvent(event);
@@ -25,7 +28,10 @@
 
 	function hoverEvent(event) {
 		if (!songBar) return;
-		hoverWidth = hover(event, songBar.getBoundingClientRect());
+		hoverWidth = hover(event, {
+			width: cWidth,
+			left: Math.abs(cWidth - $windowWidth) / 2,
+		});
 	}
 
 	function hover(event, bounds) {
@@ -36,7 +42,12 @@
 	function seekAudio(event: PointerEvent) {
 		if (!songBar && !AudioPlayer.player.src) return;
 
-		AudioPlayer.seek(seek(event, songBar.getBoundingClientRect()) * $durationStore);
+		AudioPlayer.seek(
+			seek(event, {
+				width: cWidth,
+				left: Math.abs(cWidth - $windowWidth) / 2,
+			}) * $durationStore,
+		);
 	}
 </script>
 
@@ -47,6 +58,7 @@
 <div class="progress-container">
 	<span class="timestamp secondary">{format($currentTimeStore)}</span>
 	<div class="progress-bar-wrapper">
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div
 			class="progress-bar"
 			transition:fade
@@ -85,6 +97,7 @@
 				}}
 				class:isTouchDrag
 				bind:this={songBar}
+				bind:clientWidth={cWidth}
 				value={$currentTimeStore}
 				max={$durationStore}
 			/>

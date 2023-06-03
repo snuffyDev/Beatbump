@@ -14,13 +14,13 @@
 </script>
 
 <script lang="ts">
-	import type Peer from "peerjs";
 	import Icon from "$lib/components/Icon/Icon.svelte";
-	import { IDBService } from "$lib/workers/db/service";
-	import { createEventDispatcher, onMount, tick } from "svelte";
-	import { fade } from "svelte/transition";
 	import { notify } from "$lib/utils";
 	import { setMultiplePlaylists } from "$lib/workers/db/db";
+	import { IDBService } from "$lib/workers/db/service";
+	import type Peer from "peerjs";
+	import { createEventDispatcher, onMount, tick } from "svelte";
+	import { fade } from "svelte/transition";
 
 	type PeerType = "Sender" | "Receiver";
 
@@ -212,8 +212,8 @@
 						<h1>Sync your data</h1>
 						<div class="subheading">Access your favorites on any device</div>
 						<p>
-							Securely sync your data across your devices! <br /> To begin, open this screen on another device. Whenever
-							you are ready, hit 'Next Step'
+							Securely sync your data across your devices! <br /> To begin, open
+							this screen on another device. Whenever you are ready, hit 'Next Step'
 						</p>
 					</div>
 				</div>
@@ -269,7 +269,9 @@
 					<hr />
 					{#if check === "sending"}
 						<div class="content">
-							<span class="subheading">What kind of data would you like to send?</span>
+							<span class="subheading"
+								>What kind of data would you like to send?</span
+							>
 							<div class="container">
 								{#each dataType as option}
 									<label>
@@ -289,7 +291,9 @@
 				<div class="next">
 					<button
 						class="nextbtn"
-						disabled={check === "sending" ? check === "sending" && kindOfData.length === 0 : check === undefined}
+						disabled={check === "sending"
+							? check === "sending" && kindOfData.length === 0
+							: check === undefined}
 						on:click={() => {
 							if (check !== undefined) nextStep();
 						}}>Next Step</button
@@ -348,10 +352,14 @@
 					{#if check === "sending"}
 						<div class="content">
 							<h1>
-								Get the {(peerType = check !== "sending" ? "Sender" : "Receiver")}'s ID
+								Get the {(peerType =
+									check !== "sending" ? "Sender" : "Receiver")}'s ID
 							</h1>
 							<div class="subheading">Let's find the other device</div>
-							<p>After generating an ID for both devices, enter the other's ID in the field below.</p>
+							<p
+								>After generating an ID for both devices, enter the other's ID
+								in the field below.</p
+							>
 							<hr />
 							<div class="id">
 								<p>Your ID:</p>
@@ -361,7 +369,8 @@
 								</div>
 
 								<p>
-									{(peerType = check !== "sending" ? "Sender" : "Receiver")}'s ID:
+									{(peerType = check !== "sending" ? "Sender" : "Receiver")}'s
+									ID:
 								</p>
 
 								<div class="id-cont">
@@ -396,7 +405,10 @@
 							<h1>Ready to Receive Data</h1>
 							<span>Your ID: <div class="id-cont"><code>{id}</code></div></span>
 							<div class="subheading">Waiting for sender to connect.</div>
-							<p>Once data transfer is completed, this popup window will close automatically</p>
+							<p
+								>Once data transfer is completed, this popup window will close
+								automatically</p
+							>
 						</div>
 					{/if}
 				</div>
@@ -409,12 +421,15 @@
 	.has-icon {
 		width: auto;
 	}
+
 	.justify {
 		justify-content: space-evenly;
 	}
+
 	.label {
 		color: #f2f2f2;
 	}
+
 	.checkbox-tile {
 		display: flex;
 		flex-direction: column;
@@ -423,28 +438,28 @@
 		width: 7rem;
 		min-height: 7rem;
 		border-radius: 0.5rem;
-		border: 2px solid rgba(181, 191, 217, 0.267);
-		background-color: rgba(117, 117, 117, 0.26);
+		border: 2px solid rgb(181 191 217 / 26.7%);
+		background-color: rgb(117 117 117 / 26%);
 		box-shadow: 0 5px 10px rgba(#000, 0.1);
 		transition: 0.15s ease;
 		cursor: pointer;
 		position: relative;
 
-		&:before {
+		&::before {
 			content: "";
 			position: absolute;
 			display: block;
 			width: 1.25rem;
 			height: 1.25rem;
 			border: 2px solid #b5bfd9;
-			background-color: rgba(117, 117, 117, 0.26);
+			background-color: rgb(117 117 117 / 26%);
 			border-radius: 50%;
 			top: 0.25rem;
 			left: 0.25rem;
 			opacity: 0;
 			transform: scale(0);
 			transition: 0.25s ease;
-			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' fill='%23FFFFFF' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'%3E%3C/rect%3E%3Cpolyline points='216 72.005 104 184 48 128.005' fill='none' stroke='%23FFFFFF' stroke-linecap='round' stroke-linejoin='round' stroke-width='32'%3E%3C/polyline%3E%3C/svg%3E");
+			background-image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' fill='%23FFFFFF' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'%3E%3C/rect%3E%3Cpolyline points='216 72.005 104 184 48 128.005' fill='none' stroke='%23FFFFFF' stroke-linecap='round' stroke-linejoin='round' stroke-width='32'%3E%3C/polyline%3E%3C/svg%3E";
 			background-size: 12px;
 			background-repeat: no-repeat;
 			background-position: 50% 50%;
@@ -452,7 +467,8 @@
 
 		&:hover {
 			border-color: #3b9b9b;
-			&:before {
+
+			&::before {
 				transform: scale(1);
 				opacity: 1;
 			}
@@ -461,10 +477,12 @@
 
 	.radio {
 		position: relative;
+
 		label input[type="checkbox"] {
-			// opacity: 0;
+			// opacity: 0;opacity
 			// Code to hide the input
 			appearance: none;
+
 			clip: rect(0 0 0 0);
 			clip-path: inset(100%);
 			height: 1px;
@@ -477,12 +495,14 @@
 			&:checked + .checkbox-tile .label {
 				border-color: #3b9b9b;
 				color: #f2f2f2;
-				text-shadow: 0 0 0.25rem rgba(255, 255, 255, 0.63);
+				text-shadow: 0 0 0.25rem rgb(255 255 255 / 63%);
+
 				&:not(.label) {
-					background-color: rgba(201, 201, 201, 0.274);
+					background-color: rgb(201 201 201 / 27.4%);
 					box-shadow: 0 5px 10px rgba(#000, 0.1);
 				}
-				&:before {
+
+				&::before {
 					transform: scale(1);
 					opacity: 1;
 					background-color: #3b9b9b;
@@ -495,13 +515,16 @@
 	.inline {
 		display: flex;
 		align-items: flex-start;
+
 		/* height: auto; */
 		min-height: 5ch;
+
 		/* max-height: 30ch; */
+
 		/* margin-left: auto; */
-		flex-direction: row;
-		flex-wrap: nowrap;
+		flex-flow: row nowrap;
 	}
+
 	.id-container {
 		display: inline-flex;
 		flex-direction: column;
@@ -511,18 +534,20 @@
 		background-color: #2929298e !important;
 		margin-bottom: 0.5rem;
 	}
+
 	:root {
 		--padding: 0 $xl-spacing 0 $xl-spacing;
 	}
+
 	.sync-wrapper {
 		display: grid;
 		align-items: center;
 		justify-items: center;
-
 		max-height: 100%;
 		grid-template-columns: 1fr;
 		z-index: 5;
 	}
+
 	.backdrop {
 		z-index: 1;
 		position: fixed;
@@ -531,49 +556,54 @@
 		background: #0000009c;
 		overflow: hidden;
 	}
+
 	code {
-		background: rgba(41, 41, 41, 0.555);
+		background: rgb(41 41 41 / 55.5%);
 		padding: 1rem;
 		border-radius: $lg-radius;
 		display: inline;
 		font-size: 1.125em;
 		font-weight: 400;
 		letter-spacing: 0.01em;
-		// user-select: text;
-		// cursor: text;
+		// user-select: text;user-select
+		// cursor: text;cursor
 		cursor: text;
 		user-select: text;
 	}
+
 	.id-cont {
 		display: flex;
 		margin-bottom: 0.8rem;
 		align-items: flex-end;
 	}
+
 	hr {
-		border-color: rgba(170, 170, 170, 0.199);
+		border-color: rgb(170 170 170 / 19.9%);
 		border-radius: $lg-radius;
 	}
+
 	.id {
 		display: flex;
 		flex-direction: column;
 		margin-bottom: 1.2rem;
 	}
+
 	.copy {
-		// margin-left: auto;
+		// margin-left: auto;margin-left
 		font-size: 0.95rem;
 		color: #aaa;
 		margin-left: 1rem;
 	}
+
 	.sync {
 		position: fixed;
 		top: 50%;
+
 		/* bottom: 0; */
 		left: 50%;
 		min-height: 0;
 		transform: translate(-50%, -50%);
-		flex-direction: row;
-		transform-origin: top;
-		flex-wrap: wrap;
+		flex-flow: row wrap;
 		z-index: 5;
 		padding: var(--padding);
 		width: 50%;
@@ -583,15 +613,17 @@
 		box-shadow: 0 0 1rem #2929291f;
 		border-radius: $lg-radius;
 		background: #111214;
+
 		@media only screen and (max-width: 640px) {
-			// top: 0;
-			// left: 0;
+			// top: 0;top
+			// left: 0;left
 			width: 100%;
-			// height: 100%;
+			// height: 100%;height
 			min-height: 0;
-			// transform: translate(0, 10vh);
+			// transform: translate(0, 10vh);transform
 		}
 	}
+
 	.x-button {
 		width: auto;
 		position: absolute;
@@ -600,20 +632,24 @@
 		cursor: pointer;
 		z-index: 10;
 	}
+
 	.subheading {
 		font-size: 1.3125em;
 	}
+
 	.content {
 		position: relative;
-		// background-clip: content-box;
+		// background-clip: content-box;background-clip
 		padding: 1rem;
 		min-height: 0;
 	}
+
 	.screen-wrapper {
 		height: 100%;
 		width: 100%;
 		position: relative;
 	}
+
 	.next {
 		margin-top: 1rem;
 		margin-bottom: 1rem;
@@ -621,27 +657,29 @@
 		flex-wrap: nowrap;
 		justify-content: center;
 	}
+
 	.nextbtn {
 		width: 100%;
 		margin-left: auto;
 		margin-right: auto;
+
 		@media screen and (min-width: 40em) {
 			width: unset;
 		}
 	}
+
 	.screen {
 		/* position: absolute; */
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
+		inset: 0;
 		height: 100%;
 		width: 100%;
 	}
+
 	p {
 		margin: 0 0 $sm-spacing 0;
 		font-size: 1.125rem;
 	}
+
 	h1 {
 		margin-top: 0;
 	}

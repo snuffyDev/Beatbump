@@ -28,7 +28,7 @@
 	/* your styles go here */
 	.TEST {
 		position: relative;
-		border: hsla(0, 100%, 100%, 0.5) 1px solid;
+		border: hsl(0deg 100% 100% / 50%) 1px solid;
 	}
 
 	.TEST {
@@ -40,26 +40,28 @@
 			position: absolute;
 			inset: 0;
 			background-size: 0%;
-
 			opacity: var(--progress);
 			transform: scale(var(--progress));
-			background: hsla(0, 100%, 100%, 0.2) radial-gradient(circle, hsla(0, 100%, 100%, 0.2) 1%, #0000 1%) center/15000%;
-			// transition: cubic-bezier(0.55, 0, 1, 0.45) 400ms;
+			background: hsl(0deg 100% 100% / 20%)
+				radial-gradient(circle, hsl(0deg 100% 100% / 20%) 1%, #0000 1%)
+				center/15000%;
+			// transition: cubic-bezier(0.55, 0, 1, 0.45) 400ms;transition
 
 			transition: cubic-bezier(0, 0.55, 0.45, 1) 400ms 200ms background,
-				cubic-bezier(0, 0.55, 0.45, 1) 400ms 200ms transform, cubic-bezier(0, 0.55, 0.45, 1) 800ms 200ms opacity;
-
+				cubic-bezier(0, 0.55, 0.45, 1) 400ms 200ms transform,
+				cubic-bezier(0, 0.55, 0.45, 1) 800ms 200ms opacity;
 			transition-duration: 500ms;
 			transition-delay: 0ms;
-			// border-radius: 50%;
+			// border-radius: 50%;border-radius
 		}
+
 		&:active::before {
-			// transition-property: transform, opacity;
+			// transition-property: transform, opacity;transition-property
 			transition-delay: 0ms;
-			background-color: hsla(0, 100%, 100%, 0.2);
+			background-color: hsl(0deg 100% 100% / 20%);
 			transition: cubic-bezier(0.55, 0, 1, 0.45) 400ms;
 			transition-property: transform, opacity, background;
-			// transition-property: transform, opacity, background;
+			// transition-property: transform, opacity, background;transition-property
 			background-size: 150%;
 		}
 	}

@@ -20,7 +20,10 @@ const ENDPOINT_NAMES: APIEndpoints = {
 	browse: Endpoints.Browse,
 } as const;
 
-const CONTEXT_DEFAULTS: Pick<Context, "client" | "user" | "request" | "captionParams"> = {
+const CONTEXT_DEFAULTS: Pick<
+	Context,
+	"client" | "user" | "request" | "captionParams"
+> = {
 	client: {
 		hl: "en",
 		utcOffsetMinutes: -new Date().getTimezoneOffset(),
@@ -34,4 +37,12 @@ const CONTEXT_DEFAULTS: Pick<Context, "client" | "user" | "request" | "captionPa
 	captionParams: {},
 };
 
-export { ANDROID_KEY, API_BASE_URL, API_ORIGIN, CONTEXT_DEFAULTS, ENDPOINT_NAMES, USER_AGENT, WEB_REMIX_KEY };
+export {
+	ANDROID_KEY,
+	API_BASE_URL,
+	API_ORIGIN,
+	CONTEXT_DEFAULTS,
+	ENDPOINT_NAMES,
+	USER_AGENT,
+	WEB_REMIX_KEY,
+};

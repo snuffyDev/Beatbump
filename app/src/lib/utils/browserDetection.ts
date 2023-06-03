@@ -7,5 +7,7 @@ export const isAppleMobileDevice = browser
 	: false;
 
 export const isSafari = browser
-	? (USER_AGENT.indexOf("Safari") > -1 && !/Chrome|Chromium|Edge?/i.test(USER_AGENT)) || isAppleMobileDevice
+	? (USER_AGENT.indexOf("Safari") > -1 &&
+			!/Chrome|Chromium|Edge?/i.test(USER_AGENT)) ||
+	  isAppleMobileDevice
 	: false;

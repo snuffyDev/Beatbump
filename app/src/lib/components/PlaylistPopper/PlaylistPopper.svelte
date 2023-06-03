@@ -77,17 +77,17 @@
 		overflow-y: auto;
 		position: relative;
 		padding: 0 0.5rem;
-		// justify-content: center;
+		// justify-content: center;justify-content
 	}
+
 	.playlist-modal {
 		position: absolute;
-		// gap: 0.8rem;
+		// gap: 0.8rem;gap
 		padding: 0.8rem;
 		z-index: 100;
 		background: var(--mobile-popper-bg);
 		display: flex;
-		flex-wrap: nowrap;
-		flex-direction: column;
+		flex-flow: column nowrap;
 		top: 50%;
 		left: 50%;
 		min-width: 30%;
@@ -96,10 +96,11 @@
 		max-width: 100%;
 		max-height: calc(100vh - 4rem);
 		border-radius: $lg-radius;
-		border-color: rgba(129, 129, 129, 0.411);
+		border-color: rgb(129 129 129 / 41.1%);
 		border-width: 0.025rem;
 		border-style: solid;
 		transform: translate(-50%, -50%);
+
 		@media screen and (min-width: 640px) {
 			max-width: 35%;
 			max-height: 65%;

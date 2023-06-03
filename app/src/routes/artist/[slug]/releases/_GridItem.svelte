@@ -28,40 +28,42 @@
 <style lang="scss">
 	.item {
 		display: flex;
-		flex-wrap: nowrap;
-		flex-direction: column;
-
+		flex-flow: column nowrap;
 		justify-content: flex-start;
-
 		cursor: pointer;
 		border-radius: 0.4rem;
 		padding: 0.5rem 0.4rem 0.4rem;
 		position: relative;
 		width: 100%;
+
 		.img {
 			width: 100%;
 			margin-bottom: 0.5em;
 		}
 	}
+
 	.item-title {
 		display: inline;
 		padding: 0.3rem 0.1rem;
-		font-family: "CommissionerVariable";
+		font-family: CommissionerVariable;
 		font-weight: 500;
 		font-size: 1.1em;
 		letter-spacing: -0.02em;
 		margin-bottom: 0.5em;
 	}
+
 	@media screen and (min-width: 25em) and (max-width: 37em) {
 		.item {
 			max-width: 14rem;
 		}
 	}
+
 	@media screen and (min-width: 37em) and (max-width: 48em) {
 		.item {
 			max-width: 13rem;
 		}
 	}
+
 	@media screen and (min-width: 48em) {
 		.item {
 			max-width: 14rem;

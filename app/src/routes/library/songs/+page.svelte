@@ -74,8 +74,10 @@
 		flex-direction: row;
 		margin-bottom: $md-spacing;
 	}
+
 	.ctx-item {
 		display: flex;
+
 		label {
 			margin-right: $md-spacing;
 			white-space: pre;

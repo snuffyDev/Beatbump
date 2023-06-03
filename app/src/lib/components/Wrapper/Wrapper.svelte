@@ -4,7 +4,7 @@
 	import { cubicOut } from "svelte/easing";
 	import { fly } from "svelte/transition";
 	export let main: HTMLElement;
-	export let key;
+	export let key: string;
 </script>
 
 <div class="app-content-p">
@@ -22,14 +22,14 @@
 <style>
 	.app-transition-wrapper {
 		/* display: block; */
+
 		/* position: relative; */
 		contain: content;
-		overflow-y: auto;
 		inset: 0;
 		overflow-y: auto;
 		position: absolute;
-		transform: translateZ(0px);
-
+		transform: translateZ(0);
+		will-change: top;
 		isolation: isolate;
 	}
 

@@ -27,7 +27,10 @@ function ensureIntersectionObserver(node: HTMLElement) {
 }
 
 /* eslint-disable no-inner-declarations */
-export default function lazyContainer(node: HTMLElement) {
+export default function lazyContainer(
+	node: HTMLElement,
+	{ items }: { items: any[] },
+) {
 	ensureIntersectionObserver(node);
 
 	let children = node.querySelectorAll("img[data-src]");
@@ -42,6 +45,13 @@ export default function lazyContainer(node: HTMLElement) {
 				intersectionObserver.unobserve(img);
 			}
 			children = null;
+		},
+		update(items: typeof children) {
+			children.forEach((element) => {
+				intersectionObserver.unobserve(element);
+			});
+			children = node.querySelectorAll("img[data-src]");
+			children.forEach((element) => intersectionObserver.observe(element));
 		},
 	};
 }

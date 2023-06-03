@@ -31,10 +31,10 @@
 		position: fixed;
 		bottom: var(--alert-bottom, 5.75rem);
 		left: 0;
-		// flex-direction: column;
+		// flex-direction: column;flex-direction
 		right: 0;
 		z-index: 1000;
-		// isolation: isolate;
+		// isolation: isolate;isolation
 		max-height: 60vmin;
 		align-items: center;
 		margin: 0 auto;

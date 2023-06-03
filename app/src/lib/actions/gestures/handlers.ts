@@ -1,6 +1,13 @@
 import { setHandlers } from "./shared";
 import type { DragEvent, Detail, GestureHandlers, PanEvent } from "./types";
-import { dispatcher, addListener, boundingRect, calculateVelocity, removeListener, updateDetail } from "./utils";
+import {
+	dispatcher,
+	addListener,
+	boundingRect,
+	calculateVelocity,
+	removeListener,
+	updateDetail,
+} from "./utils";
 
 export function pan(node: HTMLElement) {
 	const detail: Detail = {

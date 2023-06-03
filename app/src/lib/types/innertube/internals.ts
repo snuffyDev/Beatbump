@@ -284,7 +284,8 @@ export interface IMusicTwoRowItemRenderer {
 	aspectRatio: string;
 	title: Title;
 	subtitle: Title;
-	navigationEndpoint: IMusicTwoRowItemRendererNavigationEndpoint & PlayNavigationEndpoint;
+	navigationEndpoint: IMusicTwoRowItemRendererNavigationEndpoint &
+		PlayNavigationEndpoint;
 	trackingParams: string;
 	overlay?: Overlay;
 	menu: Menu;

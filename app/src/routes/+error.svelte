@@ -48,14 +48,16 @@
 <style lang="scss">
 	.logolink {
 	}
+
 	main {
 		text-align: center;
-
 		align-items: center;
 	}
+
 	p {
 		font-size: 1.125rem;
 	}
+
 	.logo {
 		display: flex;
 		place-content: center;

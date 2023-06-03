@@ -29,13 +29,15 @@ export const GET: RequestHandler = async () => {
 
 	const data = await response;
 
-	const contents = data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer
-		?.contents as any[];
+	const contents = data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]
+		?.tabRenderer?.content?.sectionListRenderer?.contents as any[];
 
 	/// Get only the musicCarouselShelfRenderer's
 
 	carouselItems = await Promise.all(
-		contents.filter((item) => "musicCarouselShelfRenderer" in item).map(parseCarouselItem),
+		contents
+			.filter((item) => "musicCarouselShelfRenderer" in item)
+			.map(parseCarouselItem),
 	);
 
 	return json({ carouselItems, data });

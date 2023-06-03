@@ -1,8 +1,13 @@
-function lazy(node: HTMLImageElement, data: { src?: string; placeholder?: string }): SvelteActionReturnType {
+function lazy(
+	node: HTMLImageElement,
+	data: { src?: string; placeholder?: string },
+): SvelteActionReturnType {
 	let frame: number = undefined;
 	let once = true;
 	// Error Handling
-	function handleErr(e: ErrorEvent & { target: HTMLImageElement & EventTarget }) {
+	function handleErr(
+		e: ErrorEvent & { target: HTMLImageElement & EventTarget },
+	) {
 		console.error(e.error, e.message);
 
 		node.setAttribute(
@@ -33,7 +38,9 @@ function lazy(node: HTMLImageElement, data: { src?: string; placeholder?: string
 		return {
 			update(data) {
 				// console.log(data)
-				frame = requestAnimationFrame(() => node.setAttribute("src", data?.src));
+				frame = requestAnimationFrame(() =>
+					node.setAttribute("src", data?.src),
+				);
 			},
 			destroy() {
 				if (frame !== undefined) {

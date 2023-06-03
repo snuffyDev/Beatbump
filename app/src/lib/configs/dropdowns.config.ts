@@ -164,9 +164,15 @@ export const DROPDOWN_ITEMS: Partial<{
 export function buildDropdown() {
 	const menu: TypedDropdownItem<Label, Icons>[] = [];
 	return {
-		add: function (label?: Label, action?: TypedDropdownItem<Label, Icons>["action"]) {
+		add: function (
+			label?: Label,
+			action?: TypedDropdownItem<Label, Icons>["action"],
+		) {
 			if (!label && !action) return this;
-			const item = Object.assign({}, DROPDOWN_ITEMS[label!]) as TypedDropdownItem<Label, Icons>;
+			const item = Object.assign(
+				{},
+				DROPDOWN_ITEMS[label!],
+			) as TypedDropdownItem<Label, Icons>;
 			if (item) {
 				item.action = action!;
 				menu.push(item);

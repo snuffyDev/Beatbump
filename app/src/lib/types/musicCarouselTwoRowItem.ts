@@ -56,4 +56,5 @@ interface Thumbnail {
 	placeholder?: string;
 }
 
-export type ICarouselTwoRowItem = ITwoRowItemRenderer & ITwoRowSquareItemRenderer;
+export type ICarouselTwoRowItem = ITwoRowItemRenderer &
+	ITwoRowSquareItemRenderer;

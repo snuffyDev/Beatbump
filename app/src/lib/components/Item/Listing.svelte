@@ -9,19 +9,22 @@
 
 <script lang="ts">
 	import Loading from "$components/Loading/Loading.svelte";
-	import { hasContext, tick, createEventDispatcher } from "svelte";
+	import { createEventDispatcher, hasContext, tick } from "svelte";
 
-	import { showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
+	import { browser } from "$app/environment";
 	import { goto } from "$app/navigation";
+	import type { Dropdown } from "$lib/configs/dropdowns.config";
+	import { groupSession } from "$lib/stores";
 	import list, { queue, queuePosition } from "$lib/stores/list";
 	import type { Item } from "$lib/types";
+	import { IsoBase64, Logger, filter, notify } from "$lib/utils";
 	import { IDBService } from "$lib/workers/db/service";
-	import { browser } from "$app/environment";
-	import { PopperButton, PopperStore } from "../Popper";
-	import { filter, IsoBase64, Logger, notify } from "$lib/utils";
-	import { groupSession } from "$lib/stores";
+	import {
+		showAddToPlaylistPopper,
+		showGroupSessionCreator,
+	} from "$stores/stores";
 	import { SITE_ORIGIN_URL } from "$stores/url";
-	import type { Dropdown } from "$lib/configs/dropdowns.config";
+	import { PopperButton, PopperStore } from "../Popper";
 
 	export let data: Item;
 
@@ -30,7 +33,8 @@
 	let isLibrary = hasContext("library") ? true : false;
 	let videoId = "";
 	let playlistId = "";
-	let isArtist = Array.isArray(data?.subtitle) && data.subtitle[0]?.text === "Artist";
+	let isArtist =
+		Array.isArray(data?.subtitle) && data.subtitle[0]?.text === "Artist";
 
 	let loading = false;
 
@@ -48,7 +52,8 @@
 				await tick();
 				goto(
 					`/artist/${
-						data?.subtitle.find((s) => s?.pageType?.includes("ARTIST"))?.browseId ?? data.artistInfo.artist[0].browseId
+						data?.subtitle.find((s) => s?.pageType?.includes("ARTIST"))
+							?.browseId ?? data.artistInfo.artist[0].browseId
 					}`,
 				);
 			},
@@ -88,7 +93,9 @@
 			action: async () => {
 				if (data?.endpoint?.pageType.match(/PLAYLIST|ALBUM|SINGLE/)) {
 					// console.log('PLAYLIST')
-					const response = await fetch("/api/v1/get_queue.json?playlistId=" + data?.playlistId);
+					const response = await fetch(
+						"/api/v1/get_queue.json?playlistId=" + data?.playlistId,
+					);
 					const _data = await response.json();
 					const items: Item[] = _data;
 					showAddToPlaylistPopper.set({ state: true, item: [...items] });
@@ -170,7 +177,9 @@
 		},
 	];
 	if (isArtist) {
-		DropdownItems = DropdownItems.filter((item) => !item.text?.includes("Add to Playlist"));
+		DropdownItems = DropdownItems.filter(
+			(item) => !item.text?.includes("Add to Playlist"),
+		);
 	}
 	if (data.type?.includes("playlist")) {
 		DropdownItems.splice(1, 1, {
@@ -187,7 +196,9 @@
 		});
 		DropdownItems.shift();
 		DropdownItems.pop();
-		DropdownItems = DropdownItems.filter((item) => !item.text.includes("Favorite"));
+		DropdownItems = DropdownItems.filter(
+			(item) => !item.text.includes("Favorite"),
+		);
 	}
 	if (data.type === "videos") {
 		DropdownItems = DropdownItems.filter((d) => {
@@ -202,7 +213,11 @@
 		DropdownItems = filter(DropdownItems, (d) => d.text !== "View Artist");
 	}
 	const clickHandler = async (event) => {
-		if ((event.target instanceof HTMLElement && event.target.nodeName === "A") || loading) return;
+		if (
+			(event.target instanceof HTMLElement && event.target.nodeName === "A") ||
+			loading
+		)
+			return;
 		// console.log(event.target)
 		if (isArtist) {
 			goto(`/artist/${data.artistInfo.artist[0].browseId}`);
@@ -243,13 +258,18 @@
 		? data?.thumbnails.at(0)
 		: { width: 0, height: 0, url: "", placeholder: "" };
 
-	$: srcImg.url = srcImg.width < 100 ? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-") : srcImg.url;
+	$: srcImg.url =
+		srcImg.width < 100
+			? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
+			: srcImg.url;
 </script>
 
 <div
 	class="container"
 	on:contextmenu|preventDefault={(e) => {
-		window.dispatchEvent(new window.CustomEvent("contextmenu", { detail: "listing" }));
+		window.dispatchEvent(
+			new window.CustomEvent("contextmenu", { detail: "listing" }),
+		);
 
 		PopperStore.set({
 			items: DropdownItems.slice(),
@@ -300,7 +320,9 @@
 					</p>
 				{:else if data.type === "playlist"}
 					<p class="text-artist">
-						{data.type === "playlist" && "metaData" in data ? `${data.metaData}` : ""}
+						{data.type === "playlist" && "metaData" in data
+							? `${data.metaData}`
+							: ""}
 					</p>
 				{:else}
 					<p class="text-artist secondary">
@@ -309,12 +331,14 @@
 								{artist.text}
 							{:else if artist.pageType.includes("ALBUM")}
 								<a
-									on:click|preventDefault|stopPropagation={() => goto(`/release?id=${artist?.browseId}`)}
+									on:click|preventDefault|stopPropagation={() =>
+										goto(`/release?id=${artist?.browseId}`)}
 									href={`/release?id=${artist?.browseId}`}>{artist.text}</a
 								>
 							{:else}
 								<a
-									on:click|preventDefault|stopPropagation={() => goto(`/artist/${artist?.browseId}`)}
+									on:click|preventDefault|stopPropagation={() =>
+										goto(`/artist/${artist?.browseId}`)}
 									href={`/artist/${artist?.browseId}`}>{artist.text}</a
 								>
 							{/if}
@@ -329,11 +353,15 @@
 				metadata={{
 					artist: data.type !== "playlist" &&
 						Array.isArray(data?.subtitle) && [
-							data.subtitle.find((s) => s?.pageType?.includes("ARTIST")) ?? data.artistInfo?.artist[0],
+							data.subtitle.find((s) => s?.pageType?.includes("ARTIST")) ??
+								data.artistInfo?.artist[0],
 						],
 					thumbnail: data.thumbnails,
 					title: data.title,
-					length: data.type !== "artist" && data.type !== "playlist" ? data?.length?.text : "",
+					length:
+						data.type !== "artist" && data.type !== "playlist"
+							? data?.length?.text
+							: "",
 				}}
 				type="search"
 				items={DropdownItems}
@@ -344,89 +372,101 @@
 
 <style lang="scss">
 	@use "../../../global/stylesheet/base/mixins";
+
 	.menu {
 		padding-right: 0.6em;
 	}
+
 	.hidden {
 		display: none !important;
 		visibility: hidden !important;
 	}
+
 	.album,
 	.artist-stats {
 		font-size: 0.9em;
 		font-weight: 400;
 		align-items: center;
+
 		/* white-space: revert; */
 		display: inline-flex;
 		pointer-events: auto;
+
 		a {
 			margin-left: 0.25em;
 		}
 	}
+
 	.itemWrapper {
 		display: flex;
 		width: 100%;
 		margin: 0;
 		padding: 0.3em 0.3em 0.3em 0.6em;
-		flex-direction: row;
-		flex-wrap: nowrap;
+		flex-flow: row nowrap;
 		overflow: hidden;
 		align-items: center;
 	}
+
 	p {
 		margin: 0.2rem 0;
 	}
+
 	.container:not(.menu) {
 		cursor: pointer;
 		display: flex;
 		flex: 1 1 auto;
 		width: 100%;
-		flex-direction: row;
-		flex-wrap: nowrap;
+		flex-flow: row nowrap;
 		background: transparent;
 		transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) background 0.125s;
 		max-width: unset !important;
 		contain: paint;
+
 		&:active,
 		&:hover {
 			background: lighten(#3c3d4159, 3%);
-			// filter: brightness(0.7);
+			// filter: brightness(0.7);filter
 		}
 	}
 
 	.text-artist {
 		font-size: 0.925em;
 		margin-top: 0;
+
 		@include mixins.trim(2);
 	}
+
 	.text-title {
 		align-self: center;
 		display: block;
 		flex-direction: column;
-
 		font-size: 1.1em;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		width: 100%;
+
 		&:hover {
-			text-decoration: underline solid currentColor 0.0714rem;
+			text-decoration: underline solid currentcolor 0.0714rem;
 			cursor: pointer;
 		}
 	}
+
 	img {
 		width: auto;
-
 		height: auto;
 	}
+
 	img::before {
 		display: block;
 		content: "";
 		padding-top: calc(100% * 2 / 3);
 	}
+
 	.innercard {
 		align-items: center;
 		display: grid;
+
 		/* flex-direction: row; */
 		grid-template-columns: 12fr 1fr;
 		overflow: hidden;
@@ -434,15 +474,15 @@
 		position: relative;
 		text-overflow: ellipsis;
 		width: 100%;
-		// max-width: calc(100% - 4.45em);
+		// max-width: calc(100% - 4.45em);max-width
 		@media screen and (min-width: 640px) {
-			padding: 0.2rem 0rem;
+			padding: 0.2rem 0;
 		}
 	}
 
 	.title {
-		// display: inline-flex;
-		// width: 100%;    align-self: center;
+		// display: inline-flex;display
+		// width: 100%;width    align-self: center;
 		flex-direction: column;
 		font-size: 100%;
 		margin-left: 1rem;
@@ -453,9 +493,10 @@
 		white-space: nowrap;
 		line-height: 1.7;
 
-		// line-height: 2;
+		// line-height: 2;line-height
 		display: inherit;
 	}
+
 	.img-container {
 		position: relative;
 		display: block;
@@ -468,8 +509,9 @@
 		.thumbnail {
 			width: 100%;
 			height: 100%;
-			background: rgba(13, 13, 15, 0.192);
+			background: rgb(13 13 15 / 19.2%);
 			border-radius: inherit;
+
 			img {
 				border-radius: inherit;
 				width: 100%;
@@ -478,9 +520,11 @@
 			}
 		}
 	}
+
 	.artist-img {
 		border-radius: 99999em;
 	}
+
 	.album a {
 		text-overflow: ellipsis;
 		overflow: hidden;
@@ -488,9 +532,11 @@
 		display: block;
 		max-width: calc(100vw - 2ch) !important;
 	}
+
 	a {
 		color: inherit;
 	}
+
 	@media (min-width: 640px) {
 		.container:active:not(.menu) {
 			background: lighten(#575a6359, 5%);

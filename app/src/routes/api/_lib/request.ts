@@ -8,7 +8,14 @@ import type {
 	RelatedEndpointParams,
 	SearchEndpointParams,
 } from "./_base";
-import { API_BASE_URL, API_ORIGIN, CONTEXT_DEFAULTS, ENDPOINT_NAMES, USER_AGENT, WEB_REMIX_KEY } from "./constants";
+import {
+	API_BASE_URL,
+	API_ORIGIN,
+	CONTEXT_DEFAULTS,
+	ENDPOINT_NAMES,
+	USER_AGENT,
+	WEB_REMIX_KEY,
+} from "./constants";
 import type { APIEndpoints, Body, Context } from "./types";
 import { Endpoints } from "./types";
 
@@ -32,14 +39,21 @@ const ENDPOINT_HANDLERS = {
 	search: searchRequest,
 } as const;
 
-type HandlerMap<T extends Record<string, (...args: never[]) => Promise<Response>>> = {
+type HandlerMap<
+	T extends Record<string, (...args: never[]) => Promise<Response>>,
+> = {
 	[Key in keyof T]: ((...args: never[]) => Promise<Response>) extends T[Key]
 		? (...args: Parameters<T[Key]>) => Promise<Response>
 		: any;
 };
 
-const ENDPOINT_DICT: Exclude<HandlerMap<typeof ENDPOINT_HANDLERS>[keyof typeof ENDPOINT_HANDLERS], never> =
-	ENDPOINT_HANDLERS as Exclude<HandlerMap<typeof ENDPOINT_HANDLERS>[keyof typeof ENDPOINT_HANDLERS], never>;
+const ENDPOINT_DICT: Exclude<
+	HandlerMap<typeof ENDPOINT_HANDLERS>[keyof typeof ENDPOINT_HANDLERS],
+	never
+> = ENDPOINT_HANDLERS as Exclude<
+	HandlerMap<typeof ENDPOINT_HANDLERS>[keyof typeof ENDPOINT_HANDLERS],
+	never
+>;
 
 /**
  * Builds a YouTube Music API request.
@@ -48,7 +62,11 @@ const ENDPOINT_DICT: Exclude<HandlerMap<typeof ENDPOINT_HANDLERS>[keyof typeof E
  * @returns {Promise<Response>} A promise consisting of a Response
  */
 export function buildAPIRequest<
-	T extends ArtistEndpointParams | PlayerEndpointParams | PlaylistEndpointParams | NextEndpointParams,
+	T extends
+		| ArtistEndpointParams
+		| PlayerEndpointParams
+		| PlaylistEndpointParams
+		| NextEndpointParams,
 >(
 	endpoint: keyof APIEndpoints,
 	{
@@ -66,7 +84,12 @@ export function buildAPIRequest<
 	const ctx = { ...CONTEXT_DEFAULTS, ...context };
 	if (!headers) headers = {};
 	if (!(endpoint in ENDPOINT_DICT)) return Promise.resolve(null);
-	return ENDPOINT_DICT[endpoint](ctx, params as never, continuation as never, headers as never);
+	return ENDPOINT_DICT[endpoint](
+		ctx,
+		params as never,
+		continuation as never,
+		headers as never,
+	);
 }
 
 /**
@@ -77,7 +100,10 @@ export function buildAPIRequest<
  * @param {T} params
  * @returns {*}
  */
-function nextRequest<T extends NextEndpointParams>(context: Context, params: T) {
+function nextRequest<T extends NextEndpointParams>(
+	context: Context,
+	params: T,
+) {
 	const body = buildRequestBody(context, params);
 	return fetch(API_BASE_URL + ENDPOINT_NAMES.next + "?key=" + WEB_REMIX_KEY, {
 		body: JSON.stringify(body),
@@ -114,7 +140,9 @@ function searchRequest<T extends SearchEndpointParams>(
 		API_BASE_URL +
 			ENDPOINT_NAMES.search +
 			"?" +
-			(continuation ? queryParams(continuation) + `&sp=EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D&` : "") +
+			(continuation
+				? queryParams(continuation) + `&sp=EgWKAQIIAWoKEAMQBBAKEAkQBQ%3D%3D&`
+				: "") +
 			`key=${WEB_REMIX_KEY}`,
 		{
 			body: JSON.stringify(body),
@@ -124,7 +152,8 @@ function searchRequest<T extends SearchEndpointParams>(
 			headers: {
 				"Content-Type": "application/json; charset=utf-8",
 				Origin: "https://music.youtube.com",
-				"User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+				"User-Agent":
+					"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
 			},
 		},
 	);
@@ -140,7 +169,9 @@ function searchRequest<T extends SearchEndpointParams>(
  * @param {IHeaders} [headers={}]
  * @returns
  */
-function browseRequest<T = PlayerEndpointParams | ArtistEndpointParams | RelatedEndpointParams>(
+function browseRequest<
+	T = PlayerEndpointParams | ArtistEndpointParams | RelatedEndpointParams,
+>(
 	context: Context,
 	params: T,
 	continuation?: Nullable<PlaylistEndpointContinuation>,
@@ -194,7 +225,10 @@ function playerRequest<T extends PlayerEndpointParams>(
 ) {
 	const body = buildRequestBody(context as Context, params);
 	const req = {
-		URL: API_BASE_URL + ENDPOINT_NAMES.player + `?key=${"AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w"}`,
+		URL:
+			API_BASE_URL +
+			ENDPOINT_NAMES.player +
+			`?key=${"AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w"}`,
 		init: {
 			headers: {
 				"Content-Type": "application/json; charset=utf-8",
@@ -206,10 +240,15 @@ function playerRequest<T extends PlayerEndpointParams>(
 			keepalive: true,
 		},
 	};
-	return fetch(API_BASE_URL + ENDPOINT_NAMES.player + `?key=${"AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w"}`, {
-		...req.init,
-		body: JSON.stringify(req.init.body),
-	});
+	return fetch(
+		API_BASE_URL +
+			ENDPOINT_NAMES.player +
+			`?key=${"AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w"}`,
+		{
+			...req.init,
+			body: JSON.stringify(req.init.body),
+		},
+	);
 }
 
 /**
@@ -221,7 +260,10 @@ function playerRequest<T extends PlayerEndpointParams>(
  * @param {T} body
  * @returns {*}
  */
-function artistRequest<T extends ArtistEndpointParams>(context: Context, body: T) {
+function artistRequest<T extends ArtistEndpointParams>(
+	context: Context,
+	body: T,
+) {
 	const reqBody = buildRequestBody(context as Context, body);
 
 	return fetch(API_BASE_URL + ENDPOINT_NAMES.artist + `?key=${WEB_REMIX_KEY}`, {

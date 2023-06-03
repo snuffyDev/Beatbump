@@ -1,7 +1,10 @@
 <script lang="ts">
 	import Carousel from "$components/Carousel/Carousel.svelte";
 	import Header from "$lib/components/Layouts/Header.svelte";
-	import { isMoodsAndGenres, isValidCarousel } from "$lib/validation/typeGuards/isIListItemRenderer";
+	import {
+		isMoodsAndGenres,
+		isValidCarousel,
+	} from "$lib/validation/typeGuards/isIListItemRenderer";
 
 	export let data;
 
@@ -37,7 +40,9 @@
 					<div class="scroll">
 						{#each carousel.items as item}
 							<a
-								style="--color: #{item?.color}"
+								style="
+
+--color: #{item?.color}"
 								class="item-box"
 								href="/explore/{item.endpoint.params}">{item.text}</a
 							>
@@ -51,13 +56,15 @@
 
 <style lang="scss">
 	a small {
-		$color: rgb(175, 175, 175);
+		$color: rgb(175 175 175);
+
 		font-size: 0.95rem;
 		font-weight: 700;
 		font-variant-caps: all-petite-caps;
 		letter-spacing: 0.05rem;
 		transition: ease-in color 75ms;
 		color: $color;
+
 		&:hover {
 			color: lighten($color, 30%);
 			text-decoration: underline 0.001rem solid;
@@ -69,13 +76,13 @@
 		border-radius: 0.8rem;
 		-webkit-overflow-scrolling: touch;
 		position: relative;
-
 		margin-bottom: 2rem;
 
 		@media screen and (min-width: 960px) {
 			margin-bottom: 3rem;
 		}
 	}
+
 	.box {
 		display: flex;
 		width: 100%;
@@ -84,6 +91,7 @@
 		contain: content;
 		flex-direction: column;
 	}
+
 	.scroll {
 		display: flex;
 		flex-flow: column wrap;
@@ -92,13 +100,13 @@
 		//
 		max-height: calc(100vh - 1px - calc(100vh - 23em));
 	}
+
 	.item-box {
 		cursor: pointer;
 		background: #201e27;
 		display: flex;
 		justify-content: flex-start;
-		flex-direction: row;
-		flex-wrap: nowrap;
+		flex-flow: row nowrap;
 		text-overflow: clip;
 		width: clamp(12em, 13em, 15em);
 		contain: content;
@@ -106,7 +114,6 @@
 		font-family: "CommissionerVariable", sans-serif;
 		border-left: 0.5rem solid var(--color, red);
 		align-items: center;
-
 		height: 3.25em;
 		padding: 0 0 0 0.8rem;
 	}

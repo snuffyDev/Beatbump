@@ -10,15 +10,25 @@ export const load = async ({ url, fetch }) => {
 	}
 
 	const [data, list] = await Promise.all([
-		fetch(`/api/v1/player.json?videoId=${id ? id : ""}${playlist ? `&playlistId=${playlist}` : ""}`).then((res) =>
-			res.json(),
-		),
-		fetch(`/api/v1/next.json?videoId=${id ? id : ""}${playlist ? `&playlistId=${playlist}` : ""}`).then((res) =>
-			res.json(),
-		),
+		fetch(
+			`/api/v1/player.json?videoId=${id ? id : ""}${
+				playlist ? `&playlistId=${playlist}` : ""
+			}`,
+		).then((res) => res.json()),
+		fetch(
+			`/api/v1/next.json?videoId=${id ? id : ""}${
+				playlist ? `&playlistId=${playlist}` : ""
+			}`,
+		).then((res) => res.json()),
 	]);
 
-	const { videoDetails: { title = "", videoId = "", thumbnail: { thumbnails = [] } = {} } = {} } = data;
+	const {
+		videoDetails: {
+			title = "",
+			videoId = "",
+			thumbnail: { thumbnails = [] } = {},
+		} = {},
+	} = data;
 
 	return {
 		title,

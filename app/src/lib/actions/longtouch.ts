@@ -12,7 +12,10 @@ export interface Detail {
 	timestamp: number;
 }
 
-export function mobileLongPress(node: HTMLElement, config: ILongPressConfig = { duration: 400, delay: 200 }) {
+export function mobileLongPress(
+	node: HTMLElement,
+	config: ILongPressConfig = { duration: 400, delay: 200 },
+) {
 	const dispatch = dispatcher<{
 		pressEnd: Detail;
 		pressing: Detail;

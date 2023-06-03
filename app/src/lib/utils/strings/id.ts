@@ -13,6 +13,9 @@ const mod = {
 	},
 };
 
-export function generateId(size = 16, charset: "normal" | "alternative" = "normal"): string {
+export function generateId(
+	size = 16,
+	charset: "normal" | "alternative" = "normal",
+): string {
 	return mod.generate(size, charset);
 }

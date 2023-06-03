@@ -1,5 +1,8 @@
 import { error, json as json$1 } from "@sveltejs/kit";
-import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
+import {
+	MusicResponsiveListItemRenderer,
+	MusicTwoRowItemRenderer,
+} from "$lib/parsers";
 import type { CarouselHeader } from "$lib/types";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
@@ -42,7 +45,9 @@ export const GET: RequestHandler = async ({ url }) => {
 		});
 		if (!response) throw error(500, "Failed to fetch");
 		const data = await response.json();
-		const contents = Array.isArray(data?.contents?.sectionListRenderer?.contents)
+		const contents = Array.isArray(
+			data?.contents?.sectionListRenderer?.contents,
+		)
 			? (data?.contents?.sectionListRenderer?.contents as Array<any>)
 			: [];
 		let pos = contents.length;
@@ -50,7 +55,10 @@ export const GET: RequestHandler = async ({ url }) => {
 		while (--pos > -1) {
 			const section = contents[pos];
 			if (section?.musicCarouselShelfRenderer) {
-				const carousel: { header?: CarouselHeader; items?: (ICarouselTwoRowItem | IListItemRenderer)[] } = {};
+				const carousel: {
+					header?: CarouselHeader;
+					items?: (ICarouselTwoRowItem | IListItemRenderer)[];
+				} = {};
 				let idx = section?.musicCarouselShelfRenderer?.contents?.length;
 				const promises: Promise<ICarouselTwoRowItem | IListItemRenderer>[] = [];
 
@@ -64,17 +72,23 @@ export const GET: RequestHandler = async ({ url }) => {
 						promises.unshift(MusicResponsiveListItemRenderer(item));
 					}
 				}
-				carousel.items = (await Promise.all(promises)) as (ICarouselTwoRowItem | IListItemRenderer)[];
+				carousel.items = (await Promise.all(promises)) as (
+					| ICarouselTwoRowItem
+					| IListItemRenderer
+				)[];
 				carousel.header = {
 					title:
-						section?.musicCarouselShelfRenderer?.header?.musicCarouselShelfBasicHeaderRenderer?.title?.runs[0]?.text,
+						section?.musicCarouselShelfRenderer?.header
+							?.musicCarouselShelfBasicHeaderRenderer?.title?.runs[0]?.text,
 				};
 				carousels.push(carousel);
 			}
 			// Description shelf parsing
 			if (section?.musicDescriptionShelfRenderer) {
-				description.header = section?.musicDescriptionShelfRenderer?.header?.runs[0]?.text;
-				description.description = section?.musicDescriptionShelfRenderer?.description?.runs[0]?.text;
+				description.header =
+					section?.musicDescriptionShelfRenderer?.header?.runs[0]?.text;
+				description.description =
+					section?.musicDescriptionShelfRenderer?.description?.runs[0]?.text;
 			}
 		}
 		return json$1({

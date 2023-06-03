@@ -1,11 +1,11 @@
 <script lang="ts">
-	import list from "$lib/stores/list";
-	import Icon from "$lib/components/Icon/Icon.svelte";
-	import { onMount } from "svelte";
-	import type { ArtistPage } from "$lib/parsers";
 	import { browser } from "$app/environment";
-	import Description from "./Description";
+	import Icon from "$lib/components/Icon/Icon.svelte";
+	import type { ArtistPage } from "$lib/parsers";
+	import list from "$lib/stores/list";
 	import { isDesktopMQ, windowHeight, windowWidth } from "$stores/window";
+	import { onMount } from "svelte";
+	import Description from "./Description";
 
 	export let header: ArtistPage["header"];
 	export let thumbnail = [];
@@ -26,7 +26,10 @@
 
 		const elapsed = ts - timestamp;
 
-		y = $windowWidth < 500 ? Math.min(Math.max(calc, 0), 1) * 155 : Math.min(Math.max(calc, 0), 1) * 116;
+		y =
+			$windowWidth < 500
+				? Math.min(Math.max(calc, 0), 1) * 155
+				: Math.min(Math.max(calc, 0), 1) * 116;
 		if (elapsed < 100) {
 			timestamp = requestAnimationFrame(handler);
 		} else {
@@ -89,7 +92,9 @@
 						type="image/jpeg"
 					/>
 					<source
-						media={`(min-width:${img.width + 1}px) and (max-width:${thumbnail[i + 1].width}px)`}
+						media={`(min-width:${img.width + 1}px) and (max-width:${
+							thumbnail[i + 1].width
+						}px)`}
 						srcset={img.url}
 						type="image/jpeg"
 					/>
@@ -97,7 +102,9 @@
 					<!-- -->
 				{:else}
 					<source
-						media={`(min-width:${img.width + 1}px) and (max-width:${thumbnail[i + 1].width}px)`}
+						media={`(min-width:${img.width + 1}px) and (max-width:${
+							thumbnail[i + 1].width
+						}px)`}
 						srcset={thumbnail[i + 1].url}
 						type="image/jpeg"
 					/>
@@ -201,21 +208,16 @@
 <!--  -->
 <style lang="scss">
 	@import "./index.scss";
+
 	.hidden {
 		display: none !important;
 	}
 
 	.modal {
 		position: absolute;
-		top: 0%;
-
-		right: 0;
-		left: 0%;
-		bottom: 0;
+		inset: 0% 0 0 0%;
 		width: 80%;
-
 		align-self: center;
-
 		max-height: 100%;
 		overflow-y: scroll;
 		margin: auto;
@@ -223,21 +225,18 @@
 		z-index: 5;
 		height: 80%;
 		border-radius: var(--md-radius);
-
 		background: var(--color-med);
 	}
+
 	.modal-wrapper {
 		position: fixed;
-		top: 0%;
-
-		right: 0;
-		left: 0%;
-		bottom: 0;
+		inset: 0% 0 0 0%;
 		width: 100%;
 		height: 100%;
 		z-index: 5;
+
 		&::before {
-			background: rgba(0, 0, 0, 0.438);
+			background: rgb(0 0 0 / 43.8%);
 			position: absolute;
 			z-index: -1;
 			inset: 0;
@@ -247,19 +246,18 @@
 			backdrop-filter: blur(0.05rem);
 		}
 	}
+
 	.row {
 		flex-direction: row !important;
 		align-items: center !important;
 		gap: 1.2rem;
 	}
+
 	.artist-header {
 		display: block;
-
 		position: relative;
-
-		@media only screen and (min-width: 640px) {
-		}
 	}
+
 	.artist-thumbnail {
 		display: block;
 		position: relative;
@@ -267,11 +265,12 @@
 		padding-top: 33vh;
 		overflow: hidden;
 		transition: background-color 0.8s cubic-bezier(0.19, 0, 0.7, 1);
-		background-color: rgba(0, 0, 0, 0.1);
+		background-color: rgb(0 0 0 / 10%);
 
 		@media only screen and (min-width: 1080px) and (max-width: 1600px) {
 			padding-top: 30vh;
 		}
+
 		@media only screen and (min-width: 1601px) {
 			padding-top: 33vh;
 		}
@@ -279,24 +278,17 @@
 		&::before {
 			position: absolute;
 			content: "";
-			top: 0;
-			bottom: 0;
-			left: 0;
-			right: 0;
+			inset: 0;
 		}
 	}
 
 	.gradient {
 		z-index: 0;
 		width: 100%;
-		height: inherit;
-		position: absolute;
 		height: 100%;
 		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
+		inset: 0;
+
 		&::before {
 			position: absolute;
 			inset: 0;
@@ -305,42 +297,38 @@
 			z-index: -5;
 			content: "";
 		}
-
-		top: 0;
 	}
+
 	.header-thumbnail {
 		z-index: -1;
 		top: 0;
-
 		width: 100%;
 		height: 100%;
 		max-height: 100%;
-		-o-object-fit: cover;
 		object-fit: cover;
 		position: absolute;
 		transition: opacity 0.75s linear;
-
 		overflow: hidden;
-
 		border-radius: 0;
-		-o-object-position: top;
 		object-position: top;
 	}
+
 	.artist-content {
 		position: relative;
 		z-index: 1;
 
 		@include content-spacing($type: "padding");
 		@include content-width();
+
 		padding-bottom: 0 !important;
 		margin: 0 auto;
 
 		.content-wrapper {
 			display: inline-flex;
-			flex-wrap: wrap;
-			flex-direction: column;
+			flex-flow: column wrap;
 			align-items: flex-start;
 			width: 80%;
+
 			.content-thumbnail {
 				max-width: 6rem;
 				max-height: 6rem;
@@ -350,38 +338,43 @@
 				font-weight: 700;
 				font-size: 2.5rem;
 				display: inline-block;
-				font-family: "CommissionerVariable", sans-serif;
-
-				text-shadow: rgba(0, 0, 0, 0.171) 0.2rem -0.12rem 0.5rem;
-
+				font-family: CommissionerVariable, sans-serif;
+				text-shadow: rgb(0 0 0 / 17.1%) 0.2rem -0.12rem 0.5rem;
 				letter-spacing: -0.02em;
 				padding-bottom: 1rem;
 
 				@media (min-width: 320px) and (max-width: 499px) {
 				}
+
 				@media (min-width: 500px) and (max-width: 640px) {
 				}
+
 				@media screen and (min-width: 642px) and (max-width: 839px) {
 					font-size: 2rem;
 				}
+
 				@media screen and (min-width: 840px) and (max-width: 960px) {
 					font-size: 3.5rem;
-
 					inline-size: 100%;
 					overflow-wrap: break-word;
 				}
+
 				@media screen and (min-width: 961px) {
 					font-size: 4.5rem;
 				}
 			}
 		}
+
 		max-width: $content-width-mobile;
+
 		@media only screen and (min-width: 1080px) and (max-width: 1366px) {
 			max-width: $content-width-md;
 		}
+
 		@media only screen and (min-width: 1367px) and (max-width: 1600px) {
 			max-width: $content-width-lg;
 		}
+
 		@media only screen and (min-width: 1601px) {
 			max-width: $content-width-xl;
 		}

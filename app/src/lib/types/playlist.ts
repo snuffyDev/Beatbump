@@ -1,4 +1,11 @@
-import type { Thumbnail, NextContinuationData, Artist, TitleEndpoint, ArtistInfo, Item } from "$lib/types";
+import type {
+	Thumbnail,
+	NextContinuationData,
+	Artist,
+	TitleEndpoint,
+	ArtistInfo,
+	Item,
+} from "$lib/types";
 
 export interface PlaylistSearch {
 	playlistId: string;

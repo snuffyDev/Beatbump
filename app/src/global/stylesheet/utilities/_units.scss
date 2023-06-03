@@ -210,7 +210,11 @@ $base-font-size: 16px !default;
 			dpi: 0dpi,
 		);
 		$input-unit: map-get($units, unit($input));
-		$input: if(1dppx < 95dpi, num($input-unit + (num($input) + $to-unit)), $input);
+		$input: if(
+			1dppx < 95dpi,
+			num($input-unit + (num($input) + $to-unit)),
+			$input
+		);
 	}
 
 	@return $to-unit + $input;

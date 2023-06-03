@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type { Dropdown, Icons } from "$lib/configs/dropdowns.config";
 	import { releasePageContext } from "$lib/contexts";
+	import { windowWidth } from "$stores/window";
 	import { createEventDispatcher } from "svelte";
 	import Button from "../Button";
 	import PopperButton from "../Popper/PopperButton.svelte";
-	import { windowWidth } from "$stores/window";
 
 	type Button<
 		Type extends string = string,
@@ -78,7 +78,9 @@
 			loading="lazy"
 			width="512"
 			height="512"
-			style="--img-height: 512;"
+			style="
+
+--img-height: 512;"
 			alt="album"
 		/>
 	</div>
@@ -103,7 +105,9 @@
 				</p>
 				<span class="secondary subtitle-group">
 					<p class="secondary subtitle">
-						{Array.isArray(subtitles) && subtitles.length !== 0 ? subtitles.join(" ") : ""}
+						{Array.isArray(subtitles) && subtitles.length !== 0
+							? subtitles.join(" ")
+							: ""}
 					</p>
 					<em
 						><small class="subtitle">
@@ -136,7 +140,9 @@
 				<Button
 					on:click={action}
 					outlined={i === buttons.length - 1 || type === "outlined"}
-					icon={typeof icon === "string" ? { name: icon } : { name: icon?.name, size: icon?.size }}>{text}</Button
+					icon={typeof icon === "string"
+						? { name: icon }
+						: { name: icon?.name, size: icon?.size }}>{text}</Button
 				>
 			{/if}
 		{/each}

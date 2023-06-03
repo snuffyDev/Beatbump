@@ -131,7 +131,9 @@
 	}
 	// trigger initial refresh
 	onMount(() => {
-		rows = contents.getElementsByTagName("svelte-virtual-list-row") as HTMLCollectionOf<HTMLElement>;
+		rows = contents.getElementsByTagName(
+			"svelte-virtual-list-row",
+		) as HTMLCollectionOf<HTMLElement>;
 		if (items.length > 1) mounted = true;
 	});
 </script>
@@ -163,7 +165,7 @@
 			{#if isLoading}
 				<div
 					class="loading-results"
-					style="padding: 0em;"
+					style="padding: 0;"
 				>
 					<svg
 						role="img"
@@ -274,14 +276,16 @@
 	.loading-results {
 		padding: 0;
 		margin: 0;
+
 		/* height: 100%; */
 
 		display: block;
 		position: relative;
 		bottom: 0;
 		padding-left: 0.8rem;
-		border-bottom: 0.0714rem solid hsla(0, 0%, 66.7%, 0.24);
+		border-bottom: 0.0714rem solid hsl(0deg 0% 66.7% / 24%);
 	}
+
 	svelte-virtual-list-viewport {
 		position: relative;
 		overflow-y: auto;
@@ -289,6 +293,7 @@
 		width: 100%;
 		height: 100%;
 		top: 0;
+
 		/* bottom: 8rem; */
 		-webkit-overflow-scrolling: touch;
 		display: block;
@@ -300,6 +305,7 @@
 		contain: paint;
 		will-change: padding;
 	}
+
 	svelte-virtual-list-contents,
 	svelte-virtual-list-row {
 		display: block;

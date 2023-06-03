@@ -48,7 +48,8 @@
 	}
 	@media (hover: hover) {
 		&:hover::before {
-			background: #55555528 radial-gradient(circle, transparent 1%, #55555528 1%) center/15000%;
+			background: #55555528
+				radial-gradient(circle, transparent 1%, #55555528 1%) center/15000%;
 			opacity: 1;
 		}
 	}

@@ -2,10 +2,10 @@ import { sveltekit } from "@sveltejs/kit/vite";
 import type { UserConfig } from "vitest/config";
 
 const version = new Date(Date.now());
-const version_fmt = `${version.getUTCFullYear()}.${version.getMonth().toString().padStart(2, "0")}.${version
-	.getDate()
+const version_fmt = `${version.getUTCFullYear()}.${version
+	.getMonth()
 	.toString()
-	.padStart(2, "0")}`;
+	.padStart(2, "0")}.${version.getDate().toString().padStart(2, "0")}`;
 
 const config: UserConfig = {
 	plugins: [sveltekit()],

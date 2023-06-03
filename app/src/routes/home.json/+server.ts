@@ -61,10 +61,13 @@ export const GET: RequestHandler = async ({ url }) => {
 		return result;
 	}
 
-	const sectionListContinuation = data.continuationContents?.sectionListContinuation;
+	const sectionListContinuation =
+		data.continuationContents?.sectionListContinuation;
 	const contents: any[] = sectionListContinuation.contents;
 
-	const nextContinuationData = Array.isArray(sectionListContinuation?.continuations)
+	const nextContinuationData = Array.isArray(
+		sectionListContinuation?.continuations,
+	)
 		? sectionListContinuation.continuations[0]?.nextContinuationData
 		: {};
 
@@ -84,37 +87,44 @@ export const GET: RequestHandler = async ({ url }) => {
 };
 
 async function baseResponse(data: Dict<any>, _visitorData: string) {
-	let headerThumbnail = data.background?.musicThumbnailRenderer?.thumbnail?.thumbnails ?? [];
+	let headerThumbnail =
+		data.background?.musicThumbnailRenderer?.thumbnail?.thumbnails ?? [];
 
 	const sectionListRenderer =
-		data.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer;
+		data.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+			?.content?.sectionListRenderer;
 
 	const _contents: any[] = sectionListRenderer.contents || [];
-	const nextContinuationData = sectionListRenderer.continuations[0]?.nextContinuationData;
+	const nextContinuationData =
+		sectionListRenderer.continuations[0]?.nextContinuationData;
 
-	const chips = isArrayAndReturn(sectionListRenderer?.header?.chipCloudRenderer?.chips, (item) =>
-		item.map((item) => {
-			if (!(typeof item === "object") || item == null) return;
+	const chips = isArrayAndReturn(
+		sectionListRenderer?.header?.chipCloudRenderer?.chips,
+		(item) =>
+			item.map((item) => {
+				if (!(typeof item === "object") || item == null) return;
 
-			const chipCloudChipRenderer =
-				"chipCloudChipRenderer" in item &&
-				typeof item?.chipCloudChipRenderer === "object" &&
-				(item?.chipCloudChipRenderer as any);
-			if (!chipCloudChipRenderer) return;
-			const text =
-				"text" in chipCloudChipRenderer &&
-				typeof chipCloudChipRenderer.text === "object" &&
-				chipCloudChipRenderer.text != null &&
-				"runs" in chipCloudChipRenderer.text &&
-				(chipCloudChipRenderer?.text?.runs as any[])?.[0]?.text;
-			const browseEndpoint = (chipCloudChipRenderer?.navigationEndpoint as any)?.browseEndpoint;
-			const ctoken = chipCloudChipRenderer?.clickTrackingParams;
-			return {
-				text,
-				browseEndpoint,
-				ctoken,
-			};
-		}),
+				const chipCloudChipRenderer =
+					"chipCloudChipRenderer" in item &&
+					typeof item?.chipCloudChipRenderer === "object" &&
+					(item?.chipCloudChipRenderer as any);
+				if (!chipCloudChipRenderer) return;
+				const text =
+					"text" in chipCloudChipRenderer &&
+					typeof chipCloudChipRenderer.text === "object" &&
+					chipCloudChipRenderer.text != null &&
+					"runs" in chipCloudChipRenderer.text &&
+					(chipCloudChipRenderer?.text?.runs as any[])?.[0]?.text;
+				const browseEndpoint = (
+					chipCloudChipRenderer?.navigationEndpoint as any
+				)?.browseEndpoint;
+				const ctoken = chipCloudChipRenderer?.clickTrackingParams;
+				return {
+					text,
+					browseEndpoint,
+					ctoken,
+				};
+			}),
 	);
 	const carouselItems = await filterMapAsync(
 		_contents,
@@ -124,8 +134,8 @@ async function baseResponse(data: Dict<any>, _visitorData: string) {
 			}
 			if ("musicImmersiveCarouselShelfRenderer" in item) {
 				headerThumbnail =
-					item.musicImmersiveCarouselShelfRenderer.backgroundImage?.simpleVideoThumbnailRenderer?.thumbnail
-						?.thumbnails || [];
+					item.musicImmersiveCarouselShelfRenderer.backgroundImage
+						?.simpleVideoThumbnailRenderer?.thumbnail?.thumbnails || [];
 				return await parseCarouselItem(item);
 			}
 			return Promise.resolve();

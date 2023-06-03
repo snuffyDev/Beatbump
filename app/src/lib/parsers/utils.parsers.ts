@@ -35,8 +35,9 @@ export function subtitle(items: PurpleRun[]): Subtitle[] {
 			text: item.text,
 			browseId: item.navigationEndpoint.browseEndpoint?.browseId,
 			pageType:
-				item.navigationEndpoint?.browseEndpoint?.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig
-					?.pageType,
+				item.navigationEndpoint?.browseEndpoint
+					?.browseEndpointContextSupportedConfigs
+					?.browseEndpointContextMusicConfig?.pageType,
 		};
 	});
 }

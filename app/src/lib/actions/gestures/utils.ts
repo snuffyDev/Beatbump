@@ -47,7 +47,9 @@ export const dispatcher =
 		Event extends keyof Events & string = keyof Events & string,
 	>() =>
 	(node: HTMLElement, type: Event, detail: Events[Event]): boolean =>
-		node.dispatchEvent(new CustomEvent(type, { detail: detail, bubbles: true }));
+		node.dispatchEvent(
+			new CustomEvent(type, { detail: detail, bubbles: true }),
+		);
 
 interface AddListener {
 	<
@@ -69,8 +71,14 @@ interface AddListener {
 		options?: AddEventListenerOptions | boolean | undefined,
 	);
 	<
-		EventType extends keyof (WindowEventMap | HTMLElementEventMap) = keyof (WindowEventMap | HTMLElementEventMap),
-		Event extends (WindowEventMap | HTMLElementEventMap)[EventType] = (WindowEventMap | HTMLElementEventMap)[EventType],
+		EventType extends keyof (WindowEventMap | HTMLElementEventMap) = keyof (
+			| WindowEventMap
+			| HTMLElementEventMap
+		),
+		Event extends (WindowEventMap | HTMLElementEventMap)[EventType] = (
+			| WindowEventMap
+			| HTMLElementEventMap
+		)[EventType],
 	>(
 		target: Window | HTMLElement,
 		type: EventType,
@@ -85,20 +93,41 @@ interface AddListener {
 	): void;
 }
 
-export const addListener: AddListener = <EventType, Event>(target, type, listener, options) => {
+export const addListener: AddListener = <EventType, Event>(
+	target,
+	type,
+	listener,
+	options,
+) => {
 	target.addEventListener(type, listener, options);
 };
 export function removeListener<
 	EventType extends keyof WindowEventMap = keyof WindowEventMap,
 	Event extends WindowEventMap[EventType] = WindowEventMap[EventType],
->(target: Window, type: EventType, listener: (event: Event) => void, options?: AddEventListenerOptions | boolean);
+>(
+	target: Window,
+	type: EventType,
+	listener: (event: Event) => void,
+	options?: AddEventListenerOptions | boolean,
+);
 export function removeListener<
 	EventType extends keyof HTMLElementEventMap = keyof HTMLElementEventMap,
 	Event extends HTMLElementEventMap[EventType] = HTMLElementEventMap[EventType],
->(target: HTMLElement, type: EventType, listener: (event: Event) => void, options?: AddEventListenerOptions | boolean);
+>(
+	target: HTMLElement,
+	type: EventType,
+	listener: (event: Event) => void,
+	options?: AddEventListenerOptions | boolean,
+);
 export function removeListener<
-	EventType extends keyof (WindowEventMap | HTMLElementEventMap) = keyof (WindowEventMap | HTMLElementEventMap),
-	Event extends (WindowEventMap | HTMLElementEventMap)[EventType] = (WindowEventMap | HTMLElementEventMap)[EventType],
+	EventType extends keyof (WindowEventMap | HTMLElementEventMap) = keyof (
+		| WindowEventMap
+		| HTMLElementEventMap
+	),
+	Event extends (WindowEventMap | HTMLElementEventMap)[EventType] = (
+		| WindowEventMap
+		| HTMLElementEventMap
+	)[EventType],
 >(
 	target: Window | HTMLElement,
 	type: EventType,

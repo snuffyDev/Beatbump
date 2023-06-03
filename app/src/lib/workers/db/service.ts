@@ -39,7 +39,8 @@ class IDBService {
 	process = <
 		Action extends Actions = Actions,
 		Type extends "favorite" | "playlist" | "playlists" | "favorites" = any,
-		Key extends keyof Methods & `${Action & string}${Capitalize<Type>}` = keyof Methods &
+		Key extends keyof Methods &
+			`${Action & string}${Capitalize<Type>}` = keyof Methods &
 			`${Action & string}${Capitalize<Type>}`,
 		Fn extends Methods[Key] = Methods[Key],
 	>(
@@ -49,7 +50,7 @@ class IDBService {
 		const promise = this.queue.shift();
 		if (!promise) return;
 		if (data.error) {
-			"message" in data && notify(data.message??"", "error");
+			"message" in data && notify(data.message ?? "", "error");
 		}
 
 		if (data.message) {
@@ -65,10 +66,15 @@ class IDBService {
 	async sendMessage<
 		Action extends Actions = Actions,
 		Type extends "favorite" | "playlist" | "playlists" | "favorites" = any,
-		Key extends keyof Methods & `${Action & string}${Capitalize<Type>}` = keyof Methods &
+		Key extends keyof Methods &
+			`${Action & string}${Capitalize<Type>}` = keyof Methods &
 			`${Action & string}${Capitalize<Type>}`,
 		Fn extends Methods[Key] = Methods[Key],
-	>(action: Action, type: Type, ...params: Parameters<Fn>): Promise<Awaited<ReturnType<Fn>>["data"]> {
+	>(
+		action: Action,
+		type: Type,
+		...params: Parameters<Fn>
+	): Promise<Awaited<ReturnType<Fn>>["data"]> {
 		if (browser === false) {
 			return;
 		}

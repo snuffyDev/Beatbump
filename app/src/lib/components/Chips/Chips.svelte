@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from "$app/stores";
 	import Chip from "./Chip/Chip.svelte";
 
 	export let chips: {
@@ -12,9 +13,9 @@
 <div class="chips resp-content-width">
 	{#each chips as chip (chip.text)}
 		<Chip
-			selected={active === chip.text}
+			selected={$page.url.search.includes(chip.browseEndpoint.params)}
 			{chip}
-			on:click={() => {
+			on:click={(e) => {
 				if (active !== chip.text) active = chip.text;
 				else active = "";
 			}}

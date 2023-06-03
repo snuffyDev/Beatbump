@@ -41,8 +41,7 @@
 		background: #17151c;
 		display: inline-flex;
 		justify-content: flex-start;
-		flex-direction: row;
-		flex-wrap: nowrap;
+		flex-flow: row nowrap;
 		text-overflow: clip;
 		font-size: 100%;
 		min-width: 12rem;
@@ -51,7 +50,6 @@
 		width: 100%;
 		align-items: center;
 		white-space: nowrap;
-
 		height: 3rem;
 		padding: 0 0 0 1rem;
 	}

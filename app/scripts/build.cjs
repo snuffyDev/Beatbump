@@ -9,8 +9,12 @@ const root = path.resolve(__dirname, "../");
 
 const beatbump_config_path = path.resolve(root, "beatbump.conf.json");
 /**@type {import('@sveltejs/kit/types/internal').RecursiveRequired<import('./build.types').BeatbumpSchema>} */
-const json_config = JSON.parse(fs.readFileSync(beatbump_config_path, { encoding: "utf8" }));
-const pkg = JSON.parse(fs.readFileSync(path.resolve(root, "package.json"), { encoding: "utf8" }));
+const json_config = JSON.parse(
+	fs.readFileSync(beatbump_config_path, { encoding: "utf8" }),
+);
+const pkg = JSON.parse(
+	fs.readFileSync(path.resolve(root, "package.json"), { encoding: "utf8" }),
+);
 const json = json_config;
 
 /**@type {import('./build.types').Adapter | string} */
@@ -52,20 +56,32 @@ cli
 	.action(() => {
 		try {
 			if (!beatbump_config_path) {
-				console.error(`No config file was found. Please create a file named 'beatbump.config.json' at ${rootPath}`);
+				console.error(
+					`No config file was found. Please create a file named 'beatbump.config.json' at ${rootPath}`,
+				);
 				return;
 			}
-			const options = adapter.match(/node|vercel|netlify|cloudflare(-workers)?/g) ? json["platform"][adapter] : null;
+			const options = adapter.match(
+				/node|vercel|netlify|cloudflare(-workers)?/g,
+			)
+				? json["platform"][adapter]
+				: null;
 
 			if (!pkg.devDependencies[`@sveltejs/adapter-${adapter}`]) {
-				console.info(`Adapter @sveltejs/adapter-${adapter} was not found. Installing...`);
+				console.info(
+					`Adapter @sveltejs/adapter-${adapter} was not found. Installing...`,
+				);
 
-				child_process.spawnSync(`npm`, [`i`, `-D`, `@sveltejs/adapter-${adapter}@latest`], {
-					stdio: "inherit",
-					env: process.env,
-					cwd: root,
-					shell: true,
-				});
+				child_process.spawnSync(
+					`npm`,
+					[`i`, `-D`, `@sveltejs/adapter-${adapter}@latest`],
+					{
+						stdio: "inherit",
+						env: process.env,
+						cwd: root,
+						shell: true,
+					},
+				);
 
 				console.info(`Installed successfully. Starting build...`);
 			}
@@ -80,7 +96,9 @@ cli
 			/// so we abort
 			if (!adapter_installed) console.info("Error installing config.");
 			let hooks_ts = "";
-			const hooks_path = path.resolve(root, "./src/hooks.server.ts") || path.resolve(".", "../src/hooks.server.ts");
+			const hooks_path =
+				path.resolve(root, "./src/hooks.server.ts") ||
+				path.resolve(".", "../src/hooks.server.ts");
 			if (adapter === "node") {
 				hooks_ts = fs.readFileSync(hooks_path, { encoding: "utf-8" });
 				let modified_hooks_ts = hooks_ts.replace(/\/\/#NODE /gm, "");
@@ -94,7 +112,8 @@ cli
 				shell: true,
 			});
 			console.info(`Finished build`);
-			if (adapter === "node") fs.writeFileSync(hooks_path, hooks_ts, { encoding: "utf-8" });
+			if (adapter === "node")
+				fs.writeFileSync(hooks_path, hooks_ts, { encoding: "utf-8" });
 		} catch (err) {
 			console.error(err);
 		}

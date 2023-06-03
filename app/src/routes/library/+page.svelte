@@ -168,7 +168,9 @@
 				{:else}
 					<div class="container">
 						<h4>Empty!</h4>
-						<span class="subheading"><em>Add some songs to keep track of what you love!</em></span>
+						<span class="subheading"
+							><em>Add some songs to keep track of what you love!</em></span
+						>
 					</div>
 				{/if}
 			</div>
@@ -232,24 +234,29 @@
 		margin-top: 1rem;
 		margin-bottom: 4.5rem;
 	}
+
 	.list {
 		min-height: 15%;
 		margin-bottom: 1rem;
 	}
+
 	button {
 		gap: 0.25rem;
 	}
+
 	header {
 		display: inline;
 	}
 	// .playlist-container {
-	// 	gap: 0.8rem;
+	// 	gap: 0.8rem;gap
 	// }
+
 	.image {
 		min-width: 100%;
 		max-width: 12rem;
 		width: 100%;
 		height: 100%;
+
 		img {
 			height: inherit;
 			width: inherit;
@@ -257,19 +264,23 @@
 			max-height: inherit;
 		}
 	}
+
 	.loading,
 	.loader {
 		position: relative;
 	}
+
 	.loader {
 		height: 3em;
 	}
+
 	main {
 		min-height: 100%;
 	}
+
 	.loading {
 		display: grid;
-		// background-color: red;
+		// background-color: red;background-color
 		max-width: 32em;
 		position: absolute;
 		max-height: 8em;

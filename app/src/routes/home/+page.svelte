@@ -10,7 +10,15 @@
 
 	export let data: PageData;
 
-	$: ({ carousels, chips, params, headerThumbnail, continuations, visitorData, path } = data);
+	$: ({
+		carousels,
+		chips,
+		params,
+		headerThumbnail,
+		continuations,
+		visitorData,
+		path,
+	} = data);
 
 	let loading = false;
 	let hasData = false;
@@ -36,7 +44,9 @@
 <div class="immersive-thumbnail">
 	<div
 		class="gradient"
-		style="--theme: var(--base-bg);"
+		style="
+
+--theme: var(--base-bg);"
 	/>
 	{#if headerThumbnail.length !== 0}
 		<picture>
@@ -48,7 +58,9 @@
 					/>
 				{:else}
 					<source
-						media={`(min-width: ${headerThumbnail[i - 1].width + 1}px) and (max-width: ${thumbnail?.width}px)`}
+						media={`(min-width: ${
+							headerThumbnail[i - 1].width + 1
+						}px) and (max-width: ${thumbnail?.width}px)`}
 						srcset={thumbnail.url}
 					/>
 				{/if}
@@ -67,7 +79,7 @@
 <main data-testid="home">
 	<Chips
 		{chips}
-		on:click={({ detail }) => {
+		on:click={(event) => {
 			invalidate("home:load");
 		}}
 	/>
@@ -88,9 +100,13 @@
 				if (loading || hasData) return;
 				loading = true;
 				const response = await fetch(
-					`/home.json?itct=${encodeURIComponent(continuations.clickTrackingParams)}${
+					`/home.json?itct=${encodeURIComponent(
+						continuations.clickTrackingParams,
+					)}${
 						params ? `&params=${encodeURIComponent(params)}` : ""
-					}&ctoken=${encodeURIComponent(continuations.continuation)}&type=next&visitorData=${visitorData}`,
+					}&ctoken=${encodeURIComponent(
+						continuations.continuation,
+					)}&type=next&visitorData=${visitorData}`,
 				);
 				const data = await response.json();
 				// const {continuations, carousels} = data;
@@ -120,6 +136,7 @@
 	main {
 		padding-bottom: 4em !important;
 	}
+
 	.viewport {
 		height: 1.5em;
 		position: absolute;
@@ -129,12 +146,13 @@
 		contain: content;
 		will-change: visibility;
 	}
+
 	.loading {
 		transition: opacity cubic-bezier(0.95, 0.05, 0.795, 0.035) 500ms;
 		opacity: 0;
 		display: flex;
 		position: absolute;
-		// inset:0;
+		// inset:0;inset
 		bottom: 0;
 		left: 0;
 		right: 0;
@@ -144,11 +162,8 @@
 		padding-block: 2.5rem;
 		will-change: visibility;
 	}
+
 	.immersive-thumbnail {
-		position: fixed;
-		z-index: -1;
-		width: 100%;
-		max-width: 100%;
 		position: absolute;
 		z-index: -1;
 		width: 100%;
@@ -156,9 +171,9 @@
 		top: 0;
 		left: 0;
 		right: 0;
-
 		contain: layout style paint;
 	}
+
 	.gradient {
 		position: absolute;
 		inset: 0;
@@ -166,10 +181,10 @@
 		height: 100%;
 		background: linear-gradient(to bottom, hsl(0deg 0% 0% / 60%), var(--theme));
 	}
+
 	.immer-img {
-		-o-object-fit: cover;
 		object-fit: cover;
-		-o-object-position: center;
+		object-position: center;
 		object-position: top;
 		border-radius: unset !important;
 		inset: 0;

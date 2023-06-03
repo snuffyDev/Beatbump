@@ -100,8 +100,8 @@
 		>
 			<h1>Delete Playlist?</h1>
 			<p>
-				Deleting this playlist will permanently delete all of it's data from your device (thumbnail, title, songs,
-				etc.).
+				Deleting this playlist will permanently delete all of it's data from
+				your device (thumbnail, title, songs, etc.).
 			</p>
 			<p>This action is permanent and cannot be undone!</p>
 		</div>
@@ -253,19 +253,26 @@
 		height: 100%;
 		pointer-events: none;
 		padding: 1rem;
-		background: linear-gradient(180deg, hsl(0deg 0% 0% / 10%), hsl(0deg 0% 0% / 49%));
+		background: linear-gradient(
+			180deg,
+			hsl(0deg 0% 0% / 10%),
+			hsl(0deg 0% 0% / 49%)
+		);
 		align-items: flex-end;
 		justify-content: flex-end;
 		border-radius: var(--xs-radius);
 	}
+
 	.icon {
 		position: relative;
 	}
+
 	.header {
 		display: flex;
 		flex-direction: column;
-		// line-height: 2;
+		// line-height: 2;line-height
 	}
+
 	.body {
 		display: flex;
 		justify-content: center;
@@ -274,6 +281,7 @@
 		flex-direction: column;
 		align-items: center;
 	}
+
 	.img-container {
 		max-width: 16rem;
 		max-height: 16rem;
@@ -282,35 +290,39 @@
 		position: relative;
 		aspect-ratio: 1/1;
 	}
+
 	img {
 		max-width: inherit;
 		max-height: inherit;
 		width: 100%;
 		height: 100%;
 	}
+
 	.input-row {
 		margin-bottom: 1.25rem;
 		display: grid;
 	}
+
 	.buttons {
 		margin-bottom: 0;
 		display: grid;
 		gap: 0.8rem;
 		grid-template-columns: 1fr 1fr;
-		// grid-template-rows: 1fr 1fr;
+		// grid-template-rows: 1fr 1fr;grid-template-rows
 		@media screen and (min-width: 640px) {
 			grid-template-rows: unset;
 		}
 	}
+
 	button {
 		margin-bottom: 0 !important;
 	}
+
 	form {
 		display: inline-block;
-		flex-direction: row;
+		flex-flow: row wrap;
 		min-width: 50%;
 		align-content: center;
-		flex-wrap: wrap;
 		align-self: flex-start;
 		gap: 0.8rem;
 		justify-self: center;
@@ -318,6 +330,7 @@
 		align-items: flex-end;
 		margin: 0 auto;
 	}
+
 	[type="file"] {
 		min-width: 10rem;
 		width: 100%;
@@ -330,6 +343,7 @@
 		inset: 0;
 		z-index: 50;
 	}
+
 	[type="file"]::-webkit-file-upload-button {
 		visibility: hidden;
 	}
@@ -337,46 +351,42 @@
 	.playlist-modal {
 		position: fixed;
 		gap: 0.8rem;
-
 		z-index: 105;
 		background: var(--mobile-popper-bg);
 		display: flex;
 		flex-direction: column;
-		// flex-wrap: wrap;
+		// flex-wrap: wrap;flex-wrap
 		min-width: 50%;
 		min-height: 50%;
 		width: fit-content;
 		max-width: 100%;
 		max-height: 85vh;
-		// flex: 1 1 auto;
-		// height: 100%;
+		// flex: 1 1 auto;flex
+		// height: 100%;height
 		overflow-y: auto;
-		top: 0;
-		left: 0;
 		top: 50%;
-		// inset: 0;
+		// inset: 0;inset
 		left: 50%;
-		// grid-area: m/m/m/m;
+		// grid-area: m/m/m/m;grid-area
 		border-radius: $lg-radius;
-		border-color: rgba(129, 129, 129, 0.411);
+		border-color: rgb(129 129 129 / 41.1%);
 		border-width: 0.025rem;
 		border-style: solid;
 		transform: translate(-50%, -50%);
 		padding: 1.2rem;
 
-		// justify-content: space-around;
+		// justify-content: space-around;justify-content
 	}
+
 	.image {
 		align-self: center;
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
 		background: hsl(200deg 7% 8% / 85%);
 		padding: 1rem;
-		// max-height: 14rem;
+		// max-height: 14rem;max-height
 		min-height: 0;
 		height: 100%;
-		max-width: 16rem;
 		border-radius: inherit;
 		border: 1px #e3e3e32f solid;
 		align-items: center;

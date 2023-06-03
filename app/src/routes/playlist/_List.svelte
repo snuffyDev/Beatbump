@@ -24,7 +24,7 @@
 		{#if isLoading}
 			<div
 				class="loading-results"
-				style="padding: 0em;"
+				style="padding: 0;"
 			>
 				<svg
 					role="img"

@@ -18,7 +18,9 @@ export const load = async ({
 }> => {
 	const { slug } = params;
 	console.time("playlist");
-	const data = await fetch<PlaylistResponseBody>(`/api/v1/playlist.json?list=${slug}`).then((response) => {
+	const data = await fetch<PlaylistResponseBody>(
+		`/api/v1/playlist.json?list=${slug}`,
+	).then((response) => {
 		if (!response.ok) {
 			console.error(response.status, response.statusText);
 			throw response.statusText;
@@ -27,7 +29,13 @@ export const load = async ({
 	});
 
 	// console.log(data);
-	const { tracks = [], header = {}, continuations, carouselContinuations, visitorData } = await data;
+	const {
+		tracks = [],
+		header = {},
+		continuations,
+		carouselContinuations,
+		visitorData,
+	} = await data;
 
 	console.timeEnd("playlist");
 	return {

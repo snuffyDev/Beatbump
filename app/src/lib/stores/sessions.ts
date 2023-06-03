@@ -22,7 +22,14 @@ type Kind =
 	| "state.update.continuation"
 	| "state.update.position"
 	| "action.mix.init";
-type Command = "SEND" | "GET" | "CONNECT" | "DISCONNECT" | "CONFIG" | "PUT" | "PATCH";
+type Command =
+	| "SEND"
+	| "GET"
+	| "CONNECT"
+	| "DISCONNECT"
+	| "CONFIG"
+	| "PUT"
+	| "PATCH";
 type Status = "OK" | "ERROR";
 
 /// Client Types
@@ -90,7 +97,12 @@ interface GroupSessionController {
 	/** Process data received from connected clients */
 	process(data: string): unknown;
 	/** Send a command to connected clients */
-	send(command: Command, type: Kind, data: Record<string, unknown>, metadata?: Client): void;
+	send(
+		command: Command,
+		type: Kind,
+		data: Record<string, unknown>,
+		metadata?: Client,
+	): void;
 	/** Send client state to other clients in session */
 	sendGroupState(clientState: { client: string; state: ConnectionState }): void;
 
@@ -109,15 +121,20 @@ interface GroupSessionModel {
 	// #endregion Properties (5)
 }
 
-export class GroupSession extends EventEmitter implements GroupSessionController, GroupSessionModel {
+export class GroupSession
+	extends EventEmitter
+	implements GroupSessionController, GroupSessionModel
+{
 	// #region Properties (15)
 
 	private _allCanPlay = false;
 	private _client: Client;
 	private _connection: DataConnection;
-	private _connectionStates: WritableStore<ConnectionStates> = new WritableStore({});
+	private _connectionStates: WritableStore<ConnectionStates> =
+		new WritableStore({});
 	private _connections: DataConnection[] = [];
-	private _hasActiveSession: WritableStore<boolean> = new WritableStore<boolean>(false);
+	private _hasActiveSession: WritableStore<boolean> =
+		new WritableStore<boolean>(false);
 	private _history: WritableStore<Message[]> = new WritableStore([]);
 	private _initialized = false;
 	private _once = false;
@@ -133,9 +150,16 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 	public get hasActiveSessionState() {
 		return this._hasActiveSession;
 	}
-	private subscribers = new Set<(v: this, startStop?: StartStopNotifier<typeof this>) => void>();
+	private subscribers = new Set<
+		(v: this, startStop?: StartStopNotifier<typeof this>) => void
+	>();
 	// #region Constructors (1)
-	public subscribe = (run: (value: this, startStop?: StartStopNotifier<typeof this>) => Unsubscriber) => {
+	public subscribe = (
+		run: (
+			value: this,
+			startStop?: StartStopNotifier<typeof this>,
+		) => Unsubscriber,
+	) => {
 		this.subscribers.add(run);
 		run(this);
 		return () => {
@@ -170,10 +194,10 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 			) {
 				this._once = true;
 				this._allCanPlay = true;
-                if (this.client.role === "host") {
-									await SessionListService.next(void 0, true);
-								}
-								setTimeout(() => (this._once = false), 0);
+				if (this.client.role === "host") {
+					await SessionListService.next(void 0, true);
+				}
+				setTimeout(() => (this._once = false), 0);
 			}
 		});
 	}
@@ -227,7 +251,12 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 
 		await this._lock.do(() => {
 			SessionListService.setTrackWillPlayNext(item, position).then(() => {
-				this.send("PUT", "state.update.mix", SessionListService.toJSON(), this.client);
+				this.send(
+					"PUT",
+					"state.update.mix",
+					SessionListService.toJSON(),
+					this.client,
+				);
 			});
 		});
 	}
@@ -308,7 +337,11 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 
 	private callSubs = () => this.subscribers.forEach((c) => c(this));
 
-	public init(displayName: string, type?: "host" | "guest", settings: Settings = { forceSync: true }): void {
+	public init(
+		displayName: string,
+		type?: "host" | "guest",
+		settings: Settings = { forceSync: true },
+	): void {
 		if (this.initialized) return;
 		this._initialized = true;
 		this._settings = settings;
@@ -366,7 +399,10 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 
 					SessionListService.set(list);
 
-					await getSrc(list.mix[list.position].videoId, list.mix[list.position].playlistId)
+					await getSrc(
+						list.mix[list.position].videoId,
+						list.mix[list.position].playlistId,
+					)
 						.then((body) => {
 							return AudioPlayer.updateSrc(body.body);
 						})
@@ -378,7 +414,10 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 						console.log(err);
 						const pos = parseInt((err.message as string).match(/\d+$/g)?.at(0));
 						err.message.includes("position")
-							? console.log((data as string).slice(0, pos), (data as string).slice(pos))
+							? console.log(
+									(data as string).slice(0, pos),
+									(data as string).slice(pos),
+							  )
 							: console.error(err);
 					}
 				}
@@ -386,7 +425,8 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 			/** Receive the list with the continuation data */
 			if (type === "state.update.continuation") {
 				const list = JSON.parse(data as string) as ISessionListProvider;
-				if (!list.mix && !list.mix.length) throw new Error("Provided SessionList is not valid!", {});
+				if (!list.mix && !list.mix.length)
+					throw new Error("Provided SessionList is not valid!", {});
 				await new Promise<ISessionListProvider>((resolve) => {
 					setTimeout(() => {
 						resolve(SessionListService.lockedSet(list));
@@ -398,14 +438,20 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 						});
 					})
 					.then((list) => {
-						return getSrc(list.mix[list.position]?.videoId, list.mix[list.position]?.playlistId, undefined, true);
+						return getSrc(
+							list.mix[list.position]?.videoId,
+							list.mix[list.position]?.playlistId,
+							undefined,
+							true,
+						);
 					});
 			}
 			/** Any other mix updates */
 			if (command === "PUT" && type === "state.update.mix") {
 				try {
 					const list = JSON.parse(data as string) as ISessionListProvider;
-					if (!list.mix && !list.mix.length) throw new Error("Provided SessionList is not valid!", {});
+					if (!list.mix && !list.mix.length)
+						throw new Error("Provided SessionList is not valid!", {});
 					await SessionListService.set(list);
 				} catch (error) {
 					console.error();
@@ -417,7 +463,10 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 		if (command === "PATCH") {
 			/** Gets the next or previous track */
 			if (type === "state.update.position") {
-				const { dir = undefined, position = 0 }: { dir: "<-" | "->" | undefined; position: number } = data as {
+				const {
+					dir = undefined,
+					position = 0,
+				}: { dir: "<-" | "->" | undefined; position: number } = data as {
 					dir: "<-" | "->" | undefined;
 					position: number;
 				};
@@ -425,13 +474,13 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 				await SessionListService.prefetchTrackAtIndex(position);
 
 				if (typeof dir === "undefined") {
-                    await SessionListService.next();
+					await SessionListService.next();
 				} else if (dir === "<-") {
-                    await SessionListService.previous();
+					await SessionListService.previous();
 				} else if (dir === "->") {
-                    await SessionListService.next();
+					await SessionListService.next();
 				}
-                await SessionListService.updatePosition(position);
+				await SessionListService.updatePosition(position);
 			}
 			/** Updates the playback state for the connected client */
 			if (type === "state") {
@@ -445,7 +494,12 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 		return { command, data, metadata, type };
 	}
 
-	public send(command: Command, type: Kind, data: string | Record<string, unknown>, metadata?: Client): void {
+	public send(
+		command: Command,
+		type: Kind,
+		data: string | Record<string, unknown>,
+		metadata?: Client,
+	): void {
 		if (!this._initialized) return;
 
 		iter(this._connections, (conn) => {
@@ -464,7 +518,10 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 		});
 	}
 
-	public sendGroupState(clientState: { client: string; state: ConnectionState }): void {
+	public sendGroupState(clientState: {
+		client: string;
+		state: ConnectionState;
+	}): void {
 		this._connectionStates.update((u) => ({
 			...u,
 			[this.client.clientId]: clientState["state"],
@@ -476,7 +533,10 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 
 	public setAutoMix(
 		type: "automix" | "playlist",
-		{ videoId = "", playlistId = "" }: { videoId?: string; playlistId?: string },
+		{
+			videoId = "",
+			playlistId = "",
+		}: { videoId?: string; playlistId?: string },
 	): Status {
 		this.callSubs();
 		return this.initializeHostPlayback("automix", { videoId, playlistId });
@@ -489,7 +549,12 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 
 	public updateGuestContinuation(_mix: ISessionListProvider): void {
 		this.callSubs();
-		this.send("PUT", "state.update.continuation", JSON.stringify(_mix), this._client);
+		this.send(
+			"PUT",
+			"state.update.continuation",
+			JSON.stringify(_mix),
+			this._client,
+		);
 	}
 
 	public updateGuestTrackQueue(_mix: ISessionListProvider): void {
@@ -574,14 +639,24 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 					videoId: data?.videoId as string,
 					playlistId: data?.playlistId,
 				}).then(() => {
-					this.send("PUT", "state.set.mix", SessionListService.toJSON(), this.client);
+					this.send(
+						"PUT",
+						"state.set.mix",
+						SessionListService.toJSON(),
+						this.client,
+					);
 				});
 			} else if (kind === "playlist") {
 				SessionListService.initPlaylistSession({
 					index: 0,
 					playlistId: data?.playlistId,
 				}).then(() => {
-					this.send("PUT", "state.set.mix", SessionListService.toJSON(), this.client);
+					this.send(
+						"PUT",
+						"state.set.mix",
+						SessionListService.toJSON(),
+						this.client,
+					);
 				});
 			}
 			return "OK";
@@ -596,10 +671,16 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 			const processed = await this.process(data as string);
 
 			if (processed.metadata.clientId === this.client.clientId)
-				return notify(processed.metadata.clientId + "  " + this.client.clientId, "error");
+				return notify(
+					processed.metadata.clientId + "  " + this.client.clientId,
+					"error",
+				);
 
 			if (processed.command === "CONNECT" && Array.isArray(processed.data)) {
-				const _ids = filter(processed.data as string[], (id) => id !== this.client.clientId);
+				const _ids = filter(
+					processed.data as string[],
+					(id) => id !== this.client.clientId,
+				);
 				const ids = Object.keys(this._rtc.connections);
 
 				iter(_ids, (item) => {
@@ -611,7 +692,12 @@ export class GroupSession extends EventEmitter implements GroupSessionController
 				return;
 			}
 
-			this.send(processed.command, processed.type, processed.data as Record<string, unknown>, processed.metadata);
+			this.send(
+				processed.command,
+				processed.type,
+				processed.data as Record<string, unknown>,
+				processed.metadata,
+			);
 			this.callSubs();
 		});
 

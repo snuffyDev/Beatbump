@@ -18,7 +18,7 @@
 		"format": "prettier --plugin-search-dir . --write .",
 		"lint": "npm run lint:prettier && npm run lint:styles && npm run lint:ts",
 		"lint:prettier": "prettier --plugin-search-dir . --check . ",
-		"lint:styles": "stylelint --fix",
+		"lint:styles": "stylelint **/*.{css,mjs,svelte,scss,ts}",
 		"lint:ts": " eslint \"src/**/*.{js,ts}\" --ext js,ts --fix "
 	},
 	"devDependencies": {
@@ -50,7 +50,9 @@
 		"hls.js": "^1.4.0",
 		"peerjs": "^1.4.7",
 		"postcss": "^8.4.23",
+		"postcss-html": "^1.5.0",
 		"postcss-load-config": "^4.0.1",
+		"postcss-safe-parser": "^6.0.0",
 		"prettier": "^2.8.8",
 		"prettier-plugin-svelte": "^2.10.0",
 		"sass": "^1.62.1",

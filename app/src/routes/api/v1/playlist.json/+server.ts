@@ -1,10 +1,20 @@
-import { MusicResponsiveListItemRenderer, MusicTwoRowItemRenderer } from "$lib/parsers";
+import {
+	MusicResponsiveListItemRenderer,
+	MusicTwoRowItemRenderer,
+} from "$lib/parsers";
 
 import type { PlaylistEndpointContinuation } from "$api/_base";
 import { buildAPIRequest } from "$api/request";
 import { parseParams } from "$api/utils";
-import type { CarouselHeader, NextContinuationData, Thumbnail } from "$lib/types";
-import type { Header, MusicCarouselShelfRenderer } from "$lib/types/innertube/musicCarouselShelfRenderer";
+import type {
+	CarouselHeader,
+	NextContinuationData,
+	Thumbnail,
+} from "$lib/types";
+import type {
+	Header,
+	MusicCarouselShelfRenderer,
+} from "$lib/types/innertube/musicCarouselShelfRenderer";
 import type { ITwoRowItemRenderer } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { map } from "$lib/utils/collections";
@@ -35,14 +45,32 @@ type PlaylistSchema = {
 	visitorData?: string;
 };
 
-const parser = parseParams<PlaylistSchema>(["list", "ctoken", "itct", "ref", "visitorData"]);
+const parser = parseParams<PlaylistSchema>([
+	"list",
+	"ctoken",
+	"itct",
+	"ref",
+	"visitorData",
+]);
 
-const ALLOWED_HEADER_KEYS = new Set(["subtitle", "secondSubtitle", "description", "thumbnail", "title"]);
+const ALLOWED_HEADER_KEYS = new Set([
+	"subtitle",
+	"secondSubtitle",
+	"description",
+	"thumbnail",
+	"title",
+]);
 
 export const GET: RequestHandler = async ({ url }) => {
 	try {
 		const query = url.searchParams;
-		const { list: browseId, itct, ctoken, ref: referrer = "", visitorData } = parser(query.entries());
+		const {
+			list: browseId,
+			itct,
+			ctoken,
+			ref: referrer = "",
+			visitorData,
+		} = parser(query.entries());
 
 		if (ctoken) {
 			return await getPlaylistContinuation(
@@ -67,7 +95,11 @@ export const GET: RequestHandler = async ({ url }) => {
 		});
 	}
 };
-async function getPlaylistContinuation(continuation: PlaylistEndpointContinuation, id?: string, visitorData?: string) {
+async function getPlaylistContinuation(
+	continuation: PlaylistEndpointContinuation,
+	id?: string,
+	visitorData?: string,
+) {
 	const response = await buildAPIRequest("playlist", {
 		context: {
 			client: {
@@ -84,22 +116,34 @@ async function getPlaylistContinuation(continuation: PlaylistEndpointContinuatio
 		params: {},
 		continuation,
 	});
-	if (response === null) throw error(500, { message: "Error fetching playlist" });
+	if (response === null)
+		throw error(500, { message: "Error fetching playlist" });
 	if (!response.ok) {
 		throw error(response.status, response.statusText);
 	}
 
 	const data = await response.json();
-	const { continuationContents: { musicPlaylistShelfContinuation: { contents = [], continuations = [] } = {} } = {} } =
-		await data;
+	const {
+		continuationContents: {
+			musicPlaylistShelfContinuation: {
+				contents = [],
+				continuations = [],
+			} = {},
+		} = {},
+	} = await data;
 	// console.log(data, contents, continuations)
 
 	let tracks: (IListItemRenderer | ITwoRowItemRenderer)[] = [];
 	let carousel;
-	const cont: NextContinuationData = continuations.length !== 0 ? continuations[0]?.nextContinuationData : null;
-	if (data?.continuationContents?.sectionListContinuation?.contents[0]?.musicCarouselShelfRenderer) {
+	const cont: NextContinuationData =
+		continuations.length !== 0 ? continuations[0]?.nextContinuationData : null;
+	if (
+		data?.continuationContents?.sectionListContinuation?.contents[0]
+			?.musicCarouselShelfRenderer
+	) {
 		carousel = await parseCarousel(
-			data?.continuationContents?.sectionListContinuation?.contents[0]?.musicCarouselShelfRenderer,
+			data?.continuationContents?.sectionListContinuation?.contents[0]
+				?.musicCarouselShelfRenderer,
 		);
 	} else {
 		tracks = await parseTrack(contents, id);
@@ -131,11 +175,14 @@ async function getPlaylist(browseId: string, referrer: string) {
 						osName: "Googlebot",
 						osVersion: "2.1",
 						locationInfo: {
-							locationPermissionAuthorizationStatus: "LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED",
+							locationPermissionAuthorizationStatus:
+								"LOCATION_PERMISSION_AUTHORIZATION_STATUS_UNSUPPORTED",
 						},
 						musicAppInfo: {
-							musicActivityMasterSwitch: "MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
-							musicLocationMasterSwitch: "MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE",
+							musicActivityMasterSwitch:
+								"MUSIC_ACTIVITY_MASTER_SWITCH_INDETERMINATE",
+							musicLocationMasterSwitch:
+								"MUSIC_LOCATION_MASTER_SWITCH_INDETERMINATE",
 							pwaInstallabilityStatus: "PWA_INSTALLABILITY_STATUS_UNKNOWN",
 						},
 						utcOffsetMinutes: -new Date().getTimezoneOffset(),
@@ -160,8 +207,10 @@ async function getPlaylist(browseId: string, referrer: string) {
 				"x-origin": "https://music.youtube.com",
 				"X-Goog-Visitor-Id": "CgtQc1BrdVJNNVdNRSiImZ6KBg%3D%3D",
 
-				"User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-				referer: "https://music.youtube.com/playlist?list=" + referrer || browseId,
+				"User-Agent":
+					"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+				referer:
+					"https://music.youtube.com/playlist?list=" + referrer || browseId,
 			},
 		},
 	);
@@ -179,8 +228,8 @@ async function getPlaylist(browseId: string, referrer: string) {
 	const visitorData = data.responseContext?.visitorData;
 
 	const musicPlaylistShelfRenderer =
-		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents[0]
-			?.musicPlaylistShelfRenderer;
+		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+			?.content?.sectionListRenderer?.contents[0]?.musicPlaylistShelfRenderer;
 
 	const contents = musicPlaylistShelfRenderer.contents;
 
@@ -188,12 +237,13 @@ async function getPlaylist(browseId: string, referrer: string) {
 	const continuations = musicPlaylistShelfRenderer?.continuations;
 
 	const _carouselContinuation =
-		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer
-			?.continuations || null;
+		data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
+			?.content?.sectionListRenderer?.continuations || null;
 
 	// console.log(musicDetailHeaderRenderer)
-	const continuationData: NextContinuationData = data?.contents?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer
-		?.content?.sectionListRenderer?.continuations
+	const continuationData: NextContinuationData = data?.contents
+		?.singleColumnBrowseResultsRenderer?.tabs[0]?.tabRenderer?.content
+		?.sectionListRenderer?.continuations
 		? Array.isArray(continuations) && continuations[0]?.nextContinuationData
 			? continuations[0]?.nextContinuationData
 			: _carouselContinuation[0]?.nextContinuationData
@@ -224,25 +274,38 @@ async function getPlaylist(browseId: string, referrer: string) {
 			}
 
 			if (key === "subtitle" || key === "secondSubtitle") {
-				header[key] = musicDetailHeaderRenderer[key]["runs"]["length"] !== 0 ? createArray(key) : ([] as string[]);
+				header[key] =
+					musicDetailHeaderRenderer[key]["runs"]["length"] !== 0
+						? createArray(key)
+						: ([] as string[]);
 			}
 
 			const item = musicDetailHeaderRenderer[key] as Record<string, unknown>;
-			if (key === "description" && "runs" in item && Array.isArray(item.runs) && item.runs.length !== 0) {
+			if (
+				key === "description" &&
+				"runs" in item &&
+				Array.isArray(item.runs) &&
+				item.runs.length !== 0
+			) {
 				header[key] = item.runs[0]?.text || undefined;
 			}
 			if (key === "thumbnail") {
-				const croppedSquareThumbnail = (item?.croppedSquareThumbnailRenderer as Record<string, unknown>)?.thumbnail;
+				const croppedSquareThumbnail = (
+					item?.croppedSquareThumbnailRenderer as Record<string, unknown>
+				)?.thumbnail;
 
 				if (
 					croppedSquareThumbnail != null &&
 					typeof croppedSquareThumbnail === "object" &&
 					"thumbnails" in croppedSquareThumbnail
 				) {
-					header[(key + "s") as "thumbnails"] = (croppedSquareThumbnail.thumbnails || []) as Thumbnail[];
+					header[(key + "s") as "thumbnails"] =
+						(croppedSquareThumbnail.thumbnails || []) as Thumbnail[];
 				}
 			}
-			if (key === "title") header[key] = musicDetailHeaderRenderer[key]["runs"][0]["text"] || "[ Unknown ]";
+			if (key === "title")
+				header[key] =
+					musicDetailHeaderRenderer[key]["runs"][0]["text"] || "[ Unknown ]";
 		}
 		header["playlistId"] = playlistId;
 	};
@@ -255,16 +318,25 @@ async function getPlaylist(browseId: string, referrer: string) {
 		continuations: continuationData,
 		tracks,
 		visitorData,
-		carouselContinuations: _carouselContinuation && _carouselContinuation[0].nextContinuationData,
+		carouselContinuations:
+			_carouselContinuation && _carouselContinuation[0].nextContinuationData,
 		header,
 	};
 	return json(obj);
 }
-async function parseTrack(contents = [], playlistId?: string): Promise<IListItemRenderer[]> {
+async function parseTrack(
+	contents = [],
+	playlistId?: string,
+): Promise<IListItemRenderer[]> {
 	// let idx = contents.length;
 
 	const items = (
-		await Promise.all(contents.map((track) => MusicResponsiveListItemRenderer(track, true, playlistId) || undefined))
+		await Promise.all(
+			contents.map(
+				(track) =>
+					MusicResponsiveListItemRenderer(track, true, playlistId) || undefined,
+			),
+		)
 	).filter((track) => track && track.videoId);
 	return items;
 }
@@ -280,15 +352,19 @@ async function parseBody(
 ): Promise<(IListItemRenderer | ITwoRowItemRenderer)[]> {
 	const items = await Promise.all(
 		contents.map((item) => {
-			if ("musicTwoRowItemRenderer" in item) return MusicTwoRowItemRenderer(item);
-			if ("musicResponsiveListItemRenderer" in item) return MusicResponsiveListItemRenderer(item);
+			if ("musicTwoRowItemRenderer" in item)
+				return MusicTwoRowItemRenderer(item);
+			if ("musicResponsiveListItemRenderer" in item)
+				return MusicResponsiveListItemRenderer(item);
 			return undefined as never;
 		}),
 	);
 
 	return items.filter(Boolean);
 }
-async function parseCarousel(musicCarouselShelfRenderer: MusicCarouselShelfRenderer) {
+async function parseCarousel(
+	musicCarouselShelfRenderer: MusicCarouselShelfRenderer,
+) {
 	return {
 		header: parseHeader([musicCarouselShelfRenderer.header])[0],
 		results: await parseBody(musicCarouselShelfRenderer.contents),

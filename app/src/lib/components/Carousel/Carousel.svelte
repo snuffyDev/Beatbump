@@ -1,15 +1,15 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-	import type { CarouselHeader } from "$lib/types";
-	import CarouselItem from "./CarouselItem.svelte";
-	import Icon from "$components/Icon/Icon.svelte";
-	import { page } from "$app/stores";
-	import { onDestroy, onMount } from "svelte";
 	import { browser } from "$app/environment";
-	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
-	import observer from "./observer";
+	import { page } from "$app/stores";
+	import Icon from "$components/Icon/Icon.svelte";
+	import type { CarouselHeader } from "$lib/types";
 	import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
+	import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+	import { onDestroy, onMount } from "svelte";
+	import CarouselItem from "./CarouselItem.svelte";
+	import observer from "./observer";
 
 	export let header: CarouselHeader;
 	export let items: (IListItemRenderer | ICarouselTwoRowItem)[] = [];
@@ -37,43 +37,47 @@
 
 	function scrollHandler(ts: number, context?: (any & "left") | "right") {
 		if (!carousel) return;
+		if (startTime === undefined) {
+			startTime = ts;
+		}
+		const elapsed = ts - startTime;
 		const measures = {
 			scrollWidth: carousel.scrollWidth,
 			scrollLeft: carousel.scrollLeft,
 		};
 
-		if (startTime === undefined) {
-			startTime = ts;
-		}
+		if (elapsed > 16) {
+			if (!hasScrollWidth && scrollPositions.width < 0) {
+				hasScrollWidth = true;
+				scrollPositions.width = measures.scrollWidth;
+			}
 
-		const elapsed = ts - startTime;
-		if (!hasScrollWidth && scrollPositions.width < 0) {
-			hasScrollWidth = true;
-			scrollPositions.width = measures.scrollWidth;
-		}
+			const scrollLeft = measures.scrollLeft;
 
-		const scrollLeft = measures.scrollLeft;
+			moreOnLeft = scrollLeft < 15 ? false : true;
+			scrollPositions.left = scrollLeft;
 
-		moreOnLeft = scrollLeft < 15 ? false : true;
-		scrollPositions.left = scrollLeft;
-
-		moreOnRight = scrollPositions.left < scrollPositions.width - clientWidth - 15 ? true : false;
-		scrollPositions.right = scrollPositions.width - scrollLeft - 15;
-
-		if (elapsed < 100) {
-			frame = requestAnimationFrame((ts) => scrollHandler(ts, context));
-		} else {
+			moreOnRight =
+				scrollPositions.left < scrollPositions.width - clientWidth - 15
+					? true
+					: false;
+			scrollPositions.right = scrollPositions.width - scrollLeft - 15;
 			cancelAnimationFrame(frame);
 
 			if (context === "left") {
-				carousel.scrollLeft -= Math.ceil((scrollPositions.width / items.length) * 2);
+				carousel.scrollLeft -= Math.ceil(
+					(scrollPositions.width / items.length) * 2,
+				);
 			} else if (context === "right") {
-				carousel.scrollLeft += Math.ceil((scrollPositions.width / items.length) * 2);
+				carousel.scrollLeft += Math.ceil(
+					(scrollPositions.width / items.length) * 2,
+				);
 			}
 			frame = undefined;
 			startTime = undefined;
 			isScrolling = false;
 		}
+		frame = requestAnimationFrame((ts) => scrollHandler(ts, context));
 	}
 
 	function onScroll(event?: Event, context?: any | "left" | "right") {
@@ -104,14 +108,18 @@
 	const isArtistPage = $page.url.pathname.includes("/artist/");
 	const urls = {
 		playlist: `/playlist/${header?.browseId}`,
-		trending: `/trending/new/${header?.browseId}${header?.params ? `?params=${header.params}` : ""}${
-			header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ""
-		}`,
+		trending: `/trending/new/${header?.browseId}${
+			header?.params ? `?params=${header.params}` : ""
+		}${header?.itct ? `&itct=${encodeURIComponent(header?.itct)}` : ""}`,
 		artist: `${header.browseId}/releases?visitorData=${visitorData}&params=${header?.params}&itct=${header?.itct}`,
 	};
 
 	let href =
-		header?.browseId && isArtistPage ? urls.artist : header.browseId?.includes("VLP") ? urls.playlist : urls.trending;
+		header?.browseId && isArtistPage
+			? urls.artist
+			: header.browseId?.includes("VLP")
+			? urls.playlist
+			: urls.trending;
 </script>
 
 <div class="header resp-content-width">
@@ -165,7 +173,7 @@
 		id="scrollItem"
 		on:scroll={onScroll}
 		bind:this={carousel}
-		use:observer
+		use:observer={{ items }}
 	>
 		{#each items as item, index}
 			{#if type === "trending"}

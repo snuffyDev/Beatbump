@@ -19,7 +19,10 @@ if (browser && globalThis.self.name !== "IDB" && settings) {
 	});
 }
 
-export type Callback<K extends keyof HTMLElementEventMap> = (this: HTMLElement, event: HTMLElementEventMap[K]) => void;
+export type Callback<K extends keyof HTMLElementEventMap> = (
+	this: HTMLElement,
+	event: HTMLElementEventMap[K],
+) => void;
 
 export type Listeners = Map<string, Callback<keyof HTMLElementEventMap>[]>;
 
@@ -35,7 +38,9 @@ interface AudioPlayerEvents {
 const setPosition = () => {
 	if ("mediaSession" in navigator) {
 		navigator.mediaSession.setPositionState({
-			duration: isAppleMobileDevice ? AudioPlayer.duration / 2 : AudioPlayer.duration,
+			duration: isAppleMobileDevice
+				? AudioPlayer.duration / 2
+				: AudioPlayer.duration,
 			position: AudioPlayer.currentTime,
 		});
 	}
@@ -51,8 +56,11 @@ function metaDataHandler() {
 			album: currentTrack?.album?.title ?? undefined,
 			artwork: [
 				{
-					src: currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].url,
-					sizes: `${currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].width}x${
+					src: currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1]
+						.url,
+					sizes: `${
+						currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].width
+					}x${
 						currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].height
 					}`,
 					type: "image/jpeg",
@@ -73,23 +81,39 @@ function metaDataHandler() {
 
 			setPosition();
 		});
-		navigator.mediaSession.setActionHandler("previoustrack", () => SessionListService.previous());
-		navigator.mediaSession.setActionHandler("nexttrack", () => SessionListService.next());
+		navigator.mediaSession.setActionHandler("previoustrack", () =>
+			SessionListService.previous(),
+		);
+		navigator.mediaSession.setActionHandler("nexttrack", () =>
+			SessionListService.next(),
+		);
 	}
 }
 
 // eslint-disable-next-line import/no-unused-modules
-export const updateGroupState = (opts: { client: string; state: ConnectionState }): void =>
-	groupSession.sendGroupState(opts);
+export const updateGroupState = (opts: {
+	client: string;
+	state: ConnectionState;
+}): void => groupSession.sendGroupState(opts);
 
 // eslint-disable-next-line import/no-unused-modules
-export const updateGroupPosition = (dir: "<-" | "->" | undefined, position: number): void =>
-	groupSession.send("PATCH", "state.update.position", { dir, position } as unknown as JSON, groupSession.client);
+export const updateGroupPosition = (
+	dir: "<-" | "->" | undefined,
+	position: number,
+): void =>
+	groupSession.send(
+		"PATCH",
+		"state.update.position",
+		{ dir, position } as unknown as JSON,
+		groupSession.client,
+	);
 
 // Helper to generate a fallback URL if the current src fails to play
 function createFallbackUrl(currentUrl: string) {
 	if (typeof currentUrl !== "string")
-		throw Error(`Expected parameter 'currentUrl' to be a string, received ${currentUrl}`);
+		throw Error(
+			`Expected parameter 'currentUrl' to be a string, received ${currentUrl}`,
+		);
 	const srcUrl = new URL(currentUrl);
 
 	if (!srcUrl.hostname.includes("googlevideo.com")) return currentUrl;
@@ -117,13 +141,19 @@ function createFallbackUrl(currentUrl: string) {
 type EventCallbackFn<T> = (data: T) => void;
 
 class EventEmitter<Events> {
-	private listeners: Map<keyof Events, EventCallbackFn<Events[keyof Events]>[]> = new Map();
+	private listeners: Map<
+		keyof Events,
+		EventCallbackFn<Events[keyof Events]>[]
+	> = new Map();
 
 	constructor() {
 		//
 	}
 
-	dispatch<Key extends keyof Events = keyof Events>(name: Key, data: Events[Key]) {
+	dispatch<Key extends keyof Events = keyof Events>(
+		name: Key,
+		data: Events[Key],
+	) {
 		const listeners = this.listeners.get(name) ?? [];
 
 		for (const cb of listeners) {
@@ -131,7 +161,10 @@ class EventEmitter<Events> {
 		}
 	}
 
-	off<Key extends keyof Events = keyof Events>(name: Key, callback: EventCallbackFn<Events[Key]>) {
+	off<Key extends keyof Events = keyof Events>(
+		name: Key,
+		callback: EventCallbackFn<Events[Key]>,
+	) {
 		const listeners = this.listeners.get(name) ?? [];
 		const index = listeners.indexOf(callback as never);
 
@@ -141,7 +174,10 @@ class EventEmitter<Events> {
 		this.listeners.set(name, listeners);
 	}
 
-	on<Key extends keyof Events = keyof Events & string>(name: Key, callback: EventCallbackFn<Events[Key]>) {
+	on<Key extends keyof Events = keyof Events & string>(
+		name: Key,
+		callback: EventCallbackFn<Events[Key]>,
+	) {
 		const listeners = this.listeners.get(name) ?? [];
 		listeners.push(callback as never);
 		this.listeners.set(name, listeners);
@@ -169,11 +205,18 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 	private _durationStore = new WritableStore<number>(0);
 	private _paused = writable(true);
 	private _progress = tweened<number>(0);
-	private _taskQueue: [name: keyof AudioPlayerImpl, args: [...rest: unknown[]]][] = [];
+	private _taskQueue: [
+		name: keyof AudioPlayerImpl,
+		args: [...rest: unknown[]],
+	][] = [];
 	private audioNodeListeners: Record<string, () => void> = {};
 	private invalidationTimer: ReturnType<typeof setTimeout> | null = null;
-	private nextSrc: { stale: boolean; url: string | undefined } = { stale: false, url: "" };
+	private nextSrc: { stale: boolean; url: string | undefined } = {
+		stale: false,
+		url: "",
+	};
 	private declare player: HTMLAudioElement;
+	private _repeat: string;
 
 	constructor() {
 		super();
@@ -185,7 +228,10 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 			}
 		};
 
-		document.addEventListener("click", onUserInteractionCallback, { capture: true, once: true });
+		document.addEventListener("click", onUserInteractionCallback, {
+			capture: true,
+			once: true,
+		});
 	}
 
 	public get currentTimeStore() {
@@ -193,6 +239,14 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 	}
 	public get currentTime() {
 		return this._currentTimeStore.value;
+	}
+
+	public repeat(state: "off" | "track" | "playlist") {
+		if (state === "track") {
+			this.player.loop = true;
+		} else this.player.loop = false;
+
+		this._repeat = state;
 	}
 
 	public get fastSeek() {
@@ -264,7 +318,10 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 			this.addTaskToTaskQueue("play");
 			return;
 		}
-		if (groupSession.initialized === true && groupSession.hasActiveSession === true) {
+		if (
+			groupSession.initialized === true &&
+			groupSession.hasActiveSession === true
+		) {
 			updateGroupState({
 				client: groupSession.client.clientId,
 				state: {
@@ -288,7 +345,9 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 
 	public seek(to: number) {
 		if (to < this.durationStore.value / 2) this.setStaleTimeout();
+
 		this.player.currentTime = to;
+		this._progress.set(this.player.currentTime, { duration: 10 });
 	}
 
 	public setNextTrackPrefetchedUrl(trackUrl: string) {
@@ -313,6 +372,20 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 		}
 	}
 
+	private async handleRepeat() {
+		if (
+			this._repeat === "playlist" &&
+			SessionListService.$.value.position >=
+				SessionListService.$.value.mix.length - 1
+		) {
+			await SessionListService.updatePosition(1);
+			await SessionListService.previous(true);
+			return true;
+		} else if (this._repeat === "track") {
+			return false;
+		}
+	}
+
 	private createAudioNode() {
 		let locked = false;
 		this.player = new Audio();
@@ -324,7 +397,11 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 			let promise: Promise<unknown> | undefined = Promise.resolve();
 			const setPromiseAndReturn = (duration: number) => {
 				promise = new Promise<void>((resolve) => {
-					if (!tick && this.nextSrc.stale && this.player.currentTime >= duration / 2) {
+					if (
+						!tick &&
+						this.nextSrc.stale &&
+						this.player.currentTime >= duration / 2
+					) {
 						initial = this.player.src;
 						tick += 1;
 						if (this.nextSrc.stale)
@@ -367,14 +444,22 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 
 		this.onEvent("timeupdate", async () => {
 			this._currentTimeStore.set(this.player.currentTime);
-
-			const duration = isAppleMobileDevice ? this.player.duration / 2 : this.player.duration;
+			const duration = isAppleMobileDevice
+				? this.player.duration / 2
+				: this.player.duration;
 			this._durationStore.set(duration);
 
 			// We're at the end - get the next track!
 			if (this.player.currentTime >= duration - 0.1 && !locked) {
 				try {
+					if (this._repeat !== "off") {
+						const allowContinuation = await this.handleRepeat();
+						if (allowContinuation === false) {
+							return;
+						}
+					}
 					if (!locked) locked = true;
+
 					if (groupSession.initialized) {
 						return await Promise.resolve(
 							updateGroupState({
@@ -397,19 +482,21 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 					}
 					if (groupSession.hasActiveSession && !groupSession.allCanPlay) return;
 					return await SessionListService.next(this.nextSrc.url).finally(() => {
-													locked = false; // Unlock this 'if' block when finished
-													this.nextSrc.url = undefined; // Set to undefined since e 'used' the value
-												});
+						locked = false; // Unlock this 'if' block when finished
+						this.nextSrc.url = undefined; // Set to undefined since e 'used' the value
+					});
 				} finally {
 					locked = false;
 				}
-			} else if (this.nextSrc.stale && this.player.currentTime >= duration / 2) {
-				return await prefetchLock(duration);
 			}
 		});
 
 		this.onEvent("error", () => {
-			if (this.player?.error?.message.includes("Empty src") || !this.player?.error?.message) return;
+			if (
+				this.player?.error?.message.includes("Empty src") ||
+				!this.player?.error?.message
+			)
+				return;
 
 			console.error(this.player.error);
 			this.handleError();
@@ -468,11 +555,15 @@ export const getSrc = async (
 > => {
 	try {
 		const res = await fetch(
-			`/api/v1/player.json?videoId=${videoId}${playlistId ? `&playlistId=${playlistId}` : ""}${
-				params ? `&playerParams=${params}` : ""
-			}`,
+			`/api/v1/player.json?videoId=${videoId}${
+				playlistId ? `&playlistId=${playlistId}` : ""
+			}${params ? `&playerParams=${params}` : ""}`,
 		).then((res) => res.json());
-		if (res && !res?.streamingData && res?.playabilityStatus.status === "UNPLAYABLE") {
+		if (
+			res &&
+			!res?.streamingData &&
+			res?.playabilityStatus.status === "UNPLAYABLE"
+		) {
 			return handleError();
 		}
 		const formats = sort({
@@ -493,13 +584,16 @@ export const getSrc = async (
 function setTrack(formats: PlayerFormats, shouldAutoplay: boolean) {
 	let format = undefined;
 	if (userSettings?.playback?.Stream === "HLS") {
-		format = { original_url: formats?.hls || "", url: formats.hls  || ""};
+		format = { original_url: formats?.hls || "", url: formats.hls || "" };
 	} else {
 		format = formats.streams?.[0];
 	}
-	if (format && shouldAutoplay) updatePlayerSrc({ original_url: format.original_url, url: format.url });
+	if (format && shouldAutoplay)
+		updatePlayerSrc({ original_url: format.original_url, url: format.url });
 	return {
-		body: format ? { original_url: format.original_url, url: format.url } : null,
+		body: format
+			? { original_url: format.original_url, url: format.url }
+			: null,
 		error: false,
 	};
 }
@@ -507,7 +601,11 @@ function setTrack(formats: PlayerFormats, shouldAutoplay: boolean) {
 function handleError() {
 	console.log("error");
 
-	notify("An error occurred while initiating playback, skipping...", "error", "getNextTrack");
+	notify(
+		"An error occurred while initiating playback, skipping...",
+		"error",
+		"getNextTrack",
+	);
 	return {
 		body: null,
 		error: true,

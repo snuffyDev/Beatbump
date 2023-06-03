@@ -1,7 +1,9 @@
 import type { ParsedCarousel } from "$api/models/Carousel";
 
-export const isMoodsAndGenres = (obj: unknown): obj is ParsedCarousel<"moodsAndGenres"> => {
-	return (obj as ParsedCarousel<"moodsAndGenres">)?.items?.[0]?.color !== undefined;
+export const isMoodsAndGenres = (
+	obj: unknown,
+): obj is ParsedCarousel<"moodsAndGenres"> => {
+	return !!(obj as ParsedCarousel<"moodsAndGenres">)?.items?.length;
 };
 
 export const isValidCarousel = (obj: unknown): obj is ParsedCarousel => {

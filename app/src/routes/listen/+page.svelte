@@ -3,8 +3,8 @@
 	import Listing from "$lib/components/Item/Listing.svelte";
 	import list from "$lib/stores/list";
 
-	import type { PageData } from "./$types";
 	import { SITE_ORIGIN_URL } from "$stores/url";
+	import type { PageData } from "./$types";
 
 	export let data: PageData;
 	const { videoId, playlist, thumbnails = [], title, related } = data;
@@ -36,7 +36,9 @@
 
 	<meta
 		property="og:url"
-		content={`${$SITE_ORIGIN_URL}/listen?id=${videoId}${playlist ? `&list=${playlist}` : ""}`}
+		content={`${$SITE_ORIGIN_URL}/listen?id=${videoId}${
+			playlist ? `&list=${playlist}` : ""
+		}`}
 	/>
 	<title>{title} | Beatbump</title>
 </svelte:head>
@@ -96,25 +98,23 @@
 		align-self: center;
 		gap: 1.25rem;
 	}
+
 	button {
 		grid-area: button;
 	}
+
 	header {
 		display: grid;
-		grid-template-areas: "img body";
-		grid-template-columns: 0.5fr 1fr;
-		grid-template-rows: 1fr;
-
+		grid-template: "img body" 1fr / 0.5fr 1fr;
 		gap: 1rem;
 		margin-bottom: 0.8rem;
-
 		background-color: hsl(209deg 20% 27% / 19%);
 		border-color: #1b1b1b;
 		border-radius: 0.8em;
 		border-width: 1px;
 		margin: 1em;
 		padding: 0.8em;
-		// transition: all 0.23s cubic-bezier(0.39, 0.575, 0.565, 1);
+		// transition: all 0.23s cubic-bezier(0.39, 0.575, 0.565, 1);transition
 		@media screen and (min-width: 640px) {
 			grid-template-areas:
 				"img body"
@@ -122,6 +122,7 @@
 			grid-template-rows: 1fr 1fr;
 		}
 	}
+
 	.container {
 		place-items: center;
 	}
@@ -132,8 +133,8 @@
 		max-height: 20rem;
 		grid-area: img;
 	}
+
 	img {
-		width: inherit;
 		max-width: inherit;
 		max-height: inherit;
 		width: 100%;

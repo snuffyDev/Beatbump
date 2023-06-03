@@ -52,7 +52,10 @@ export const GET: RequestHandler = async ({ url }) => {
 				params: filter !== "all" ? `${rawFilterParam}` : undefined,
 			},
 			headers: null,
-			continuation: ctoken !== null ? { continuation: ctoken, ctoken, itct: `${itct}`, type: "next" } : {},
+			continuation:
+				ctoken !== null
+					? { continuation: ctoken, ctoken, itct: `${itct}`, type: "next" }
+					: {},
 		}).then((r) => {
 			if (!r) throw Error("Failed to send the search request"); // No response returned
 			if (!r.ok) throw Error(r.statusText); // Response status code >= 400
@@ -61,9 +64,11 @@ export const GET: RequestHandler = async ({ url }) => {
 		});
 
 		const contents =
-			data.contents?.tabbedSearchResultsRenderer.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents;
+			data.contents?.tabbedSearchResultsRenderer.tabs[0]?.tabRenderer?.content
+				?.sectionListRenderer?.contents;
 
-		const continuationContents = data?.continuationContents?.musicShelfContinuation;
+		const continuationContents =
+			data?.continuationContents?.musicShelfContinuation;
 		const results = ctoken
 			? await parseContinuation(continuationContents, filter as SearchFilter)
 			: await parseContents(contents);
@@ -75,9 +80,13 @@ export const GET: RequestHandler = async ({ url }) => {
 	}
 };
 
-async function parseContinuation(contents: Record<string, any>, filter: string & SearchFilter) {
+async function parseContinuation(
+	contents: Record<string, any>,
+	filter: string & SearchFilter,
+) {
 	const continuation: Maybe<Partial<NextContinuationData>> =
-		Array.isArray(contents?.continuations) && contents?.continuations[0]?.nextContinuationData;
+		Array.isArray(contents?.continuations) &&
+		contents?.continuations[0]?.nextContinuationData;
 	const type = filter.includes("playlists") ? "playlists" : filter;
 
 	const results = await parseResults(contents.contents, type);
@@ -107,13 +116,21 @@ async function parseContents(
 	const continuation: Maybe<Partial<NextContinuationData>> = {};
 
 	type DeepPartial<T extends Record<string, any>> = {
-		[Key in keyof T]?: Exclude<T[Key], undefined | null> extends Record<string, any> ? DeepPartial<T[Key]> : T[Key];
+		[Key in keyof T]?: Exclude<T[Key], undefined | null> extends Record<
+			string,
+			any
+		>
+			? DeepPartial<T[Key]>
+			: T[Key];
 	};
 	return {
 		results: await filterMapAsync(
 			contents,
 			async (section) => {
-				const shelf: DeepPartial<MusicShelf> = { contents: [], header: { title: "" } };
+				const shelf: DeepPartial<MusicShelf> = {
+					contents: [],
+					header: { title: "" },
+				};
 
 				/// PR: https://github.com/snuffyDev/Beatbump/pull/83
 				if (section && section.itemSectionRenderer) {
@@ -122,11 +139,18 @@ async function parseContents(
 				const musicShelf = section.musicShelfRenderer;
 				if (musicShelf) {
 					// Get the inner contents
-					const items = Array.isArray(musicShelf.contents) && musicShelf.contents;
+					const items =
+						Array.isArray(musicShelf.contents) && musicShelf.contents;
 
 					// Gets the continuation tokens
-					if (Array.isArray(musicShelf?.continuations) && musicShelf?.continuations[0].nextContinuationData)
-						Object.assign(continuation, musicShelf.continuations[0].nextContinuationData);
+					if (
+						Array.isArray(musicShelf?.continuations) &&
+						musicShelf?.continuations[0].nextContinuationData
+					)
+						Object.assign(
+							continuation,
+							musicShelf.continuations[0].nextContinuationData,
+						);
 
 					// If the section has an array at the property `contents` - parse it.
 					if (musicShelf.title) {
@@ -159,7 +183,8 @@ function parseResults(items: any[], type: string) {
 			const item = await MusicResponsiveListItemRenderer(entry);
 			const _type =
 				type === "top_result"
-					? "endpoint" in item && (item.endpoint as any)?.pageType?.match(/SINGLE|ALBUM/i)
+					? "endpoint" in item &&
+					  (item.endpoint as any)?.pageType?.match(/SINGLE|ALBUM/i)
 						? "albums"
 						: type
 					: type;
@@ -173,16 +198,21 @@ function parseResults(items: any[], type: string) {
 
 				Object.assign(item, {
 					metaData: metaData,
-					browseId: entry.musicResponsiveListItemRenderer?.navigationEndpoint?.browseEndpoint?.browseId,
+					browseId:
+						entry.musicResponsiveListItemRenderer?.navigationEndpoint
+							?.browseEndpoint?.browseId,
 					playlistId:
-						entry.musicResponsiveListItemRenderer.menu?.menuRenderer?.items[0]?.menuNavigationItemRenderer
-							?.navigationEndpoint?.watchPlaylistEndpoint?.playlistId,
+						entry.musicResponsiveListItemRenderer.menu?.menuRenderer?.items[0]
+							?.menuNavigationItemRenderer?.navigationEndpoint
+							?.watchPlaylistEndpoint?.playlistId,
 				});
 			}
 
 			if (type === "songs") {
 				Object.assign(item, {
-					album: item.subtitle?.at?.(-3)?.pageType?.includes("ALBUM") && item.subtitle.at(-3),
+					album:
+						item.subtitle?.at?.(-3)?.pageType?.includes("ALBUM") &&
+						item.subtitle.at(-3),
 				});
 			}
 

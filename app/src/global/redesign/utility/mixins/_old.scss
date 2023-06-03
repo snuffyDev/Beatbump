@@ -18,7 +18,14 @@
 	}
 }
 
-@mixin animation($delay, $duration, $infinite: false, $animation, $direction: forward, $fillmode: fowards) {
+@mixin animation(
+	$delay,
+	$duration,
+	$infinite: false,
+	$animation,
+	$direction: forward,
+	$fillmode: fowards
+) {
 	-webkit-animation-delay: $delay;
 	-webkit-animation-duration: $duration;
 	-webkit-animation-name: $animation;

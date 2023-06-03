@@ -62,7 +62,8 @@ const PWA_THEME_COLORS = {
 };
 
 const setTopBarTheme = (theme: Appearance["Theme"]) => {
-	document.querySelector<HTMLMetaElement>("meta[name='theme-color']").content = PWA_THEME_COLORS[theme];
+	document.querySelector<HTMLMetaElement>("meta[name='theme-color']").content =
+		PWA_THEME_COLORS[theme];
 };
 
 export const settings = _settings();
@@ -76,7 +77,9 @@ function _settings() {
 	const stored = JSON.parse(localStorage.getItem("settings")) as UserSettings;
 	// Migrate from previous settings to new ones
 	if (!stored?.appearance && !stored?.playback && !stored?.search) {
-		const theme = localStorage.getItem("theme") as Lowercase<Appearance["Theme"]>;
+		const theme = localStorage.getItem("theme") as Lowercase<
+			Appearance["Theme"]
+		>;
 		//@ts-expect-error it's correct, the compilers lying
 		list.appearance.Theme =
 			theme !== null
@@ -86,21 +89,26 @@ function _settings() {
 				: list.appearance.Theme;
 
 		list.playback["Prefer WebM Audio"] =
-			(Boolean(localStorage.getItem("preferWebM")) as Playback["Prefer WebM Audio"]) ??
-			list.playback["Prefer WebM Audio"];
+			(Boolean(
+				localStorage.getItem("preferWebM"),
+			) as Playback["Prefer WebM Audio"]) ?? list.playback["Prefer WebM Audio"];
 
 		list.playback["Remember Last Track"] =
-			(Boolean(localStorage.getItem("Remember Last Track")) as Playback["Remember Last Track"]) ??
+			(Boolean(
+				localStorage.getItem("Remember Last Track"),
+			) as Playback["Remember Last Track"]) ??
 			list.playback["Remember Last Track"];
 
 		list.playback["Dedupe Automix"] =
-			(Boolean(localStorage.getItem("theme")) as Playback["Dedupe Automix"]) ?? list.playback["Dedupe Automix"];
+			(Boolean(localStorage.getItem("theme")) as Playback["Dedupe Automix"]) ??
+			list.playback["Dedupe Automix"];
 
 		localStorage.clear();
 		localStorage.setItem("settings", JSON.stringify(list));
 	} else {
 		if (!stored?.network["HLS Stream Proxy"]) {
-			stored.network["HLS Stream Proxy"] = "https://yt-hls-rewriter.onrender.com/";
+			stored.network["HLS Stream Proxy"] =
+				"https://yt-hls-rewriter.onrender.com/";
 		}
 		list = stored as UserSettings;
 	}

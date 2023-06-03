@@ -7,7 +7,9 @@ interface CustomWindow extends Window {
 
 type CSSKeys = { [key in keyof CSSStyleDeclaration]: CSSStyleDeclaration[key] };
 declare global {
-	interface IPropertyIndexedKeyFrames extends PropertyIndexedKeyframes, CSSKeys {}
+	interface IPropertyIndexedKeyFrames
+		extends PropertyIndexedKeyframes,
+			CSSKeys {}
 	interface IBody<T> extends Body {
 		readonly body: ReadableStream<Uint8Array> | null;
 		readonly bodyUsed: boolean;
@@ -28,7 +30,10 @@ declare global {
 		clone(): IResponse<T>;
 	}
 
-	function fetch<T = any>(url: URL | RequestInfo, init?: RequestInit): Promise<IResponse<T>>;
+	function fetch<T = any>(
+		url: URL | RequestInfo,
+		init?: RequestInit,
+	): Promise<IResponse<T>>;
 	interface Window {
 		bbAudio: (audio: HTMLAudioElement) => { duration: number; src: string };
 		hls: Hls;

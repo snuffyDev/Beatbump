@@ -75,7 +75,11 @@
 	import { IsoBase64, notify, slide } from "$lib/utils";
 	import { messenger } from "$lib/utils/sync";
 	import { IDBService } from "$lib/workers/db/service";
-	import { playerLoading, showAddToPlaylistPopper, showGroupSessionCreator } from "$stores/stores";
+	import {
+		playerLoading,
+		showAddToPlaylistPopper,
+		showGroupSessionCreator,
+	} from "$stores/stores";
 	import { PopperButton } from "../Popper";
 	import Controls from "./Controls.svelte";
 	import ProgressBar from "./ProgressBar";
@@ -98,7 +102,9 @@
 		AudioPlayer.play();
 	});
 
-	function handleImageError(event: Event & { currentTarget: EventTarget & HTMLElement }) {
+	function handleImageError(
+		event: Event & { currentTarget: EventTarget & HTMLElement },
+	) {
 		(event.target as HTMLImageElement).src = IMAGE_NOT_FOUND;
 	}
 
@@ -155,7 +161,9 @@
     letter-spacing: -0.02em;"
 			>
 				<span class="now-playing-title">{$currentTrack?.title}</span>
-				<span class="now-playing-artist">{$currentTrack?.artistInfo?.artist[0]?.text}</span>
+				<span class="now-playing-artist"
+					>{$currentTrack?.artistInfo?.artist[0]?.text}</span
+				>
 			</div>
 		{:else}
 			<img
@@ -281,18 +289,20 @@
 </div>
 
 <style lang="scss">
-	@import "../../../global/stylesheet/components/_player.scss";
+	@import "../../../global/stylesheet/components/player";
 	.now-playing {
 		display: flex;
 		grid-area: n;
 		line-height: 1.3;
 		font-size: 0.95em;
 		gap: 0.95em;
+
 		@media screen and (min-width: 720px) {
 			line-height: 1.4;
 			font-size: 14px;
-			// gap: 0.875em;
+			// gap: 0.875em;gap
 		}
+
 		> .container {
 			visibility: visible;
 			display: flex;

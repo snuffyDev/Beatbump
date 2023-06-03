@@ -1,11 +1,18 @@
 type ParameterSchema = Record<string, string>;
 
 type ParsedParameters<T> = {
-	[Key in keyof T]-?: undefined extends Extract<T[Key], undefined> ? NonNullable<T[Key]> | null : T[Key];
+	[Key in keyof T]-?: undefined extends Extract<T[Key], undefined>
+		? NonNullable<T[Key]> | null
+		: T[Key];
 };
-export const parseParams = <Schema extends ParameterSchema, Keys extends keyof Schema = keyof Schema>(
+export const parseParams = <
+	Schema extends ParameterSchema,
+	Keys extends keyof Schema = keyof Schema,
+>(
 	keys: Keys[],
-): ((params: IterableIterator<[string, string]>) => ParsedParameters<Schema>) => {
+): ((
+	params: IterableIterator<[string, string]>,
+) => ParsedParameters<Schema>) => {
 	return (params) => {
 		const result: Partial<ParsedParameters<Schema>> = {};
 

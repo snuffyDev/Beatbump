@@ -30,7 +30,8 @@
 					{#each themes as theme}
 						<option
 							value={theme}
-							selected={$settings["appearance"]["Theme"] === theme}>{theme}</option
+							selected={$settings["appearance"]["Theme"] === theme}
+							>{theme}</option
 						>
 					{/each}
 				</select>
@@ -78,7 +79,8 @@
 					{#each ["Normal", "High"] as option}
 						<option
 							value={option}
-							selected={$settings["playback"]["Quality"] === option}>{option}</option
+							selected={$settings["playback"]["Quality"] === option}
+							>{option}</option
 						>
 					{/each}
 				</select>
@@ -109,7 +111,8 @@
 					{#each ["HTTP", "HLS"] as option}
 						<option
 							value={option}
-							selected={$settings["playback"]["Stream"] === option}>{option}</option
+							selected={$settings["playback"]["Stream"] === option}
+							>{option}</option
 						>
 					{/each}
 				</select>
@@ -140,7 +143,8 @@
 				<span
 					class="link"
 					on:click={() => {
-						$settings["network"]["HLS Stream Proxy"] = "https://yt-hls-rewriter.onrender.com/";
+						$settings["network"]["HLS Stream Proxy"] =
+							"https://yt-hls-rewriter.onrender.com/";
 					}}>Reset to default</span
 				>
 			</div>
@@ -159,7 +163,8 @@
 					{#each ["Category", "Query", "Category + Query", "None"] as option}
 						<option
 							value={option}
-							selected={$settings["playback"]["Stream"] === option}>{option}</option
+							selected={$settings["playback"]["Stream"] === option}
+							>{option}</option
 						>
 					{/each}
 				</select>
@@ -177,12 +182,13 @@
 
 	label {
 		display: inline-block;
-
-		font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
-			"Open Sans", "Helvetica Neue", sans-serif;
+		font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+			Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+			sans-serif;
 		font-size: 1em;
 		text-transform: none !important;
 		font-variant: unset;
+
 		@media screen and (min-width: 40em) {
 			~ :last-child {
 				margin-left: auto;
@@ -196,7 +202,7 @@
 		margin-block-end: 1em;
 
 		&:not(:last-child) {
-			border-bottom: 0.01em solid rgba(218, 218, 218, 0.082);
+			border-bottom: 0.01em solid rgb(218 218 218 / 8.2%);
 		}
 	}
 
@@ -204,21 +210,24 @@
 		display: inline-flex;
 		color: inherit;
 		vertical-align: top;
-
 		gap: 1em;
 		flex-direction: column;
 		margin-block: 1em;
+
 		&:first-of-type {
-			margin-block-start: 0em;
+			margin-block-start: 0;
 		}
+
 		&:last-of-type {
 			margin-block-end: 2em;
 		}
+
 		@media screen and (min-width: 40em) {
 			align-items: center;
 			flex-direction: row;
 		}
 	}
+
 	.switch {
 		position: relative;
 		display: inline-flex;
@@ -227,30 +236,34 @@
 		height: 2em;
 		cursor: pointer;
 		overflow: hidden;
-		background-color: rgba(109, 109, 109, 0.35);
+		background-color: rgb(109 109 109 / 35%);
 		border-radius: 1.25rem;
 		transition: background-color 0.3s;
 	}
+
 	.switch::after {
 		--size: calc(2em - (2px * 2));
+
 		content: "";
 		position: absolute;
 		width: var(--size);
 		height: var(--size);
 		border-radius: 9999em;
 		background-color: white;
-		// top: 0.06125em;
+		// top: 0.06125em;top
 		left: 0.125em;
 		transition: left 0.3s;
-		box-shadow: 0 0 5px 0.5px rgba(0, 0, 0, 0.384);
+		box-shadow: 0 0 5px 0.5px rgb(0 0 0 / 38.4%);
 	}
 
 	[type="checkbox"]:checked + .switch::after {
 		left: 2em;
 	}
+
 	[type="checkbox"]:checked + .switch {
 		background-color: #00cd6a;
 	}
+
 	[type="checkbox"] {
 		display: none;
 	}

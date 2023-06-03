@@ -58,7 +58,8 @@
 
 	function open(kind: number, detail) {
 		const step = detail.deltaY / queueHeight;
-		const miss = detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : 1 - step;
+		const miss =
+			detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : 1 - step;
 		const distance = miss * windowHeight;
 		motion.update(
 			() => {
@@ -72,7 +73,8 @@
 
 	async function close(kind: number, detail) {
 		const step = detail.deltaY / queueHeight;
-		const miss = detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : step;
+		const miss =
+			detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : step;
 		const distance = miss * windowHeight;
 		if (kind === 1) {
 			motion.set(windowHeight, {
@@ -145,11 +147,16 @@
 			});
 		}
 	}
-	$: srcImg = Array.isArray($PopperStore.metadata?.thumbnail ?? $PopperStore.items[0]?.thumbnails)
+	$: srcImg = Array.isArray(
+		$PopperStore.metadata?.thumbnail ?? $PopperStore.items[0]?.thumbnails,
+	)
 		? $PopperStore.metadata?.thumbnail[0] ?? $PopperStore.items[0]?.thumbnails
 		: { width: 0, height: 0, url: "", placeholder: "" };
 
-	$: srcImg.url = srcImg.width < 100 ? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-") : srcImg.url;
+	$: srcImg.url =
+		srcImg.width < 100
+			? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
+			: srcImg.url;
 </script>
 
 {#if isOpen}
@@ -262,32 +269,35 @@
 		gap: 1em;
 		border-radius: 0.3125em;
 		padding: 1em;
-		// flex: 1 0 auto;
+		// flex: 1 0 auto;flex
 		align-items: center;
 		background-color: #4e4e4e27;
-		box-shadow: 0px 0px 14px -11px #000;
+		box-shadow: 0 0 14px -11px #000;
 		height: auto;
+
 		:where(.image) {
-			// height: auto !important;
+			// height: auto !important;height
 			flex: 1 0 auto;
-			// height: 0 !important;
+			// height: 0 !important;height
 			object-fit: scale-down;
 			max-width: 33%;
 			max-height: 33%;
+
 			img {
 				width: 100%;
 				height: 100%;
 				object-fit: contain;
 			}
-			// height: auto;
+			// height: auto;height
 		}
 	}
 
 	.metatext {
 		display: flex;
 		flex-direction: column;
-		// justify-content: center;
-		// gap: 0.5em;
+		// justify-content: center;justify-content
+		// gap: 0.5em;gap
+
 		> :where(.title) {
 			margin-bottom: 0.3125em;
 		}
@@ -310,59 +320,59 @@
 		}
 
 		100% {
-			background-color: hsla(0, 0%, 0%, 0.55);
+			background-color: hsl(0deg 0% 0% / 55%);
 			opacity: 1;
 		}
 	}
+
 	.backdrop {
 		overscroll-behavior: contain;
-
 		position: fixed;
 		isolation: isolate;
 		display: grid;
-		background-color: hsla(0, 0%, 0%, 0);
+		background-color: hsl(0deg 0% 0% / 0%);
 		inset: 0;
 		z-index: 151;
-		// margin-top: var(--top-bar-height);
+		// margin-top: var(--top-bar-height);margin-top
 		touch-action: pan-y;
 		bottom: 0;
 		max-height: 100vh;
-
 		contain: strict;
 		will-change: transform, opacity;
 		opacity: 0;
-		// bottom: 0;
+		// bottom: 0;bottom
 	}
 
 	.drag {
 		position: absolute;
-
 		bottom: 0;
-
 		min-height: 0;
 		background: var(--bottom-bg-light);
 		overscroll-behavior: contain;
 		touch-action: pan-y;
-		// content-visibility: auto;
+		// content-visibility: auto;content-visibility
 		z-index: 1100;
-		// display: block !important;
+		// display: block !important;display
 		margin-inline: auto;
-		// max-width: 95%;
-		// flex-direction: row;
+		// max-width: 95%;max-width
+		// flex-direction: row;flex-direction
 		will-change: transform, visibility;
 		width: 95%;
 		align-items: center;
-		// flex-direction: column;
+		// flex-direction: column;flex-direction
 		border-top-left-radius: 0.75em;
 		border-top-right-radius: 0.75em;
 		contain: paint layout;
-		// inset: 0;
+		// inset: 0;inset
 		left: 0;
 		right: 0;
-		max-height: calc(100% - calc(var(--top-bar-height) + var(--player-bar-height)));
+		max-height: calc(
+			100% - calc(var(--top-bar-height) + var(--player-bar-height))
+		);
 		max-height: 80%;
 		padding-bottom: 0.3125em;
 	}
+
 	hr {
 		&.horz::before {
 			position: absolute;
@@ -371,13 +381,13 @@
 			margin: auto;
 			width: 25%;
 			color: hsl(0deg 0% 80%);
-			background: rgba(206, 206, 206, 0.308);
+			background: rgb(206 206 206 / 30.8%);
 			height: 0.45em;
 			border-radius: 3.6667em;
-
 			line-height: inherit;
 			z-index: 5;
 		}
+
 		&.vertical::before {
 			position: absolute;
 			inset: 0;
@@ -387,57 +397,63 @@
 			margin: auto;
 			height: 15%;
 			color: hsl(0deg 0% 80%);
-			background: rgba(206, 206, 206, 0.308);
+			background: rgb(206 206 206 / 30.8%);
 			width: 0.45em;
 			line-height: inherit;
 			border-radius: 3.6667em;
 			z-index: 100;
 			transition-delay: 400ms;
 		}
+
 		&.vertical:hover::before {
 			opacity: 1;
 			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) 200ms opacity;
 		}
+
 		overscroll-behavior: contain;
 		width: 100%;
 		border: none;
 		position: relative;
+
 		&.vertical {
 			height: 100%;
 		}
-		// z-index: 100;
+		// z-index: 100;z-index
 	}
 
 	.horz {
 		width: 100%;
-		// border-top: 0.0175rem groove rgba(171, 171, 171, 0.151);
+		// border-top: 0.0175rem groove rgba(171, 171, 171, 0.151);border-top
 		border-top-left-radius: $sm-radius;
 		border-top-right-radius: $sm-radius;
-		// height: 2.75rem;
+		// height: 2.75rem;height
 		padding-block: 0.7em;
 		align-content: center;
 		display: inline-block;
 		align-self: center;
 		top: 0;
 		left: 0;
+
 		@media screen and (min-width: 720px) {
 			display: none !important;
 			visibility: none !important;
 		}
 	}
+
 	.handle {
 		overscroll-behavior: contain;
 		width: 100%;
 
-		// box-shadow: 0 -0.4rem 23px -17px hsl(0deg 0% 100% / 100%);
+		// box-shadow: 0 -0.4rem 23px -17px hsl(0deg 0% 100% / 100%);box-shadow
 		z-index: 1;
 		display: grid;
 		display: inline-block;
 		cursor: pointer;
-		// padding: 0.12em;
+		// padding: 0.12em;padding
 		align-items: center;
 		vertical-align: middle;
 	}
+
 	.list-wrapper {
 		&::after {
 			position: absolute;
@@ -446,6 +462,7 @@
 			box-shadow: 0 0 4px #000;
 			content: "";
 		}
+
 		position: relative;
 		width: 100%;
 		padding: 0.25em;
@@ -457,7 +474,6 @@
 		}
 
 		&::-webkit-scrollbar-track {
-			border-radius: 0.625rem;
 			height: 0;
 			width: 0%;
 			background-clip: content-box;
@@ -474,6 +490,7 @@
 			background-clip: content-box;
 		}
 	}
+
 	ul {
 		list-style: none;
 		display: flex;
@@ -483,7 +500,7 @@
 		width: 100%;
 		margin: 0 auto;
 
-		// height: 100%;
+		// height: 100%;height
 	}
 
 	li {
@@ -497,9 +514,10 @@
 		color: #f3f3f3;
 		display: flex;
 		background-color: #4e4e4e27;
-		box-shadow: 0px 0px 14px -11px #000;
+		box-shadow: 0 0 14px -11px #000;
 		gap: 0.5rem;
 		transition: background-color 100ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
 		&:active {
 			background-color: #4e4e4e3c;
 		}

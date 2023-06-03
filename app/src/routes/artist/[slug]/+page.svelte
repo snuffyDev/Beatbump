@@ -1,17 +1,17 @@
 <script lang="ts">
+	import { page } from "$app/stores";
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
 	import ArtistPageHeader from "../../../lib/components/ArtistPageHeader/ArtistPageHeader.svelte";
-	import { page } from "$app/stores";
 
+	import Header from "$lib/components/Layouts/Header.svelte";
 	import ListItem from "$lib/components/ListItem/ListItem.svelte";
 	import { isPagePlaying } from "$lib/stores/stores";
-	import Header from "$lib/components/Layouts/Header.svelte";
 
-	import type { ArtistPageBody } from "$lib/parsers/artist";
-	import { CTX_ListItem } from "$lib/contexts";
-	import type { PageData } from "./$types";
-	import { isMobileMQ } from "$stores/window";
 	import Description from "$components/ArtistPageHeader/Description";
+	import { CTX_ListItem } from "$lib/contexts";
+	import type { ArtistPageBody } from "$lib/parsers/artist";
+	import { isMobileMQ } from "$stores/window";
+	import type { PageData } from "./$types";
 
 	export let data: PageData;
 	const { body, header, visitorData } = data;
@@ -48,7 +48,8 @@
 					<span class="h2">Songs</span>
 					<a
 						style="white-space:pre; display: inline-block;"
-						href={`/playlist/${songs?.header?.browseId}`}><small>See All</small></a
+						href={`/playlist/${songs?.header?.browseId}`}
+						><small>See All</small></a
 					>
 				</div>
 				<section class="songs">
@@ -100,13 +101,14 @@
 
 <style lang="scss">
 	@import "../../../lib/components/ArtistPageHeader/index.scss";
+
 	.song-list {
 		margin-bottom: 3.3339em;
 	}
+
 	.content-wrapper {
 		display: flex;
-		max-width: inherit;
-		margin: 0.5rem 0.7rem 0rem 0.7rem;
+		margin: 0.5rem 0.7rem 0;
 		width: auto;
 		max-width: 9rem;
 	}
@@ -118,19 +120,23 @@
 		padding: 0;
 		width: 100%;
 	}
+
 	section {
 	}
+
 	.songs {
 		margin-bottom: 1rem;
 	}
+
 	main {
 		@include content-spacing($type: "padding");
 	}
+
 	.artist-body {
-		padding: 1em 0 0 0;
-		// padding-bottom: 2rem;
+		padding: 1em 0 0;
+		// padding-bottom: 2rem;padding-bottom
 		@media screen and (max-width: 500px) {
-			// padding: 0 1rem;
+			// padding: 0 1rem;padding
 		}
 	}
 </style>

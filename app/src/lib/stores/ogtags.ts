@@ -39,8 +39,10 @@ type Store = {
 const metatags = (): Store => {
 	const { subscribe, set, update } = writable(tags);
 	let origin = "https://beatbump.io";
-	const desc = (desc) => update((d) => ({ ...d, description: desc, "og:description": desc }));
-	const title = (title) => update((t) => ({ ...t, title: title, "og:title": title }));
+	const desc = (desc) =>
+		update((d) => ({ ...d, description: desc, "og:description": desc }));
+	const title = (title) =>
+		update((t) => ({ ...t, title: title, "og:title": title }));
 	const url = (url) =>
 		update((u) => ({
 			...u,

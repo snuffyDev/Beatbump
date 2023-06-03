@@ -8,7 +8,12 @@
 	import type { Dropdown } from "$lib/configs/dropdowns.config";
 	import { CTX_ListItem } from "$lib/contexts";
 	import { AudioPlayer } from "$lib/player";
-	import { immersiveQueue, isMobileMQ, isPagePlaying, playerLoading } from "$lib/stores";
+	import {
+		immersiveQueue,
+		isMobileMQ,
+		isPagePlaying,
+		playerLoading,
+	} from "$lib/stores";
 	import { currentTrack, queue, queuePosition } from "$lib/stores/list";
 	import { groupSession } from "$lib/stores/sessions";
 	import type { Thumbnail } from "$lib/types";
@@ -19,7 +24,11 @@
 	import { windowWidth } from "$stores/window";
 	import { cubicOut, quartIn, quartOut } from "svelte/easing";
 	import { tweened } from "svelte/motion";
-	import { fade, type EasingFunction, type TransitionConfig } from "svelte/transition";
+	import {
+		fade,
+		type EasingFunction,
+		type TransitionConfig,
+	} from "svelte/transition";
 	import ListItem, { listItemPageContext } from "../ListItem/ListItem.svelte";
 	import Loading from "../Loading/Loading.svelte";
 	import Tabs from "../Tabs";
@@ -101,13 +110,17 @@
 				duration: 180,
 			});
 		} else {
-			queueTween.set(0 - (detail.clientY * 0.7 + detail.clientY * 0.3) / windowHeight, { duration: 180 });
+			queueTween.set(
+				0 - (detail.clientY * 0.7 + detail.clientY * 0.3) / windowHeight,
+				{ duration: 180 },
+			);
 		}
 	}
 
 	function open(kind: number, detail) {
 		const step = detail.deltaY / queueHeight;
-		const miss = detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : 1 - step;
+		const miss =
+			detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : 1 - step;
 		const distance = miss * windowHeight;
 		if (kind === 1) {
 			motion.update(
@@ -130,7 +143,8 @@
 
 	function close(kind: number, detail) {
 		const step = detail.deltaY / queueHeight;
-		const miss = detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : step;
+		const miss =
+			detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : step;
 		const distance = miss * windowHeight;
 		if (kind === 1) {
 			motion.set(0, {
@@ -188,7 +202,11 @@
 
 	function slideInOut(
 		node: HTMLElement,
-		{ duration = 400, delay = 400, easing = quartOut }: { duration?: number; easing?: EasingFunction; delay?: number },
+		{
+			duration = 400,
+			delay = 400,
+			easing = quartOut,
+		}: { duration?: number; easing?: EasingFunction; delay?: number },
 	): TransitionConfig {
 		const style = getComputedStyle(node);
 		const target_opacity = +style.opacity;
@@ -215,12 +233,21 @@
 		<div
 			class="immersive"
 			class:open={state === "open"}
-			in:fade={{ duration: 400, delay: 500, easing: quartIn }}
-			out:fade={{ duration: 400, delay: 400, easing: quartOut }}
-			style="--svg: url({new URL(
+			in:fade={{ duration: 600, delay: 200, easing: quartIn }}
+			out:fade={{ duration: 600, delay: 400, easing: quartOut }}
+			style="
+
+--svg: url({new URL(
 				blurURL + '#blur',
 				import.meta.url,
-			)}); background-image: url({thumbnail.url}); --scale: {queueOpen ? 1 : 1}; --blur: {queueOpen ? 0.1 : 0.2}rem;"
+			)}); --background-image: url({thumbnail.url}); transform: scale({state ===
+				'open' || queueOpen
+				? $isMobileMQ
+					? 2
+					: 1.5
+				: $isMobileMQ
+				? 4
+				: 2.2}); --blur: {queueOpen ? 2 : 8}px;"
 		/>
 	{/if}
 	<div
@@ -296,9 +323,12 @@
 							<div class="marquee">
 								<span
 									class="marquee-wrapper"
-									style="animation-play-state: {state === 'open' && titleWidth > $windowWidth
+									style="animation-play-state: {state === 'open' &&
+									titleWidth > $windowWidth
 										? 'running'
-										: 'paused'}; {titleWidth < $windowWidth ? 'animation: none; transform: unset;' : ''}"
+										: 'paused'}; {titleWidth < $windowWidth
+										? 'animation: none; transform: unset;'
+										: ''}"
 									><span
 										bind:clientWidth={titleWidth}
 										class="h5 marquee-text">{data?.title}</span
@@ -308,7 +338,9 @@
 							<span
 								class="h6"
 								style="text-align:center; "
-								>{data?.artistInfo && data?.artistInfo.artist.at(0) ? data?.artistInfo.artist.at(0).text : ""}</span
+								>{data?.artistInfo && data?.artistInfo.artist.at(0)
+									? data?.artistInfo.artist.at(0).text
+									: ""}</span
 							>
 						</div>
 						<div
@@ -337,16 +369,20 @@
 
 			<div
 				class="handle vertical"
-				style="transform: translate3d({queueOpen ? 53.5 : 91.5}vw, 0px, 0) !important;"
-				on:pointerover={() => {
+				style="transform: translate3d({queueOpen
+					? 53.5
+					: 91.5}vw, 0, 0) !important;"
+				on:pointerdown={() => {
 					requestFrameSingle(() => {
 						tracklist.style.willChange = "transform";
 					});
 				}}
-				on:click={() => {
-					requestFrameSingle(() => {
-						tracklist.style.willChange = "unset";
-					});
+				on:pointerup={() => {
+					setTimeout(() => {
+						requestFrameSingle(() => {
+							tracklist.style.willChange = "unset";
+						});
+					}, 200);
 					queueOpen = !queueOpen;
 				}}
 			>
@@ -360,20 +396,25 @@
 					? `transform: translate3d(0, ${$motion}px, 0); top: ${
 							windowHeight - 65
 					  }px; bottom:0; padding-bottom: calc(6.5em);`
-					: `transform: translate3d(${queueOpen ? 55 : 93}vw, 0px, 0) !important;`}
+					: `transform: translate3d(${
+							queueOpen ? 55 : 93
+					  }vw, 0px, 0) !important;`}
 			>
 				<div
 					use:draggable
 					on:dragstart|capture|stopPropagation={(e) => onDragStart(1, e)}
-					on:dragmove|capture|stopPropagation={(e) => trackMovement(1, e.detail)}
+					on:dragmove|capture|stopPropagation={(e) =>
+						trackMovement(1, e.detail)}
 					on:dragend|capture|stopPropagation={(e) => release(1, e.detail)}
 					on:pointerdown={() => {
-						tracklist.style.willChange = "scroll-position, transform";
+						tracklist.style.willChange = "top transform";
 					}}
 					on:pointerup={() => {
-						requestFrameSingle(() => {
-							tracklist.style.willChange = "unset";
-						});
+						setTimeout(() => {
+							requestFrameSingle(() => {
+								tracklist.style.willChange = "unset";
+							});
+						}, 200);
 					}}
 					class="handle horz"
 				>
@@ -415,7 +456,9 @@
 									{#if $related.description.description}
 										<div class="mb-2">
 											<span class="h2">{$related?.description?.header}</span>
-											<Description description={$related.description.description} />
+											<Description
+												description={$related.description.description}
+											/>
 										</div>
 									{/if}
 									{#if Array.isArray($related.carousels)}
@@ -461,26 +504,28 @@
 
 <style lang="scss">
 	.pad {
-		padding: 2vh 1em 1.5em 1em;
+		padding: 2vh 1em 1.5em;
 		// height: 100%;
 
 		overflow-y: auto;
 		contain: style paint size layout;
 		width: 100%;
 	}
+
 	.marquee {
 		position: relative;
 		overflow: hidden;
 		max-width: calc(100% - 4em);
 		margin: 0 auto;
+
 		--max-width: calc(100% - 4em);
 		--offset: 10vw;
 		--move-initial: calc(-10vw + var(--offset));
 		--move-final: calc(calc(-100% + 80vw) + var(--offset));
-
 		--text-initial: calc(10vw);
 		--text-final: calc(var(--text-initial) * 100vw);
 	}
+
 	.marquee-wrapper {
 		width: fit-content;
 		display: flex;
@@ -492,6 +537,7 @@
 		// animation-play-state: running;
 		// box-shadow:  inset (-40px) 0 40px (-16px) transparent;
 	}
+
 	.marquee-text {
 		padding: 0 1em;
 		white-space: nowrap;
@@ -501,27 +547,32 @@
 		0% {
 			transform: translate3d(var(--move-initial), 0, 0);
 		}
+
 		25% {
 			transform: translate3d(var(--move-initial), 0, 0);
 		}
+
 		75% {
 			transform: translate3d(var(--move-final), 0, 0);
 		}
+
 		100% {
 			transform: translate3d(var(--move-final), 0, 0);
 		}
 	}
+
 	.controls {
 		gap: 1em;
 	}
+
 	.text-shadow {
-		text-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.692), -0.1em -0.1em 0.2em rgba(0, 0, 0, 0.418);
+		text-shadow: 0.1em 0.1em 0.2em rgb(0 0 0 / 69.2%),
+			-0.1em -0.1em 0.2em rgb(0 0 0 / 41.8%);
 	}
+
 	.scroller {
 		overflow-y: auto;
-		overscroll-behavior: contain;
-		overflow-y: auto;
-		transform: translate3d(0px, 0px, 0px);
+		transform: translate3d(0, 0, 0);
 		overflow-x: hidden;
 		backface-visibility: hidden;
 		contain: strict;
@@ -543,11 +594,31 @@
 		backface-visibility: hidden;
 		overflow: hidden;
 
-		background-color: hsla(0, 0%, 0%, 0.587);
 		// mask-composite: ;
-		// backdrop-filter: brightness(0.6) opacity(1) contrast(1) saturate(1.1) grayscale(0.3) sepia(0.2) url(1rem);
-		&.open {
+		@media screen and (max-width: 720px) {
+			position: fixed;
+			z-index: 151;
+			left: 0;
+			top: 0;
+			// background-repeat: no-repeat !important;
+			background-size: 50% 50% !important;
+			// top: 50%;
 		}
+
+		transform: scale(var(--scale)) translate3d(0, 0, 0);
+		transition: backdrop-filter cubic-bezier(0.895, 0.03, 0.685, 0.22) 1600ms
+			800ms;
+		transition-delay: 850ms;
+		transition-property: background-color transform filter backdrop-filter;
+		transition-duration: 1600ms;
+		background-color: hsl(0deg 0% 0%);
+
+		&.open {
+			// backdrop-filter: brightness(0.6) opacity(1) contrast(1) saturate(1.1) grayscale(0.3) sepia(0.2) url(1rem);
+			background-color: hsl(0deg 0% 0% / 58.7%);
+			transition-delay: 600ms;
+		}
+
 		&::after {
 			content: "";
 			position: absolute;
@@ -555,26 +626,43 @@
 			width: 100%;
 			height: 100%;
 
-			border-radius: 9999rem;
+			// border-radius: 9999rem;
 			z-index: 1;
-
 			touch-action: none;
 			overscroll-behavior: contain;
 			perspective: 1000px;
 			backface-visibility: hidden;
 			// overflow: hidden;
-			will-change: opacity, backdrop-filter;
-			contain: style;
-			transform: scale(var(--scale)) translate3d(0px, 0px, 0px);
-			transition-delay: 450ms;
-			transition-duration: 800ms;
-			transition: backdrop-filter cubic-bezier(0.895, 0.03, 0.685, 0.22) 800ms 800ms;
-			box-shadow: 0px 0px 100px -20px #000000d5 inset, 0px 0px 50rem 5px #000000c9;
-			backdrop-filter: brightness(0.9) opacity(1) contrast(1) saturate(1.7) grayscale(0.35) sepia(0.2)
-				blur(var(--blur, 8px));
+			will-change: opacity, top;
+			transform: scale(var(--scale)) translate3d(0, 0, 0);
+			transition: backdrop-filter cubic-bezier(0.25, 0.46, 0.45, 0.94) 1600ms
+				800ms;
+			transition-property: background-color, transform, filter, backdrop-filter;
+			transition-duration: 900ms;
+			transition-delay: 600ms;
+
+			@media screen and (max-width: 720px) {
+				position: absolute;
+				max-width: 100%;
+				// z-index: -1;
+				left: 0;
+				top: 0;
+				// background-repeat: no-repeat !important;
+				background-size: 100vh !important;
+				// top: 50%;
+				background-attachment: scroll;
+				background-position: center;
+			}
+
+			background-image: var(--background-image);
+			box-shadow: 0 0 100px -20px #000000d5 inset, 0 0 50rem 5px #000000c9;
+			filter: brightness(0.9) opacity(1) contrast(1) saturate(1.7)
+				grayscale(0.35) sepia(0.2) blur(var(--blur, 4px));
+
 			// mask-image: url(#blur);
 			// mask-size: 100% 100%;
 		}
+
 		> img {
 			object-fit: cover;
 			height: 100%;
@@ -585,14 +673,13 @@
 			inset: 0;
 			overflow: hidden;
 			will-change: filter, visibility;
-
 			touch-action: none;
 		}
 	}
+
 	.tracklist,
 	.pad {
 		position: absolute;
-
 		bottom: 0;
 		height: 100%;
 		min-height: 0;
@@ -604,6 +691,7 @@
 		border-top-left-radius: $sm-radius;
 		border-top-right-radius: $sm-radius;
 		contain: paint layout style;
+
 		@media screen and (min-width: 720px) {
 			position: absolute;
 			left: 0;
@@ -618,6 +706,10 @@
 			border-top-right-radius: unset !important;
 		}
 	}
+
+	.tracklist {
+		box-shadow: 0px 5px 32px -10px #000;
+	}
 	.fullscreen-player-popup {
 		position: absolute;
 		top: 0;
@@ -625,6 +717,7 @@
 		width: 100%;
 		z-index: 1;
 		grid-area: m;
+
 		&::before {
 			position: absolute;
 			content: "";
@@ -632,11 +725,11 @@
 			opacity: 0.2;
 			background: var(--base-bg);
 		}
+
 		display: flex;
 		isolation: isolate;
 		touch-action: pan-y;
-
-		transform: translate3d(0, 0vh, 0);
+		transform: translate3d(0, 0, 0);
 		will-change: transform, opacity;
 		overscroll-behavior: contain;
 		overflow: hidden;
@@ -647,6 +740,7 @@
 			flex-direction: row;
 		}
 	}
+
 	hr {
 		touch-action: none;
 
@@ -657,13 +751,13 @@
 			margin: auto;
 			width: 25%;
 			color: hsl(0deg 0% 80%);
-			background: rgba(206, 206, 206, 0.308);
+			background: rgb(206 206 206 / 30.8%);
 			height: 0.45em;
 			border-radius: 3.6667em;
-
 			line-height: inherit;
 			z-index: 5;
 		}
+
 		&.vertical::before {
 			position: absolute;
 			inset: 0;
@@ -673,25 +767,29 @@
 			margin: auto;
 			height: 15%;
 			color: hsl(0deg 0% 80%);
-			background: rgba(206, 206, 206, 0.308);
+			background: rgb(206 206 206 / 30.8%);
 			width: 0.45em;
 			line-height: inherit;
 			border-radius: 3.6667em;
 			z-index: 100;
 			transition-delay: 400ms;
 		}
+
 		&.vertical:hover::before {
 			opacity: 1;
 			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) 200ms opacity;
 		}
+
 		overscroll-behavior: contain;
 		width: 100%;
 		border: none;
 		position: relative;
+
 		&.vertical {
 			height: 100%;
 		}
 	}
+
 	.mobile {
 		min-height: 100% !important;
 		margin-top: unset !important;
@@ -703,9 +801,10 @@
 		}
 
 		100% {
-			background-color: hsla(0, 0%, 0%, 0.587);
+			background-color: hsl(0deg 0% 0% / 58.7%);
 		}
 	}
+
 	.menu-mobile {
 		position: absolute;
 		top: 0;
@@ -715,9 +814,9 @@
 		max-width: 3em;
 		max-height: 3em;
 	}
+
 	.backdrop {
 		overscroll-behavior: contain;
-
 		grid-area: m;
 		position: fixed;
 		isolation: isolate;
@@ -726,17 +825,16 @@
 		background-color: #0000;
 		inset: 0;
 		z-index: 151;
-		animation: fade-in 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 100ms alternate forwards;
+		animation: fade-in 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 100ms
+			alternate forwards;
 		margin-top: var(--top-bar-height);
 		height: calc(100% - calc(var(--top-bar-height) + var(--player-bar-height)));
-		touch-action: none;
-
 		max-height: 100vh;
-
 		contain: strict;
 		touch-action: pan-y;
 		will-change: transform, opacity;
 	}
+
 	.album-art {
 		margin-top: 7vh;
 		overscroll-behavior: contain;
@@ -745,46 +843,44 @@
 		place-items: center;
 		margin-bottom: 1em;
 		width: 55vw;
-		contain: strict;
 		justify-content: center;
 		max-width: 100%;
+
 		@media screen and (max-width: 719px) {
 			margin-bottom: 1em;
 			width: 100%;
 			height: unset;
 		}
 	}
+
 	.img-container {
 		display: grid;
 		place-items: center;
-		width: 100%;
-		overscroll-behavior: contain;
-		max-width: 100%;
 		min-height: 0;
-
 		position: relative;
 		max-width: 100%;
-
 		width: 100%;
 		overscroll-behavior: contain;
-
 		max-height: 35vh;
+		box-shadow: 0px 0px 38px -18px #000;
+
 		@media screen and (max-width: 719px) {
 			max-height: 28vh;
 		}
+
 		@media screen and (min-width: 1800px) {
 			max-height: 45vh;
 		}
 	}
+
 	.thumbnail {
 		position: relative;
 		overscroll-behavior: contain;
-		max-height: inherit;
 		height: 100%;
 		min-height: 20vh;
 		width: 100%;
-
 		max-height: inherit;
+
 		img {
 			touch-action: none;
 			max-width: inherit;
@@ -793,7 +889,7 @@
 			height: 100%;
 			object-fit: contain;
 			overscroll-behavior: contain;
-			filter: drop-shadow(0px 0px 12px rgba(0, 0, 0, 0.16));
+			filter: drop-shadow(0 0 12px rgb(0 0 0 / 16%));
 		}
 	}
 
@@ -803,6 +899,7 @@
 		right: 0;
 		z-index: 100;
 	}
+
 	.horz {
 		width: 100%;
 		border-top-left-radius: $sm-radius;
@@ -811,17 +908,17 @@
 		padding-bottom: 0.0606em;
 		padding-block: 0.7em;
 		align-content: center;
-
 		top: 0;
 		left: 0;
+
 		@media screen and (min-width: 720px) {
 			display: none !important;
 			visibility: none !important;
 		}
 	}
+
 	.handle {
 		overscroll-behavior: contain;
-
 		z-index: 1;
 		display: grid;
 		cursor: pointer;
@@ -829,17 +926,18 @@
 		align-items: center;
 		touch-action: none;
 	}
+
 	.handle.vertical {
 		@media screen and (max-width: 719px) and (hover: hover) {
 			display: none;
 			visibility: none;
 		}
+
 		left: 0;
 		position: absolute;
 		transition: transform cubic-bezier(0.25, 0.46, 0.45, 0.94) 400ms;
 
 		@media screen and (min-width: 720px) and (hover: hover) {
-			place-items: center;
 			width: 2.5em;
 			height: 100%;
 			padding-right: 0.0606em;

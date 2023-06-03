@@ -55,7 +55,8 @@
 		min-height: unset;
 		max-height: 5ch;
 	}
+
 	.input {
-		// margin-left: auto;
+		// margin-left: auto;margin-left
 	}
 </style>

@@ -23,10 +23,12 @@
 <style lang="scss">
 	.dd-item {
 		z-index: 5;
+
 		&:first-child {
 			border-top-left-radius: inherit;
 			border-top-right-radius: inherit;
 		}
+
 		&:last-of-type {
 			border-bottom-left-radius: inherit;
 			border-bottom-right-radius: inherit;

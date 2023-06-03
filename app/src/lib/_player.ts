@@ -7,18 +7,27 @@ import { isAppleMobileDevice } from "./utils/browserDetection";
 type EventCallbackFn<T> = (data: T) => void;
 
 class EventEmitter<Events extends Record<string, any>> {
-	private listeners: Map<keyof Events, EventCallbackFn<Events[keyof Events] & string>[]> = new Map();
+	private listeners: Map<
+		keyof Events,
+		EventCallbackFn<Events[keyof Events] & string>[]
+	> = new Map();
 	constructor() {
 		//
 	}
 
-	on<Key extends keyof Events = keyof Events & string>(name: Key, callback: EventCallbackFn<Events[Key]>) {
+	on<Key extends keyof Events = keyof Events & string>(
+		name: Key,
+		callback: EventCallbackFn<Events[Key]>,
+	) {
 		const listeners = this.listeners.get(name) ?? [];
 		listeners.push(callback);
 		this.listeners.set(name, listeners);
 	}
 
-	off<Key extends keyof Events = keyof Events & string>(name: Key, callback: EventCallbackFn<Events[Key]>) {
+	off<Key extends keyof Events = keyof Events & string>(
+		name: Key,
+		callback: EventCallbackFn<Events[Key]>,
+	) {
 		const listeners = this.listeners.get(name) ?? [];
 		const index = listeners.indexOf(callback);
 
@@ -28,7 +37,10 @@ class EventEmitter<Events extends Record<string, any>> {
 		this.listeners.set(name, listeners);
 	}
 
-	dispatch<Key extends keyof Events = keyof Events & string>(name: Key, data: Events[Key]) {
+	dispatch<Key extends keyof Events = keyof Events & string>(
+		name: Key,
+		data: Events[Key],
+	) {
 		const listeners = this.listeners.get(name) ?? [];
 
 		for (const cb of listeners) {
@@ -102,7 +114,13 @@ class AudioPlayerImpl extends EventEmitter<{ c: string }> {
 		this.nextSrc.stale = false;
 	}
 
-	public updateSrc({ original_url, url }: { original_url: string; url: string }) {
+	public updateSrc({
+		original_url,
+		url,
+	}: {
+		original_url: string;
+		url: string;
+	}) {
 		this.player.src = original_url;
 	}
 	constructor() {
@@ -114,7 +132,10 @@ class AudioPlayerImpl extends EventEmitter<{ c: string }> {
 			}
 		};
 
-		document.body.addEventListener("click", onUserInteractionCallback, { capture: true, once: true });
+		document.body.addEventListener("click", onUserInteractionCallback, {
+			capture: true,
+			once: true,
+		});
 	}
 	public play() {
 		const promise = this.player.play();
@@ -138,7 +159,9 @@ class AudioPlayerImpl extends EventEmitter<{ c: string }> {
 
 		this.onEvent("timeupdate", async () => {
 			this._currentTimeStore.set(this.player.currentTime);
-			this._durationStore.set(isAppleMobileDevice ? this.player.duration / 2 : this.player.duration);
+			this._durationStore.set(
+				isAppleMobileDevice ? this.player.duration / 2 : this.player.duration,
+			);
 
 			if (this.nextSrc.stale) {
 				await SessionListService.prefetchNextTrack();
