@@ -22,7 +22,7 @@
 		on:focusout={() => {
 			isShowing = false;
 		}}
-		transition:slide={{ duration: 200, easing: quartInOut }}
+		transition:slide|global={{ duration: 200, easing: quartInOut }}
 		class="menu"
 	>
 		{#each items as item}

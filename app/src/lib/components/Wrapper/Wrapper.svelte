@@ -11,8 +11,8 @@
 	{#key key}
 		<div
 			class="app-transition-wrapper"
-			in:fly|local={{ x: -5, duration: 500, delay: 500, easing: cubicOut }}
-			out:fly|local={{ x: -5, duration: 500, easing: cubicOut, opacity: 0 }}
+			in:fly={{ x: -5, duration: 500, delay: 500, easing: cubicOut }}
+			out:fly={{ x: -5, duration: 500, easing: cubicOut, opacity: 0 }}
 		>
 			<slot />
 		</div>

@@ -26,12 +26,12 @@
 <div
 	class="backdrop"
 	on:click={() => dispatch("close")}
-	transition:fade={{ duration: 125 }}
+	transition:fade|global={{ duration: 125 }}
 />
 
 <section
 	class="playlist-modal"
-	transition:fly={{ duration: 250, delay: 125 }}
+	transition:fly|global={{ duration: 250, delay: 125 }}
 >
 	<div class="image">
 		{#if thumbnail}

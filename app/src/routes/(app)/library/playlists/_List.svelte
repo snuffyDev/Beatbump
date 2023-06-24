@@ -24,8 +24,8 @@
 	{#each items as item, i (i)}
 		<div
 			class="item-wrapper"
-			out:send={{ duration: 400, key: i }}
-			in:receive={{ duration: 400, key: i }}
+			out:send|global={{ duration: 400, key: i }}
+			in:receive|global={{ duration: 400, key: i }}
 			animate:flip={{ duration: 300 }}
 		>
 			<slot

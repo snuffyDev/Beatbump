@@ -235,7 +235,7 @@
 				{#if volumeHover}
 					<div
 						class="volume-wrapper"
-						transition:slide={{ duration: 80, y: 100 }}
+						transition:slide|global={{ duration: 80, y: 100 }}
 					>
 						<div class="volume-slider">
 							<input

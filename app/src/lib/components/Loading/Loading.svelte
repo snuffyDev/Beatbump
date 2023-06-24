@@ -7,7 +7,7 @@
 	id="vertical-loading-bars"
 	style={`--size: ${size};  max-width: ${size};
     max-height: ${size}`}
-	transition:fade
+	transition:fade|global
 >
 	<span />
 	<span />

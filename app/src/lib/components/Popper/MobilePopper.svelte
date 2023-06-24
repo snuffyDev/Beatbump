@@ -172,8 +172,8 @@
 		<div
 			class="column container drag"
 			bind:this={tracklist}
-			in:fly={{ duration: 600, delay: 300, opacity: 0, y: windowHeight }}
-			out:fly={{ duration: 600, y: windowHeight, opacity: 0 }}
+			in:fly|global={{ duration: 600, delay: 300, opacity: 0, y: windowHeight }}
+			out:fly|global={{ duration: 600, y: windowHeight, opacity: 0 }}
 			bind:clientHeight={queueHeight}
 			style={`transform: translate3d(0, ${$motion}px, 0);  bottom:0;`}
 		>

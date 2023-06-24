@@ -265,8 +265,8 @@
 	>
 		<div
 			class="fullscreen-player-popup"
-			in:slideInOut={{ delay: 400, duration: 400 }}
-			out:slideInOut={{ delay: 200, duration: 400, easing: quartIn }}
+			in:slideInOut|global={{ delay: 400, duration: 400 }}
+			out:slideInOut|global={{ delay: 200, duration: 400, easing: quartIn }}
 		>
 			<div
 				class="column container"

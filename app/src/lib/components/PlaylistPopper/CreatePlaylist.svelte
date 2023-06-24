@@ -80,7 +80,7 @@
 	<div
 		class="backdrop"
 		style="z-index: 100;"
-		transition:fade={{ duration: 125 }}
+		transition:fade|global={{ duration: 125 }}
 		on:scroll|preventDefault
 		on:click={() => {
 			dispatch("close");
@@ -149,7 +149,7 @@
 {/if}
 <section
 	class="playlist-modal"
-	transition:fade={{ duration: 250, delay: 125 }}
+	transition:fade|global={{ duration: 250, delay: 125 }}
 >
 	<div class="image">
 		<div class="img-container">

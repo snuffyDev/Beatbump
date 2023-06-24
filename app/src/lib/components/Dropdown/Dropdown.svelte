@@ -171,8 +171,8 @@
 		bind:this={popper}
 		on:mouseleave|stopPropagation={onClose}
 		on:lostfocus={onClose}
-		in:slide|local={{ delay: 125, duration: 125 }}
-		out:slide|local={{ duration: 250, delay: 125 }}
+		in:slide={{ delay: 125, duration: 125 }}
+		out:slide={{ duration: 250, delay: 125 }}
 		class={type === "player" ? "dd-player" : "dd-menu"}
 		style="transform: translate({posX}px, {posY}px)"
 	>

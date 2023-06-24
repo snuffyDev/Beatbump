@@ -174,7 +174,7 @@
 		class="backdrop"
 		on:click|stopPropagation|preventDefault
 		style:z-index={500}
-		transition:fade={{ duration: 400, easing: circOut }}
+		transition:fade|global={{ duration: 400, easing: circOut }}
 	>
 		<div
 			use:clickOutside
@@ -182,8 +182,8 @@
 				hidden = !hidden;
 			}}
 			class="nav-search"
-			in:fade={{ delay: 200, duration: 200, easing: circOut }}
-			out:fade={{ duration: 200, easing: circOut }}
+			in:fade|global={{ delay: 200, duration: 200, easing: circOut }}
+			out:fade|global={{ duration: 200, easing: circOut }}
 		>
 			<Search
 				{filter}

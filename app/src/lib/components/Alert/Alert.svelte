@@ -8,8 +8,8 @@
 <div class="alert-container">
 	{#each $alertHandler as notif (notif.id)}
 		<div
-			in:fly={{ y: 150, duration: 250, easing: expoOut }}
-			out:fade={{ duration: 1250, delay: 500 }}
+			in:fly|global={{ y: 150, duration: 250, easing: expoOut }}
+			out:fade|global={{ duration: 1250, delay: 500 }}
 			animate:flip={{ duration: 250, delay: 0 }}
 			on:introend={() => {
 				setTimeout(() => {

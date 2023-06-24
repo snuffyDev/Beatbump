@@ -11,7 +11,7 @@
 <div
 	class="backdrop"
 	on:click|self={() => dispatch("close")}
-	transition:fade={{ duration: 125 }}
+	transition:fade|global={{ duration: 125 }}
 	style="z-index: {zIndex};"
 >
 	<div
@@ -23,7 +23,7 @@
 		}}
 		use:clickOutside
 		role="dialog"
-		transition:fly={{ duration: 250, delay: 125 }}
+		transition:fly|global={{ duration: 250, delay: 125 }}
 	>
 		<div class="modal-container">
 			<slot name="header" />

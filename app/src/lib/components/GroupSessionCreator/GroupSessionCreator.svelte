@@ -37,7 +37,7 @@
 {#if $showGroupSessionCreator}
 	<div
 		class="backdrop"
-		transition:fade
+		transition:fade|global
 	>
 		<div
 			class="groupSessionCreator modal"

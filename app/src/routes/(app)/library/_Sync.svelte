@@ -184,12 +184,12 @@
 <div
 	class="backdrop"
 	on:click={() => dispatch("close")}
-	transition:fade={{ duration: 150, delay: 150 }}
+	transition:fade|global={{ duration: 150, delay: 150 }}
 />
 <div class="sync-wrapper">
 	<div
 		class="sync"
-		transition:fade={{ duration: 300, delay: 300 }}
+		transition:fade|global={{ duration: 300, delay: 300 }}
 	>
 		<div
 			class="x-button"
