@@ -1,4 +1,8 @@
-import type { Handle } from "@sveltejs/kit";
+import {
+	defaultCookieParams,
+	type PreferencesCookie,
+} from "$lib/server/cookies";
+import type { Cookies, Handle } from "@sveltejs/kit";
 
 const headers = {
 	"X-Frame-Options": "SAMEORIGIN",
@@ -14,13 +18,28 @@ const checkUserAgent = (userAgent: string) =>
 		: /Android/i.test(userAgent)
 		? "Android"
 		: "Other";
+const updatePreferencesCookie = (cookies: Cookies) => {
+	const prefsCookie = cookies.get("_prefs") ?? "";
 
+	const preferences: PreferencesCookie = prefsCookie
+		? JSON.parse(atob(prefsCookie))
+		: { "Proxy Thumbnails": true, Restricted: false };
+
+	cookies.set(
+		"_prefs",
+		btoa(JSON.stringify(preferences)),
+		defaultCookieParams(),
+	);
+	return preferences;
+};
 export const handle: Handle = async ({ event, resolve }) => {
 	const UA = event.request.headers.get("User-Agent");
 	const agentType = checkUserAgent(UA);
+	const preferences = updatePreferencesCookie(event.cookies);
+
 	event.locals.iOS = agentType === "iOS";
 	event.locals.Android = agentType === "Android";
-
+	event.locals.preferences = preferences;
 	const response = await resolve(event);
 	for (const key in headers) {
 		response.headers.set(`${key}`, `${headers[key]}`);

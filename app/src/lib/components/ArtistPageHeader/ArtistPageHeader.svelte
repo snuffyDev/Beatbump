@@ -338,7 +338,7 @@
 				font-weight: 700;
 				font-size: 2.5rem;
 				display: inline-block;
-				font-family: CommissionerVariable, sans-serif;
+				font-family: "Commissioner Variable", sans-serif;
 				text-shadow: rgb(0 0 0 / 17.1%) 0.2rem -0.12rem 0.5rem;
 				letter-spacing: -0.02em;
 				padding-bottom: 1rem;

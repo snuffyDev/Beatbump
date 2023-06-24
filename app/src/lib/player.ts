@@ -216,7 +216,7 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 		url: "",
 	};
 	private declare player: HTMLAudioElement;
-	private _repeat: string;
+	private _repeat: string = "off";
 
 	constructor() {
 		super();

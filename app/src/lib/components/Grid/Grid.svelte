@@ -10,7 +10,7 @@
 	</div>
 	<div
 		class="grid resp-content-width"
-		use:observer
+		use:observer={{ items }}
 	>
 		{#each items as item, i (item)}
 			<slot

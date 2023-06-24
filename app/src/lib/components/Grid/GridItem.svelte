@@ -80,7 +80,7 @@
 	.item-title {
 		display: inline;
 		padding: 0.3rem 0.1rem;
-		font-family: CommissionerVariable;
+		font-family: "Commissioner Variable";
 		font-weight: 500;
 		font-size: 1.1em;
 		letter-spacing: -0.02em;

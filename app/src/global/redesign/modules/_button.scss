@@ -20,8 +20,8 @@ $focus-color: #1c1c1c;
 	background: $background;
 
 	border: 0.15em solid hsl(0deg 0% 7%);
-	border-radius: v.$base-radius;
-	font-family: "CommissionerVariable", sans-serif;
+	border-radius: v.$xxl-radius;
+	font-family: "Commissioner Variable", sans-serif;
 	cursor: pointer;
 	font-size: 1em;
 	gap: 0.25em;
@@ -39,11 +39,11 @@ $focus-color: #1c1c1c;
 	justify-content: center;
 	align-items: center;
 	vertical-align: middle;
-	transition: background linear 75ms, color linear 75ms;
+	transition: background linear 35ms, color linear 35ms;
 	@media (hover: hover) {
 		&:hover {
 			color: #252525 !important;
-			background: color.scale($focus-background, $lightness: 12%) !important;
+			background: color.scale($focus-background, $lightness: 66%) !important;
 			border-color: #202020 !important;
 			box-shadow: -0.01em -0.01em 0.1em 0rem rgba(0, 0, 0, 0.904) inset;
 			outline: 0;
@@ -124,7 +124,7 @@ button.outlined {
 		&:hover {
 			background: rgba(255, 255, 255, 0.034) !important;
 			border-color: rgba(194, 170, 194, 0.667) !important;
-			color: rgb(231, 221, 231) !important;
+			color: rgb(222, 216, 222) !important;
 		}
 	}
 	&:focus,

@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { createEventDispatcher } from "svelte";
-	export let value;
-	export let options = [];
-	const dispatch = createEventDispatcher();
+	export let value: number;
+	export let options: { params: string; action: () => void; label: string }[] =
+		[];
 </script>
 
 <label
@@ -17,7 +16,10 @@
 		on:change
 	>
 		{#each options as option, i (option.params)}
-			<option value={i}>{option.label}</option>
+			<option
+				value={i}
+				selected={value === i}>{option.label}</option
+			>
 		{/each}
 	</select>
 </div>

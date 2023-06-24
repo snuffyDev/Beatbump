@@ -1,57 +1,68 @@
-let intersectionObserver: IntersectionObserver;
+import { browser } from "$app/environment";
+import { CALLBACK_MAP } from "./ioCallbackMap";
 
-const observerCallback = (entries: IntersectionObserverEntry[], ob) => {
-	for (let idx = 0; idx < entries.length; idx++) {
-		const entry = entries[idx];
-		const target = entry.target as HTMLImageElement;
-		if (entry.isIntersecting) {
-			target.decode().finally(() => {
-				target.src = target.dataset.src;
-				queueMicrotask(() => {
-					target.decode().finally(() => {
-						intersectionObserver.unobserve(entry.target);
-					});
-				});
-			});
-		}
+class GlobalIntersectionObserver {
+	private declare $self: IntersectionObserver;
+	private callbacks = CALLBACK_MAP;
+	private targets: WeakMap<
+		HTMLElement,
+		(typeof CALLBACK_MAP)[keyof typeof CALLBACK_MAP]
+	> = new WeakMap();
+
+	constructor() {
+		if (!browser) return;
+		this.$self = new IntersectionObserver((entries) => {
+			for (const entry of entries) {
+				const callback = this.targets.get(entry.target as HTMLElement);
+				if (!callback) continue;
+				callback(this, entry);
+			}
+		});
 	}
-};
 
-function ensureIntersectionObserver(node: HTMLElement) {
-	if (intersectionObserver) return;
-	intersectionObserver = new IntersectionObserver(observerCallback, {
-		threshold: 0,
-		rootMargin: "95px 80px",
-	});
-	return intersectionObserver;
+	observe(target: HTMLElement, callback: keyof typeof CALLBACK_MAP) {
+		this.targets.set(target, this.callbacks[callback]);
+		this.$self.observe(target);
+	}
+	unobserve(target: HTMLElement) {
+		this.targets.delete(target);
+		this.$self.unobserve(target);
+	}
 }
 
+const Observer = new GlobalIntersectionObserver();
+
+export type { GlobalIntersectionObserver };
 /* eslint-disable no-inner-declarations */
 export default function lazyContainer(
 	node: HTMLElement,
+	// eslint-disable-next-line unused-imports/no-unused-vars, @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
 	{ items }: { items: any[] },
 ) {
-	ensureIntersectionObserver(node);
+	let children: NodeListOf<HTMLImageElement> | null =
+		node.querySelectorAll<HTMLImageElement>("img[data-src]");
 
-	let children = node.querySelectorAll("img[data-src]");
-
-	for (const img of children) {
-		intersectionObserver.observe(img);
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	for (const img of children!) {
+		Observer.observe(img, "images");
 	}
 
 	return {
 		destroy() {
-			for (const img of children) {
-				intersectionObserver.unobserve(img);
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			for (const img of children!) {
+				Observer.unobserve(img);
 			}
 			children = null;
 		},
-		update(items: typeof children) {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		update(_items: typeof children) {
+			if (!children) return;
 			children.forEach((element) => {
-				intersectionObserver.unobserve(element);
+				Observer.unobserve(element);
 			});
 			children = node.querySelectorAll("img[data-src]");
-			children.forEach((element) => intersectionObserver.observe(element));
+			children.forEach((element) => Observer.observe(element, "images"));
 		},
 	};
 }

@@ -102,7 +102,7 @@
 	) => {
 		const { $queue, $startIndex = 0, $list } = stores;
 		if (item.playlistId === $list!.currentMixId) {
-			if (index - $startIndex < $queue.length) {
+			if ($queue && index - $startIndex < $queue.length) {
 				await list
 					.getSessionContinuation({
 						videoId: item?.videoId,
@@ -111,8 +111,8 @@
 						loggingContext: item.loggingContext,
 						playerParams: item?.playerParams,
 						playlistSetVideoId: item?.playlistSetVideoId,
-						ctoken: $list.continuation,
-						clickTrackingParams: item.clickTrackingParams,
+						ctoken: $list ? $list.continuation : "",
+						clickTrackingParams: item.clickTrackingParams || "",
 					})
 					.then(() => {
 						return list.updatePosition(index);
@@ -153,10 +153,11 @@
 		}
 		await tick();
 		await list.initPlaylistSession({
-			playlistId: item.playlistId,
+			playlistId: item.playlistId || "",
 			visitorData,
 			clickTrackingParams:
-				(item.playlistId === $list.currentMixId &&
+				($queue &&
+					item.playlistId === $list?.currentMixId &&
 					$queue[index]?.clickTrackingParams) ||
 				item?.clickTrackingParams,
 			index: index,
@@ -164,44 +165,6 @@
 			playlistSetVideoId: item?.playlistSetVideoId,
 			videoId: item?.videoId,
 		});
-	};
-
-	const handleQueueClick: ClickHandler = async (item, index, stores) => {
-		const { $queue } = stores;
-		/// Do we have a group session?
-		if (groupSession.initialized && groupSession.hasActiveSession) {
-			/// If the index is 0, handle it differently
-			if (index === 0) {
-				updateGroupPosition(undefined, index === 0 ? 1 : index);
-				list.updatePosition(1);
-
-				return AudioPlayer.previous(false);
-			}
-
-			/// If the index is the last item, handle it differently
-			if (index === $queue.length - 1) {
-				list.updatePosition(index === 0 ? 0 : index - 1);
-				SessionListService.next(true, true);
-				await tick();
-				return;
-			}
-
-			/// Update position as normal
-			list.updatePosition(index === 0 ? 0 : index - 1);
-			updateGroupPosition(undefined, index === 0 ? 0 : index - 1);
-			await tick();
-			SessionListService.next(true, true);
-		} else {
-			if (index === 0) {
-				list.updatePosition(1);
-				await tick();
-				return AudioPlayer.previous(false);
-			}
-			list.updatePosition(index - 1);
-			await tick();
-
-			SessionListService.next(true, false);
-		}
 	};
 
 	const buildMenu = ({
@@ -250,12 +213,12 @@
 				IDBService.sendMessage("create", "favorite", item);
 			})
 			.add(
-				page === "queue" ? "Remove from Queue" : null,
+				page === "queue" ? "Remove from Queue" : undefined,
 				page === "queue"
 					? () => {
 							list.removeTrack(idx);
 					  }
-					: null,
+					: undefined,
 			)
 			.add("Share", async () => {
 				let shareData: {
@@ -305,7 +268,6 @@
 <script lang="ts">
 	import { page as PageStore } from "$app/stores";
 	import {
-		groupSession,
 		isMobileMQ,
 		isPagePlaying,
 		queue,
@@ -318,17 +280,15 @@
 	import { buildDropdown } from "$lib/configs/dropdowns.config";
 	import { APIParams } from "$lib/constants";
 	import { CTX_ListItem } from "$lib/contexts";
-	import { AudioPlayer, updateGroupPosition } from "$lib/player";
-	import list, {
-		currentTrack,
-		queuePosition,
-		type ISessionListProvider,
-		type ISessionListService,
-	} from "$lib/stores/list";
+	import { currentTrack, queuePosition } from "$lib/stores/list";
+	import type {
+		ISessionListProvider,
+		ISessionListService,
+	} from "$lib/stores/list/types.list";
 	import type { PageContext } from "$lib/types/allContexts";
 	import type { BuildMenuParams } from "$lib/types/common";
 	import { IDBService } from "$lib/workers/db/service";
-	import SessionListService from "$stores/list/sessionList";
+	import list from "$stores/list/sessionList";
 	import { SITE_ORIGIN_URL } from "$stores/url";
 	import { createEventDispatcher, tick } from "svelte";
 	import { writable } from "svelte/store";
@@ -346,7 +306,11 @@
 	}
 
 	const dispatch = createEventDispatcher<$$Events>();
-	const { visitorData = "", parentPlaylistId = "" } = CTX_ListItem.get()!;
+	const {
+		visitorData = "",
+		parentPlaylistId = "",
+		page: currentCtx,
+	} = CTX_ListItem.get()!;
 	$: page = $listItemPageContext;
 	const DropdownItems = buildMenu({
 		item,
@@ -357,7 +321,7 @@
 	});
 
 	$: isPlaying =
-		$isPagePlaying.has($PageStore.params.slug) &&
+		($isPagePlaying.has($PageStore.params.slug) || currentCtx === "queue") &&
 		$queue.length > 0 &&
 		$queuePosition === idx &&
 		$currentTrack?.videoId === item.videoId;
@@ -433,7 +397,8 @@
 	class="m-item"
 	tabindex="0"
 	class:isPlaying
-	on:click|stopPropagation={handleClick}
+	draggable="true"
+	on:click|preventDefault|capture|stopPropagation={handleClick}
 	on:pointerenter={() => {
 		isHovering = true;
 	}}
@@ -455,7 +420,7 @@
 		</span>
 	</div>
 	<div class="metadata">
-		{#if item.thumbnails.length !== 0}
+		{#if Array.isArray(item.thumbnails) && item.thumbnails.length}
 			<div class="thumbnail">
 				<img
 					decoding="async"

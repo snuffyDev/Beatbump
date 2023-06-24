@@ -1,11 +1,9 @@
 <script lang="ts">
-	import Select from "./Select.svelte";
-
-	import { createEventDispatcher } from "svelte";
 	import Icon from "../Icon/Icon.svelte";
-	export let value = "unsorted";
-	export let options = [];
-	const dispatch = createEventDispatcher();
+	import Select from "./Select.svelte";
+	export let value = 0;
+	export let options: { params: string; action: () => void; label: string }[] =
+		[];
 </script>
 
 {#if options.length !== 0}

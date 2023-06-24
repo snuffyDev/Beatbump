@@ -1,4 +1,9 @@
-export { currentTrack, queue, queuePosition } from "./derived";
+export {
+	currentTrack,
+	default as default,
+	queue,
+	queuePosition,
+	related,
+} from "./sessionList";
 export type { ISessionListProvider, ISessionListService } from "./types.list";
-export { split, filterList, fetchNext } from "./utils.list";
-export { default as default } from "./sessionList";
+export { fetchNext, filterList, split } from "./utils.list";

@@ -182,9 +182,10 @@
 				on:pointerdown|stopPropagation={() => {
 					tracklist.style.willChange = "scroll-position, transform";
 				}}
-				on:dragstart|capture|stopPropagation={(e) => onDragStart(1, e)}
-				on:dragmove|capture|stopPropagation={(e) => trackMovement(1, e.detail)}
-				on:dragend|capture|stopPropagation={(e) => release(1, e.detail)}
+				on:bb-dragstart|capture|stopPropagation={(e) => onDragStart(1, e)}
+				on:bb-dragmove|capture|stopPropagation={(e) =>
+					trackMovement(1, e.detail)}
+				on:bb-dragend|capture|stopPropagation={(e) => release(1, e.detail)}
 				class="handle"
 			>
 				<hr class="horz" />

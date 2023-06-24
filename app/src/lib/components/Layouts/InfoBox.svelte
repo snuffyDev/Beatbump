@@ -53,7 +53,7 @@
 				dispatch("playlistAdd");
 			},
 		},
-		releasePageContext.has()
+		releasePageContext.has('release')
 			? {
 					text: "Shuffle",
 					action: () => {

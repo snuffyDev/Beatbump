@@ -21,12 +21,7 @@
 
 <style>
 	.app-transition-wrapper {
-		/* display: block; */
-
-		/* position: relative; */
-		contain: content;
 		inset: 0;
-		overflow-y: auto;
 		position: absolute;
 		transform: translateZ(0);
 		will-change: top;

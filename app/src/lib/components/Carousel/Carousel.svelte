@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
 	import { browser } from "$app/environment";
 	import { page } from "$app/stores";
@@ -73,17 +71,17 @@
 					(scrollPositions.width / items.length) * 2,
 				);
 			}
-			frame = undefined;
-			startTime = undefined;
-			isScrolling = false;
 		}
-		frame = requestAnimationFrame((ts) => scrollHandler(ts, context));
+		if (frame < 24) {
+			frame = requestAnimationFrame((ts) => scrollHandler(ts, context));
+		}
 	}
 
-	function onScroll(event?: Event, context?: any | "left" | "right") {
+	function onScroll(context?: any | "left" | "right") {
 		if (frame) {
 			return;
 		}
+		if (!carousel) return;
 		if (!clientWidth) clientWidth = carousel.clientWidth;
 		if (isScrolling) return;
 		isScrolling = true;
@@ -145,7 +143,7 @@
 		class:showMoreBtn={!moreOnLeft}
 		on:click={() => {
 			if (!items || scrollPositions.left <= 25) return;
-			onScroll(null, "left");
+			onScroll("left");
 		}}
 	>
 		<Icon
@@ -159,7 +157,7 @@
 		class:showMoreBtn={!moreOnRight}
 		on:click={() => {
 			if (!items || scrollPositions.right <= 25) return;
-			onScroll(null, "right");
+			onScroll("right");
 		}}
 	>
 		<Icon

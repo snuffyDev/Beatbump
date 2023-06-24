@@ -20,7 +20,7 @@
 			delay,
 			duration,
 			easing,
-			css: (t, u) =>
+			css: (t: number) =>
 				"overflow: hidden;" +
 				`opacity: ${Math.min(t * 20, 1) * opacity};` +
 				`height: ${t * height}px;` +
@@ -35,11 +35,10 @@
 
 	// Focus state action
 	function focusState(node: HTMLElement) {
-		function handleFocusOut(
-			event: FocusEvent & { relatedTarget: HTMLElement & EventTarget },
-		) {
+		function handleFocusOut(event: FocusEvent) {
+			const relatedTarget = event.relatedTarget as HTMLElement;
 			// console.log(node.contains(event.relatedTarget))
-			if (!node.contains(event.relatedTarget)) {
+			if (!node.contains(relatedTarget)) {
 				node.dispatchEvent(new CustomEvent("lostfocus"));
 			}
 		}
@@ -58,7 +57,7 @@
 	import { windowHeight, windowWidth } from "$stores/window";
 	import { cubicOut } from "svelte/easing";
 
-	import { PopperStore, isOpen, activeNode } from "../Popper/popperStore";
+	import { PopperStore, activeNode, isOpen } from "../Popper/popperStore";
 	import DropdownItem from "./DropdownItem.svelte";
 
 	export let main: HTMLElement;
@@ -68,13 +67,12 @@
 
 	$: isShowing = $PopperStore?.items.length !== 0;
 
-	let frame: number;
+	let frame: number | undefined;
 
 	let width: number;
-	let popperHeight;
-	let popper: HTMLElement = undefined;
-	let scrollPosY = 0;
-	let lastScrollTime;
+	let popperHeight: number;
+	let popper: HTMLElement | undefined = undefined;
+	let scrollPosY: number | undefined = 0;
 	let isScrolling = false;
 	let posX: number;
 	let posY: number;
@@ -83,23 +81,27 @@
 		let rect = popper.getBoundingClientRect();
 		// Get position on the X axis
 		if ($PopperStore?.direction === "right") {
-			if (rect?.left <= 0) {
+			if (rect?.left <= 0 && $PopperStore.x) {
 				posX = $PopperStore.x + rect?.width;
 			} else if (rect?.right >= $windowWidth) {
 				posX = $windowWidth + -width * 1.75;
-			} else {
+			} else if ($PopperStore.x) {
 				posX = $PopperStore.x;
 			}
-		} else {
+		} else if ($PopperStore.x) {
 			posX = $PopperStore.x - width;
 		}
 
 		// Get position on the Y axis
-		if ($PopperStore?.y - popperHeight <= 0) {
+		if ($PopperStore.y && $PopperStore.y - popperHeight <= 0) {
 			posY = $PopperStore.y;
-		} else if ($PopperStore.bottom + popperHeight >= $windowHeight) {
+		} else if (
+			$PopperStore.bottom &&
+			$PopperStore.y &&
+			$PopperStore.bottom + popperHeight >= $windowHeight
+		) {
 			posY = $PopperStore.y - popperHeight;
-		} else {
+		} else if ($PopperStore.y) {
 			posY = $PopperStore.y;
 		}
 	}
@@ -122,7 +124,7 @@
 			onClose();
 		}
 	}
-	let startTime: number;
+	let startTime: number | undefined;
 	function scrollHandler(ts: number) {
 		if (!popper) return;
 		if (startTime === undefined) {
@@ -134,7 +136,7 @@
 			frame = requestAnimationFrame(scrollHandler);
 		} else {
 			onClose();
-			cancelAnimationFrame(frame);
+			if (frame) cancelAnimationFrame(frame);
 			isScrolling = false;
 			isShowing = false;
 			startTime = undefined;
@@ -147,7 +149,7 @@
 
 	function onScroll() {
 		if (!isShowing && !popper) return;
-		if (!scrollPosY) scrollPosY = popper.getBoundingClientRect().top;
+		if (!scrollPosY && popper) scrollPosY = popper.getBoundingClientRect().top;
 		if (frame) {
 			return;
 		}
@@ -169,11 +171,10 @@
 		bind:this={popper}
 		on:mouseleave|stopPropagation={onClose}
 		on:lostfocus={onClose}
-		in:slide={{ delay: 125, duration: 125 }}
-		out:slide={{ duration: 125 }}
+		in:slide|local={{ delay: 125, duration: 125 }}
+		out:slide|local={{ duration: 250, delay: 125 }}
 		class={type === "player" ? "dd-player" : "dd-menu"}
 		style="transform: translate({posX}px, {posY}px)"
-		tabindex="0"
 	>
 		{#each items as item}
 			<DropdownItem

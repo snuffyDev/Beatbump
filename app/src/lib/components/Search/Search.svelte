@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import Icon from "$lib/components/Icon/Icon.svelte";
+	import { queryParams } from "$lib/utils";
 	import { debounce } from "$lib/utils/sync";
+	import { settings } from "$stores/settings";
 	import { createEventDispatcher } from "svelte";
 	import { fullscreenStore } from "../Player/channel";
 	import { searchFilter } from "./options";
@@ -18,9 +20,11 @@
 		if (!query.length) return;
 		dispatch("submitted", { submitted: true, filter, query });
 		fullscreenStore.set("closed");
-		let url = `/search/${encodeURIComponent(query)}${
-			filter !== undefined ? `?filter=${filter}` : ""
-		}`;
+		const params = queryParams({
+			filter,
+			restricted: $settings.search.Restricted,
+		});
+		let url = `/search/${encodeURIComponent(query)}?${params}`;
 		goto(url);
 	}
 

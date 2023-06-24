@@ -21,6 +21,7 @@ export interface MusicCarouselShelfBasicHeaderRenderer {
 	title: Title;
 	accessibilityData: MusicCarouselShelfBasicHeaderRendererAccessibilityData;
 	headerStyle: string;
+	strapline?: { runs: TextRun[] };
 	moreContentButton: MoreContentButton;
 	trackingParams: string;
 }

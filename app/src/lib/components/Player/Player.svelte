@@ -157,7 +157,7 @@
 				class="container"
 				style="
     font-weight: 400;
-    font-family: 'CommissionerVariable';
+    font-family: ''Commissioner Variable'';
     letter-spacing: -0.02em;"
 			>
 				<span class="now-playing-title">{$currentTrack?.title}</span>

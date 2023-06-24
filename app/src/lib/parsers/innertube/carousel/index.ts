@@ -1,21 +1,22 @@
-import type { ParsedCarousel } from "$api/models/Carousel";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MoodsAndGenresItem } from "$lib/parsers";
-import {
-	MusicTwoRowItemRenderer,
-	MusicResponsiveListItemRenderer,
-} from "$lib/parsers/items";
-import type { CarouselHeader, MoodsAndGenresItem } from "$lib/types";
+import type { ItemBuilder } from "$lib/parsers/items";
+import type { CarouselHeader } from "$lib/types";
 import type {
-	IMusicTwoRowItemRenderer,
 	IMusicResponsiveListItemRenderer,
+	IMusicTwoRowItemRenderer,
 } from "$lib/types/innertube/internals";
+import type { MusicCarouselShelfBasicHeaderRenderer } from "$lib/types/innertube/musicCarouselShelfRenderer";
 import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+import type { ParsedCarousel } from "../../../../routes/(app)/api/_lib/models/Carousel";
 import type { GridOrCarousel } from "../parseSectionObject";
 
-function parseHeader({
-	musicCarouselShelfBasicHeaderRenderer,
+function parseHeader(header: {
+	musicCarouselShelfBasicHeaderRenderer: MusicCarouselShelfBasicHeaderRenderer;
 }): CarouselHeader {
+	if (typeof header !== "object") return { title: "" };
+	const { musicCarouselShelfBasicHeaderRenderer } = header;
 	if (musicCarouselShelfBasicHeaderRenderer) {
 		let subheading: any, browseId: any;
 		if (musicCarouselShelfBasicHeaderRenderer?.strapline?.runs[0]?.text) {
@@ -36,6 +37,7 @@ function parseHeader({
 			browseId,
 		};
 	}
+	return undefined as never;
 }
 
 async function parseBody(
@@ -43,6 +45,7 @@ async function parseBody(
 		| { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer }[]
 		| { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer }[]
 		| any[] = [],
+	itemBuilder: ItemBuilder,
 ): Promise<ICarouselTwoRowItem[] | IListItemRenderer[] | []> {
 	const items: any[] = await Promise.all(
 		contents.map(
@@ -56,12 +59,12 @@ async function parseBody(
 					  },
 			) => {
 				if ("musicTwoRowItemRenderer" in item) {
-					return MusicTwoRowItemRenderer(
+					return itemBuilder.MusicTwoRowItemRenderer(
 						item as { musicTwoRowItemRenderer: IMusicTwoRowItemRenderer },
 					);
 				}
 				if ("musicResponsiveListItemRenderer" in item) {
-					return MusicResponsiveListItemRenderer(
+					return itemBuilder.MusicResponsiveListItemRenderer(
 						item as {
 							musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer;
 						},
@@ -77,14 +80,17 @@ async function parseBody(
 
 	return items;
 }
-export async function parseCarouselItem(data: {
-	musicImmersiveCarouselShelfRenderer?: GridOrCarousel<"carousel">["musicCarouselShelfRenderer"];
-	musicCarouselShelfRenderer?: GridOrCarousel<"carousel">["musicCarouselShelfRenderer"];
-}): Promise<ParsedCarousel<"twoRowItem">> {
+export async function parseCarousel(
+	data: {
+		musicImmersiveCarouselShelfRenderer?: GridOrCarousel<"carousel">["musicCarouselShelfRenderer"];
+		musicCarouselShelfRenderer?: GridOrCarousel<"carousel">["musicCarouselShelfRenderer"];
+	},
+	itemBuilder: ItemBuilder,
+): Promise<ParsedCarousel<"twoRowItem">> {
 	const carousel =
 		data?.musicCarouselShelfRenderer ??
 		data?.musicImmersiveCarouselShelfRenderer;
-	const header = parseHeader(carousel?.header);
-	const items = await parseBody(carousel?.contents);
+	const header = parseHeader(carousel?.header as never);
+	const items = await parseBody(carousel?.contents, itemBuilder);
 	return { header, items, type: "carousel" };
 }

@@ -1,24 +1,32 @@
+import type { proxyUrls } from "$lib/server/thumbnailProxyUrl";
 import type { Thumbnail } from "$lib/types";
+import type {
+    IMusicResponsiveListItemRenderer,
+    PurpleRun,
+} from "$lib/types/innertube/internals";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { subtitle, thumbnailTransformer } from "../utils.parsers";
-import type {
-	IMusicResponsiveListItemRenderer,
-	PurpleRun,
-} from "$lib/types/innertube/internals";
 
 export async function MusicResponsiveListItemRenderer(
 	ctx: { musicResponsiveListItemRenderer: IMusicResponsiveListItemRenderer },
-	playlistSetVideoId?: boolean,
-	playlistId?: string,
-	type: string | undefined = undefined,
+	params: {
+		playlistSetVideoId?: boolean;
+		playlistId?: string;
+		rewriteThumbnails?: ReturnType<typeof proxyUrls> | undefined;
+		type?: string | undefined;
+	} = {},
 ): Promise<IListItemRenderer> {
+	const { playlistSetVideoId, playlistId, type, rewriteThumbnails } = params;
 	const item = ctx.musicResponsiveListItemRenderer;
 	const thumbnails = (
 		item.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails || []
-	).map((thumbnail) => ({
-		...thumbnail,
-		...thumbnailTransformer(thumbnail.url),
-	}));
+	).map((thumbnail) => {
+		const parsed = {
+			...thumbnail,
+			...thumbnailTransformer(thumbnail.url),
+		};
+		return rewriteThumbnails ? rewriteThumbnails(parsed) : parsed;
+	});
 
 	const flexColumns = Array.isArray(item.flexColumns) && item.flexColumns;
 	const subtitleRuns =

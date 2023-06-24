@@ -159,6 +159,11 @@
 			)
 			.add("Share", MENU_HANDLERS.share.bind(MENU_HANDLERS.share, ctx))
 			.build();
+	const thumbnailProxy = (url: string) => {
+		const urlNoHttps = url.slice(8);
+		const hostname = urlNoHttps.slice(0, 3);
+		return hostname === "y.i" ? "vi" : hostname;
+	};
 </script>
 
 <script lang="ts">
@@ -381,11 +386,12 @@
 
 <style lang="scss">
 	@import "../../../global/redesign/utility/mixins/media-query";
+	@import "../../../global/redesign/utility/mixins/old";
 
 	article {
 		--thumbnail-radius: clamp(
 			4px,
-			calc(var(--column-width, 0px) - 32px) * 0.025,
+			calc(var(--column-width, 0px) - 322px) * 0.025,
 			8px
 		);
 
@@ -396,7 +402,10 @@
 		scroll-snap-align: start;
 		width: var(--column-width);
 		contain: layout paint style;
-
+		flex: 0 1;
+		display: flex;
+		flex-direction: column;
+		// flex: 1 0;
 		@media (hover: hover) {
 			&:hover {
 				> :where(.image)::before {
@@ -412,7 +421,7 @@
 		position: relative;
 		overflow: hidden;
 		display: block;
-		margin-bottom: 0.5em;
+		margin-bottom: 0.5rem;
 
 		&.img16x9 {
 			aspect-ratio: 16/9;
@@ -487,6 +496,7 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		cursor: pointer;
+		@include trim(3);
 	}
 
 	.h1 {
@@ -494,6 +504,7 @@
 		line-height: 1.25;
 		font-weight: 400 !important;
 		display: inline;
+		@include trim(3);
 	}
 
 	.image {

@@ -29,6 +29,8 @@ import { objectKeys } from "$lib/utils/collections/objects";
 import { Mutex } from "$lib/utils/sync";
 import { tick } from "svelte";
 // eslint-disable-next-line import/no-cycle
+import { derived } from "svelte/store";
+import type { RelatedEndpointResponse } from "../../../routes/(app)/api/v1/related.json/+server";
 import { groupSession } from "../sessions";
 import { filterAutoPlay, playerLoading } from "../stores";
 import type { ISessionListProvider } from "./types.list";
@@ -65,6 +67,7 @@ const VALID_KEYS = [
 ] as const;
 
 export class ListService {
+	private restricted = false;
 	private nextTrackUrl: string | null = null;
 	_$: WritableStore<ISessionListProvider> =
 		new WritableStore<ISessionListProvider>({
@@ -77,7 +80,6 @@ export class ListService {
 			position: 0,
 			related: null,
 		});
-
 	constructor() {
 		this._$.set(this._state);
 	}
@@ -293,7 +295,7 @@ export class ListService {
 		}
 	}
 	public async previous(_broadcast = false) {
-		let position = await this.updatePosition("next");
+		let position = await this.updatePosition("back");
 		if (position >= this._$.value.mix.length) {
 			position = this._$.value.position;
 		}
@@ -309,7 +311,7 @@ export class ListService {
 			videoId: this.#currentTrack(this.position)?.videoId,
 			playlistId: this.currentMixId,
 			...(this.continuation && { continuation: this?.continuation }),
-			...(this?.clickTrackingParams && {
+			...(this.clickTrackingParams && {
 				clickTracking: this.clickTrackingParams,
 			}),
 		});
@@ -825,6 +827,10 @@ export class ListService {
 								continue;
 							}
 
+							if (key === "position" && (to[key] as number) < 0) {
+								old[key] = 0;
+							}
+
 							// `mix` has a slightly altered type here
 							if (key === "mix") {
 								if (!Array.isArray(to.mix)) continue;
@@ -867,3 +873,46 @@ export class ListService {
 
 export const SessionListService = new ListService();
 export default SessionListService;
+
+/**
+ * A derived store for read-only access to the current mix
+ */
+const queue = derived(SessionListService, ($list) => $list.mix);
+/**
+ * A derived store for read-only access to the current track
+ */
+const currentTrack = derived(
+	SessionListService,
+	($list) => $list.mix[$list.position],
+);
+/**
+ * A derived store for read-only access to the current position
+ */
+const queuePosition = derived(SessionListService, ($list) => $list.position);
+
+const related = (() => {
+	const prevPosition = undefined;
+	const { subscribe } = derived<
+		typeof SessionListService,
+		RelatedEndpointResponse
+	>(SessionListService, ($list, set) => {
+		try {
+			(async () => {
+				if ($list.position === prevPosition) return;
+				if ($list.related !== null) {
+					await fetch<RelatedEndpointResponse>(
+						`/api/v1/related.json?browseId=${$list.related?.browseId}`,
+					)
+						.then((res) => res.json())
+						.then(set);
+				}
+			})();
+		} catch (err) {
+			Logger.err(err);
+		}
+	});
+	return { subscribe };
+})();
+
+export { currentTrack, queue, queuePosition, related };
+

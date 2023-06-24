@@ -1,5 +1,7 @@
-import { MusicResponsiveListItemRenderer } from "$lib/parsers/items/musicResponsiveListItemRenderer";
-import { filter, map } from "$lib/utils";
+import type { Thumbnail } from "$lib/types";
+import type { MusicResponsiveListItemRendererItem } from "$lib/types/innertube/internals";
+import { filter } from "$lib/utils";
+import type { ItemBuilder } from "./items";
 type Data = {
 	header: {
 		musicDetailHeaderRenderer: {
@@ -34,19 +36,30 @@ type Data = {
 	};
 };
 /* eslint-disable no-prototype-builtins */
-export function parsePageContents(data: Data) {
+export async function parsePageContents(data: Data, itemBuilder: ItemBuilder) {
 	const contents =
 		data.contents?.singleColumnBrowseResultsRenderer?.tabs[0].tabRenderer
 			.content.sectionListRenderer.contents[0].musicShelfRenderer.contents ||
 		[];
 
-	const songs = map(contents, ({ musicResponsiveListItemRenderer }, index) => ({
-		...MusicResponsiveListItemRenderer({ musicResponsiveListItemRenderer }),
-		index,
-	}));
+	const songs = await Promise.all(
+		contents.map(
+			async (
+				{
+					musicResponsiveListItemRenderer,
+				}: MusicResponsiveListItemRendererItem,
+				index: number,
+			) => ({
+				...(await itemBuilder.MusicResponsiveListItemRenderer({
+					musicResponsiveListItemRenderer,
+				})),
+				index,
+			}),
+		),
+	);
 
 	const releaseInfoParser = () => {
-		console.log(data.header.musicDetailHeaderRenderer.subtitle.runs);
+		// console.log(data.header.musicDetailHeaderRenderer.subtitle.runs);
 		const year = data.header?.musicDetailHeaderRenderer?.subtitle?.runs.at(-1);
 		const length = data.header?.musicDetailHeaderRenderer?.subtitle?.runs[0];
 		const artists = filter(
@@ -80,9 +93,10 @@ export function parsePageContents(data: Data) {
 			],
 			secondSubtitle: [],
 			artist: artists,
-			thumbnails:
+			thumbnails: (
 				data.header?.musicDetailHeaderRenderer?.thumbnail
-					?.croppedSquareThumbnailRenderer?.thumbnail?.thumbnails,
+					?.croppedSquareThumbnailRenderer?.thumbnail?.thumbnails as Thumbnail[]
+			)?.map((thumbnail) => itemBuilder.handleGenericThumbnailItem(thumbnail)),
 			title: data.header?.musicDetailHeaderRenderer.title?.runs[0].text,
 			autoMixId:
 				data.header?.musicDetailHeaderRenderer.menu?.menuRenderer?.items[1]
@@ -95,6 +109,7 @@ export function parsePageContents(data: Data) {
 
 	return {
 		items: songs,
+		contents,
 		releaseInfo: releaseInfo,
 	};
 }

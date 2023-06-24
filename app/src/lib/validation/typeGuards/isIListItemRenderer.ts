@@ -1,4 +1,4 @@
-import type { ParsedCarousel } from "$api/models/Carousel";
+import type { ParsedCarousel } from "../../../routes/(app)/api/_lib/models/Carousel";
 
 export const isMoodsAndGenres = (
 	obj: unknown,

@@ -6,7 +6,7 @@ import { WritableStore } from "$lib/utils/stores";
 import { generateId } from "$lib/utils/strings/id";
 import type Peer from "peerjs";
 import type { DataConnection } from "peerjs";
-import SessionListService, { type ISessionListProvider } from "./list";
+import SessionListService, { type ISessionListProvider } from "./list/";
 
 import { AudioPlayer, getSrc } from "$lib/player";
 import { EventEmitter, Mutex } from "$lib/utils/sync";

@@ -14,13 +14,15 @@ $lg-spacing: calc($base-spacing * 2);
 $xl-spacing: calc($base-spacing * 1.25);
 
 $base-radius: 0.35em;
+$xxs-radius: m.div($base-radius, 1.5);
 $xs-radius: m.div($base-radius, 0.75);
 $sm-radius: m.div($base-radius, 0.675);
 $md-radius: m.div($base-radius, 0.575);
 $lg-radius: m.div($base-radius, 0.5);
 $xl-radius: m.div($base-radius, 0.3125);
+$xxl-radius: m.div($base-radius, 0.01);
 
-$secondary-font-family: "CommissionerVariable", sans-serif;
+$secondary-font-family: "Commissioner Variable", sans-serif;
 
 $line-height: 1.5;
 
@@ -34,7 +36,7 @@ $z-index: (
 	"z-500p": 500,
 );
 
-$content-width-mobile: calc(100vw - 2.25em);
+$content-width-mobile: calc(100vw - 3.25rem);
 
 $content-width-md: calc(100vw - 0.5625rem - 14rem);
 $content-width-lg: 82rem;

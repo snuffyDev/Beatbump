@@ -2,6 +2,8 @@
 	display: inline-block;
 	margin-left: 0.5em;
 	font-size: 0.95rem;
+	line-height: 1;
+	margin-block: 0.16em;
 	white-space: nowrap;
 	color: inherit;
 }
@@ -32,7 +34,8 @@
 	z-index: 5;
 	display: flex;
 	flex-direction: row;
-	padding: 0.667em;
+	padding: 0.85em 1.1em;
+	line-height: 1.2;
 	align-items: center;
 	cursor: pointer;
 	margin: 0;
@@ -43,12 +46,16 @@
 	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 		Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 	position: relative;
+	gap: 0.325rem;
+	transition: background-color 50ms ease-in;
 	&:hover {
 		color: #fcf6f6;
-		background-color: #585869;
+		background-color: #474756;
 	}
+	&:hover:active,
 	&:active {
-		background-color: #a0a0b1;
+		transition: background-color 100ms ease-out;
+		background-color: #55555e;
 	}
 }
 
@@ -58,11 +65,11 @@
 	flex-direction: column;
 	top: 0;
 	left: 0;
-	border-radius: var(--sm-radius);
+	border-radius: var(--xxs-radius);
 	z-index: 200;
 
 	transform: translate(0px, 0px);
-	background: #333333;
+	background: var(--menu-bg-light);
 	border: 1px #686868 solid;
 	pointer-events: all;
 }

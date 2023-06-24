@@ -7,6 +7,7 @@ export async function PlaylistPanelVideoRenderer(
 ): Promise<Song> {
 	// console.log(ctx.menu.menuRenderer.items);
 	const Item = {
+		explicit: ctx.badges && Array.isArray(ctx.badges),
 		subtitle: map(ctx.shortBylineText?.runs, (item, idx) => {
 			if (ctx.longBylineText?.runs[idx]?.navigationEndpoint !== undefined) {
 				return {

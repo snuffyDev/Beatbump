@@ -13,7 +13,7 @@ h6,
 .h5,
 .h6,
 .subheading {
-	font-family: "CommissionerVariable", sans-serif;
+	font-family: "Commissioner Variable", sans-serif;
 
 	line-height: 1.2;
 	font-weight: 500;
@@ -95,15 +95,15 @@ a:not(.no-style),
 .explicit {
 	text-shadow: none;
 	/* max-height: 1em; */
-	min-width: 1em;
-	min-height: 1em;
+	min-width: 0.8rem;
+	min-height: 0.8rem;
 	/* width: 1em; */
 	position: relative;
 	place-content: center;
 	display: inline-flex;
 	// contain: paint;
-	font-size: 0.5em;
-	text-rendering: optimizeLegibility;
+
+	text-rendering: geometricPrecision;
 	&::before {
 		content: "E";
 		position: absolute;
@@ -112,13 +112,16 @@ a:not(.no-style),
 
 		place-self: center;
 		// inset:0;
-		font-weight: 700;
-		aspect-ratio: 1/1;
-		line-height: 1.1;
+		font-size: 1em;
+		font-weight: 750;
+		// aspect-ratio: 1/1;
+		line-height: 1;
 	}
-	font-size: calc(1em * 0.25 + 4px);
-	padding: 0.0875rem;
-	aspect-ratio: 1/1;
+	font-size: calc(1.6px + 0.8vw);
+	line-height: 1;
+	padding: 4px;
+	padding-top: 4px;
+	// aspect-ratio: 1/1;
 	background: #ffffffbf;
 	border-radius: clamp(calc(calc(0.25em * 0.5) + 0.1px), 16px * 0.0125, 4px);
 	vertical-align: middle;

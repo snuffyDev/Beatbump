@@ -1,8 +1,8 @@
 .info-bar {
 	display: grid;
 	grid-template-rows: 1fr;
-	grid-template-columns: [index] 6.25rem 1fr 2.9rem;
-	padding: 0.8rem 0 0.4rem 0;
+	grid-template-columns: [index] 6.25rem 1fr 3rem;
+	padding: 0.8rem 0.1rem 0.4rem 0;
 	max-width: inherit;
 	/* gap: 0.8rem; */
 	width: 100%;
@@ -25,7 +25,7 @@
 	.mobile-thumbnail {
 		@extend .index;
 		display: block;
-		padding-left: 2rem;
+		padding-left: 2.5rem;
 		grid-column: index;
 	}
 
@@ -33,10 +33,12 @@
 		padding-right: 1.5rem;
 	}
 	@media screen and (min-width: 640px) {
-		grid-template-columns: [index] 9.5rem [title] 1fr 3rem;
+		grid-template-columns: 0.7rem[index] 10.8rem[title] 1fr 3rem;
 		.index {
 			grid-column: index;
 			display: block;
+
+			justify-self: center;
 		}
 		.title {
 			justify-self: flex-start;

@@ -81,6 +81,12 @@ html {
 					$lightness: 8%,
 					$saturation: -66%
 				)};
+			--menu-bg-light: #{scale-color(
+					map-get($themes, $theme, "base"),
+					$lightness: 20%,
+					$saturation: -66%
+				)};
+
 			--top-bg: #{map-get($themes, $theme, "top")};
 			--base-bg: #{map-get($themes, $theme, "base")};
 			background: var(--base-bg);

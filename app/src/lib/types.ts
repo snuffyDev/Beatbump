@@ -5,7 +5,7 @@ import type { PlaylistSearch } from "./types/playlist";
 import type { IMergedObject } from "./types/utilities";
 export interface CarouselHeader {
 	browseId?: string;
-	title?: string;
+	title: string;
 	params?: string;
 	itct?: string;
 	subheading?: string;

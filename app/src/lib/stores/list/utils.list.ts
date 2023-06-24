@@ -1,9 +1,11 @@
+import { browser } from "$app/environment";
 import type { Item } from "$lib/types";
 import { queryParams } from "$lib/utils";
+import type { NextEndpointResponse } from "../../../routes/(app)/api/v1/next.json/+server";
+import { settings } from "../settings";
 
 export const d = "";
-import type { NextEndpointResponse } from "../../../routes/api/v1/next.json/+server";
-
+let restricted = false;
 /** Take an array, turn it into chunks[][] of size `chunk` */
 export function split(arr, chunk) {
 	const temp = [];
@@ -33,6 +35,7 @@ export function fetchNext(
 		videoId?: string;
 		playlistId?: string;
 		ctoken?: string;
+		restricted?: boolean;
 		loggingContext?: string;
 		index?: number;
 		playlistSetVideoId?: string;
@@ -41,7 +44,7 @@ export function fetchNext(
 		visitorData?: string;
 	} = {},
 ): Promise<NextEndpointResponse | void> {
-	const _params = queryParams(obj);
+	const _params = queryParams({ ...obj, restricted });
 	// console.log(options, _params)
 	return fetch<NextEndpointResponse>("/api/v1/next.json?" + _params, {
 		headers: { accept: "application/json" },
@@ -50,4 +53,10 @@ export function fetchNext(
 		.catch((err) => {
 			console.error(err);
 		});
+}
+
+if (browser) {
+	settings.subscribe((settings) => {
+		restricted = settings.search.Restricted!;
+	});
 }

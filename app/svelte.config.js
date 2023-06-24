@@ -1,12 +1,12 @@
 // /* eslint-disable no-undef */
-import adapterCfw from "@sveltejs/adapter-cloudflare-workers";
 import adapterCf from "@sveltejs/adapter-cloudflare";
-import vercel from "@sveltejs/adapter-vercel";
+import adapterCfw from "@sveltejs/adapter-cloudflare-workers";
 import netlify from "@sveltejs/adapter-netlify";
 import node from "@sveltejs/adapter-node";
+import vercel from "@sveltejs/adapter-vercel";
+import dotenv from "dotenv";
 import path from "path";
 import sveltePreprocess from "svelte-preprocess";
-import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 
 dotenv.config();
@@ -47,7 +47,7 @@ const config = {
 
 		alias: {
 			$stores: path.resolve("./src/lib/stores"),
-			$api: path.resolve("./src/routes/api/_lib"),
+			$api: path.resolve("./src/routes/(app)/api/_lib"),
 			$components: path.resolve("./src/lib/components"),
 			$env: path.resolve("./src/env.ts"),
 		},

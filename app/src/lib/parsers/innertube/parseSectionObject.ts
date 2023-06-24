@@ -32,4 +32,4 @@ export const parseGridRendererSection = async ({
 	} as const;
 };
 
-export { parseCarouselItem } from "./carousel";
+export { parseCarousel as parseCarouselItem } from "./carousel";

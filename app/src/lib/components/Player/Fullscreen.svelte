@@ -2,6 +2,7 @@
 	import { navigating } from "$app/stores";
 	import Description from "$components/ArtistPageHeader/Description/Description.svelte";
 	import Carousel from "$components/Carousel/Carousel.svelte";
+	import DraggableList from "$components/DraggableList/DraggableList.svelte";
 	import PopperButton from "$components/Popper/PopperButton.svelte";
 	import { draggable } from "$lib/actions/draggable";
 	import { pan } from "$lib/actions/gestures/handlers";
@@ -14,30 +15,34 @@
 		isPagePlaying,
 		playerLoading,
 	} from "$lib/stores";
-	import { currentTrack, queue, queuePosition } from "$lib/stores/list";
+	import {
+		currentTrack,
+		queue,
+		queuePosition,
+		related,
+	} from "$lib/stores/list";
 	import { groupSession } from "$lib/stores/sessions";
 	import type { Thumbnail } from "$lib/types";
 	import { requestFrameSingle } from "$lib/utils";
-	import { related } from "$stores/list/derived";
 	import SessionListService from "$stores/list/sessionList";
 	import { SITE_ORIGIN_URL } from "$stores/url";
 	import { windowWidth } from "$stores/window";
 	import { cubicOut, quartIn, quartOut } from "svelte/easing";
-	import { tweened } from "svelte/motion";
-	import {
-		fade,
-		type EasingFunction,
-		type TransitionConfig,
-	} from "svelte/transition";
-	import ListItem, { listItemPageContext } from "../ListItem/ListItem.svelte";
-	import Loading from "../Loading/Loading.svelte";
-	import Tabs from "../Tabs";
-	import TrackList from "../TrackList";
-	import Controls from "./Controls.svelte";
-	import { createPlayerPopperMenu } from "./Player.svelte";
-	import ProgressBar from "./ProgressBar";
-	import blurURL from "./blur.svg?url";
-	import { fullscreenStore } from "./channel";
+// eslint-disable-next-line import/no-duplicates
+    import { tweened } from 'svelte/motion';
+    import {
+    	fade,
+    	type EasingFunction,
+    	type TransitionConfig,
+    } from "svelte/transition";
+    import ListItem, { listItemPageContext } from "../ListItem/ListItem.svelte";
+    import Loading from "../Loading/Loading.svelte";
+    import Tabs from "../Tabs";
+    import Controls from "./Controls.svelte";
+    import { createPlayerPopperMenu } from "./Player.svelte";
+    import ProgressBar from "./ProgressBar";
+    import blurURL from "./blur.svg?url";
+    import { fullscreenStore } from "./channel";
 
 	export let state: "open" | "closed";
 
@@ -226,15 +231,17 @@
 			},
 		};
 	}
+
+    $: console.log($queue)
 </script>
 
 {#if $queue.length && state === "open"}
 	{#if $immersiveQueue}
 		<div
 			class="immersive"
-			class:open={state === "open"}
-			in:fade={{ duration: 600, delay: 200, easing: quartIn }}
-			out:fade={{ duration: 600, delay: 400, easing: quartOut }}
+			class:open={queueOpen}
+			in:fade|global={{ duration: 600, delay: 600, easing: quartIn }}
+			out:fade|global={{ duration: 800, delay: 500, easing: quartIn }}
 			style="
 
 --svg: url({new URL(
@@ -402,10 +409,10 @@
 			>
 				<div
 					use:draggable
-					on:dragstart|capture|stopPropagation={(e) => onDragStart(1, e)}
-					on:dragmove|capture|stopPropagation={(e) =>
+					on:bb-dragstart|capture|stopPropagation={(e) => onDragStart(1, e)}
+					on:bb-dragmove|capture|stopPropagation={(e) =>
 						trackMovement(1, e.detail)}
-					on:dragend|capture|stopPropagation={(e) => release(1, e.detail)}
+					on:bb-dragend|capture|stopPropagation={(e) => release(1, e.detail)}
 					on:pointerdown={() => {
 						tracklist.style.willChange = "top transform";
 					}}
@@ -432,22 +439,25 @@
 					>
 						{#if tab.id === "UpNext"}
 							{#if isActive}
-								<div class="scroller">
-									<TrackList
+								<div
+									class="scroller"
+									on:touchstart|stopPropagation={null}
+								>
+									<DraggableList
 										items={$queue}
-										hasData={true}
-										let:index
-										let:item
-									>
+                                        >
 										<ListItem
-											{item}
+										let:index
+                let:item
+                                        {item}
 											idx={index}
+											slot="item"
 											on:setPageIsPlaying={() => {
 												if (isPagePlaying.has("player-queue")) return;
 												isPagePlaying.add("player-queue");
 											}}
 										/>
-									</TrackList>
+									</DraggableList>
 								</div>
 							{/if}
 						{:else if isActive}
@@ -616,7 +626,9 @@
 		&.open {
 			// backdrop-filter: brightness(0.6) opacity(1) contrast(1) saturate(1.1) grayscale(0.3) sepia(0.2) url(1rem);
 			background-color: hsl(0deg 0% 0% / 58.7%);
-			transition-delay: 600ms;
+			&::after {
+				transition-delay: 800ms;
+			}
 		}
 
 		&::after {
@@ -635,11 +647,10 @@
 			// overflow: hidden;
 			will-change: opacity, top;
 			transform: scale(var(--scale)) translate3d(0, 0, 0);
-			transition: backdrop-filter cubic-bezier(0.25, 0.46, 0.45, 0.94) 1600ms
-				800ms;
+			transition: backdrop-filter cubic-bezier(0.25, 0.46, 0.45, 0.94);
 			transition-property: background-color, transform, filter, backdrop-filter;
-			transition-duration: 900ms;
-			transition-delay: 600ms;
+			transition-duration: 500ms;
+			transition-delay: 1000ms;
 
 			@media screen and (max-width: 720px) {
 				position: absolute;

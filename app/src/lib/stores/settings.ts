@@ -1,6 +1,7 @@
 import { browser } from "$app/environment";
+import type { NestedKeyOf } from "$lib/types/utilities";
+import { get, writable, type Writable } from "svelte/store";
 import { ENV_DONATION_URL } from "../../env";
-import { get, writable } from "svelte/store";
 
 export type Theme = "Dark" | "Dim" | "Midnight" | "YTM";
 export type StreamType = "HTTP" | "HLS";
@@ -11,6 +12,7 @@ interface Appearance {
 }
 interface Search {
 	Preserve?: "Category" | "Query" | "Category + Query" | "None";
+	Restricted?: boolean;
 }
 interface Playback {
 	"Prefer WebM Audio"?: boolean;
@@ -21,18 +23,19 @@ interface Playback {
 }
 interface Network {
 	"HLS Stream Proxy": string;
+	"Proxy Thumbnails": boolean;
 }
 interface AppInfo {
 	Donate: string;
 	GitHub: string;
 }
-export interface UserSettings {
+export type UserSettings = {
 	appearance: Appearance;
 	playback: Playback;
 	search: Search;
 	network: Network;
 	appinfo: AppInfo;
-}
+};
 
 let list: UserSettings = {
 	appearance: {
@@ -50,9 +53,17 @@ let list: UserSettings = {
 		Donate: ENV_DONATION_URL,
 		GitHub: "https://github.com/snuffyDev/Beatbump",
 	},
-	network: { "HLS Stream Proxy": "https://yt-hls-rewriter.onrender.com/" },
-	search: { Preserve: "Category" },
+	network: {
+		"HLS Stream Proxy": "https://yt-hls-rewriter.onrender.com/",
+		"Proxy Thumbnails": true,
+	},
+	search: { Preserve: "Category", Restricted: false },
 };
+
+export const SERVER_PERSISTED_SETTING_KEYS: Extract<NestedKeyOf<UserSettings>, 'Restricted' | "Proxy Thumbnails">[] = [
+	"Restricted",
+	"Proxy Thumbnails",
+];
 
 const PWA_THEME_COLORS = {
 	YTM: "#010102",
@@ -66,13 +77,24 @@ const setTopBarTheme = (theme: Appearance["Theme"]) => {
 		PWA_THEME_COLORS[theme];
 };
 
-export const settings = _settings();
+export const settings = browser
+	? _settings()
+	: (writable() as unknown as ReturnType<typeof _settings>);
 
 function _settings() {
 	if (!browser) {
-		return writable(list);
+		return writable(list) as unknown as {
+			subscribe: Writable<UserSettings>["subscribe"];
+			set: Writable<UserSettings>["set"];
+			value: () => UserSettings;
+		};
 	}
-	if ("localStorage" in self === false) return;
+	if ("localStorage" in self === false)
+		return writable({}) as unknown as {
+			subscribe: Writable<UserSettings>["subscribe"];
+			set: Writable<UserSettings>["set"];
+			value: () => UserSettings;
+		};
 	// Migrate from previous settings to new ones
 	const stored = JSON.parse(localStorage.getItem("settings")) as UserSettings;
 	// Migrate from previous settings to new ones
@@ -109,6 +131,12 @@ function _settings() {
 		if (!stored?.network["HLS Stream Proxy"]) {
 			stored.network["HLS Stream Proxy"] =
 				"https://yt-hls-rewriter.onrender.com/";
+		}
+		if (!stored?.network["Proxy Thumbnails"]) {
+			stored.network["Proxy Thumbnails"] = true;
+		}
+		if (stored?.search && typeof stored?.search?.Restricted === "undefined") {
+			stored.search.Restricted = false;
 		}
 		list = stored as UserSettings;
 	}

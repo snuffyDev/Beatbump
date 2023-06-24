@@ -8,7 +8,7 @@
 	import { Popper } from "$lib/components/Popper";
 
 	import PlaylistPopper from "$lib/components/PlaylistPopper";
-	import "@fontsource/commissioner/variable.css";
+	import "@fontsource-variable/commissioner";
 
 	import { browser, dev } from "$app/environment";
 	import { afterNavigate } from "$app/navigation";
@@ -29,8 +29,6 @@
 	$: ({ key } = data);
 	let main: HTMLElement;
 
-	$: console.log($groupSession);
-
 	let isFullscreen = false;
 
 	$: $fullscreenStore === "open"
@@ -41,7 +39,10 @@
 				isFullscreen = false;
 		  }, 0);
 
-	$: hasplayer = $queue.length !== 0;
+	let queueAlreadyPopulated = false;
+	$: hasplayer = !queueAlreadyPopulated
+		? ((queueAlreadyPopulated = true), $queue.length !== 0)
+		: queueAlreadyPopulated;
 
 	// Setup dev debugging logs
 	$: if (dev && browser) {
@@ -64,9 +65,9 @@
 		localStorage.setItem("lastTrack", JSON.stringify($currentTrack));
 	}
 
-	afterNavigate(({ from, to }) => {
-		if (import.meta.env.SSR) return;
-		if (main) main.scrollTop = 0;
+	afterNavigate(() => {
+		if (!browser) return;
+		if (main) main.scrollTo({ top: 0 });
 	});
 
 	onMount(() => {
@@ -88,6 +89,23 @@
 			Logger.err(err);
 		}
 	});
+	let info: Record<string, any> = {};
+
+	const logInfo = (event: TouchEvent) => {
+		["target", "changedTouches"].forEach((prop) =>
+			prop === "changedTouches"
+				? (info[prop] = JSON.stringify(
+						Object.fromEntries(
+							["clientX", "clientY"].map((k) => [k, event[prop].item(0)[k]]),
+						),
+				  ))
+				: (info[prop] = event[prop].outerHTML.slice(
+						0,
+						event[prop].outerHTML.indexOf(">"),
+				  )),
+		);
+		console.log(event.changedTouches);
+	};
 </script>
 
 <svelte:window
@@ -99,16 +117,23 @@
 		AudioPlayer.dispose();
 	}}
 />
+{#if info}
+	<div
+		class="info"
+		style="position: fixed; z-index: 10000000000; top: 0;
+left: 0; background: var(--base-bg); font-size: 1.1rem; display: flex; flex-direction: column;"
+	>
+		{#each Object.entries(info) as [key, value]}
+			<p><strong>{key}</strong> - {value}</p>
+		{/each}
+	</div>
+{/if}
 <Nav {key} />
 <Popper {main} />
 <div
 	class="wrapper app-content-m"
 	{hasplayer}
 	bind:this={main}
-	style:overflow-y={$page.route.id === "/search/[slug]" &&
-	!$page.url.search.includes("all")
-		? "hidden"
-		: "auto"}
 	id="wrapper"
 >
 	<Wrapper
@@ -144,17 +169,16 @@
 		transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 350ms,
 			opacity cubic-bezier(0.165, 0.84, 0.44, 1) 350ms;
 		opacity: 0;
+		will-change: transform;
 		transform: translate3d(0, var(--player-bar-height), 0);
 	}
 
 	.show-player {
 		opacity: 1;
 		transform: translate3d(0, 0, 0);
-		will-change: transform;
 	}
 
 	.wrapper {
-		overflow-y: auto;
 		-webkit-overflow-scrolling: touch;
 	}
 </style>

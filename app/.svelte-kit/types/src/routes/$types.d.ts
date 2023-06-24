@@ -10,7 +10,7 @@ type EnsureDefined<T> = T extends null | undefined ? {} : T;
 type OptionalUnion<U extends Record<string, any>, A extends keyof U = U extends U ? keyof U : never> = U extends unknown ? { [P in Exclude<A, keyof U>]?: never } & U : never;
 export type Snapshot<T = any> = Kit.Snapshot<T>;
 type PageParentData = EnsureDefined<LayoutData>;
-type LayoutRouteId = RouteId | "/" | "/artist/[slug]" | "/artist/[slug]/releases" | "/explore" | "/explore/[slug]" | "/home" | "/library" | "/library/playlists" | "/library/playlists/[slug]" | "/library/songs" | "/listen" | "/playlist/[slug]" | "/release" | "/search/[slug]" | "/session" | "/settings" | "/test" | "/trending" | "/trending/new/[slug]" | null
+type LayoutRouteId = RouteId | "/" | "/(app)/artist/[slug]" | "/(app)/artist/[slug]/releases" | "/(app)/explore" | "/(app)/explore/[slug]" | "/(app)/home" | "/(app)/library" | "/(app)/library/playlists" | "/(app)/library/playlists/[slug]" | "/(app)/library/songs" | "/(app)/listen" | "/(app)/playlist/[slug]" | "/(app)/release" | "/(app)/search/[slug]" | "/(app)/session" | "/(app)/settings" | "/(app)/trending" | "/(app)/trending/new/[slug]" | null
 type LayoutParams = RouteParams & { slug?: string }
 type LayoutServerParentData = EnsureDefined<{}>;
 type LayoutParentData = EnsureDefined<{}>;

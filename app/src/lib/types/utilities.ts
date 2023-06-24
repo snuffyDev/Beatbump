@@ -17,3 +17,10 @@ export type IMergedObject<T, U> = IsObject<T> & IsObject<U> extends true
 			[K in keyof T]: K extends keyof U ? IMergedObject<T[K], U[K]> : T[K];
 	  } & U
 	: U;
+
+    export type NestedKeyOf<ObjectType extends object> = {
+			[Key in keyof ObjectType &
+				(string | number)]: ObjectType[Key] extends object
+				? `${Key}` | `${NestedKeyOf<ObjectType[Key]>}`
+				: `${Key}`;
+		}[keyof ObjectType & (string | number)];

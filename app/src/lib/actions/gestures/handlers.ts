@@ -1,10 +1,10 @@
 import { setHandlers } from "./shared";
-import type { DragEvent, Detail, GestureHandlers, PanEvent } from "./types";
+import type { Detail, DragEvent, GestureHandlers, PanEvent } from "./types";
 import {
-	dispatcher,
 	addListener,
 	boundingRect,
 	calculateVelocity,
+	dispatcher,
 	removeListener,
 	updateDetail,
 } from "./utils";
@@ -100,7 +100,7 @@ export function draggable(node: HTMLElement) {
 			initialRect.parentTop = parent_top;
 			updateDetail(event, detail);
 
-			dispatch(node, "dragstart", detail);
+			dispatch(node, "bb-dragstart", detail);
 
 			addListener(window, "pointermove", handlers.onMove);
 			addListener(window, "pointerup", handlers.onEnd, { passive: true });
@@ -111,7 +111,7 @@ export function draggable(node: HTMLElement) {
 			// event.preventDefault();
 			calculateVelocity(event, detail);
 
-			dispatch(node, "dragmove", {
+			dispatch(node, "bb-dragmove", {
 				...detail,
 				clientY: detail.clientY - initialRect.parentTop - initialRect.height,
 			});
@@ -124,7 +124,7 @@ export function draggable(node: HTMLElement) {
 
 			calculateVelocity(event, detail);
 
-			dispatch(node, "dragend", detail);
+			dispatch(node, "bb-dragend", detail);
 			// detail.clientY = 0;
 			removeListener(window, "pointermove", handlers.onMove);
 			removeListener(window, "pointercancel", handlers.onEnd);
