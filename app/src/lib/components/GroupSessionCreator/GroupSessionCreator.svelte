@@ -32,15 +32,72 @@
 			}),
 		)}`;
 	}
+
+	// Svelte action to lock focus for keyboard navigation within a modal when it is open
+	const focusLock = (node: HTMLElement) => {
+		// Find all focusable children
+		const focusableElements = node.querySelectorAll(
+			'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select',
+		);
+
+		// Convert NodeList to Array
+		const focusableChildren = Array.prototype.slice.call(focusableElements);
+
+		const firstFocusableEl = focusableChildren[0]; // get first element to be focused inside modal
+		const lastFocusableEl = focusableChildren[focusableChildren.length - 1]; // get last element to be focused inside modal
+
+		function lastFocusableElmCb(e: KeyboardEvent) {
+			if (e.key === "Tab" && !e.shiftKey) {
+				e.preventDefault();
+				firstFocusableEl.focus();
+			}
+		}
+
+		// redirect last tab to first element inside modal
+		lastFocusableEl.addEventListener("keydown", lastFocusableElmCb);
+
+		function firstFocusableElmCb(e: KeyboardEvent) {
+			if (e.key === "Tab" && e.shiftKey) {
+				e.preventDefault();
+				lastFocusableEl.focus();
+			}
+		}
+
+		// redirect first shift+tab to last element inside modal
+		firstFocusableEl.addEventListener("keydown", firstFocusableElmCb);
+
+		const handleClick = (e) => {
+			if (e.target === node) {
+				showGroupSessionCreator.set(false);
+			}
+		};
+		// close modal on click outside
+		node.addEventListener("click", handleClick);
+
+		// set focus on first element inside modal
+		firstFocusableEl.focus();
+
+		return {
+			destroy() {
+				lastFocusableEl.removeEventListener("keydown", lastFocusableElmCb);
+				firstFocusableEl.removeEventListener("keydown", firstFocusableElmCb);
+				node.removeEventListener("click", handleClick);
+			},
+		};
+	};
 </script>
 
 {#if $showGroupSessionCreator}
 	<div
 		class="backdrop"
+		style="z-index: 1000; background-color: rgba(0, 0, 0, 0.6);"
 		transition:fade|global
 	>
 		<div
+			inert={false}
+			tabindex="-1"
 			class="groupSessionCreator modal"
+			use:focusLock
 			on:click_outside={() => ($showGroupSessionCreator = false)}
 			use:clickOutside
 		>

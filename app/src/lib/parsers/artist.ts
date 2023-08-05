@@ -92,10 +92,9 @@ export async function ArtistPageParser({
 function parseSongs(items: unknown[] = []) {
 	return Promise.all(
 		items.map(async (item) => {
-            return await MusicResponsiveListItemRenderer(
-							item as MusicResponsiveListItemRendererItem,
-						);
-
+			return await MusicResponsiveListItemRenderer(
+				item as MusicResponsiveListItemRendererItem,
+			);
 		}),
 	);
 }

@@ -113,15 +113,21 @@ export const GET: RequestHandler = async ({
 			return response.json();
 		})
 		.catch((reason) => {
+			console.error(reason);
 			throw error(500, reason);
 		});
 
 	/* For when you are NOT listening to a song.
 	 ********************************************/
 	if (!continuation) {
-		const res = await parseNextBody(response);
+		try {
+			const res = await parseNextBody(response);
 
-		return json(Object.assign({}, res, { response }));
+			return json(Object.assign({}, res, { response }));
+		} catch (err) {
+			console.error(err);
+			return json({ response, err });
+		}
 	}
 
 	return json(

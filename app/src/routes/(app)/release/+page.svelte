@@ -69,7 +69,12 @@
 		{thumbnail}
 		buttons={[
 			{ text: "Play Album", action: () => playAlbum(), icon: "play" },
-			{ text: "Album Radio", action: () => playRadio(), icon: "play" },
+			{
+				text: "Album Radio",
+				type: "outlined",
+				action: () => playRadio(),
+				icon: "play",
+			},
 			{ icon: "dots", type: "icon" },
 		]}
 		title={releaseInfo.title}

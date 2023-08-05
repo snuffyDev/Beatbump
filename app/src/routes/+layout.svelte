@@ -65,11 +65,18 @@
 		localStorage.setItem("lastTrack", JSON.stringify($currentTrack));
 	}
 
+	$: if ($fullscreenStore && browser) {
+		$fullscreenStore === "open"
+			? document.documentElement.classList.add("no-scroll")
+			: document.documentElement.classList.remove("no-scroll");
+	}
+
 	afterNavigate(() => {
 		if (!browser) return;
 		if (main) main.scrollTo({ top: 0 });
 	});
 
+	let scrollTop = 0;
 	onMount(() => {
 		try {
 			if (
@@ -104,12 +111,14 @@
 						event[prop].outerHTML.indexOf(">"),
 				  )),
 		);
-		console.log(event.changedTouches);
+		// console.log(event.changedTouches);
 	};
 </script>
 
+<svelte:body class={$fullscreenStore === "open" ? "no-scroll" : ""} />
 <svelte:window
-	on:beforeunload={() => {
+	on:pagehide={({ persisted }) => {
+		if (persisted) return;
 		if (!browser) return;
 		if (groupSession.initialized && groupSession.hasActiveSession) {
 			groupSession.disconnect();
@@ -128,17 +137,26 @@ left: 0; background: var(--base-bg); font-size: 1.1rem; display: flex; flex-dire
 		{/each}
 	</div>
 {/if}
-<Nav {key} />
+<Nav
+	{key}
+	--top-bar-width={isFullscreen
+		? "calc(100%)"
+		: "calc(100% - var(--scrollbar-width) + 0.05em)"}
+	bind:fullscreen={isFullscreen}
+	bind:opacity={scrollTop}
+/>
 <Popper {main} />
 <div
 	class="wrapper app-content-m"
 	{hasplayer}
-	bind:this={main}
 	id="wrapper"
 >
 	<Wrapper
+		on:scrolled={(e) => {
+			scrollTop = !e.detail ? 100 : 0;
+		}}
 		{key}
-		{main}
+		bind:main
 	>
 		<slot />
 	</Wrapper>

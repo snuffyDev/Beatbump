@@ -13,7 +13,7 @@
 
 	function handleStreamSelect() {
 		AudioPlayer.dispatch("update:stream_type", {
-			type: $settings.playback.Stream,
+			type: $settings.playback.Stream ?? "HTTP",
 		});
 	}
 
@@ -151,24 +151,28 @@
 					<div class="input no-btn mb-1">
 						<input
 							type="url"
-							on:input={(e) => {
+							on:blur={(e) => {
 								let value = e.currentTarget.value;
 
 								if (!value.endsWith("/")) value = value + "/";
+							}}
+							on:input={(e) => {
+								let value = e.currentTarget.value;
+
 								if (value.match(/^https?:\/\//i)) {
-									$settings["network"]["HLS Stream Proxy"] = value;
+									$settings["network"]["Stream Proxy Server"] = value;
 								}
 							}}
 							pattern="http://.*"
-							placeholder="https://yt-hls-rewriter.onrender.com/"
-							value={$settings["network"]["HLS Stream Proxy"]}
+							placeholder="https://hls.beatbump.io/"
+							value={$settings["network"]["Stream Proxy Server"]}
 						/>
 					</div>
 					<button
 						class="link mt-2"
 						on:click={() => {
-							$settings["network"]["HLS Stream Proxy"] =
-								"https://yt-hls-rewriter.onrender.com/";
+							$settings["network"]["Stream Proxy Server"] =
+								"https://hls.beatbump.io/";
 						}}>Reset to default</button
 					>
 				</div>
@@ -187,6 +191,23 @@
 				/>
 				<label
 					for="proxy-thumbnails"
+					class="switch"
+				/>
+			</div>
+
+			<div class="setting">
+				<label
+					>Proxy Audio
+					<span class="">Proxy audio streams through a server.</span>
+				</label>
+				<input
+					name="proxy-audio"
+					id="proxy-audio"
+					type="checkbox"
+					bind:checked={$settings["network"]["Proxy Streams"]}
+				/>
+				<label
+					for="proxy-audio"
 					class="switch"
 				/>
 			</div>

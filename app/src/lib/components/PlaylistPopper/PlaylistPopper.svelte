@@ -16,6 +16,7 @@
 	const fetchPlaylists = async () => {
 		const promise = await IDBService.sendMessage("get", "playlists");
 		if (promise) {
+			console.log(promise);
 			playlists = promise;
 		}
 	};
@@ -50,6 +51,7 @@
 
 {#if isShowing}
 	<Modal
+		zIndex={1000}
 		on:close={() => {
 			dispatch("close");
 			hasFocus = true;
@@ -60,6 +62,13 @@
 		<div class="list">
 			<List
 				on:click={async (e) => {
+					const playlist = playlists[e.detail];
+					const items = [...playlist?.items].concat(item);
+					const promise = await IDBService.sendMessage("update", "playlist", {
+						hideAlert: false,
+						id: playlist.id,
+						items: items,
+					});
 					showAddToPlaylistPopper.set({ state: false, item: undefined });
 				}}
 				items={playlists}

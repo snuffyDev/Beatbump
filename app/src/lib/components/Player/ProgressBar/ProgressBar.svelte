@@ -1,11 +1,11 @@
 <script lang="ts">
+	// eslint-disable-next-line import/no-duplicates
 	import { expoIn, sineIn } from "svelte/easing";
-
+	// eslint-disable-next-line import/no-duplicates
 	import { fade } from "svelte/transition";
 
 	import { AudioPlayer } from "$lib/player";
 	import { format } from "$lib/utils";
-	import { windowWidth } from "$stores/window";
 	const { progress, currentTimeStore, durationStore } = AudioPlayer;
 
 	let isTouchDrag = false;
@@ -28,10 +28,7 @@
 
 	function hoverEvent(event) {
 		if (!songBar) return;
-		hoverWidth = hover(event, {
-			width: cWidth,
-			left: Math.abs(cWidth - $windowWidth) / 2,
-		});
+		hoverWidth = hover(event, songBar.getBoundingClientRect());
 	}
 
 	function hover(event, bounds) {
@@ -40,13 +37,10 @@
 	}
 
 	function seekAudio(event: PointerEvent) {
-		if (!songBar && !AudioPlayer.player.src) return;
+		if (!songBar) return;
 
 		AudioPlayer.seek(
-			seek(event, {
-				width: cWidth,
-				left: Math.abs(cWidth - $windowWidth) / 2,
-			}) * $durationStore,
+			seek(event, songBar.getBoundingClientRect()) * $durationStore,
 		);
 	}
 </script>

@@ -13,6 +13,8 @@
 
 	import { browser } from "$app/environment";
 	import { goto } from "$app/navigation";
+	import Icon from "$components/Icon/Icon.svelte";
+	import { mobileLongPress } from "$lib/actions/longtouch";
 	import type { Dropdown } from "$lib/configs/dropdowns.config";
 	import { groupSession } from "$lib/stores";
 	import list, { queue, queuePosition } from "$lib/stores/list";
@@ -259,13 +261,19 @@
 		: { width: 0, height: 0, url: "", placeholder: "" };
 
 	$: srcImg.url =
-		srcImg.width < 100
-			? srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-")
+		srcImg.width < 240
+			? ((srcImg.width = 240),
+			  (srcImg.height = 240),
+			  srcImg.url.replace(RE_THUMBNAIL_DIM, "=w240-h240-"))
 			: srcImg.url;
+
+	let pressing = false;
 </script>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
 	class="container"
+	class:pressing
 	on:contextmenu|preventDefault={(e) => {
 		window.dispatchEvent(
 			new window.CustomEvent("contextmenu", { detail: "listing" }),
@@ -284,7 +292,27 @@
 		class="innercard"
 		on:click|stopPropagation={clickHandler}
 	>
-		<div class="itemWrapper">
+		<div
+			class="itemWrapper"
+			use:mobileLongPress={{ delay: 500, duration: 720 }}
+			on:touchstart={(e) => {
+				pressing = true;
+			}}
+			on:touchend={() => {
+				pressing = false;
+			}}
+			on:touchcancel={() => {
+				pressing = false;
+			}}
+			on:pressEnd={(e) => {
+				e.currentTarget.dispatchEvent(new TouchEvent("touchcancel"));
+				pressing = false;
+				setTimeout(() => {
+					pressing = false;
+					e.target.querySelector(".dd-button").click();
+				}, 1200);
+			}}
+		>
 			<div
 				class="img-container"
 				class:artist-img={isArtist}
@@ -295,7 +323,6 @@
 				<div class="thumbnail">
 					<img
 						alt="thumbnail"
-						loading={"lazy"}
 						width={srcImg.width}
 						height={srcImg.height}
 						src={srcImg.url}
@@ -304,13 +331,16 @@
 			</div>
 			<div class="title">
 				<p class="text-title">
-					{data.title}
-					<span
-						class="explicit"
-						class:hidden={!data.explicit}
-					>
-						<span class="sr-only">Explicit</span>
-					</span>
+					<span>{data.title}</span>
+					{#if data.explicit}
+						<Icon
+							name="explicit"
+							fill="hsla(0, 0%, 95%, 0.7)"
+							size="12px"
+						>
+							<span class="sr-only">Explicit</span>
+						</Icon>
+					{/if}
 				</p>
 				{#if data.type === "artists"}
 					<p class="artist-stats">
@@ -326,23 +356,25 @@
 					</p>
 				{:else}
 					<p class="text-artist secondary">
-						{#each data?.subtitle as artist}
-							{#if !artist.pageType}
-								{artist.text}
-							{:else if artist.pageType.includes("ALBUM")}
-								<a
-									on:click|preventDefault|stopPropagation={() =>
-										goto(`/release?id=${artist?.browseId}`)}
-									href={`/release?id=${artist?.browseId}`}>{artist.text}</a
-								>
-							{:else}
-								<a
-									on:click|preventDefault|stopPropagation={() =>
-										goto(`/artist/${artist?.browseId}`)}
-									href={`/artist/${artist?.browseId}`}>{artist.text}</a
-								>
-							{/if}
-						{/each}
+						{#if data.subtitle}
+							{#each data?.subtitle as artist}
+								{#if !artist.pageType}
+									{artist.text}
+								{:else if artist.pageType.includes("ALBUM")}
+									<a
+										on:click|preventDefault|stopPropagation={() =>
+											goto(`/release?id=${artist?.browseId}`)}
+										href={`/release?id=${artist?.browseId}`}>{artist.text}</a
+									>
+								{:else}
+									<a
+										on:click|preventDefault|stopPropagation={() =>
+											goto(`/artist/${artist?.browseId}`)}
+										href={`/artist/${artist?.browseId}`}>{artist.text}</a
+									>
+								{/if}
+							{/each}
+						{/if}
 					</p>
 				{/if}
 			</div>
@@ -364,6 +396,7 @@
 							: "",
 				}}
 				type="search"
+				size="1.5em"
 				items={DropdownItems}
 			/>
 		</div>
@@ -374,7 +407,7 @@
 	@use "../../../global/stylesheet/base/mixins";
 
 	.menu {
-		padding-right: 0.6em;
+		padding-right: 0em;
 	}
 
 	.hidden {
@@ -417,15 +450,35 @@
 		flex: 1 1 auto;
 		width: 100%;
 		flex-flow: row nowrap;
-		background: transparent;
-		transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) background 0.125s;
+
+		transition: cubic-bezier(0.755, 0.05, 0.855, 0.06) background 0.4s;
+		transition-delay: 100ms;
+		background: #0000;
 		max-width: unset !important;
 		contain: paint;
+		&.pressing {
+			transition-duration: 200ms;
+			transition-delay: 0ms;
+			transition-timing-function: cubic-bezier(0.86, 0, 0.07, 1);
 
-		&:active,
-		&:hover {
+			background: lighten(#3c3d4159, 3%);
+		}
+		@media screen and (hover: hover) {
+			transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) background 0.1s;
+
+			&:hover {
+				transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) background 0.2s;
+				transition-delay: 0ms;
+
+				background: lighten(#3c3d4159, 3%);
+			}
+		}
+		&:not(.pressing):active {
+			transition: cubic-bezier(0.215, 0.61, 0.355, 1) background 0.2s;
+
 			background: lighten(#3c3d4159, 3%);
 			// filter: brightness(0.7);filter
+			transition-delay: 0ms;
 		}
 	}
 
@@ -437,14 +490,16 @@
 	}
 
 	.text-title {
-		align-self: center;
+		align-self: flex-start;
 		display: block;
-		flex-direction: column;
-		font-size: 1.1em;
+		font-size: 1em;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		width: 100%;
+		> span {
+			margin-right: 3px;
+		}
 
 		&:hover {
 			text-decoration: underline solid currentcolor 0.0714rem;
@@ -453,8 +508,13 @@
 	}
 
 	img {
+		position: relative;
 		width: auto;
 		height: auto;
+		image-rendering: auto;
+		object-fit: contain;
+		image-rendering: crisp-edges;
+		image-rendering: -webkit-optimize-contrast;
 	}
 
 	img::before {
@@ -468,7 +528,7 @@
 		display: grid;
 
 		/* flex-direction: row; */
-		grid-template-columns: 12fr 1fr;
+		grid-template-columns: 18fr 1fr;
 		overflow: hidden;
 		padding: 0.4rem 0;
 		position: relative;
@@ -491,7 +551,7 @@
 		text-overflow: ellipsis;
 		width: 100%;
 		white-space: nowrap;
-		line-height: 1.7;
+		line-height: 1.3;
 
 		// line-height: 2;line-height
 		display: inherit;
@@ -505,8 +565,36 @@
 		min-width: 5rem;
 		height: 5rem;
 		border-radius: $xs-radius;
+		&::before {
+			display: block;
+			position: absolute;
+			inset: 0;
+			content: "";
 
-		.thumbnail {
+			background-image: linear-gradient(
+				to bottom,
+				hsla(0, 0%, 0%, 0.82) 0%,
+				hsla(0, 0%, 0%, 0.754) 7.9%,
+				hsla(0, 0%, 0%, 0.684) 14.2%,
+				hsla(0, 0%, 0%, 0.612) 19.2%,
+				hsla(0, 0%, 0%, 0.539) 23.3%,
+				hsla(0, 0%, 0%, 0.465) 26.8%,
+				hsla(0, 0%, 0%, 0.393) 30%,
+				hsla(0, 0%, 0%, 0.324) 33.3%,
+				hsla(0, 0%, 0%, 0.258) 36.9%,
+				hsla(0, 0%, 0%, 0.197) 41.2%,
+				hsla(0, 0%, 0%, 0.142) 46.5%,
+				hsla(0, 0%, 0%, 0.094) 53.2%,
+				hsla(0, 0%, 0%, 0.055) 61.6%,
+				hsla(0, 0%, 0%, 0.025) 71.9%,
+				hsla(0, 0%, 0%, 0.006) 84.6%,
+				hsla(0, 0%, 0%, 0) 100%
+			);
+			opacity: 0.1;
+			z-index: 1;
+			z-index: 10;
+		}
+		> .thumbnail {
 			width: 100%;
 			height: 100%;
 			background: rgb(13 13 15 / 19.2%);
@@ -517,6 +605,7 @@
 				width: 100%;
 				height: 100%;
 				object-fit: contain;
+				image-rendering: crisp-edges;
 			}
 		}
 	}

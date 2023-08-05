@@ -2,17 +2,17 @@
 	import type { PageData } from "./$types";
 
 	import { page } from "$app/stores";
-	import { afterNavigate } from "$app/navigation";
 	import Listing from "$components/Item/Listing.svelte";
-	import type { Item } from "$lib/types";
 	import VirtualList from "$lib/components/SearchList/VirtualList.svelte";
+	import type { Item } from "$lib/types";
 
 	import Header from "$lib/components/Layouts/Header.svelte";
 
+	import { afterNavigate } from "$app/navigation";
 	import { writable } from "svelte/store";
 
 	export let data: PageData;
-	let { results, continuation, filter } = data;
+	$: ({ results, continuation, filter } = data);
 
 	const search = writable<Item[]>();
 	$: results && filter !== "all" && search.set(results[0].contents);
@@ -21,6 +21,27 @@
 	let isLoading = false;
 	let hasData = false;
 
+	// export const snapshot = {
+	// 	capture() {
+	// 		return {
+	// 			search: $search,
+	// 			ctoken,
+	// 			results,
+	// 			itct,
+	// 			hasData,
+	// 			start,
+	// 			end,
+	// 		};
+	// 	},
+	// 	restore(snapshot) {
+	// 		console.log(snapshot);
+	// 		let s: typeof $search | [] = [];
+
+	// 		({ search: s, results, ctoken, itct, hasData, start, end } = snapshot);
+	// 		search.set(s);
+	// 		if (results) results = [...results];
+	// 	},
+	// };
 	async function paginate() {
 		if (isLoading || hasData) return;
 		try {
@@ -51,6 +72,7 @@
 			};
 		}
 	}
+	// $: console.log($search, results, data.response);
 	// $: console.log(results);
 	afterNavigate(async ({ from, to }) => {
 		if (to.url.pathname.includes("/search")) {

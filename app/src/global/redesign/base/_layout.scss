@@ -7,6 +7,8 @@ html {
 	-webkit-overflow-scrolling: touch;
 	font-size: 12px;
 	overscroll-behavior: contain;
+	position: fixed;
+	inset: 0;
 }
 
 *,
@@ -20,12 +22,12 @@ body {
 	background-color: #010102;
 	color: var(--color-dark);
 	line-height: 1.75;
-	position: fixed;
+
 	min-height: 100vh;
 	min-width: 100vw;
 	inset: 0;
 	overscroll-behavior: contain;
-	max-height: 100%;
+	// max-height: 100%;
 	overflow: hidden;
 	margin: 0;
 }
@@ -34,8 +36,11 @@ body {
 	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 		Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 	word-wrap: break-word;
+	-webkit-overflow-scrolling: touch;
+	scroll-behavior: smooth;
 	-webkit-text-size-adjust: 100%;
 	--base-font-size: 0.75rem;
+	--scrollbar-width: 0.916667rem;
 
 	/* ===== Scrollbar CSS ===== */
 
@@ -46,17 +51,19 @@ body {
 	}
 
 	::-webkit-scrollbar {
+		z-index: 10000;
+		position: absolute;
 		width: 0.916667rem;
 		height: 0.916667rem;
 	}
 
 	::-webkit-scrollbar-track {
-		background: #74747e21;
-		border-radius: 0.625rem;
 		height: 0.916667rem;
 		width: 100%;
+		background: #141318cd;
+		z-index: 10000;
+		position: absolute;
 		background-clip: content-box;
-		border-radius: 0.833333rem;
 		border: transparent solid 0.0983333rem;
 	}
 
@@ -64,9 +71,12 @@ body {
 		background-color: #e0e0e0a8;
 		border-radius: 0.5625rem;
 		width: 0.5625rem;
+		// transform: translateZ(0);
 		scrollbar-width: 0.625rem;
 		border: 0.25rem solid #b8b8b800;
 		background-clip: content-box;
+		z-index: 10000;
+		position: absolute;
 	}
 
 	-webkit-touch-callout: none;
@@ -80,15 +90,16 @@ body {
 	--top-bar-height: clamp(3.9rem, 4.175rem, 4.625rem);
 	text-rendering: geometricPrecision;
 	font-smooth: auto;
-	@media screen and (min-width: 40em) and (max-width: 115.375em) {
+
+	@media screen and (min-width: 40rem) and (max-width: 81.375rem) {
 		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
 		--base-font-size: 0.875rem;
 	}
-	@media screen and (min-width: 115.375em) and (max-width: 134em) {
+	@media screen and (min-width: 81.375rem) and (max-width: 134rem) {
 		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
 		--base-font-size: 1rem;
 	}
-	@media screen and (min-width: 134.75em) {
+	@media screen and (min-width: 134.75rem) {
 		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
 		--base-font-size: 1.125rem;
 	}
@@ -137,30 +148,39 @@ body {
 
 body {
 	margin: 0;
-	overflow: hidden;
-	position: fixed;
+	height: 100%;
+	position: relative;
+	overflow-y: hidden;
 }
 html {
+	overflow-x: hidden;
+	overflow: hidden;
 	font-size: var(--base-font-size);
 }
 #app {
-	position: fixed;
-	height: 100%;
+	// position: fixed;
+	// overflow: hidden;
+	// overflow-y: auto;
+	overflow: hidden;
 	width: 100%;
 	line-height: 1.3;
 	inset: 0;
-
+	overflow-x: hidden;
+	height: 100%;
+	// overflow-y: auto;
 	max-width: 100%;
 	overscroll-behavior: contain;
-	contain: strict;
 }
 main {
 	margin: 0 auto;
 	position: relative;
 	contain: layout style;
 	@include v.content-spacing($type: "padding");
+	overflow-x: hidden;
+	margin-top: var(--top-bar-height);
 	transform: translateZ(0px);
 	overscroll-behavior: contain;
+
 	@media screen and (min-width: 640px) {
 		@include v.content-width();
 	}
@@ -177,26 +197,31 @@ main {
 }
 .wrapper {
 	overflow: hidden;
-	overflow-y: auto;
 	-webkit-overflow-scrolling: touch;
 	display: block;
 	touch-action: pan-y;
 	overscroll-behavior: contain;
-	position: absolute;
+	// position: relative;
+	height: 100%;
 	inset: 0;
 	isolation: isolate;
+	contain: content;
+	overflow-y: hidden;
 }
 .app-content-m {
-	margin-block-start: calc(var(--top-bar-height) + 0px);
 	will-change: margin-block;
 	transform: translateZ(0px);
 	isolation: isolate;
+	// overflow-y: auto;
+
 	&[hasplayer="true"] {
 		will-change: unset;
 		margin-block-end: calc(var(--player-bar-height) + 0px);
 	}
 }
-
+.app-content-p {
+	overflow-y: auto;
+}
 .container {
 	max-width: 112rem;
 

@@ -13,7 +13,7 @@ $md-spacing: $base-spacing;
 $lg-spacing: calc($base-spacing * 2);
 $xl-spacing: calc($base-spacing * 1.25);
 
-$base-radius: 0.35em;
+$base-radius: 0.25em;
 $xxs-radius: m.div($base-radius, 1.5);
 $xs-radius: m.div($base-radius, 0.75);
 $sm-radius: m.div($base-radius, 0.675);
@@ -21,6 +21,7 @@ $md-radius: m.div($base-radius, 0.575);
 $lg-radius: m.div($base-radius, 0.5);
 $xl-radius: m.div($base-radius, 0.3125);
 $xxl-radius: m.div($base-radius, 0.01);
+$rounded-radius: m.div($base-radius, 0.01);
 
 $secondary-font-family: "Commissioner Variable", sans-serif;
 

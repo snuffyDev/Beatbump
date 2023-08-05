@@ -3,15 +3,18 @@
 	import Icon from "$lib/components/Icon/Icon.svelte";
 	import type { ArtistPage } from "$lib/parsers";
 	import list from "$lib/stores/list";
+	import { debounce, throttle } from "$lib/utils";
 	import { isDesktopMQ, windowHeight, windowWidth } from "$stores/window";
 	import { onMount } from "svelte";
+	import { cubicOut } from "svelte/easing";
+	import { tweened } from "svelte/motion";
 	import Description from "./Description";
 
 	export let header: ArtistPage["header"];
 	export let thumbnail = [];
 	export let description = "";
 	let container: HTMLDivElement = undefined;
-	let y = 0;
+	let y = 1;
 	let wrapper: HTMLElement;
 	let isExpanded = false;
 	let timestamp = 0;
@@ -19,35 +22,36 @@
 	let opacity = 0;
 	let img: HTMLImageElement;
 	let isScrolling = false;
-	let scroll: DOMRect;
 	let calc: number;
+	const scale = tweened(1, { duration: 300, easing: cubicOut });
+	const debounced = debounce(() => (isScrolling = false), 200);
+	const handleScrollEnd = throttle(debounced, 100);
+
 	const handler = (ts: number) => {
 		if (!browser && !container) return;
 
-		const elapsed = ts - timestamp;
+		calc = (wrapper.scrollTop / $windowHeight) * 2 || 0;
 
-		y =
+		scale.update(() =>
 			$windowWidth < 500
-				? Math.min(Math.max(calc, 0), 1) * 155
-				: Math.min(Math.max(calc, 0), 1) * 116;
-		if (elapsed < 100) {
-			timestamp = requestAnimationFrame(handler);
-		} else {
-			cancelAnimationFrame(timestamp);
-			timestamp = undefined;
-			isScrolling = false;
+				? Math.max(calc * 3, 1)
+				: Math.min(5, Math.max(1, calc * 4)),
+		);
+		if (!isScrolling) {
+			return;
 		}
+		timestamp = requestAnimationFrame(handler);
 	};
 
 	function onScroll(event: UIEvent) {
+		handleScrollEnd();
 		if (timestamp) {
 			return;
 		}
 		if (isScrolling) return;
-		scroll = container.getBoundingClientRect();
-		calc = -scroll.top / $windowHeight;
 		isScrolling = true;
-		requestAnimationFrame(handler);
+
+		timestamp = requestAnimationFrame(handler);
 	}
 
 	onMount(() => {
@@ -72,14 +76,19 @@
 <div class="artist-header">
 	<div
 		class="artist-thumbnail"
-		style="{isExpanded ? 'background-color: rgba(0, 0, 0, 0.4)' : ''};"
+		style="{isExpanded
+			? 'background-color: rgba(0, 0, 0, 0.4) !important'
+			: ''};"
 	>
 		<div
 			bind:this={container}
-			style={`background-image: linear-gradient(1turn, var(--base-bg) ${Math.min(
-				Math.max(0, y),
-				100,
-			)}%, transparent); transition: cubic-bezier(0.6, -0.28, 0.74, 0.05) background 120ms`}
+			style={`background-image: linear-gradient(0deg, var(--base-bg) -${
+				6 + 0.6 * cubicOut($scale)
+			}%, var(--base-bg) ${
+				(20 + -$scale) * 0.5
+			}%, var(--base-bg-opacity-1_2) 35%, var(--base-bg-opacity-1_2) 40%, transparent);  --scale: ${Math.abs(
+				$scale,
+			)};`}
 			id="gradient"
 			class="gradient"
 		/>
@@ -173,7 +182,6 @@
 				<div class="btn-wrpr">
 					{#if header?.buttons.radio !== null}
 						<button
-							class="outlined"
 							on:click={() =>
 								list.initAutoMixSession({
 									config: { playerParams: header.buttons.radio?.params },
@@ -187,6 +195,7 @@
 					{/if}
 					{#if header?.buttons.shuffle !== false}
 						<button
+							class="outlined"
 							on:click={() =>
 								list.initAutoMixSession({
 									videoId: header.buttons.shuffle?.videoId,
@@ -288,7 +297,10 @@
 		height: 100%;
 		position: absolute;
 		inset: 0;
-
+		contain: content;
+		will-change: transform;
+		transform-origin: bottom;
+		transform: scaleY(var(--scale));
 		&::before {
 			position: absolute;
 			inset: 0;
@@ -342,12 +354,6 @@
 				text-shadow: rgb(0 0 0 / 17.1%) 0.2rem -0.12rem 0.5rem;
 				letter-spacing: -0.02em;
 				padding-bottom: 1rem;
-
-				@media (min-width: 320px) and (max-width: 499px) {
-				}
-
-				@media (min-width: 500px) and (max-width: 640px) {
-				}
 
 				@media screen and (min-width: 642px) and (max-width: 839px) {
 					font-size: 2rem;

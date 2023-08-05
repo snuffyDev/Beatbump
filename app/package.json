@@ -4,7 +4,7 @@
 	"scripts": {
 		"dev": "npm run sync && vite dev --host",
 		"bb:build": "node ./scripts/build.cjs build",
-		"cfw:deploy": "wrangler publish",
+		"cfw:deploy": "npm run build && wrangler publish",
 		"cfw:preview:deploy": "wrangler publish --env preview",
 		"vercel:deploy": "vercel deploy --prod",
 		"netlify:deploy": "netlify deploy --prod",

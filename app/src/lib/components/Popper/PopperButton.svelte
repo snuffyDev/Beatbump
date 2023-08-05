@@ -68,7 +68,7 @@
 			return;
 		}
 
-		node.addEventListener("click", handleClick);
+		node.addEventListener("click", handleClick, { capture: true });
 
 		node.addEventListener("keydown", a11yClick, { capture: true });
 

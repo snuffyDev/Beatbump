@@ -1,4 +1,5 @@
 import { goto } from "$app/navigation";
+import { createRandomMixId } from "$lib/constants";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import list from "$stores/list";
 
@@ -29,7 +30,7 @@ export async function clickHandler({
 	type: string;
 	kind: string;
 }) {
-	console.log(item);
+	// console.log(item);
 	if (type === "trending") {
 		if (item.endpoint?.pageType?.match(/ALBUM|SINGLE/m)) {
 			goto(
@@ -62,11 +63,13 @@ export async function clickHandler({
 		await list.initAutoMixSession({
 			loggingContext: item?.loggingContext,
 			videoId: item.videoId,
-			playlistId: item.playlistId,
+			playlistId: item.playlistId ?? createRandomMixId(item.videoId, "video"),
 			keyId: type !== "home" ? index : undefined,
 		});
+		list.updatePosition(index);
 	} else {
-		browseHandler(item.endpoint.pageType, item.endpoint.browseId);
+		if (item.endpoint)
+			browseHandler(item.endpoint?.pageType, item.endpoint?.browseId);
 	}
 	return false;
 }

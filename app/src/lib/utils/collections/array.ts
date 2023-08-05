@@ -107,7 +107,7 @@ export function filterMapAsync<T, U>(
 	predicate: (item: U) => boolean,
 ): Promise<U[]>;
 export async function filterMapAsync<T, U>(
-	array: Array<T>,
+	array: Array<Promise<T>>,
 	cb: (...args: any[]) => Promise<ReturnType<ItemCallback<T, U>>>,
 	predicate: (item: U) => unknown,
 ): Promise<U[]> {

@@ -20,12 +20,12 @@ $focus-color: #1c1c1c;
 	background: $background;
 
 	border: 0.15em solid hsl(0deg 0% 7%);
-	border-radius: v.$xxl-radius;
+	border-radius: v.$rounded-radius;
 	font-family: "Commissioner Variable", sans-serif;
 	cursor: pointer;
 	font-size: 1em;
 	gap: 0.25em;
-	font-weight: 550;
+	line-height: 1.3;
 	text-transform: none;
 	white-space: nowrap;
 	cursor: pointer;
@@ -33,11 +33,12 @@ $focus-color: #1c1c1c;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
-	padding: 0.63125em 1.25em;
+	padding: 0.6125em 1.25em;
 	text-transform: capitalize;
-	font-size: 1em;
+	font-size: 1.1rem;
 	justify-content: center;
 	align-items: center;
+	font-weight: 500;
 	vertical-align: middle;
 	transition: background linear 35ms, color linear 35ms;
 	@media (hover: hover) {
@@ -104,9 +105,9 @@ button.has-icon {
 
 button.outlined {
 	background: #0000 !important;
-	border: $background 0.1em solid !important;
+	border: transparentize($background, 0.7) 0.1em solid !important;
 	color: $background !important;
-	font-weight: 525;
+	font-weight: 500;
 
 	&:active {
 		border: rgb(158, 158, 158) 0.1rem solid !important;
@@ -169,4 +170,8 @@ button.danger {
 		border-color: #eb20195b !important;
 		background: #c013136c !important;
 	}
+}
+
+:where(.squared) {
+	border-radius: v.$xs-radius !important;
 }

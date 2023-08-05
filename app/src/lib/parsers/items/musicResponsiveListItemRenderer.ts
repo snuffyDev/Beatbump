@@ -1,8 +1,8 @@
 import type { proxyUrls } from "$lib/server/thumbnailProxyUrl";
 import type { Thumbnail } from "$lib/types";
 import type {
-    IMusicResponsiveListItemRenderer,
-    PurpleRun,
+	IMusicResponsiveListItemRenderer,
+	PurpleRun,
 } from "$lib/types/innertube/internals";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import { subtitle, thumbnailTransformer } from "../utils.parsers";

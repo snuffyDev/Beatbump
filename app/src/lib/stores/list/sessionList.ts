@@ -68,6 +68,8 @@ const VALID_KEYS = [
 
 export class ListService {
 	private restricted = false;
+	private isLocal = false;
+
 	private nextTrackUrl: string | null = null;
 	_$: WritableStore<ISessionListProvider> =
 		new WritableStore<ISessionListProvider>({
@@ -548,6 +550,7 @@ export class ListService {
 				playlistSetVideoId = "",
 				visitorData = "",
 			} = args;
+
 			await tick();
 			console.log("this.initPlaylistSession");
 
@@ -630,6 +633,7 @@ export class ListService {
 					resolve(this._state);
 			});
 		});
+		this.isLocal = type === "local";
 		if (groupSession?.initialized && groupSession?.hasActiveSession) {
 			groupSession.send(
 				"PUT",
@@ -855,8 +859,10 @@ export class ListService {
 						resolve({ ...old, ...this._state } as ISessionListProvider);
 					} else {
 						let { mix } = to;
+						const toKeys = objectKeys(to);
+
 						if (!mix) mix = [];
-						for (const key in to) {
+						for (const key of toKeys) {
 							if (!VALID_KEYS.includes(key as any))
 								delete to[key as keyof typeof to];
 						}
@@ -915,4 +921,3 @@ const related = (() => {
 })();
 
 export { currentTrack, queue, queuePosition, related };
-

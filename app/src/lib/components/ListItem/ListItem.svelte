@@ -21,6 +21,9 @@
 		const { subscribe, update } = writable<PageContext>();
 		return {
 			subscribe,
+			isLibrary() {
+				return stack.filter(({ context }) => context === "library").length > 0;
+			},
 			add(context: PageContext) {
 				const id = { context } as const;
 				if (context === "queue") {
@@ -278,7 +281,7 @@
 
 	import { goto } from "$app/navigation";
 	import { buildDropdown } from "$lib/configs/dropdowns.config";
-	import { APIParams } from "$lib/constants";
+	import { APIParams, FINITE_LIST_PARAMS } from "$lib/constants";
 	import { CTX_ListItem } from "$lib/contexts";
 	import { currentTrack, queuePosition } from "$lib/stores/list";
 	import type {
@@ -298,8 +301,9 @@
 
 	export let item: Item;
 	export let idx: number;
-
+	export let draggable = false;
 	interface $$Events {
+		click: MouseEvent;
 		setPageIsPlaying: { id: string };
 		initLocalPlaylist: { idx: number };
 		change: undefined;
@@ -341,16 +345,22 @@
 		const position = cache.has(idx)
 			? cache.get(idx)
 			: cache.set(idx, queueIndex < 0 ? idx : queueIndex);
-		console.log({ cache, idx, position, queueIndex, $listItemPageContext });
 		switch (page) {
-			case "queue":
+			case "queue": {
+				if (listItemPageContext.isLibrary()) {
+					dispatch("initLocalPlaylist", { idx });
+					dispatch("setPageIsPlaying", { id: "", index: idx });
+					return;
+				}
+
 				await handlePlaylistClick(
-					item,
+					{ ...item, params: FINITE_LIST_PARAMS },
 					position,
 					{ $list, $queue, $startIndex },
 					visitorData,
 				);
 				break;
+			}
 			case "playlist":
 				await handlePlaylistClick(
 					item,
@@ -393,12 +403,13 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <article
 	class="m-item"
 	tabindex="0"
 	class:isPlaying
-	draggable="true"
-	on:click|preventDefault|capture|stopPropagation={handleClick}
+	{draggable}
+	on:click|stopPropagation={handleClick}
 	on:pointerenter={() => {
 		isHovering = true;
 	}}
@@ -435,10 +446,14 @@
 		<div class="column">
 			<span class="title"
 				>{item.title}
-				{#if item?.explicit}
-					<span class="explicit">
+				{#if item.explicit}
+					<Icon
+						name="explicit"
+						fill="hsla(0, 0%, 95%, 0.7)"
+						size="12px"
+					>
 						<span class="sr-only">Explicit</span>
-					</span>
+					</Icon>
 				{/if}
 			</span>
 			<div class="artists secondary">

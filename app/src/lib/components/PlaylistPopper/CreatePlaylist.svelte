@@ -89,7 +89,7 @@
 {/if}
 {#if deletePlaylistRequest}
 	<Modal
-		zIndex={200}
+		zIndex={1500}
 		on:close={() => {
 			deletePlaylistRequest = false;
 		}}
@@ -351,7 +351,7 @@
 	.playlist-modal {
 		position: fixed;
 		gap: 0.8rem;
-		z-index: 105;
+		z-index: 1001;
 		background: var(--mobile-popper-bg);
 		display: flex;
 		flex-direction: column;

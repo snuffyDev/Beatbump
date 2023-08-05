@@ -240,6 +240,7 @@
 			cb();
 		};
 	});
+
 	releasePageContext.set({ page: "release" });
 </script>
 

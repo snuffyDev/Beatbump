@@ -15,7 +15,7 @@
 >
 	<Icon
 		name={icon}
-		size="1.5em"
+		size="1.25em"
 	/>
 	<div class="dd-text">{text}</div>
 </div>

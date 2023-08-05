@@ -3,8 +3,34 @@ export const IMAGE_NOT_FOUND =
 
 export const FINITE_LIST_PARAMS = "wAEB8gECeAE%3D";
 
+/**
+ * These are the parameters that are needed for the list endpoint.
+ * The next property is a base64 encoded string that contains a cursor.
+ * This cursor is used to get the next set of results.
+ */
 export const APIParams = {
 	finite: FINITE_LIST_PARAMS,
 	next: encodeURIComponent("OAHyAQIIAQ=="),
 	lt100: "8gECGAM%3D",
 } as const;
+
+// This code takes in a string that is an ID and a type. It then returns a string that is the ID prefixed with the correct identifier. The identifier is determined by the type. The type is a string that is the name of a property in the PLAYLIST_ID_IDENTIFIER object. The property is a string that is the prefix for the ID.
+const RANDOM_PLAYLIST_HEADER = "RDAM";
+
+const PLAYLIST_ID_IDENTIFIER = {
+	playlist: "PL",
+	song: "VL",
+	video: "VM",
+};
+
+// Create a funciton that will intake an ID as well as a type and return the ID with the correct prefix
+export const createRandomMixId = (
+	id: string,
+	type: keyof typeof PLAYLIST_ID_IDENTIFIER,
+) => {
+	return PLAYLIST_ID_IDENTIFIER[type] + id;
+};
+
+export const isRandomMix = (id: string) => {
+	return id.startsWith(RANDOM_PLAYLIST_HEADER);
+};

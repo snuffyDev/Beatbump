@@ -1,6 +1,6 @@
 import type { Dict } from "$lib/types/utilities";
-import { filterMap, map } from "$lib/utils/collections/array";
 import { buildDashManifest, type IFormat } from "$lib/utils/buildDashManifest";
+import { filterMap, map } from "$lib/utils/collections/array";
 export interface PlayerFormats {
 	hls?: string;
 	dash?: string;
@@ -25,18 +25,18 @@ export function sort({
 	data: Dict<any>;
 	WebM?: boolean;
 	dash?: boolean;
-	proxyUrl?: string;
+	proxyUrl?: string | false;
 }): PlayerFormats {
 	let dash_manifest: string;
 
 	if (dash === true) {
-		const proxy_url = new URL(proxyUrl);
+		const proxy_url = proxyUrl ? new URL(proxyUrl) : new URL("");
 		const formats = map(
 			data?.streamingData?.adaptiveFormats as Array<IFormat>,
 			(item) => {
 				const url = new URL(item.url);
 				const host = url.host;
-				url.host = proxy_url.host ?? "yt-hls-rewriter.onrender.com";
+				url.host = proxy_url.host ?? "hls.beatbump.io";
 				url.searchParams.set("host", host);
 				return {
 					...item,
@@ -54,10 +54,11 @@ export function sort({
 	const host = data?.playerConfig?.hlsProxyConfig?.hlsChunkHost;
 	const formats: Array<any> = data?.streamingData
 		?.adaptiveFormats as Array<any>;
+	const hostRegex = /https:\/\/(.*?)\//;
 	const hls =
 		(data?.streamingData?.hlsManifestUrl as string).replace(
-			/https:\/\/(.*?)\//,
-			proxyUrl !== "" ? proxyUrl : "https://yt-hls-rewriter.onrender.com/",
+			hostRegex,
+			proxyUrl ? proxyUrl : "https://hls.beatbump.io/",
 		) +
 		("?host=" + host);
 
@@ -65,16 +66,21 @@ export function sort({
 		formats,
 		(item) => {
 			if ((item.itag as number) < 139 && item.itag > 251) return null;
+			const url = new URL(item.url);
+			if (proxyUrl) {
+				url.searchParams.set("host", url.host);
+				url.host = new URL(proxyUrl).host;
+			}
 			if (WebM === true && item.itag === 251)
 				return {
-					original_url: item.url,
+					original_url: url.toString(),
 					url: createRedirectorURL(item.url),
 					mimeType: "webm",
 				};
 			if (item.itag === 140)
 				return {
-					original_url: item.url,
-					url: item.url,
+					original_url: url.toString(),
+					url: url.toString(),
 					mimeType: "mp4",
 				};
 		},

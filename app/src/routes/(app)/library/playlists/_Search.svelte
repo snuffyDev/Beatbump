@@ -50,13 +50,20 @@
 <style lang="scss">
 	.input,
 	input[type="search"] {
-		min-width: 14em;
-		max-width: 17em;
 		min-height: unset;
 		max-height: 5ch;
 	}
 
 	.input {
+		min-width: 14em;
+		max-width: 63vw !important;
+		margin: 0 auto;
+		width: clamp(14em, 32rem, 63vw);
+		margin-top: 2em;
+		margin-bottom: 1.5rem;
+		@media screen and (min-width: 640px) {
+			margin-left: 2rem;
+		}
 		// margin-left: auto;margin-left
 	}
 </style>

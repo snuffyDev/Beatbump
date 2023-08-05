@@ -84,7 +84,7 @@ export const GET = async ({ url, locals }) => {
 			? await parseContinuation(continuationContents, filter, itemBuilder)
 			: await parseContents(contents, itemBuilder);
 
-		return json(results);
+		return json({ ...results, response });
 	} catch (err) {
 		console.error(err);
 		throw error(500, (err as Error).message);

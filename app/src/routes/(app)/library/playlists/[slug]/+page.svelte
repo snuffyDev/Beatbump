@@ -2,20 +2,22 @@
 	import InfoBox from "$lib/components/Layouts/InfoBox.svelte";
 	import { IDBService } from "$lib/workers/db/service";
 
-	import List from "../_List.svelte";
-	import { isPagePlaying } from "$lib/stores/stores";
-	import list from "$lib/stores/list";
-	import { filter } from "$lib/utils";
-	import Header from "$lib/components/Layouts/Header.svelte";
 	import { page } from "$app/stores";
-	import CreatePlaylist from "$lib/components/PlaylistPopper/CreatePlaylist.svelte";
+	import DraggableList from "$lib/components/DraggableList/DraggableList.svelte";
+	import Header from "$lib/components/Layouts/Header.svelte";
 	import ListInfoBar from "$lib/components/ListInfoBar";
-	import LocalListItem from "$lib/components/ListItem/LocalListItem.svelte";
-	import { CTX_ListItem } from "$lib/contexts";
+	import CreatePlaylist from "$lib/components/PlaylistPopper/CreatePlaylist.svelte";
 	import { getSrc } from "$lib/player";
-	import Search from "../_Search.svelte";
+	import list from "$lib/stores/list";
+	import { isPagePlaying } from "$lib/stores/stores";
+	import { filter } from "$lib/utils";
 	import { onMount, tick } from "svelte";
+	import Search from "../_Search.svelte";
 
+	import ListItem, {
+		listItemPageContext,
+	} from "$components/ListItem/ListItem.svelte";
+	import { CTX_ListItem } from "$lib/contexts";
 	import type { Item } from "$lib/types";
 	import type { IDBPlaylist } from "$lib/workers/db/types";
 	export let data;
@@ -34,12 +36,14 @@
 			playlistName,
 		);
 		playlist = {};
+		console.log(promise);
 		Object.assign(playlist, promise);
-		playlist = [...playlist];
-		items = playlist.items;
+		// playlist = [...playlist];
+		items = [...playlist.items];
 	}
 	onMount(async () => {
 		await getPlaylist();
+		return listItemPageContext.add("library");
 	});
 	const drop = async (event, target) => {
 		if (hasQuery) return;
@@ -142,6 +146,7 @@
 					icon: "edit",
 					text: "Edit Playlist",
 					type: "outlined",
+					style: "squared",
 					action: async () => {
 						showEditPlaylist = true;
 					},
@@ -160,36 +165,56 @@
 			}}
 		/>
 		<ListInfoBar />
-		<List
+		<DraggableList
 			{items}
-			let:item
-			let:index
+			on:dragstart={({ detail }) => dragstart(detail.event, detail.index)}
+			on:dragend={async ({ detail }) => {
+				const { event, index } = detail;
+				if (hasQuery) return;
+				drop(event, index);
+				await tick();
+				await IDBService.sendMessage("update", "playlist", {
+					items: [...items],
+					id: playlistName,
+					hideAlert: true,
+				});
+			}}
 		>
-			<LocalListItem
-				on:dragstart={(event) => dragstart(event, index)}
-				on:change={async () => getPlaylist()}
-				on:drop={async (event) => {
-					if (hasQuery) return;
-					drop(event, index);
-					await tick();
-					await IDBService.sendMessage("update", "playlist", {
-						items: [...items],
-						id: playlistName,
-						hideAlert: true,
-					});
-				}}
+			<ListItem
+				draggable
+				let:item
+				let:index
 				on:initLocalPlaylist={async ({ detail }) => {
-					!$isPagePlaying.has(playlistName) && list.setMix(items);
+					!$isPagePlaying.has(playlistName) &&
+						(await list.setMix(
+							items.map((item) => ({ ...item, IS_LOCAL: true })),
+							"local",
+						));
+
 					await tick();
+
 					await getSrc($list.mix[detail.idx]?.videoId);
 				}}
-				on:setPageIsPlaying={() => {
+				on:setPageIsPlaying={async ({ detail }) => {
 					isPagePlaying.add(playlistName);
+					if ($list.mix.length) {
+						await getSrc(
+							$list.mix[detail.index]?.videoId,
+							undefined,
+							undefined,
+							true,
+						);
+					}
 				}}
+				on:click={async ({ detail }) => {
+					if (!$list.mix.length) return;
+					await getSrc($list.mix[detail.index]?.videoId);
+				}}
+				slot="item"
 				{item}
 				idx={index}
 			/>
-		</List>
+		</DraggableList>
 	</main>
 {/if}
 

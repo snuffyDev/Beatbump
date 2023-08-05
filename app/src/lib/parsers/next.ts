@@ -35,8 +35,11 @@ export async function parseContents(
 			await Promise.all(
 				contents.map((item) =>
 					parseItem(item as never)?.then((item) => {
-						if (!item.playlistId) item.playlistId = currentMix;
-						return item;
+						if (item) {
+							if (!item.playlistId) item.playlistId = currentMix;
+							return item;
+						}
+						return null;
 					}),
 				),
 			)

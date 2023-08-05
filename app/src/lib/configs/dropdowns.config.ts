@@ -64,6 +64,7 @@ export type Icons =
 	| "album"
 	| "pause"
 	| "x"
+	| "explicit"
 	| "send"
 	| "list"
 	| "radio"

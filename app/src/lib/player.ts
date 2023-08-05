@@ -1,7 +1,9 @@
+/* eslint-disable import/no-duplicates */
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import { browser } from "$app/environment";
 import { SessionListService } from "$stores/list/sessionList";
 import type { UserSettings } from "$stores/settings";
+import Hls from "hls.js";
 import { tweened } from "svelte/motion";
 import { writable } from "svelte/store";
 import { sort, type PlayerFormats } from "./parsers/player";
@@ -10,14 +12,9 @@ import { groupSession, type ConnectionState } from "./stores/sessions";
 import type { JSON } from "./types";
 import { WritableStore, notify, type ResponseBody } from "./utils";
 import { isAppleMobileDevice } from "./utils/browserDetection";
+import { objectKeys } from "./utils/collections/objects";
 
 let userSettings: UserSettings | undefined = undefined;
-
-if (browser && globalThis.self.name !== "IDB" && settings) {
-	settings.subscribe((value) => {
-		userSettings = value;
-	});
-}
 
 export type Callback<K extends keyof HTMLElementEventMap> = (
 	this: HTMLElement,
@@ -34,6 +31,7 @@ type SrcDict = { original_url: string; url: string };
 
 interface AudioPlayerEvents {
 	play: unknown;
+	"update:stream_type": { type: "HLS" | "HTTP" };
 }
 const setPosition = () => {
 	if ("mediaSession" in navigator) {
@@ -184,6 +182,19 @@ class EventEmitter<Events> {
 	}
 }
 
+const loadAndAttachHLS = async (player: HTMLAudioElement) => {
+	const hls = await import("hls.js");
+	const Hls = hls.default;
+	if (Hls.isSupported() === false) return null;
+	const hlsjsConfig = {
+		lowLatencyMode: true,
+		enableWorker: true,
+
+		backBufferLength: 90,
+	};
+	return new Hls(hlsjsConfig);
+};
+
 const getPlayerVolumeFromLS = (player: HTMLAudioElement) => {
 	const storedLevel = localStorage.getItem("volume");
 	const setDefaultVolume = () => {
@@ -209,15 +220,39 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 		name: keyof AudioPlayerImpl,
 		args: [...rest: unknown[]],
 	][] = [];
+	private hls: Hls | undefined;
+
 	private audioNodeListeners: Record<string, () => void> = {};
 	private invalidationTimer: ReturnType<typeof setTimeout> | null = null;
 	private nextSrc: { stale: boolean; url: string | undefined } = {
 		stale: false,
 		url: "",
 	};
+	public async setType(type: "HLS" | "HTTP") {
+		if (!this.player) {
+			this.createAudioNode();
+			window["_player"] = this.player;
+		}
+		// console.log(type);
+		if (type === "HLS") {
+			this.playerKind = Hls.isSupported() ? "hls" : "html5";
+			if (this.playerKind !== "hls") return;
+			if (!this.hls) {
+				// console.log("loadHLS");
+				await this.loadHLS();
+			}
+		}
+		if (type === "HTTP") {
+			this.playerKind = "html5";
+			if (this.hls) {
+				this.hls.destroy();
+			}
+		}
+	}
 	private declare player: HTMLAudioElement;
 	private _repeat: string = "off";
-
+	private playerKind: "hls" | "html5" = "html5";
+	private declare unsubscriber: () => void;
 	constructor() {
 		super();
 		if (!browser) return;
@@ -297,7 +332,8 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 	}
 
 	public dispose() {
-		for (const key in this.audioNodeListeners) {
+		const keys = objectKeys(this.audioNodeListeners);
+		for (const key of keys) {
 			const callback = this.audioNodeListeners[key];
 			this.player.removeEventListener(key, callback);
 		}
@@ -356,11 +392,42 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 	}
 
 	public updateSrc({ url }: { url: string }) {
-		this.player.src = url;
+		if (this.playerKind === "hls") {
+			this.loadHLS(url);
+		} else {
+			this.player.src = url;
+		}
 	}
 
 	private addTaskToTaskQueue(name: keyof AudioPlayerImpl, ...args: unknown[]) {
 		this._taskQueue.push([name, args]);
+	}
+	private async loadHLS(source?: string) {
+		if (this.hls) this.hls.destroy();
+		const hls = await loadAndAttachHLS(this.player);
+		if (!hls) return;
+		this.hls = hls;
+
+		this.hls.attachMedia(this.player);
+
+		this.hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+			this.hls?.loadSource(source || this.player.src);
+			// console.log(this);
+		});
+
+		this.hls.on(Hls.Events.ERROR, (_event, data) => {
+			// console.log(this);
+			const type = data.type;
+			switch (type) {
+				case Hls.ErrorTypes.MEDIA_ERROR:
+					this.hls?.recoverMediaError();
+					break;
+				case Hls.ErrorTypes.NETWORK_ERROR:
+					this.hls?.startLoad();
+					break;
+				default:
+			}
+		});
 	}
 	private errorCount = 0;
 	private handleError() {
@@ -391,38 +458,6 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 		this.player = new Audio();
 		this.player.autoplay = true;
 		getPlayerVolumeFromLS(this.player);
-		const prefetchLock = (() => {
-			let initial = this.player.src;
-			let tick = 0;
-			let promise: Promise<unknown> | undefined = Promise.resolve();
-			const setPromiseAndReturn = (duration: number) => {
-				promise = new Promise<void>((resolve) => {
-					if (
-						!tick &&
-						this.nextSrc.stale &&
-						this.player.currentTime >= duration / 2
-					) {
-						initial = this.player.src;
-						tick += 1;
-						if (this.nextSrc.stale)
-							SessionListService.prefetchNextTrack().finally(() => {
-								this.setStaleTimeout();
-							});
-					} else if (tick && this.player.src === initial) return false;
-					else if (tick && this.player.src !== initial) {
-						tick = 0;
-						promise = undefined;
-						this.nextSrc.url = undefined;
-
-						return resolve(undefined as never);
-					}
-				});
-				return promise;
-			};
-			return (duration: number) => {
-				return !tick ? setPromiseAndReturn(duration) : promise;
-			};
-		})();
 
 		// Dispatched on first autoplay
 		this.on("play", () => {
@@ -502,6 +537,11 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 			this.handleError();
 		});
 
+		this.on("update:stream_type", async ({ type }) => {
+			console.log("update:stream_type", type);
+			this.setType(type);
+		});
+
 		// If there's any actions (eg: set volume) that take place before
 		// we're setup, they'll be put in the taskQueue - process them here
 		if (this._taskQueue.length) {
@@ -569,7 +609,9 @@ export const getSrc = async (
 		const formats = sort({
 			data: res,
 			dash: false,
-			proxyUrl: userSettings?.network["HLS Stream Proxy"] ?? "",
+			proxyUrl:
+				!!userSettings?.network?.["Proxy Streams"] &&
+				userSettings?.network["Stream Proxy Server"],
 		});
 
 		const src = setTrack(formats, shouldAutoplay);
@@ -610,4 +652,13 @@ function handleError() {
 		body: null,
 		error: true,
 	};
+}
+
+if (browser && globalThis.self.name !== "IDB" && settings) {
+	settings.subscribe((value) => {
+		userSettings = value;
+		if (userSettings?.playback?.Stream) {
+			AudioPlayer.setType(userSettings.playback.Stream);
+		}
+	});
 }

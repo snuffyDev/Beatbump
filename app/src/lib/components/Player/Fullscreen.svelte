@@ -8,7 +8,7 @@
 	import { pan } from "$lib/actions/gestures/handlers";
 	import type { Dropdown } from "$lib/configs/dropdowns.config";
 	import { CTX_ListItem } from "$lib/contexts";
-	import { AudioPlayer } from "$lib/player";
+	import { AudioPlayer, getSrc } from "$lib/player";
 	import {
 		immersiveQueue,
 		isMobileMQ,
@@ -28,27 +28,27 @@
 	import { SITE_ORIGIN_URL } from "$stores/url";
 	import { windowWidth } from "$stores/window";
 	import { cubicOut, quartIn, quartOut } from "svelte/easing";
-// eslint-disable-next-line import/no-duplicates
-    import { tweened } from 'svelte/motion';
-    import {
-    	fade,
-    	type EasingFunction,
-    	type TransitionConfig,
-    } from "svelte/transition";
-    import ListItem, { listItemPageContext } from "../ListItem/ListItem.svelte";
-    import Loading from "../Loading/Loading.svelte";
-    import Tabs from "../Tabs";
-    import Controls from "./Controls.svelte";
-    import { createPlayerPopperMenu } from "./Player.svelte";
-    import ProgressBar from "./ProgressBar";
-    import blurURL from "./blur.svg?url";
-    import { fullscreenStore } from "./channel";
+	// eslint-disable-next-line import/no-duplicates
+	import { tweened } from "svelte/motion";
+	import {
+		fade,
+		type EasingFunction,
+		type TransitionConfig,
+	} from "svelte/transition";
+	import ListItem, { listItemPageContext } from "../ListItem/ListItem.svelte";
+	import Loading from "../Loading/Loading.svelte";
+	import Tabs from "../Tabs";
+	import Controls from "./Controls.svelte";
+	import { createPlayerPopperMenu } from "./Player.svelte";
+	import ProgressBar from "./ProgressBar";
+	import blurURL from "./blur.svg?url";
+	import { fullscreenStore } from "./channel";
 
 	export let state: "open" | "closed";
 
 	const { paused } = AudioPlayer;
 
-	$: isPlaying = !$paused;
+	$: isPlaying = $paused;
 	let windowHeight = 0,
 		queueHeight = 0,
 		sliding = false;
@@ -82,7 +82,7 @@
 		},
 	];
 
-	const motion = tweened(0, {
+	const motion = tweened(-36, {
 		duration: 180,
 		easing: cubicOut,
 	});
@@ -152,7 +152,7 @@
 			detail.velocityY >= 0 && detail.velocityY > 0.2 ? 1 - step : step;
 		const distance = miss * windowHeight;
 		if (kind === 1) {
-			motion.set(0, {
+			motion.set(-36, {
 				duration: Math.min(distance / Math.abs(detail.velocityY), 640),
 			});
 		} else {
@@ -166,13 +166,15 @@
 		sliding = false;
 	}
 
-	$: if (state === "open") {
-		rmContextFn = listItemPageContext.add("queue");
-	}
-	$: if (state === "closed") {
-		if (rmContextFn) {
-			rmContextFn();
-			rmContextFn = undefined;
+	$: {
+		if (state === "open") {
+			rmContextFn = listItemPageContext.add("queue");
+		}
+		if (state === "closed") {
+			if (rmContextFn) {
+				rmContextFn();
+				rmContextFn = undefined;
+			}
 		}
 	}
 	$: {
@@ -232,7 +234,7 @@
 		};
 	}
 
-    $: console.log($queue)
+	$: console.log($queue);
 </script>
 
 {#if $queue.length && state === "open"}
@@ -240,7 +242,7 @@
 		<div
 			class="immersive"
 			class:open={queueOpen}
-			in:fade|global={{ duration: 600, delay: 600, easing: quartIn }}
+			in:fade|global={{ duration: 200, delay: 200, easing: quartIn }}
 			out:fade|global={{ duration: 800, delay: 500, easing: quartIn }}
 			style="
 
@@ -265,8 +267,8 @@
 	>
 		<div
 			class="fullscreen-player-popup"
-			in:slideInOut|global={{ delay: 400, duration: 400 }}
-			out:slideInOut|global={{ delay: 200, duration: 400, easing: quartIn }}
+			in:slideInOut|global={{ duration: 400 }}
+			out:slideInOut|global={{ delay: 300, duration: 300, easing: quartIn }}
 		>
 			<div
 				class="column container"
@@ -445,15 +447,26 @@
 								>
 									<DraggableList
 										items={$queue}
-                                        >
+										on:dragend={() => {
+											if ($groupSession.hasActiveSession)
+												groupSession.updateGuestTrackQueue($SessionListService);
+										}}
+									>
 										<ListItem
-										let:index
-                let:item
-                                        {item}
+											let:index
+											let:item
+											draggable
+											{item}
 											idx={index}
 											slot="item"
-											on:setPageIsPlaying={() => {
-												if (isPagePlaying.has("player-queue")) return;
+											on:setPageIsPlaying={async ({ detail }) => {
+												if (isPagePlaying.has("player-queue")) {
+													if ($queue.length) {
+														getSrc(item.videoId, undefined, undefined, true);
+													}
+													SessionListService.updatePosition(detail.index);
+													return;
+												}
 												isPagePlaying.add("player-queue");
 											}}
 										/>
@@ -618,7 +631,7 @@
 		transform: scale(var(--scale)) translate3d(0, 0, 0);
 		transition: backdrop-filter cubic-bezier(0.895, 0.03, 0.685, 0.22) 1600ms
 			800ms;
-		transition-delay: 850ms;
+		transition-delay: 800ms;
 		transition-property: background-color transform filter backdrop-filter;
 		transition-duration: 1600ms;
 		background-color: hsl(0deg 0% 0%);

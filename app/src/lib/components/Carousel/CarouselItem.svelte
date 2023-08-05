@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script
 	context="module"
 	lang="ts"
@@ -100,6 +98,7 @@
 			}
 		},
 		addToPlaylist: async (ctx: BuildMenuParams) => {
+			// console.log(ctx);
 			const { item } = ctx;
 			if (item.endpoint?.pageType.match(RE_ALBUM_PLAYLIST_SINGLE)) {
 				const response = await fetch(
@@ -155,7 +154,10 @@
 			.add("Favorite", MENU_HANDLERS.favorite.bind(MENU_HANDLERS.favorite, ctx))
 			.add(
 				"Start Group Session",
-				MENU_HANDLERS.startGroupSession.bind(MENU_HANDLERS.favorite, ctx),
+				MENU_HANDLERS.startGroupSession.bind(
+					MENU_HANDLERS.startGroupSession,
+					ctx,
+				),
 			)
 			.add("Share", MENU_HANDLERS.share.bind(MENU_HANDLERS.share, ctx))
 			.build();
@@ -169,7 +171,7 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import Loading from "$components/Loading/Loading.svelte";
-	// import { groupSession } from "$lib/stores";
+// import { groupSession } from "$lib/stores";
 	import { IDBService } from "$lib/workers/db/service";
 
 	import { browser } from "$app/environment";
@@ -217,8 +219,7 @@
 		page: item.endpoint?.pageType as Exclude<SharePageType, null>,
 	};
 
-	let DropdownItems = buildMenu(ctx);
-
+	$: DropdownItems = buildMenu(ctx);
 	$: {
 		if (
 			type === "artist" ||
@@ -353,7 +354,7 @@
 			<div class="item-menu">
 				<PopperButton
 					tabindex={0}
-					items={DropdownItems}
+					bind:items={DropdownItems}
 				/>
 			</div>
 		</section>
@@ -391,8 +392,8 @@
 	article {
 		--thumbnail-radius: clamp(
 			4px,
-			calc(var(--column-width, 0px) - 322px) * 0.025,
-			8px
+			calc(var(--column-width, 0px) - 256px),
+			16px
 		);
 
 		padding: 0.75em;
@@ -409,7 +410,21 @@
 		@media (hover: hover) {
 			&:hover {
 				> :where(.image)::before {
-					background: linear-gradient(rgb(0 0 0 / 53.4%), rgb(0 0 0 / 11%));
+					background-image: linear-gradient(
+						rgb(0 0 0 / 88%) 0%,
+						rgb(0 0 0 / 72%) 8%,
+						rgb(0 0 0 /42.5%) 19%,
+						rgb(0 0 0 / 31%) 24%,
+						rgb(0 0 0 / 28%) 32%,
+						rgb(0 0 0 / 25%) 51%,
+						rgb(0 0 0 / 20%) 59%,
+						rgb(0 0 0 / 14%) 65%,
+						rgb(0 0 0 / 10%) 71%,
+						rgb(0 0 0 / 8%) 79%,
+						rgb(0 0 0 /5%) 83%,
+						rgb(0 0 0 / 3%) 92%,
+						rgb(0 0 0 / 0%) 100%
+					);
 					opacity: 0.7;
 					z-index: 1;
 				}
@@ -528,18 +543,43 @@
 			content: "";
 			inset: 0;
 			background-image: linear-gradient(
-				rgb(0 0 0 / 50.2%),
-				rgb(0 0 0 / 0%),
-				rgb(0 0 0 / 0%)
+				rgb(0 0 0 / 88%) 0%,
+				rgb(0 0 0 / 72%) 8%,
+				rgb(0 0 0 /42.5%) 19%,
+				rgb(0 0 0 / 31%) 24%,
+				rgb(0 0 0 / 28%) 32%,
+				rgb(0 0 0 / 25%) 51%,
+				rgb(0 0 0 / 20%) 59%,
+				rgb(0 0 0 / 14%) 65%,
+				rgb(0 0 0 / 10%) 71%,
+				rgb(0 0 0 / 8%) 79%,
+				rgb(0 0 0 /5%) 83%,
+				rgb(0 0 0 / 3%) 92%,
+				rgb(0 0 0 / 0%) 100%
 			);
 			pointer-events: none;
 			transition: background-image linear 0.1s, opacity linear 0.1s;
-			opacity: 0.1;
+			opacity: 0.5;
 			z-index: 1;
 		}
 
 		&:active:hover::before {
-			background-image: linear-gradient(rgb(0 0 0 / 58.9%), rgb(0 0 0 / 11%));
+			background-image: linear-gradient(
+				rgb(0 0 0 / 88%) 0%,
+				rgb(0 0 0 / 72%) 8%,
+				rgb(0 0 0 /42.5%) 19%,
+				rgb(0 0 0 / 31%) 24%,
+				rgb(0 0 0 / 28%) 32%,
+				rgb(0 0 0 / 25%) 51%,
+				rgb(0 0 0 / 20%) 59%,
+				rgb(0 0 0 / 14%) 65%,
+				rgb(0 0 0 / 10%) 71%,
+				rgb(0 0 0 / 8%) 79%,
+				rgb(0 0 0 /5%) 83%,
+				rgb(0 0 0 / 3%) 92%,
+				rgb(0 0 0 / 0%) 100%
+			);
+
 			opacity: 1;
 		}
 
@@ -555,7 +595,21 @@
 
 		@media screen and (max-width: 640px) {
 			&::before {
-				background: linear-gradient(rgb(0 0 0 / 53.4%), rgb(0 0 0 / 11%));
+				background-image: linear-gradient(
+					rgb(0 0 0 / 88%) 0%,
+					rgb(0 0 0 / 72%) 8%,
+					rgb(0 0 0 /42.5%) 19%,
+					rgb(0 0 0 / 31%) 24%,
+					rgb(0 0 0 / 28%) 32%,
+					rgb(0 0 0 / 25%) 51%,
+					rgb(0 0 0 / 20%) 59%,
+					rgb(0 0 0 / 14%) 65%,
+					rgb(0 0 0 / 10%) 71%,
+					rgb(0 0 0 / 8%) 79%,
+					rgb(0 0 0 /5%) 83%,
+					rgb(0 0 0 / 3%) 92%,
+					rgb(0 0 0 / 0%) 100%
+				);
 				opacity: 0.7;
 				z-index: 1;
 			}
@@ -608,7 +662,21 @@
 	@mixin active {
 		> .image {
 			&::before {
-				background: linear-gradient(rgb(0 0 0 / 53.4%), rgb(0 0 0 / 11%));
+				background-image: linear-gradient(
+					rgb(0 0 0 / 88%) 0%,
+					rgb(0 0 0 / 72%) 8%,
+					rgb(0 0 0 /42.5%) 19%,
+					rgb(0 0 0 / 31%) 24%,
+					rgb(0 0 0 / 28%) 32%,
+					rgb(0 0 0 / 25%) 51%,
+					rgb(0 0 0 / 20%) 59%,
+					rgb(0 0 0 / 14%) 65%,
+					rgb(0 0 0 / 10%) 71%,
+					rgb(0 0 0 / 8%) 79%,
+					rgb(0 0 0 /5%) 83%,
+					rgb(0 0 0 / 3%) 92%,
+					rgb(0 0 0 / 0%) 100%
+				);
 				opacity: 0.7;
 				z-index: 1;
 			}

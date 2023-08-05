@@ -111,7 +111,7 @@
 	$: DropdownItems = createPlayerPopperMenu(
 		$currentTrack,
 		$queuePosition,
-		groupSession.hasActiveSession,
+		$groupSession.hasActiveSession,
 		$SITE_ORIGIN_URL,
 	);
 
@@ -134,11 +134,14 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
 	class="player"
+	aria-haspopup="true"
 	on:click={(e) => {
 		fullscreenStore.toggle();
 	}}
+	tabindex="-1"
 	use:keyboardHandler={{ shortcut }}
 >
 	<div
@@ -198,7 +201,10 @@
 					SessionListService.next(undefined, true);
 					// AudioPlayer.updateTime($durationStore);
 				}}
-				prevBtn={() => SessionListService.previous(true)}
+				prevBtn={() => {
+					if ($queue.length && $SessionListService.position >= 1)
+						SessionListService.previous(true);
+				}}
 			/>
 			<ProgressBar />
 		{/if}

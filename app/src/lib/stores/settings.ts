@@ -22,7 +22,8 @@ interface Playback {
 	Stream?: StreamType;
 }
 interface Network {
-	"HLS Stream Proxy": string;
+	"Stream Proxy Server": string;
+	"Proxy Streams": boolean;
 	"Proxy Thumbnails": boolean;
 }
 interface AppInfo {
@@ -54,16 +55,17 @@ let list: UserSettings = {
 		GitHub: "https://github.com/snuffyDev/Beatbump",
 	},
 	network: {
-		"HLS Stream Proxy": "https://yt-hls-rewriter.onrender.com/",
+		"Stream Proxy Server": "https://hls.beatbump.io/",
 		"Proxy Thumbnails": true,
+		"Proxy Streams": false,
 	},
 	search: { Preserve: "Category", Restricted: false },
 };
 
-export const SERVER_PERSISTED_SETTING_KEYS: Extract<NestedKeyOf<UserSettings>, 'Restricted' | "Proxy Thumbnails">[] = [
-	"Restricted",
-	"Proxy Thumbnails",
-];
+export const SERVER_PERSISTED_SETTING_KEYS: Extract<
+	NestedKeyOf<UserSettings>,
+	"Restricted" | "Proxy Thumbnails"
+>[] = ["Restricted", "Proxy Thumbnails"];
 
 const PWA_THEME_COLORS = {
 	YTM: "#010102",
@@ -128,9 +130,16 @@ function _settings() {
 		localStorage.clear();
 		localStorage.setItem("settings", JSON.stringify(list));
 	} else {
-		if (!stored?.network["HLS Stream Proxy"]) {
-			stored.network["HLS Stream Proxy"] =
-				"https://yt-hls-rewriter.onrender.com/";
+		if (
+			(!stored?.network["Stream Proxy Server"] &&
+				"HLS Stream Proxy" in stored.network) ||
+			stored?.network["Stream Proxy Server"]?.includes(
+				"yt-hls-rewriter.onrender.com",
+			)
+		) {
+			stored.network["Stream Proxy Server"] = "https://hls.beatbump.io/";
+			if ("HLS Stream Proxy" in stored.network)
+				delete stored.network["HLS Stream Proxy"];
 		}
 		if (!stored?.network["Proxy Thumbnails"]) {
 			stored.network["Proxy Thumbnails"] = true;

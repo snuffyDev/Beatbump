@@ -14,6 +14,9 @@
 	import { searchFilter } from "../Search/options";
 
 	export let key;
+	export let opacity = 0;
+	export let fullscreen = false;
+
 	let isHidden = true;
 	let hidden = isHidden ? true : false;
 
@@ -28,9 +31,14 @@
 
 		window.history.go(-1);
 	};
+
+	$: console.log({ opacity });
 </script>
 
-<nav class="nav">
+<nav
+	class="nav"
+	class:scrolled={opacity >= 100 || fullscreen}
+>
 	<div class="logo">
 		{#if !key.includes("home")}
 			<button
@@ -170,6 +178,8 @@
 </nav>
 
 {#if !hidden}
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<div
 		class="backdrop"
 		on:click|stopPropagation|preventDefault
@@ -219,23 +229,55 @@
 	nav {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
-		padding-inline: 0.75em;
-		position: fixed;
+		padding-inline: 0.6em;
+		padding-inline-end: 1.2em;
+		position: absolute;
+
 		top: 0;
 		left: 0;
-		right: 0;
-		width: 100%;
-		min-width: 100vw;
+		width: var(--top-bar-width, calc(100% - var(--scrollbar-width) + 0.05em));
+		@media screen and (max-width: 720px) {
+			width: 100vw;
+		}
+
+		// padding-right: var(--scrollbar-width);
 		grid-template-areas: "l m r";
 		height: var(--top-bar-height);
 		align-content: center;
 		align-items: center;
 		touch-action: none;
 		z-index: 150;
-		background-color: var(--top-bg);
+		background-color: var(--base-bg-opacity-1_2) !important;
 		// isolation: isolate;isolation
 		justify-content: space-between;
-		border-bottom: 0.0625rem hsl(0deg 0% 12%) solid;
+		transition: 50ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+		transition-property: opacity, background, box-shadow;
+		// box-shadow: 0 -0.5rem 32px -14px var(--top-bg) inset;
+		&.scrolled::before {
+			border-color: hsla(0, 0%, 91%, 0.174);
+		}
+		&::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			z-index: -1;
+			opacity: 0.1;
+			border-bottom: 0.0625rem hsla(0, 0%, 91%, 0.174) solid;
+			border-color: hsla(0, 0%, 91%, 0.023);
+
+			transition: 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+			transition-property: opacity, background, box-shadow;
+			transition-delay: 0ms;
+			box-shadow: 0 -0.5rem 62px -32px #000 inset;
+			background: #0000 !important;
+		}
+		&.scrolled::before {
+			box-shadow: unset;
+			transition-delay: 300ms;
+			opacity: 1;
+			background: var(--top-bg) !important;
+		}
 
 		@media screen and (min-width: 720px) {
 			z-index: 155;

@@ -39,18 +39,14 @@
 			startTime = ts;
 		}
 		const elapsed = ts - startTime;
-		const measures = {
-			scrollWidth: carousel.scrollWidth,
-			scrollLeft: carousel.scrollLeft,
-		};
 
-		if (elapsed > 16) {
+		if (elapsed >= 32) {
 			if (!hasScrollWidth && scrollPositions.width < 0) {
 				hasScrollWidth = true;
-				scrollPositions.width = measures.scrollWidth;
+				scrollPositions.width = carousel.scrollWidth;
 			}
 
-			const scrollLeft = measures.scrollLeft;
+			const scrollLeft = carousel.scrollLeft;
 
 			moreOnLeft = scrollLeft < 15 ? false : true;
 			scrollPositions.left = scrollLeft;
@@ -60,7 +56,6 @@
 					? true
 					: false;
 			scrollPositions.right = scrollPositions.width - scrollLeft - 15;
-			cancelAnimationFrame(frame);
 
 			if (context === "left") {
 				carousel.scrollLeft -= Math.ceil(
@@ -71,8 +66,12 @@
 					(scrollPositions.width / items.length) * 2,
 				);
 			}
-		}
-		if (frame < 24) {
+			if (frame) cancelAnimationFrame(frame);
+			frame = undefined;
+			startTime = undefined;
+			isScrolling = false;
+			return;
+		} else {
 			frame = requestAnimationFrame((ts) => scrollHandler(ts, context));
 		}
 	}
@@ -83,8 +82,11 @@
 		}
 		if (!carousel) return;
 		if (!clientWidth) clientWidth = carousel.clientWidth;
-		if (isScrolling) return;
-		isScrolling = true;
+		if (isScrolling) {
+			cancelAnimationFrame(frame);
+		} else {
+			isScrolling = true;
+		}
 
 		requestAnimationFrame((ts) => scrollHandler(ts, context));
 	}

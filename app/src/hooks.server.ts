@@ -2,6 +2,7 @@ import {
 	defaultCookieParams,
 	type PreferencesCookie,
 } from "$lib/server/cookies";
+import { objectKeys } from "$lib/utils/collections/objects";
 import type { Cookies, Handle } from "@sveltejs/kit";
 
 const headers = {
@@ -12,11 +13,13 @@ const headers = {
 	"Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
 };
 
-const checkUserAgent = (userAgent: string) =>
-	/i(Phone|Pad|Pod)/i.test(userAgent)
-		? "iOS"
-		: /Android/i.test(userAgent)
-		? "Android"
+const checkUserAgent = (userAgent: string | null) =>
+	userAgent !== null
+		? /i(Phone|Pad|Pod)/i.test(userAgent)
+			? "iOS"
+			: /Android/i.test(userAgent)
+			? "Android"
+			: "Other"
 		: "Other";
 const updatePreferencesCookie = (cookies: Cookies) => {
 	const prefsCookie = cookies.get("_prefs") ?? "";
@@ -32,6 +35,9 @@ const updatePreferencesCookie = (cookies: Cookies) => {
 	);
 	return preferences;
 };
+
+const HEADER_KEYS = objectKeys(headers);
+
 export const handle: Handle = async ({ event, resolve }) => {
 	const UA = event.request.headers.get("User-Agent");
 	const agentType = checkUserAgent(UA);
@@ -41,11 +47,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.Android = agentType === "Android";
 	event.locals.preferences = preferences;
 	const response = await resolve(event);
-	for (const key in headers) {
+
+	for (const key of HEADER_KEYS) {
 		response.headers.set(`${key}`, `${headers[key]}`);
 	}
 	return response;
 };
 
-//#NODE process.on('SIGINT', function () { process.exit(); }); // Ctrl+C
-//#NODE process.on('SIGTERM', function () { process.exit(); }); // docker stop
+// process.on('SIGINT', function () { process.exit(); }); // Ctrl+C
+// process.on('SIGTERM', function () { process.exit(); }); // docker stop

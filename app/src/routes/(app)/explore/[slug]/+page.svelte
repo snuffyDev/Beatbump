@@ -1,15 +1,8 @@
-<script
-	context="module"
-	lang="ts"
->
-	export let test = "";
-</script>
-
 <script lang="ts">
+	import CarouselItem from "$components/Carousel/CarouselItem.svelte";
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
 	import { Grid } from "$lib/components/Grid";
 	import Header from "$lib/components/Layouts/Header.svelte";
-	import CarouselItem from "$components/Carousel/CarouselItem.svelte";
 
 	export let data;
 </script>

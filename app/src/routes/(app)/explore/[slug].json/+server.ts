@@ -1,5 +1,6 @@
 import { error, json as json$1 } from "@sveltejs/kit";
 
+import { ItemBuilder } from "$lib/parsers";
 import {
 	parseCarouselItem,
 	parseGridRendererSection,
@@ -13,18 +14,18 @@ export type ExploreSlugResponse = Awaited<
 	ReturnType<Awaited<ReturnType<typeof GET>>["json"]>
 >;
 
-/**
- * @type {import('./$types').PageServerLoad}
- */
-export const GET = async ({
-	params,
-}): Promise<
-	IResponse<{ header: string; items: (ParsedCarousel | ParsedGrid)[] }>
-> => {
+export const GET = async ({ params, url, locals }) => {
 	const { slug } = params;
+
+	const { preferences } = locals;
+	const { "Proxy Thumbnails": proxy, Restricted: restricted } = preferences;
+
+	const itemBuilder = new ItemBuilder({ proxy, origin: url.origin });
+
 	const response = await buildAPIRequest("browse", {
 		context: {
 			client: { clientName: "WEB_REMIX", clientVersion: "1.20230501.01.00" },
+			user: { lockedSafetyMode: restricted },
 		},
 		headers: null,
 		params: { browseId: "FEmusic_moods_and_genres_category", params: slug },
@@ -70,7 +71,9 @@ export const GET = async ({
 			);
 		}
 		if ("musicCarouselShelfRenderer" in data) {
-			responseItems.push(parseCarouselItem(data as GridOrCarousel<"carousel">));
+			responseItems.push(
+				parseCarouselItem(data as GridOrCarousel<"carousel">, itemBuilder),
+			);
 		}
 	}
 	const items = await Promise.all(responseItems);

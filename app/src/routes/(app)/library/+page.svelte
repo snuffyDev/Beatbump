@@ -9,12 +9,12 @@
 
 	import { IDBService } from "$lib/workers/db/service";
 
-	import { setContext } from "svelte";
-	import Grid from "./_components/Grid/Grid.svelte";
-	import Sync from "./_Sync.svelte";
 	import Button from "$components/Button";
-	import { exportDB, importDB } from "$lib/db";
 	import Loading from "$components/Loading/Loading.svelte";
+	import { exportDB, importDB } from "$lib/db";
+	import { setContext } from "svelte";
+	import Sync from "./_Sync.svelte";
+	import Grid from "./_components/Grid/Grid.svelte";
 
 	let favorites;
 	let playlists;
@@ -201,7 +201,7 @@
 			/>
 		{/if}
 		<section>
-			{#await playlists then favorites}
+			{#await playlists then _}
 				<Grid
 					heading="Your Playlists"
 					items={playlists}

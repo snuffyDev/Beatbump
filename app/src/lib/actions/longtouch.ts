@@ -25,6 +25,7 @@ export function mobileLongPress(
 	let running;
 	let task: Task;
 	async function handlePointerStart(event: PointerEvent) {
+		if (event.pointerType === "mouse") return;
 		event.preventDefault();
 		const startTime = performance.now() + config?.delay;
 		const endTime = startTime + config?.duration;
@@ -50,7 +51,9 @@ export function mobileLongPress(
 		node.addEventListener("pointerup", handlePointerEnd);
 		node.addEventListener("pointercancel", handlePointerEnd);
 	}
-	async function cancel() {
+	async function cancel(event: PointerEvent) {
+		if (event.pointerType === "mouse") return;
+
 		if (task) task.abort();
 		// dispatch(node, 'pressEnd', { progress: Math.ceil(curTime), timestamp: performance.now() });
 	}

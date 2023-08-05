@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Icon from "../Icon/Icon.svelte";
 	import type { Icons } from "$components/Icon/icons";
+	import Icon from "../Icon/Icon.svelte";
 
 	export let icon: { name?: Icons; size?: string } = undefined;
 	export let outlined = false;
@@ -17,6 +17,7 @@
 	{disabled}
 	on:click|preventDefault
 	>{#if icon}<Icon
+			style="stroke-width: 2.5;"
 			name={icon.name}
 			size={icon.size ?? "1em"}
 		/>{/if}<slot /></button

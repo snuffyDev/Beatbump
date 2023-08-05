@@ -114,12 +114,17 @@ $width: 1fr;
 	}
 }
 small {
-	display: inline;
+	display: inline-flex;
+	gap: 0.25em;
+	vertical-align: middle;
 	justify-self: flex-end;
-	font-size: smaller;
+	font-size: 0.9em;
+	margin-top: 0.1rem;
+	line-height: 1.2;
 }
 
 .box {
+	line-height: 2;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	-webkit-user-select: none;
@@ -142,9 +147,9 @@ small {
 
 	-webkit-margin-after: 1.3333em;
 	margin-block-end: 1.3333em;
-	max-width: 100%;
+	max-width: 95% !important;
 	overflow-wrap: break-word;
-
+	font-size: 1rem;
 	@media screen and (min-width: 286px) and (max-width: 512px) {
 		grid-template-columns: 1fr;
 		gap: 0.5rem 1rem;

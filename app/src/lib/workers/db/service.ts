@@ -2,11 +2,13 @@
 import { browser, dev } from "$app/environment";
 import { notify } from "$lib/utils/utils";
 import type { Actions, Methods } from "./types";
+
 type Deferred<T> = {
 	promise: Promise<T>;
 	resolve: (value: T | PromiseLike<T>) => void;
 	reject: (reason: any) => void;
 };
+
 const Defer = <T>() => {
 	const p: Partial<Deferred<T>> = {};
 

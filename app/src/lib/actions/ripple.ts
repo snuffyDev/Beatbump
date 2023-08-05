@@ -10,7 +10,7 @@ export function ripple(node: HTMLElement) {
 		elm.addEventListener("animationcancel", removeAnim);
 		elm.addEventListener("animationend", removeAnim);
 		node.appendChild(elm);
-		console.log(node.getAnimations({ subtree: true }));
+		// console.log(node.getAnimations({ subtree: true }));
 	}
 	function removeAnim(event) {
 		// node.classList.toggle("anim-ripple", true);

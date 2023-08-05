@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Icon from "$components/Icon/Icon.svelte";
 	import type { Dropdown, Icons } from "$lib/configs/dropdowns.config";
 	import { releasePageContext } from "$lib/contexts";
 	import { windowWidth } from "$stores/window";
@@ -13,6 +14,7 @@
 		text?: string;
 		type?: T;
 		action?: () => void;
+		style?: "normal" | "squared";
 		icon?: Icons | { name: Icons; size?: string };
 	};
 
@@ -53,7 +55,7 @@
 				dispatch("playlistAdd");
 			},
 		},
-		releasePageContext.has('release')
+		releasePageContext.has("release")
 			? {
 					text: "Shuffle",
 					action: () => {
@@ -89,9 +91,7 @@
 			<span class="box-title"
 				>{title}
 				{#if Array.isArray(subtitles) && subtitles[0]?.contentRating}
-					<span class="explicit">
-						<span class="sr-only">Explicit</span>
-					</span>
+					<span class="explicit" />
 				{/if}</span
 			>
 		</div>
@@ -118,27 +118,44 @@
 			{/key}
 		{:else if type === "release"}
 			<p class="secondary">
-				{#each artist as artist}
-					{#if artist.channelId}
-						<a href={`/artist/${artist.channelId}`}>{artist.name}</a>
-					{:else}
-						<span>{artist.name}</span>
-						<!-- {#if i !== artist.length - 1}
-					-->{/if}
+				{#each artist.slice(1, -2) as subtitle, index}
+					{#if subtitle.channelId}
+						<a
+							class="secondary"
+							href={`/artist/${subtitle.channelId}`}>{subtitle.name}</a
+						>
+					{:else if index !== 0}
+						<span>{subtitle.name}</span>
+						{#if index === 0}
+							<br />
+						{/if}
+					{/if}
 				{/each}
+				<br />
 				<small>
-					• {subtitles[0].year} • {subtitles[0].tracks}
+					<Icon
+						name="explicit"
+						fill="hsla(0, 0%, 95%, 0.7)"
+						color="transparent"
+						--stroke="transparent"
+						style="margin-right: 0.1em; stroke-width: 4;font-weight: 800;"
+						size="1em"
+					>
+						<span class="sr-only">Explicit</span>
+					</Icon>
+					{subtitles[0].type} • {subtitles[0].tracks} • {subtitles[0].year}
 				</small>
 			</p>
 		{/if}
 	</div>
 	<div class="button-group">
-		{#each buttons as { type, icon, text, action }, i}
+		{#each buttons as { style, type, icon, text, action }, i}
 			{#if type === "icon"}
 				<PopperButton items={DropdownItems} />
 			{:else}
 				<Button
 					on:click={action}
+					class={style ?? ""}
 					outlined={i === buttons.length - 1 || type === "outlined"}
 					icon={typeof icon === "string"
 						? { name: icon }
@@ -155,5 +172,9 @@
 	p {
 		margin-top: 0;
 		margin-bottom: 0.3rem;
+	}
+	p.secondary {
+		letter-spacing: -0.01em;
+		max-width: 40ch;
 	}
 </style>

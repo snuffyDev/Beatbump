@@ -1,6 +1,8 @@
 import type { Thumbnail } from "$lib/types";
-import type { MusicResponsiveListItemRendererItem } from "$lib/types/innertube/internals";
-import { filter } from "$lib/utils";
+import type {
+	MusicResponsiveListItemRendererItem,
+	SubtitleRun,
+} from "$lib/types/innertube/internals";
 import type { ItemBuilder } from "./items";
 type Data = {
 	header: {
@@ -62,12 +64,13 @@ export async function parsePageContents(data: Data, itemBuilder: ItemBuilder) {
 		// console.log(data.header.musicDetailHeaderRenderer.subtitle.runs);
 		const year = data.header?.musicDetailHeaderRenderer?.subtitle?.runs.at(-1);
 		const length = data.header?.musicDetailHeaderRenderer?.subtitle?.runs[0];
-		const artists = filter(
-			data.header?.musicDetailHeaderRenderer?.subtitle?.runs,
-			(item) => !!item?.navigationEndpoint?.browseEndpoint?.browseId,
+		const artists = (
+			data.header?.musicDetailHeaderRenderer?.subtitle?.runs as SubtitleRun[]
 		).map((item) => ({
 			name: item.text,
-			channelId: item?.navigationEndpoint?.browseEndpoint?.browseId || "",
+			...(!!item?.navigationEndpoint?.browseEndpoint?.browseId && {
+				channelId: item?.navigationEndpoint?.browseEndpoint?.browseId || "",
+			}),
 		}));
 		return {
 			playlistId:
@@ -102,6 +105,11 @@ export async function parsePageContents(data: Data, itemBuilder: ItemBuilder) {
 				data.header?.musicDetailHeaderRenderer.menu?.menuRenderer?.items[1]
 					?.menuNavigationItemRenderer?.navigationEndpoint
 					?.watchPlaylistEndpoint?.playlistId || null,
+
+			explicit:
+				data?.header?.musicDetailHeaderRenderer?.subtitleBadges?.[0]?.icon?.includes?.(
+					"EXPLICIT",
+				),
 		};
 	};
 	const releaseInfo = releaseInfoParser();
