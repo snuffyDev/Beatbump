@@ -1,6 +1,6 @@
 {
 	"environment": {
-		"adapter": "cloudflare-workers",
+		"adapter": "node",
 		"proxy_streams": false
 	},
 	"platform": {

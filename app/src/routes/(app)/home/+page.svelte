@@ -44,9 +44,7 @@
 <div class="immersive-thumbnail">
 	<div
 		class="gradient"
-		style="
-
---theme: var(--base-bg);"
+		style="--theme: var(--base-bg);"
 	/>
 	{#if headerThumbnail.length !== 0}
 		<picture>
@@ -79,15 +77,15 @@
 <main data-testid="home">
 	<Chips
 		{chips}
-		on:click={(event) => {
+		on:click={() => {
 			invalidate("home:load");
 		}}
 	/>
-	{#each carousels as carousel}
+	{#each carousels as carousel (carousel.items)}
 		<Carousel
 			items={carousel.items}
 			header={carousel.header}
-			type="home"
+			type="trending"
 			kind={carousel.header?.type}
 			isBrowseEndpoint={false}
 		/>
@@ -118,7 +116,9 @@
 					loading = false;
 					return hasData;
 				}
-				hasData = data.continuations === undefined;
+				hasData =
+					data.continuations === undefined ||
+					data.continuations.ctoken === undefined;
 				return !loading;
 			}}
 		/>

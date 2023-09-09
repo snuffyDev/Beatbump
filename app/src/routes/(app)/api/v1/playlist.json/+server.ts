@@ -20,9 +20,9 @@ export type PlaylistHeader = {
 	playlistId: string;
 };
 export interface PlaylistResponseBody {
-	header: PlaylistHeader;
 	carouselContinuations?: NextContinuationData;
 	continuations?: NextContinuationData;
+	header: PlaylistHeader;
 	tracks: IListItemRenderer[];
 	visitorData?: string;
 }

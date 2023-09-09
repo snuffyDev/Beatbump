@@ -12,8 +12,10 @@ services:
       - "443:${PORT}"
     environment:
       PORT: 3000
-      VITE_DOMAIN: "beatbump.ml"
-      VITE_SITE_URL: "https://beatbump.ml"
+      ALLOW_IFRAME: true
+      ALLOW_THUMBNAIL_PROXY: false
+      VITE_DOMAIN: "beatbump.io"
+      VITE_SITE_URL: "https://beatbump.io"
       VITE_DONATION_URL: "https://www.paypal.com/donate/?hosted_button_id=E6YRHKS2H2KP2"
     restart: unless-stopped
   proxy:

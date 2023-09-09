@@ -2,43 +2,30 @@ export type Releaser = () => void;
 export type Callback<T> = () => Promise<T> | T;
 
 export interface ISemaphoreQueueEntry {
-	resolve(result: [number, Releaser]): void;
 	reject(err: unknown): void;
+	resolve(result: [number, Releaser]): void;
 }
 
 export interface ISemaphore {
-	isLocked(): boolean;
 	acquire(value: number): Promise<[number, Releaser]>;
-
-	waitForUnlock(value?: number): Promise<void>;
-
-	setValue(value: number): void;
-	release(value?: number): void;
-	getValue(): number;
-
 	cancel(): void;
+	getValue(): number;
+	isLocked(): boolean;
+	release(value?: number): void;
+	setValue(value: number): void;
+	waitForUnlock(value?: number): Promise<void>;
 }
 
 export class Semaphore implements ISemaphore {
 	#queue: ISemaphoreQueueEntry[][] = [];
-	#waiting: (() => void)[][] = [];
 	#value;
+	#waiting: (() => void)[][] = [];
+
 	constructor(weight = 3) {
 		this.#value = weight;
 	}
-	isLocked(): boolean {
-		return this.#value <= 0;
-	}
-	async do<T>(callback: Callback<T>): Promise<T> {
-		const [_, release] = await this.acquire();
 
-		try {
-			return await callback();
-		} finally {
-			queueMicrotask(release);
-		}
-	}
-	acquire(value = 1): Promise<[number, Releaser]> {
+	public acquire(value = 1): Promise<[number, Releaser]> {
 		if (value <= 0)
 			throw new Error(`Value must be greater than 0. Received: #{value}`);
 
@@ -50,30 +37,8 @@ export class Semaphore implements ISemaphore {
 			this.#dispatch();
 		});
 	}
-	waitForUnlock(value: number | undefined = 1): Promise<void> {
-		if (value <= 0)
-			throw new Error(`Value must be greater than 0. Received: #{value}`);
 
-		return new Promise((resolve, reject) => {
-			if (!this.#waiting[value - 1]) {
-				this.#waiting[value - 1] = [];
-			}
-			this.#waiting[value - 1].push(resolve);
-			queueMicrotask(this.#dispatch);
-		});
-	}
-	setValue(value: number): void {
-		this.#value = value;
-		this.#dispatch();
-	}
-	release(value?: number | undefined): void {
-		this.#value += value!;
-		this.#dispatch();
-	}
-	getValue(): number {
-		return this.#value;
-	}
-	cancel(): void {
+	public cancel(): void {
 		const length = this.#queue.length;
 		let idx = -1;
 		while (++idx < length) {
@@ -85,6 +50,47 @@ export class Semaphore implements ISemaphore {
 			}
 		}
 		this.#queue = [];
+	}
+
+	async do<T>(callback: Callback<T>): Promise<T> {
+		const [_, release] = await this.acquire();
+
+		try {
+			return await callback();
+		} finally {
+			queueMicrotask(release);
+		}
+	}
+
+	public getValue(): number {
+		return this.#value;
+	}
+
+	public isLocked(): boolean {
+		return this.#value <= 0;
+	}
+
+	public release(value?: number | undefined): void {
+		this.#value += value!;
+		this.#dispatch();
+	}
+
+	public setValue(value: number): void {
+		this.#value = value;
+		this.#dispatch();
+	}
+
+	public waitForUnlock(value: number | undefined = 1): Promise<void> {
+		if (value <= 0)
+			throw new Error(`Value must be greater than 0. Received: #{value}`);
+
+		return new Promise((resolve, reject) => {
+			if (!this.#waiting[value - 1]) {
+				this.#waiting[value - 1] = [];
+			}
+			this.#waiting[value - 1].push(resolve);
+			queueMicrotask(this.#dispatch);
+		});
 	}
 
 	#dispatch(): void {
@@ -104,6 +110,15 @@ export class Semaphore implements ISemaphore {
 		this.#drainUnlockWaiters();
 	}
 
+	#drainUnlockWaiters(): void {
+		for (let weight = this.#value; weight > 0; weight--) {
+			if (!this.#waiting[weight - 1]) continue;
+
+			this.#waiting[weight - 1].forEach((waiter) => waiter());
+			this.#waiting[weight - 1] = [];
+		}
+	}
+
 	#newReleaser(weight: number): () => void {
 		let called = false;
 
@@ -113,15 +128,6 @@ export class Semaphore implements ISemaphore {
 
 			this.release(weight);
 		};
-	}
-
-	#drainUnlockWaiters(): void {
-		for (let weight = this.#value; weight > 0; weight--) {
-			if (!this.#waiting[weight - 1]) continue;
-
-			this.#waiting[weight - 1].forEach((waiter) => waiter());
-			this.#waiting[weight - 1] = [];
-		}
 	}
 }
 

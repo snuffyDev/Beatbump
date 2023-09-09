@@ -3,6 +3,7 @@ import { SessionListService } from "$stores/list/sessionList";
 import { tweened } from "svelte/motion";
 import { writable } from "svelte/store";
 import { isAppleMobileDevice } from "./utils/browserDetection";
+import type Hls from "hls.js";
 
 type EventCallbackFn<T> = (data: T) => void;
 
@@ -62,6 +63,57 @@ const getPlayerVolumeFromLS = (player: HTMLAudioElement) => {
 		setDefaultVolume();
 	}
 };
+interface AudioPlayerEvents {
+	play: unknown;
+	"update:stream_type": { type: "HLS" | "HTTP" };
+}
+// create an audio player that has the ability to switch between HTML5 Audio and HLS.js
+// it should also be able to switch between the two on the fly
+// and it should also handle the logic for prefetching the next track, the state of the player, etc.
+class AudioSourceNode {
+    private declare playerNode: HTMLAudioElement;
+    private declare hls: Hls;
+
+    private handlers: Map<string, EventCallbackFn<AudioPlayerEvents[keyof AudioPlayerEvents]>> = new Map();
+
+    constructor() {
+        if (!browser) return;
+        
+        const onUserInteractionCallback = () => {
+            if (!this.playerNode) {
+                this.setup();
+            }
+        }
+
+        document.body.addEventListener("click", onUserInteractionCallback)
+    }
+
+    private onPlayerEvent(name: keyof HTMLMediaElementEventMap, callback: () => void) {
+        if (!this.playerNode) this.setup();
+
+        this.handlers.set(name, callback);
+        this.playerNode.addEventListener(name, callback);
+    }
+
+    private removePlayerEvent(name: keyof HTMLMediaElementEventMap) {
+        if (!this.playerNode) return;
+
+        const handler = this.handlers.get(name);
+        if (handler) {
+            this.handlers.delete(name)
+            this.playerNode.removeEventListener(name, handler);
+        }
+    }
+
+
+    private setup() {
+        this.playerNode = new Audio();
+        getPlayerVolumeFromLS(this.playerNode);
+        
+        this.onPlayerEvent("play", () => {
+            
+
+}
 
 class AudioPlayerImpl extends EventEmitter<{ c: string }> {
 	private declare player: HTMLAudioElement;
@@ -164,6 +216,7 @@ class AudioPlayerImpl extends EventEmitter<{ c: string }> {
 			);
 
 			if (this.nextSrc.stale) {
+				console.log("prefetching next track");
 				await SessionListService.prefetchNextTrack();
 			}
 		});

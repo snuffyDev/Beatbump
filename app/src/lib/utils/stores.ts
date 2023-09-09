@@ -58,6 +58,10 @@ export class WritableStore<T = unknown> extends ReadableStore<T> {
 		this.value = value;
 	}
 
+	public update(updater: (value: T) => T): void {
+		this.value = updater(this.value);
+	}
+
 	public async updateAsync(updater: (value: T) => Promise<T>): Promise<T> {
 		return new Promise<T>((resolve) => {
 			updater(this.value)
@@ -67,10 +71,6 @@ export class WritableStore<T = unknown> extends ReadableStore<T> {
 				})
 				.then(resolve);
 		});
-	}
-
-	public update(updater: (value: T) => T): void {
-		this.value = updater(this.value);
 	}
 
 	protected onValueChanged(oldValue?: T): void {

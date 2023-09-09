@@ -21,24 +21,10 @@ const Defer = <T>() => {
 };
 
 class IDBService {
-	private worker: Worker | null = null;
 	private queue: Deferred<any>[] = [];
-	constructor() {
-		if (!browser) return;
-	}
-	async setup() {
-		if (!browser) return null;
-		if (this.worker) return this.worker;
-		const workerInstance = dev
-			? new Worker(new URL("./worker.ts", import.meta.url), {
-					type: "module",
-					name: "idb",
-			  })
-			: new Worker(new URL("./worker.ts", import.meta.url), { name: "idb" });
-		workerInstance.onmessage = this.process;
-		return workerInstance;
-	}
-	process = <
+	private worker: Worker | null = null;
+
+	public process = <
 		Action extends Actions = Actions,
 		Type extends "favorite" | "playlist" | "playlists" | "favorites" = any,
 		Key extends keyof Methods &
@@ -65,6 +51,11 @@ class IDBService {
 
 		promise.resolve(data.data);
 	};
+
+	constructor() {
+		if (!browser) return;
+	}
+
 	async sendMessage<
 		Action extends Actions = Actions,
 		Type extends "favorite" | "playlist" | "playlists" | "favorites" = any,
@@ -91,6 +82,19 @@ class IDBService {
 		this.worker?.postMessage({ action, type, params });
 
 		return promise.promise;
+	}
+
+	public async setup() {
+		if (!browser) return null;
+		if (this.worker) return this.worker;
+		const workerInstance = dev
+			? new Worker(new URL("./worker.ts", import.meta.url), {
+					type: "module",
+					name: "idb",
+			  })
+			: new Worker(new URL("./worker.ts", import.meta.url), { name: "idb" });
+		workerInstance.onmessage = this.process;
+		return workerInstance;
 	}
 }
 

@@ -4,36 +4,10 @@
 	context="module"
 	lang="ts"
 >
-	import type { Action } from "svelte/action";
-	// Svelte action that detects if the element is scrolled based on the visibility of a target child element using IntersectionObserver
-	// https://svelte.dev/docs#use_action
-	const observer: Action<
-		HTMLElement,
-		IntersectionObserverInit & { target: string },
-		{ "on:scrolled": (event: CustomEvent<boolean>) => void }
-	> = (
-		node: HTMLElement,
-		options: IntersectionObserverInit & { target: string },
-	) => {
-		const observer = new IntersectionObserver(([entry]) => {
-			node.dispatchEvent(
-				new CustomEvent("scrolled", {
-					detail: entry.isIntersecting,
-				}),
-			);
-		}, options);
-
-		observer.observe(node.querySelector<HTMLElement>(options.target)!);
-
-		return {
-			destroy() {
-				observer.disconnect();
-			},
-		};
-	};
 </script>
 
 <script lang="ts">
+	import { scrollObserver } from "$lib/actions/scrollObserver";
 	import { createEventDispatcher } from "svelte";
 
 	import { cubicOut } from "svelte/easing";
@@ -47,8 +21,8 @@
 <div
 	class="app-content-p"
 	bind:this={main}
-	on:scrolled={({ detail }) => dispatch("scrolled", detail)}
-	use:observer={{ target: ".scroll-target" }}
+	on:scrolled={({ detail }) => dispatch("scrolled", detail["isIntersecting"])}
+	use:scrollObserver={{ target: ".scroll-target" }}
 >
 	<div class="scroll-target" />
 	{#key key}
@@ -71,15 +45,15 @@
 		height: 1px;
 	}
 	.app-transition-wrapper {
-		inset: 0;
-		position: absolute;
 		transform: translateZ(0);
 		will-change: top;
 		isolation: isolate;
+		padding-bottom: 2.1rem;
 	}
 
 	.app-content-p {
-		display: grid;
+		/* display: grid;
+        */
 		inset: 0;
 		position: absolute;
 	}

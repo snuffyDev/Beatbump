@@ -67,10 +67,10 @@ const VALID_KEYS = [
 ] as const;
 
 export class ListService {
-	private restricted = false;
 	private isLocal = false;
-
 	private nextTrackUrl: string | null = null;
+	private restricted = false;
+
 	_$: WritableStore<ISessionListProvider> =
 		new WritableStore<ISessionListProvider>({
 			clickTrackingParams: "",
@@ -82,23 +82,17 @@ export class ListService {
 			position: 0,
 			related: null,
 		});
+
 	constructor() {
 		this._$.set(this._state);
-	}
-	private get _state() {
-		return this._$.value;
-	}
-
-	public get subscribe() {
-		return this._$.subscribe;
-	}
-
-	public get clickTrackingParams(): string | null {
-		return this._$.value.clickTrackingParams;
 	}
 
 	public get $() {
 		return this._$;
+	}
+
+	public get clickTrackingParams(): string | null {
+		return this._$.value.clickTrackingParams;
 	}
 
 	public get continuation() {
@@ -121,212 +115,52 @@ export class ListService {
 		return this._$.set;
 	}
 
+	public get subscribe() {
+		return this._$.subscribe;
+	}
+
+	public get isLocalPlaylist() {
+		return this.isLocal;
+	}
+
 	public get value() {
 		return this._state;
 	}
 
-	#currentTrack(position = 0) {
-		return this._$.value.mix[position];
+	private get _state() {
+		return this._$.value;
 	}
 
-	public async next(nextSrc: string | undefined = undefined, update = false) {
-		const currentPosition = this._$.value.position;
-		const nextTrack = this._$.value.mix[this._$.value.position + 1];
+	private findIndexForTrack({
+		originalVideoId,
+		originalIndex,
+		originalPlaylistId,
+		mix,
+	}: {
+		originalIndex?: number;
+		originalVideoId?: string;
+		originalPlaylistId?: string;
+		mix: Item[];
+	}): number {
+		return mix.findIndex((item, index) => {
+			// find the index of the item that matches the videoId and optionally the playlist id OR the index property (or array index) that matches the keyId OR  matches both previous condiitions
+			const isSameVideoAndPlaylist =
+				item.videoId === originalVideoId &&
+				item.playlistId === originalPlaylistId;
+			const isSameIndex = index === originalIndex;
 
-		if (!nextTrack) {
-			const currentTrack = this._$.value.mix[this._$.value.position];
-
-			await this.getSessionContinuation(
-				{
-					videoId: currentTrack?.videoId,
-					key: this._$.value.position,
-					playlistId: currentTrack?.playlistId,
-					loggingContext: currentTrack?.loggingContext,
-					playerParams: currentTrack?.playerParams,
-					playlistSetVideoId:
-						APIParams.lt100 === currentTrack?.playerParams
-							? undefined
-							: currentTrack?.playlistSetVideoId,
-
-					ctoken: this.continuation,
-					clickTrackingParams: this.clickTrackingParams!,
-				},
-				true,
-			)
-				.then((data) => {
-					return data;
-				})
-				.finally(async () => {
-					const newPosition = await this.updatePosition(currentPosition + 1);
-					if (update) {
-						updateGroupPosition("->", newPosition);
-					}
-				});
-			return;
-		} else {
-			if (nextSrc || this.nextTrackUrl) {
-				await this.updatePosition("next");
-				updatePlayerSrc({
-					original_url: nextSrc ? nextSrc : (this.nextTrackUrl as string),
-					url: nextSrc ? (nextSrc as string) : (this.nextTrackUrl as string),
-				});
-				this.nextTrackUrl = null;
-			} else {
-				let position = await this.updatePosition("next");
-				if (position >= this._$.value.mix.length) {
-					position = this._$.value.position;
-				}
-				const currentTrack = this.#currentTrack(position);
-				const data = await fetchNext({
-					...(this._$.value?.visitorData && {
-						visitorData: this._$.value.visitorData,
-					}),
-					params: "gAQBiAQB",
-					playlistSetVideoId: currentTrack?.playlistSetVideoId,
-					index: position,
-					loggingContext:
-						currentTrack?.loggingContext?.vssLoggingContext
-							?.serializedContextData,
-					videoId: currentTrack?.videoId,
-					playlistId: this.currentMixId,
-					...(this?.clickTrackingParams && {
-						clickTracking: this.clickTrackingParams,
-					}),
-				});
-				if (!data) return;
-
-				const state = await this.#sanitizeAndUpdate("APPLY", data);
-				await getSrc(
-					state.mix[currentPosition + 1].videoId,
-					state.mix[currentPosition + 1].playlistId,
-					undefined,
-					true,
-				);
+			if (isSameVideoAndPlaylist || isSameIndex) {
+				return true;
 			}
-			const position = this._$.value.position;
-			if (update) {
-				updateGroupPosition("->", position);
+
+			if (isSameVideoAndPlaylist && isSameIndex) {
+				return true;
 			}
-		}
-	}
-	public async prefetchTrackAtIndex(index: number) {
-		const nextTrack = this._$.value.mix[index];
-		if (!nextTrack) {
-			const currentTrack = this._$.value.mix[this._$.value.position];
-			const currentIndex = this._$.value.position;
-			await this.getSessionContinuation(
-				{
-					videoId: currentTrack?.videoId,
-					key: this._$.value.position,
-					playlistId: currentTrack?.playlistId,
-					loggingContext: currentTrack?.loggingContext,
-					playerParams: currentTrack?.playerParams,
-					playlistSetVideoId:
-						APIParams.lt100 === currentTrack?.playerParams
-							? undefined
-							: currentTrack?.playlistSetVideoId,
 
-					ctoken: this.continuation,
-					clickTrackingParams: this.clickTrackingParams!,
-				},
-				false,
-			)
-				.then(() => {
-					this.updatePosition(currentIndex + 1);
-				})
-				.then(() => {
-					if (groupSession.hasActiveSession) {
-						groupSession.updateGuestContinuation(this._$.value);
-					}
-				});
-			return;
-		}
-		const response = await getSrc(
-			nextTrack.videoId,
-			nextTrack.playlistId,
-			undefined,
-			false,
-		);
-		if (response && response.body) {
-			this.nextTrackUrl = response.body.url as string;
-			AudioPlayer.setNextTrackPrefetchedUrl(response.body.url);
-		}
-	}
-	public async prefetchNextTrack() {
-		const nextTrack = this._$.value.mix[this._$.value.position + 1];
-		if (!nextTrack) {
-			const currentTrack = this._$.value.mix[this._$.value.position];
-			const currentIndex = this._$.value.position;
-			console.log({ nextTrack, currentTrack, state: this._state, this: this });
-			await this.getSessionContinuation(
-				{
-					videoId: currentTrack?.videoId,
-					key: this._$.value.position,
-					playlistId: currentTrack?.playlistId,
-					loggingContext: currentTrack?.loggingContext,
-					playerParams: currentTrack?.playerParams,
-					playlistSetVideoId:
-						APIParams.lt100 === currentTrack?.playerParams
-							? undefined
-							: currentTrack?.playlistSetVideoId,
-
-					ctoken: this.continuation,
-					clickTrackingParams: this.clickTrackingParams!,
-				},
-				false,
-			)
-				.then(() => {
-					this.updatePosition(currentIndex + 1);
-				})
-				.then(() => {
-					if (groupSession.hasActiveSession) {
-						groupSession.updateGuestContinuation(this._$.value);
-					}
-				});
-			return;
-		}
-		const response = await getSrc(
-			nextTrack.videoId,
-			nextTrack.playlistId,
-			undefined,
-			false,
-		);
-		if (response && response.body) {
-			this.nextTrackUrl = response.body.url as string;
-			AudioPlayer.setNextTrackPrefetchedUrl(response.body.url);
-		}
-	}
-	public async previous(_broadcast = false) {
-		let position = await this.updatePosition("back");
-		if (position >= this._$.value.mix.length) {
-			position = this._$.value.position;
-		}
-		const data = await fetchNext({
-			...(this._$.value?.visitorData && {
-				visitorData: this._$.value?.visitorData,
-			}),
-			params: "OAHyAQIIAQ==",
-			playlistSetVideoId: this._$.value.mix[this.position]?.playlistSetVideoId,
-			index: this._$.value.position,
-			loggingContext: this.#currentTrack(this.position)?.loggingContext
-				?.vssLoggingContext?.serializedContextData,
-			videoId: this.#currentTrack(this.position)?.videoId,
-			playlistId: this.currentMixId,
-			...(this.continuation && { continuation: this?.continuation }),
-			...(this.clickTrackingParams && {
-				clickTracking: this.clickTrackingParams,
-			}),
+			return false;
 		});
-		if (!data) return;
-		if (data.related) this._$.value.related = data.related;
-		const state = await this.#sanitizeAndUpdate("APPLY", data);
-		await getSrc(
-			state.mix[position].videoId,
-			state.mix[position].playlistId,
-			undefined,
-			true,
-		);
 	}
+
 	public async getMoreLikeThis({
 		playlistId,
 	}: {
@@ -339,7 +173,7 @@ export class ListService {
 			const response = await fetchNext({
 				params: APIParams.finite,
 				playlistId:
-					playlistId !== null
+					playlistId != null && !!playlistId
 						? playlistId?.startsWith("RDAMPL")
 							? playlistId
 							: "RDAMPL" + playlistId
@@ -364,8 +198,8 @@ export class ListService {
 			}
 
 			await getSrc(
-				this._$.value.mix[this._$.value.position + 1].videoId,
-				this._$.value.mix[this._$.value.position].playlistId,
+				this._$.value.mix[state.position + 1].videoId,
+				this._$.value.mix[state.position + 1].playlistId,
 				undefined,
 				false,
 			);
@@ -411,15 +245,17 @@ export class ListService {
 			}
 			const nextTrack = this._$.value.mix[nextIndex];
 			await getSrc(nextTrack?.videoId, nextTrack?.playlistId, undefined, true);
+			// await this.prefetchTrackAtIndex(nextIndex + 1);
+
 			toggle();
 			return;
 		}
 
 		try {
 			if (!clickTrackingParams && !ctoken) {
-				playlistId = !playlistId?.startsWith("RDAMPL")
-					? "RDAMPL" + playlistId
-					: playlistId;
+				playlistId = `RDAMPL${
+					playlistId ? playlistId : this.currentMixId ?? ""
+				}`;
 			}
 
 			const params: Parameters<typeof fetchNext>["0"] = {
@@ -469,6 +305,7 @@ export class ListService {
 
 	public async initAutoMixSession(args: AutoMixArgs) {
 		const toggle = togglePlayerLoad();
+		this.isLocal = false;
 		try {
 			const {
 				loggingContext,
@@ -481,47 +318,87 @@ export class ListService {
 			} = args;
 			// Wait for the DOM to update
 			await tick();
-
+			console.log(args);
 			let willRevert = false;
 			// Reset the current mix state
-			if (this._$.value.mix.length) {
+			if (
+				this._$.value.mix.length &&
+				this._$.value.currentMixId !== playlistId
+			) {
 				willRevert = true;
 				this.#revertState();
 			}
 
-			this._$.value.currentMixType = "auto";
+			if (
+				this._$.value.currentMixId !== playlistId ||
+				`RDAMPL${this._$.value.currentMixId}` !== playlistId
+			) {
+				this._$.value.currentMixType = "auto";
 
-			const data = await fetchNext({
-				params: config?.playerParams ? config?.playerParams : undefined,
-				videoId,
-				playlistId: playlistId ? playlistId : undefined,
-				loggingContext: loggingContext
-					? loggingContext.vssLoggingContext?.serializedContextData
-					: undefined,
-				playlistSetVideoId: playlistSetVideoId ? playlistSetVideoId : undefined,
-				clickTracking,
-				configType: config?.type || undefined,
-			});
+				const data = await fetchNext({
+					params: config?.playerParams ? config?.playerParams : undefined,
+					videoId,
+					playlistId: playlistId ? playlistId : undefined,
+					loggingContext: loggingContext
+						? loggingContext.vssLoggingContext?.serializedContextData
+						: undefined,
+					playlistSetVideoId: playlistSetVideoId
+						? playlistSetVideoId
+						: undefined,
+					clickTracking,
+					configType: config?.type || undefined,
+				});
 
-			if (!data || !Array.isArray(data.results)) {
-				throw new Error("Invalid response was returned from `next` endpoint.");
-			}
+				if (!data || !Array.isArray(data.results)) {
+					throw new Error(
+						"Invalid response was returned from `next` endpoint.",
+					);
+				}
 
-			const item = data.results[keyId ?? 0];
+				const playbackIndex =
+					keyId === 0
+						? 0
+						: this.findIndexForTrack({
+								originalVideoId: videoId,
+								originalPlaylistId: playlistId,
+								mix: data.results,
+								originalIndex: keyId,
+						  }) ||
+						  keyId ||
+						  0;
+				const item = data.results[playbackIndex ?? 0];
 
-			getSrc(videoId ?? item?.videoId, item?.playlistId, config?.playerParams);
+				await getSrc(
+					videoId
+						? videoId
+						: item?.videoId
+						? item.videoId
+						: data.results[0]
+						? data.results[0]?.videoId
+						: undefined,
+					item?.playlistId,
+					config?.playerParams,
+				);
 
-			const state = await this.#sanitizeAndUpdate(
-				willRevert ? "SET" : "APPLY",
-				{
-					...this._state,
-					...data,
-					mix: ["append", data.results],
-				},
-			);
-
-			if (groupSession?.initialized && groupSession?.hasActiveSession) {
-				groupSession.expAutoMix(state);
+				const state = await this.#sanitizeAndUpdate(
+					willRevert ? "SET" : "APPLY",
+					{
+						...this._state,
+						...data,
+						position: Math.max(0, playbackIndex),
+						mix: ["append", data.results],
+					},
+				);
+				if (groupSession?.initialized && groupSession?.hasActiveSession) {
+					groupSession.expAutoMix(state);
+				}
+			} else {
+				return await this.getSessionContinuation({
+					...args,
+					clickTrackingParams: args.clickTracking!,
+					key: args.keyId!,
+					ctoken: "",
+				} as never);
 			}
 		} catch (err) {
 			Logger.err(err);
@@ -540,6 +417,7 @@ export class ListService {
 		playlistSetVideoId?: string;
 	}): Promise<{ body: ResponseBody; error?: boolean } | undefined> {
 		const toggle = togglePlayerLoad();
+		this.isLocal = false;
 		try {
 			const {
 				playlistId = "",
@@ -552,12 +430,10 @@ export class ListService {
 			} = args;
 
 			await tick();
-			console.log("this.initPlaylistSession");
 
 			if (this._$.value.currentMixId !== playlistId) {
 				this.#revertState();
 			}
-			console.time("playlistInit");
 			const data = await fetchNext({
 				params,
 				playlistId: playlistId.startsWith("VL")
@@ -569,7 +445,6 @@ export class ListService {
 				playlistSetVideoId,
 				videoId,
 			});
-			console.timeEnd("playlistInit");
 
 			if (!data || !Array.isArray(data.results)) {
 				throw new Error("Invalid response returned from `next` endpoint.");
@@ -584,15 +459,27 @@ export class ListService {
 					mix: ["set", data.results],
 					currentMixType: "playlist",
 				});
-				const position = state.mix.findIndex((item) => item.index === index);
-				await this.updatePosition(position ?? 0);
+
+				const playbackIndex =
+					index === 0
+						? 0
+						: this.findIndexForTrack({
+								originalVideoId: videoId,
+								originalPlaylistId: playlistId,
+								mix: state.mix,
+								originalIndex: index,
+						  }) ||
+						  index ||
+						  0;
+				await this.updatePosition(playbackIndex);
+				Logger.mark("wow");
 				await tick();
 				if (groupSession?.initialized && groupSession?.hasActiveSession) {
 					groupSession.expAutoMix(state);
 				}
 
 				return (await getSrc(
-					state.mix[position]?.videoId,
+					state.mix[playbackIndex]?.videoId,
 					playlistId,
 					undefined,
 					true,
@@ -611,6 +498,211 @@ export class ListService {
 			this._$.set(_mix);
 			return Promise.resolve(this._state);
 		});
+	}
+
+	public async next(nextSrc: string | undefined = undefined, update = false) {
+		const currentPosition = this._$.value.position;
+		const nextTrack = this._$.value.mix[this._$.value.position + 1];
+
+		if (!nextTrack) {
+			const currentTrack = this._$.value.mix[this._$.value.position];
+			Logger.dev("No next track", { nextSrc, _$: this._$ });
+			await this.getSessionContinuation(
+				{
+					videoId: currentTrack?.videoId,
+					key: this._$.value.position + 1,
+					playlistId: currentTrack?.playlistId,
+					loggingContext: currentTrack?.loggingContext,
+					playerParams: currentTrack?.playerParams,
+					playlistSetVideoId:
+						APIParams.lt100 === currentTrack?.playerParams
+							? undefined
+							: currentTrack?.playlistSetVideoId,
+
+					ctoken: this.continuation,
+					clickTrackingParams: this.clickTrackingParams!,
+				},
+				true,
+			)
+				.then(() => {
+					return this.updatePosition("next");
+				})
+				.then((data) => {
+					return data;
+				});
+
+			return;
+		} else {
+			if (nextSrc || this.nextTrackUrl) {
+				Logger.dev("next track Cond A", {
+					nextSrc,
+					_$: this._$,
+					nextTrack,
+					thisNextTrackURL: this.nextTrackUrl,
+				});
+				const state = await this.updatePosition("next");
+				updatePlayerSrc({
+					original_url: nextSrc ? nextSrc : (this.nextTrackUrl as string),
+					url: nextSrc ? (nextSrc as string) : (this.nextTrackUrl as string),
+				});
+				this.nextTrackUrl = null;
+				await this.prefetchTrackAtIndex(state + 1);
+			} else {
+				let position = await this.updatePosition("next");
+				if (position >= this._$.value.mix.length) {
+					position = this._$.value.position;
+				}
+				const currentTrack = this.#currentTrack(position);
+				const data = await fetchNext({
+					...(this._$.value?.visitorData && {
+						visitorData: this._$.value.visitorData,
+					}),
+					params: "gAQBiAQB",
+					playlistSetVideoId: currentTrack?.playlistSetVideoId,
+					index: position,
+					loggingContext:
+						currentTrack?.loggingContext?.vssLoggingContext
+							?.serializedContextData,
+					videoId: currentTrack?.videoId,
+					playlistId: this.currentMixId,
+					...(this?.clickTrackingParams && {
+						clickTracking: this.clickTrackingParams,
+					}),
+				});
+				if (!data) return;
+
+				const state = await this.#sanitizeAndUpdate("APPLY", data);
+				await getSrc(
+					state.mix[currentPosition + 1].videoId,
+					state.mix[currentPosition + 1].playlistId,
+					undefined,
+					true,
+				);
+				await this.prefetchTrackAtIndex(state.position + 1);
+			}
+			const position = this._$.value.position;
+			if (update) {
+				updateGroupPosition("->", position);
+			}
+		}
+	}
+
+	public async prefetchNextTrack() {
+		console.log("prefetchNextTrack");
+		const nextTrack = this._$.value.mix[this._$.value.position + 1];
+		if (!nextTrack) {
+			const currentTrack = this._$.value.mix[this._$.value.position];
+			const currentIndex = this._$.value.position;
+			console.log({ nextTrack, currentTrack, state: this._state, this: this });
+			await this.getSessionContinuation(
+				{
+					videoId: currentTrack?.videoId,
+					key: this._$.value.position,
+					playlistId: currentTrack?.playlistId,
+					loggingContext: currentTrack?.loggingContext,
+					playerParams: currentTrack?.playerParams,
+					playlistSetVideoId:
+						APIParams.lt100 === currentTrack?.playerParams
+							? undefined
+							: currentTrack?.playlistSetVideoId,
+
+					ctoken: this.continuation,
+					clickTrackingParams: this.clickTrackingParams!,
+				},
+				false,
+			).then(() => {
+				if (groupSession.hasActiveSession) {
+					groupSession.updateGuestContinuation(this._$.value);
+				}
+			});
+			return;
+		}
+		const response = await getSrc(
+			nextTrack.videoId,
+			nextTrack.playlistId,
+			undefined,
+			false,
+		);
+		if (response && response.body) {
+			this.nextTrackUrl = response.body.url as string;
+			AudioPlayer.setNextTrackPrefetchedUrl(response.body.url);
+		}
+	}
+
+	public async prefetchTrackAtIndex(index: number) {
+		const nextTrack = this._$.value.mix[index];
+		if (!nextTrack) {
+			const currentIndex = this._$.value.position;
+			const currentTrack = this._$.value.mix[currentIndex];
+			await this.getSessionContinuation(
+				{
+					videoId: currentTrack?.videoId,
+					key: this._$.value.position,
+					playlistId: currentTrack?.playlistId,
+					loggingContext: currentTrack?.loggingContext,
+					playerParams: currentTrack?.playerParams,
+					playlistSetVideoId:
+						APIParams.lt100 === currentTrack?.playerParams
+							? undefined
+							: currentTrack?.playlistSetVideoId,
+
+					ctoken: this.continuation,
+					clickTrackingParams: this.clickTrackingParams!,
+				},
+				false,
+			)
+				.then(() => {
+					this.updatePosition(currentIndex + 1);
+				})
+				.then(() => {
+					if (groupSession.hasActiveSession) {
+						groupSession.updateGuestContinuation(this._$.value);
+					}
+				});
+			return;
+		}
+		const response = await getSrc(
+			nextTrack.videoId,
+			nextTrack.playlistId,
+			undefined,
+			false,
+		);
+		if (response && response.body) {
+			this.nextTrackUrl = response.body.url as string;
+			AudioPlayer.setNextTrackPrefetchedUrl(response.body.url);
+		}
+	}
+
+	public async previous(_broadcast = false) {
+		let position = await this.updatePosition("back");
+		if (position >= this._$.value.mix.length) {
+			position = this._$.value.position;
+		}
+		const data = await fetchNext({
+			...(this._$.value?.visitorData && {
+				visitorData: this._$.value?.visitorData,
+			}),
+			params: "OAHyAQIIAQ==",
+			playlistSetVideoId: this._$.value.mix[this.position]?.playlistSetVideoId,
+			index: this._$.value.position,
+			loggingContext: this.#currentTrack(this.position)?.loggingContext
+				?.vssLoggingContext?.serializedContextData,
+			videoId: this.#currentTrack(this.position)?.videoId,
+			playlistId: this.currentMixId,
+			...(this.continuation && { continuation: this?.continuation }),
+			...(this.clickTrackingParams && {
+				clickTracking: this.clickTrackingParams,
+			}),
+		});
+		if (!data) return;
+		if (data.related) this._$.value.related = data.related;
+		const state = await this.#sanitizeAndUpdate("APPLY", data);
+		await getSrc(
+			state.mix[position].videoId,
+			state.mix[position].playlistId,
+			undefined,
+			true,
+		);
 	}
 
 	public removeTrack(index: number) {
@@ -656,7 +748,7 @@ export class ListService {
 
 			splice(this._$.value.mix, key + 1, 0, ...itemToAdd);
 
-			await this.#sanitizeAndUpdate("APPLY", {
+			const state = await this.#sanitizeAndUpdate("APPLY", {
 				mix: ["set", this._$.value.mix] satisfies MixListAppendOp,
 			});
 
@@ -667,6 +759,7 @@ export class ListService {
 					undefined,
 					true,
 				);
+				await this.prefetchTrackAtIndex(state.position + 1);
 			}
 		} catch (err) {
 			console.error(err);
@@ -776,6 +869,10 @@ export class ListService {
 		}
 
 		return this._$.value.position;
+	}
+
+	#currentTrack(position = 0) {
+		return this._$.value.mix[position];
 	}
 
 	#revertState(): ISessionListProvider {
@@ -889,7 +986,7 @@ const queue = derived(SessionListService, ($list) => $list.mix);
  */
 const currentTrack = derived(
 	SessionListService,
-	($list) => $list.mix[$list.position],
+	($list) => $list.mix[Math.max(0, $list.position)],
 );
 /**
  * A derived store for read-only access to the current position

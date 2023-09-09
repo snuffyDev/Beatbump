@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
 	import { browser } from "$app/environment";
 	import { page } from "$app/stores";
@@ -32,7 +34,6 @@
 		width: -1,
 		right: 0,
 	};
-
 	function scrollHandler(ts: number, context?: (any & "left") | "right") {
 		if (!carousel) return;
 		if (startTime === undefined) {

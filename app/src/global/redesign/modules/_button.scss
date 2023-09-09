@@ -25,7 +25,7 @@ $focus-color: #1c1c1c;
 	cursor: pointer;
 	font-size: 1em;
 	gap: 0.25em;
-	line-height: 1.3;
+	line-height: 1;
 	text-transform: none;
 	white-space: nowrap;
 	cursor: pointer;
@@ -105,7 +105,7 @@ button.has-icon {
 
 button.outlined {
 	background: #0000 !important;
-	border: transparentize($background, 0.7) 0.1em solid !important;
+	border: transparentize($background, 0.75) 0.13em solid !important;
 	color: $background !important;
 	font-weight: 500;
 

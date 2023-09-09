@@ -1,13 +1,14 @@
 export interface Client {
+	readonly hl?: string;
+
 	clientName?: "ANDROID" | "WEB_REMIX" | "IOS";
 	clientVersion?: "17.13.3" | "1.20230501.01.00";
-	utcOffsetMinutes?: number;
-	visitorData?: string;
 	gl?: string;
-	readonly hl?: string;
 	originalUrl?: string;
 	remoteHost?: string;
 	userAgent?: string;
+	utcOffsetMinutes?: number;
+	visitorData?: string;
 }
 
 export interface ClickTracking {
@@ -15,15 +16,15 @@ export interface ClickTracking {
 }
 
 export interface Context {
-	client: Client;
+	captionParams: Record<string, never>;
 	clickTracking?: ClickTracking;
+	client: Client;
 	request: {
 		useSsl: boolean;
 	};
 	user: {
 		lockedSafetyMode: boolean;
 	};
-	captionParams: Record<string, never>;
 }
 
 export enum Endpoints {
@@ -33,14 +34,14 @@ export enum Endpoints {
 	Player = "player",
 }
 export interface APIEndpoints {
+	readonly artist: Endpoints.Browse;
+	readonly browse: Endpoints.Browse;
 	readonly home: Endpoints.Browse;
-	readonly playlist: Endpoints.Browse;
-	readonly search: Endpoints.Search;
 	readonly next: Endpoints.Next;
 	readonly player: Endpoints.Player;
-	readonly artist: Endpoints.Browse;
+	readonly playlist: Endpoints.Browse;
 	readonly related: Endpoints.Browse;
-	readonly browse: Endpoints.Browse;
+	readonly search: Endpoints.Search;
 }
 
 export interface BaseClientConfig {
@@ -50,8 +51,8 @@ export interface BaseClientConfig {
 }
 
 export interface ClientConfig extends BaseClientConfig {
-	userAgent?: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36 Edg/100.0.1185.36";
 	originalUrl?: string;
+	userAgent?: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36 Edg/100.0.1185.36";
 }
 export type Body<T> = {
 	[Property in keyof T]: T[Property];

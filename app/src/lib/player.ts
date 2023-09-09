@@ -7,7 +7,7 @@ import Hls from "hls.js";
 import { tweened } from "svelte/motion";
 import { writable } from "svelte/store";
 import { sort, type PlayerFormats } from "./parsers/player";
-import { settings } from "./stores";
+import { settings, type ISessionListProvider } from "./stores";
 import { groupSession, type ConnectionState } from "./stores/sessions";
 import type { JSON } from "./types";
 import { WritableStore, notify, type ResponseBody } from "./utils";
@@ -44,10 +44,12 @@ const setPosition = () => {
 	}
 };
 
-function metaDataHandler() {
+function metaDataHandler(sessionList: ISessionListProvider) {
 	if ("mediaSession" in navigator) {
-		const position = SessionListService.position;
-		const currentTrack = SessionListService.mix[position];
+		const position = sessionList.position;
+		const currentTrack = sessionList.mix[position];
+		console.log({ currentTrack, position, mix: sessionList.mix });
+		if (!currentTrack) return;
 		navigator.mediaSession.metadata = new MediaMetadata({
 			title: currentTrack?.title,
 			artist: currentTrack?.artistInfo?.artist?.[0]?.text || "",
@@ -80,10 +82,10 @@ function metaDataHandler() {
 			setPosition();
 		});
 		navigator.mediaSession.setActionHandler("previoustrack", () =>
-			SessionListService.previous(),
+			sessionList.previous(),
 		);
 		navigator.mediaSession.setActionHandler("nexttrack", () =>
-			SessionListService.next(),
+			sessionList.next(),
 		);
 	}
 }
@@ -195,15 +197,16 @@ const loadAndAttachHLS = async (player: HTMLAudioElement) => {
 	return new Hls(hlsjsConfig);
 };
 
-const getPlayerVolumeFromLS = (player: HTMLAudioElement) => {
+const getPlayerVolumeFromLS = (player: WritableStore<number>) => {
 	const storedLevel = localStorage.getItem("volume");
 	const setDefaultVolume = () => {
 		localStorage.setItem("volume", "0.5");
-		player.volume = 0.5;
+		player.set(0.5);
 	};
+
 	if (storedLevel !== null) {
 		try {
-			player.volume = +storedLevel;
+			player.set(+storedLevel);
 		} catch {
 			setDefaultVolume();
 		}
@@ -214,6 +217,8 @@ const getPlayerVolumeFromLS = (player: HTMLAudioElement) => {
 class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 	private _currentTimeStore = new WritableStore<number>(0);
 	private _durationStore = new WritableStore<number>(0);
+	private _volumeStore = new WritableStore<number>(0);
+	private _srcStore = new WritableStore<string | undefined>(undefined);
 	private _paused = writable(true);
 	private _progress = tweened<number>(0);
 	private _taskQueue: [
@@ -255,18 +260,19 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 	private declare unsubscriber: () => void;
 	constructor() {
 		super();
-		if (!browser) return;
-		const onUserInteractionCallback = () => {
-			if (!this.player) {
-				this.createAudioNode();
-				window["_player"] = this.player;
-			}
-		};
+		if (browser) {
+			const onUserInteractionCallback = () => {
+				if (!this.player) {
+					this.createAudioNode();
+					window["_player"] = this.player;
+				}
+			};
 
-		document.addEventListener("click", onUserInteractionCallback, {
-			capture: true,
-			once: true,
-		});
+			document.addEventListener("click", onUserInteractionCallback, {
+				capture: true,
+				once: true,
+			});
+		}
 	}
 
 	public get currentTimeStore() {
@@ -326,9 +332,13 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 		};
 	}
 
-	public set volume(value: number) {
+	public get volume() {
+		return this._volumeStore;
+	}
+
+	public setVolume(value: number) {
 		if (!this.player) return;
-		this.player.volume = value;
+		this._volumeStore.set(value);
 	}
 
 	public dispose() {
@@ -392,16 +402,20 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 	}
 
 	public updateSrc({ url }: { url: string }) {
+		if (url === undefined) return;
+
 		if (this.playerKind === "hls") {
 			this.loadHLS(url);
 		} else {
 			this.player.src = url;
 		}
+		metaDataHandler(SessionListService.$.value);
 	}
 
 	private addTaskToTaskQueue(name: keyof AudioPlayerImpl, ...args: unknown[]) {
 		this._taskQueue.push([name, args]);
 	}
+
 	private async loadHLS(source?: string) {
 		if (this.hls) this.hls.destroy();
 		const hls = await loadAndAttachHLS(this.player);
@@ -412,11 +426,9 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 
 		this.hls.on(Hls.Events.MEDIA_ATTACHED, () => {
 			this.hls?.loadSource(source || this.player.src);
-			// console.log(this);
 		});
 
 		this.hls.on(Hls.Events.ERROR, (_event, data) => {
-			// console.log(this);
 			const type = data.type;
 			switch (type) {
 				case Hls.ErrorTypes.MEDIA_ERROR:
@@ -457,11 +469,22 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 		let locked = false;
 		this.player = new Audio();
 		this.player.autoplay = true;
-		getPlayerVolumeFromLS(this.player);
+		getPlayerVolumeFromLS(this._volumeStore);
 
+		const volumeSubscription = this._volumeStore.subscribe((value) => {
+			this.player.volume = value;
+			localStorage.setItem("volume", value.toString());
+		});
+
+		window.addEventListener("pagehide", ({ persisted }) => {
+			if (persisted) return;
+			this.dispose();
+			volumeSubscription();
+			this.player.remove();
+		});
 		// Dispatched on first autoplay
 		this.on("play", () => {
-			this.play();
+			// this.play();
 		});
 
 		this.onEvent("loadedmetadata", () => {
@@ -469,7 +492,6 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 			groupSession.resetAllCanPlay();
 
 			this.setStaleTimeout();
-			metaDataHandler();
 		});
 
 		this.onEvent("play", () => {
@@ -516,6 +538,7 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 						});
 					}
 					if (groupSession.hasActiveSession && !groupSession.allCanPlay) return;
+					console.log({ nextSrc: this.nextSrc });
 					return await SessionListService.next(this.nextSrc.url).finally(() => {
 						locked = false; // Unlock this 'if' block when finished
 						this.nextSrc.url = undefined; // Set to undefined since e 'used' the value

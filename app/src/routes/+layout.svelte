@@ -20,7 +20,9 @@
 	import { groupSession, settings } from "$lib/stores";
 	import { currentTrack, queue } from "$lib/stores/list";
 	import { Logger } from "$lib/utils";
-	import SessionListService from "$stores/list/sessionList";
+	import { skipFirstInvocation } from "$lib/utils/skipFirstInvocation.js";
+	import { SessionListService } from "$stores/list/sessionList";
+	import { playbackURLStateUpdater } from "$stores/url.js";
 	import { onMount } from "svelte";
 	import { get } from "svelte/store";
 
@@ -40,10 +42,22 @@
 		  }, 0);
 
 	let queueAlreadyPopulated = false;
-	$: hasplayer = !queueAlreadyPopulated
-		? ((queueAlreadyPopulated = true), $queue.length !== 0)
+
+	const setAppHeightWithPlayer = () => {
+		if (queueAlreadyPopulated) return true;
+		const appElm = document.querySelector<HTMLDivElement>("#app");
+		if (appElm) {
+			queueAlreadyPopulated = true;
+			appElm.style.marginBlockEnd = "var(--player-bar-height)";
+		}
+		return true;
+	};
+
+	$: hasplayer = $queue.length
+		? setAppHeightWithPlayer()
 		: queueAlreadyPopulated;
 
+	$: if (hasplayer && browser) setAppHeightWithPlayer();
 	// Setup dev debugging logs
 	$: if (dev && browser) {
 		console.log($SessionListService);
@@ -76,9 +90,24 @@
 		if (main) main.scrollTo({ top: 0 });
 	});
 
+	let playbackUpdatesUrlHandler: ReturnType<typeof playbackURLStateUpdater>;
+
+	const setPlaybackUpdatesUrlHandler = skipFirstInvocation<boolean>((value) => {
+		playbackUpdatesUrlHandler.setEnabled(value);
+	});
+
+	$: if (
+		playbackUpdatesUrlHandler &&
+		$settings["playback"]["Playback Updates URL"] !== undefined
+	) {
+		setPlaybackUpdatesUrlHandler($fullscreenStore === "open");
+	}
 	let scrollTop = 0;
 	onMount(() => {
 		try {
+			playbackUpdatesUrlHandler = playbackURLStateUpdater(
+				$settings["playback"]["Playback Updates URL"] || false,
+			);
 			if (
 				$settings["playback"]["Remember Last Track"] &&
 				localStorage["lastTrack"]
@@ -97,31 +126,31 @@
 		}
 	});
 	let info: Record<string, any> = {};
-
-	const logInfo = (event: TouchEvent) => {
-		["target", "changedTouches"].forEach((prop) =>
-			prop === "changedTouches"
-				? (info[prop] = JSON.stringify(
-						Object.fromEntries(
-							["clientX", "clientY"].map((k) => [k, event[prop].item(0)[k]]),
-						),
-				  ))
-				: (info[prop] = event[prop].outerHTML.slice(
-						0,
-						event[prop].outerHTML.indexOf(">"),
-				  )),
-		);
-		// console.log(event.changedTouches);
-	};
 </script>
 
 <svelte:body class={$fullscreenStore === "open" ? "no-scroll" : ""} />
 <svelte:window
+	on:popstate={() => {
+		if (browser) {
+			const { state } = history;
+			if (state) {
+				const { info: _info } = state;
+				console.log({ _info, state });
+				if (_info) {
+					info = _info;
+				}
+			}
+		}
+	}}
 	on:pagehide={({ persisted }) => {
-		if (persisted) return;
+		if (persisted) return console.log(persisted);
 		if (!browser) return;
 		if (groupSession.initialized && groupSession.hasActiveSession) {
 			groupSession.disconnect();
+		}
+		if ($settings["playback"]["Playback Updates URL"]) {
+			playbackUpdatesUrlHandler.setEnabled(false);
+			playbackUpdatesUrlHandler.dispose();
 		}
 		AudioPlayer.dispose();
 	}}

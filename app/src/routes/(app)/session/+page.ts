@@ -1,5 +1,5 @@
-import type { PageLoad } from "./$types";
 import { IsoBase64 } from "$lib/utils/buffer";
+import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ url }) => {
 	const decoded_token = IsoBase64.fromBase64(

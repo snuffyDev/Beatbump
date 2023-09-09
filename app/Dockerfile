@@ -1,9 +1,16 @@
-FROM node:18-alpine3.15
+# Use a multi-stage build for better image size
+FROM node:20-alpine3.18 as builder
 
 WORKDIR /app
 
 ARG PORT
 ENV PORT ${PORT}
+
+ARG ALLOW_IFRAME
+ENV ALLOW_IFRAME ${ALLOW_IFRAME}
+ARG PUBLIC_ALLOW_THUMBNAIL_PROXY
+ENV PUBLIC_ALLOW_THUMBNAIL_PROXY ${PUBLIC_ALLOW_THUMBNAIL_PROXY}
+
 # install dependencies
 COPY package.json package-lock.json ./
 
@@ -13,18 +20,22 @@ RUN npm ci --legacy-peer-deps
 COPY . .
 
 RUN npm exec svelte-kit sync
-RUN npm run bb:build
+RUN PORT=${PORT} \
+    ALLOW_IFRAME=${ALLOW_IFRAME} \
+    PUBLIC_ALLOW_THUMBNAIL_PROXY=${PUBLIC_ALLOW_THUMBNAIL_PROXY} \
+    node ./scripts/build.cjs build
 
-FROM node:18-alpine3.15 as app
+# Start a new stage for the final image
+FROM node:20-alpine3.18 as app
 
-# RUN apk add --update nodejs npm
 WORKDIR /app
 
-COPY --from=0 /app/node_modules ./node_modules
-COPY --from=0 /app/build ./build
-COPY --from=0 /app/svelte.config.js .
-COPY --from=0 /app/vite.config.ts .
-COPY --from=0 /app/package.json ./
+# Copy necessary files from the builder stage
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/build ./build
+COPY --from=builder /app/svelte.config.js .
+COPY --from=builder /app/vite.config.ts .
+COPY --from=builder /app/package.json ./
 
 
 EXPOSE 3000

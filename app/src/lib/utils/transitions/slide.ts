@@ -3,17 +3,17 @@ import { cubicOut } from "svelte/easing";
 export type EasingFunction = (t: number) => number;
 
 export interface TransitionConfig {
+	css?: (t: number, u: number) => string;
 	delay?: number;
 	duration?: number;
 	easing?: EasingFunction;
-	css?: (t: number, u: number) => string;
 	tick?: (t: number, u: number) => void;
 }
 interface SlideParams {
 	delay?: number;
 	duration?: number;
-	y?: number;
 	easing?: EasingFunction;
+	y?: number;
 }
 export function slide(
 	node: Element,

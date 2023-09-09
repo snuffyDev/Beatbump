@@ -5,7 +5,7 @@
 	const RE_ALBUM_PLAYLIST_SINGLE = /PLAYLIST|ALBUM|SINGLE/;
 	const RE_THUMBNAIL_DIM = /=w\d+-h\d+-/gm;
 
-	const errorHandler = (event: Event) => {
+	const imageErrorHandler = (event: Event) => {
 		if (!browser) return;
 		const target = event.currentTarget as HTMLImageElement;
 		target.onerror = null;
@@ -132,7 +132,7 @@
 					notify("Shared successfully", "success");
 				}
 			} catch (error) {
-				notify("Error: " + error, "error");
+				notify("Failed to share: " + error, "error");
 			}
 		},
 	};
@@ -161,17 +161,12 @@
 			)
 			.add("Share", MENU_HANDLERS.share.bind(MENU_HANDLERS.share, ctx))
 			.build();
-	const thumbnailProxy = (url: string) => {
-		const urlNoHttps = url.slice(8);
-		const hostname = urlNoHttps.slice(0, 3);
-		return hostname === "y.i" ? "vi" : hostname;
-	};
 </script>
 
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import Loading from "$components/Loading/Loading.svelte";
-// import { groupSession } from "$lib/stores";
+	// import { groupSession } from "$lib/stores";
 	import { IDBService } from "$lib/workers/db/service";
 
 	import { browser } from "$app/environment";
@@ -317,6 +312,7 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <article
 	class="item item{ASPECT_RATIO}"
 	on:contextmenu={(event) => handleContextMenu(event, DropdownItems)}
@@ -326,11 +322,9 @@
 	}}
 >
 	<section class="item-thumbnail-wrapper img{ASPECT_RATIO}">
-		<section
+		<div
 			class="item-thumbnail img{ASPECT_RATIO}"
 			class:isArtistKind
-			on:focus
-			on:blur
 		>
 			<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 			<div
@@ -343,7 +337,7 @@
 				{/if}
 				<img
 					alt="thumbnail img{ASPECT_RATIO}"
-					on:error={(e) => errorHandler(e)}
+					on:error={(e) => imageErrorHandler(e)}
 					loading={index >= 3 ? "lazy" : null}
 					width={srcImg.width}
 					height={srcImg.height}
@@ -357,7 +351,7 @@
 					bind:items={DropdownItems}
 				/>
 			</div>
-		</section>
+		</div>
 	</section>
 	<div
 		class="item-title"

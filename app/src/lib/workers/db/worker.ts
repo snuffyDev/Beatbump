@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /// <reference lib="webworker" />
-import type { Actions, Methods } from "./types";
 import { dbHandler } from "./db";
+import type { Actions, Methods } from "./types";
 
 const worker = self as unknown as DedicatedWorkerGlobalScope;
 

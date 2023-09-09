@@ -2,10 +2,13 @@
 	import { page } from "$app/stores";
 	import Header from "$lib/components/Layouts/Header.svelte";
 	import InfoBox from "$lib/components/Layouts/InfoBox.svelte";
-	import ListItem from "$lib/components/ListItem/ListItem.svelte";
+	import ListItem, {
+		listItemPageContext,
+	} from "$lib/components/ListItem/ListItem.svelte";
 	import { CTX_ListItem, releasePageContext } from "$lib/contexts";
 	import list from "$lib/stores/list";
 	import { isPagePlaying } from "$stores/stores";
+	import { onMount } from "svelte";
 	import type { PageData } from "./$types";
 
 	export let data: PageData;
@@ -48,6 +51,11 @@
 			index: 0,
 		});
 	};
+
+	onMount(() => {
+		const release = listItemPageContext.add("playlist");
+		return release;
+	});
 
 	CTX_ListItem.set({
 		parentPlaylistId: releaseInfo.playlistId,

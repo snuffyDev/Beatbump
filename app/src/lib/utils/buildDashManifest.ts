@@ -1,4 +1,4 @@
-import { buildXML, type XMLRoot, type XMLNode } from "./xmlBuilder";
+import { buildXML, type XMLNode, type XMLRoot } from "./xmlBuilder";
 
 import { iter } from "./collections";
 
@@ -173,30 +173,30 @@ export function buildDashManifest(formats: IFormat[], lengthInSeconds: string) {
 }
 
 export interface IFormat {
-	itag: number;
-	url: string;
-	mimeType: string;
-	bitrate: number;
-	width?: number;
-	height?: number;
-	initRange: InitRange;
-	indexRange: InitRange;
-	lastModified: string;
-	contentLength: string;
-	quality: string;
-	fps?: number;
-	qualityLabel?: string;
-	projectionType: string;
-	averageBitrate: number;
 	approxDurationMs: string;
-	highReplication?: boolean;
+	audioChannels?: number;
 	audioQuality?: string;
 	audioSampleRate?: string;
-	audioChannels?: number;
+	averageBitrate: number;
+	bitrate: number;
+	contentLength: string;
+	fps?: number;
+	height?: number;
+	highReplication?: boolean;
+	indexRange: InitRange;
+	initRange: InitRange;
+	itag: number;
+	lastModified: string;
 	loudnessDb?: number;
+	mimeType: string;
+	projectionType: string;
+	quality: string;
+	qualityLabel?: string;
+	url: string;
+	width?: number;
 }
 
 interface InitRange {
-	start: string;
 	end: string;
+	start: string;
 }

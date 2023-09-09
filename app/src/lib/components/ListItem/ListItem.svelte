@@ -104,27 +104,28 @@
 		visitorData,
 	) => {
 		const { $queue, $startIndex = 0, $list } = stores;
+		console.log({ index, $startIndex, $queue, $list });
 		if (item.playlistId === $list!.currentMixId) {
 			if ($queue && index - $startIndex < $queue.length) {
-				await list
-					.getSessionContinuation({
-						videoId: item?.videoId,
-						key: index,
-						playlistId: item.playlistId,
-						loggingContext: item.loggingContext,
-						playerParams: item?.playerParams,
-						playlistSetVideoId: item?.playlistSetVideoId,
-						ctoken: $list ? $list.continuation : "",
-						clickTrackingParams: item.clickTrackingParams || "",
-					})
-					.then(() => {
-						return list.updatePosition(index);
-					});
+				await list.updatePosition($startIndex || index);
+
+				await list.getSessionContinuation({
+					videoId: item?.videoId,
+					key: $startIndex || index,
+					playlistId: item.playlistId,
+					loggingContext: item.loggingContext,
+					playerParams: item?.playerParams,
+					playlistSetVideoId: item?.playlistSetVideoId,
+					ctoken: $list ? $list.continuation : "",
+					clickTrackingParams: item.clickTrackingParams || "",
+				});
 			} else {
+				await list.updatePosition($startIndex || index);
+
 				await list
 					.getSessionContinuation({
 						videoId: item?.videoId,
-						key: index,
+						key: $startIndex || index,
 						playlistId: item.playlistId,
 						loggingContext: item.loggingContext,
 						playerParams: item?.playerParams,
@@ -135,10 +136,6 @@
 
 						ctoken: $list!.continuation,
 						clickTrackingParams: item.clickTrackingParams!,
-					})
-					.then(() => {
-						return list.updatePosition(index);
-						// return SessionListService.next();
 					})
 					.catch(() => {
 						return list.initPlaylistSession({
@@ -155,16 +152,17 @@
 			return;
 		}
 		await tick();
-		await list.initPlaylistSession({
+		await list.updatePosition(index);
+		await list.initAutoMixSession({
 			playlistId: item.playlistId || "",
-			visitorData,
-			clickTrackingParams:
+
+			clickTracking:
 				($queue &&
 					item.playlistId === $list?.currentMixId &&
 					$queue[index]?.clickTrackingParams) ||
 				item?.clickTrackingParams,
-			index: index,
-			params: item.playerParams ?? item?.itct,
+			keyId: index,
+			config:  {playerParams: item.playerParams ?? item?.itct},
 			playlistSetVideoId: item?.playlistSetVideoId,
 			videoId: item?.videoId,
 		});
@@ -342,12 +340,15 @@
 			{ index: idx },
 			(a, b) => (a.index ?? 0) - (b.index ?? 0),
 		);
+
 		const position = cache.has(idx)
 			? cache.get(idx)
 			: cache.set(idx, queueIndex < 0 ? idx : queueIndex);
+		console.log(event, position, idx, queueIndex, $list);
+		Logger.mark(`Handle Click: ${position}`);
 		switch (page) {
 			case "queue": {
-				if (listItemPageContext.isLibrary()) {
+				if (listItemPageContext.isLibrary() && !list.isLocalPlaylist) {
 					dispatch("initLocalPlaylist", { idx });
 					dispatch("setPageIsPlaying", { id: "", index: idx });
 					return;
@@ -362,6 +363,7 @@
 				break;
 			}
 			case "playlist":
+				Logger.mark(`Handle Playlist Click @ ${$startIndex}:  ${position}`);
 				await handlePlaylistClick(
 					item,
 					position,
@@ -374,6 +376,7 @@
 				dispatch("initLocalPlaylist", { idx });
 				break;
 			case "release":
+				Logger.mark(`Release Click: ${$startIndex} ${position}`);
 				await handlePlaylistClick(
 					item,
 					position,

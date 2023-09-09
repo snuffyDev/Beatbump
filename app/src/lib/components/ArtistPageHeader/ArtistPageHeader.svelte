@@ -1,58 +1,33 @@
 <script lang="ts">
-	import { browser } from "$app/environment";
+	import { scrollObserver } from "$lib/actions/scrollObserver";
 	import Icon from "$lib/components/Icon/Icon.svelte";
 	import type { ArtistPage } from "$lib/parsers";
 	import list from "$lib/stores/list";
-	import { debounce, throttle } from "$lib/utils";
-	import { isDesktopMQ, windowHeight, windowWidth } from "$stores/window";
+	import type { Thumbnail } from "$lib/types";
+	import { debounce } from "$lib/utils";
+	import { isDesktopMQ, isMobileMQ, windowHeight } from "$stores/window";
 	import { onMount } from "svelte";
-	import { cubicOut } from "svelte/easing";
+	import { quadOut } from "svelte/easing";
 	import { tweened } from "svelte/motion";
 	import Description from "./Description";
 
 	export let header: ArtistPage["header"];
-	export let thumbnail = [];
+	export let thumbnail: Thumbnail[] = [];
 	export let description = "";
-	let container: HTMLDivElement = undefined;
 	let y = 1;
-	let wrapper: HTMLElement;
 	let isExpanded = false;
 	let timestamp = 0;
 
+	let willChange = false;
+	const setWillChange = debounce(() => {
+		willChange = false;
+	}, 1000);
+
 	let opacity = 0;
 	let img: HTMLImageElement;
-	let isScrolling = false;
+
 	let calc: number;
-	const scale = tweened(1, { duration: 300, easing: cubicOut });
-	const debounced = debounce(() => (isScrolling = false), 200);
-	const handleScrollEnd = throttle(debounced, 100);
-
-	const handler = (ts: number) => {
-		if (!browser && !container) return;
-
-		calc = (wrapper.scrollTop / $windowHeight) * 2 || 0;
-
-		scale.update(() =>
-			$windowWidth < 500
-				? Math.max(calc * 3, 1)
-				: Math.min(5, Math.max(1, calc * 4)),
-		);
-		if (!isScrolling) {
-			return;
-		}
-		timestamp = requestAnimationFrame(handler);
-	};
-
-	function onScroll(event: UIEvent) {
-		handleScrollEnd();
-		if (timestamp) {
-			return;
-		}
-		if (isScrolling) return;
-		isScrolling = true;
-
-		timestamp = requestAnimationFrame(handler);
-	}
+	const scale = tweened(1, { duration: 300, easing: quadOut });
 
 	onMount(() => {
 		if (img) {
@@ -61,34 +36,58 @@
 			});
 		}
 
-		wrapper = document.getElementById("wrapper");
-		wrapper.addEventListener("scroll", onScroll, {
-			passive: true,
-			capture: true,
-		});
 		return () => {
 			if (timestamp) cancelAnimationFrame(timestamp);
-			wrapper.removeEventListener("scroll", onScroll, true);
 		};
 	});
 </script>
 
-<div class="artist-header">
+<div
+	class="artist-header"
+	style:will-change={willChange ? "top, transform" : null}
+>
 	<div
+		use:scrollObserver={{
+			target: "self",
+			threshold: [...Array(25).keys()].map((i) => {
+				return i / 25;
+			}),
+		}}
+		on:scrolled={({ detail }) => {
+			if (typeof detail.intersectionRatio === "number") {
+				if (!willChange) willChange = true;
+				y = (1.1 - detail.intersectionRatio) * 1000;
+				console.log(detail);
+				calc = y / detail.intersectionRatio / $windowHeight || 0;
+
+				scale.update(() =>
+					$isMobileMQ
+						? Math.min(7, Math.max(calc * 3, 1))
+						: Math.min(6, Math.max(1, calc * 3)),
+				);
+
+				console.log($scale);
+				setWillChange();
+			}
+			console.log({ y });
+		}}
 		class="artist-thumbnail"
 		style="{isExpanded
 			? 'background-color: rgba(0, 0, 0, 0.4) !important'
 			: ''};"
 	>
 		<div
-			bind:this={container}
-			style={`background-image: linear-gradient(0deg, var(--base-bg) -${
-				6 + 0.6 * cubicOut($scale)
-			}%, var(--base-bg) ${
-				(20 + -$scale) * 0.5
-			}%, var(--base-bg-opacity-1_2) 35%, var(--base-bg-opacity-1_2) 40%, transparent);  --scale: ${Math.abs(
-				$scale,
-			)};`}
+			style={`background-image: linear-gradient(0deg, var(--base-bg), var(--base-bg) ${
+				(-0.15 * $scale) / 0.5
+			}%,
+            var(--base-bg), var(--base-bg) ${
+							$scale < 4 ? $scale * 1.5 : 7 - 0.5 * $scale
+						}%, var(--base-bg-opacity-1_2) ${Math.min(
+				18,
+				Math.max(25, 5 * $scale),
+			)}%, var(--base-bg-opacity-3_4) ${$scale * 45}%,
+                            rgba(0, 0, 0, 0) 105%); --scale: ${$scale};
+            `}
 			id="gradient"
 			class="gradient"
 		/>
@@ -265,24 +264,26 @@
 	.artist-header {
 		display: block;
 		position: relative;
+		inset: 0;
 	}
 
 	.artist-thumbnail {
 		display: block;
 		position: relative;
-		height: 100%;
-		padding-top: 33vh;
-		overflow: hidden;
-		transition: background-color 0.8s cubic-bezier(0.19, 0, 0.7, 1);
-		background-color: rgb(0 0 0 / 10%);
-
-		@media only screen and (min-width: 1080px) and (max-width: 1600px) {
-			padding-top: 30vh;
-		}
-
-		@media only screen and (min-width: 1601px) {
+		bottom: 0;
+		left: 0;
+		right: 0;
+		padding-top: 45vh;
+		@media only screen and (min-width: 1024px) {
 			padding-top: 33vh;
 		}
+
+		@media only screen and (min-width: 1400px) {
+			padding-top: 30vh;
+		}
+		transition: background-color 0.8s cubic-bezier(0.19, 0, 0.7, 1);
+		background-color: rgb(0 0 0 / 10%);
+		max-width: 100%;
 
 		&::before {
 			position: absolute;
@@ -294,13 +295,11 @@
 	.gradient {
 		z-index: 0;
 		width: 100%;
-		height: 100%;
 		position: absolute;
 		inset: 0;
-		contain: content;
-		will-change: transform;
 		transform-origin: bottom;
 		transform: scaleY(var(--scale));
+		margin-bottom: -0.1rem;
 		&::before {
 			position: absolute;
 			inset: 0;

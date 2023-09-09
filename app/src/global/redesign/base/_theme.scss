@@ -93,6 +93,10 @@ html {
 					map-get($themes, $theme, "base"),
 					0.5
 				)};
+			--base-bg-opacity-3_4: #{transparentize(
+					map-get($themes, $theme, "base"),
+					0.8
+				)};
 			background: var(--base-bg-opacity-1_2);
 
 			@each $section, $elm in $sections {

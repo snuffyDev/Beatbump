@@ -7,6 +7,7 @@
 <script lang="ts">
 	import { browser } from "$app/environment";
 	import Header from "$components/Layouts/Header.svelte";
+	import { PUBLIC_ALLOW_THUMBNAIL_PROXY } from "$env/static/public";
 	import { AudioPlayer } from "$lib/player";
 	import { settings, type Theme } from "$stores/settings";
 	const themes: Theme[] = ["Dark", "Dim", "Midnight", "YTM"];
@@ -118,7 +119,7 @@
 				/>
 			</div>
 			<div class="setting">
-				<label for="stream"> Stream </label>
+				<label for="stream">Stream </label>
 				<div class="select">
 					<select
 						name="stream"
@@ -135,6 +136,26 @@
 						{/each}
 					</select>
 				</div>
+			</div>
+
+			<div class="setting">
+				<!-- svelte-ignore a11y-label-has-associated-control -->
+				<label
+					>Playback Updates URL
+					<span class=""
+						>Playing a song updates the URL with the song's sharing URL.</span
+					>
+				</label>
+				<input
+					name="update-url"
+					id="update-url"
+					type="checkbox"
+					bind:checked={$settings["playback"]["Playback Updates URL"]}
+				/>
+				<label
+					for="update-url"
+					class="switch"
+				/>
 			</div>
 		</section>
 		<section>
@@ -177,24 +198,25 @@
 					>
 				</div>
 			</div>
-			<div class="setting">
-				<label
-					>Proxy Thumbnails
-					<span class="">Proxy all thumbnails through Beatbump.</span>
-				</label>
-				<input
-					name="proxy-thumbnails"
-					id="proxy-thumbnails"
-					type="checkbox"
-					on:input={updatePrefsCookie}
-					bind:checked={$settings["network"]["Proxy Thumbnails"]}
-				/>
-				<label
-					for="proxy-thumbnails"
-					class="switch"
-				/>
-			</div>
-
+			{#if PUBLIC_ALLOW_THUMBNAIL_PROXY === "true"}
+				<div class="setting">
+					<label
+						>Proxy Thumbnails
+						<span class="">Proxy all thumbnails through Beatbump.</span>
+					</label>
+					<input
+						name="proxy-thumbnails"
+						id="proxy-thumbnails"
+						type="checkbox"
+						on:input={updatePrefsCookie}
+						bind:checked={$settings["network"]["Proxy Thumbnails"]}
+					/>
+					<label
+						for="proxy-thumbnails"
+						class="switch"
+					/>
+				</div>
+			{/if}
 			<div class="setting">
 				<label
 					>Proxy Audio

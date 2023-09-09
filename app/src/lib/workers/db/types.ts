@@ -3,31 +3,31 @@ import type { Item } from "$lib/types";
 export type Actions = "create" | "get" | "update" | "delete";
 
 export interface Methods {
-	updatePlaylist: (entry: IDBPlaylistInternal) => Promise<IDBMessage<void>>;
-	deletePlaylist: (name: string) => Promise<IDBMessage<void>>;
+	createFavorite: (item: Item) => Promise<IDBMessage<void>>;
 	createPlaylist: (entry: IDBPlaylist) => Promise<IDBMessage<void>>;
 	deleteFavorite: (item: Item) => Promise<IDBMessage<void>>;
+	deletePlaylist: (name: string) => Promise<IDBMessage<void>>;
 	getFavorites: () => Promise<IDBMessage<Item[]>>;
 	getPlaylist: (id: string) => Promise<IDBMessage<IDBPlaylist>>;
 	getPlaylists: () => Promise<IDBMessage<IDBPlaylist[]>>;
-	createFavorite: (item: Item) => Promise<IDBMessage<void>>;
+	updatePlaylist: (entry: IDBPlaylistInternal) => Promise<IDBMessage<void>>;
 }
 
 export interface IObjectStores {
-	playlists: { keyPath: "id" };
 	favorites: { keyPath: "videoId" | "id" };
+	playlists: { keyPath: "id" };
 }
 export interface IDBPlaylist {
-	name?: string;
 	description?: string;
-	thumbnail?: any;
-	items?: Item[];
 	id?: string;
+	items?: Item[];
+	name?: string;
+	thumbnail?: any;
 }
 
 export interface IDBPlaylistInternal extends IDBPlaylist {
-	length?: number;
 	hideAlert?: boolean;
+	length?: number;
 }
 
 export type IDBRequestTarget = Event & {
@@ -36,7 +36,7 @@ export type IDBRequestTarget = Event & {
 export type IDBStoreKeys = "playlists" | "favorites";
 
 export interface IDBMessage<T = unknown> {
-	error?: boolean;
 	data?: T;
+	error?: boolean;
 	message?: string;
 }

@@ -1,30 +1,30 @@
 import { debounce } from "./debounce";
-import { throttle } from "./throttle";
 import type {
-	EventType,
 	EventCallback,
 	EventListeners,
+	EventType,
 	IEventEmitter,
 } from "./emitter";
 import { EventEmitter, Messenger, messenger } from "./emitter";
-import type { SyncResult, Receiver, Sender } from "./mpmc";
-import { mpmc, globalChannel } from "./mpmc";
+import type { Receiver, Sender, SyncResult } from "./mpmc";
+import { globalChannel, mpmc } from "./mpmc";
 import { Mutex } from "./mutex";
+import { throttle } from "./throttle";
 
 export {
-	type EventCallback,
 	EventEmitter,
-	type EventListeners,
-	type EventType,
-	type IEventEmitter,
 	Messenger,
 	Mutex,
-	type Receiver,
-	type Sender,
-	type SyncResult,
 	debounce,
 	globalChannel,
 	messenger,
 	mpmc,
 	throttle,
+	type EventCallback,
+	type EventListeners,
+	type EventType,
+	type IEventEmitter,
+	type Receiver,
+	type Sender,
+	type SyncResult,
 };

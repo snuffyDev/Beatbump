@@ -19,9 +19,6 @@
 			"$components/*": [
 				"../src/lib/components/*"
 			],
-			"$env": [
-				"../src/env.ts"
-			],
 			"$lib": [
 				"../src/lib"
 			],

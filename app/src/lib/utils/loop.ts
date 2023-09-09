@@ -9,8 +9,9 @@ const raf = browser
 	  };
 
 export interface Task {
-	abort(): void;
 	promise: Promise<void>;
+
+	abort(): void;
 }
 
 type TaskCallback = (now: number) => boolean | void;

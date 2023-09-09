@@ -4,13 +4,12 @@ import type { ResponseBody } from "$lib/utils/utils";
 import type { Writable } from "svelte/store";
 
 export interface ISessionListProvider {
-	currentMixId: string;
-	continuation: string;
 	clickTrackingParams: Nullable<string>;
+	continuation: string;
+	currentMixId: string;
+	currentMixType: "playlist" | "auto" | "local" | null;
 	mix: Array<Item>;
 	position: number;
-	currentMixType: "playlist" | "auto" | "local" | null;
-	visitorData: null | string;
 	related?: {
 		browseId: string;
 		browseEndpointContextSupportedConfigs: {
@@ -19,12 +18,38 @@ export interface ISessionListProvider {
 			};
 		};
 	} | null;
+	visitorData: null | string;
 }
 
 export interface ISessionListService {
-	subscribe: Writable<ISessionListProvider>["subscribe"];
+	/** Getter for clickTrackingParams */
+	clickTrackingParams: string;
+	/** Getter for continuation */
+	continuation: string;
+	/** Getter for currentMixId */
+	currentMixId: string;
+	/** Getter for mix */
+	mix: Array<Item>;
+	/** Getter for queue position */
+	position: number;
 	set: Writable<ISessionListProvider>["set"];
-	lockedSet(_mix: ISessionListProvider): Promise<ISessionListProvider>;
+	subscribe: Writable<ISessionListProvider>["subscribe"];
+
+	/**
+	 * Fetches a set of similar songs and appends them to the current
+	 * automix session
+	 */
+	getMoreLikeThis(args?: { playlistId?: Nullable<string> }): Promise<void>;
+	/** Continues current automix session by fetching the next batch of songs */
+	getSessionContinuation(args: {
+		itct: string;
+		videoId: string;
+		playlistId: string;
+		ctoken: string;
+		clickTrackingParams: string;
+		loggingContext?: { vssLoggingContext: { serializedContextData: string } };
+		key: number;
+	}): Promise<ResponseBody>;
 	/** Initialize a new automix session */
 	initAutoMixSession(args: {
 		videoId?: string;
@@ -50,46 +75,13 @@ export interface ISessionListService {
 		body: ResponseBody;
 		error?: boolean | undefined;
 	} | null>;
-
-	/** Continues current automix session by fetching the next batch of songs */
-	getSessionContinuation(args: {
-		itct: string;
-		videoId: string;
-		playlistId: string;
-		ctoken: string;
-		clickTrackingParams: string;
-		loggingContext?: { vssLoggingContext: { serializedContextData: string } };
-		key: number;
-	}): Promise<ResponseBody>;
-
-	/**
-	 * Fetches a set of similar songs and appends them to the current
-	 * automix session
-	 */
-	getMoreLikeThis(args?: { playlistId?: Nullable<string> }): Promise<void>;
-
+	lockedSet(_mix: ISessionListProvider): Promise<ISessionListProvider>;
+	removeTrack(index: number): void;
+	setMix(mix: Item[], type?: "auto" | "playlist" | "local"): void;
 	/** Sets the item passed to the function to play next */
 	setTrackWillPlayNext(item: Item, key: number): Promise<void>;
-
-	setMix(mix: Item[], type?: "auto" | "playlist" | "local"): void;
-
-	removeTrack(index: number): void;
-
-	shuffleRandom(items: Array<Item>): void;
-
 	shuffle(index: number, preserveBeforeActive?: boolean): void;
-
+	shuffleRandom(items: Array<Item>): void;
 	toJSON(): string;
-
 	updatePosition(direction: "next" | "back" | number): Promise<number>;
-	/** Getter for queue position */
-	position: number;
-	/** Getter for mix */
-	mix: Array<Item>;
-	/** Getter for currentMixId */
-	currentMixId: string;
-	/** Getter for clickTrackingParams */
-	clickTrackingParams: string;
-	/** Getter for continuation */
-	continuation: string;
 }

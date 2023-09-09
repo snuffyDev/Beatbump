@@ -12,7 +12,6 @@
 			"$api/*": ["./src/routes/(app)/api/_lib/*"],
 			"$lib": ["./src/lib"],
 			"$lib/*": ["./src/lib/*"],
-			"$env": ["./src/env.ts"],
 			"$app/*": ["./.svelte-kit/runtime/app/*"]
 		}
 	},

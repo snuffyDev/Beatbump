@@ -2,21 +2,20 @@ version: "3"
 
 services:
   app:
+    env_file:
+      - .env
     build:
       context: ./app
       dockerfile: Dockerfile
       args:
         - PORT=$PORT
+        - ALLOW_IFRAME=$ALLOW_IFRAME
+        - PUBLIC_ALLOW_THUMBNAIL_PROXY=$PUBLIC_ALLOW_THUMBNAIL_PROXY
     ports:
-      - "443:${PORT}"
-    environment:
-      PORT: 3000
-      VITE_DOMAIN: "beatbump.ml"
-      VITE_SITE_URL: "https://beatbump.ml"
-      VITE_DONATION_URL: "https://www.paypal.com/donate/?hosted_button_id=E6YRHKS2H2KP2"
+      - "3000:3000"
   proxy:
     build:
-      context: ./packages/proxy-server/deno
+      context: ./packages/proxy-server/rust
       dockerfile: Dockerfile
     ports:
       - "3001:3001"

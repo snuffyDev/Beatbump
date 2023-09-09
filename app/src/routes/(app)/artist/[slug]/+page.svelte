@@ -35,69 +35,71 @@
 	image={header?.thumbnails && header?.thumbnails[0]?.url}
 />
 <svelte:window bind:innerWidth />
-<ArtistPageHeader
-	description={header?.description}
-	{header}
-	thumbnail={header?.thumbnails}
-/>
-<main>
-	<div class="artist-body">
-		{#if songs?.items?.length > 0}
-			<section class="song-list resp-content-width">
-				<div class="header">
-					<span class="h2">Songs</span>
-					<a
-						style="white-space:pre; display: inline-block;"
-						href={`/playlist/${songs?.header?.browseId}`}
-						><small>See All</small></a
-					>
-				</div>
-				<section class="songs">
-					{#each songs?.items as item, idx}
-						<ListItem
-							{item}
-							{idx}
-							on:setPageIsPlaying={() => {
-								isPagePlaying.add(id);
-							}}
-						/>
-					{/each}
+<div class="fix-width">
+	<ArtistPageHeader
+		description={header?.description}
+		{header}
+		thumbnail={header?.thumbnails}
+	/>
+	<main>
+		<div class="artist-body">
+			{#if songs?.items?.length > 0}
+				<section class="song-list resp-content-width">
+					<div class="header">
+						<span class="h2">Songs</span>
+						<a
+							style="white-space:pre; display: inline-block;"
+							href={`/playlist/${songs?.header?.browseId}`}
+							><small>See All</small></a
+						>
+					</div>
+					<section class="songs">
+						{#each songs?.items as item, idx}
+							<ListItem
+								{item}
+								{idx}
+								on:setPageIsPlaying={() => {
+									isPagePlaying.add(id);
+								}}
+							/>
+						{/each}
+					</section>
 				</section>
-			</section>
-		{/if}
-		{#each carousels as { contents, header }, i}
-			{#if i === carousels.length - 1}
-				<Carousel
-					{visitorData}
-					items={contents}
-					type="artist"
-					kind={header?.type}
-					isBrowseEndpoint={true}
-					{header}
-				>
-					>
-				</Carousel>
-			{:else}
-				<Carousel
-					items={contents}
-					{visitorData}
-					type="artist"
-					kind={header?.type}
-					isBrowseEndpoint={false}
-					{header}
-				>
-					>
-				</Carousel>
 			{/if}
-		{/each}
-		{#if $isMobileMQ && header?.description}
-			<Description
-				class="resp-content-width"
-				description={header.description}
-			/>
-		{/if}
-	</div>
-</main>
+			{#each carousels as { contents, header }, i}
+				{#if i === carousels.length - 1}
+					<Carousel
+						{visitorData}
+						items={contents}
+						type="artist"
+						kind={header?.type}
+						isBrowseEndpoint={true}
+						{header}
+					>
+						>
+					</Carousel>
+				{:else}
+					<Carousel
+						items={contents}
+						{visitorData}
+						type="artist"
+						kind={header?.type}
+						isBrowseEndpoint={false}
+						{header}
+					>
+						>
+					</Carousel>
+				{/if}
+			{/each}
+			{#if $isMobileMQ && header?.description}
+				<Description
+					class="resp-content-width"
+					description={header.description}
+				/>
+			{/if}
+		</div>
+	</main>
+</div>
 
 <style lang="scss">
 	@import "../../../../lib/components/ArtistPageHeader/index.scss";
@@ -111,6 +113,10 @@
 		margin: 0.5rem 0.7rem 0;
 		width: auto;
 		max-width: 9rem;
+	}
+	.fix-width {
+		position: absolute;
+		inset: 0;
 	}
 
 	.item-title {

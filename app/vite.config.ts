@@ -22,7 +22,11 @@ const config: UserConfig = {
 		minifyIdentifiers: true,
 		minifySyntax: true,
 	},
-
+	server: {
+		fs: {
+			strict: false,
+		},
+	},
 	test: {
 		include: ["src/**/*.{test,spec}.{js,ts}"],
 	},

@@ -1,5 +1,5 @@
-import { json as json$1 } from "@sveltejs/kit";
 import type { RequestHandler } from "@sveltejs/kit";
+import { json as json$1 } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams;

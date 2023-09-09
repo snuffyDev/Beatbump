@@ -20,6 +20,7 @@ interface Playback {
 	"Remember Last Track"?: boolean;
 	Quality?: "Normal" | "Low";
 	Stream?: StreamType;
+	"Playback Updates URL"?: boolean;
 }
 interface Network {
 	"Stream Proxy Server": string;
@@ -49,6 +50,7 @@ let list: UserSettings = {
 		"Remember Last Track": false,
 		"Prefer WebM Audio": false,
 		Stream: "HTTP",
+		"Playback Updates URL": false,
 	},
 	appinfo: {
 		Donate: ENV_DONATION_URL,

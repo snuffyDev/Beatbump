@@ -9,12 +9,7 @@ export const browseHandler = (pageType: string, browseId: string): void => {
 	} else {
 		pageType.includes("PLAYLIST")
 			? goto("/playlist/" + browseId)
-			: goto(
-					"/release?type=" +
-						encodeURIComponent(pageType) +
-						"&id=" +
-						encodeURIComponent(browseId),
-			  );
+			: goto("/release?type=" + encodeURIComponent(pageType) + "&id=" + encodeURIComponent(browseId));
 	}
 };
 export async function clickHandler({
@@ -40,36 +35,34 @@ export async function clickHandler({
 					encodeURIComponent(item.endpoint?.browseId),
 			);
 		} else {
+			console.log({ index });
+
 			await list.initAutoMixSession({
 				videoId: item.videoId,
 				playlistId: item.playlistId,
+
 				loggingContext: item?.loggingContext || null,
-				keyId: kind === "isPlaylist" ? index : 0,
 				config: { type: item?.musicVideoType },
 			});
-
-			list.updatePosition(kind === "isPlaylist" ? index : 0);
+			return;
 		}
 	}
 	if (item?.endpoint?.pageType.includes("ARTIST")) {
 		goto(`/artist/${item?.endpoint?.browseId}`);
 	}
 
-	if (
-		!isBrowseEndpoint &&
-		item.videoId !== undefined &&
-		!item?.endpoint?.pageType.includes("ARTIST")
-	) {
+	if (!isBrowseEndpoint && item.videoId !== undefined && !item?.endpoint?.pageType.includes("ARTIST")) {
 		await list.initAutoMixSession({
 			loggingContext: item?.loggingContext,
 			videoId: item.videoId,
-			playlistId: item.playlistId ?? createRandomMixId(item.videoId, "video"),
-			keyId: type !== "home" ? index : undefined,
+			playlistId: item.playlistId,
+
+			config: { type: item?.musicVideoType },
 		});
-		list.updatePosition(index);
+		return;
 	} else {
-		if (item.endpoint)
-			browseHandler(item.endpoint?.pageType, item.endpoint?.browseId);
+		if (item.endpoint) browseHandler(item.endpoint?.pageType, item.endpoint?.browseId);
+		return;
 	}
 	return false;
 }

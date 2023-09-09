@@ -34,6 +34,9 @@ function dev(...message: any[]) {
 }
 
 export const Logger = {
+	mark: (name: string) => {
+		log(`[${new Date().toDateString()}]: `, name, new Error().stack);
+	},
 	dev,
 	debug,
 	log,

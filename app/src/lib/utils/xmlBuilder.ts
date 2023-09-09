@@ -1,11 +1,11 @@
 import { reduce } from "./collections";
 
 export interface XMLNode {
-	type: "element" | "declaration";
-	name?: string;
 	attrs?: Record<string, string | boolean | number>;
+	name?: string;
 	nodes?: Array<XMLNode>;
 	text?: string;
+	type: "element" | "declaration";
 }
 
 export interface XMLRoot {

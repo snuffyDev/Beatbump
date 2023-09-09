@@ -21,3 +21,4 @@ node_modules
 /packages/proxy-server/rust/target
 /app/.svelte-kit/*
 app/.svelte-kit/ambient.d.ts
+app/build/**/*

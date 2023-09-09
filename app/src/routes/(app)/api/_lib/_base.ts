@@ -1,30 +1,30 @@
 interface ArtistEndpointParams {
-	browseId: string;
 	browseEndpointContextMusicConfig: {
 		browseEndpointContextMusicConfig: {
 			pageType: "MUSIC_PAGE_TYPE_ARTIST";
 		};
 	};
+	browseId: string;
 }
 interface RelatedEndpointParams {
 	browseId: string;
 	params: string;
 }
 interface PlayerEndpointParams {
-	videoId: string;
-	playlistId?: string;
 	playerParams?: string;
+	playlistId?: string;
+	videoId: string;
 }
 
 interface NextEndpointParams {
 	continuation?: string;
-	params?: string;
-	videoId?: string;
-	playlistSetVideoId?: string;
-	isAudioOnly: boolean;
 	enablePersistentPlaylistPanel: boolean;
+	isAudioOnly: boolean;
+	params?: string;
 	playlistId?: string;
+	playlistSetVideoId?: string;
 	tunerSettingValue: "AUTOMIX_SETTING_NORMAL";
+	videoId?: string;
 	watchEndpointMusicSupportedConfigs: {
 		watchEndpointMusicConfig?: {
 			musicVideoType?: string | "MUSIC_VIDEO_TYPE_ATV";
@@ -33,8 +33,8 @@ interface NextEndpointParams {
 }
 interface SearchEndpointParams extends PlaylistEndpointContinuation {
 	browseId: string;
-	query: string;
 	params?: string;
+	query: string;
 }
 
 interface PlaylistEndpointContinuation {
@@ -53,9 +53,9 @@ interface PlaylistEndpointParams {
 export type {
 	ArtistEndpointParams,
 	NextEndpointParams,
-	PlaylistEndpointParams,
-	PlaylistEndpointContinuation,
 	PlayerEndpointParams,
-	SearchEndpointParams,
+	PlaylistEndpointContinuation,
+	PlaylistEndpointParams,
 	RelatedEndpointParams,
+	SearchEndpointParams,
 };

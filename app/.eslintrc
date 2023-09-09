@@ -5,11 +5,9 @@
 	"extends": [
 		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended",
-		"plugin:import/recommended",
-		"plugin:import/typescript",
 		"plugin:svelte/recommended"
 	],
-	"plugins": ["@typescript-eslint", "import", "unused-imports", "svelte"],
+	"plugins": ["@typescript-eslint", "unused-imports", "svelte"],
 	"ignorePatterns": ["*.cjs"],
 	"overrides": [
 		{
@@ -22,13 +20,9 @@
 		{ "files": ["*.cjs"], "env": { "node": true } }
 	],
 	"rules": {
-		"import/no-unresolved": [2, { "ignore": ["\\$app/", "\\$service-worker"] }],
-		"import/no-cycle": "error",
-		"import/no-unused-modules": "off",
 		"no-mixed-spaces-and-tabs": "off",
 		"svelte/valid-compile": "off",
 		"no-unused-vars": "off", // or "@typescript-eslint/no-unused-vars": "off",
-		"import/no-duplicates": "off",
 		"unused-imports/no-unused-imports": "error",
 		"unused-imports/no-unused-vars": [
 			"warn",

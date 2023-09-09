@@ -27,6 +27,7 @@
 <style lang="scss">
 	.alert-container {
 		display: flex;
+        flex-direction: column;
 		justify-content: center;
 		position: fixed;
 		bottom: var(--alert-bottom, 5.75rem);

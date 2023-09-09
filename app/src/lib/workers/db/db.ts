@@ -4,14 +4,14 @@ const browser = typeof globalThis !== "undefined";
 import type { Maybe, VoidCallback } from "$lib/utils/collections/array";
 import type { Item } from "../../types";
 import type {
+	Actions,
+	IDBMessage,
+	IDBPlaylist,
 	IDBPlaylistInternal,
 	IDBRequestTarget,
-	IDBPlaylist,
-	Actions,
 	IDBStoreKeys,
-	IDBMessage,
-	Methods,
 	IObjectStores,
+	Methods,
 } from "./types";
 
 function iter<T>(array: ArrayLike<T>, cb: VoidCallback<T>): void {
@@ -41,7 +41,33 @@ function filter<T, S>(
 }
 export class IDB {
 	private $$: Promise<IDBDatabase> | undefined;
+
 	constructor(private DB_NAME: string, private DB_VER: number = 1) {}
+
+	public transaction<
+		K = unknown,
+		T extends (store: IDBObjectStore) => K = (store: IDBObjectStore) => K,
+	>(
+		store: IDBStoreKeys,
+		type: IDBTransactionMode,
+		callback: T,
+	): Promise<K | void> {
+		if (!browser) {
+			return;
+		}
+
+		this.init();
+		return (this.$$ as Promise<IDBDatabase>).then(
+			(db) =>
+				new Promise<K | void>((resolve, reject) => {
+					const tx = db.transaction(store, type);
+					tx.oncomplete = () => resolve();
+					tx.onabort = tx.onerror = () => reject(tx.error);
+
+					callback(tx.objectStore(store));
+				}),
+		);
+	}
 
 	private init(): void {
 		if (this.$$) {
@@ -78,30 +104,6 @@ export class IDB {
 				}
 			};
 		});
-	}
-	public transaction<
-		K = unknown,
-		T extends (store: IDBObjectStore) => K = (store: IDBObjectStore) => K,
-	>(
-		store: IDBStoreKeys,
-		type: IDBTransactionMode,
-		callback: T,
-	): Promise<K | void> {
-		if (!browser) {
-			return;
-		}
-
-		this.init();
-		return (this.$$ as Promise<IDBDatabase>).then(
-			(db) =>
-				new Promise<K | void>((resolve, reject) => {
-					const tx = db.transaction(store, type);
-					tx.oncomplete = () => resolve();
-					tx.onabort = tx.onerror = () => reject(tx.error);
-
-					callback(tx.objectStore(store));
-				}),
-		);
 	}
 }
 

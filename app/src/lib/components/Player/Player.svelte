@@ -2,6 +2,22 @@
 	context="module"
 	lang="ts"
 >
+	const volumeMenuHandler = (callback: () => void, delay: number) => {
+		let timer: ReturnType<typeof setTimeout> | undefined;
+		const toggle = () => {
+			if (timer) {
+				clearTimeout(timer);
+				timer = undefined;
+			} else {
+				timer = setTimeout(callback, delay);
+			}
+		};
+
+		return {
+			toggle,
+		};
+	};
+
 	export const createPlayerPopperMenu = (
 		$currentTrack: Item,
 		$queuePosition: number,
@@ -92,9 +108,14 @@
 	import { SITE_ORIGIN_URL } from "$stores/url";
 	import PlayerButton from "./PlayerButton.svelte";
 
-	const { paused } = AudioPlayer;
-	let volume = 0.5;
+	const { paused, volume: AudioPlayerVolume } = AudioPlayer;
+
+	$: volume = $AudioPlayerVolume;
 	let volumeHover = false;
+
+	const handleVolumeHover = volumeMenuHandler(() => {
+		volumeHover = !volumeHover;
+	}, 500);
 
 	$: isPlaying = $paused;
 
@@ -217,9 +238,7 @@
 		>
 			<div
 				class="volume"
-				on:pointerleave={() => {
-					volumeHover = false;
-				}}
+				on:pointerleave={handleVolumeHover.toggle}
 				use:clickOutside
 				on:click_outside={() => (volumeHover = false)}
 			>
@@ -228,7 +247,7 @@
 					color="white"
 					class="volume-icon player-btn"
 					on:pointerover={() => {
-						volumeHover = true;
+						handleVolumeHover.toggle();
 					}}
 					on:click|capture|stopPropagation={() => (volumeHover = !volumeHover)}
 				>
@@ -251,7 +270,7 @@
 								on:input|capture|stopPropagation={(e) => {
 									let linear = e.target.value / 1;
 									let sqrt = Math.pow(linear, 1.2);
-									AudioPlayer.volume = sqrt;
+									AudioPlayer.setVolume(sqrt);
 								}}
 								bind:value={volume}
 								min="0"

@@ -174,6 +174,7 @@
 			if (rmContextFn) {
 				rmContextFn();
 				rmContextFn = undefined;
+				isPagePlaying.remove("player-queue");
 			}
 		}
 	}
@@ -461,7 +462,7 @@
 											slot="item"
 											on:setPageIsPlaying={async ({ detail }) => {
 												if (isPagePlaying.has("player-queue")) {
-													if ($queue.length) {
+													if ($queue.length && $SessionListService) {
 														getSrc(item.videoId, undefined, undefined, true);
 													}
 													SessionListService.updatePosition(detail.index);
@@ -719,7 +720,7 @@
 		@media screen and (min-width: 720px) {
 			position: absolute;
 			left: 0;
-			width: 45vw;
+			width: calc(45vw);
 			max-height: 100%;
 			// transform: unset !important;
 			height: 100% !important;

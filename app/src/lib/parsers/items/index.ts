@@ -73,14 +73,19 @@ export class ItemBuilder {
 				flexCol0.navigationEndpoint?.watchEndpoint
 					?.watchEndpointMusicSupportedConfigs?.watchEndpointMusicConfig
 					?.musicVideoType,
-			videoId: flexCol0.navigationEndpoint?.watchEndpoint?.videoId ?? undefined,
+			videoId:
+				flexCol0.navigationEndpoint?.watchEndpoint?.videoId ??
+				item.navigationEndpoint?.watchEndpoint?.videoId ??
+				 undefined,
 			playlistId: flexCol0.navigationEndpoint?.watchEndpoint?.playlistId
 				? flexCol0?.navigationEndpoint?.watchEndpoint?.playlistId
 				: item.menu?.menuRenderer.items[0].menuNavigationItemRenderer
 						?.navigationEndpoint?.watchEndpoint?.playlistId
 				? item.menu?.menuRenderer?.items[0]?.menuNavigationItemRenderer
 						.navigationEndpoint?.watchEndpoint?.playlistId
-				: item?.watchEndpoint?.playlistId,
+				: item?.watchEndpoint?.playlistId
+				? item?.watchEndpoint?.playlistId
+				: item.navigationEndpoint?.watchEndpoint?.playlistId,
 			thumbnails: thumbnails as (Thumbnail & { placeholder: string })[],
 			length:
 				"fixedColumns" in item &&
@@ -105,7 +110,8 @@ export class ItemBuilder {
 			loggingContext:
 				item.overlay?.musicItemThumbnailOverlayRenderer?.content
 					?.musicPlayButtonRenderer?.playNavigationEndpoint?.watchEndpoint
-					?.loggingContext,
+					?.loggingContext ??
+				item.navigationEndpoint?.watchEndpoint?.loggingContext,
 		});
 		if (isNavigationItem)
 			Item.endpoint = {

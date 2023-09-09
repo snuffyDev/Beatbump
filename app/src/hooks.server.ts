@@ -1,3 +1,7 @@
+const p: NodeJS.Process =
+	typeof process !== "undefined" ? process : { env: {} };
+
+import { PUBLIC_ALLOW_THUMBNAIL_PROXY } from "$env/static/public";
 import {
 	defaultCookieParams,
 	type PreferencesCookie,
@@ -6,7 +10,7 @@ import { objectKeys } from "$lib/utils/collections/objects";
 import type { Cookies, Handle } from "@sveltejs/kit";
 
 const headers = {
-	"X-Frame-Options": "SAMEORIGIN",
+	...(p.env?.ALLOW_IFRAME !== "true" && { "X-Frame-Options": "SAMEORIGIN" }),
 	"Referrer-Policy": "no-referrer",
 	"Permissions-Policy": `accelerometer=(), autoplay="*", camera=(), document-domain=(), encrypted-media=(), fullscreen=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), sync-xhr=(), usb=(), xr-spatial-tracking=(), geolocation=()`,
 	"X-Content-Type-Options": "nosniff",
@@ -21,16 +25,28 @@ const checkUserAgent = (userAgent: string | null) =>
 			? "Android"
 			: "Other"
 		: "Other";
+
+const forceThumbnailProxyUserConfig = (preferences: PreferencesCookie) => {
+	if (PUBLIC_ALLOW_THUMBNAIL_PROXY === "false") {
+		preferences["Proxy Thumbnails"] = false;
+	}
+	return preferences;
+};
+
 const updatePreferencesCookie = (cookies: Cookies) => {
 	const prefsCookie = cookies.get("_prefs") ?? "";
 
 	const preferences: PreferencesCookie = prefsCookie
 		? JSON.parse(atob(prefsCookie))
-		: { "Proxy Thumbnails": true, Restricted: false };
+		: {
+				"Proxy Thumbnails":
+					PUBLIC_ALLOW_THUMBNAIL_PROXY === "true" ? true : false,
+				Restricted: false,
+		  };
 
 	cookies.set(
 		"_prefs",
-		btoa(JSON.stringify(preferences)),
+		btoa(JSON.stringify(forceThumbnailProxyUserConfig(preferences))),
 		defaultCookieParams(),
 	);
 	return preferences;

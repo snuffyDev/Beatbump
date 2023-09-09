@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import type { IObject, IMergedObject } from "$lib/types/utilities";
+import type { IMergedObject, IObject } from "$lib/types/utilities";
 import { map } from "./array";
 
 type VoidCallback<T extends IObject<T>, K extends keyof T> = (
