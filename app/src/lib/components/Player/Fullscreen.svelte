@@ -767,8 +767,7 @@
 	}
 
 	hr {
-		touch-action: none;
-
+		margin-bottom: 1rem;
 		&.horz::before {
 			position: absolute;
 			inset: 0;
@@ -929,7 +928,7 @@
 		width: 100%;
 		border-top-left-radius: $sm-radius;
 		border-top-right-radius: $sm-radius;
-		height: 2.75em;
+		height: 4.5em;
 		padding-bottom: 0.0606em;
 		padding-block: 0.7em;
 		align-content: center;

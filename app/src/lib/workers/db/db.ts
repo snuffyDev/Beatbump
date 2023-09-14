@@ -23,6 +23,21 @@ function iter<T>(array: ArrayLike<T>, cb: VoidCallback<T>): void {
 	idx = null;
 }
 
+function removeNullish<T>(array: Array<T>): Array<T> {
+	const result: Array<T> = [];
+	let idx = -1,
+		curPos = 0;
+	const length = array.length;
+	for (; ++idx < length; ) {
+		if (!array[idx]) {
+			continue;
+		}
+		result[curPos] = array[idx];
+		curPos++;
+	}
+	return result;
+}
+
 function filter<T, S>(
 	array: Array<T>,
 	predicate: (item: Maybe<T>) => boolean,
@@ -40,7 +55,13 @@ function filter<T, S>(
 	return result as T[];
 }
 export class IDB {
-	private $$: Promise<IDBDatabase> | undefined;
+	private $$:
+		| Promise<
+				IDBDatabase & {
+					transaction: IDBTransaction;
+				}
+		  >
+		| undefined;
 
 	constructor(private DB_NAME: string, private DB_VER: number = 1) {}
 
@@ -53,7 +74,7 @@ export class IDB {
 		callback: T,
 	): Promise<K | void> {
 		if (!browser) {
-			return;
+			return undefined as never;
 		}
 
 		this.init();
@@ -143,17 +164,18 @@ export function updatePlaylist(
 				cursorReq.onsuccess = (event: IDBRequestTarget) => {
 					const cursor = event.target.result;
 					if (cursor) {
+						const items = removeNullish(
+							Array.isArray(entry?.items)
+								? [...entry.items]
+								: [...cursor.value.items],
+						);
 						cursor.update({
 							...cursor.value,
 							name: entry?.name ?? cursor?.value?.name,
 							thumbnail: entry?.thumbnail ?? cursor?.value?.thumbnail,
 							description: entry?.description ?? cursor?.value?.description,
-							length: Array.isArray(entry?.items)
-								? entry?.items.length
-								: cursor?.value?.items.length,
-							items: Array.isArray(entry?.items)
-								? [...entry.items]
-								: [...cursor.value.items],
+							length: items.length,
+							items,
 						});
 					}
 
@@ -353,7 +375,10 @@ export function getFavorites(): Promise<IDBMessage<Item[]>> {
 				const request = store.getAll();
 				request.onsuccess = (event: IDBRequestTarget) => {
 					if (Array.isArray(event?.target?.result)) {
-						resolve({ data: event.target.result });
+						const favorites = removeNullish(
+							Array.isArray(event.target.result) ? event.target.result : [],
+						);
+						resolve({ data: favorites });
 					}
 				};
 			} catch (error) {
@@ -363,13 +388,74 @@ export function getFavorites(): Promise<IDBMessage<Item[]>> {
 	});
 }
 
+function isValidPlaylist(thing: unknown): boolean {
+	return (
+		typeof thing === "object" &&
+		thing !== null &&
+		"id" in thing &&
+		"name" in thing &&
+		"length" in thing &&
+		"items" in thing &&
+		"thumbnail" in thing &&
+		"description" in thing
+	);
+}
+
+function findMissingProps(playlist: IDBPlaylistInternal): string[] {
+	const props = ["id", "name", "length", "items", "thumbnail", "description"];
+	const missingProps: string[] = [];
+	iter(props, (prop) => {
+		if (!(prop in playlist)) {
+			missingProps.push(prop);
+		}
+	});
+	return missingProps;
+}
+
+const coercePlaylist = (playlist: IDBPlaylistInternal): IDBPlaylist => {
+	const items = removeNullish(
+		Array.isArray(playlist?.items) ? playlist.items : [],
+	);
+
+	if (!isValidPlaylist(playlist)) {
+		const missingProps = findMissingProps(playlist);
+		for (const prop of missingProps) {
+			if (prop === "id") {
+				playlist.id = generateId(32);
+			}
+			if (prop === "length") {
+				playlist.length = Array.isArray(playlist?.items)
+					? playlist.items.length
+					: 0;
+			}
+			if (prop === "items") {
+				playlist.items = [];
+			}
+			if (prop === "name") {
+				playlist.name = "Unnamed Playlist";
+			}
+			if (prop === "thumbnail") {
+				playlist.thumbnail = "";
+			}
+			if (prop === "description") {
+				playlist.description = "";
+			}
+		}
+	}
+
+	return {
+		...playlist,
+		items,
+	};
+};
+
 export function getPlaylist(id: string): Promise<IDBMessage<IDBPlaylist>> {
 	return new Promise<IDBMessage<IDBPlaylist>>((resolve) => {
 		return db.transaction("playlists", "readwrite", (store) => {
 			try {
 				const request = store.openCursor(id);
 				request.onsuccess = (event: IDBRequestTarget) => {
-					resolve({ data: event.target.result.value });
+					resolve({ data: coercePlaylist(event.target.result.value) });
 				};
 				request.onerror = (e) => {};
 			} catch (error) {
@@ -421,8 +507,9 @@ export function getPlaylists(): Promise<IDBMessage<IDBPlaylist[]>> {
 										].flat();
 									}
 								}
+								results[idx].items = removeNullish(results[idx].items);
 								results[idx].length = item?.items.length ?? item?.length;
-								store.put({ ...results[idx] });
+								store.put(coercePlaylist({ ...results[idx] }));
 							}
 						});
 						resolve({ data: results });

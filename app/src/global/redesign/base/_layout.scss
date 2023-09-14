@@ -104,6 +104,17 @@ body {
 		--top-bar-height: clamp(3.8rem, 4rem, 4.75rem);
 		--base-font-size: 1.125rem;
 	}
+
+    // native app-like scrollbars
+    @media (hover: none) and (pointer: coarse) {
+        * {
+            scrollbar-width: none;
+        }
+        *::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
 }
 .tooltip {
 	position: absolute;

@@ -16,11 +16,13 @@
 	class:outlined
 	{disabled}
 	on:click|preventDefault
-	>{#if icon}<Icon
-			style="stroke-width: 2.5; display: inline-block; vertical-align: middle;"
-			name={icon.name}
-			size={icon.size ?? "1em"}
-		/>{/if}<span>
+	>{#if icon}<span>
+			<Icon
+				style="stroke-width: 1.5; display: inline-block; vertical-align: middle;"
+				name={icon.name}
+				size={icon.size ?? "1rem"}
+			/>
+		</span>{/if}<span>
 		<slot />
 	</span></button
 >
@@ -32,8 +34,10 @@
 	button > span {
 		padding-bottom: 0.1825rem;
 		line-height: 1;
-		margin-left: 0.25rem;
 		display: inline-block;
 		vertical-align: middle;
+		&:nth-child(2) {
+			margin-left: 0.25rem;
+		}
 	}
 </style>

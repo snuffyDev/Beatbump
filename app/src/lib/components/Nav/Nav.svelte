@@ -209,18 +209,6 @@
 					hidden = !hidden;
 				}}
 			/>
-			<button
-				on:click={() => {
-					hidden = !hidden;
-				}}
-				class="icon-btn x-button"
-				aria-label="close"
-			>
-				<Icon
-					name="x"
-					size="1.6125em"
-				/>
-			</button>
 		</div>
 	</div>
 {/if}

@@ -1,6 +1,6 @@
 <script lang="ts">
+	import Button from "$components/Button/Button.svelte";
 	import { scrollObserver } from "$lib/actions/scrollObserver";
-	import Icon from "$lib/components/Icon/Icon.svelte";
 	import type { ArtistPage } from "$lib/parsers";
 	import list from "$lib/stores/list";
 	import type { Thumbnail } from "$lib/types";
@@ -180,31 +180,25 @@
 				{/if}
 				<div class="btn-wrpr">
 					{#if header?.buttons.radio !== null}
-						<button
+						<Button
+							icon={{ name: "radio" }}
 							on:click={() =>
 								list.initAutoMixSession({
 									config: { playerParams: header.buttons.radio?.params },
 									playlistId: header.buttons.radio?.playlistId,
-								})}
-							><Icon
-								size="1.25em"
-								name="radio"
-							/><span class="button-text"> Play Radio</span></button
+								})}><span class="button-text"> Play Radio</span></Button
 						>
 					{/if}
 					{#if header?.buttons.shuffle !== false}
-						<button
+						<Button
 							class="outlined"
+							icon={{ name: "shuffle" }}
 							on:click={() =>
 								list.initAutoMixSession({
 									videoId: header.buttons.shuffle?.videoId,
 									config: { playerParams: header.buttons.shuffle?.params },
 									playlistId: header.buttons.shuffle?.playlistId,
-								})}
-							><Icon
-								size="1.25em"
-								name="shuffle"
-							/><span class="button-text"> Shuffle</span></button
+								})}><span class="button-text"> Shuffle</span></Button
 						>
 					{/if}
 				</div>
@@ -299,7 +293,7 @@
 		inset: 0;
 		transform-origin: bottom;
 		transform: scaleY(var(--scale));
-		margin-bottom: -0.1rem;
+		margin-bottom: -0.2em;
 		&::before {
 			position: absolute;
 			inset: 0;

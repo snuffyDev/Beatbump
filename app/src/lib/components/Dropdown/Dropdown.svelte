@@ -124,7 +124,9 @@
 			onClose();
 		}
 	}
+
 	let startTime: number | undefined;
+	
 	function scrollHandler(ts: number) {
 		if (!popper) return;
 		if (startTime === undefined) {
@@ -172,7 +174,8 @@
 		on:mouseleave|stopPropagation={onClose}
 		on:lostfocus={onClose}
 		in:slide={{ delay: 125, duration: 125 }}
-		out:slide={{ duration: 250, delay: 125 }}
+		out:slide={{ duration: 125, delay: 25 }}
+		on:click_outside={onClose}
 		class={type === "player" ? "dd-player" : "dd-menu"}
 		style="transform: translate({posX}px, {posY}px)"
 	>

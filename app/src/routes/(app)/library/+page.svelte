@@ -10,30 +10,32 @@
 	import { IDBService } from "$lib/workers/db/service";
 
 	import Button from "$components/Button";
-	import Loading from "$components/Loading/Loading.svelte";
 	import { exportDB, importDB } from "$lib/db";
-	import { setContext } from "svelte";
+	import type { Song } from "$lib/types";
+	import type { IDBPlaylist } from "$lib/workers/db/types";
+	import { onMount, setContext } from "svelte";
 	import Sync from "./_Sync.svelte";
 	import Grid from "./_components/Grid/Grid.svelte";
 
-	let favorites;
-	let playlists;
+	let favorites: Song[] = [];
+	let playlists: IDBPlaylist[] = [];
 
-	let showSyncModal;
-	let showPlaylistModal;
-	let showImportModal;
+	let showSyncModal = false;
+	let showPlaylistModal = false;
+	let showImportModal = false;
 	let files: FileList;
 
 	setContext("library", { isLibrary: true });
 
 	const updateFavorites = async () => {
-		favorites = await IDBService.sendMessage("get", "favorites");
+		favorites = (await IDBService.sendMessage("get", "favorites")) || [];
 		favorites = [...favorites.slice(0, 5)];
 		return favorites;
 	};
 	const updatePlaylists = async () => {
-		playlists = await IDBService.sendMessage("get", "playlists");
+		playlists = (await IDBService.sendMessage("get", "playlists")) || [];
 		playlists = [...playlists];
+		console.log(playlists);
 		return playlists;
 	};
 
@@ -46,23 +48,23 @@
 		}
 	};
 	$: if (files) readFiles(files);
-	let promise = loadLibrary();
-	async function loadLibrary() {
-		if (!browser) return;
-		try {
-			const [hasPlaylists, hasFavorites] = await Promise.all([
-				IDBService.sendMessage("get", "playlists"),
-				IDBService.sendMessage("get", "favorites"),
-			]);
 
-			favorites = hasFavorites.length !== 0 && [...hasFavorites.slice(0, 5)];
-			playlists = hasPlaylists.length !== 0 && [...hasPlaylists];
-			console.log(hasPlaylists, hasFavorites);
+	async function loadLibrary() {
+		try {
+			favorites = (await IDBService.sendMessage("get", "favorites")) || [];
+
+			playlists = (await IDBService.sendMessage("get", "playlists")) || [];
+
 			return { favorites, playlists };
 		} catch (err) {
 			console.error(err);
+			return { favorites: [], playlists: [] };
 		}
 	}
+
+	onMount(() => {
+		loadLibrary();
+	});
 </script>
 
 {#if showSyncModal && browser}
@@ -140,93 +142,80 @@
 		</div>
 	</header>
 
-	{#await promise}
-		<div class="loading">
-			<div class="loader">
-				<Loading size="3em" />
-			</div>
-			<p>Please wait...</p>
+	<section>
+		<div class="header">
+			<h2>Your Songs</h2>
+			<a href="/library/songs"
+				>{#if favorites?.length > 0}<small>See All</small>{/if}</a
+			>
 		</div>
-	{:then { favorites, playlists }}
-		<section>
-			<div class="header">
-				<h2>Your Songs</h2>
-				<a href="/library/songs"
-					>{#if favorites?.length > 0}<small>See All</small>{/if}</a
-				>
-			</div>
-			<div class="list">
-				{#if favorites?.length > 0}
-					{#each favorites as favorite}
-						<Listing
-							on:update={() => {
-								updateFavorites();
-							}}
-							data={favorite}
-						/>
-					{/each}
-				{:else}
-					<div class="container">
-						<h4>Empty!</h4>
-						<span class="subheading"
-							><em>Add some songs to keep track of what you love!</em></span
-						>
-					</div>
-				{/if}
-			</div>
-		</section>
-		{#if showPlaylistModal}
-			<CreatePlaylist
-				defaults={{
-					description: undefined,
-					name: undefined,
-					thumbnail: undefined,
-				}}
-				hasFocus={true}
-				on:submit={async (e) => {
-					const promise = await IDBService.sendMessage("create", "playlist", {
-						name: e.detail?.title,
-						description: e.detail?.description,
-						thumbnail:
-							e.detail?.thumbnail ??
-							"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjNDI0MjQyIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA1LjU0IDE2Ni43OTQpIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCZxdW90O1NlZ29lIFVJJnF1b3Q7LFJvYm90byxPeHlnZW4sVWJ1bnR1LENhbnRhcmVsbCwmcXVvdDtPcGVuIFNhbnMmcXVvdDssJnF1b3Q7SGVsdmV0aWNhIE5ldWUmcXVvdDssc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNmYWZhZmEiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiA1NC44MzkpIiBkPSJNMCAwaDcydjE0Ni4zMjNIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+",
-						items: [],
-					});
-					await updatePlaylists();
-					showPlaylistModal = false;
-				}}
-				on:close={() => {
-					showPlaylistModal = false;
-				}}
-			/>
-		{/if}
-		<section>
-			{#await playlists then _}
-				<Grid
-					heading="Your Playlists"
-					items={playlists}
-					on:new_playlist={() => {
-						showPlaylistModal = true;
-					}}
-				>
-					<button
-						slot="buttons"
-						class="outlined"
-						style="margin-top:0.75em;"
-						on:click={() => {
-							IDBService.sendMessage("delete", "playlists");
+		<div class="list">
+			{#if favorites?.length > 0}
+				{#each favorites as favorite}
+					<Listing
+						on:update={() => {
+							updateFavorites();
 						}}
-						><Icon
-							name="x"
-							size="1.1em"
-						/><span class="btn-text">Delete All Playlists</span></button
-					></Grid
-				>
-			{:catch err}
-				{err}
-			{/await}
-		</section>
-	{/await}
+						data={favorite}
+					/>
+				{/each}
+			{:else}
+				<div class="container">
+					<h4>Empty!</h4>
+					<span class="subheading"
+						><em>Add some songs to keep track of what you love!</em></span
+					>
+				</div>
+			{/if}
+		</div>
+	</section>
+	{#if showPlaylistModal}
+		<CreatePlaylist
+			defaults={{
+				description: undefined,
+				name: undefined,
+				thumbnail: undefined,
+			}}
+			hasFocus={true}
+			on:submit={async (e) => {
+				const promise = await IDBService.sendMessage("create", "playlist", {
+					name: e.detail?.title,
+					description: e.detail?.description,
+					thumbnail:
+						e.detail?.thumbnail ??
+						"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHN0eWxlPSJpc29sYXRpb246aXNvbGF0ZSIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHdpZHRoPSIyNTZwdCIgaGVpZ2h0PSIyNTZwdCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJwcmVmaXhfX2EiPjxwYXRoIGQ9Ik0wIDBoMjU2djI1NkgweiIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNwcmVmaXhfX2EpIj48cGF0aCBmaWxsPSIjNDI0MjQyIiBkPSJNMCAwaDI1NnYyNTZIMHoiLz48ZyBjbGlwLXBhdGg9InVybCgjcHJlZml4X19iKSI+PHRleHQgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA1LjU0IDE2Ni43OTQpIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCZxdW90O1NlZ29lIFVJJnF1b3Q7LFJvYm90byxPeHlnZW4sVWJ1bnR1LENhbnRhcmVsbCwmcXVvdDtPcGVuIFNhbnMmcXVvdDssJnF1b3Q7SGVsdmV0aWNhIE5ldWUmcXVvdDssc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjQwMCIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNmYWZhZmEiPj88L3RleHQ+PC9nPjxkZWZzPjxjbGlwUGF0aCBpZD0icHJlZml4X19iIj48cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiA1NC44MzkpIiBkPSJNMCAwaDcydjE0Ni4zMjNIMHoiLz48L2NsaXBQYXRoPjwvZGVmcz48L2c+PC9zdmc+",
+					items: [],
+				});
+				await updatePlaylists();
+				showPlaylistModal = false;
+			}}
+			on:close={() => {
+				showPlaylistModal = false;
+			}}
+		/>
+	{/if}
+	<section>
+		<Grid
+			heading="Your Playlists"
+			items={playlists}
+			on:new_playlist={() => {
+				showPlaylistModal = true;
+			}}
+		>
+			<button
+				slot="buttons"
+				class="outlined"
+				style="margin-top:0.75em;"
+				on:click={() => {
+					IDBService.sendMessage("delete", "playlists");
+				}}
+				><Icon
+					name="x"
+					size="1.1em"
+				/><span class="btn-text">Delete All Playlists</span></button
+			></Grid
+		>
+	</section>
 </main>
 
 <style lang="scss">

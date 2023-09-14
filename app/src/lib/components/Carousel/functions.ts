@@ -1,5 +1,4 @@
 import { goto } from "$app/navigation";
-import { createRandomMixId } from "$lib/constants";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import list from "$stores/list";
 
@@ -9,7 +8,12 @@ export const browseHandler = (pageType: string, browseId: string): void => {
 	} else {
 		pageType.includes("PLAYLIST")
 			? goto("/playlist/" + browseId)
-			: goto("/release?type=" + encodeURIComponent(pageType) + "&id=" + encodeURIComponent(browseId));
+			: goto(
+					"/release?type=" +
+						encodeURIComponent(pageType) +
+						"&id=" +
+						encodeURIComponent(browseId),
+			  );
 	}
 };
 export async function clickHandler({
@@ -25,6 +29,10 @@ export async function clickHandler({
 	type: string;
 	kind: string;
 }) {
+	if (item.endpoint && item.endpoint?.pageType && item.endpoint?.browseId) {
+		browseHandler(item.endpoint.pageType, item.endpoint?.browseId);
+		return;
+	}
 	// console.log(item);
 	if (type === "trending") {
 		if (item.endpoint?.pageType?.match(/ALBUM|SINGLE/m)) {
@@ -51,7 +59,11 @@ export async function clickHandler({
 		goto(`/artist/${item?.endpoint?.browseId}`);
 	}
 
-	if (!isBrowseEndpoint && item.videoId !== undefined && !item?.endpoint?.pageType.includes("ARTIST")) {
+	if (
+		!isBrowseEndpoint &&
+		item.videoId !== undefined &&
+		!item?.endpoint?.pageType.includes("ARTIST")
+	) {
 		await list.initAutoMixSession({
 			loggingContext: item?.loggingContext,
 			videoId: item.videoId,
@@ -61,8 +73,6 @@ export async function clickHandler({
 		});
 		return;
 	} else {
-		if (item.endpoint) browseHandler(item.endpoint?.pageType, item.endpoint?.browseId);
 		return;
 	}
-	return false;
 }

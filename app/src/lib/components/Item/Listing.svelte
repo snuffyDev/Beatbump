@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script
 	context="module"
 	lang="ts"
@@ -268,6 +266,8 @@
 			: srcImg.url;
 
 	let pressing = false;
+
+	$: console.log({ data });
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

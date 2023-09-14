@@ -1,9 +1,7 @@
 import { redirect } from "@sveltejs/kit";
 export const load = async ({ url, fetch }) => {
-	const id = url.searchParams.get("id");
+	const id = url.searchParams.get("id") ?? url.searchParams.get("videoId");
 	const playlist = url.searchParams.get("list") || undefined;
-	// const meta = await get('player', { videoId: id })
-	// const data = await meta.body
 
 	if (!id) {
 		throw redirect(301, "/trending");

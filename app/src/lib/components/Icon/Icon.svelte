@@ -7,7 +7,7 @@
 <script lang="ts">
 	import type { Icons } from "./icons";
 	export let name: Icons;
-	export let size = "1.5rem";
+	export let size = "1.5em";
 	export let strokeWidth: number | "default" = "default";
 	export let color = "var(--stroke, currentColor)";
 	export let fill = "none";
@@ -18,10 +18,12 @@
 	xmlns="http://www.w3.org/2000/svg"
 	focusable="false"
 	{fill}
-	stroke-width={fill !== "none" && strokeWidth === "default"
+	stroke-width={name === "dots"
+		? 2
+		: fill !== "none" && strokeWidth === "default"
 		? 0
 		: strokeWidth === "default"
-		? 2
+		? 1
 		: strokeWidth}
 	stroke-linecap="round"
 	stroke={color}
@@ -45,10 +47,9 @@
 		vertical-align: middle;
 		shape-rendering: geometricprecision;
 	}
-	.icon {
-		display: inline-block;
-		position: relative;
-		vertical-align: middle;
-		display: inline-flex;
+	@media screen and (min-width: 640px) {
+		svg {
+			stroke-width: 2;
+		}
 	}
 </style>

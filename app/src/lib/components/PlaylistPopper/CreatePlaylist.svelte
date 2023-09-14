@@ -355,24 +355,19 @@
 		background: var(--mobile-popper-bg);
 		display: flex;
 		flex-direction: column;
-		// flex-wrap: wrap;flex-wrap
-		min-width: 50%;
-		min-height: 50%;
+		min-width: 80%;
 		width: fit-content;
 		max-width: 100%;
 		max-height: 85vh;
-		// flex: 1 1 auto;flex
-		// height: 100%;height
 		overflow-y: auto;
 		top: 50%;
-		// inset: 0;inset
 		left: 50%;
-		// grid-area: m/m/m/m;grid-area
 		border-radius: $lg-radius;
 		border-color: rgb(129 129 129 / 41.1%);
 		border-width: 0.025rem;
 		border-style: solid;
 		transform: translate(-50%, -50%);
+		place-content: center;
 		padding: 1.2rem;
 
 		// justify-content: space-around;justify-content

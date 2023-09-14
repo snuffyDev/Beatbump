@@ -28,5 +28,11 @@
 
 		"editor.defaultFormatter": "svelte.svelte-vscode"
 	},
-	"typescript.tsdk": "./app/node_modules/typescript/lib"
+	"typescript.tsdk": "./app/node_modules/typescript/lib",
+	"search.exclude": {
+		".cloudflare/**": true,
+		"**/.cloudflare": true,
+		"**/.cloudflare/*": true,
+		"build/**": true
+	}
 }

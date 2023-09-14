@@ -162,7 +162,7 @@
 					$queue[index]?.clickTrackingParams) ||
 				item?.clickTrackingParams,
 			keyId: index,
-			config:  {playerParams: item.playerParams ?? item?.itct},
+			config: { playerParams: item.playerParams ?? item?.itct },
 			playlistSetVideoId: item?.playlistSetVideoId,
 			videoId: item?.videoId,
 		});
@@ -357,7 +357,7 @@
 				await handlePlaylistClick(
 					{ ...item, params: FINITE_LIST_PARAMS },
 					position,
-					{ $list, $queue, $startIndex },
+					{ $list, $queue, $startIndex: idx },
 					visitorData,
 				);
 				break;
@@ -463,14 +463,25 @@
 				{#if Array.isArray(item.subtitle)}
 					{#each item.subtitle as subtitle}
 						{#if subtitle?.browseId}
-							<a
-								class="artist secondary"
-								href={`/artist/${subtitle.browseId}`}
-								on:click|preventDefault={() => {
-									goto(`/artist/${subtitle.browseId}`);
-									fullscreenStore.set("closed");
-								}}>{subtitle.text}</a
-							>
+							{#if subtitle.pageType.includes("ARTIST")}
+								<a
+									class="artist secondary"
+									href={`/artist/${subtitle.browseId}`}
+									on:click|preventDefault={() => {
+										goto(`/artist/${subtitle.browseId}`);
+										fullscreenStore.set("closed");
+									}}>{subtitle.text}</a
+								>
+							{:else}
+								<a
+									class="artist secondary"
+									href={`/release?id=${subtitle.browseId}`}
+									on:click|preventDefault={() => {
+										goto(`/release?id=${subtitle.browseId}`);
+										fullscreenStore.set("closed");
+									}}>{subtitle.text}</a
+								>
+							{/if}
 						{:else}
 							<span>{subtitle.text} </span>
 						{/if}

@@ -108,7 +108,7 @@
 	--thumbnail-size: calc(2vh + 13em);
 
 	@include media-query-down(xs) {
-		--thumbnail-size: 14em;
+		--thumbnail-size: calc(1vh + 12em);
 	}
 	@include media-query(sm) {
 		--thumbnail-size: calc(1vh + 13em);
