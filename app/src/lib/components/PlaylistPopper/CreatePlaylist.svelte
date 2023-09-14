@@ -79,7 +79,7 @@
 {#if hasFocus}
 	<div
 		class="backdrop"
-		style="z-index: 100;"
+		style="z-index: 1001;"
 		transition:fade|global={{ duration: 125 }}
 		on:scroll|preventDefault
 		on:click={() => {

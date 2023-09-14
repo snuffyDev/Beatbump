@@ -18,17 +18,17 @@
 	xmlns="http://www.w3.org/2000/svg"
 	focusable="false"
 	{fill}
-	stroke-width={name === "dots"
-		? 2
-		: fill !== "none" && strokeWidth === "default"
-		? 0
-		: strokeWidth === "default"
-		? 1
-		: strokeWidth}
 	stroke-linecap="round"
 	stroke={color}
 	stroke-linejoin="round"
-	style="width: {size}; height:{size}; {style}; transition: stroke linear 50ms;"
+	style="width: {size}; height:{size}; transition: stroke linear 50ms; stroke-width: {name ===
+	'dots'
+		? 2
+		: fill !== 'none' && strokeWidth === 'default'
+		? 0
+		: strokeWidth === 'default'
+		? 1
+		: strokeWidth}; {style}; "
 	viewBox="0 0 24 24"
 	><use href="{icons}#{name}" />
 	<slot />
@@ -49,7 +49,7 @@
 	}
 	@media screen and (min-width: 640px) {
 		svg {
-			stroke-width: 2;
+			stroke-width: initial;
 		}
 	}
 </style>

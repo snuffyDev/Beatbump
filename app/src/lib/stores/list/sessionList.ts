@@ -29,6 +29,7 @@ import { objectKeys } from "$lib/utils/collections/objects";
 import { Mutex } from "$lib/utils/sync";
 import { tick } from "svelte";
 // eslint-disable-next-line import/no-cycle
+import { syncTabs } from "$lib/tabSync";
 import { derived } from "svelte/store";
 import type { RelatedEndpointResponse } from "../../../routes/(app)/api/v1/related.json/+server";
 import { groupSession } from "../sessions";
@@ -246,7 +247,7 @@ export class ListService {
 			const nextTrack = this._$.value.mix[nextIndex];
 			await getSrc(nextTrack?.videoId, nextTrack?.playlistId, undefined, true);
 			// await this.prefetchTrackAtIndex(nextIndex + 1);
-
+			syncTabs.updatePosition(nextIndex);
 			toggle();
 			return;
 		}
@@ -290,6 +291,7 @@ export class ListService {
 				groupSession.updateGuestContinuation(state);
 			}
 
+			syncTabs.updateSessionList(state);
 			if (autoPlay) {
 				const src = await getSrc(state.mix[key].videoId);
 
@@ -389,6 +391,8 @@ export class ListService {
 						mix: ["append", data.results],
 					},
 				);
+				syncTabs.updateSessionList(state);
+
 				if (groupSession?.initialized && groupSession?.hasActiveSession) {
 					groupSession.expAutoMix(state);
 				}
@@ -474,6 +478,7 @@ export class ListService {
 				await this.updatePosition(playbackIndex);
 				Logger.mark("wow");
 				await tick();
+				syncTabs.updateSessionList(state);
 				if (groupSession?.initialized && groupSession?.hasActiveSession) {
 					groupSession.expAutoMix(state);
 				}
@@ -525,6 +530,7 @@ export class ListService {
 				true,
 			)
 				.then(() => {
+					syncTabs.updatePosition(currentPosition + 1);
 					return this.updatePosition("next");
 				})
 				.then((data) => {
@@ -584,6 +590,8 @@ export class ListService {
 			if (update) {
 				updateGroupPosition("->", position);
 			}
+
+			syncTabs.updatePosition(position);
 		}
 	}
 
@@ -703,6 +711,8 @@ export class ListService {
 			undefined,
 			true,
 		);
+
+		syncTabs.updatePosition(position);
 	}
 
 	public removeTrack(index: number) {
@@ -711,6 +721,7 @@ export class ListService {
 			...u,
 			mix: [...u.mix.slice(0, index), ...u.mix.slice(index + 1)],
 		}));
+		syncTabs.updateSessionList(this._$.value);
 	}
 
 	public async setMix(mix: Item[], type?: "auto" | "playlist" | "local") {
@@ -734,6 +745,7 @@ export class ListService {
 				groupSession.client,
 			);
 		}
+		syncTabs.updateSessionList(guard);
 	}
 
 	public async setTrackWillPlayNext(item: Item, key: number) {
@@ -794,6 +806,7 @@ export class ListService {
 				if (groupSession?.initialized && groupSession?.hasActiveSession) {
 					groupSession.updateGuestTrackQueue(state);
 				}
+				syncTabs.updateSessionList(state);
 			},
 		);
 	}
@@ -991,7 +1004,9 @@ const currentTrack = derived(
 /**
  * A derived store for read-only access to the current position
  */
-const queuePosition = derived(SessionListService, ($list) => $list.position);
+const queuePosition = derived(SessionListService, ($list, set) => {
+	set($list.position);
+});
 
 const related = (() => {
 	const prevPosition = undefined;

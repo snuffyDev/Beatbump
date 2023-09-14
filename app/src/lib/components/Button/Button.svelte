@@ -18,7 +18,7 @@
 	on:click|preventDefault
 	>{#if icon}<span>
 			<Icon
-				style="stroke-width: 1.5; display: inline-block; vertical-align: middle;"
+				style="stroke-width: 2; display: inline-block; vertical-align: middle; font-size:inherit;"
 				name={icon.name}
 				size={icon.size ?? "1rem"}
 			/>
@@ -30,14 +30,19 @@
 <style lang="scss">
 	button {
 		display: inline-block;
+		line-height: 1;
 	}
 	button > span {
-		padding-bottom: 0.1825rem;
-		line-height: 1;
 		display: inline-block;
 		vertical-align: middle;
+		&:first-child {
+			vertical-align: middle;
+			margin-bottom: 0.1em;
+		}
+		padding-bottom: 0.1em;
 		&:nth-child(2) {
-			margin-left: 0.25rem;
+			margin-top: 0.01em;
+			margin-left: 0.3em;
 		}
 	}
 </style>

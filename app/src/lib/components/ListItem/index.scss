@@ -67,7 +67,7 @@
 	width: 100%;
 	max-width: calc(100%);
 	@media screen and (min-width: 966px) {
-		max-width: calc(100% - 7em);
+		max-width: calc(100% - 1em);
 	}
 }
 
@@ -98,11 +98,15 @@
 }
 
 .length {
+    &:is(span) {
+        padding:0.5em;
+    }
 	align-self: center;
 	grid-area: right;
 	display: flex;
 	white-space: nowrap;
 	justify-content: flex-end;
+    min-width:max-content;
 }
 
 .thumbnail {

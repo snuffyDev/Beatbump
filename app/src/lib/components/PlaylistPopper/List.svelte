@@ -37,9 +37,8 @@
 		flex-direction: row;
 		padding: 0.8rem;
 		gap: 0.8rem;
-		backdrop-filter: brightness(1.5);
-		border-radius: $lg-radius;
-		border: rgb(163 163 163 / 21.2%) solid 1px;
+		margin-bottom: 0.125rem;
+		margin-top: 0rem;
 
 		:first-of-type {
 			margin: 0 auto;

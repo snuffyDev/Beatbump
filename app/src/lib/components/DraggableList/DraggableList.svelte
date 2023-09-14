@@ -14,6 +14,7 @@
 
 	// eslint-disable-next-line no-undef
 	export let items: T[] = [];
+	export let style = "";
 
 	const dispatch = createEventDispatcher<{
 		click: void;
@@ -109,7 +110,7 @@
 		if (touchTimer) clearTimeout(touchTimer);
 		isDragging = false;
 	}}
-	style="overflow-y: {isDragging ? 'hidden' : 'auto'};"
+	style="overflow-y: {isDragging ? 'hidden' : 'auto'}; {style}"
 >
 	{#if currentDragId !== null}
 		<div

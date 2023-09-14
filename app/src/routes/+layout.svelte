@@ -19,6 +19,7 @@
 	import { AudioPlayer } from "$lib/player";
 	import { groupSession, settings } from "$lib/stores";
 	import { currentTrack, queue } from "$lib/stores/list";
+	import { syncTabs } from "$lib/tabSync.js";
 	import { Logger } from "$lib/utils";
 	import { skipFirstInvocation } from "$lib/utils/skipFirstInvocation.js";
 	import { SessionListService } from "$stores/list/sessionList";
@@ -98,7 +99,8 @@
 
 	$: if (
 		playbackUpdatesUrlHandler &&
-		$settings["playback"]["Playback Updates URL"] !== undefined
+		$settings["playback"]["Playback Updates URL"] !== undefined &&
+		$settings["playback"]["Playback Updates URL"] == true
 	) {
 		setPlaybackUpdatesUrlHandler($fullscreenStore === "open");
 	}
@@ -106,7 +108,7 @@
 	onMount(() => {
 		try {
 			playbackUpdatesUrlHandler = playbackURLStateUpdater(
-				$settings["playback"]["Playback Updates URL"] || false,
+				$settings["playback"]["Playback Updates URL"] == true || false,
 			);
 			if (
 				$settings["playback"]["Remember Last Track"] &&
@@ -124,6 +126,7 @@
 		} catch (err) {
 			Logger.err(err);
 		}
+		syncTabs.connect();
 	});
 	let info: Record<string, any> = {};
 </script>
@@ -221,6 +224,7 @@ left: 0; background: var(--base-bg); font-size: 1.1rem; display: flex; flex-dire
 	}
 
 	.show-player {
+		will-change: initial;
 		opacity: 1;
 		transform: translate3d(0, 0, 0);
 	}

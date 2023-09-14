@@ -3,6 +3,16 @@
 	lang="ts"
 >
 	const RE_THUMBNAIL_DIM = /=w\d+-h\d+-/gm;
+
+	const isChannelOrArtist = (item: Item) => {
+		if (item?.subtitle) {
+			return (
+				(item.endpoint && item.endpoint?.pageType?.includes("ARTIST")) ||
+				item.endpoint?.pageType?.includes("USER_CHANNEL")
+			);
+		}
+		return false;
+	};
 </script>
 
 <script lang="ts">
@@ -33,8 +43,7 @@
 	let isLibrary = hasContext("library") ? true : false;
 	let videoId = "";
 	let playlistId = "";
-	let isArtist =
-		Array.isArray(data?.subtitle) && data.subtitle[0]?.text === "Artist";
+	let isArtist = isChannelOrArtist(data);
 
 	let loading = false;
 
@@ -212,7 +221,7 @@
 	if (isArtist) {
 		DropdownItems = filter(DropdownItems, (d) => d.text !== "View Artist");
 	}
-	const clickHandler = async (event) => {
+	const clickHandler = async (event: { target: { nodeName: string } }) => {
 		if (
 			(event.target instanceof HTMLElement && event.target.nodeName === "A") ||
 			loading
@@ -220,7 +229,11 @@
 			return;
 		// console.log(event.target)
 		if (isArtist) {
-			goto(`/artist/${data.artistInfo.artist[0].browseId}`);
+			goto(
+				data.endpoint?.pageType.includes("ARTIST")
+					? `/artist/${data.artistInfo?.artist[0].browseId}`
+					: `/channel/${data.endpoint?.browseId}`,
+			);
 			return;
 		}
 		try {
@@ -266,8 +279,6 @@
 			: srcImg.url;
 
 	let pressing = false;
-
-	$: console.log({ data });
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -342,7 +353,7 @@
 						</Icon>
 					{/if}
 				</p>
-				{#if data.type === "artists"}
+				{#if isArtist}
 					<p class="artist-stats">
 						{#each data.subtitle as subtitle}
 							{subtitle.text}

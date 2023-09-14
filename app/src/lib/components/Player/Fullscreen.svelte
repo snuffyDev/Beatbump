@@ -558,8 +558,6 @@
 		animation: marquee linear infinite forwards;
 		animation-delay: 2s;
 		animation-duration: 9s;
-		// animation-play-state: running;
-		// box-shadow:  inset (-40px) 0 40px (-16px) transparent;
 	}
 
 	.marquee-text {
@@ -603,6 +601,7 @@
 		overscroll-behavior: contain;
 		height: inherit;
 		-webkit-overflow-scrolling: touch;
+		background: inherit;
 	}
 
 	.immersive {
@@ -618,30 +617,26 @@
 		backface-visibility: hidden;
 		overflow: hidden;
 
-		// mask-composite: ;
 		@media screen and (max-width: 720px) {
 			position: fixed;
 			z-index: 151;
 			left: 0;
 			top: 0;
-			// background-repeat: no-repeat !important;
 			background-size: 50% 50% !important;
-			// top: 50%;
 		}
 
 		transform: scale(var(--scale)) translate3d(0, 0, 0);
-		transition: backdrop-filter cubic-bezier(0.895, 0.03, 0.685, 0.22) 1600ms
-			800ms;
+		transition: backdrop-filter cubic-bezier(0.77, 0, 0.175, 1) 1600ms 800ms;
 		transition-delay: 800ms;
 		transition-property: background-color transform filter backdrop-filter;
 		transition-duration: 1600ms;
 		background-color: hsl(0deg 0% 0%);
 
 		&.open {
-			// backdrop-filter: brightness(0.6) opacity(1) contrast(1) saturate(1.1) grayscale(0.3) sepia(0.2) url(1rem);
 			background-color: hsl(0deg 0% 0% / 58.7%);
 			&::after {
-				transition-delay: 800ms;
+				transition-delay: 1000ms;
+				transition-duration: 700ms;
 			}
 		}
 
@@ -652,29 +647,24 @@
 			width: 100%;
 			height: 100%;
 
-			// border-radius: 9999rem;
 			z-index: 1;
 			touch-action: none;
 			overscroll-behavior: contain;
 			perspective: 1000px;
 			backface-visibility: hidden;
-			// overflow: hidden;
 			will-change: opacity, top;
 			transform: scale(var(--scale)) translate3d(0, 0, 0);
-			transition: backdrop-filter cubic-bezier(0.25, 0.46, 0.45, 0.94);
+			transition: backdrop-filter cubic-bezier(0.77, 0, 0.175, 1);
 			transition-property: background-color, transform, filter, backdrop-filter;
-			transition-duration: 500ms;
+			transition-duration: 1000ms;
 			transition-delay: 1000ms;
 
 			@media screen and (max-width: 720px) {
 				position: absolute;
 				max-width: 100%;
-				// z-index: -1;
 				left: 0;
 				top: 0;
-				// background-repeat: no-repeat !important;
 				background-size: 100vh !important;
-				// top: 50%;
 				background-attachment: scroll;
 				background-position: center;
 			}
@@ -683,9 +673,6 @@
 			box-shadow: 0 0 100px -20px #000000d5 inset, 0 0 50rem 5px #000000c9;
 			filter: brightness(0.9) opacity(1) contrast(1) saturate(1.7)
 				grayscale(0.35) sepia(0.2) blur(var(--blur, 4px));
-
-			// mask-image: url(#blur);
-			// mask-size: 100% 100%;
 		}
 
 		> img {

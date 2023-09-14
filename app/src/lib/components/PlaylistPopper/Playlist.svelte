@@ -48,8 +48,7 @@
 		flex-direction: row;
 		padding: 0.5rem;
 		gap: 0.8rem;
-		backdrop-filter: brightness(1.5);
-		border-radius: $lg-radius;
+		border-radius: $sm-radius;
 		// backdrop-filter: brightness(2);backdrop-filter
 		transition: backdrop-filter linear 50ms;
 		border: rgb(163 163 163 / 21.2%) solid 1px;

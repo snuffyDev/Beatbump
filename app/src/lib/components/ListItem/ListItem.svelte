@@ -452,6 +452,7 @@
 				{#if item.explicit}
 					<Icon
 						name="explicit"
+						strokeWidth={0}
 						fill="hsla(0, 0%, 95%, 0.7)"
 						size="12px"
 					>
