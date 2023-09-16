@@ -30,12 +30,13 @@
 	bottom: 0;
 	pointer-events: all;
 	cursor: pointer;
-	background-color: hsl(0deg 0% 88% / 95%);
+	background-color: hsla(0, 0%, 95%, 0.715);
 	border: rgba(0, 0, 0, 0.171) 0.33px solid;
-	transition: background-color 200ms cubic-bezier(0.22, 0.61, 0.36, 1);
-	box-shadow: 0 0 8px -4px hsl(0deg 0% 0% / 20%);
+	transition:  200ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    transition-property: background-color, box-shadow;
+	box-shadow: 0 0 8px -4px hsl(0deg 0% 0% / 20%), inset 0 0 8px -4px hsl(0deg 0% 0% / 20%);
 	height: 3rem;
-	color: hsla(0, 0%, 18%, 1);
+	color: rgb(3, 3, 3);
 	border-radius: 50%;
 	opacity: 1;
 	padding: 0;
@@ -48,8 +49,8 @@
 	isolation: isolate;
 	&:hover {
 		background-color: rgb(233, 233, 233);
-		box-shadow: -1px -1px 8px -12px hsl(0deg 0% 0% / 20%) inset,
-			1px 1px 10px -6px hsl(0deg 0% 0% / 10%) inset;
+		box-shadow: -1px -1px 8px -4px hsla(0, 0%, 0%, .1) inset,
+			1px 1px 10px -2px hsl(0deg 0% 0% / 20%) inset;
 		color: #111111e0;
 	}
 

@@ -34,5 +34,12 @@
 		"**/.cloudflare": true,
 		"**/.cloudflare/*": true,
 		"build/**": true
-	}
+	},
+	"diffEditor.codeLens": true,
+	"diffEditor.experimental.showMoves": true,
+	"explorer.fileNesting.enabled": true,
+	"explorer.fileNesting.patterns": {
+		"*.svelte": "+${capture}.css.scss.js.ts"
+	},
+	"diffEditor.hideUnchangedRegions.enabled": true
 }

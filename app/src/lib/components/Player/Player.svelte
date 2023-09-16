@@ -119,13 +119,11 @@
 
 	$: isPlaying = $paused;
 
-	messenger.listen("player", (data) => {
+	messenger.listen("player", () => {
 		AudioPlayer.play();
 	});
 
-	function handleImageError(
-		event: Event & { currentTarget: EventTarget & HTMLElement },
-	) {
+	function handleImageError(event: Event) {
 		(event.target as HTMLImageElement).src = IMAGE_NOT_FOUND;
 	}
 
@@ -138,7 +136,7 @@
 
 	const shortcut = {
 		Comma: () => {
-			AudioPlayer.previous();
+			SessionListService.previous();
 		},
 		Period: () => {
 			SessionListService.next();
@@ -186,7 +184,7 @@
 			>
 				<span class="now-playing-title">{$currentTrack?.title}</span>
 				<span class="now-playing-artist"
-					>{$currentTrack?.artistInfo?.artist[0]?.text}</span
+					>{$currentTrack?.artistInfo?.artist?.[0]?.text}</span
 				>
 			</div>
 		{:else}
@@ -266,9 +264,14 @@
 							<input
 								class="volume"
 								type="range"
-								on:click|capture|stopPropagation={() => {}}
+								on:click|capture|stopPropagation={() => {
+									// no empty
+								}}
 								on:input|capture|stopPropagation={(e) => {
-									let linear = e.target.value / 1;
+									let linear =
+										(e.target instanceof HTMLInputElement
+											? e.target.valueAsNumber
+											: volume) / 1;
 									let sqrt = Math.pow(linear, 1.2);
 									AudioPlayer.setVolume(sqrt);
 								}}

@@ -72,6 +72,7 @@ export type Icons =
 	| "edit"
 	| "list-plus"
 	| "list-music"
+	| "volume"
 	| "list-video"
 	| "dots";
 

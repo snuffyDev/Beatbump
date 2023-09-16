@@ -1004,9 +1004,12 @@ const currentTrack = derived(
 /**
  * A derived store for read-only access to the current position
  */
-const queuePosition = derived(SessionListService, ($list, set) => {
-	set($list.position);
-});
+const queuePosition = derived<typeof SessionListService, number>(
+	SessionListService,
+	($list, set) => {
+		set($list.position);
+	},
+);
 
 const related = (() => {
 	const prevPosition = undefined;

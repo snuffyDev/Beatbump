@@ -1,6 +1,9 @@
 import { redirect } from "@sveltejs/kit";
 export const load = async ({ url, fetch }) => {
-	const id = url.searchParams.get("id") ?? url.searchParams.get("videoId");
+	const id =
+		url.searchParams.get("id") ??
+		url.searchParams.get("v") ??
+		url.searchParams.get("videoId");
 	const playlist = url.searchParams.get("list") || undefined;
 
 	if (!id) {

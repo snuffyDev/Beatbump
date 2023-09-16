@@ -9,10 +9,11 @@ import { writable } from "svelte/store";
 import { sort, type PlayerFormats } from "./parsers/player";
 import { settings, type ISessionListProvider } from "./stores";
 import { groupSession, type ConnectionState } from "./stores/sessions";
-import type { JSON } from "./types";
+import { syncTabs } from "./tabSync";
 import { WritableStore, notify, type ResponseBody } from "./utils";
 import { isAppleMobileDevice } from "./utils/browserDetection";
 import { objectKeys } from "./utils/collections/objects";
+import { setWorkerInterval } from "./utils/workerTimeout";
 
 let userSettings: UserSettings | undefined = undefined;
 
@@ -33,6 +34,7 @@ interface AudioPlayerEvents {
 	play: unknown;
 	"update:stream_type": { type: "HLS" | "HTTP" };
 }
+
 const setPosition = () => {
 	if ("mediaSession" in navigator) {
 		navigator.mediaSession.setPositionState({
@@ -90,13 +92,11 @@ function metaDataHandler(sessionList: ISessionListProvider) {
 	}
 }
 
-// eslint-disable-next-line import/no-unused-modules
 export const updateGroupState = (opts: {
 	client: string;
 	state: ConnectionState;
 }): void => groupSession.sendGroupState(opts);
 
-// eslint-disable-next-line import/no-unused-modules
 export const updateGroupPosition = (
 	dir: "<-" | "->" | undefined,
 	position: number,
@@ -104,7 +104,7 @@ export const updateGroupPosition = (
 	groupSession.send(
 		"PATCH",
 		"state.update.position",
-		{ dir, position } as unknown as JSON,
+		{ dir, position } as never,
 		groupSession.client,
 	);
 
@@ -221,6 +221,7 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 	private _srcStore = new WritableStore<string | undefined>(undefined);
 	private _paused = writable(true);
 	private _progress = tweened<number>(0);
+	private _leechInterval: ReturnType<typeof setWorkerInterval> | null = null;
 	private _taskQueue: [
 		name: keyof AudioPlayerImpl,
 		args: [...rest: unknown[]],
@@ -350,12 +351,24 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 	}
 
 	public pause() {
-		if (!this.player) {
-			this.addTaskToTaskQueue("pause");
+		syncTabs.playback({
+			state: "pause",
+			currentTime: this.currentTime,
+			duration: this.duration,
+		});
+		if (this._leechInterval) {
+			this._leechInterval.clear()?.then(() => {
+				this._leechInterval = null;
+			});
 			return;
+		} else {
+			if (!this.player) {
+				this.addTaskToTaskQueue("pause");
+				return;
+			}
+			this.paused.set(true);
+			this.player.pause();
 		}
-		this.paused.set(true);
-		this.player.pause();
 	}
 
 	public play() {
@@ -364,6 +377,11 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 			this.addTaskToTaskQueue("play");
 			return;
 		}
+		syncTabs.playback({
+			state: "play",
+			currentTime: this.currentTime,
+			duration: this.duration,
+		});
 		if (
 			groupSession.initialized === true &&
 			groupSession.hasActiveSession === true
@@ -399,6 +417,18 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 	public setNextTrackPrefetchedUrl(trackUrl: string) {
 		this.nextSrc.url = trackUrl;
 		this.nextSrc.stale = false;
+	}
+
+	/** Used when sync'ing a 'leech' tab */
+	public async fakePlay(currentTime: number, duration: number) {
+		if (this._leechInterval) await this._leechInterval.clear();
+		this._paused.set(false);
+		this._currentTimeStore.set(currentTime);
+		this._durationStore.set(duration);
+
+		this._leechInterval = setWorkerInterval(() => {
+			this._currentTimeStore.set(this._currentTimeStore.value + 1);
+		}, 1000);
 	}
 
 	public updateSrc({ url }: { url: string }) {
@@ -492,6 +522,22 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 			groupSession.resetAllCanPlay();
 
 			this.setStaleTimeout();
+
+			this._currentTimeStore.set(this.player.currentTime);
+
+			const duration = isAppleMobileDevice
+				? this.player.duration / 2
+				: this.player.duration;
+			this._durationStore.set(duration);
+
+			if (syncTabs.role === "host") {
+				syncTabs.updatePosition(SessionListService.position);
+				syncTabs.playback({
+					state: "play",
+					currentTime: this.currentTime,
+					duration: this.duration,
+				});
+			}
 		});
 
 		this.onEvent("play", () => {

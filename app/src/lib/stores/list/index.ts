@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-cycle
 export {
 	currentTrack,
 	default as default,

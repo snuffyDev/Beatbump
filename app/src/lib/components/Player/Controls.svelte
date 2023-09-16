@@ -63,6 +63,7 @@
 <div class="player-controls">
 	<div class="buttons">
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
 			class="player-btn"
 			on:click|stopPropagation|capture={handleShuffle}
@@ -79,6 +80,7 @@
 		</div>
 		<div class="controls-middle">
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div
 				class="player-btn"
 				on:click|stopPropagation|capture={prevBtn}
@@ -92,6 +94,7 @@
 				/>
 			</div>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div
 				class="player-btn player-title"
 				on:click|stopPropagation|capture={(e) => {
@@ -127,6 +130,7 @@
 				{/if}
 			</div>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div
 				class="player-btn"
 				on:click|stopPropagation|capture={nextBtn}
@@ -141,6 +145,7 @@
 			</div>
 		</div>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
 			class="player-btn"
 			on:click|stopPropagation|capture={handleRepeat}
