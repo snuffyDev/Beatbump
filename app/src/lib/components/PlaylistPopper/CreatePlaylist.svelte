@@ -100,7 +100,7 @@
 		>
 			<h1>Delete Playlist?</h1>
 			<p>
-				Deleting this playlist will permanently delete all of it's data from
+				Deleting this playlist will permanently delete all of its data from
 				your device (thumbnail, title, songs, etc.).
 			</p>
 			<p>This action is permanent and cannot be undone!</p>
