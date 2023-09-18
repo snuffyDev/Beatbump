@@ -241,7 +241,7 @@
 		};
 	});
 
-	releasePageContext.set({ page: "release" });
+	releasePageContext.set({ page: "playlist" });
 </script>
 
 <svelte:window bind:innerWidth={width} />

@@ -47,6 +47,7 @@ interface AutoMixArgs {
 	playlistId?: string;
 	playlistSetVideoId?: string;
 	videoId?: string;
+	visitorData?: string;
 }
 
 function togglePlayerLoad() {
@@ -299,7 +300,20 @@ export class ListService {
 			}
 		} catch (err) {
 			Logger.err(err);
-			throw err;
+			if (playlistId?.startsWith("RDAMPL")) return;
+			return this.getSessionContinuation(
+				{
+					clickTrackingParams,
+					ctoken,
+					key,
+					videoId,
+					playlistId: `RDAMPL${playlistId}`,
+					loggingContext,
+					playerParams,
+					playlistSetVideoId,
+				},
+				autoPlay,
+			);
 		} finally {
 			toggle();
 		}
@@ -315,6 +329,7 @@ export class ListService {
 				clickTracking,
 				config,
 				playlistId,
+				visitorData,
 				playlistSetVideoId,
 				videoId,
 			} = args;
@@ -332,14 +347,16 @@ export class ListService {
 			}
 
 			if (
-				this._$.value.currentMixId !== playlistId ||
-				`RDAMPL${this._$.value.currentMixId}` !== playlistId
+				this._$.value.currentMixId !== undefined &&
+				(this._$.value.currentMixId !== playlistId ||
+					`RDAMPL${this._$.value.currentMixId}` !== playlistId)
 			) {
 				this._$.value.currentMixType = "auto";
 
 				const data = await fetchNext({
 					params: config?.playerParams ? config?.playerParams : undefined,
 					videoId,
+					...(visitorData && { visitorData }),
 					playlistId: playlistId ? playlistId : undefined,
 					loggingContext: loggingContext
 						? loggingContext.vssLoggingContext?.serializedContextData
@@ -417,6 +434,7 @@ export class ListService {
 		clickTrackingParams?: string;
 		params?: string;
 		videoId?: string;
+		loggingContext?: string;
 		visitorData?: string;
 		playlistSetVideoId?: string;
 	}): Promise<{ body: ResponseBody; error?: boolean } | undefined> {
@@ -429,6 +447,7 @@ export class ListService {
 				clickTrackingParams = "",
 				params = "",
 				videoId = "",
+				loggingContext,
 				playlistSetVideoId = "",
 				visitorData = "",
 			} = args;
@@ -443,9 +462,9 @@ export class ListService {
 				playlistId: playlistId.startsWith("VL")
 					? playlistId.slice(2)
 					: playlistId,
+				loggingContext,
 				clickTracking: clickTrackingParams,
 				visitorData,
-				index: index,
 				playlistSetVideoId,
 				videoId,
 			});

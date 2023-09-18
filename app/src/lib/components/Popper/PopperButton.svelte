@@ -111,6 +111,7 @@
 >
 	<Icon
 		color="#f2f2f2"
+		strokeWidth={2}
 		{size}
 		name="dots"
 	/>

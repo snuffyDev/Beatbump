@@ -188,6 +188,7 @@
 		object-position: top;
 		border-radius: unset !important;
 		inset: 0;
+		z-index: -1;
 		contain: style;
 		width: 100%;
 		max-width: 100%;

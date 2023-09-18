@@ -41,7 +41,6 @@ const config = {
 
     kit: {
         adapter: dev ? node() : adapter,
-        env: { dir: '../' },
         alias: {
             $stores: path.resolve("./src/lib/stores"),
             $api: path.resolve("./src/routes/(app)/api/_lib"),

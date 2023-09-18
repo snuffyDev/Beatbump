@@ -1,3 +1,4 @@
+import type { Action } from "svelte/action";
 import { setHandlers } from "./shared";
 import type { Detail, DragEvent, GestureHandlers, PanEvent } from "./types";
 import {
@@ -77,7 +78,15 @@ export function pan(node: HTMLElement) {
 	return setHandlers(node, { handlers, capture: false });
 }
 
-export function draggable(node: HTMLElement) {
+export const draggable: Action<
+	HTMLElement,
+	never,
+	{
+		"on:bb-dragstart": (event: CustomEvent<Detail>) => void;
+		"on:bb-dragmove": (event: CustomEvent<Detail>) => void;
+		"on:bb-dragend": (event: CustomEvent<Detail>) => void;
+	}
+> = (node: HTMLElement) => {
 	const detail: Detail = {
 		startTime: 0,
 		timeStamp: 0,
@@ -133,4 +142,4 @@ export function draggable(node: HTMLElement) {
 		},
 	};
 	return setHandlers(node, { handlers, capture: true });
-}
+};

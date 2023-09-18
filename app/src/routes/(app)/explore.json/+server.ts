@@ -4,7 +4,7 @@ import { buildAPIRequest } from "../api/_lib/request";
 
 export const prerender = false;
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
 	const { restricted } = extractPrefsFromLocals(locals);
 	const query = url.searchParams;
 	const browseId = query.get("browseId");

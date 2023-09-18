@@ -75,6 +75,8 @@
 				href={`/home`}
 				class="no-style"
 			>
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 				<img
 					on:click={() => {
 						$fullscreenStore && fullscreenStore.set("closed");
@@ -178,6 +180,12 @@
 </nav>
 
 {#if !hidden}
+	<button
+		class="sr-only"
+		on:click={() => {
+			hidden = !hidden;
+		}}>Close Search Dialogue</button
+	>
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<div

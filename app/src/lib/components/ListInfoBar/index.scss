@@ -33,7 +33,7 @@
 		padding-right: 1.5rem;
 	}
 	@media screen and (min-width: 640px) {
-		grid-template-columns: 0.7rem[index] 10.8rem[title] 1fr 4rem;
+		grid-template-columns: 0.7rem[index] 10.8rem[title] 1fr 4.375rem;
 		.index {
 			grid-column: index;
 			display: block;

@@ -5,7 +5,8 @@ import { parseContents } from "$lib/parsers/next";
 import { error, json } from "@sveltejs/kit";
 
 import { ItemBuilder } from "$lib/parsers";
-import type { Item } from "$lib/types";
+import type { Item, Song } from "$lib/types";
+import type { IPlaylistPanelVideoRenderer } from "$lib/types/playlistPanelVideoRenderer";
 import type { Dict } from "$lib/types/utilities";
 import { buildAPIRequest } from "../../_lib/request";
 import { parseParams } from "../../_lib/utils";
@@ -121,7 +122,7 @@ export const GET: RequestHandler = async ({
 	 ********************************************/
 	if (!continuation) {
 		try {
-			const res = await parseNextBody(response);
+			const res = await parseNextBody(itemBuilder, response);
 
 			return json(Object.assign({}, res, { response }));
 		} catch (err) {
@@ -135,7 +136,15 @@ export const GET: RequestHandler = async ({
 	);
 };
 
-async function parseNextBody(data: Dict<any>) {
+function parseItem(builder: ItemBuilder, item: Song) {
+	if ("playlistPanelVideoRenderer" in item) {
+		return builder.PlaylistPanelVideoRenderer(
+			item["playlistPanelVideoRenderer"] as IPlaylistPanelVideoRenderer,
+		) as Promise<Item>;
+	}
+}
+
+async function parseNextBody(itemBuilder: ItemBuilder, data: Dict<any>) {
 	try {
 		const tabs =
 			data?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer
@@ -166,13 +175,26 @@ async function parseNextBody(data: Dict<any>) {
 		const watchEndpoint = data?.currentVideoEndpoint?.watchEndpoint;
 		const visitorData = data?.responseContext?.visitorData;
 
-		const parsed = await parseContents(
-			contents,
+		const parsed = {
+			results: (
+				await Promise.all(
+					(contents as Song[]).map((item) =>
+						parseItem(itemBuilder, item as never)?.then((item) => {
+							if (item) {
+								if (!item.playlistId)
+									item.playlistId = watchEndpoint?.playlistId;
+								return item;
+							}
+							return null;
+						}),
+					),
+				)
+			).filter(Boolean) as Array<Item>,
 			continuation,
 			clickTrackingParams,
-			watchEndpoint || "",
+			currentMixId: watchEndpoint.playlistId,
 			visitorData,
-		);
+		};
 		return { ...parsed, related };
 	} catch (err) {
 		console.error(err);

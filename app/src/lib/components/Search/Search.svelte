@@ -8,7 +8,7 @@
 	import { fullscreenStore } from "../Player/channel";
 	import { searchFilter } from "./options";
 
-	export let type;
+	export let type: "inline";
 	export let query = "";
 	export let filter = searchFilter[0].params;
 
@@ -33,16 +33,45 @@
 		const target = event.target as HTMLLIElement;
 
 		if (event.key === "ArrowDown") {
-			if (target.nextElementSibling.parentElement !== listbox) return;
-			(target.nextElementSibling as HTMLElement).tabIndex = 0;
+			if (
+				target.nextElementSibling?.parentElement !== listbox &&
+				target.id !== "searchBox"
+			)
+				return;
+
+			const next =
+				target.nextElementSibling?.parentElement === listbox
+					? (target.nextElementSibling as HTMLElement)
+					: (listbox.querySelector("li") as HTMLLIElement);
+
+			next.tabIndex = 0;
 			target.tabIndex = -1;
-			(target.nextElementSibling as HTMLElement).focus();
+			next.focus();
 		}
 		if (event.key === "ArrowUp") {
-			if (target.previousElementSibling.parentElement !== listbox) return;
-			(target.previousElementSibling as HTMLElement).tabIndex = 0;
+			if (
+				target.previousElementSibling?.parentElement !== listbox &&
+				target.id !== "searchBox" &&
+				target.parentElement?.previousElementSibling?.classList.contains(
+					"nav-item",
+				) !== true
+			)
+				return;
+
+			const next =
+				target.previousElementSibling?.parentElement === listbox
+					? (target.previousElementSibling as HTMLElement)
+					: target.parentElement?.previousElementSibling?.classList.contains(
+							"nav-item",
+					  ) === true
+					? (target.parentElement?.previousElementSibling?.querySelector<HTMLInputElement>(
+							"input",
+					  ) as HTMLInputElement)
+					: (listbox.querySelector("li") as HTMLLIElement);
+
+			next.tabIndex = 0;
 			target.tabIndex = -1;
-			(target.previousElementSibling as HTMLElement).focus();
+			next.focus();
 		}
 
 		return false;
@@ -56,20 +85,22 @@
 	}, 250);
 </script>
 
+<!-- svelte-ignore a11y-no-noninteractive-element-to-interactive-role -->
 <form
 	aria-expanded="true"
 	aria-owns="suggestions"
-	role="combobox"
+	role="listbox"
 	class={type}
-	on:keydown|capture={handleKeyDown}
+	on:keydown={handleKeyDown}
 	on:submit|preventDefault={handleSubmit}
 >
 	<div class="nav-item">
 		<div
 			role="textbox"
-			aria-activedescendant="searchBox"
 			class="input"
 		>
+			<!-- svelte-ignore a11y-interactive-supports-focus -->
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div
 				role="button"
 				aria-label="search button"
@@ -106,7 +137,9 @@
 			bind:this={listbox}
 			class="suggestions"
 		>
+			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 			{#each results as result (result?.id)}
+				<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 				<li
 					tabindex="0"
 					on:click={() => {
@@ -152,7 +185,6 @@
 		width: 100%;
 		width: clamp(28vw, 35vw, 78vw);
 
-		/* max-height: 44vh; */
 		border-radius: $xs-radius;
 		height: auto;
 		display: flex;
@@ -178,7 +210,6 @@
 			width: clamp(68%, 78%, 95%);
 			right: 0;
 		}
-		// padding: 0.4em;padding
 	}
 
 	form.inline {
@@ -212,15 +243,9 @@
 			padding: 0.7em 0.5em;
 			z-index: 1;
 			margin: 0;
-			// border-radius: inherit;border-radius
 			cursor: pointer;
-			// background: inherit;background
 			font-size: 1em;
 			background: #0000;
-			// height: 100%;height
-			// max-height: 5.125em;max-height
-			// border-bottom: 1px solid #1a1a1a;border-bottom
-
 			&:hover {
 				background: rgb(255 255 255 / 10%);
 			}

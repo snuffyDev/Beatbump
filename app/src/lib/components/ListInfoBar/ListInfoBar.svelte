@@ -7,7 +7,10 @@
 </script>
 
 {#if options.length !== 0}
-	<div class="sort resp-content-width">
+	<div
+		class="sort resp-content-width"
+		style="margin-inline: 1.5rem;"
+	>
 		<Select
 			{options}
 			bind:value

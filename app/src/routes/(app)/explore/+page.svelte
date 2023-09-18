@@ -20,9 +20,9 @@
 		<Grid
 			items={[...section.section]}
 			heading={section.title}
-			let:item
 		>
 			<a
+				let:item
 				slot="item"
 				style={`border-left: 0.4286rem solid ${item.color}`}
 				class="box"

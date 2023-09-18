@@ -69,6 +69,7 @@
 			item: Item,
 			index: number,
 			stores: StoreSubscriptions,
+			context: PageContext,
 			visitorData?: string,
 		): Promise<void>;
 	}
@@ -101,6 +102,7 @@
 		item,
 		index,
 		stores,
+		context,
 		visitorData,
 	) => {
 		const { $queue, $startIndex = 0, $list } = stores;
@@ -153,19 +155,32 @@
 		}
 		await tick();
 		await list.updatePosition(index);
-		await list.initAutoMixSession({
-			playlistId: item.playlistId || "",
+		if (context === "playlist" || context === "release") {
+			await list.initPlaylistSession({
+				videoId: item?.videoId,
+				index: $startIndex || index,
+				playlistId: item.playlistId!,
+				loggingContext: item?.loggingContext,
+				params: item?.playerParams,
+				playlistSetVideoId: item?.playlistSetVideoId,
+				visitorData,
+				clickTrackingParams: item.clickTrackingParams!,
+			});
+		} else {
+			await list.initAutoMixSession({
+				playlistId: item.playlistId || "",
 
-			clickTracking:
-				($queue &&
-					item.playlistId === $list?.currentMixId &&
-					$queue[index]?.clickTrackingParams) ||
-				item?.clickTrackingParams,
-			keyId: index,
-			config: { playerParams: item.playerParams ?? item?.itct },
-			playlistSetVideoId: item?.playlistSetVideoId,
-			videoId: item?.videoId,
-		});
+				clickTracking:
+					($queue &&
+						item.playlistId === $list?.currentMixId &&
+						$queue[index]?.clickTrackingParams) ||
+					item?.clickTrackingParams,
+				keyId: index,
+				config: { playerParams: item.playerParams ?? item?.itct },
+				playlistSetVideoId: item?.playlistSetVideoId,
+				videoId: item?.videoId,
+			});
+		}
 	};
 
 	const buildMenu = ({
@@ -300,14 +315,13 @@
 	export let item: Item;
 	export let idx: number;
 	export let draggable = false;
-	interface $$Events {
-		click: MouseEvent;
-		setPageIsPlaying: { id: string };
+
+	const dispatch = createEventDispatcher<{
+		click: { index: number; id?: number };
+		setPageIsPlaying: { id: string; index: number };
 		initLocalPlaylist: { idx: number };
 		change: undefined;
-	}
-
-	const dispatch = createEventDispatcher<$$Events>();
+	}>();
 	const {
 		visitorData = "",
 		parentPlaylistId = "",
@@ -358,6 +372,7 @@
 					{ ...item, params: FINITE_LIST_PARAMS },
 					position,
 					{ $list, $queue, $startIndex: idx },
+					page,
 					visitorData,
 				);
 				break;
@@ -368,6 +383,7 @@
 					item,
 					position,
 					{ $list, $queue, $startIndex },
+					page,
 					visitorData,
 				);
 				break;
@@ -381,6 +397,7 @@
 					item,
 					position,
 					{ $list, $queue, $startIndex },
+					page,
 					visitorData,
 				);
 
@@ -427,6 +444,7 @@
 				name="play"
 				color="inherit"
 				size="1.5em"
+				strokeWidth={2}
 			/>
 		</span>
 		<span class:hidden={isPlaying !== false || isHovering !== false}>
@@ -470,6 +488,15 @@
 									href={`/artist/${subtitle.browseId}`}
 									on:click|preventDefault={() => {
 										goto(`/artist/${subtitle.browseId}`);
+										fullscreenStore.set("closed");
+									}}>{subtitle.text}</a
+								>
+							{:else if subtitle.pageType?.includes("USER_CHANNEL")}
+								<a
+									class="artist secondary"
+									href={`/channel/${subtitle.browseId}`}
+									on:click|preventDefault={() => {
+										goto(`/channel/${subtitle.browseId}`);
 										fullscreenStore.set("closed");
 									}}>{subtitle.text}</a
 								>

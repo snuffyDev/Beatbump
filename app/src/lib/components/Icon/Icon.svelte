@@ -28,7 +28,7 @@
 		? 0
 		: strokeWidth === 'default'
 		? 1
-		: strokeWidth}; {style}; "
+		: strokeWidth}; {style}; {strokeWidth ?? `--stroke-width: ${strokeWidth}`}"
 	viewBox="0 0 24 24"
 	><use href="{icons}#{name}" />
 	<slot />
@@ -49,7 +49,7 @@
 	}
 	@media screen and (min-width: 640px) {
 		svg {
-			stroke-width: initial;
+			stroke-width: var(--stroke-width, initial);
 		}
 	}
 </style>

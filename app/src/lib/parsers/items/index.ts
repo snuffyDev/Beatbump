@@ -76,7 +76,7 @@ export class ItemBuilder {
 			videoId:
 				flexCol0.navigationEndpoint?.watchEndpoint?.videoId ??
 				item.navigationEndpoint?.watchEndpoint?.videoId ??
-				 undefined,
+				undefined,
 			playlistId: flexCol0.navigationEndpoint?.watchEndpoint?.playlistId
 				? flexCol0?.navigationEndpoint?.watchEndpoint?.playlistId
 				: item.menu?.menuRenderer.items[0].menuNavigationItemRenderer
@@ -103,10 +103,10 @@ export class ItemBuilder {
 				flexCol0?.navigationEndpoint?.watchEndpoint?.playerParams ||
 				flexCol0?.navigationEndpoint?.watchEndpoint?.params,
 			clickTrackingParams:
-				flexCol0?.navigationEndpoint?.clickTrackingParams ||
 				item.overlay?.musicItemThumbnailOverlayRenderer?.content
 					?.musicPlayButtonRenderer?.playNavigationEndpoint
-					?.clickTrackingParams,
+					?.clickTrackingParams ||
+				flexCol0?.navigationEndpoint?.clickTrackingParams,
 			loggingContext:
 				item.overlay?.musicItemThumbnailOverlayRenderer?.content
 					?.musicPlayButtonRenderer?.playNavigationEndpoint?.watchEndpoint

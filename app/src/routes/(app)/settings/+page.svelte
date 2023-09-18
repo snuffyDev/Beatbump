@@ -393,7 +393,7 @@
 		transform: translateY(-50%);
 		left: 0.125em;
 		transition: left 0.3s;
-		box-shadow: 0 0 5px 0.5px rgb(0 0 0 / 38.4%);
+		box-shadow: 0 0 12px -3px rgb(0 0 0 / 38.4%);
 	}
 
 	[type="checkbox"]:checked + .switch::after {

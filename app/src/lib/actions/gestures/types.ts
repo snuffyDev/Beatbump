@@ -17,9 +17,9 @@ export interface GestureHandlers {
 	onEnd(event: PointerEvent): void;
 }
 export interface DragEvent {
-	dragstart: Detail;
-	dragmove: Detail;
-	dragend: Detail;
+	"bb-dragstart": Detail;
+	"bb-dragmove": Detail;
+	"bb-dragend": Detail;
 }
 
 export interface PanEvent {

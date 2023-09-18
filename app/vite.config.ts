@@ -25,7 +25,9 @@ const config: UserConfig = {
 	server: {
 		fs: {
 			strict: false,
+			allow: [".."],
 		},
+		cors: true,
 	},
 	test: {
 		include: ["src/**/*.{test,spec}.{js,ts}"],

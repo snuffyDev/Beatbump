@@ -40,7 +40,7 @@ export interface Song {
 	album?: Album;
 	index?: number;
 	itct?: string;
-	title?: string;
+	title: string;
 	artistInfo?: ArtistInfo;
 	videoId: string;
 	type?: string;

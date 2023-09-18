@@ -28,6 +28,8 @@
 .index {
 	display: none;
 	visibility: none;
+		color: hsl(0, 0%, 100%, 0.7);
+
 	@media screen and (min-width: 720px) {
 		width: 1.5em;
 		font-weight: 600;
@@ -107,6 +109,8 @@
 	white-space: nowrap;
 	justify-content: flex-end;
     min-width:max-content;
+		color: var(--secondary-font-color);
+
 }
 
 .thumbnail {
