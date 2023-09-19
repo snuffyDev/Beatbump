@@ -56,13 +56,14 @@ Some of Beatbump's features includes:
 
 > Service Uptime Monitoring: https://stats.uptimerobot.com/9PnmRfz6Gm
 
-| Name                         | URL
-| ---                          | ---                                                                       |
-| Beatbump (Official) | https://beatbump.io                                                       |
-| ~Vern (Clearnet)             | https://bb.vern.cc/                                                       |
-| ~Vern (Onion)                | http://bb.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion/ |
-| ~Vern (I2P)                  | http://vern6inmbjzqpecx4kpkq5sln3cqqrfuxfzh4au3tpxbsfbwbnta.b32.i2p/      |
-| btb.frail.duckdns.org (Clearnet) | https://btb.frail.duckdns.org/ |
+| Name                             | URL
+| ---                              | ---                                                                       |
+| Beatbump (Official)              | https://beatbump.io                                                       |
+| ~Vern (Clearnet)                 | https://bb.vern.cc/                                                       |
+| ~Vern (Onion)                    | http://bb.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion/ |
+| ~Vern (I2P)                      | http://vern6inmbjzqpecx4kpkq5sln3cqqrfuxfzh4au3tpxbsfbwbnta.b32.i2p/      |
+| btb.frail.duckdns.org (Clearnet) | https://btb.frail.duckdns.org/                                            |
+| bb.ggtyler.dev (Clearnet)        | https://bb.ggtyler.dev/                                                   |
 
 
 ## Donations
