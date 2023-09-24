@@ -8,15 +8,10 @@ declare global {
 			preferences: PreferencesCookie;
 		}
 
-		interface Platform {}
-
-		interface Session {
-			iOS?: boolean;
-			Android?: boolean;
-		}
-
 		interface PageData {
 			path?: string;
+			iOS?: boolean;
+			Android?: boolean;
 			page?: string;
 		}
 	}

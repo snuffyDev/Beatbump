@@ -10,6 +10,7 @@ import { fileURLToPath } from "url";
 
 const dev = process.env["NODE_ENV"] === "development";
 const ENV_ADAPTER = process.env["BB_ADAPTER"] ?? "cloudflare-workers";
+const ENV_IFRAME = process.env["ALLOW_IFRAME"] ?? "false";
 
 const adapters = {
     "cloudflare-workers": adapterCfw({}),
@@ -40,7 +41,7 @@ const config = {
     }),
 
     kit: {
-        adapter: dev ? node() : adapter,
+        adapter: dev ? node() : adapter, env: { dir: '../' },
         alias: {
             $stores: path.resolve("./src/lib/stores"),
             $api: path.resolve("./src/routes/(app)/api/_lib"),
@@ -54,6 +55,11 @@ const config = {
             serviceWorker: "src/service-worker",
             appTemplate: "src/app.html",
             hooks: { server: "src/hooks.server" },
+        },
+        csp: {
+            directives: {
+                'frame-ancestors': ['self', ENV_IFRAME ? '*' : '']
+            }
         },
         version: { pollInterval: 600000 },
     },

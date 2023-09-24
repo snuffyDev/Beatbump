@@ -103,7 +103,7 @@
 
 	.item-box {
 		cursor: pointer;
-		background: #201e27;
+		background: #2727298a;
 		display: flex;
 		justify-content: flex-start;
 		flex-flow: row nowrap;

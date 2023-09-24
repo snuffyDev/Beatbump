@@ -82,7 +82,7 @@
 		},
 	];
 
-	const motion = tweened(-36, {
+	const motion = tweened(-33, {
 		duration: 180,
 		easing: cubicOut,
 	});

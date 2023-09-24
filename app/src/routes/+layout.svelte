@@ -213,7 +213,7 @@ left: 0; background: var(--base-bg); font-size: 1.1rem; display: flex; flex-dire
 	lang="scss"
 	global
 >
-	@use "../global/redesign/main.scss" as *;
+	@import "../global/redesign/main.scss";
 
 	.footer-container {
 		transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 350ms,

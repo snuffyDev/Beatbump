@@ -1,5 +1,5 @@
 const p: NodeJS.Process =
-	typeof process !== "undefined" ? process : { env: {} };
+	typeof process !== "undefined" ? process : ({ env: {} } as NodeJS.Process);
 
 import { PUBLIC_ALLOW_THUMBNAIL_PROXY } from "$env/static/public";
 import {
@@ -10,7 +10,6 @@ import { objectKeys } from "$lib/utils/collections/objects";
 import type { Cookies, Handle } from "@sveltejs/kit";
 
 const headers = {
-	...(p.env?.ALLOW_IFRAME !== "true" && { "X-Frame-Options": "SAMEORIGIN" }),
 	"Referrer-Policy": "no-referrer",
 	"Permissions-Policy": `accelerometer=(), autoplay="*", camera=(), document-domain=(), encrypted-media=(), fullscreen=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), sync-xhr=(), usb=(), xr-spatial-tracking=(), geolocation=()`,
 	"X-Content-Type-Options": "nosniff",

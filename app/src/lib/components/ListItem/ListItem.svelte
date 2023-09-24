@@ -306,6 +306,7 @@
 	import { IDBService } from "$lib/workers/db/service";
 	import list from "$stores/list/sessionList";
 	import { SITE_ORIGIN_URL } from "$stores/url";
+	import { isDesktopMQ } from "$stores/window";
 	import { createEventDispatcher, tick } from "svelte";
 	import { writable } from "svelte/store";
 	import Icon from "../Icon/Icon.svelte";
@@ -437,20 +438,22 @@
 		isHovering = false;
 	}}
 >
-	<div class="index">
-		<span class:hidden={isPlaying !== true && isHovering !== true}>
-			<!--#9990a0-->
-			<Icon
-				name="play"
-				color="inherit"
-				size="1.5em"
-				strokeWidth={2}
-			/>
-		</span>
-		<span class:hidden={isPlaying !== false || isHovering !== false}>
-			{idx + 1}
-		</span>
-	</div>
+	{#if ($isMobileMQ && (!Array.isArray(item.thumbnails) || !item.thumbnails.length)) || $isDesktopMQ}
+		<div class="index">
+			<span class:hidden={isPlaying !== true && isHovering !== true}>
+				<!--#9990a0-->
+				<Icon
+					name="play"
+					color="inherit"
+					size="1.5em"
+					strokeWidth={2}
+				/>
+			</span>
+			<span class:hidden={isPlaying !== false || isHovering !== false}>
+				{idx + 1}
+			</span>
+		</div>
+	{/if}
 	<div class="metadata">
 		{#if Array.isArray(item.thumbnails) && item.thumbnails.length}
 			<div class="thumbnail">
@@ -518,7 +521,7 @@
 			</div>
 		</div>
 	</div>
-	{#if $isMobileMQ || isHovering}
+	{#if $PageStore.data.iOS || $PageStore.data.Android || $isMobileMQ || isHovering}
 		<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 		<div
 			class="length"
