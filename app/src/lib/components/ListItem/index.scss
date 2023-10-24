@@ -7,8 +7,7 @@
 	justify-content: space-between;
 	align-content: center;
 	gap: 1.5em;
-		padding: 0 0.75em 0 2.25em;
-        line-height: 1.5;
+    line-height: 1.5;
 	@media screen and (min-width: 720px) {
 		align-content: center;
 		display: grid;
@@ -89,7 +88,7 @@ overflow:hidden;
 
 .length {
     &:is(span) {
-        padding:0.5em;
+        padding:0.25em;
     }
 	align-self: center;
 	grid-area: right;

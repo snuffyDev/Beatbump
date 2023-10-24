@@ -80,7 +80,7 @@ export function pan(node: HTMLElement) {
 
 export const draggable: Action<
 	HTMLElement,
-	never,
+	void,
 	{
 		"on:bb-dragstart": (event: CustomEvent<Detail>) => void;
 		"on:bb-dragmove": (event: CustomEvent<Detail>) => void;

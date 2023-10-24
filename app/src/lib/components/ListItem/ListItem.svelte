@@ -209,6 +209,7 @@
 			.add("Play Song Radio", async () => {
 				list.initAutoMixSession({
 					videoId: item.videoId,
+					playlistId: item.autoMixList ?? "",
 					loggingContext: item?.loggingContext,
 				});
 			})
@@ -319,7 +320,7 @@
 
 	const dispatch = createEventDispatcher<{
 		click: { index: number; id?: number };
-		setPageIsPlaying: { id: string; index: number };
+		setPageIsPlaying: { isLocal: boolean; id: string; index: number };
 		initLocalPlaylist: { idx: number };
 		change: undefined;
 	}>();
@@ -365,7 +366,7 @@
 			case "queue": {
 				if (listItemPageContext.isLibrary() && !list.isLocalPlaylist) {
 					dispatch("initLocalPlaylist", { idx });
-					dispatch("setPageIsPlaying", { id: "", index: idx });
+					dispatch("setPageIsPlaying", { isLocal: true, id: "", index: idx });
 					return;
 				}
 
@@ -418,7 +419,10 @@
 				});
 				break;
 		}
-		dispatch("setPageIsPlaying", { id: parentPlaylistId });
+		dispatch("setPageIsPlaying", {
+			isLocal: page === "library",
+			id: `${parentPlaylistId}`,
+		});
 	}
 </script>
 

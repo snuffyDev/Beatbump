@@ -15,7 +15,7 @@ export const proxyUrls = (origin: string) => {
 	};
 };
 export const thumbnailProxyUrl = (origin: string, url: string) => {
-	const urlNoHttps = url.slice(8);
+	const urlNoHttps = url.replace(/https?:\/\//g, "");
 	const hostname = urlNoHttps.slice(0, 3);
 	const path = url.slice(url.indexOf(".com/") + 5);
 	return `${origin}/i/${

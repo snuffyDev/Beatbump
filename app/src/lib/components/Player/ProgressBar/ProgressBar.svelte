@@ -1,37 +1,46 @@
+<script
+	context="module"
+	lang="ts"
+>
+	export const progressBarSeek = writable<number>(0);
+</script>
+
 <script lang="ts">
-	// eslint-disable-next-line import/no-duplicates
 	import { expoIn, sineIn } from "svelte/easing";
-	// eslint-disable-next-line import/no-duplicates
 	import { fade } from "svelte/transition";
 
 	import { AudioPlayer } from "$lib/player";
 	import { format } from "$lib/utils";
-	const { progress, currentTimeStore, durationStore } = AudioPlayer;
+	import { createEventDispatcher } from "svelte";
+	import { writable } from "svelte/store";
+
+	const { currentTimeStore, durationStore } = AudioPlayer;
+
+	const dispatch = createEventDispatcher<{ seek: number }>();
 
 	let isTouchDrag = false;
 	let seeking = false;
 	let hovering = false;
-	let hoverWidth;
-	let cWidth = 0;
+	let hoverWidth: number;
 	let songBar: HTMLElement;
-	let songBarRect: DOMRect;
+
 	function trackMouse(event: PointerEvent) {
 		if (seeking) seekAudio(event);
 		if (hovering) hoverEvent(event);
 	}
 
-	function seek(event, bounds) {
+	function seek(event: PointerEvent, bounds: DOMRect) {
 		let x = event.clientX - bounds.left;
 
 		return Math.min(Math.max(x / bounds.width, 0), 1);
 	}
 
-	function hoverEvent(event) {
+	function hoverEvent(event: PointerEvent) {
 		if (!songBar) return;
 		hoverWidth = hover(event, songBar.getBoundingClientRect());
 	}
 
-	function hover(event, bounds) {
+	function hover(event: PointerEvent, bounds: DOMRect) {
 		const x = event.clientX - bounds.left;
 		return Math.min(Math.max(x / bounds.width, 0), 1);
 	}
@@ -39,10 +48,14 @@
 	function seekAudio(event: PointerEvent) {
 		if (!songBar) return;
 
-		AudioPlayer.seek(
-			seek(event, songBar.getBoundingClientRect()) * $durationStore,
-		);
+		const seekTime =
+			seek(event, songBar.getBoundingClientRect()) * $durationStore;
+		AudioPlayer.seek(seekTime);
+
+		progressBarSeek.set(seekTime);
 	}
+
+	$: $progressBarSeek && dispatch("seek", $progressBarSeek);
 </script>
 
 <svelte:window
@@ -57,15 +70,16 @@
 		<div
 			class="progress-bar"
 			transition:fade|global
-			on:pointerover={(e) => {
+			on:pointerover={() => {
 				hovering = true;
 			}}
-			on:click|stopPropagation|capture={() => {}}
+			on:pointerup
+			on:click|stopPropagation|capture={null}
 			on:pointerdown|stopPropagation|capture={seekAudio}
 			on:touchstart={() => {
 				isTouchDrag = true;
 			}}
-			on:pointerleave={(event) => {
+			on:pointerleave={() => {
 				hovering = false;
 			}}
 		>
@@ -92,7 +106,6 @@
 				}}
 				class:isTouchDrag
 				bind:this={songBar}
-				bind:clientWidth={cWidth}
 				value={$currentTimeStore}
 				max={$durationStore}
 			/>

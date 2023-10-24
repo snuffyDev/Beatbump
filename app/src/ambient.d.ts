@@ -37,6 +37,8 @@ declare global {
 	interface Window {
 		bbAudio: (audio: HTMLAudioElement) => { duration: number; src: string };
 		hls: Hls;
+		_player: HTMLAudioElement;
+		$page: import("@sveltejs/kit").Page;
 		bbPlayer: { src?: string; duration?: number; title?: string };
 		fetch<T>(url: URL | string, init?: RequestInit): Promise<IResponse<T>>;
 	}

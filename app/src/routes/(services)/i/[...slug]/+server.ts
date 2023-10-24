@@ -11,8 +11,8 @@ export const GET = async ({ fetch, params, request, url }) => {
 	const SLUG = params.slug.slice(0, FIRST_SLASH);
 	const PATH =
 		SLUG === "vi" ? `/${params.slug}` : params.slug.slice(FIRST_SLASH);
-
 	const BASE = SERVER_MAP[SLUG as keyof typeof SERVER_MAP];
+	console.log({ BASE, PATH, url });
 
 	// Rewrite request to point to Google's thumbnail services.
 	request = new Request(BASE + PATH, {

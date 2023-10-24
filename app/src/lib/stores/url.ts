@@ -7,26 +7,38 @@ import { currentTrack } from "./list";
 
 export const SITE_ORIGIN_URL = derived(page, ($page) => $page.url.origin);
 
-export const playbackURLStateUpdater = (defaultValue: boolean) => {
+export const playbackURLStateUpdater = ((defaultValue: boolean) => {
 	let enabled = defaultValue;
 	let subscriber: Unsubscriber | null = null;
 	let oldState: History["state"] = {};
 	let lastURL = "";
 	let currentURL = "";
+	let lastNonListenURL = "";
 
 	if (browser) {
+		if (!window.location.href.includes("listen")) {
+			lastNonListenURL = window.location.href;
+		}
 		subscriber = currentTrack.subscribe(
 			skipFirstInvocation(($currentTrack) => {
-				if (enabled && $currentTrack && $currentTrack.videoId) {
-					if (!lastURL.includes("listen")) {
+				if ($currentTrack && $currentTrack.videoId) {
+					if (lastURL && !lastURL.includes("listen")) {
+						lastNonListenURL = lastURL;
 						lastURL = window.location.href;
 					}
 					const url = new URL(window.location.href);
 					url.pathname = "/listen";
 					url.searchParams.set("id", $currentTrack?.videoId ?? "");
 					oldState = window.history.state;
-					window.history.pushState(window.history.state, "", url.toString());
 					currentURL = url.toString();
+				}
+
+				if (enabled) {
+					window.history.pushState(
+						window.history.state,
+						"",
+						currentURL.toString(),
+					);
 				}
 			}),
 		);
@@ -34,6 +46,7 @@ export const playbackURLStateUpdater = (defaultValue: boolean) => {
 
 	return {
 		setEnabled: (value: boolean) => {
+			if (!browser) return;
 			enabled = value;
 
 			if (enabled) {
@@ -47,11 +60,31 @@ export const playbackURLStateUpdater = (defaultValue: boolean) => {
 				window.history.pushState(window.history.state, "", lastURL.toString());
 			}
 		},
+		toggle() {
+			if (!browser) return;
+			enabled = !enabled;
+			if (enabled) {
+				if (!window.location.pathname.includes("listen"))
+					lastNonListenURL = window.location.href;
+				window.history.pushState(
+					window.history.state,
+					"",
+					currentURL.toString(),
+				);
+			} else if (!enabled && lastNonListenURL) {
+				window.history.pushState(
+					window.history.state,
+					"",
+					lastNonListenURL.toString(),
+				);
+			}
+		},
 		dispose: () => {
+			if (!browser) return;
 			if (lastURL)
 				window.history.pushState(window.history.state, "", lastURL.toString());
 
 			subscriber?.();
 		},
 	};
-};
+})(false);

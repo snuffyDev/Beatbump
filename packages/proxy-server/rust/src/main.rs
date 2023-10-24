@@ -53,7 +53,11 @@ lazy_static! {
 // Sends a HTTP request
 #[async_recursion]
 async fn send_request(url: &str, host: &str) -> ResponseResult {
-    let req_url = &url;
+    if (url == "unknown") {
+        return ResponseResult::Err("Unknown URL".to_string());
+    }
+
+    let req_url = url.clone();
 
     let req = Request::builder()
         .uri(req_url.to_string())
@@ -68,8 +72,9 @@ async fn send_request(url: &str, host: &str) -> ResponseResult {
 
     match HTTP_CLIENT.request(request).await {
         Ok(res) => {
+            // If the response is a redirect, send a request to the new location
             if let Some(location_header) = res.headers().get(header::LOCATION) {
-                return send_request(&location_header.to_str().unwrap(), host).await;
+                return send_request(&location_header.to_str().unwrap_or("unknown"), host).await;
             }
             ResponseResult::Ok(res)
         }

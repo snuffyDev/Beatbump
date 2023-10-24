@@ -2,6 +2,7 @@ import { browser } from "$app/environment";
 import SessionListService from "$stores/list/sessionList";
 import { AudioPlayer } from "./player";
 import type { ISessionListProvider } from "./stores";
+import { generateId } from "./utils";
 
 const _syncTabs = (() => {
 	if (!browser) return;
@@ -346,7 +347,7 @@ const _syncTabs = (() => {
 		}
 	}
 
-	return new SyncTabs(crypto.randomUUID());
+	return new SyncTabs(generateId(16));
 })();
 
 export const syncTabs = _syncTabs as NonNullable<typeof _syncTabs>;

@@ -21,9 +21,7 @@
 	import { currentTrack, queue } from "$lib/stores/list";
 	import { syncTabs } from "$lib/tabSync.js";
 	import { Logger } from "$lib/utils";
-	import { skipFirstInvocation } from "$lib/utils/skipFirstInvocation.js";
 	import { SessionListService } from "$stores/list/sessionList";
-	import { playbackURLStateUpdater } from "$stores/url.js";
 	import { onMount } from "svelte";
 	import { get } from "svelte/store";
 
@@ -91,31 +89,16 @@
 		if (main) main.scrollTo({ top: 0 });
 	});
 
-	let playbackUpdatesUrlHandler: ReturnType<typeof playbackURLStateUpdater>;
-
-	const setPlaybackUpdatesUrlHandler = skipFirstInvocation<boolean>((value) => {
-		playbackUpdatesUrlHandler.setEnabled(value);
-	});
-
-	$: if (
-		playbackUpdatesUrlHandler &&
-		$settings["playback"]["Playback Updates URL"] !== undefined &&
-		$settings["playback"]["Playback Updates URL"] == true
-	) {
-		setPlaybackUpdatesUrlHandler($fullscreenStore === "open");
-	}
 	let scrollTop = 0;
 	onMount(() => {
 		try {
-			playbackUpdatesUrlHandler = playbackURLStateUpdater(
-				$settings["playback"]["Playback Updates URL"] == true || false,
-			);
 			if (
 				$settings["playback"]["Remember Last Track"] &&
 				localStorage["lastTrack"]
 			) {
 				const track = JSON.parse(
-					localStorage.getItem("lastTrack"),
+					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+					localStorage.getItem("lastTrack")! as string,
 				) as unknown as typeof $currentTrack;
 
 				SessionListService.setTrackWillPlayNext(track, 0);
@@ -151,10 +134,7 @@
 		if (groupSession.initialized && groupSession.hasActiveSession) {
 			groupSession.disconnect();
 		}
-		if ($settings["playback"]["Playback Updates URL"]) {
-			playbackUpdatesUrlHandler.setEnabled(false);
-			playbackUpdatesUrlHandler.dispose();
-		}
+
 		AudioPlayer.dispose();
 	}}
 />

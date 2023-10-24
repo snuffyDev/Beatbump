@@ -16,7 +16,6 @@ const config: UserConfig = {
 	define: {
 		"process.env.APP_VERSION": JSON.stringify(version_fmt),
 	},
-	envDir: "../",
 	esbuild: {
 		treeShaking: true,
 		minifyWhitespace: true,
@@ -26,7 +25,7 @@ const config: UserConfig = {
 	server: {
 		fs: {
 			strict: false,
-			allow: ["..", "."],
+			allow: ["../", "./"],
 		},
 	},
 	test: {

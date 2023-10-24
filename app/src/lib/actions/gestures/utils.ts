@@ -33,7 +33,7 @@ export function calculateVelocity(event: PointerEvent, detail: Detail) {
 
 	if (timeDelta > 0 && timeDelta < 100) {
 		const distance = (currentY - lastY) / timeDelta;
-		detail.velocityY = distance * 0.7 + detail.velocityY * 0.3;
+		detail.velocityY = distance * 0.3 + detail.velocityY * 0.4;
 	}
 	// detail.deltaY = (currentY - detail.startY) - lastY;
 }

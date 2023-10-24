@@ -1,10 +1,12 @@
 import type { Dict } from "$lib/types/utilities";
 import { buildDashManifest, type IFormat } from "$lib/utils/buildDashManifest";
 import { filterMap, map } from "$lib/utils/collections/array";
+import type { UserSettings } from "$stores/settings";
 export interface PlayerFormats {
 	hls?: string;
 	dash?: string;
 	streams?: { url: string; original_url: string; mimeType: string }[];
+	video?: string;
 }
 
 /** Creates a new `redirector.googlevideo.com` URL */
@@ -16,21 +18,32 @@ const createRedirectorURL = (url: string) => {
 	return url;
 };
 
+const YOUTUBE_MP4_VIDEO_ONLY_ITAGS = [
+	134, // 360p
+	135, // 480p
+	136, // 720p
+];
+
 export function sort({
 	data = {},
 	WebM = false,
 	dash = false,
-	proxyUrl = "",
+	$proxySettings,
 }: {
 	data: Dict<any>;
 	WebM?: boolean;
 	dash?: boolean;
-	proxyUrl?: string | false;
+	$proxySettings: UserSettings["network"];
 }): PlayerFormats {
-	let dash_manifest: string;
+	let dash_manifest = "";
+
+	const proxyUrl = ($proxySettings as Required<UserSettings["network"]>)[
+		"Stream Proxy Server"
+	];
+	const canProxy = $proxySettings["Proxy Streams"] === true;
 
 	if (dash === true) {
-		const proxy_url = proxyUrl ? new URL(proxyUrl) : new URL("");
+		const proxy_url = canProxy ? new URL(proxyUrl) : new URL("");
 		const formats = map(
 			data?.streamingData?.adaptiveFormats as Array<IFormat>,
 			(item) => {
@@ -62,27 +75,40 @@ export function sort({
 		) +
 		("?host=" + host);
 
-	const arr = filterMap(
+	let video = "";
+
+	const arr = filterMap<
+		Record<string, string>,
+		{ original_url: string; mimeType: "mp4" | "webm"; url: string } | null
+	>(
 		formats,
 		(item) => {
-			if ((item.itag as number) < 139 && item.itag > 251) return null;
 			const url = new URL(item.url);
-			if (proxyUrl) {
+			if (canProxy) {
 				url.searchParams.set("host", url.host);
 				url.host = new URL(proxyUrl).host;
 			}
-			if (WebM === true && item.itag === 251)
+			const itag = parseInt(item.itag.toString());
+
+			if (!video && YOUTUBE_MP4_VIDEO_ONLY_ITAGS.includes(itag)) {
+				if (video) return null;
+				video = createRedirectorURL(item.url);
+				return null;
+			}
+
+			if (WebM === true && itag === 251)
 				return {
 					original_url: url.toString(),
 					url: createRedirectorURL(item.url),
 					mimeType: "webm",
 				};
-			if (item.itag === 140)
+			if (itag === 140) {
 				return {
 					original_url: url.toString(),
 					url: url.toString(),
 					mimeType: "mp4",
 				};
+			}
 		},
 		(it) => !!it,
 	);
@@ -90,6 +116,7 @@ export function sort({
 	return {
 		hls,
 		dash: dash_manifest,
-		streams: arr,
+		streams: arr as NonNullable<(typeof arr)[number]>[],
+		video,
 	};
 }

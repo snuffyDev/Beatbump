@@ -9,7 +9,7 @@
 	export let data;
 
 	const { carouselItems, page: path } = data;
-	$: console.log(data.data);
+	$: console.log(data);
 </script>
 
 <Header

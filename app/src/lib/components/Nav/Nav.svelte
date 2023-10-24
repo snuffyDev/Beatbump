@@ -35,6 +35,8 @@
 	$: console.log({ opacity });
 </script>
 
+<svelte:body class={!hidden ? "no-scroll" : ""} />
+
 <nav
 	class="nav"
 	class:scrolled={opacity >= 100 || fullscreen}
@@ -245,8 +247,8 @@
 		z-index: 150;
 		background-color: var(--base-bg-opacity-1_2) !important;
 		justify-content: space-between;
-		transition: 50ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-
+		transition: 150ms cubic-bezier(0.215, 0.61, 0.355, 1);
+		transition-delay: 200ms;
 		&.scrolled::before {
 			border-color: hsla(0, 0%, 91%, 0.174);
 		}
@@ -259,15 +261,15 @@
 			border-bottom: 0.0625rem hsla(0, 0%, 91%, 0.174) solid;
 			border-color: hsla(0, 0%, 91%, 0.023);
 
-			transition: 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-			transition-property: opacity, background-color, box-shadow;
-			transition-delay: 0ms;
+			transition: 300ms cubic-bezier(0.215, 0.61, 0.355, 1);
+			transition-property: opacity, background-color, box-shadow, border;
+			transition-delay: 100ms;
 			box-shadow: 0 -0.5rem 62px -32px #000 inset;
 			background-color: #0000;
 		}
 		&.scrolled::before {
 			box-shadow: 0 -0.5rem 62px -32px #0000 inset;
-			transition-delay: 150ms;
+			transition-delay: 0ms;
 			opacity: 1;
 			background-color: var(--top-bg);
 		}
@@ -335,6 +337,10 @@
 	}
 
 	.backdrop {
+		position: fixed;
+		inset: 0;
+		overflow-y: hidden;
+		touch-action: none;
 		background: linear-gradient(
 			to bottom,
 			hsl(0deg 0% 3% / 94%) 0%,

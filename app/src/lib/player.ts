@@ -1,15 +1,17 @@
-/* eslint-disable import/no-duplicates */
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import { browser } from "$app/environment";
 import { SessionListService } from "$stores/list/sessionList";
 import type { UserSettings } from "$stores/settings";
 import Hls from "hls.js";
+import { tick } from "svelte";
 import { tweened } from "svelte/motion";
 import { writable } from "svelte/store";
+import { APIClient } from "./api";
 import { sort, type PlayerFormats } from "./parsers/player";
 import { settings, type ISessionListProvider } from "./stores";
 import { groupSession, type ConnectionState } from "./stores/sessions";
 import { syncTabs } from "./tabSync";
+import type { Dict } from "./types/utilities";
 import { WritableStore, notify, type ResponseBody } from "./utils";
 import { isAppleMobileDevice } from "./utils/browserDetection";
 import { objectKeys } from "./utils/collections/objects";
@@ -28,47 +30,52 @@ export interface IEventHandler {
 	onEvent<K extends keyof HTMLElementEventMap>(type: K, cb: Callback<K>): void;
 }
 
-type SrcDict = { original_url: string; url: string };
+type SrcDict = { original_url: string; url: string; video_url?: string };
 
 interface AudioPlayerEvents {
 	play: unknown;
 	"update:stream_type": { type: "HLS" | "HTTP" };
 }
 
-const setPosition = () => {
+const setPosition = (currentTime: number, duration: number) => {
 	if ("mediaSession" in navigator) {
+		console.log({ currentTime, duration });
 		navigator.mediaSession.setPositionState({
-			duration: isAppleMobileDevice
-				? AudioPlayer.duration / 2
-				: AudioPlayer.duration,
-			position: AudioPlayer.currentTime,
+			duration: duration,
+			position: currentTime,
 		});
 	}
 };
 
-function metaDataHandler(sessionList: ISessionListProvider) {
+function metaDataHandler({
+	currentTime,
+	duration,
+	sessionList,
+}: {
+	currentTime: number;
+	duration: number;
+	sessionList: ISessionListProvider;
+}) {
 	if ("mediaSession" in navigator) {
 		const position = sessionList.position;
 		const currentTrack = sessionList.mix[position];
-		console.log({ currentTrack, position, mix: sessionList.mix });
-		if (!currentTrack) return;
+
+		const artwork = currentTrack?.thumbnails;
+
+		console.debug({ currentTrack, position, mix: sessionList.mix });
+
+		if (!currentTrack) return console.debug("no current track");
 		navigator.mediaSession.metadata = new MediaMetadata({
 			title: currentTrack?.title,
 			artist: currentTrack?.artistInfo?.artist?.[0]?.text || "",
 			album: currentTrack?.album?.title ?? undefined,
-			artwork: [
-				{
-					src: currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1]
-						.url,
-					sizes: `${
-						currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].width
-					}x${
-						currentTrack?.thumbnails[currentTrack?.thumbnails.length - 1].height
-					}`,
-					type: "image/jpeg",
-				},
-			],
+			artwork: artwork.reverse().map(({ url, width, height }) => ({
+				src: url,
+				sizes: `${width}x${height}`,
+				type: "image/jpeg",
+			})),
 		});
+		console.log({ metadata: navigator.mediaSession.metadata });
 		navigator.mediaSession.setActionHandler("play", () => {
 			AudioPlayer.play();
 		});
@@ -76,19 +83,26 @@ function metaDataHandler(sessionList: ISessionListProvider) {
 		navigator.mediaSession.setActionHandler("seekto", (session) => {
 			if (session.fastSeek && "fastSeek" in AudioPlayer) {
 				session.seekTime && AudioPlayer.fastSeek(session.seekTime);
-				setPosition();
+				setPosition(
+					session.seekTime ?? AudioPlayer.currentTime,
+					AudioPlayer.duration,
+				);
 				return;
 			}
 			session.seekTime && AudioPlayer.seek(session.seekTime);
 
-			setPosition();
+			setPosition(
+				session.seekTime ?? AudioPlayer.currentTime,
+				AudioPlayer.duration,
+			);
 		});
 		navigator.mediaSession.setActionHandler("previoustrack", () =>
-			sessionList.previous(),
+			SessionListService.previous(),
 		);
 		navigator.mediaSession.setActionHandler("nexttrack", () =>
-			sessionList.next(),
+			SessionListService.next(),
 		);
+		setPosition(currentTime, duration);
 	}
 }
 
@@ -184,7 +198,7 @@ class EventEmitter<Events> {
 	}
 }
 
-const loadAndAttachHLS = async (player: HTMLAudioElement) => {
+const loadAndAttachHLS = async () => {
 	const hls = await import("hls.js");
 	const Hls = hls.default;
 	if (Hls.isSupported() === false) return null;
@@ -195,6 +209,19 @@ const loadAndAttachHLS = async (player: HTMLAudioElement) => {
 		backBufferLength: 90,
 	};
 	return new Hls(hlsjsConfig);
+};
+
+const loadVideo = (player: HTMLVideoElement) => {
+	return new Promise((resolve, reject) => {
+		player.onloadeddata = () => {
+			resolve(player);
+		};
+		player.onerror = (e) => {
+			reject(e);
+		};
+
+		player.load();
+	});
 };
 
 const getPlayerVolumeFromLS = (player: WritableStore<number>) => {
@@ -218,16 +245,16 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 	private _currentTimeStore = new WritableStore<number>(0);
 	private _durationStore = new WritableStore<number>(0);
 	private _volumeStore = new WritableStore<number>(0);
-	private _srcStore = new WritableStore<string | undefined>(undefined);
 	private _paused = writable(true);
 	private _progress = tweened<number>(0);
+	private _mode = new WritableStore<"audio" | "video">("audio");
 	private _leechInterval: ReturnType<typeof setWorkerInterval> | null = null;
 	private _taskQueue: [
 		name: keyof AudioPlayerImpl,
 		args: [...rest: unknown[]],
 	][] = [];
 	private hls: Hls | undefined;
-
+	private _videoUrl = new WritableStore<string | undefined>(undefined);
 	private audioNodeListeners: Record<string, () => void> = {};
 	private invalidationTimer: ReturnType<typeof setTimeout> | null = null;
 	private nextSrc: { stale: boolean; url: string | undefined } = {
@@ -256,6 +283,7 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 		}
 	}
 	private declare player: HTMLAudioElement;
+	private declare videoPlayer: HTMLVideoElement | undefined;
 	private _repeat: string = "off";
 	private playerKind: "hls" | "html5" = "html5";
 	private declare unsubscriber: () => void;
@@ -281,6 +309,27 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 	}
 	public get currentTime() {
 		return this._currentTimeStore.value;
+	}
+
+	public get mode() {
+		return this._mode;
+	}
+
+	public get videoUrlStore() {
+		return this._videoUrl;
+	}
+
+	public get videoNode() {
+		return this.videoPlayer;
+	}
+	public set videoNode(node: HTMLVideoElement | undefined) {
+		this.videoPlayer = node;
+		if (this.videoPlayer && this._videoUrl.value) {
+			this.videoPlayer.src = this._videoUrl.value;
+			this.videoPlayer.load();
+			this.videoPlayer.currentTime = this.currentTime;
+			this.videoPlayer.play();
+		}
 	}
 
 	public repeat(state: "off" | "track" | "playlist") {
@@ -431,15 +480,27 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 		}, 1000);
 	}
 
-	public updateSrc({ url }: { url: string }) {
+	public async updateSrc({
+		url,
+		videoUrl,
+	}: {
+		videoUrl?: string;
+		url: string;
+	}) {
 		if (url === undefined) return;
 
+		if (videoUrl && this.videoPlayer) {
+			this.videoPlayer.src = videoUrl;
+		}
+		this._videoUrl.set(videoUrl);
 		if (this.playerKind === "hls") {
 			this.loadHLS(url);
 		} else {
 			this.player.src = url;
 		}
-		metaDataHandler(SessionListService.$.value);
+
+		this.nextSrc.url = undefined;
+		this.setStaleTimeout();
 	}
 
 	private addTaskToTaskQueue(name: keyof AudioPlayerImpl, ...args: unknown[]) {
@@ -448,7 +509,7 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 
 	private async loadHLS(source?: string) {
 		if (this.hls) this.hls.destroy();
-		const hls = await loadAndAttachHLS(this.player);
+		const hls = await loadAndAttachHLS();
 		if (!hls) return;
 		this.hls = hls;
 
@@ -488,7 +549,7 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 				SessionListService.$.value.mix.length - 1
 		) {
 			await SessionListService.updatePosition(1);
-			await SessionListService.previous(true);
+			await SessionListService.previous();
 			return true;
 		} else if (this._repeat === "track") {
 			return false;
@@ -499,8 +560,25 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 		let locked = false;
 		this.player = new Audio();
 		this.player.autoplay = true;
+
 		getPlayerVolumeFromLS(this._volumeStore);
 
+		const modeSubscription = this._mode.subscribe(async (value) => {
+			await tick();
+			if (value === "audio") {
+				if (this.videoPlayer) {
+					this.videoPlayer.pause();
+					this.videoPlayer.autoplay = false;
+				}
+			} else {
+				if (this.videoPlayer) {
+					await tick();
+					this.videoPlayer.autoplay = true;
+					await this.videoPlayer.play();
+					this.videoPlayer.currentTime = this.player.currentTime;
+				}
+			}
+		});
 		const volumeSubscription = this._volumeStore.subscribe((value) => {
 			this.player.volume = value;
 			localStorage.setItem("volume", value.toString());
@@ -510,19 +588,26 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 			if (persisted) return;
 			this.dispose();
 			volumeSubscription();
+			modeSubscription();
 			this.player.remove();
-		});
-		// Dispatched on first autoplay
-		this.on("play", () => {
-			// this.play();
+			this.videoPlayer?.remove();
 		});
 
-		this.onEvent("loadedmetadata", () => {
+		this.onEvent("loadedmetadata", async () => {
 			this._paused.set(false);
+			if (this.videoNode)
+				await loadVideo(this.videoNode).then(async () => {
+					await tick();
+					if (this.videoNode)
+						this.videoNode.currentTime = this.player.currentTime;
+				});
+
+			await this.videoPlayer?.play();
+			await tick();
 			groupSession.resetAllCanPlay();
 
 			this.setStaleTimeout();
-
+			this.nextSrc.url = undefined;
 			this._currentTimeStore.set(this.player.currentTime);
 
 			const duration = isAppleMobileDevice
@@ -538,6 +623,12 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 					duration: this.duration,
 				});
 			}
+
+			metaDataHandler({
+				duration: this.player.duration,
+				currentTime: this.player.currentTime,
+				sessionList: SessionListService.$.value,
+			});
 		});
 
 		this.onEvent("play", () => {
@@ -545,12 +636,17 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 			this.play();
 		});
 
+		this.onEvent("seeked", () => {
+			if (this.videoPlayer && this._mode.value === "video") {
+				this.videoPlayer.currentTime = this.player.currentTime;
+			}
+		});
+
 		this.onEvent("timeupdate", async () => {
 			this._currentTimeStore.set(this.player.currentTime);
 			const duration = isAppleMobileDevice
 				? this.player.duration / 2
 				: this.player.duration;
-			this._durationStore.set(duration);
 
 			// We're at the end - get the next track!
 			if (this.player.currentTime >= duration - 0.1 && !locked) {
@@ -591,6 +687,7 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 					});
 				} finally {
 					locked = false;
+					this.nextSrc.url = undefined; // Set to undefined since e 'used' the value
 				}
 			}
 		});
@@ -645,8 +742,8 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 export const AudioPlayer = new AudioPlayerImpl();
 
 /** Updates the current track for the audio player */
-export function updatePlayerSrc({ url }: SrcDict): void {
-	AudioPlayer.updateSrc({ url });
+export function updatePlayerSrc({ url, video_url }: SrcDict): void {
+	AudioPlayer.updateSrc({ url, videoUrl: video_url });
 }
 
 // Get source URLs
@@ -663,24 +760,22 @@ export const getSrc = async (
 	| undefined
 > => {
 	try {
-		const res = await fetch(
-			`/api/v1/player.json?videoId=${videoId}${
-				playlistId ? `&playlistId=${playlistId}` : ""
-			}${params ? `&playerParams=${params}` : ""}`,
-		).then((res) => res.json());
+		const res = (await APIClient.player({
+			videoId,
+			playerParams: params,
+			playlistId,
+		})) as Dict<Record<string, string>>;
 		if (
 			res &&
 			!res?.streamingData &&
-			res?.playabilityStatus.status === "UNPLAYABLE"
+			res?.playabilityStatus?.status === "UNPLAYABLE"
 		) {
 			return handleError();
 		}
 		const formats = sort({
 			data: res,
 			dash: false,
-			proxyUrl:
-				!!userSettings?.network?.["Proxy Streams"] &&
-				userSettings?.network["Stream Proxy Server"],
+			$proxySettings: userSettings?.network || settings.value()["network"],
 		});
 
 		const src = setTrack(formats, shouldAutoplay);
@@ -700,7 +795,11 @@ function setTrack(formats: PlayerFormats, shouldAutoplay: boolean) {
 		format = formats.streams?.[0];
 	}
 	if (format && shouldAutoplay)
-		updatePlayerSrc({ original_url: format.original_url, url: format.url });
+		updatePlayerSrc({
+			video_url: formats.video,
+			original_url: format.original_url,
+			url: format.url,
+		});
 	return {
 		body: format
 			? { original_url: format.original_url, url: format.url }

@@ -1,10 +1,10 @@
-import type { proxyUrls } from "$lib/server/thumbnailProxyUrl";
 import type { Thumbnail } from "$lib/types";
 import type {
 	IMusicResponsiveListItemRenderer,
 	PurpleRun,
 } from "$lib/types/innertube/internals";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
+import type { proxyUrls } from "$lib/utils/thumbnailProxyUrl";
 import { subtitle, thumbnailTransformer } from "../utils.parsers";
 
 export async function MusicResponsiveListItemRenderer(

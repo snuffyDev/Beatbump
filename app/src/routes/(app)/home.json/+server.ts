@@ -4,11 +4,11 @@ import { buildAPIRequest } from "../api/_lib/request";
 
 import { ItemBuilder } from "$lib/parsers";
 import { extractPrefsFromLocals } from "$lib/server/locals";
-import { proxyUrls } from "$lib/server/thumbnailProxyUrl";
 import type { Thumbnail } from "$lib/types";
 import type { Dict } from "$lib/types/utilities";
 import { filterMapAsync } from "$lib/utils/collections/array";
 import { isArrayAndReturn } from "$lib/utils/isArray";
+import { proxyUrls } from "$lib/utils/thumbnailProxyUrl";
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ url, locals }) => {

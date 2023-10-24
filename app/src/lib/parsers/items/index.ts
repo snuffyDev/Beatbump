@@ -1,4 +1,3 @@
-import { proxyUrls } from "$lib/server/thumbnailProxyUrl";
 import type { Song, Thumbnail } from "$lib/types";
 import type {
 	IMusicResponsiveListItemRenderer,
@@ -10,6 +9,7 @@ import type { ICarouselTwoRowItem } from "$lib/types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "$lib/types/musicListItemRenderer";
 import type { IPlaylistPanelVideoRenderer } from "$lib/types/playlistPanelVideoRenderer";
 import { map } from "$lib/utils";
+import { proxyUrls } from "$lib/utils/thumbnailProxyUrl";
 import { subtitle, thumbnailTransformer } from "../utils.parsers";
 
 export { MusicResponsiveListItemRenderer } from "./musicResponsiveListItemRenderer";

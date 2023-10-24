@@ -1,6 +1,7 @@
 import { browser } from "$app/environment";
 import type { NestedKeyOf } from "$lib/types/utilities";
-import { get, writable, type Writable } from "svelte/store";
+import { WritableStore } from "$lib/utils";
+import { writable, type Writable } from "svelte/store";
 import { ENV_DONATION_URL } from "../../env";
 
 export type Theme = "Dark" | "Dim" | "Midnight" | "YTM";
@@ -76,9 +77,14 @@ const PWA_THEME_COLORS = {
 	Midnight: "#0f0916",
 };
 
-const setTopBarTheme = (theme: Appearance["Theme"]) => {
-	document.querySelector<HTMLMetaElement>("meta[name='theme-color']").content =
-		PWA_THEME_COLORS[theme];
+const setTopBarTheme = (theme: Theme) => {
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	const metaElm = document.querySelector<HTMLMetaElement>(
+		"meta[name='theme-color']",
+	)!;
+	if (metaElm) {
+		metaElm.content = PWA_THEME_COLORS[theme];
+	}
 };
 
 export const settings = browser
@@ -99,13 +105,13 @@ function _settings() {
 			set: Writable<UserSettings>["set"];
 			value: () => UserSettings;
 		};
-	// Migrate from previous settings to new ones
-	const stored = JSON.parse(localStorage.getItem("settings")) as UserSettings;
+	const lsValue = localStorage.getItem("settings");
+
+	const stored = (lsValue ? JSON.parse(lsValue) : list) as UserSettings;
+
 	// Migrate from previous settings to new ones
 	if (!stored?.appearance && !stored?.playback && !stored?.search) {
-		const theme = localStorage.getItem("theme") as Lowercase<
-			Appearance["Theme"]
-		>;
+		const theme = localStorage.getItem("theme") as Lowercase<Theme>;
 		//@ts-expect-error it's correct, the compilers lying
 		list.appearance.Theme =
 			theme !== null
@@ -143,7 +149,7 @@ function _settings() {
 			if ("HLS Stream Proxy" in stored.network)
 				delete stored.network["HLS Stream Proxy"];
 		}
-		if (!stored?.network["Proxy Thumbnails"]) {
+		if (stored?.network["Proxy Thumbnails"] === undefined) {
 			stored.network["Proxy Thumbnails"] = true;
 		}
 		if (stored?.search && typeof stored?.search?.Restricted === "undefined") {
@@ -152,11 +158,11 @@ function _settings() {
 		list = stored as UserSettings;
 	}
 
-	const store = writable<UserSettings>(list);
+	const store = new WritableStore<UserSettings>(list);
 
 	const { subscribe, update, set } = store;
 
-	setTopBarTheme(list.appearance.Theme);
+	setTopBarTheme(list.appearance.Theme as Theme);
 
 	function save(settings: UserSettings) {
 		themeSet(settings.appearance.Theme as Theme);
@@ -185,7 +191,7 @@ function _settings() {
 		subscribe,
 		change,
 		value() {
-			return get(store);
+			return store.value;
 		},
 		set: (settings: UserSettings) => {
 			list = settings;
@@ -196,9 +202,9 @@ function _settings() {
 	};
 }
 
-function themeSet(theme: Appearance["Theme"]) {
+function themeSet(theme: NonNullable<Appearance["Theme"]>) {
 	if (!browser) return;
 	const root = document.documentElement;
-	const currentTheme = root.classList.item(0);
+	const currentTheme = root.classList.item(0) as Theme;
 	root.classList.replace(currentTheme, theme);
 }

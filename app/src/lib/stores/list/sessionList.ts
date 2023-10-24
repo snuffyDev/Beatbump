@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { APIParams } from "$lib/constants";
 // eslint-disable-next-line import/no-cycle
-import {
-	AudioPlayer,
-	getSrc,
-	updateGroupPosition,
-	updatePlayerSrc,
-} from "$lib/player";
+import { getSrc, updateGroupPosition, updatePlayerSrc } from "$lib/player";
 import type {
 	Artist,
 	ArtistInfo,
@@ -131,6 +126,10 @@ export class ListService {
 
 	private get _state() {
 		return this._$.value;
+	}
+
+	private clearNextTrack() {
+		this.nextTrackUrl = null;
 	}
 
 	private findIndexForTrack({
@@ -337,6 +336,7 @@ export class ListService {
 			await tick();
 			console.log(args);
 			let willRevert = false;
+			this.clearNextTrack();
 			// Reset the current mix state
 			if (
 				this._$.value.mix.length &&
@@ -357,7 +357,7 @@ export class ListService {
 					params: config?.playerParams ? config?.playerParams : undefined,
 					videoId,
 					...(visitorData && { visitorData }),
-					playlistId: playlistId ? playlistId : undefined,
+					playlistId: playlistId ? playlistId : `RDAMVM${videoId}`,
 					loggingContext: loggingContext
 						? loggingContext.vssLoggingContext?.serializedContextData
 						: undefined,
@@ -387,6 +387,16 @@ export class ListService {
 						  0;
 				const item = data.results[playbackIndex ?? 0];
 
+				const state = await this.#sanitizeAndUpdate(
+					willRevert ? "SET" : "APPLY",
+					{
+						...this._state,
+						...data,
+						position: Math.max(0, playbackIndex),
+						mix: ["append", data.results],
+					},
+				);
+				await tick();
 				await getSrc(
 					videoId
 						? videoId
@@ -397,16 +407,6 @@ export class ListService {
 						: undefined,
 					item?.playlistId,
 					config?.playerParams,
-				);
-
-				const state = await this.#sanitizeAndUpdate(
-					willRevert ? "SET" : "APPLY",
-					{
-						...this._state,
-						...data,
-						position: Math.max(0, playbackIndex),
-						mix: ["append", data.results],
-					},
 				);
 				syncTabs.updateSessionList(state);
 
@@ -440,6 +440,7 @@ export class ListService {
 	}): Promise<{ body: ResponseBody; error?: boolean } | undefined> {
 		const toggle = togglePlayerLoad();
 		this.isLocal = false;
+
 		try {
 			const {
 				playlistId = "",
@@ -455,6 +456,8 @@ export class ListService {
 			await tick();
 
 			if (this._$.value.currentMixId !== playlistId) {
+				this.clearNextTrack();
+
 				this.#revertState();
 			}
 			const data = await fetchNext({
@@ -571,7 +574,7 @@ export class ListService {
 					url: nextSrc ? (nextSrc as string) : (this.nextTrackUrl as string),
 				});
 				this.nextTrackUrl = null;
-				await this.prefetchTrackAtIndex(state + 1);
+				// await this.prefetchTrackAtIndex(state + 1);
 			} else {
 				let position = await this.updatePosition("next");
 				if (position >= this._$.value.mix.length) {
@@ -594,7 +597,7 @@ export class ListService {
 						clickTracking: this.clickTrackingParams,
 					}),
 				});
-				if (!data) return;
+				if (!data) return console.log("no data on next", { data });
 
 				const state = await this.#sanitizeAndUpdate("APPLY", data);
 				await getSrc(
@@ -603,7 +606,7 @@ export class ListService {
 					undefined,
 					true,
 				);
-				await this.prefetchTrackAtIndex(state.position + 1);
+				// await this.prefetchTrackAtIndex(state.position + 1);
 			}
 			const position = this._$.value.position;
 			if (update) {
@@ -615,92 +618,14 @@ export class ListService {
 	}
 
 	public async prefetchNextTrack() {
-		console.log("prefetchNextTrack");
-		const nextTrack = this._$.value.mix[this._$.value.position + 1];
-		if (!nextTrack) {
-			const currentTrack = this._$.value.mix[this._$.value.position];
-			const currentIndex = this._$.value.position;
-			console.log({ nextTrack, currentTrack, state: this._state, this: this });
-			await this.getSessionContinuation(
-				{
-					videoId: currentTrack?.videoId,
-					key: this._$.value.position,
-					playlistId: currentTrack?.playlistId,
-					loggingContext: currentTrack?.loggingContext,
-					playerParams: currentTrack?.playerParams,
-					playlistSetVideoId:
-						APIParams.lt100 === currentTrack?.playerParams
-							? undefined
-							: currentTrack?.playlistSetVideoId,
-
-					ctoken: this.continuation,
-					clickTrackingParams: this.clickTrackingParams!,
-				},
-				false,
-			).then(() => {
-				if (groupSession.hasActiveSession) {
-					groupSession.updateGuestContinuation(this._$.value);
-				}
-			});
-			return;
-		}
-		const response = await getSrc(
-			nextTrack.videoId,
-			nextTrack.playlistId,
-			undefined,
-			false,
-		);
-		if (response && response.body) {
-			this.nextTrackUrl = response.body.url as string;
-			AudioPlayer.setNextTrackPrefetchedUrl(response.body.url);
-		}
+		return;
 	}
 
 	public async prefetchTrackAtIndex(index: number) {
-		const nextTrack = this._$.value.mix[index];
-		if (!nextTrack) {
-			const currentIndex = this._$.value.position;
-			const currentTrack = this._$.value.mix[currentIndex];
-			await this.getSessionContinuation(
-				{
-					videoId: currentTrack?.videoId,
-					key: this._$.value.position,
-					playlistId: currentTrack?.playlistId,
-					loggingContext: currentTrack?.loggingContext,
-					playerParams: currentTrack?.playerParams,
-					playlistSetVideoId:
-						APIParams.lt100 === currentTrack?.playerParams
-							? undefined
-							: currentTrack?.playlistSetVideoId,
-
-					ctoken: this.continuation,
-					clickTrackingParams: this.clickTrackingParams!,
-				},
-				false,
-			)
-				.then(() => {
-					this.updatePosition(currentIndex + 1);
-				})
-				.then(() => {
-					if (groupSession.hasActiveSession) {
-						groupSession.updateGuestContinuation(this._$.value);
-					}
-				});
-			return;
-		}
-		const response = await getSrc(
-			nextTrack.videoId,
-			nextTrack.playlistId,
-			undefined,
-			false,
-		);
-		if (response && response.body) {
-			this.nextTrackUrl = response.body.url as string;
-			AudioPlayer.setNextTrackPrefetchedUrl(response.body.url);
-		}
+		return;
 	}
 
-	public async previous(_broadcast = false) {
+	public async previous() {
 		let position = await this.updatePosition("back");
 		if (position >= this._$.value.mix.length) {
 			position = this._$.value.position;
@@ -930,7 +855,7 @@ export class ListService {
 				: ISessionListProvider[Key];
 		},
 	) {
-		return this._$.updateAsync(
+		const value = await this._$.updateAsync(
 			(old) =>
 				new Promise((resolve) => {
 					if (kind === "APPLY") {
@@ -1003,6 +928,7 @@ export class ListService {
 					}
 				}),
 		);
+		return value;
 	}
 }
 

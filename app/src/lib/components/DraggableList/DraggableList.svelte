@@ -83,6 +83,7 @@
 	function handleDragOver(event: DragEvent, overId: number) {
 		dragOverId = overId;
 		if (overId === dragOverId) return;
+		if ((dragOverId || overId) === null) return;
 		if (dragOverId !== null && currentDragId !== null) {
 			// [items[currentDragId], items[dragOverId]] = [
 			// 	items[dragOverId],
@@ -132,8 +133,13 @@
 			on:touchstart={() => {
 				if (touchTimer) clearTimeout(touchTimer);
 				touchTimer = setTimeout(() => {
+					touchTimer = undefined;
 					isDragging = true;
-				}, 500);
+				}, 800);
+			}}
+			on:touchmove={() => {
+				if (isDragging) return;
+				if (touchTimer) clearTimeout(touchTimer);
 			}}
 			on:drag={(event) => {
 				const target = event.target;

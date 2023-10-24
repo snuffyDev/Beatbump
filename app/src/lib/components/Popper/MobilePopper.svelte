@@ -10,11 +10,12 @@
 	import list, { currentTrack } from "$lib/stores/list";
 	import { tick } from "svelte";
 
-	import { quartOut } from "svelte/easing";
+	import { clamp } from "$lib/utils/minmax";
+	import { cubicOut, quartOut } from "svelte/easing";
 	import { tweened } from "svelte/motion";
 	import { fly } from "svelte/transition";
 	import Icon from "../Icon/Icon.svelte";
-	import { activeNode, PopperStore } from "./popperStore";
+	import { PopperStore, activeNode } from "./popperStore";
 
 	$: items = $PopperStore.items;
 	$: type = $PopperStore.type;
@@ -24,10 +25,19 @@
 	let queueHeight = 0;
 	let windowHeight = 0;
 
+	let scrollValue = 0;
+	let scrollTarget: HTMLElement;
+	let scrolling = false;
+	let frame: number | undefined;
+
 	$: heightCalc = windowHeight - queueHeight * 0.5;
 
 	let backdrop: HTMLDivElement;
-	let tracklist: HTMLDivElement = undefined;
+	let tracklist: HTMLDivElement | undefined = undefined;
+	let listElm: HTMLDivElement | undefined = undefined;
+	let listRect: DOMRectReadOnly;
+	let hasOverflow = false;
+
 	$: isOpen = !!items.length;
 	const motion = tweened(0, {
 		duration: 640,
@@ -81,6 +91,8 @@
 				duration: Math.min(distance / Math.abs(detail.velocityY), 640),
 			});
 		}
+		scrolling = false;
+		scrollValue = 0;
 		sliding = false;
 		await tick();
 		isOpen = false;
@@ -147,6 +159,21 @@
 			});
 		}
 	}
+
+	$: {
+		if (listElm && listRect) {
+			const { scrollHeight } = listElm;
+			const { height: parentHeight } = listElm.getBoundingClientRect();
+			if (scrollHeight > parentHeight) {
+				listElm.style.overflowY = "scroll";
+				hasOverflow = true;
+			} else {
+				listElm.style.overflowY = "hidden";
+				hasOverflow = false;
+			}
+		}
+	}
+
 	$: srcImg = Array.isArray(
 		$PopperStore.metadata?.thumbnail ?? $PopperStore.items[0]?.thumbnails,
 	)
@@ -159,11 +186,19 @@
 			: srcImg.url;
 </script>
 
+<svelte:window
+	on:touchend|capture={() => {
+		scrolling = false;
+	}}
+/>
+
 {#if isOpen}
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
 		class="fixed"
 		bind:clientHeight={windowHeight}
 	>
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div
 			class="backdrop"
 			bind:this={backdrop}
@@ -172,15 +207,21 @@
 		<div
 			class="column container drag"
 			bind:this={tracklist}
-			in:fly|global={{ duration: 600, delay: 300, opacity: 0, y: windowHeight }}
-			out:fly|global={{ duration: 600, y: windowHeight, opacity: 0 }}
+			in:fly|global={{ duration: 720, delay: 300, opacity: 0, y: windowHeight }}
+			out:fly|global={{
+				duration: 620,
+				easing: cubicOut,
+				y: windowHeight,
+				opacity: 0.3,
+			}}
 			bind:clientHeight={queueHeight}
 			style={`transform: translate3d(0, ${$motion}px, 0);  bottom:0;`}
 		>
 			<div
 				use:draggable
 				on:pointerdown|stopPropagation={() => {
-					tracklist.style.willChange = "scroll-position, transform";
+					if (tracklist)
+						tracklist.style.willChange = "scroll-position, transform";
 				}}
 				on:bb-dragstart|capture|stopPropagation={(e) => onDragStart(1, e)}
 				on:bb-dragmove|capture|stopPropagation={(e) =>
@@ -242,8 +283,48 @@
 					</div>
 				</section>
 			{/if}
-			<div class="list-wrapper">
+			<div
+				class="list-wrapper"
+				bind:contentRect={listRect}
+				bind:this={listElm}
+				on:pointerdown={() => {
+					if (!hasOverflow || scrolling) return;
+					scrolling = true;
+				}}
+				on:touchend|capture={() => {
+					if (!hasOverflow || !scrolling) return;
+					scrolling = false;
+				}}
+				on:scroll={(e) => {
+					if (!hasOverflow) return;
+					if (!(e.currentTarget instanceof HTMLElement) || !scrollTarget)
+						return;
+
+					const newScrollValue = e.currentTarget["scrollTop"] * 10;
+
+					if (frame) {
+						cancelAnimationFrame(frame);
+						frame = undefined;
+					}
+					frame = requestAnimationFrame(() => {
+						scrollValue = clamp(3, newScrollValue, listRect.height - 10);
+						// (100 * scrollValue) / e["currentTarget"]["offsetHeight"];
+						frame = undefined;
+					});
+				}}
+			>
+				<span
+					class="scroll-target"
+					bind:this={scrollTarget}
+				/>
 				<ul>
+					{#if hasOverflow}
+						<div
+							class="scrollbar"
+							style:--thumb={`${scrollValue}px`}
+							class:active={scrolling}
+						/>
+					{/if}
 					{#each items as item}
 						<li on:click={item?.action}>
 							<Icon
@@ -261,6 +342,49 @@
 {/if}
 
 <style lang="scss">
+	.scroll-target {
+		position: absolute;
+		display: block;
+		top: 0;
+		height: 1px;
+		width: 100%;
+	}
+	.scrollbar {
+		position: absolute;
+		right: calc(-0.4rem);
+
+		width: 0.916667rem;
+		height: 100%;
+		background: #14131813;
+		z-index: 10000;
+		position: absolute;
+		background-clip: content-box;
+		border: transparent solid 0.0983333rem;
+		will-change: transform;
+		contain: strict;
+		--thumb-bg: #e0e0e01e;
+		&.active::before {
+			--thumb-bg: #e0e0e0a1;
+		}
+		&::before {
+			background-color: var(--thumb-bg, #e0e0e01e);
+			border-radius: 0.5625rem;
+			width: 0.8rem;
+			top: 1%;
+			// inset: 0;
+			will-change: transform;
+			transform: translateZ(0) translateY(var(--thumb, 0%));
+			scrollbar-width: 0.625rem;
+			transition: transform 220ms cubic-bezier(0.19, 1, 0.22, 1);
+			border: 0.25rem solid #b8b8b800;
+			background-clip: content-box;
+			z-index: 10000;
+			height: 10%;
+
+			position: absolute;
+			content: "";
+		}
+	}
 	.m-metadata {
 		display: flex;
 		max-width: 93%;
@@ -464,11 +588,15 @@
 			content: "";
 		}
 
-		position: relative;
-		width: 100%;
-		padding: 0.25em;
-		overflow-y: scroll;
+		touch-action: pan-y;
 
+		position: relative;
+		padding: 0.5rem;
+		overflow-y: scroll;
+		max-height: 100%;
+		overflow-x: hidden;
+		width: calc(100% - 0.1rem);
+		margin-right: auto;
 		&::-webkit-scrollbar {
 			width: 0;
 			height: 0;
@@ -501,6 +629,7 @@
 		width: 100%;
 		margin: 0 auto;
 
+		position: relative;
 		// height: 100%;height
 	}
 

@@ -6,7 +6,20 @@
 >
 	function dropdown(
 		node: HTMLElement,
-		{ items = [], type = "", metadata = {} },
+		{
+			items,
+			metadata,
+			type,
+		}: {
+			items: any[];
+			type: string;
+			metadata: Partial<{
+				thumbnail: Thumbnail[];
+				title: string;
+				artist?: Artist[] | undefined;
+				length?: string;
+			}>;
+		},
 	) {
 		let x: number, y: number, bottom: number;
 		let open = false;
@@ -80,6 +93,11 @@
 				node.removeEventListener("click", handleClick, true);
 				node.removeEventListener("keydown", a11yClick, true);
 			},
+			update(newOptions: { items: any[]; type: string; metadata: any }) {
+				items = newOptions.items;
+				type = newOptions.type;
+				metadata = newOptions.metadata;
+			},
 		};
 	}
 </script>
@@ -90,7 +108,7 @@
 	import Icon from "../Icon/Icon.svelte";
 	import { activeNode, isOpen, PopperStore } from "./popperStore";
 
-	export let items = [];
+	export let items: any[] = [];
 	export let type = "";
 	export let metadata: Partial<{
 		thumbnail: Thumbnail[];

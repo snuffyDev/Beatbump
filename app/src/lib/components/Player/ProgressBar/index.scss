@@ -21,6 +21,7 @@
 	width: 100%;
 	cursor: pointer;
 	transition: cubic-bezier(0.25, 0.46, 0.45, 0.94) 180ms transform;
+    will-change: transform;
 	transform-origin: 0% 50%;
 	overflow: hidden;
 	border-radius: 333333em;
@@ -32,13 +33,16 @@
 	height: 100%;
 }
 .progress-container {
-	--height: 1rem;
+    --height: 1.3rem;
+    @media screen and (min-width: 768px) {
+        --height: 1rem;
+    }
 	contain: layout;
 	display: flex;
 	font-size: var(--base-font-size);
 	gap: 0.5em;
 	grid-template-columns: auto 1fr auto;
-	height: 1rem;
+	height: var(--height);
 	position: relative;
 	align-items: flex-end;
 	line-height: 1;
@@ -72,6 +76,8 @@ progress::-moz-progress-bar {
 }
 progress::-webkit-progress-value {
 	background-color: rgb(255, 255, 255);
+    border-radius: 4px;
+    height:calc(calc(var(--height) + 1px) / 3);
 }
 
 .timestamp {
@@ -81,7 +87,7 @@ progress::-webkit-progress-value {
 		sans-serif;
 	font-size: calc(var(--base-font-size) * 0.95);
 	letter-spacing: -0.02em;
-
+    height:calc(calc(var(--height) + .1px) / 1.33);
 	white-space: nowrap;
-	vertical-align: top;
+	vertical-align: middle;
 }

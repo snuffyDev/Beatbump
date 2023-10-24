@@ -241,6 +241,7 @@
 			videoId = data.videoId ? data.videoId : "";
 			playlistId = data?.playlistId ? data?.playlistId : "";
 			if (data.type?.includes("playlist") || data?.type === "albums") {
+				notify(JSON.stringify({ type: data.type }), "success");
 				await list.initPlaylistSession({
 					playlistId,
 					index: 0,
@@ -248,6 +249,7 @@
 					params: data.params,
 				});
 			} else {
+				notify(JSON.stringify({ type: data.type }), "success");
 				await list.initAutoMixSession({
 					loggingContext: data?.loggingContext,
 					videoId: videoId,
@@ -267,9 +269,11 @@
 			return;
 		}
 	};
-	let srcImg = Array.isArray(data?.thumbnails)
-		? data?.thumbnails.at(0)
-		: { width: 0, height: 0, url: "", placeholder: "" };
+	let srcImg =
+		Array.isArray(data?.thumbnails) && data?.thumbnails[0]
+			? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			  data.thumbnails[0]!
+			: { width: 0, height: 0, url: "", placeholder: "" };
 
 	$: srcImg.url =
 		srcImg.width < 240

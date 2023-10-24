@@ -26,6 +26,12 @@
 	) =>
 		buildDropdown()
 			.add("View Artist", () => {
+				console.log({
+					$currentTrack,
+					$queuePosition,
+					hasActiveSession,
+					$SITE_ORIGIN_URL,
+				});
 				window.scrollTo({
 					behavior: "smooth",
 					top: 0,
