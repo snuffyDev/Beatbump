@@ -120,7 +120,7 @@
 			if (Math.sign(detail.deltaY || 0) < 0) {
 				open(kind, detail);
 			} else {
-				close(kind, detail);
+				close(kind, detail as Required<Detail>);
 			}
 			sliding = false;
 		}
@@ -168,7 +168,7 @@
 		}
 	}
 
-	function close(kind: Kind, detail: Detail) {
+	function close(kind: Kind, detail: Required<Detail>) {
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const step = detail.deltaY! / queueHeight;
 		const miss =
@@ -207,11 +207,11 @@
 			if (hasEverBeenOpen) playbackURLStateUpdater.toggle();
 		}
 	}
+
 	let thumbnail: Thumbnail = { height: 0, url: "", width: 0 };
 
 	$: {
 		if ($isMobileMQ) {
-			console.log({ $currentTrack });
 			DropdownItems = createPlayerPopperMenu(
 				$currentTrack,
 				$queuePosition,
@@ -258,7 +258,6 @@
 		};
 	}
 
-	$: console.log($queue);
 	let imgElm: HTMLImageElement;
 	let videoElm: HTMLVideoElement;
 
@@ -289,7 +288,7 @@
 		return currentTrackUnsub;
 	});
 
-	const setVideoTime = debounce((time: number) => {
+	const setVideoTime = debounce(() => {
 		if (videoElm) {
 			videoElm.pause();
 			requestFrameSingle(() => {
@@ -299,7 +298,7 @@
 		}
 	}, 100);
 
-	$: $progressBarSeek && setVideoTime($progressBarSeek);
+	$: $progressBarSeek && setVideoTime();
 </script>
 
 {#if $immersiveQueue}
@@ -343,7 +342,7 @@
 	>
 		<div
 			class="column"
-			use:pan
+			use:pan={{ capture: true }}
 			on:pan={(event) => {
 				if (!$isMobileMQ) return;
 				const { detail } = event;
@@ -388,10 +387,12 @@
 					>
 						<div class="player-kind-wrapper">
 							<button
+								class:active={$mode === "video"}
 								on:click={() => {
 									$mode = "video";
 								}}>Video</button
 							><button
+								class:active={$mode === "audio"}
 								on:click={() => {
 									$mode = "audio";
 								}}>Audio</button
@@ -415,7 +416,7 @@
 						{:else}
 							<video
 								id="img"
-								style="aspect-ratio: {thumbnail?.width} / {thumbnail?.height};"
+								style="--poster-url: {thumbnail?.url}; aspect-ratio: {thumbnail?.width} / {thumbnail?.height};"
 								autoplay
 								poster={thumbnail?.url ?? ""}
 								disablepictureinpicture
@@ -424,7 +425,7 @@
 								height={thumbnail?.height}
 								bind:paused={$paused}
 								bind:this={AudioPlayer.videoNode}
-								preload="auto"
+								preload="none"
 								muted
 								playsinline
 							/>
@@ -466,8 +467,8 @@
 						style="margin-bottom: 1em; max-width: 75vw; margin-inline: auto;"
 					>
 						<ProgressBar
-							on:seek={({ detail }) => {
-								setVideoTime(detail);
+							on:seek={() => {
+								setVideoTime();
 							}}
 						/>
 					</div>
@@ -939,7 +940,7 @@
 		justify-content: center;
 		min-height: 2rem;
 		margin-top: 2rem;
-		width: 100vw;
+		width: 100%;
 		@media screen and (min-width: 720px) {
 			width: 53vw;
 		}
@@ -990,9 +991,14 @@
 				border-top-left-radius: 16px;
 				border-bottom-left-radius: 16px;
 			}
+			&.active,
 			&:hover {
 				background-color: hsla(219, 7%, 40%, 0.733) !important;
 				border-color: hsla(0, 0%, 60%, 0.8) !important;
+			}
+
+			@media screen and (min-width: 720px) {
+				font-size: 1rem;
 			}
 		}
 	}
@@ -1087,6 +1093,9 @@
 			border-radius: 4px;
 			&:not(video) {
 				filter: drop-shadow(0 0 12px rgb(0 0 0 / 66%));
+			}
+			&:not(img) {
+				background: var(--poster-url);
 			}
 		}
 	}

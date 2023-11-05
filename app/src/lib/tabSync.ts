@@ -343,7 +343,7 @@ const _syncTabs = (() => {
 		};
 
 		dispose() {
-			this.protocol.dispose();
+			this.protocol?.dispose?.();
 		}
 	}
 

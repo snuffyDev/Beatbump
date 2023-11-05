@@ -135,7 +135,7 @@
 			groupSession.disconnect();
 		}
 
-		AudioPlayer.dispose();
+		AudioPlayer?.dispose?.();
 	}}
 />
 {#if info}

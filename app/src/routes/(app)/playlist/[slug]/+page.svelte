@@ -6,6 +6,7 @@
 	import { isPagePlaying, showAddToPlaylistPopper } from "$lib/stores/stores";
 	import List from "../_List.svelte";
 
+	import type { ParsedCarousel } from "$api/models/Carousel";
 	import Carousel from "$lib/components/Carousel/Carousel.svelte";
 	import Header from "$lib/components/Layouts/Header.svelte";
 	import InfoBox from "$lib/components/Layouts/InfoBox.svelte";
@@ -36,14 +37,14 @@
 		key,
 	} = data;
 
-	$: ctoken = continuations?.continuation || "";
-	$: itct = continuations?.clickTrackingParams || "";
+	$: ctoken = continuations?.continuation || null;
+	$: itct = continuations?.clickTrackingParams || undefined;
 	let width = 640;
 	let pageTitle = header?.title || "";
 	let description: string;
 	let isLoading = false;
-	let hasData = false;
-	let carousel: any;
+	let hasData: boolean | null = false;
+	let carousel: ParsedCarousel<"twoRowItem">;
 
 	const trackStore = writable<IListItemRenderer[]>([]);
 
@@ -157,6 +158,7 @@
 		{
 			label: "Unsorted",
 			params: "nosort",
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			action: () => {},
 		},
 		{
@@ -165,14 +167,15 @@
 			action: () => {
 				$trackStore = [
 					...$trackStore.sort((a, b) => {
-						const itemA = a.artistInfo.artist[0].text.toLowerCase();
-						const itemB = b.artistInfo.artist[0].text.toLowerCase();
+						const itemA = a.artistInfo.artist?.[0]?.text?.toLowerCase() || "";
+						const itemB = b.artistInfo.artist?.[0]?.text?.toLowerCase() || "";
 						if (itemA < itemB) {
 							return -1;
 						}
 						if (itemA > itemB) {
 							return 1;
 						}
+						return 0;
 					}),
 				];
 			},
@@ -183,14 +186,15 @@
 			action: () => {
 				$trackStore = [
 					...$trackStore.sort((a, b) => {
-						const itemA = a.artistInfo.artist[0].text.toLowerCase();
-						const itemB = b.artistInfo.artist[0].text.toLowerCase();
+						const itemA = a.artistInfo.artist?.[0]?.text?.toLowerCase() || "";
+						const itemB = b.artistInfo.artist?.[0]?.text?.toLowerCase() || "";
 						if (itemA < itemB) {
 							return 1;
 						}
 						if (itemA > itemB) {
 							return -1;
 						}
+						return 0;
 					}),
 				];
 			},
@@ -209,6 +213,7 @@
 						if (itemA > itemB) {
 							return 1;
 						}
+						return 0;
 					}),
 				];
 			},
@@ -227,6 +232,7 @@
 						if (itemA > itemB) {
 							return -1;
 						}
+						return 0;
 					}),
 				];
 			},
@@ -251,7 +257,7 @@
 		url={`${key}`}
 		desc={description}
 		image={header?.thumbnails !== null
-			? header?.thumbnails[header?.thumbnails?.length - 1]?.url
+			? header?.thumbnails?.[header?.thumbnails?.length - 1]?.url
 			: undefined}
 	/>
 {/if}
@@ -261,7 +267,7 @@
 			subtitles={header?.subtitles}
 			secondSubtitle={header?.secondSubtitle}
 			thumbnail={header?.thumbnails !== null
-				? header?.thumbnails[header?.thumbnails?.length - 1].url.replace(
+				? header?.thumbnails?.[header?.thumbnails?.length - 1].url.replace(
 						/=(w(\d+))-(h(\d+))/g,
 						"=w512-h512",
 				  )
@@ -295,6 +301,7 @@
 					text: "Start Radio",
 				},
 				{
+					// eslint-disable-next-line @typescript-eslint/no-empty-function
 					action: () => {},
 					icon: { name: "dots", size: "1.25rem" },
 					text: "",
@@ -352,13 +359,3 @@
 		{/if}
 	</footer>
 </main>
-
-<style lang="scss">
-	footer {
-	}
-
-	.list {
-		display: block;
-		height: 100%;
-	}
-</style>

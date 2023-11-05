@@ -42,11 +42,13 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
 	/// Get only the musicCarouselShelfRenderer's
 
-	carouselItems = await Promise.all(
-		contents
-			.filter((item) => "musicCarouselShelfRenderer" in item)
-			.map((carouselItem) => parseCarousel(carouselItem, itemBuilder)),
-	);
+	carouselItems = (
+		await Promise.all(
+			contents
+				.filter((item) => "musicCarouselShelfRenderer" in item)
+				.map((carouselItem) => parseCarousel(carouselItem, itemBuilder)),
+		)
+	).filter((item) => !item.header.title.includes("Popular episodes"));
 
 	return json({ carouselItems, data });
 };

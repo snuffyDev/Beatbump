@@ -1,5 +1,5 @@
-import { makeContext } from "./utils/getContext";
 import type { ListItemCtx } from "./types/allContexts";
+import { makeContext } from "./utils/getContext";
 
 const KEYS = {
 	releaseCtxKey: {},
@@ -8,7 +8,7 @@ const KEYS = {
 
 export const listItemCtxKey = {};
 export const CTX_ListItem = makeContext<ListItemCtx>(listItemCtxKey);
-export const releasePageContext = makeContext<{ page: "release" }>(
+export const releasePageContext = makeContext<{ page: "playlist" | "release" }>(
 	KEYS.releaseCtxKey,
 );
 export const homeChipContext = makeContext<{ params: string }>(

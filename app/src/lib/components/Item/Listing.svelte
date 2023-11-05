@@ -7,8 +7,8 @@
 	const isChannelOrArtist = (item: Item) => {
 		if (item?.subtitle) {
 			return (
-				(item.endpoint && item.endpoint?.pageType?.includes("ARTIST")) ||
-				item.endpoint?.pageType?.includes("USER_CHANNEL")
+				!!(item.endpoint && item.endpoint?.pageType?.includes("ARTIST")) ||
+				!!item.endpoint?.pageType?.includes("USER_CHANNEL")
 			);
 		}
 		return false;
@@ -44,6 +44,12 @@
 	let videoId = "";
 	let playlistId = "";
 	let isArtist = isChannelOrArtist(data);
+
+	let srcImg =
+		Array.isArray(data?.thumbnails) && data?.thumbnails[0]
+			? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			  data.thumbnails[0]!
+			: { width: 0, height: 0, url: "", placeholder: "" };
 
 	let loading = false;
 
@@ -269,11 +275,6 @@
 			return;
 		}
 	};
-	let srcImg =
-		Array.isArray(data?.thumbnails) && data?.thumbnails[0]
-			? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			  data.thumbnails[0]!
-			: { width: 0, height: 0, url: "", placeholder: "" };
 
 	$: srcImg.url =
 		srcImg.width < 240
@@ -320,12 +321,12 @@
 				pressing = false;
 			}}
 			on:pressEnd={(e) => {
-				e.currentTarget.dispatchEvent(new TouchEvent("touchcancel"));
+				e.currentTarget?.dispatchEvent(new TouchEvent("touchcancel"));
 				pressing = false;
-				setTimeout(() => {
-					pressing = false;
-					e.target.querySelector(".dd-button").click();
-				}, 1200);
+				// setTimeout(() => {
+				// 	pressing = false;
+				// 	// e.currentTarget?.querySelector(".dd-button")?.click?.();
+				// }, 1200);
 			}}
 		>
 			<div

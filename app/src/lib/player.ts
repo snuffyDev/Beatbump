@@ -586,7 +586,7 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 
 		window.addEventListener("pagehide", ({ persisted }) => {
 			if (persisted) return;
-			this.dispose();
+			this?.dispose?.();
 			volumeSubscription();
 			modeSubscription();
 			this.player.remove();

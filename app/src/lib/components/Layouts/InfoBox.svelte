@@ -1,7 +1,23 @@
-<script lang="ts">
+<script
+	context="module"
+	lang="ts"
+>
+	// eslint-disable-next-line unused-imports/no-unused-vars, @typescript-eslint/no-unused-vars
+	type AltSubtitle = {
+		tracks: number;
+		type: "playlist" | "single" | "album";
+		year: number;
+	};
+</script>
+
+<script
+	lang="ts"
+	generics="T extends (Subtitle | AltSubtitle)[]"
+>
 	import Icon from "$components/Icon/Icon.svelte";
 	import type { Dropdown, Icons } from "$lib/configs/dropdowns.config";
 	import { releasePageContext } from "$lib/contexts";
+	import type { Subtitle } from "$lib/types";
 	import { windowWidth } from "$stores/window";
 	import { createEventDispatcher } from "svelte";
 	import Button from "../Button";
@@ -19,15 +35,22 @@
 	};
 
 	/** Thumbnail to display*/
-	export let thumbnail: string;
+	export let thumbnail: string | undefined = undefined;
 	/** Title of the playlist/album */
 	export let title = "";
 	/** Description for the playlist/album */
-	export let description = undefined;
+	export let description: string | undefined = undefined;
 	/** Subtitles (year/track count/etc.) */
-	export let subtitles = [];
+	// eslint-disable-next-line no-undef
+	export let subtitles: T[] = [];
 	/** Subtitles (year/track count/etc.) */
-	export let secondSubtitle = [];
+	export let secondSubtitle:
+		| Subtitle[]
+		| {
+				tracks: number;
+				type: "playlist" | "single" | "album";
+				year: number;
+		  }[] = [];
 	/** Buttons (play album/shuffle/etc.)*/
 	export let buttons: Button[] = [];
 	/** An array of artist or channel objects */
@@ -55,6 +78,7 @@
 				dispatch("playlistAdd");
 			},
 		},
+		// @ts-expect-error it's fine
 		releasePageContext.has("release")
 			? {
 					text: "Shuffle",
@@ -90,7 +114,7 @@
 		<div class="info-title">
 			<span class="box-title"
 				>{title}
-				{#if Array.isArray(subtitles) && subtitles[0]?.contentRating}
+				{#if Array.isArray(subtitles) && "contentRating" in subtitles[0] && subtitles[0]?.contentRating}
 					<span class="explicit" />
 				{/if}</span
 			>
@@ -143,7 +167,9 @@
 					>
 						<span class="sr-only">Explicit</span>
 					</Icon>
-					{subtitles[0].type} • {subtitles[0].tracks} • {subtitles[0].year}
+					{#if "type" in subtitles[0] && "tracks" in subtitles[0] && "year" in subtitles[0]}
+						{subtitles[0].type} • {subtitles[0].tracks} • {subtitles[0].year}
+					{/if}
 				</small>
 			</p>
 		{/if}

@@ -10,7 +10,11 @@ import {
 	updateDetail,
 } from "./utils";
 
-export function pan(node: HTMLElement) {
+export function pan(
+	node: HTMLElement,
+	options: { capture?: boolean } = { capture: false },
+) {
+	const { capture } = options;
 	const detail: Detail = {
 		startTime: 0,
 		timeStamp: 0,
@@ -75,18 +79,19 @@ export function pan(node: HTMLElement) {
 			removeListener(window, "pointerup", handlers.onEnd);
 		},
 	};
-	return setHandlers(node, { handlers, capture: false });
+	return setHandlers(node, { handlers, capture });
 }
 
 export const draggable: Action<
 	HTMLElement,
-	void,
+	{ capture?: boolean },
 	{
 		"on:bb-dragstart": (event: CustomEvent<Detail>) => void;
 		"on:bb-dragmove": (event: CustomEvent<Detail>) => void;
 		"on:bb-dragend": (event: CustomEvent<Detail>) => void;
 	}
-> = (node: HTMLElement) => {
+> = (node: HTMLElement, options = { capture: true }) => {
+	const { capture } = options;
 	const detail: Detail = {
 		startTime: 0,
 		timeStamp: 0,
@@ -141,5 +146,5 @@ export const draggable: Action<
 			// event.preventDefault();
 		},
 	};
-	return setHandlers(node, { handlers, capture: true });
+	return setHandlers(node, { handlers, capture });
 };

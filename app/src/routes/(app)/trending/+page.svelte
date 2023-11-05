@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from "$app/environment";
 	import Carousel from "$components/Carousel/Carousel.svelte";
 	import Header from "$lib/components/Layouts/Header.svelte";
 	import {
@@ -9,7 +10,7 @@
 	export let data;
 
 	const { carouselItems, page: path } = data;
-	$: console.log(data);
+	$: browser && console.log(data);
 </script>
 
 <Header
@@ -44,7 +45,7 @@
 
 --color: #{item?.color}"
 								class="item-box"
-								href="/explore/{item.endpoint.params}">{item.text}</a
+								href="/explore/{item?.endpoint?.params}">{item?.text}</a
 							>
 						{/each}
 					</div>

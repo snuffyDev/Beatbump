@@ -1,11 +1,15 @@
-<script lang="ts">
+<script
+	lang="ts"
+	generics="T extends any[]"
+>
 	import viewport from "$lib/actions/viewport";
 	import { createEventDispatcher } from "svelte";
 
-	export let items = [];
-	export let hasData = false;
+	// eslint-disable-next-line no-undef
+	export let items: T = [];
+	export let hasData: boolean | null = false;
 	export let isLoading = false;
-	const dispatch = createEventDispatcher<{ getMore: never }>();
+	const dispatch = createEventDispatcher<{ getMore: void }>();
 </script>
 
 <div class="list">

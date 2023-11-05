@@ -122,7 +122,7 @@ export const messenger = (function () {
 			Messenger.on(to, cb);
 		},
 		dispose() {
-			Messenger.dispose();
+			Messenger?.dispose?.();
 		},
 		off(name: string, cb?: EventCallback) {
 			Messenger.off(name, cb);

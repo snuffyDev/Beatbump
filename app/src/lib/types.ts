@@ -93,6 +93,7 @@ export interface Subtitle {
 	text?: string;
 	browseId?: string;
 	pageType?: string;
+	contentRating?: string | undefined;
 }
 
 export type NavigationEndpoint = {
