@@ -301,20 +301,25 @@
 	$: $progressBarSeek && setVideoTime();
 </script>
 
-{#if $immersiveQueue}
-	{#if $queue.length && state === "open"}
+{#if $queue.length && state === "open"}
+	{#if $immersiveQueue}
 		<div
 			in:fade|global={{ duration: 200, delay: 200, easing: quartIn }}
 			out:fade|global={{ duration: 300, delay: 0, easing: quartIn }}
-			class="immersive-wrapper"
-			style="transform: scale({state === 'open' || queueOpen
-				? $isMobileMQ
-					? 2
-					: 1.5
-				: $isMobileMQ
-				? 4
-				: 2.2}); --blur: {queueOpen ? 2 : 8}px;"
+			class={$immersiveQueue ? "immersive-wrapper" : "backdrop"}
+			style={$immersiveQueue
+				? `transform: scale(${
+						state === "open" || queueOpen
+							? $isMobileMQ
+								? 2
+								: 1.5
+							: $isMobileMQ
+							? 4
+							: 2.2
+				  }); --blur: ${queueOpen ? 2 : 8}px;}"`
+				: "background-color: hsla(261, 14%, 13%, 1) !important; z-index:100; opacity:1;"}
 		>
+			>
 			<img
 				class="immersive"
 				bind:this={imgElm}
@@ -1049,7 +1054,7 @@
 		max-width: 100%;
 
 		@media screen and (max-width: 719px) {
-			margin-bottom: 1em;
+			margin-bottom: 0.25em;
 			height: unset;
 		}
 	}

@@ -248,12 +248,16 @@
 		background-color: var(--base-bg-opacity-1_2) !important;
 		justify-content: space-between;
 		transition: 150ms cubic-bezier(0.215, 0.61, 0.355, 1);
+		transition-property: background-color, border;
 		transition-delay: 200ms;
 		&.scrolled::before {
 			border-color: hsla(0, 0%, 91%, 0.174);
 		}
 		&::before {
 			content: "";
+			@media (--mobile) {
+				margin-left: 0.8em;
+			}
 			position: absolute;
 			inset: 0;
 			z-index: -1;
@@ -294,6 +298,10 @@
 		grid-area: l;
 		display: inline-flex;
 		align-items: center;
+
+		@media screen and (min-width: 640px) {
+			margin-left: 0.8em;
+		}
 
 		&-back {
 			visibility: visible !important;

@@ -196,6 +196,7 @@
 	export let kind = "";
 	export let aspectRatio: string;
 	export let isBrowseEndpoint = false;
+	export let nofollow = false;
 
 	const { hasActiveSessionState } = groupSession;
 	let loading = false;
@@ -333,6 +334,7 @@
 				class="image img{ASPECT_RATIO}"
 				class:isArtistKind
 				tabindex="0"
+				title={item.title}
 			>
 				{#if loading}
 					<Loading />
@@ -340,7 +342,8 @@
 				<img
 					alt="thumbnail img{ASPECT_RATIO}"
 					on:error={(e) => imageErrorHandler(e)}
-					loading={index >= 3 ? "lazy" : null}
+					loading={index >= 3 ? "lazy" : "eager"}
+					decoding="async"
 					width={srcImg.width}
 					height={srcImg.height}
 					src={index >= 3 ? srcImg.placeholder : srcImg.url}
@@ -372,6 +375,7 @@
 							on:click|stopPropagation|preventDefault={() => {
 								goto("/artist/" + sub?.browseId);
 							}}
+							rel={nofollow ? "nofollow" : ""}
 							href={"/artist/" + sub?.browseId}><span>{sub.text}</span></a
 						>
 					{/if}
@@ -387,7 +391,7 @@
 
 	article {
 		--thumbnail-radius: clamp(
-			4px,
+			4pt,
 			calc(var(--column-width, 0px) - 256px),
 			16px
 		);

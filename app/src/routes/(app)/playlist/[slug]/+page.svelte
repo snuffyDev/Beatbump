@@ -355,6 +355,7 @@
 				items={carousel?.items}
 				type="home"
 				isBrowseEndpoint={false}
+				nofollow
 			/>
 		{/if}
 	</footer>

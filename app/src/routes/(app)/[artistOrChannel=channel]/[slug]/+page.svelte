@@ -75,9 +75,8 @@
 						kind={header?.type}
 						isBrowseEndpoint={true}
 						{header}
-					>
-						>
-					</Carousel>
+						nofollow
+					/>
 				{:else}
 					<Carousel
 						items={contents}
@@ -86,9 +85,8 @@
 						kind={header?.type}
 						isBrowseEndpoint={false}
 						{header}
-					>
-						>
-					</Carousel>
+						nofollow
+					/>
 				{/if}
 			{/each}
 			{#if $isMobileMQ && header?.description}

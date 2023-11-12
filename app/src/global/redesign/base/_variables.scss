@@ -43,6 +43,7 @@ $content-width-md: calc(100vw - 0.5625rem - 14rem);
 $content-width-lg: 63.75rem;
 $content-width-xl: 87.5rem;
 
+
 @mixin content-spacing($type: "padding") {
 	#{$type}: 1.25em 0 5vh;
 	#{$type}-bottom: 8.3125vh;

@@ -29,14 +29,9 @@
 			open = false;
 		};
 
-		function handleDocumentClick(
-			event: MouseEvent & { target: HTMLElement & EventTarget },
-		) {
-			if (
-				open &&
-				!node.contains(event.target) &&
-				!node.isSameNode(event.target)
-			) {
+		function handleDocumentClick(event: MouseEvent) {
+			const target = event.target as HTMLElement;
+			if (open && !node.contains(target) && !node.isSameNode(target)) {
 				isOpen.set(false);
 				open = false;
 				PopperStore.reset();
@@ -44,9 +39,7 @@
 			}
 		}
 
-		function handleClick(
-			event: MouseEvent & { target: HTMLElement & EventTarget },
-		) {
+		function handleClick(event: MouseEvent) {
 			event.stopPropagation();
 			// console.log(node);
 			// Button clicked is same node as the event target -> reset state!
@@ -116,7 +109,7 @@
 		artist?: Artist[] | undefined;
 		length?: string;
 	}> = {};
-	export let size = "1.8rem";
+	export let size = "1.5rem";
 	export let tabindex = 0;
 </script>
 

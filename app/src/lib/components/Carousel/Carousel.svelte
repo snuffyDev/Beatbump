@@ -17,6 +17,7 @@
 	export let kind = "normal";
 	export let isBrowseEndpoint: boolean;
 	export let visitorData = "";
+	export let nofollow = false;
 
 	let moreOnLeft: boolean, moreOnRight: boolean;
 
@@ -141,7 +142,7 @@
 	{/if}
 </div>
 <div class="section">
-	<div
+	<button
 		class="left"
 		class:showMoreBtn={!moreOnLeft}
 		on:click={() => {
@@ -153,9 +154,9 @@
 			name="chevron-left"
 			size="1.5em"
 		/>
-	</div>
+	</button>
 
-	<div
+	<button
 		class="right"
 		class:showMoreBtn={!moreOnRight}
 		on:click={() => {
@@ -167,7 +168,7 @@
 			name="chevron-right"
 			size="1.5em"
 		/>
-	</div>
+	</button>
 
 	<div
 		class="scroll"
@@ -184,6 +185,7 @@
 					aspectRatio={item.aspectRatio}
 					{item}
 					isBrowseEndpoint={!!item.endpoint}
+					{nofollow}
 					{index}
 				/>
 			{:else if type === "artist" || type === "home"}
@@ -191,6 +193,7 @@
 					{type}
 					{kind}
 					aspectRatio={item.aspectRatio}
+					{nofollow}
 					isBrowseEndpoint={!!item.endpoint}
 					{item}
 					{index}
@@ -199,6 +202,7 @@
 				<CarouselItem
 					type="new"
 					aspectRatio={item.aspectRatio}
+					{nofollow}
 					{item}
 					{index}
 				/>

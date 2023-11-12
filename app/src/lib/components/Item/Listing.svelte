@@ -237,7 +237,7 @@
 		if (isArtist) {
 			goto(
 				data.endpoint?.pageType.includes("ARTIST")
-					? `/artist/${data.artistInfo?.artist[0].browseId}`
+					? `/artist/${data.artistInfo?.artist?.[0].browseId}`
 					: `/channel/${data.endpoint?.browseId}`,
 			);
 			return;
@@ -247,7 +247,7 @@
 			videoId = data.videoId ? data.videoId : "";
 			playlistId = data?.playlistId ? data?.playlistId : "";
 			if (data.type?.includes("playlist") || data?.type === "albums") {
-				notify(JSON.stringify({ type: data.type }), "success");
+				// notify(JSON.stringify({ type: data.type }), "success");
 				await list.initPlaylistSession({
 					playlistId,
 					index: 0,
@@ -255,7 +255,7 @@
 					params: data.params,
 				});
 			} else {
-				notify(JSON.stringify({ type: data.type }), "success");
+				// notify(JSON.stringify({ type: data.type }), "success");
 				await list.initAutoMixSession({
 					loggingContext: data?.loggingContext,
 					videoId: videoId,
@@ -311,7 +311,7 @@
 		<div
 			class="itemWrapper"
 			use:mobileLongPress={{ delay: 500, duration: 720 }}
-			on:touchstart={(e) => {
+			on:touchstart={() => {
 				pressing = true;
 			}}
 			on:touchend={() => {
