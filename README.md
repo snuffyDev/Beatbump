@@ -64,6 +64,7 @@ Some of Beatbump's features includes:
 | ~Vern (I2P)                      | http://vern6inmbjzqpecx4kpkq5sln3cqqrfuxfzh4au3tpxbsfbwbnta.b32.i2p/      |
 | btb.frail.duckdns.org (Clearnet) | https://btb.frail.duckdns.org/                                            |
 | bb.ggtyler.dev (Clearnet)        | https://bb.ggtyler.dev/                                                   |
+| ytm.sudovanilla.com (Cloudflare) | ytm.sudovanilla.com                                                       |
 
 
 ## Donations
