@@ -114,7 +114,7 @@
 		<div class="info-title">
 			<span class="box-title"
 				>{title}
-				{#if Array.isArray(subtitles) && "contentRating" in subtitles[0] && subtitles[0]?.contentRating}
+				{#if Array.isArray(subtitles) && typeof subtitles[0] === "object" && "contentRating" in subtitles[0] && subtitles[0]?.contentRating}
 					<span class="explicit" />
 				{/if}</span
 			>

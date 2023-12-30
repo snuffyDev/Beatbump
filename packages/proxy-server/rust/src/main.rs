@@ -9,11 +9,35 @@ use hyper::service::service_fn;
 use hyper::{Body, Request};
 use hyper::{Method, Response, StatusCode};
 use std::net::SocketAddr;
+use std::str::FromStr;
 use tokio::net::TcpListener;
 
 use std::collections::HashMap;
 use std::time::Duration;
 use url::form_urlencoded;
+
+use once_cell::sync::Lazy;
+
+// Todo: implement this
+static HEADER_BLACKLIST: Lazy<[String; 9]> = Lazy::<[String; 9]>::new(|| {
+    [
+        String::from_str("Accept-Encoding").unwrap(),
+        String::from_str("Authorization").unwrap(),
+        String::from_str("Timing-Allow-Origin").unwrap(),
+        String::from_str("Server").unwrap(),
+        String::from_str("Origin").unwrap(),
+        String::from_str("Referer").unwrap(),
+        String::from_str("Cookie").unwrap(),
+        String::from_str("Set-Cookie").unwrap(),
+        String::from_str("Etag").unwrap(),
+    ]
+});
+
+fn remove_headers(headers: &mut hyper::http::HeaderMap) {
+    HEADER_BLACKLIST.iter().for_each(|header| {
+        headers.remove(header);
+    });
+}
 
 async fn handle_request(req: Request<Body>) -> Result<Response<Body>, HttpClientError> {
     let mut response = Response::new(Body::empty());
@@ -47,9 +71,13 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, HttpClient
                     println!("Error: {}", e);
                     Ok(Response::new(Body::from(e.to_string())))
                 },
-                |r| {
-                    *response.body_mut() = r;
-                    Ok(response)
+                |mut r| {
+                    remove_headers(r.headers_mut());
+                    r.headers_mut().insert(
+                        hyper::header::ACCESS_CONTROL_ALLOW_ORIGIN,
+                        "*".parse::<hyper::http::HeaderValue>().unwrap(),
+                    );
+                    Ok(r)
                 },
             ),
         (&Method::GET, "api") => {
@@ -76,13 +104,9 @@ async fn handle_videoplayback(
     host: &str,
     path: &str,
     query: &str,
-) -> Result<Body, HttpClientError> {
+) -> Result<Response<Body>, HttpClientError> {
     let url = format!("https://{}{}?{}", host, path, query);
-    Ok(client
-        .get(&url, &host)
-        .await
-        .unwrap_or_default()
-        .into_body())
+    Ok(client.get(&url, &host).await.unwrap_or_default())
 }
 
 async fn handle_hls(client: &HttpClient, host: &str, path: &str) -> Result<Body, HttpClientError> {
@@ -92,13 +116,11 @@ async fn handle_hls(client: &HttpClient, host: &str, path: &str) -> Result<Body,
     let body = result.body_mut();
 
     let body = hyper::body::to_bytes(body).await.unwrap_or_default();
-    let body_str = String::from_utf8(body.to_vec()).unwrap_or_default();
+    let body_str = String::from_utf8(body.into()).unwrap_or_default();
 
     // Modify the HLS Manifest and return it as a Body
     Ok(Body::from(
-        modify_hls_body(body_str, &host)
-            .await
-            .expect("Could not modify HLS body."),
+        modify_hls_body(body_str, &host).expect("Could not modify HLS body."),
     ))
 }
 

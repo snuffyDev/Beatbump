@@ -8,7 +8,9 @@ import {
 
 function mediaQuery(query: string): StartStopNotifier<boolean> {
 	return (set: Subscriber<boolean>) => {
-		let stop = () => {};
+		let stop = () => {
+			/** empty */
+		};
 		if (browser) {
 			const media = window.matchMedia(query);
 			const updateStoreValue = () => set(media.matches);
@@ -33,13 +35,15 @@ export const isDesktopMQ = readable(
 function size(bound: "innerWidth" | "innerHeight") {
 	return (set: Subscriber<number>) => {
 		// Throttle how often we update the store
-		const throttledResize = throttle<Event>((event) => {
+		const throttledResize = throttle<Event>(() => {
 			requestAnimationFrame(() => {
 				set(window[bound]);
 			});
 		}, 80);
 
-		let stop = () => {};
+		let stop = () => {
+			/** empty */
+		};
 
 		if (browser) {
 			set(window[bound]);

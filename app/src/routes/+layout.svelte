@@ -4,7 +4,6 @@
 	import Player from "$lib/components/Player/Player.svelte";
 	import Wrapper from "$lib/components/Wrapper/Wrapper.svelte";
 	import { showAddToPlaylistPopper } from "$stores/stores";
-	import "./../app.postcss";
 
 	import { Popper } from "$lib/components/Popper";
 

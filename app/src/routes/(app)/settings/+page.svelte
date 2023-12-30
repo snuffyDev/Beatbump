@@ -176,15 +176,22 @@
 								let value = e.currentTarget.value;
 
 								if (!value.endsWith("/")) value = value + "/";
+
+								if (value.match(/^https?:\/\//i)) {
+									$settings["network"]["Stream Proxy Server"] = value;
+								} else if (value.match(/^(.[0-9]*\.?){1,4}:[0-9]+/im)) {
+									$settings["network"]["Stream Proxy Server"] = value;
+								}
 							}}
 							on:input={(e) => {
 								let value = e.currentTarget.value;
 
 								if (value.match(/^https?:\/\//i)) {
 									$settings["network"]["Stream Proxy Server"] = value;
+								} else if (value.match(/^(.[0-9]*\.?){1,4}:[0-9]+/im)) {
+									$settings["network"]["Stream Proxy Server"] = value;
 								}
 							}}
-							pattern="http://.*"
 							placeholder="https://hls.beatbump.io/"
 							value={$settings["network"]["Stream Proxy Server"]}
 						/>

@@ -2,7 +2,7 @@
 import { browser } from "$app/environment";
 import { SessionListService } from "$stores/list/sessionList";
 import type { UserSettings } from "$stores/settings";
-import Hls from "hls.js";
+import Hls, { type HlsConfig } from "hls.js";
 import { tick } from "svelte";
 import { tweened } from "svelte/motion";
 import { writable } from "svelte/store";
@@ -202,10 +202,11 @@ const loadAndAttachHLS = async () => {
 	const hls = await import("hls.js");
 	const Hls = hls.default;
 	if (Hls.isSupported() === false) return null;
-	const hlsjsConfig = {
+	const hlsjsConfig: Partial<HlsConfig> = {
 		lowLatencyMode: true,
 		enableWorker: true,
-
+		progressive: true,
+		manifestLoadingMaxRetry: 2,
 		backBufferLength: 90,
 	};
 	return new Hls(hlsjsConfig);
@@ -329,6 +330,7 @@ class AudioPlayerImpl extends EventEmitter<AudioPlayerEvents> {
 			this.videoPlayer.load();
 			this.videoPlayer.currentTime = this.currentTime;
 			this.videoPlayer.play();
+			this.videoPlayer.currentTime = this.currentTime;
 		}
 	}
 
@@ -778,8 +780,8 @@ export const getSrc = async (
 			$proxySettings: userSettings?.network || settings.value()["network"],
 		});
 
+		console.log(formats);
 		const src = setTrack(formats, shouldAutoplay);
-
 		return src;
 	} catch (err) {
 		console.error(err);

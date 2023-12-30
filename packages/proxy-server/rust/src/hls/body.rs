@@ -1,23 +1,37 @@
-use lazy_static::lazy_static;
-use regex::{Captures, Regex};
+use regex::Regex;
+use url::Url;
 
-lazy_static! {
-    static ref RE_URL: Regex = Regex::new(r"https://(.*?)/").unwrap();
-    static ref RE_PATH: Regex = Regex::new("(/(?:api|videoplayback)(?:.[^\"\n]+))").unwrap();
-    static ref RE_XMAP: Regex = Regex::new("(#EXT-X-MAP:URI=\".*?)(?:?)(host=.*\")").unwrap();
-}
+pub fn modify_hls_body(body: String, host_url: &str) -> Result<String, ()> {
+    let re_path: Regex = Regex::new("(https?://.+?/(?:api|videoplayback)/.+[^\"|\n])").unwrap();
 
-pub async fn modify_hls_body(body: String, host_url: &str) -> Result<String, ()> {
-    let body_relative_urls = RE_URL.replace_all(&body, "/");
-    let body_add_host = RE_PATH.replace_all(&body_relative_urls, |caps: &Captures| {
-        format!("{}?host={}", &caps[1], host_url)
-    });
+    let mut modified_body = String::new();
+    let mut last_index = 0;
 
-    if body_add_host.contains("#EXT-X-MAP:URI=\"") {
-        let body_fix_query = RE_XMAP.replace_all(&body_add_host, |caps: &Captures| {
-            format!("{}&{}", &caps[1], &caps[2])
-        });
-        return Ok(body_fix_query.to_string());
+    for capture in re_path.captures_iter(&body) {
+        let path = &capture[1];
+        let url = Url::parse(path).map_err(|_| ())?;
+
+        let mut query_pairs = url
+            .query_pairs()
+            .into_iter()
+            .filter(|(k, _)| k.ne("host"))
+            .collect::<Vec<_>>();
+
+        query_pairs.push(("host".into(), host_url.into()));
+
+        let new_query = query_pairs
+            .into_iter()
+            .map(|(k, v)| format!("{}={}", k, v))
+            .collect::<Vec<_>>()
+            .join("&");
+        let modified_path = format!("{}?{}", url.path(), new_query);
+
+        modified_body.push_str(&body[last_index..capture.get(1).unwrap().start()]);
+        modified_body.push_str(&modified_path);
+        last_index = capture.get(1).unwrap().end();
     }
-    Ok(body_add_host.to_string())
+
+    modified_body.push_str(&body[last_index..]);
+
+    Ok(modified_body)
 }

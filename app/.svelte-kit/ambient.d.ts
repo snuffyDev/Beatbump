@@ -41,7 +41,6 @@ declare module '$env/static/private' {
 	export const TERM_PROGRAM_VERSION: string;
 	export const NODE: string;
 	export const LC_ADDRESS: string;
-	export const DOTNET_ROOT: string;
 	export const LC_NAME: string;
 	export const SSH_AUTH_SOCK: string;
 	export const MEMORY_PRESSURE_WRITE: string;
@@ -53,6 +52,7 @@ declare module '$env/static/private' {
 	export const NO_AT_BRIDGE: string;
 	export const npm_config_globalconfig: string;
 	export const EDITOR: string;
+	export const ZEITGEIST_DATA_PATH: string;
 	export const PWD: string;
 	export const XDG_SESSION_DESKTOP: string;
 	export const LOGNAME: string;
@@ -78,7 +78,6 @@ declare module '$env/static/private' {
 	export const INVOCATION_ID: string;
 	export const MANAGERPID: string;
 	export const INIT_CWD: string;
-	export const DOTNET_BUNDLE_EXTRACT_BASE_DIR: string;
 	export const CHROME_DESKTOP: string;
 	export const npm_lifecycle_script: string;
 	export const GJS_DEBUG_OUTPUT: string;
@@ -171,7 +170,6 @@ declare module '$env/dynamic/private' {
 		TERM_PROGRAM_VERSION: string;
 		NODE: string;
 		LC_ADDRESS: string;
-		DOTNET_ROOT: string;
 		LC_NAME: string;
 		SSH_AUTH_SOCK: string;
 		MEMORY_PRESSURE_WRITE: string;
@@ -183,6 +181,7 @@ declare module '$env/dynamic/private' {
 		NO_AT_BRIDGE: string;
 		npm_config_globalconfig: string;
 		EDITOR: string;
+		ZEITGEIST_DATA_PATH: string;
 		PWD: string;
 		XDG_SESSION_DESKTOP: string;
 		LOGNAME: string;
@@ -208,7 +207,6 @@ declare module '$env/dynamic/private' {
 		INVOCATION_ID: string;
 		MANAGERPID: string;
 		INIT_CWD: string;
-		DOTNET_BUNDLE_EXTRACT_BASE_DIR: string;
 		CHROME_DESKTOP: string;
 		npm_lifecycle_script: string;
 		GJS_DEBUG_OUTPUT: string;

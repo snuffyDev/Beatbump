@@ -46,8 +46,8 @@
 		"scss.validate": false,
 		"stylelint.enable": true,
 		"editor.codeActionsOnSave": {
-			"source.fixAll": true,
-			"source.organizeImports": true
+			"source.fixAll": "explicit",
+			"source.organizeImports": "explicit"
 		},
 		"eslint.format.enable": false,
 		"eslint.codeActionsOnSave.mode": "all",

@@ -1,4 +1,4 @@
-import type { BrowseEndpoint } from "./types/innertube/internals";
+import type { BrowseEndpoint, WatchEndpoint } from "./types/innertube/internals";
 import type { ICarouselTwoRowItem } from "./types/musicCarouselTwoRowItem";
 import type { IListItemRenderer } from "./types/musicListItemRenderer";
 import type { PlaylistSearch } from "./types/playlist";
@@ -100,6 +100,10 @@ export type NavigationEndpoint = {
 	browseEndpoint: {
 		browseId: string;
 	};
+    watchEndpoint: never;
+} | {
+    watchEndpoint: WatchEndpoint;
+    browseEndpoint: never;
 };
 
 export interface SearchResult {

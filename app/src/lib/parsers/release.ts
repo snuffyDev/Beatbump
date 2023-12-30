@@ -1,8 +1,9 @@
-import type { Thumbnail } from "$lib/types";
+import type { NavigationEndpoint, Thumbnail } from "$lib/types";
 import type {
 	MusicResponsiveListItemRendererItem,
 	SubtitleRun,
 } from "$lib/types/innertube/internals";
+import type { ButtonRenderer } from "$lib/types/innertube/musicCarouselShelfRenderer";
 import type { ItemBuilder } from "./items";
 type Data = {
 	header: {
@@ -19,6 +20,11 @@ type Data = {
 			moreButton;
 			subtitleBadges;
 			secondSubtitle: { runs: { text: string }[] };
+			topLevelButtons: {
+				buttonRenderer: ButtonRenderer & {
+					navigationEndpoint: NavigationEndpoint;
+				};
+			}[];
 		};
 	};
 	contents: {
@@ -74,9 +80,9 @@ export async function parsePageContents(data: Data, itemBuilder: ItemBuilder) {
 		}));
 		return {
 			playlistId:
-				data.header?.musicDetailHeaderRenderer.menu?.menuRenderer
-					?.topLevelButtons[0].buttonRenderer.navigationEndpoint
-					.watchPlaylistEndpoint.playlistId,
+				data.header?.musicDetailHeaderRenderer?.menu?.menuRenderer
+					?.topLevelButtons[0]?.buttonRenderer?.navigationEndpoint
+					?.watchEndpoint?.playlistId,
 			subtitles: [
 				{
 					year: year.text,
