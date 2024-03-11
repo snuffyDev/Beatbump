@@ -18,7 +18,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	try {
 		const response = await buildAPIRequest("player", {
 			context: {
-				client: { clientName: "IOS", clientVersion: "17.13.3", hl: "en" },
+				client: { clientName: "IOS", clientVersion: "18.11.34", hl: "en" },
 			},
 			params: { videoId, playlistId, params: playerParams, racyCheckOk: true, contentCheckOk: true },
 		});
