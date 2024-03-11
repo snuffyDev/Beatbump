@@ -1,6 +1,6 @@
 export interface Client {
 	clientName?: "ANDROID" | "WEB_REMIX" | "IOS";
-	clientVersion?: "17.13.3" | "1.20220404.01.00" | "16.20";
+	clientVersion?: "18.11.34" | "1.20220404.01.00" | "16.20";
 	utcOffsetMinutes?: number;
 	visitorData?: string;
 	gl?: string;
