@@ -1,5 +1,7 @@
 <img align="right" src=".repo/images/logo-header.png" width="128px" height="128px" />
 
+> :warning: Beatbump is no longer being actively developed, this is due to the changes made by YouTube.
+
 # Beatbump
 
 A privacy-respecting alternative frontend for YouTube Music. Built with SvelteKit, official instance hosted with Cloudflare Workers.
