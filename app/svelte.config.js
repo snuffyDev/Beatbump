@@ -46,14 +46,6 @@ const config = {
 			$env: path.resolve("./src/env.ts"),
 		},
 		prerender: { concurrency: 3 },
-		files: {
-			assets: "static",
-			lib: "src/lib",
-			routes: "src/routes",
-			serviceWorker: "src/service-worker",
-			appTemplate: "src/app.html",
-			hooks: { server: "src/hooks.server" },
-		},
 		version: { pollInterval: 600000 },
 	},
 	onwarn(warning, defaultHandler) {
